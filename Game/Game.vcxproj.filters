@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Game">
+      <UniqueIdentifier>{662a0d86-745e-4de9-ae33-13637b28e741}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{c116a066-7198-4e81-ae15-c223b9f0fe20}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Main.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Sample.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Sample.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Resources\Shader\Default.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Resources\Shader\Header.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+  </ItemGroup>
+</Project>
