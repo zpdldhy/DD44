@@ -5,7 +5,7 @@
 void Texture::SetTextureSize()
 {
 	ID3D11Texture2D* pTexture = nullptr;
-	HRESULT hr = _texture->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&pTexture);
+	HRESULT hr = m_pTexture->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&pTexture);
 	if (SUCCEEDED(hr))
 	{
 		D3D11_TEXTURE2D_DESC desc;
@@ -22,10 +22,10 @@ bool Texture::LoadTexture(std::wstring _filename)
 	HRESULT hr = DirectX::CreateWICTextureFromFile(
 		DEVICE.Get(),
 		_filename.c_str(),
-		_texture.GetAddressOf(), _texSRV.GetAddressOf());
+		m_pTexture.GetAddressOf(), m_pTexSRV.GetAddressOf());
 	if (FAILED(hr))
 	{
-		hr = DirectX::CreateDDSTextureFromFile(DEVICE.Get(), _filename.c_str(), _texture.GetAddressOf(), _texSRV.GetAddressOf());
+		hr = DirectX::CreateDDSTextureFromFile(DEVICE.Get(), _filename.c_str(), m_pTexture.GetAddressOf(), m_pTexSRV.GetAddressOf());
 		if (FAILED(hr))
 		{
 			DX_CHECK(hr, _T(__FUNCTION__));

@@ -1,8 +1,5 @@
 #include "pch.h"
 #include "UMaterial.h"
-#include "Texture.h"
-#include "Shader.h"
-#include "Inputlayout.h"
 
 void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
 {
