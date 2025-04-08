@@ -28,6 +28,9 @@
     <Filter Include="Headers\Template">
       <UniqueIdentifier>{098b33bb-db5c-4539-8e38-1864f777ae0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Material">
+      <UniqueIdentifier>{912625d0-fb6c-4b48-b33e-38dcf4f0a494}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -81,6 +84,9 @@
     <ClInclude Include="EnginePch.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="UMaterial.h">
+      <Filter>Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -115,6 +121,9 @@
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="UMaterial.cpp">
+      <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
