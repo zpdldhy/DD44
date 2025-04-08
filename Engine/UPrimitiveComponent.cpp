@@ -8,6 +8,11 @@ void UPrimitiveComponent::SetMaterial(shared_ptr<UMaterial> _material)
 	m_pMaterial = _material;
 }
 
+shared_ptr<UMaterial> UPrimitiveComponent::GetMaterial()
+{
+	return m_pMaterial;
+}
+
 bool UPrimitiveComponent::CreateVertexBuffer()
 {
 	if (m_vVertexList.size() <= 0) { return true; }
@@ -59,7 +64,7 @@ void UPrimitiveComponent::PreRender()
 	DC->PSSetShaderResources(0, 1, m_pMaterial->GetTexture()->m_pTexSRV.GetAddressOf());
 	DC->VSSetShader(m_pMaterial->GetShader()->m_pVertexShader.Get(), nullptr, 0);
 	DC->PSSetShader(m_pMaterial->GetShader()->m_pPixelShader.Get(), nullptr, 0);
-	DC->IASetInputLayout(m_pMaterial->GetInputlayout()->GetInputlayout().Get());
+	DC->IASetInputLayout(m_pMaterial->GetInputlayout()->m_pInputLayout.Get());
 
 	// IA Setting
 	UINT Strides = sizeof(PNCT_VERTEX);

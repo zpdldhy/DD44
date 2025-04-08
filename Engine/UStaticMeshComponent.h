@@ -3,7 +3,9 @@
 
 class UStaticMeshComponent : public UMeshComponent
 {
-protected:
-
+public:
+	void CreateCube();
+	void CreateTriangle();
+	void CreatePlane();
 };
 

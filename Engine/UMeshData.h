@@ -6,6 +6,5 @@ class UMeshData
 	vector<PNCT_VERTEX> m_vertexList;
 	vector<DWORD> m_indexList;
 public:
-	SetVertie
 };
 
