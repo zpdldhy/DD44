@@ -17,15 +17,15 @@ void Texture::SetTextureSize()
 	pTexture->Release();
 }
 
-bool Texture::LoadTexture(std::wstring fileName)
+bool Texture::LoadTexture(std::wstring _filename)
 {
 	HRESULT hr = DirectX::CreateWICTextureFromFile(
 		DEVICE.Get(),
-		fileName.c_str(),
+		_filename.c_str(),
 		_texture.GetAddressOf(), _texSRV.GetAddressOf());
 	if (FAILED(hr))
 	{
-		hr = DirectX::CreateDDSTextureFromFile(DEVICE.Get(), fileName.c_str(), _texture.GetAddressOf(), _texSRV.GetAddressOf());
+		hr = DirectX::CreateDDSTextureFromFile(DEVICE.Get(), _filename.c_str(), _texture.GetAddressOf(), _texSRV.GetAddressOf());
 		if (FAILED(hr))
 		{
 			DX_CHECK(hr, _T(__FUNCTION__));

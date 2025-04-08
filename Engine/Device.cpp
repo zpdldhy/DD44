@@ -2,7 +2,7 @@
 #include "Device.h"
 #include "DxState.h"
 
-bool Device::CreateDevice()
+void Device::CreateDeviceAndSwapChain()
 {
     D3D_FEATURE_LEVEL pFeatureLevel;
     IDXGIAdapter* pAdapter = nullptr;
@@ -39,51 +39,41 @@ bool Device::CreateDevice()
         FeatureLevels,
         SDKVersion,
         &scd,
-        _pSwapChain.GetAddressOf(),
-        _pd3dDevice.GetAddressOf(),
+        m_pSwapChain.GetAddressOf(),
+        m_pd3dDevice.GetAddressOf(),
         &pFeatureLevel,
-        &_pd3dContext);
+        &m_pd3dContext);
 
     if (FAILED(hr))
     {
         DX_CHECK(hr, _T(__FUNCTION__));
-        return false;
     }
-
-    ID3D11Texture2D* pBackBuffer;
-    hr = _pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-    if (FAILED(hr))
-    {
-        DX_CHECK(hr, _T(__FUNCTION__));
-        return false;
-    }
-    hr = _pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &_pRTV);
-    pBackBuffer->Release();
-    if (FAILED(hr))
-    {
-        DX_CHECK(hr, _T(__FUNCTION__));
-        return false;
-    }
-    // viewport
-    _MainVP.Width = (FLOAT)g_windowSize.x;
-    _MainVP.Height = (FLOAT)g_windowSize.y;
-    _MainVP.MinDepth = 0.0f;
-    _MainVP.MaxDepth = 1.0f;
-    _MainVP.TopLeftX = 0;
-    _MainVP.TopLeftY = 0;
-
-    CreateDepthStencilBuffer();
-
-    _pd3dContext->RSSetViewports(1, &_MainVP);
-    _pd3dContext->OMSetRenderTargets(1, _pRTV.GetAddressOf(), _pDSV.Get());
-
-    return true;
 }
-bool Device::CreateDepthStencilBuffer()
+
+void Device::CreateRenderTargetView()
 {
-    HRESULT hr;
+    ID3D11Texture2D* pBackBuffer = nullptr;
+    HRESULT hr = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+
+    if (FAILED(hr))
+    {
+        DX_CHECK(hr, _T(__FUNCTION__));
+    }
+
+    hr = m_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, m_pRTV.GetAddressOf());
+    pBackBuffer->Release();
+
+    if (FAILED(hr))
+    {
+        DX_CHECK(hr, _T(__FUNCTION__));
+    }
+}
+
+void Device::CreateDepthStencilBuffer()
+{
     D3D11_TEXTURE2D_DESC desc;
     ZeroMemory(&desc, sizeof(desc));
+
     desc.Width = g_windowSize.x;
     desc.Height = g_windowSize.y;
     desc.MipLevels = 1;
@@ -95,71 +85,94 @@ bool Device::CreateDepthStencilBuffer()
     desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     desc.CPUAccessFlags = 0;
     desc.MiscFlags = 0;
-    hr = _pd3dDevice->CreateTexture2D(&desc, NULL,
-        _pDepthStencilTexture.GetAddressOf());
+
+    HRESULT hr = m_pd3dDevice->CreateTexture2D(
+        &desc, NULL, m_pDepthStencilTexture.GetAddressOf());
+
     if (FAILED(hr))
     {
-        DX_CHECK(hr, _T("CreateTexture2D"));
-        return false;
+        DX_CHECK(hr, _T(__FUNCTION__));
     }
 
     D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
     ZeroMemory(&dsvDesc, sizeof(dsvDesc));
+
     dsvDesc.Format = desc.Format;
     dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
-    if (FAILED(hr = _pd3dDevice->CreateDepthStencilView(
-        _pDepthStencilTexture.Get(), &dsvDesc,
-        _pDSV.GetAddressOf())))
+    hr = m_pd3dDevice->CreateDepthStencilView(
+        m_pDepthStencilTexture.Get(), &dsvDesc, m_pDSV.GetAddressOf());
+
+    if (FAILED(hr))
     {
-        DX_CHECK(hr, _T("CreateDepthStencilView"));
-        return false;
+        DX_CHECK(hr, _T(__FUNCTION__));
     }
-    return true;
+}
+
+void Device::SetViewport()
+{
+    m_MainVP.Width = (FLOAT)g_windowSize.x;
+    m_MainVP.Height = (FLOAT)g_windowSize.y;
+    m_MainVP.MinDepth = 0.0f;
+    m_MainVP.MaxDepth = 1.0f;
+    m_MainVP.TopLeftX = 0.0f;
+    m_MainVP.TopLeftY = 0.0f;
 }
 
 void Device::Init()
 {
-    if (!CreateDevice())
-    {
-
-    }
+    CreateDeviceAndSwapChain();
+    CreateRenderTargetView();
+    CreateDepthStencilBuffer();
+    SetViewport();
 }
+
 void Device::Frame()
 {
 
 }
+
 void Device::PreRender()
 {
+    m_pd3dContext->RSSetViewports(1, &m_MainVP);
+    m_pd3dContext->OMSetRenderTargets(1, m_pRTV.GetAddressOf(), m_pDSV.Get());
+
     float ClearColor[] = { 0.1f, 0.25f, 0.4f, 1.0f };
-    _pd3dContext->ClearRenderTargetView(_pRTV.Get(), ClearColor);
-    // DEPTH STENCIL VIEW ÃÊ±âÈ­
-    _pd3dContext->ClearDepthStencilView(_pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
-    _pd3dContext->PSSetSamplers(0, 1, STATE->_linearSS.GetAddressOf());
+
+    m_pd3dContext->ClearRenderTargetView(m_pRTV.Get(), ClearColor);
+    m_pd3dContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+    
+    m_pd3dContext->PSSetSamplers(0, 1, STATE->_linearSS.GetAddressOf());
     //_pd3dContext->OMSetBlendState(TDxState::GetInstance().m_pAlphaBlend.Get(), 0, -1);
 }
+
 void Device::Render()
 {
     PreRender();
     PostRender();
 }
+
 void Device::PostRender()
 {
-    _pSwapChain->Present(0, 0);
+    m_pSwapChain->Present(0, 0);
 }
+
 void Device::Release()
 {
+
 }
 
 ComPtr<ID3D11Device> Device::GetDevice()
 {
-    return _pd3dDevice;
+    return m_pd3dDevice;
 }
+
 ComPtr<IDXGISwapChain> Device::GetSwapChain()
 {
-    return _pSwapChain;
+    return m_pSwapChain;
 }
+
 ComPtr<ID3D11DeviceContext> Device::GetDeviceContext()
 {
-    return _pd3dContext;
+    return m_pd3dContext;
 }

@@ -5,36 +5,35 @@
 POINT g_windowSize;
 HWND g_hWnd;
 
-LRESULT CALLBACK WndProc(HWND m_hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lParam)
 {
-    switch (message)
+    switch (_message)
     {
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
     }
-    return  DefWindowProc(m_hWnd, message, wParam, lParam);
-
+    return  DefWindowProc(_hWnd, _message, _wParam, _lParam);
 }
 
-bool Window::SetWindowClass(HINSTANCE hInstance)
+bool Window::SetWindowClass(HINSTANCE _hInstance)
 {
-	m_hInstance = hInstance;
+	m_hInstance = _hInstance;
     WNDCLASSEXW wcex;
     ZeroMemory(&wcex, sizeof(wcex));
     wcex.cbSize = sizeof(WNDCLASSEXW);
     wcex.style = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc = WndProc;
     wcex.hInstance = m_hInstance;
-    wcex.lpszClassName = L"Game";
+    wcex.lpszClassName = L"DD44";
     RegisterClassExW(&wcex);
     return true;
 }
 
-bool Window::SetWindow(float windowX, float windowY)
+bool Window::SetWindow(float _windowX, float _windowY)
 {
-    m_fWidth = windowX;
-    m_fHeight = windowY;
+    m_fWidth = _windowX;
+    m_fHeight = _windowY;
     g_windowSize.x = m_fWidth;
     g_windowSize.y = m_fHeight;
 
@@ -42,9 +41,12 @@ bool Window::SetWindow(float windowX, float windowY)
     AdjustWindowRect(&winRect, WS_OVERLAPPEDWINDOW, FALSE);
 
     m_hWnd = CreateWindow(
-            L"Game", L"Game", WS_OVERLAPPEDWINDOW, 0, 0, 
+            L"DD44", L"DD44", WS_OVERLAPPEDWINDOW, 0, 0, 
             winRect.right - winRect.left, winRect.bottom - winRect.top, nullptr, nullptr, m_hInstance, nullptr);
-    if (!m_hWnd) { return false; }
+    if (!m_hWnd)
+    {
+        return false;
+    }
     g_hWnd = m_hWnd;
 
     ShowWindow(m_hWnd, SW_SHOW);

@@ -3,24 +3,36 @@
 
 class Device : public Singleton<Device>
 {
-    ComPtr<ID3D11Device> _pd3dDevice;
-    ComPtr<ID3D11DeviceContext> _pd3dContext;
-    ComPtr<IDXGISwapChain> _pSwapChain;
-    ComPtr<ID3D11RenderTargetView> _pRTV;
-    ComPtr<ID3D11DepthStencilView> _pDSV;
-    ComPtr<ID3D11Texture2D> _pDepthStencilTexture;
+    // Device & SwapChain
+    ComPtr<ID3D11Device> m_pd3dDevice;
+    ComPtr<ID3D11DeviceContext> m_pd3dContext;
+    ComPtr<IDXGISwapChain> m_pSwapChain;
 
-    D3D11_VIEWPORT			_MainVP;
+    // Render Target View
+    ComPtr<ID3D11RenderTargetView> m_pRTV;
+
+    // Depth Stencil View
+    ComPtr<ID3D11DepthStencilView> m_pDSV;
+    ComPtr<ID3D11Texture2D> m_pDepthStencilTexture;
+
+    // Viewport
+    D3D11_VIEWPORT m_MainVP;
+
+    bool m_bWireFrame;
+
 private:
-    bool   CreateDevice();
-    bool   CreateDepthStencilBuffer();
+    void CreateDeviceAndSwapChain();
+    void CreateRenderTargetView();
+    void CreateDepthStencilBuffer();
+    void SetViewport();
+
 public:
-    void   Init();
-    void   Frame();
-    void   PreRender();
-    void   Render();
-    void   PostRender();
-    void   Release();
+    void Init();
+    void Frame();
+    void PreRender();
+    void Render();
+    void PostRender();
+    void Release();
 public:
     ComPtr<ID3D11Device> GetDevice();
     ComPtr< IDXGISwapChain> GetSwapChain();

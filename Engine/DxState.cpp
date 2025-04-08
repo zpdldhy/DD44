@@ -13,6 +13,6 @@ void DxState::Create()
 	HRESULT hr = DEVICE->CreateSamplerState(&sd, &_linearSS);
 	if (FAILED(hr))
 	{
-
+		DX_CHECK(hr, _T("CreateSamplerState"));
 	}
 }
