@@ -13,7 +13,7 @@ bool Inputlayout::Load(ComPtr<ID3DBlob> _pCode, D3D11_INPUT_ELEMENT_DESC _layout
 		_szNumCounter,
 		_pCode->GetBufferPointer(),
 		_pCode->GetBufferSize(),
-		_inputLayout.GetAddressOf());
+		m_pInputLayout.GetAddressOf());
 	if (FAILED(hr))
 	{
 		DX_CHECK(hr, _T(__FUNCTION__));

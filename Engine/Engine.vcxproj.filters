@@ -31,6 +31,9 @@
     <Filter Include="Material">
       <UniqueIdentifier>{912625d0-fb6c-4b48-b33e-38dcf4f0a494}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Mesh">
+      <UniqueIdentifier>{160083ba-d5d3-4f5e-8d5e-b15bda4cb24e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -87,6 +90,24 @@
     <ClInclude Include="UMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
+    <ClInclude Include="UActorComponent.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="USceneComponent.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="UMeshComponent.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="UPrimitiveComponent.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="UStaticMeshComponent.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -124,6 +145,24 @@
     </ClCompile>
     <ClCompile Include="UMaterial.cpp">
       <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="UActorComponent.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="USceneComponent.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="UMeshComponent.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="UPrimitiveComponent.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="UStaticMeshComponent.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
