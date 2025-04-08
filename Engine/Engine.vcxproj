@@ -167,6 +167,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="UMaterial.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +186,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SimpleMath.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UMaterial.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
