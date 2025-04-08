@@ -2,19 +2,19 @@
 #include "Shader.h"
 #include "Device.h"
 
-bool Shader::Load(std::wstring filename)
+bool Shader::Load(std::wstring _filename)
 {
-	if (!CreateVertexShader(filename))
+	if (!CreateVertexShader(_filename))
 	{
 		return false;
 	}
-	if (!CreatePixelShader(filename))
+	if (!CreatePixelShader(_filename))
 	{
 		return false;
 	}
 	return true;
 }
-bool Shader::CreateVertexShader(std::wstring fileName)
+bool Shader::CreateVertexShader(std::wstring _filename)
 {
 	ID3DBlob* errorCode = nullptr;
 	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
@@ -23,7 +23,7 @@ bool Shader::CreateVertexShader(std::wstring fileName)
 	flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 	// 버텍스 쉐이더 파일 컴파일
-	HRESULT hr = D3DCompileFromFile(fileName.c_str(),
+	HRESULT hr = D3DCompileFromFile(_filename.c_str(),
 		nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"VS", "vs_5_0",
 		flags, 0,
@@ -50,7 +50,7 @@ bool Shader::CreateVertexShader(std::wstring fileName)
 	if (errorCode) errorCode->Release();
 	return true;
 }
-bool Shader::CreatePixelShader(std::wstring fileName)
+bool Shader::CreatePixelShader(std::wstring _filename)
 {
 	// 픽셀 쉐이더 파일 컴파일
 	ID3DBlob* code = nullptr;
@@ -60,7 +60,7 @@ bool Shader::CreatePixelShader(std::wstring fileName)
 	flags |= D3DCOMPILE_DEBUG;
 	flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
-	HRESULT hr = D3DCompileFromFile(fileName.c_str(),
+	HRESULT hr = D3DCompileFromFile(_filename.c_str(),
 		nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"PS", "ps_5_0",
 		flags, 0,
@@ -91,9 +91,9 @@ void Shader::Release()
 {
 }
 
-shared_ptr<Shader> ShaderManager::Get(wstring filename)
+shared_ptr<Shader> ShaderManager::Get(wstring _filename)
 {
-	wstring name = SplitPath(filename);
+	wstring name = SplitPath(_filename);
 	auto target = m_mList.find(name);
 	if (target != m_mList.end())
 	{
@@ -101,15 +101,15 @@ shared_ptr<Shader> ShaderManager::Get(wstring filename)
 	}
 	else
 	{
-		return Load(filename);
+		return Load(_filename);
 	}
 }
 
-shared_ptr<Shader> ShaderManager::Load(wstring filename)
+shared_ptr<Shader> ShaderManager::Load(wstring _filename)
 {
-	wstring name = SplitPath(filename);
+	wstring name = SplitPath(_filename);
 	shared_ptr<Shader> shader = make_shared<Shader>();
-	if (shader->Load(filename))
+	if (shader->Load(_filename))
 	{
 		m_mList.insert(make_pair(name, shader));
 		return shader;

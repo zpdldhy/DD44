@@ -14,7 +14,7 @@ public:
 
 public:
 	void SetTextureSize();
-	bool LoadTexture(std::wstring fileName);
+	bool LoadTexture(std::wstring _filename);
 	Texture() = default;
 };
 
@@ -24,7 +24,7 @@ class TextureManager : public Singleton<TextureManager>
 
 public:
 	shared_ptr<Texture> Get(wstring _filename);
-	shared_ptr<Texture> Load(wstring filename);
+	shared_ptr<Texture> Load(wstring _filename);
 public:
 	~TextureManager();
 };

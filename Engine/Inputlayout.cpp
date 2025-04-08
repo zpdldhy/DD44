@@ -43,9 +43,9 @@ bool InputlayoutManager::CreateDefault()
 	return true;
 }
 
-ComPtr<ID3D11InputLayout> InputlayoutManager::Get(wstring name)
+ComPtr<ID3D11InputLayout> InputlayoutManager::Get(wstring _name)
 {
-	auto target = m_mList.find(name);
+	auto target = m_mList.find(_name);
 	if (target != m_mList.end())
 	{
 		return target->second->GetInputlayout();
