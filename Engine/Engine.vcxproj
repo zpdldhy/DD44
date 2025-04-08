@@ -167,6 +167,12 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="UActorComponent.h" />
+    <ClInclude Include="UMeshComponent.h" />
+    <ClInclude Include="UPrimitiveComponent.h" />
+    <ClInclude Include="USceneComponent.h" />
+    <ClInclude Include="UStaticMeshComponent.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +191,12 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SimpleMath.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UActorComponent.cpp" />
+    <ClCompile Include="UMeshComponent.cpp" />
+    <ClCompile Include="UPrimitiveComponent.cpp" />
+    <ClCompile Include="USceneComponent.cpp" />
+    <ClCompile Include="UStaticMeshComponent.cpp" />
+    <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>

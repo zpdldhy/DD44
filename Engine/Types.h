@@ -1,5 +1,6 @@
 #pragma once
 #include "SimpleMath.h"
+#include "Vertex.h"
 
 using uint8 = unsigned __int8;
 
