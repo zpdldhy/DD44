@@ -18,13 +18,18 @@ class Device : public Singleton<Device>
     // Viewport
     D3D11_VIEWPORT m_MainVP;
 
-    bool m_bWireFrame;
+    // DxState
+    bool m_bWireFrame = false;
 
 private:
     void CreateDeviceAndSwapChain();
     void CreateRenderTargetView();
     void CreateDepthStencilBuffer();
     void SetViewport();
+    void SetDefaultState();
+
+public:
+    void OnResize(UINT _width, UINT _height);
 
 public:
     void Init();
@@ -33,6 +38,7 @@ public:
     void Render();
     void PostRender();
     void Release();
+
 public:
     ComPtr<ID3D11Device> GetDevice();
     ComPtr< IDXGISwapChain> GetSwapChain();
