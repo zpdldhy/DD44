@@ -23,9 +23,11 @@ public:
 public:
 	float m_fFontSize = 20.0f;
 	wstring m_wsFontName = L"";
+	std::vector<std::wstring> m_vFontPaths;
 
 public:
-	void SetFont(const std::wstring& _fontName);
+	void LoadFontResources(const vector<wstring>& fontPaths);
+	void SetFont(const wstring& _fontPath);
 	void IncreaseFontSize(float _step = 2.0f);
 	void DecreaseFontSize(float _step = 2.0f);
 	void SetFontColor(D2D1::ColorF _color);
@@ -33,7 +35,23 @@ public:
 
 
 public:
-	void   DirectDraw(D2D1_RECT_F layoutRect, std::wstring msg, D2D1::ColorF Color = D2D1::ColorF(1, 1, 1, 1));
-	void   Draw(D2D1_RECT_F layoutRect, std::wstring msg, D2D1::ColorF Color = D2D1::ColorF(1, 0, 1, 1));
+	void   DirectDraw(D2D1_RECT_F _layoutRect, std::wstring _msg);
+	void   Draw(D2D1_RECT_F _layoutRect, std::wstring _msg);
+	void   DrawMultiline(D2D1_RECT_F _layoutRect, std::wstring _msg);
 };
 
+class Typer : public Singleton<Typer>
+{
+private:
+	std::wstring fullText;
+	std::wstring currentText;
+	float m_fCharDelay = 0.05f;
+	float m_fTimer = 0.0f;
+	size_t visibleLength = 0;
+	bool m_bFinished = false;
+
+public:
+	void Reset(const std::wstring& newText);
+	void Update(float deltaTime);
+	void Draw(D2D1_RECT_F rect);
+};

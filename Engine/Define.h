@@ -10,3 +10,4 @@
 #define STATE		GET_SINGLE(DxState)
 #define INPUT		GET_SINGLE(Input)
 #define DXWRITE     GET_SINGLE(DxWrite)
+#define TYPER		GET_SINGLE(Typer)

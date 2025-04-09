@@ -30,67 +30,6 @@ void Engine::Init()
 void Engine::Frame()
 {
 	_app->Update();
-
-	if (INPUT->GetButton(A))
-	{
-		DXWRITE->SetFont(L"소야뜰9");
-	}
-
-	if (INPUT->GetButton(S))
-	{
-		DXWRITE->SetFont(L"궁서");
-	}
-
-	if (INPUT->GetButton(D))
-	{
-		DXWRITE->SetFont(L"Rubik Spray Paint");
-	}
-	
-	if (INPUT->GetButton(W))
-	{
-		DXWRITE->SetFont(L"Mapo홍대프리덤");
-	}
-
-	if (INPUT->GetButton(Q))
-	{
-		DXWRITE->IncreaseFontSize();
-	}
-	if (INPUT->GetButton(E))
-	{
-		DXWRITE->DecreaseFontSize();
-	}
-
-	if (INPUT->GetButton(G))
-	{
-		DXWRITE->SetFontColor(D2D1::ColorF(D2D1::ColorF::Orange));
-	}
-	if (INPUT->GetButton(H))
-	{
-		DXWRITE->SetFontColor(D2D1::ColorF(D2D1::ColorF::Aqua));
-	}
-	if (INPUT->GetButton(J))
-	{
-		DXWRITE->SetFontColor(D2D1::ColorF(D2D1::ColorF::DarkSeaGreen));
-	}
-
-	if (INPUT->GetButton(R))
-	{
-		DXWRITE->SetAlignment(DWRITE_TEXT_ALIGNMENT_CENTER,	DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-	}
-	if (INPUT->GetButton(T))
-	{
-		DXWRITE->SetAlignment(
-			DWRITE_TEXT_ALIGNMENT_LEADING,
-			DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-	}
-	if (INPUT->GetButton(Y))
-	{
-		DXWRITE->GetInstance()->SetAlignment(
-			DWRITE_TEXT_ALIGNMENT_TRAILING,
-			DWRITE_PARAGRAPH_ALIGNMENT_FAR);
-	}
-
-
 	if (INPUT->GetButtonDown(A))
 	{
 		INPUT->GetMousePos();
@@ -104,6 +43,10 @@ void Engine::Render()
 
 	D2D1_RECT_F rt = {0.0f, 0.0f, 800.0f, 600.0f };
 	DXWRITE->Draw(rt, L"1234567890");
+
+	D2D1_RECT_F rect = D2D1::RectF(50, 50, 400, 200);
+	std::wstring text = L"이것은 멀티라인 텍스트입니다.\n자동 줄바꿈도 되고, 영역을 벗어나지 않아요!\n글씨 크기를 바꾸면 자동으로 맞춰집니다.";
+	DxWrite::GetInstance()->DrawMultiline(rect, text);
 	_app->Render();
 
 	DXWRITE->m_pd2dRT->EndDraw();
