@@ -8,7 +8,6 @@
     <ClCompile Include="IExecute.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Inputlayout.cpp" />
-    <ClCompile Include="MeshHelper.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SimpleMath.cpp" />
@@ -36,9 +35,7 @@
     <ClInclude Include="IExecute.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Inputlayout.h" />
-    <ClInclude Include="MeshHelper.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SimpleMath.h" />
     <ClInclude Include="Singleton.h" />
@@ -57,5 +54,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="SimpleMath.inl" />
+    <None Include="..\.gitignore" />
   </ItemGroup>
 </Project>
