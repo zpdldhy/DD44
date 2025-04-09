@@ -73,10 +73,9 @@ HRESULT DxWrite::Create()
 }
 
 // 동적으로 폰트 변경.
-void DxWrite::SetFont(const std::wstring& _fontName, float _fontSize)
+void DxWrite::SetFont(const std::wstring& _fontName)
 {
 	m_wsFontName = _fontName;
-	m_fFontSize = _fontSize;
 
 	if (!m_pDxWrite)
 	{
@@ -90,7 +89,7 @@ void DxWrite::SetFont(const std::wstring& _fontName, float _fontSize)
 		DWRITE_FONT_WEIGHT_NORMAL,
 		DWRITE_FONT_STYLE_NORMAL,
 		DWRITE_FONT_STRETCH_NORMAL,
-		_fontSize,
+		m_fFontSize,
 		L"ko-kr",
 		m_pTextFormat.ReleaseAndGetAddressOf()
 	);
@@ -105,13 +104,30 @@ void DxWrite::SetFont(const std::wstring& _fontName, float _fontSize)
 void DxWrite::IncreaseFontSize(float _step)
 {
 	m_fFontSize += _step;
-	SetFont(m_wsFontName, m_fFontSize);
+	SetFont(m_wsFontName);
 }
 
 void DxWrite::DecreaseFontSize(float _step)
 {
 	m_fFontSize -= _step;
-	SetFont(m_wsFontName, m_fFontSize);
+	SetFont(m_wsFontName);
+}
+
+void DxWrite::SetFontColor(D2D1::ColorF _color)
+{
+	if (m_pColorBrush)
+	{
+		m_pColorBrush->SetColor(_color);
+	}
+}
+
+void DxWrite::SetAlignment(DWRITE_TEXT_ALIGNMENT _textAlign, DWRITE_PARAGRAPH_ALIGNMENT _paraAlign)
+{
+	if (m_pTextFormat)
+	{
+		m_pTextFormat->SetTextAlignment(_textAlign);
+		m_pTextFormat->SetParagraphAlignment(_paraAlign);
+	}
 }
 
 void DxWrite::DirectDraw(D2D1_RECT_F layoutRect, std::wstring msg, D2D1::ColorF Color)
@@ -129,7 +145,7 @@ void DxWrite::Draw(D2D1_RECT_F layoutRect, std::wstring msg, D2D1::ColorF Color)
 {
 	if (m_pd2dRT)
 	{
-		m_pColorBrush->SetColor(Color);
+		//m_pColorBrush->SetColor(Color);
 		m_pd2dRT->DrawText(msg.c_str(), msg.size(), m_pTextFormat.Get(), &layoutRect, m_pColorBrush.Get());
 	}
 }

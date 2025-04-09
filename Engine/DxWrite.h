@@ -25,9 +25,11 @@ public:
 	wstring m_wsFontName = L"";
 
 public:
-	void SetFont(const std::wstring& _fontName, float _fontSize);
+	void SetFont(const std::wstring& _fontName);
 	void IncreaseFontSize(float _step = 2.0f);
 	void DecreaseFontSize(float _step = 2.0f);
+	void SetFontColor(D2D1::ColorF _color);
+	void SetAlignment(DWRITE_TEXT_ALIGNMENT _textAlign, DWRITE_PARAGRAPH_ALIGNMENT _paraAlign);
 
 
 public:

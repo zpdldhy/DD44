@@ -33,22 +33,22 @@ void Engine::Frame()
 
 	if (INPUT->GetButton(A))
 	{
-		DXWRITE->SetFont(L"¼Ò¾ß¶ã9",20);
+		DXWRITE->SetFont(L"¼Ò¾ß¶ã9");
 	}
 
 	if (INPUT->GetButton(S))
 	{
-		DXWRITE->SetFont(L"±Ã¼­", 20);
+		DXWRITE->SetFont(L"±Ã¼­");
 	}
 
 	if (INPUT->GetButton(D))
 	{
-		DXWRITE->SetFont(L"Rubik Spray Paint", 20);
+		DXWRITE->SetFont(L"Rubik Spray Paint");
 	}
 	
 	if (INPUT->GetButton(W))
 	{
-		DXWRITE->SetFont(L"MapoÈ«´ëÇÁ¸®´ı", 20);
+		DXWRITE->SetFont(L"MapoÈ«´ëÇÁ¸®´ı");
 	}
 
 	if (INPUT->GetButton(Q))
@@ -59,6 +59,37 @@ void Engine::Frame()
 	{
 		DXWRITE->DecreaseFontSize();
 	}
+
+	if (INPUT->GetButton(G))
+	{
+		DXWRITE->SetFontColor(D2D1::ColorF(D2D1::ColorF::Orange));
+	}
+	if (INPUT->GetButton(H))
+	{
+		DXWRITE->SetFontColor(D2D1::ColorF(D2D1::ColorF::Aqua));
+	}
+	if (INPUT->GetButton(J))
+	{
+		DXWRITE->SetFontColor(D2D1::ColorF(D2D1::ColorF::DarkSeaGreen));
+	}
+
+	if (INPUT->GetButton(R))
+	{
+		DXWRITE->SetAlignment(DWRITE_TEXT_ALIGNMENT_CENTER,	DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	}
+	if (INPUT->GetButton(T))
+	{
+		DXWRITE->SetAlignment(
+			DWRITE_TEXT_ALIGNMENT_LEADING,
+			DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+	}
+	if (INPUT->GetButton(Y))
+	{
+		DXWRITE->GetInstance()->SetAlignment(
+			DWRITE_TEXT_ALIGNMENT_TRAILING,
+			DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+	}
+
 
 	if (INPUT->GetButtonDown(A))
 	{
@@ -71,7 +102,7 @@ void Engine::Render()
 	GET_SINGLE(Device)->PreRender();
 	DXWRITE->m_pd2dRT->BeginDraw();
 
-	D2D1_RECT_F rt = { 500.0f, 0.0f, 800.0f, 600.0f };
+	D2D1_RECT_F rt = {0.0f, 0.0f, 800.0f, 600.0f };
 	DXWRITE->Draw(rt, L"1234567890");
 	_app->Render();
 
