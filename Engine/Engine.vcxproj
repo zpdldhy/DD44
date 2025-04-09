@@ -154,6 +154,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClInclude Include="Define.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="DxState.h" />
+    <ClInclude Include="DxWrite.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="EnginePch.h" />
     <ClInclude Include="framework.h" />
@@ -172,6 +173,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
   <ItemGroup>
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="DxState.cpp" />
+    <ClCompile Include="DxWrite.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="IExecute.cpp" />
     <ClCompile Include="Input.cpp" />
