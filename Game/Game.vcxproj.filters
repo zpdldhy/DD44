@@ -7,20 +7,39 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{c116a066-7198-4e81-ae15-c223b9f0fe20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{54431514-562b-4a9e-9c11-46b90321147b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="Sample.h" />
-    <ClInclude Include="TestSJ.h" />
-    <ClInclude Include="TestYR.h" />
+    <ClInclude Include="pch.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="TestYR.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="TestSJ.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Sample.cpp" />
-    <ClCompile Include="TestSJ.cpp" />
-    <ClCompile Include="TestYR.cpp" />
+    <ClCompile Include="pch.cpp">
+      <Filter>Headers</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="TestSJ.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="TestYR.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\Default.hlsl">
