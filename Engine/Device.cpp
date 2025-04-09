@@ -19,15 +19,16 @@ void Device::CreateDeviceAndSwapChain()
 
     DXGI_SWAP_CHAIN_DESC scd;
     ZeroMemory(&scd, sizeof(scd));
-    scd.BufferCount = 1;
     scd.BufferDesc.Width = g_windowSize.x;
     scd.BufferDesc.Height = g_windowSize.y;
-    scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    scd.OutputWindow = g_hWnd;
-    scd.Windowed = true;
     scd.BufferDesc.RefreshRate.Numerator = 60;
     scd.BufferDesc.RefreshRate.Denominator = 1;
+    scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    scd.BufferCount = 2;                                   // 트리플 버퍼링
+    scd.OutputWindow = g_hWnd;
+    scd.Windowed = true;
+    scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;        // Win8 이상 호환성 높임
     scd.SampleDesc.Count = 1;
 
     HRESULT hr = D3D11CreateDeviceAndSwapChain(
@@ -42,17 +43,17 @@ void Device::CreateDeviceAndSwapChain()
         m_pSwapChain.GetAddressOf(),
         m_pd3dDevice.GetAddressOf(),
         &pFeatureLevel,
-        &m_pd3dContext);
+        m_pd3dContext.GetAddressOf());
 
     if (FAILED(hr))
     {
-        DX_CHECK(hr, _T(__FUNCTION__));
+        DX_CHECK(hr, _T("CreateDeviceAndSwapChain"));
     }
 }
 
 void Device::CreateRenderTargetView()
 {
-    ID3D11Texture2D* pBackBuffer = nullptr;
+    ComPtr<ID3D11Texture2D> pBackBuffer;
     HRESULT hr = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 
     if (FAILED(hr))
@@ -60,8 +61,7 @@ void Device::CreateRenderTargetView()
         DX_CHECK(hr, _T(__FUNCTION__));
     }
 
-    hr = m_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, m_pRTV.GetAddressOf());
-    pBackBuffer->Release();
+    hr = m_pd3dDevice->CreateRenderTargetView(pBackBuffer.Get(), NULL, m_pRTV.GetAddressOf());
 
     if (FAILED(hr))
     {
@@ -119,6 +119,55 @@ void Device::SetViewport()
     m_MainVP.TopLeftY = 0.0f;
 }
 
+void Device::SetDefaultState()
+{
+    m_pd3dContext->PSSetSamplers(0, 1, STATE->m_pLinearSS.GetAddressOf());
+    m_pd3dContext->OMSetBlendState(STATE->m_pAlphaBlend.Get(), 0, -1);
+
+    if (!m_bWireFrame)
+    {
+        m_pd3dContext->RSSetState(STATE->m_pRSSolid.Get());
+    }
+    else
+    {
+        m_pd3dContext->RSSetState(STATE->m_pRSWireFrame.Get());
+    }
+
+    m_pd3dContext->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
+}
+
+void Device::OnResize(UINT _width, UINT _height)
+{
+    if (!m_pSwapChain) return;
+
+    if (m_pd3dContext)
+    {
+        m_pd3dContext->OMSetRenderTargets(0, nullptr, nullptr);
+    }
+
+    // RTV, DSV 등 리소스 해제
+    m_pRTV.Reset();
+    m_pDSV.Reset();
+    m_pDepthStencilTexture.Reset();
+
+    // 스왑 체인 크기 변경
+    HRESULT hr = m_pSwapChain->ResizeBuffers(0, _width, _height, DXGI_FORMAT_UNKNOWN, 0);
+    if (FAILED(hr))
+    {
+        DX_CHECK(hr, _T("ResizeBuffers"));
+        return;
+    }
+
+    // 최신 크기 갱신
+    g_windowSize.x = _width;
+    g_windowSize.y = _height;
+
+    // 다시 생성
+    CreateRenderTargetView();
+    CreateDepthStencilBuffer();
+    SetViewport();
+}
+
 void Device::Init()
 {
     CreateDeviceAndSwapChain();
@@ -137,12 +186,16 @@ void Device::PreRender()
     m_pd3dContext->RSSetViewports(1, &m_MainVP);
     m_pd3dContext->OMSetRenderTargets(1, m_pRTV.GetAddressOf(), m_pDSV.Get());
 
-    float ClearColor[] = { 0.1f, 0.25f, 0.4f, 1.0f };
+    float ClearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
     m_pd3dContext->ClearRenderTargetView(m_pRTV.Get(), ClearColor);
     m_pd3dContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+
+    m_pd3dContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    SetDefaultState();
     
-    m_pd3dContext->PSSetSamplers(0, 1, STATE->_linearSS.GetAddressOf());
+    //m_pd3dContext->PSSetSamplers(0, 1, STATE->_linearSS.GetAddressOf());
     //_pd3dContext->OMSetBlendState(TDxState::GetInstance().m_pAlphaBlend.Get(), 0, -1);
 }
 

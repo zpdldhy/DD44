@@ -6,8 +6,8 @@
 class Texture
 {
 public:
-	ComPtr<ID3D11Resource> _texture;
-	ComPtr<ID3D11ShaderResourceView> _texSRV;
+	ComPtr<ID3D11Resource> m_pTexture;
+	ComPtr<ID3D11ShaderResourceView> m_pTexSRV;
 
 	UINT width = 0;
 	UINT height = 0;

@@ -13,7 +13,7 @@ bool Inputlayout::Load(ComPtr<ID3DBlob> _pCode, D3D11_INPUT_ELEMENT_DESC _layout
 		_szNumCounter,
 		_pCode->GetBufferPointer(),
 		_pCode->GetBufferSize(),
-		_inputLayout.GetAddressOf());
+		m_pInputLayout.GetAddressOf());
 	if (FAILED(hr))
 	{
 		DX_CHECK(hr, _T(__FUNCTION__));
@@ -43,12 +43,12 @@ bool InputlayoutManager::CreateDefault()
 	return true;
 }
 
-ComPtr<ID3D11InputLayout> InputlayoutManager::Get(wstring _name)
+shared_ptr<Inputlayout> InputlayoutManager::Get(wstring _name)
 {
 	auto target = m_mList.find(_name);
 	if (target != m_mList.end())
 	{
-		return target->second->GetInputlayout();
+		return target->second;
 	}
 	else
 	{

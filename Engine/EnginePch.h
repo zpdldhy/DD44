@@ -3,6 +3,7 @@
 #include "Functions.h"
 #include "Types.h"
 #include "Define.h"
+#include "Vertex.h"
 
 // WIN
 #include <windows.h>
