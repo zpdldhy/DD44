@@ -34,6 +34,9 @@
     <Filter Include="Mesh">
       <UniqueIdentifier>{160083ba-d5d3-4f5e-8d5e-b15bda4cb24e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{77029347-f335-4252-899b-47766a853dd9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -86,10 +89,10 @@
     </ClInclude>
     <ClInclude Include="EnginePch.h">
       <Filter>헤더 파일</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="DxWrite.h">
       <Filter>Core</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="UMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
@@ -110,6 +113,12 @@
     </ClInclude>
     <ClInclude Include="Vertex.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="UMeshData.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -148,7 +157,7 @@
     </ClCompile>
     <ClCompile Include="DxWrite.cpp">
       <Filter>Core</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="UMaterial.cpp">
       <Filter>Material</Filter>
     </ClCompile>
@@ -170,10 +179,17 @@
     <ClCompile Include="Vertex.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="UMeshData.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SimpleMath.inl">
       <Filter>Utils</Filter>
     </None>
+    <None Include="..\.gitignore" />
   </ItemGroup>
 </Project>
