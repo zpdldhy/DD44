@@ -123,6 +123,12 @@
     <ClInclude Include="Camera.h">
       <Filter>Camera</Filter>
     </ClInclude>
+    <ClInclude Include="DirectionCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="TargetCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -189,6 +195,12 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="TargetCamera.cpp">
       <Filter>Camera</Filter>
     </ClCompile>
   </ItemGroup>
