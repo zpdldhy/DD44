@@ -22,7 +22,6 @@
     <ClCompile Include="UStaticMeshComponent.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="Window.cpp" />
-    <ClCompile Include="UObject.cpp" />
     <ClCompile Include="USkinnedComponent.cpp" />
     <ClCompile Include="AActor.cpp">
       <Filter>Object</Filter>
@@ -31,6 +30,9 @@
       <Filter>Object</Filter>
     </ClCompile>
     <ClCompile Include="APawn.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="UObject.cpp">
       <Filter>Object</Filter>
     </ClCompile>
   </ItemGroup>
@@ -63,7 +65,6 @@
     <ClInclude Include="UStaticMeshComponent.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
-    <ClInclude Include="UObject.h" />
     <ClInclude Include="USkinnedComponent.h" />
     <ClInclude Include="AActor.h">
       <Filter>Object</Filter>
@@ -74,6 +75,9 @@
     <ClInclude Include="APawn.h">
       <Filter>Object</Filter>
     </ClInclude>
+    <ClInclude Include="UObject.h">
+      <Filter>Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SimpleMath.inl" />
@@ -81,6 +85,9 @@
   <ItemGroup>
     <Filter Include="Object">
       <UniqueIdentifier>{cce268ec-dff1-4d21-a0df-a09c046f6176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FSM">
+      <UniqueIdentifier>{35275572-9699-4c69-a6e1-17a93b94604c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
