@@ -87,6 +87,8 @@
     <ClInclude Include="EnginePch.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="DxWrite.h">
+      <Filter>Core</Filter>
     <ClInclude Include="UMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
@@ -143,6 +145,8 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
+    <ClCompile Include="DxWrite.cpp">
+      <Filter>Core</Filter>
     <ClCompile Include="UMaterial.cpp">
       <Filter>Material</Filter>
     </ClCompile>

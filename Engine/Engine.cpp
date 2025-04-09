@@ -6,6 +6,7 @@
 #include "DxState.h"
 #include "Shader.h"
 #include "Input.h"
+#include "DxWrite.h"
 
 void Engine::Init()
 {
@@ -16,6 +17,7 @@ void Engine::Init()
 		shared_ptr<Shader> shader = SHADER->Get(L"../Resources/Shader/Default.hlsl");
 		INPUTLAYOUT->Init(shader->m_pCode);
 		STATE->Create();
+		DXWRITE->Create();
 	}
 
 	// 기타 기능 객체 초기화 ( input, )
@@ -28,7 +30,6 @@ void Engine::Init()
 void Engine::Frame()
 {
 	_app->Update();
-
 	if (INPUT->GetButtonDown(A))
 	{
 		INPUT->GetMousePos();
@@ -38,7 +39,17 @@ void Engine::Frame()
 void Engine::Render()
 {
 	GET_SINGLE(Device)->PreRender();
+	DXWRITE->m_pd2dRT->BeginDraw();
+
+	D2D1_RECT_F rt = {0.0f, 0.0f, 800.0f, 600.0f };
+	DXWRITE->Draw(rt, L"1234567890");
+
+	D2D1_RECT_F rect = D2D1::RectF(50, 50, 400, 200);
+	std::wstring text = L"이것은 멀티라인 텍스트입니다.\n자동 줄바꿈도 되고, 영역을 벗어나지 않아요!\n글씨 크기를 바꾸면 자동으로 맞춰집니다.";
+	DxWrite::GetInstance()->DrawMultiline(rect, text);
 	_app->Render();
+
+	DXWRITE->m_pd2dRT->EndDraw();
 	GET_SINGLE(Device)->PostRender();
 }
 
