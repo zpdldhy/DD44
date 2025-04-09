@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Input.h"
 #include "DxWrite.h"
+#include "Timer.h" 
 
 void Engine::Init()
 {
@@ -63,14 +64,25 @@ void Engine::Run()
 	_window.SetWindowClass(_hInstance);
 	_window.SetWindow();
 	Init();
+
+	Timer timer; 
+	timer.Init(); 
+
 	while (_window.CheckRun())
 	{
 		if (!_window.ProcessMessage())
 		{
+			timer.Update(); 
+
+			float dt = timer.GetDeltaTime();
+			float fps = timer.GetFPS();
+			OutputDebugStringA(("DeltaTime: " + std::to_string(dt) + " | FPS: " + std::to_string(fps) + "\n").c_str());
+
 			Frame();
 			Render();
 		}
 	}
+
 	Release();
 }
 
