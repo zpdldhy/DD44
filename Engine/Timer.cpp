@@ -33,3 +33,4 @@ float Timer::GetFPS() const
         return 0.0f;
     return 1.0f / m_fDeltaTime;
 }
+// test ¿ë ÁÖ¼®
