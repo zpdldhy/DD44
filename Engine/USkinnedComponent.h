@@ -3,11 +3,9 @@
 
 class USkinnedComponent : public UMeshComponent
 {
-	void Init() override;
-	void Tick() override;
-	void PreRender() override;
-	void Render() override;
-	void PostRender() override;
-	void Destroy() override;
+	virtual void Init();
+	virtual void Tick();
+	virtual void Render();
+	virtual void Destroy();
 };
 

@@ -9,15 +9,7 @@ void USceneComponent::Tick()
 {
 }
 
-void USceneComponent::PreRender()
-{
-}
-
 void USceneComponent::Render()
-{
-}
-
-void USceneComponent::PostRender()
 {
 }
 

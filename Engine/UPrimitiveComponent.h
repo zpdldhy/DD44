@@ -21,11 +21,8 @@ public:
 	bool CreateVertexBuffer();
 	bool CreateIndexBuffer();
 public:
-	void Init() override;
-	void Tick() override;
-	void PreRender() override;
-	void Render() override;
-	void PostRender()override;
-	void Destroy() override;
+	void PreRender();
+	virtual void Render() override;
+	void PostRender();
 };
 

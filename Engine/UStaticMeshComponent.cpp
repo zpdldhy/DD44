@@ -1,30 +1,6 @@
 #include "pch.h"
 #include "UStaticMeshComponent.h"
 
-void UStaticMeshComponent::Init()
-{
-}
-
-void UStaticMeshComponent::Tick()
-{
-}
-
-void UStaticMeshComponent::PreRender()
-{
-}
-
-void UStaticMeshComponent::Render()
-{
-}
-
-void UStaticMeshComponent::PostRender()
-{
-}
-
-void UStaticMeshComponent::Destroy()
-{
-}
-
 void UStaticMeshComponent::CreateCube()
 {
 	m_vVertexList.resize(24);
