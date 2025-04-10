@@ -142,6 +142,7 @@
     <ClInclude Include="Sample.h" />
     <ClInclude Include="TestSJ.h" />
     <ClInclude Include="TestYR.h" />
+    <ClInclude Include="TestYS.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -151,6 +152,7 @@
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="TestSJ.cpp" />
     <ClCompile Include="TestYR.cpp" />
+    <ClCompile Include="TestYS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
