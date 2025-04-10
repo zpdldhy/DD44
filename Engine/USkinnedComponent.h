@@ -1,9 +1,8 @@
 #pragma once
-#include "UActorComponent.h"
+#include "UMeshComponent.h"
 
-class USceneComponent : public UActorComponent
+class USkinnedComponent : public UMeshComponent
 {
-public:
 	void Init() override;
 	void Tick() override;
 	void PreRender() override;

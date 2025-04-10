@@ -37,6 +37,12 @@
     <Filter Include="Camera">
       <UniqueIdentifier>{77029347-f335-4252-899b-47766a853dd9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object">
+      <UniqueIdentifier>{cce268ec-dff1-4d21-a0df-a09c046f6176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FSM">
+      <UniqueIdentifier>{35275572-9699-4c69-a6e1-17a93b94604c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -51,14 +57,14 @@
     <ClInclude Include="Device.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="DxState.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="ACharacter.h">
+      <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="APawn.h">
+      <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="Functions.h">
-      <Filter>Headers</Filter>
+    <ClInclude Include="UObject.h">
+      <Filter>Object</Filter>
     </ClInclude>
     <ClInclude Include="IExecute.h">
       <Filter>Core</Filter>
@@ -128,6 +134,18 @@
     </ClInclude>
     <ClInclude Include="TargetCamera.h">
       <Filter>Camera</Filter>
+    </ClInclude>
+        <ClInclude Include="AActor.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ACharacter.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="APawn.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="UObject.h">
+      <Filter>Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -52,6 +52,14 @@ bool UPrimitiveComponent::CreateIndexBuffer()
 	return true;
 }
 
+void UPrimitiveComponent::Init()
+{
+}
+
+void UPrimitiveComponent::Tick()
+{
+}
+
 void UPrimitiveComponent::Render()
 {
 	PreRender();
@@ -80,4 +88,8 @@ void UPrimitiveComponent::PostRender()
 		DC->Draw(m_vVertexList.size(), 0);
 	else
 		DC->DrawIndexed(m_vIndexList.size(), 0, 0);
+}
+
+void UPrimitiveComponent::Destroy()
+{
 }
