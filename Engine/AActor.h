@@ -1,6 +1,7 @@
 #pragma once
 #include "UObject.h"
-#include "UStaticMeshComponent.h"
+#include "UMeshComponent.h"
+#include "UCameraComponent.h"
 
 struct cbData
 {
@@ -9,10 +10,17 @@ struct cbData
 	Matrix matProj;
 };
 
+enum ComponentType
+{
+	CT_MESH,
+	CT_COUNT,
+};
+
 class AActor : public UObject
 {
 protected:
-	shared_ptr<UStaticMeshComponent> m_pMesh;
+	array<shared_ptr<UPrimitiveComponent>, ComponentType::CT_COUNT> m_Components;
+	friend class UCameraComponent;
 
 	cbData m_cbData;
 	ComPtr<ID3D11Buffer> m_pConstantBuffer;
@@ -47,16 +55,23 @@ public:
 	virtual bool CreateConstantBuffer();
 
 	void UpdateWorldMatrix();
+
 public:
-	UStaticMeshComponent* GetMesh() { return m_pMesh.get(); }
+	template<typename T>
+	shared_ptr<T> GetMesh() { return static_pointer_cast<T>(m_Components[ComponentType::CT_MESH]); }
+
+	void SetMesh(shared_ptr<UMeshComponent> _mesh) { m_Components[ComponentType::CT_MESH] = _mesh; }
+
+public:
 	const Vec3& GetPosition() const { return m_vPosition; }
 	const Vec3& GetRotation() const { return m_vRotation; }
 	const Vec3& GetScale() const { return m_vScale; }
 
-	void SetMesh(shared_ptr<UStaticMeshComponent> _mesh) { m_pMesh = _mesh; }
 	void SetPosition(const Vec3& _pos) { m_vPosition = _pos; }
 	void SetRotation(const Vec3& _rot) { m_vRotation = _rot; }
 	void SetScale(const Vec3& _scale) { m_vScale = _scale; }
+	void AddPosition(const Vec3& _pos) { m_vPosition += _pos; }
+	void AddRotation(const Vec3& _rot) { m_vRotation += _rot; }	
 };
 
 // AActor

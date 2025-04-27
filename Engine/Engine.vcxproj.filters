@@ -126,7 +126,7 @@
     <ClInclude Include="Timer.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="CameraComponent.h">
+    <ClInclude Include="UCameraComponent.h">
       <Filter>Camera</Filter>
     </ClInclude>
     <ClInclude Include="AActor.h">
@@ -154,7 +154,7 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ACameraActor.h">
-      <Filter>Object</Filter>
+      <Filter>Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -221,7 +221,7 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="CameraComponent.cpp">
+    <ClCompile Include="UCameraComponent.cpp">
       <Filter>Camera</Filter>
     </ClCompile>
     <ClCompile Include="USkinnedComponent.cpp">
@@ -240,7 +240,7 @@
       <Filter>Object</Filter>
     </ClCompile>
     <ClCompile Include="ACameraActor.cpp">
-      <Filter>Object</Filter>
+      <Filter>Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -7,8 +7,8 @@ cbuffer cb0 : register(b0)
 
 cbuffer CameraBuffer : register(b1)
 {
-    matrix g_matView;
-    matrix g_matProj;
+    row_major matrix g_matView;
+    row_major matrix g_matProj;
 };
 
 cbuffer cbGlowFX : register(b2)

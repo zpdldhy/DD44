@@ -5,17 +5,28 @@
 void AActor::Init()
 {
 	CreateConstantBuffer();
+
+	for (auto& component : m_Components)
+	{
+		if (component)
+		{
+			component->Init();
+			component->SetOwner(this);
+		}
+	}
 }
 
 void AActor::Tick()
 {
 	UpdateWorldMatrix();
 
-	if (m_pMesh)
+	for (auto& component : m_Components)
 	{
-		m_pMesh->Tick();
+		if (component)
+		{
+			component->Tick();
+		}
 	}
-
 }
 
 void AActor::PreRender()
@@ -34,9 +45,12 @@ void AActor::Render()
 {
 	PreRender();
 
-	if (m_pMesh)
+	for (auto& component : m_Components)
 	{
-		m_pMesh->Render();
+		if (component)
+		{
+			component->Render();
+		}
 	}
 
 	PostRender();
@@ -44,15 +58,21 @@ void AActor::Render()
 
 void AActor::PostRender()
 {
-	DC->UpdateSubresource(m_pConstantBuffer.Get(), 0, NULL, &m_cbData, 0, 0);
-	DC->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+	if (m_pConstantBuffer) 
+	{
+		DC->UpdateSubresource(m_pConstantBuffer.Get(), 0, NULL, &m_cbData, 0, 0);
+		DC->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+	}
 }
 
 void AActor::Destroy()
 {
-	if (m_pMesh)
+	for (auto& component : m_Components)
 	{
-		m_pMesh->Destroy();
+		if (component)
+		{
+			component->Destroy();
+		}
 	}
 }
 

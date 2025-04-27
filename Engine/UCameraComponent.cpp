@@ -1,23 +1,28 @@
 #include "pch.h"
-#include "CameraComponent.h"
+#include "UCameraComponent.h"
 
-void CameraComponent::Tick()
+void UCameraComponent::Init()
 {
-	UpdateView();
+	CreateCameraBuffer();
 }
 
-void CameraComponent::Render(ProjectionType _projectionType)
+void UCameraComponent::Tick()
 {
-	if (_projectionType == ProjectionType::PT_ORTHOGRAPHIC)
-		UpdateOrthographicProjection();
-	else if (_projectionType == ProjectionType::PT_PERSPECTIVE)
-		UpdatePersPectiveProjection();
+	UpdateView();
 
+	if (m_ProjectionType == ProjectionType::PT_ORTHOGRAPHIC)
+		UpdateOrthographicProjection();
+	else if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
+		UpdatePersPectiveProjection();
+}
+
+void UCameraComponent::Render()
+{
 	DC->UpdateSubresource(m_pCameraBuffer.Get(), 0, nullptr, &m_CameraData, 0, 0);
 	DC->VSSetConstantBuffers(1, 1, m_pCameraBuffer.GetAddressOf());
 }
 
-void CameraComponent::CreateCameraBuffer()
+void UCameraComponent::CreateCameraBuffer()
 {
 	D3D11_BUFFER_DESC pDesc;
 	ZeroMemory(&pDesc, sizeof(pDesc));
@@ -33,31 +38,35 @@ void CameraComponent::CreateCameraBuffer()
 	}
 }
 
-void CameraComponent::UpdateOrthographicProjection()
+void UCameraComponent::UpdateView()
+{
+	auto vEye = m_pOwner->m_vPosition;
+	auto vLook = m_pOwner->m_vLook;
+	auto vUp = m_pOwner->m_vUp;
+
+	m_CameraData.matView = DirectX::XMMatrixLookAtLH(vEye, vEye + vLook, vUp);
+}
+
+void UCameraComponent::UpdateOrthographicProjection()
 {	
 	m_CameraData.matProjection = DirectX::SimpleMath::Matrix::CreateOrthographic(m_fWidth, m_fHeight, 0.1f, 1000.0f);
 }
 
-void CameraComponent::UpdatePersPectiveProjection()
+void UCameraComponent::UpdatePersPectiveProjection()
 {
 	m_CameraData.matProjection = DirectX::SimpleMath::Matrix::CreatePerspectiveFieldOfView(DirectX::XMConvertToRadians(m_fFov), m_fAspect, 0.1f, 1000.0f);
 }
 
-void CameraComponent::SetOrthographic(float _width, float _height)
+void UCameraComponent::SetOrthographic(float _width, float _height)
 {
 	m_fWidth = _width;
 	m_fHeight = _height;	
 }
 
-void CameraComponent::SetPerspective(float _fov, float _aspect, float _near, float _far)
+void UCameraComponent::SetPerspective(float _fov, float _aspect, float _near, float _far)
 {
 	m_fFov = _fov;
 	m_fAspect = _aspect;
 	m_fNear = _near;
 	m_fFar = _far;
-}
-
-CameraComponent::CameraComponent()
-{
-	CreateCameraBuffer();
 }

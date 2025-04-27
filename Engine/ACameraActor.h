@@ -1,15 +1,18 @@
 #pragma once
 #include "AActor.h"
-#include "CameraComponent.h"
+#include "UCameraComponent.h"
 
 class ACameraActor : public AActor
 {
-	shared_ptr<CameraComponent> m_pCameraComponent;
+	shared_ptr<UCameraComponent> m_pCameraComponent;
 
 public:
+	void Init() override;
 	void Tick() override;
+	void Render() override;
 
 public:
-	shared_ptr<CameraComponent> GetCameraComponent() { return m_pCameraComponent; }
+	ACameraActor() : m_pCameraComponent(make_shared<UCameraComponent>(ProjectionType::PT_PERSPECTIVE)) {}
+	~ACameraActor() {}
 };
 

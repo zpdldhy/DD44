@@ -1,4 +1,6 @@
 #pragma once
+#include "USceneComponent.h"
+#include "AActor.h"
 #include "Device.h"
 #include "SimpleMath.h"
 
@@ -8,20 +10,18 @@ enum class ProjectionType
 	PT_PERSPECTIVE,
 };
 
-struct CameraConstantData
+struct CameraConstantData 
 {
 	Matrix matView;
 	Matrix matProjection;
 };
 
-class CameraComponent
+class UCameraComponent : public USceneComponent
 {
-protected:
+	ProjectionType m_ProjectionType = ProjectionType::PT_PERSPECTIVE;
+
 	ComPtr<ID3D11Buffer> m_pCameraBuffer;
 	CameraConstantData m_CameraData;
-
-	Vec3 m_vEye = Vec3(0.0f, 0.0f, 0.0f);
-	Vec3 m_vUp = Vec3(0.0f, 1.0f, 0.0f);
 
 	// Projection
 	// - Orthographic
@@ -35,24 +35,25 @@ protected:
 	float m_fFar = 1000.0f;
 	
 public:
-	virtual void Tick();
-	virtual void Render(ProjectionType _projectionType);
+	void Init() override;
+	void Tick() override;
+	void Render() override;
 
 private:
 	void CreateCameraBuffer();
 
 private:
-	virtual void UpdateView() abstract;
+	void UpdateView();
 	void UpdateOrthographicProjection();
 	void UpdatePersPectiveProjection();
 
 public:
-	void SetCameraPosition(Vec3 _CameraPosition) { m_vEye = _CameraPosition; }
+	//void SetCameraPosition(Vec3 _CameraPosition) { m_vEye = _CameraPosition; }
 	void SetOrthographic(float _width, float _height);
 	void SetPerspective(float _fov, float _aspect, float _near, float _far);
 
 public:
-	CameraComponent();
-	virtual ~CameraComponent() {}
+	UCameraComponent(ProjectionType _projectionType) : m_ProjectionType(_projectionType) {}
+	virtual ~UCameraComponent() {}
 };
 
