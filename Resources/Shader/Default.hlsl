@@ -5,8 +5,7 @@ VS_OUT VS(VS_IN input)
     VS_OUT output;
     output.p = float4(input.p, 1.0f);
     //float4 vLocal = float4(input.p, 1.0f);
-    //float4 vWorld = mul(vLocal, obj_matWorld);
-
+    //float4 vWorld = mul(vLocal, g_matWorld);
     //float4 vView = mul(vWorld, g_matView);
     //float4 vProj = mul(vView, g_matProj);
     //output.p = vProj;

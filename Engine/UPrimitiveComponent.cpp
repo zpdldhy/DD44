@@ -88,3 +88,4 @@ void UPrimitiveComponent::PostRender()
 	else
 		DC->DrawIndexed(m_vIndexList.size(), 0, 0);
 }
+

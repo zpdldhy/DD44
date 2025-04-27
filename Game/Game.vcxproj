@@ -141,6 +141,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Sample.h" />
     <ClInclude Include="TestSJ.h" />
+    <ClInclude Include="TestSY.h" />
     <ClInclude Include="TestYR.h" />
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +151,7 @@
     </ClCompile>
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="TestSJ.cpp" />
+    <ClCompile Include="TestSY.cpp" />
     <ClCompile Include="TestYR.cpp" />
   </ItemGroup>
   <ItemGroup>

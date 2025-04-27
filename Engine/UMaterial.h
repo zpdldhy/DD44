@@ -21,7 +21,7 @@ public:
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
-	virtual void SetTexture(shared_ptr<Texture> m_pTexture) { m_pTexture = m_pTexture; }
+	virtual void SetTexture(shared_ptr<Texture> _texture) { m_pTexture = _texture; }
 
 public:
 	shared_ptr<Shader> GetShader() { return m_pShader; }
