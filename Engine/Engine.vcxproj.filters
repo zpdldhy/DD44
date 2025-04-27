@@ -39,46 +39,26 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Define.h" />
-    <ClInclude Include="Device.h" />
-    <ClInclude Include="DxState.h" />
-    <ClInclude Include="DxWrite.h" />
-    <ClInclude Include="Engine.h" />
-    <ClInclude Include="EnginePch.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="Functions.h" />
-    <ClInclude Include="IExecute.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Inputlayout.h" />
-    <ClInclude Include="MeshHelper.h" />
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="SimpleMath.h" />
-    <ClInclude Include="Singleton.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="Types.h" />
-    <ClInclude Include="UMaterial.h" />
-    <ClInclude Include="UActorComponent.h" />
-    <ClInclude Include="UMeshComponent.h" />
-    <ClInclude Include="UMeshData.h" />
-    <ClInclude Include="UPrimitiveComponent.h" />
-    <ClInclude Include="USceneComponent.h" />
-    <ClInclude Include="UStaticMeshComponent.h" />
-    <ClInclude Include="Vertex.h" />
-    <ClInclude Include="Window.h" />
-    <ClInclude Include="USkinnedComponent.h" />
-    <ClInclude Include="AActor.h">
-      <Filter>Object</Filter>
+    <ClInclude Include="framework.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ACharacter.h">
-      <Filter>Object</Filter>
+    <ClInclude Include="pch.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="APawn.h">
-      <Filter>Object</Filter>
+    <ClInclude Include="Define.h">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="UObject.h">
-      <Filter>Object</Filter>
+    <ClInclude Include="Device.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DxState.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions.h">
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="IExecute.h">
       <Filter>Core</Filter>
@@ -211,11 +191,5 @@
       <Filter>Utils</Filter>
     </None>
     <None Include="..\.gitignore" />
-    <Filter Include="Object">
-      <UniqueIdentifier>{cce268ec-dff1-4d21-a0df-a09c046f6176}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="FSM">
-      <UniqueIdentifier>{35275572-9699-4c69-a6e1-17a93b94604c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
 </Project>

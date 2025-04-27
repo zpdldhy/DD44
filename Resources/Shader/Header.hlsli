@@ -7,10 +7,10 @@ cbuffer cb0 : register(b0)
     matrix g_matProj;
 }
 
-//cbuffer TransformBuffer : register(b1)
-//{
-//    matrix obj_matWorld;
-//};
+cbuffer TransformBuffer : register(b1)
+{
+    matrix obj_matWorld;
+};
 
 cbuffer cbGlowFX : register(b2)
 {
