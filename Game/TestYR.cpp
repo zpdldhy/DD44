@@ -43,7 +43,7 @@ void TestYR::Update()
     // Material縑 機等檜お
     m_pStaticMesh->GetMaterial()->SetGlowParams(
         glowPower,
-        Vec3(1.0f, 1.0f, 1.0f) // 說除儀
+        Vec3(1.0f, 0.0f, 0.0f) // 說除儀
     );
 }
 void TestYR::Render()
