@@ -12,3 +12,4 @@
 #define DXWRITE     GET_SINGLE(DxWrite)
 #define TYPER		GET_SINGLE(Typer)
 #define TIMER		GET_SINGLE(Timer)
+#define GUI			GET_SINGLE(ImGuiCore)
