@@ -25,9 +25,6 @@
     <ClInclude Include="TestSJ.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="TestYS.h">
-      <Filter>Game</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -41,9 +38,6 @@
       <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="TestYR.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="TestYS.cpp">
       <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>

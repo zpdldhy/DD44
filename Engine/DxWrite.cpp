@@ -94,7 +94,7 @@ void DxWrite::LoadFontResources(const vector<wstring>& fontPaths)
 	// 등록된 폰트가 하나라도 있으면 시스템에 알림
 	if (totalFontsAdded > 0)
 	{
-		//SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
+		SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
 	}
 	else
 	{
