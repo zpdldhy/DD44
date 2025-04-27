@@ -126,16 +126,10 @@
     <ClInclude Include="Timer.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="CameraComponent.h">
       <Filter>Camera</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionCamera.h">
-      <Filter>Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="TargetCamera.h">
-      <Filter>Camera</Filter>
-    </ClInclude>
-        <ClInclude Include="AActor.h">
+    <ClInclude Include="AActor.h">
       <Filter>Object</Filter>
     </ClInclude>
     <ClInclude Include="ACharacter.h">
@@ -145,6 +139,21 @@
       <Filter>Object</Filter>
     </ClInclude>
     <ClInclude Include="UObject.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="DxState.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="USkinnedComponent.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ACameraActor.h">
       <Filter>Object</Filter>
     </ClInclude>
   </ItemGroup>
@@ -212,14 +221,26 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="CameraComponent.cpp">
       <Filter>Camera</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionCamera.cpp">
-      <Filter>Camera</Filter>
+    <ClCompile Include="USkinnedComponent.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="TargetCamera.cpp">
-      <Filter>Camera</Filter>
+    <ClCompile Include="AActor.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ACharacter.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="APawn.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="UObject.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ACameraActor.cpp">
+      <Filter>Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

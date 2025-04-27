@@ -1,12 +1,12 @@
 #include "pch.h"
-#include "Camera.h"
+#include "CameraComponent.h"
 
-void Camera::Tick()
+void CameraComponent::Tick()
 {
 	UpdateView();
 }
 
-void Camera::Render(ProjectionType _projectionType)
+void CameraComponent::Render(ProjectionType _projectionType)
 {
 	if (_projectionType == ProjectionType::PT_ORTHOGRAPHIC)
 		UpdateOrthographicProjection();
@@ -17,7 +17,7 @@ void Camera::Render(ProjectionType _projectionType)
 	DC->VSSetConstantBuffers(1, 1, m_pCameraBuffer.GetAddressOf());
 }
 
-void Camera::CreateCameraBuffer()
+void CameraComponent::CreateCameraBuffer()
 {
 	D3D11_BUFFER_DESC pDesc;
 	ZeroMemory(&pDesc, sizeof(pDesc));
@@ -33,23 +33,23 @@ void Camera::CreateCameraBuffer()
 	}
 }
 
-void Camera::UpdateOrthographicProjection()
+void CameraComponent::UpdateOrthographicProjection()
 {	
 	m_CameraData.matProjection = DirectX::SimpleMath::Matrix::CreateOrthographic(m_fWidth, m_fHeight, 0.1f, 1000.0f);
 }
 
-void Camera::UpdatePersPectiveProjection()
+void CameraComponent::UpdatePersPectiveProjection()
 {
 	m_CameraData.matProjection = DirectX::SimpleMath::Matrix::CreatePerspectiveFieldOfView(DirectX::XMConvertToRadians(m_fFov), m_fAspect, 0.1f, 1000.0f);
 }
 
-void Camera::SetOrthographic(float _width, float _height)
+void CameraComponent::SetOrthographic(float _width, float _height)
 {
 	m_fWidth = _width;
 	m_fHeight = _height;	
 }
 
-void Camera::SetPerspective(float _fov, float _aspect, float _near, float _far)
+void CameraComponent::SetPerspective(float _fov, float _aspect, float _near, float _far)
 {
 	m_fFov = _fov;
 	m_fAspect = _aspect;
@@ -57,7 +57,7 @@ void Camera::SetPerspective(float _fov, float _aspect, float _near, float _far)
 	m_fFar = _far;
 }
 
-Camera::Camera()
+CameraComponent::CameraComponent()
 {
 	CreateCameraBuffer();
 }

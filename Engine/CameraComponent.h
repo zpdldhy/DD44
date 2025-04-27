@@ -14,7 +14,7 @@ struct CameraConstantData
 	Matrix matProjection;
 };
 
-class Camera
+class CameraComponent
 {
 protected:
 	ComPtr<ID3D11Buffer> m_pCameraBuffer;
@@ -52,7 +52,7 @@ public:
 	void SetPerspective(float _fov, float _aspect, float _near, float _far);
 
 public:
-	Camera();
-	virtual ~Camera() {}
+	CameraComponent();
+	virtual ~CameraComponent() {}
 };
 

@@ -3,13 +3,12 @@
 cbuffer cb0 : register(b0)
 {
     matrix g_matWorld;
-    matrix g_matView;
-    matrix g_matProj;
 }
 
-cbuffer TransformBuffer : register(b1)
+cbuffer CameraBuffer : register(b1)
 {
-    matrix obj_matWorld;
+    matrix g_matView;
+    matrix g_matProj;
 };
 
 cbuffer cbGlowFX : register(b2)

@@ -153,12 +153,12 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AActor.h" />
+    <ClInclude Include="ACameraActor.h" />
     <ClInclude Include="ACharacter.h" />
     <ClInclude Include="APawn.h" />
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraComponent.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Device.h" />
-    <ClInclude Include="DirectionCamera.h" />
     <ClInclude Include="DxState.h" />
     <ClInclude Include="DxWrite.h" />
     <ClInclude Include="Engine.h" />
@@ -172,7 +172,6 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SimpleMath.h" />
     <ClInclude Include="Singleton.h" />
-    <ClInclude Include="TargetCamera.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Types.h" />
@@ -190,11 +189,11 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AActor.cpp" />
+    <ClCompile Include="ACameraActor.cpp" />
     <ClCompile Include="ACharacter.cpp" />
     <ClCompile Include="APawn.cpp" />
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CameraComponent.cpp" />
     <ClCompile Include="Device.cpp" />
-    <ClCompile Include="DirectionCamera.cpp" />
     <ClCompile Include="DxState.cpp" />
     <ClCompile Include="DxWrite.cpp" />
     <ClCompile Include="Engine.cpp" />
@@ -209,7 +208,6 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     </ClCompile>
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SimpleMath.cpp" />
-    <ClCompile Include="TargetCamera.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="UMaterial.cpp" />
