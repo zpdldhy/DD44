@@ -12,6 +12,12 @@ cbuffer cb0 : register(b0)
 //    matrix obj_matWorld;
 //};
 
+cbuffer cbGlowFX : register(b2)
+{
+    float g_fGlowPower; // ¹ß±¤ ¼¼±â
+    float3 g_vGlowColor; // ¹ß±¤ »ö»ó
+}
+
 struct VS_IN
 {
     float3 p : POSITION;
