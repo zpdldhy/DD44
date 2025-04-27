@@ -24,6 +24,11 @@ using namespace std;
 #include <d3dcompiler.h>
 #include <d3d11shader.h>
 
+// ImGUI
+#include "imgui.h"
+#include "imgui_impl_dx11.h"
+#include "imgui_impl_win32.h"
+
 // LIBS
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")

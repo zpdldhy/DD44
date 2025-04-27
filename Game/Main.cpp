@@ -2,7 +2,6 @@
 #include "pch.h"
 #include "Engine.h"
 #include "Sample.h"
-#include "TestSJ.h"
 #include "TestYR.h"
 
 int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCmdLine, int _nCmdShow)
@@ -12,4 +11,5 @@ int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCm
     Engine game(_hInstance, app);
     game.Run();
 
+    return 0;
 }

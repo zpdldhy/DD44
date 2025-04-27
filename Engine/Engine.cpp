@@ -8,6 +8,7 @@
 #include "Input.h"
 #include "DxWrite.h"
 #include "Timer.h" 
+#include "ImGuiCore.h"
 
 void Engine::Init()
 {
@@ -24,18 +25,22 @@ void Engine::Init()
 	{
 		INPUT->Init();
 		DXWRITE->Create();
+		GUI->Init();
 	}
 	_app->Init();
 }
 
 void Engine::Frame()
 {
+	GUI->Update();
+	
 	_app->Update();
 	if (INPUT->GetButtonDown(A))
 	{
 		INPUT->GetMousePos();
 	}
 	TIMER->Update();
+	
 }
 
 void Engine::Render()
@@ -50,6 +55,7 @@ void Engine::Render()
 	/*std::wstring text = L"이것은 멀티라인 텍스트입니다.\n자동 줄바꿈도 되고, 영역을 벗어나지 않아요!\n글씨 크기를 바꾸면 자동으로 맞춰집니다.";
 	DxWrite::GetInstance()->DrawMultiline(rect, text);*/
 	_app->Render();
+	GUI->Render(); // *Fix Location* after _app->Render() 
 
 	DXWRITE->m_pd2dRT->EndDraw();
 	GET_SINGLE(Device)->PostRender();
