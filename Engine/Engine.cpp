@@ -47,8 +47,8 @@ void Engine::Render()
 	DXWRITE->Draw(rt, TIMER->m_szTime);
 
 	D2D1_RECT_F rect = D2D1::RectF(50, 50, 400, 200);
-	std::wstring text = L"이것은 멀티라인 텍스트입니다.\n자동 줄바꿈도 되고, 영역을 벗어나지 않아요!\n글씨 크기를 바꾸면 자동으로 맞춰집니다.";
-	DxWrite::GetInstance()->DrawMultiline(rect, text);
+	/*std::wstring text = L"이것은 멀티라인 텍스트입니다.\n자동 줄바꿈도 되고, 영역을 벗어나지 않아요!\n글씨 크기를 바꾸면 자동으로 맞춰집니다.";
+	DxWrite::GetInstance()->DrawMultiline(rect, text);*/
 	_app->Render();
 
 	DXWRITE->m_pd2dRT->EndDraw();
