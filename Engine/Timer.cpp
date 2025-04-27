@@ -11,6 +11,15 @@ void Timer::Update()
     auto now = std::chrono::steady_clock::now();
     m_fDeltaTime = std::chrono::duration<float>(now - m_PrevTime).count();
     m_PrevTime = now;
+    m_fTempTimer += m_fDeltaTime;
+    if (m_fTempTimer > 1.0f)
+    {
+        m_fTempTimer = 0.0f;
+        m_iGameFrame = GetFPS();
+    }
+    m_szTime = L"FPS: ";
+    m_szTime += std::to_wstring(m_iGameFrame);
+    m_szTime += L"\n";
 }
 
 float Timer::GetDeltaTime() const
@@ -24,3 +33,4 @@ float Timer::GetFPS() const
         return 0.0f;
     return 1.0f / m_fDeltaTime;
 }
+// test ¿ë ÁÖ¼®

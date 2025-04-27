@@ -20,15 +20,25 @@ void AActor::Tick()
 
 void AActor::PreRender()
 {
-	// 카메라 변환 행렬에 따른 Constant Buffer 업데이트
 	m_cbData.matWorld = m_matWorld;
-	// m_cbData.matView = CAMERA->GetViewMatrix();
-	// m_cbData.matProj = CAMERA->GetProjectionMatrix();
+	Matrix view = Matrix::CreateLookAt(
+		Vec3(0, 0, -5), Vec3(0, 0, 0), Vec3(0, 1, 0));
+	Matrix proj = Matrix::CreatePerspectiveFieldOfView(
+		3.141592f / 4.0f, 800.0f / 600.0f, 0.1f, 100.0f);
+
+	m_cbData.matView = view;
+	m_cbData.matProj = proj;
 }
 
 void AActor::Render()
 {
 	PreRender();
+
+	if (m_pMesh)
+	{
+		m_pMesh->Render();
+	}
+
 	PostRender();
 }
 
@@ -36,11 +46,6 @@ void AActor::PostRender()
 {
 	DC->UpdateSubresource(m_pConstantBuffer.Get(), 0, NULL, &m_cbData, 0, 0);
 	DC->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
-
-	if (m_pMesh)
-	{
-		m_pMesh->Render();
-	}
 }
 
 void AActor::Destroy()
@@ -48,7 +53,6 @@ void AActor::Destroy()
 	if (m_pMesh)
 	{
 		m_pMesh->Destroy();
-		m_pMesh.reset();
 	}
 }
 

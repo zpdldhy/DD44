@@ -1,6 +1,6 @@
 #pragma once
 #include "UObject.h"
-#include "UMeshComponent.h"
+#include "UStaticMeshComponent.h"
 
 struct cbData
 {
@@ -12,7 +12,7 @@ struct cbData
 class AActor : public UObject
 {
 protected:
-	shared_ptr<UMeshComponent> m_pMesh;
+	shared_ptr<UStaticMeshComponent> m_pMesh;
 
 	cbData m_cbData;
 	ComPtr<ID3D11Buffer> m_pConstantBuffer;
@@ -48,12 +48,12 @@ public:
 
 	void UpdateWorldMatrix();
 public:
-	UMeshComponent* GetMesh() { return m_pMesh.get(); }
+	UStaticMeshComponent* GetMesh() { return m_pMesh.get(); }
 	const Vec3& GetPosition() const { return m_vPosition; }
 	const Vec3& GetRotation() const { return m_vRotation; }
 	const Vec3& GetScale() const { return m_vScale; }
 
-	void SetMesh(shared_ptr<UMeshComponent> _mesh) { m_pMesh = _mesh; }
+	void SetMesh(shared_ptr<UStaticMeshComponent> _mesh) { m_pMesh = _mesh; }
 	void SetPosition(const Vec3& _pos) { m_vPosition = _pos; }
 	void SetRotation(const Vec3& _rot) { m_vRotation = _rot; }
 	void SetScale(const Vec3& _scale) { m_vScale = _scale; }

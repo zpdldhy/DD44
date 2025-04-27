@@ -38,6 +38,7 @@ public:
 	void   DirectDraw(D2D1_RECT_F _layoutRect, std::wstring _msg);
 	void   Draw(D2D1_RECT_F _layoutRect, std::wstring _msg);
 	void   DrawMultiline(D2D1_RECT_F _layoutRect, std::wstring _msg);
+	void   DrawGlow(D2D1_RECT_F rect, std::wstring msg, D2D1::ColorF glowColor, D2D1::ColorF mainColor);
 };
 
 class Typer : public Singleton<Typer>

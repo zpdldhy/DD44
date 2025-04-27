@@ -141,6 +141,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Sample.h" />
     <ClInclude Include="TestSJ.h" />
+    <ClInclude Include="TestSY.h" />
     <ClInclude Include="TestYR.h" />
     <ClInclude Include="TestYS.h" />
   </ItemGroup>
@@ -151,6 +152,7 @@
     </ClCompile>
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="TestSJ.cpp" />
+    <ClCompile Include="TestSY.cpp" />
     <ClCompile Include="TestYR.cpp" />
     <ClCompile Include="TestYS.cpp" />
   </ItemGroup>
@@ -164,6 +166,11 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\Glow.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

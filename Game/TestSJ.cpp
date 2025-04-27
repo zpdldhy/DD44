@@ -72,5 +72,10 @@ void TestSJ::Update()
 
 void TestSJ::Render()
 {
-
+	DXWRITE->DrawGlow(
+		D2D1::RectF(300, 300, 600, 400),
+		L"빛나는 텍스트",
+		D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
+		D2D1::ColorF::White                   // 메인 텍스트 색
+	);
 }
