@@ -46,7 +46,7 @@ HRESULT DxWrite::Create()
 
 	//DirectWrite 팩토리 설정.
 	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), (IUnknown**)m_pDxWrite.GetAddressOf());
-	
+
 	//폰트 등록
 	m_vFontPaths = { L"../Resources/Font/font6.ttf",
 	L"../Resources/Font/font7.ttf",
@@ -57,7 +57,7 @@ HRESULT DxWrite::Create()
 	L"../Resources/Font/font.ttf",
 	L"../Resources/Font/font8.ttf" };
 	LoadFontResources(m_vFontPaths);
-	
+
 	//초기 폰트, 크기
 	m_wsFontName = L"Mapo홍대프리덤";
 	m_fFontSize = 20;
@@ -209,6 +209,35 @@ void DxWrite::DrawMultiline(D2D1_RECT_F _layoutRect, std::wstring _msg)
 	);
 }
 
+//발광효과 글씨표현.
+void DxWrite::DrawGlow(D2D1_RECT_F rect, std::wstring msg, D2D1::ColorF glowColor, D2D1::ColorF mainColor)
+{
+	if (!m_pd2dRT || !m_pTextFormat) return;
+
+	const float glowOffsets[] = { -1, 0, 1 };
+
+	for (float dx : glowOffsets)
+	{
+		for (float dy : glowOffsets)
+		{
+			if (dx == 0 && dy == 0) continue;
+
+			D2D1_RECT_F glowRect = rect;
+			glowRect.left += dx;
+			glowRect.top += dy;
+			glowRect.right += dx;
+			glowRect.bottom += dy;
+
+			m_pColorBrush->SetColor(glowColor);
+			m_pd2dRT->DrawText(msg.c_str(), msg.size(), m_pTextFormat.Get(), &glowRect, m_pColorBrush.Get());
+		}
+	}
+
+	// 중앙 본 텍스트
+	m_pColorBrush->SetColor(mainColor);
+	m_pd2dRT->DrawText(msg.c_str(), msg.size(), m_pTextFormat.Get(), &rect, m_pColorBrush.Get());
+}
+
 void Typer::Reset(const std::wstring& newText)
 {
 	fullText = newText;
@@ -240,4 +269,5 @@ void Typer::Draw(D2D1_RECT_F rect)
 {
 	DXWRITE->DrawMultiline(rect, currentText);
 }
+
 
