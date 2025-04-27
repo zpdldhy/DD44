@@ -72,6 +72,13 @@ void UPrimitiveComponent::PreRender()
 	DC->IASetVertexBuffers(0, 1, m_pVertexBuffer.GetAddressOf(), &Strides, &Offsets);
 	DC->IASetIndexBuffer(m_pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	DC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+	if (m_pMaterial->GetGlowCB())
+	{
+		DC->VSSetConstantBuffers(2, 1, m_pMaterial->GetGlowCB().GetAddressOf());
+		DC->PSSetConstantBuffers(2, 1, m_pMaterial->GetGlowCB().GetAddressOf());
+	}
 }
 
 void UPrimitiveComponent::PostRender()
