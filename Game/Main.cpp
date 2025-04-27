@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "Sample.h"
 #include "TestSJ.h"
+#include "TestYR.h"
 
 int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCmdLine, int _nCmdShow)
 {

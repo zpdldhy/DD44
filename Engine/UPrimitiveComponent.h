@@ -14,6 +14,8 @@ protected:
 	vector<PNCT_VERTEX> m_vVertexList;
 	vector<DWORD> m_vIndexList;
 
+
+
 public:
 	void SetMaterial(shared_ptr<UMaterial> _material);
 	shared_ptr<UMaterial> GetMaterial();
