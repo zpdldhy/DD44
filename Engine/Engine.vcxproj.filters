@@ -41,10 +41,13 @@
       <UniqueIdentifier>{cce268ec-dff1-4d21-a0df-a09c046f6176}</UniqueIdentifier>
     </Filter>
     <Filter Include="FSM">
-      <UniqueIdentifier>{35275572-9699-4c69-a6e1-17a93b94604c}</UniqueIdentifier>      
+      <UniqueIdentifier>{35275572-9699-4c69-a6e1-17a93b94604c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utils\ImGUI">
       <UniqueIdentifier>{d7d517c4-cbd4-4729-a5b6-1a413df3da3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Sky">
+      <UniqueIdentifier>{168048c2-d65f-4442-bbae-75e7951c1b87}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +201,9 @@
     <ClInclude Include="ImGuiCore.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="ASky.h">
+      <Filter>Object\Sky</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -282,7 +288,7 @@
       <Filter>Object</Filter>
     </ClCompile>
     <ClCompile Include="ACameraActor.cpp">
-      <Filter>Camera</Filter>      
+      <Filter>Camera</Filter>
     </ClCompile>
     <ClCompile Include="AActor.cpp">
       <Filter>소스 파일</Filter>
@@ -322,6 +328,9 @@
     </ClCompile>
     <ClCompile Include="ImGuiCore.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ASky.cpp">
+      <Filter>Object\Sky</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

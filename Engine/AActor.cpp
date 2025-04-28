@@ -44,6 +44,7 @@ void AActor::PreRender()
 void AActor::Render()
 {
 	PreRender();
+	PostRender();
 
 	for (auto& component : m_Components)
 	{
@@ -52,8 +53,6 @@ void AActor::Render()
 			component->Render();
 		}
 	}
-
-	PostRender();
 }
 
 void AActor::PostRender()
@@ -102,7 +101,7 @@ bool AActor::CreateConstantBuffer()
 
 void AActor::UpdateWorldMatrix()
 {
-	m_matScale.CreateScale(m_vScale);
+	m_matScale = Matrix::CreateScale(m_vScale);
 
 	m_matRotation  = Matrix::CreateRotationZ(m_vRotation.z);
 	m_matRotation *= Matrix::CreateRotationX(m_vRotation.x);
