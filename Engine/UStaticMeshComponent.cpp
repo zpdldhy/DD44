@@ -1,6 +1,102 @@
 #include "pch.h"
 #include "UStaticMeshComponent.h"
 
+void UStaticMeshComponent::CreateSphere(int iSliceCount, int iStackCount)
+{
+	m_vVertexList.clear();
+	m_vIndexList.clear();
+
+	float radius = 0.5f; // 구 반지름
+
+	// Top Vertex
+	m_vVertexList.push_back(
+		PNCT_VERTEX(
+			Vec3(0.0f, +radius, 0.0f),
+			Vec3(0.0f, +1.0f, 0.0f),
+			Vec4(1, 0, 0, 1),
+			Vec2(0.0f, 0.0f)
+		)
+	);
+
+	float phiStep = DD_PI / iStackCount;
+	float thetaStep = 2.0f * DD_PI / iSliceCount;
+
+	// Middle vertices
+	for (int i = 1; i <= iStackCount - 1; ++i)
+	{
+		float phi = i * phiStep;
+
+		for (int j = 0; j <= iSliceCount; ++j)
+		{
+			float theta = j * thetaStep;
+
+			Vec3 pos(
+				radius * sinf(phi) * cosf(theta),
+				radius * cosf(phi),
+				radius * sinf(phi) * sinf(theta)
+			);
+
+			Vec3 normal = pos;
+			normal.Normalize();
+			Vec2 texCoord(theta / (2 * DD_PI), phi / DD_PI);
+
+			m_vVertexList.push_back(
+				PNCT_VERTEX(pos, normal, Vec4(1, 0, 0, 1), texCoord)
+			);
+		}
+	}
+
+	// Bottom Vertex
+	m_vVertexList.push_back(
+		PNCT_VERTEX(
+			Vec3(0.0f, -radius, 0.0f),
+			Vec3(0.0f, -1.0f, 0.0f),
+			Vec4(1, 0, 0, 1),
+			Vec2(0.0f, 1.0f)
+		)
+	);
+
+	// Top stack
+	for (int i = 1; i <= iSliceCount; ++i)
+	{
+		m_vIndexList.push_back(0);
+		m_vIndexList.push_back(i + 1);
+		m_vIndexList.push_back(i);
+	}
+
+	// Middle stacks
+	int baseIndex = 1;
+	int ringVertexCount = iSliceCount + 1;
+	for (int i = 0; i < iStackCount - 2; ++i)
+	{
+		for (int j = 0; j < iSliceCount; ++j)
+		{
+			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j);
+			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
+			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+
+			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
+			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+		}
+	}
+
+	// Bottom stack
+	int southPoleIndex = (int)m_vVertexList.size() - 1;
+	baseIndex = southPoleIndex - ringVertexCount;
+
+	for (int i = 0; i < iSliceCount; ++i)
+	{
+		m_vIndexList.push_back(southPoleIndex);
+		m_vIndexList.push_back(baseIndex + i);
+		m_vIndexList.push_back(baseIndex + i + 1);
+	}
+
+	CreateVertexBuffer();
+	CreateIndexBuffer();
+}
+
+
 void UStaticMeshComponent::CreateCube()
 {
 	m_vVertexList.resize(24);

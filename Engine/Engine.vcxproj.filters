@@ -46,7 +46,7 @@
     <Filter Include="Utils\ImGUI">
       <UniqueIdentifier>{d7d517c4-cbd4-4729-a5b6-1a413df3da3f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sky">
+    <Filter Include="Object\Sky">
       <UniqueIdentifier>{168048c2-d65f-4442-bbae-75e7951c1b87}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -201,6 +201,9 @@
     <ClInclude Include="ImGuiCore.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="ASky.h">
+      <Filter>Object\Sky</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -325,6 +328,9 @@
     </ClCompile>
     <ClCompile Include="ImGuiCore.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ASky.cpp">
+      <Filter>Object\Sky</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
