@@ -217,6 +217,7 @@ void DxState::CreateRasterizerStates()
 		ZeroMemory(&rsDesc, sizeof(rsDesc));
 		rsDesc.FillMode = D3D11_FILL_SOLID;
 		rsDesc.CullMode = D3D11_CULL_BACK;
+		rsDesc.FrontCounterClockwise = TRUE;
 		rsDesc.DepthClipEnable = true;
 		HRESULT hr = DEVICE->CreateRasterizerState(&rsDesc, m_pRSSolid.GetAddressOf());
 		if (FAILED(hr))
@@ -231,6 +232,7 @@ void DxState::CreateRasterizerStates()
 		ZeroMemory(&rsDesc, sizeof(rsDesc));
 		rsDesc.FillMode = D3D11_FILL_SOLID;
 		rsDesc.CullMode = D3D11_CULL_NONE;
+		rsDesc.FrontCounterClockwise = TRUE;
 		rsDesc.DepthClipEnable = false;
 		HRESULT hr = DEVICE->CreateRasterizerState(&rsDesc, m_pRSSolidNone.GetAddressOf());
 		if (FAILED(hr))
@@ -245,6 +247,7 @@ void DxState::CreateRasterizerStates()
 		ZeroMemory(&rsDesc, sizeof(rsDesc));
 		rsDesc.FillMode = D3D11_FILL_WIREFRAME;
 		rsDesc.CullMode = D3D11_CULL_NONE;
+		rsDesc.FrontCounterClockwise = TRUE;
 		HRESULT hr = DEVICE->CreateRasterizerState(&rsDesc, m_pRSWireFrame.GetAddressOf());
 		if (FAILED(hr))
 		{

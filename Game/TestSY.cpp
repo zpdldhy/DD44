@@ -23,7 +23,7 @@ void TestSY::Init()
 
 	m_pActor->SetMesh(m_pStaticMesh);
 	m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
-	m_pActor->SetPosition({ 0.0f, 0.0f, -10.0f });
+	m_pActor->SetPosition({ 0.0f, 0.0f, 0.0f });
 	m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 	m_pCameraActor->Init();
@@ -50,6 +50,14 @@ void TestSY::Update()
 	{
 		m_pCameraActor->AddPosition(Vec3(1.0f, 0.0f, 0.0f) * deltaTime);
 	}		
+	if (INPUT->GetButtonDown(Q))
+	{
+		m_pCameraActor->AddPosition(Vec3(0.0f, -1.0f, 0.0f) * deltaTime);
+	}
+	if (INPUT->GetButtonDown(E))
+	{
+		m_pCameraActor->AddPosition(Vec3(0.0f, 1.0f, 0.0f) * deltaTime);
+	}
 
 
 	m_pCameraActor->Tick();
