@@ -204,6 +204,12 @@
     <ClInclude Include="ASky.h">
       <Filter>Object\Sky</Filter>
     </ClInclude>
+    <ClInclude Include="UTerrainMeshComponent.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="ATerrainTileActor.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -331,6 +337,12 @@
     </ClCompile>
     <ClCompile Include="ASky.cpp">
       <Filter>Object\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="UTerrainMeshComponent.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="ATerrainTileActor.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
