@@ -153,8 +153,10 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AActor.h" />
+    <ClInclude Include="ACameraActor.h" />
     <ClInclude Include="ACharacter.h" />
     <ClInclude Include="APawn.h" />
+    <ClInclude Include="UCameraComponent.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="DxState.h" />
@@ -196,8 +198,10 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AActor.cpp" />
+    <ClCompile Include="ACameraActor.cpp" />
     <ClCompile Include="ACharacter.cpp" />
     <ClCompile Include="APawn.cpp" />
+    <ClCompile Include="UCameraComponent.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="DxState.cpp" />
     <ClCompile Include="DxWrite.cpp" />
