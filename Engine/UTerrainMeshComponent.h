@@ -1,6 +1,7 @@
 #pragma once
-class UTerrainMeshComponent :
-    public MeshComponent
+#include "UMeshComponent.h"
+
+class UTerrainMeshComponent : public UMeshComponent
 {
 };
 
