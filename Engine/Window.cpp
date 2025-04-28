@@ -6,8 +6,16 @@
 POINT g_windowSize;
 HWND g_hWnd;
 
+// ImGUI extern
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lParam)
 {
+    if (ImGui_ImplWin32_WndProcHandler(_hWnd, _message, _wParam, _lParam))
+    {
+        return true;
+    }
+
     switch (_message)
     {
     case WM_DESTROY:
