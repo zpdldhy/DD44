@@ -5,6 +5,10 @@ class UMaterial;
 
 class UPrimitiveComponent : public USceneComponent
 {
+public:
+	UPrimitiveComponent() = default;
+	virtual ~UPrimitiveComponent() = default;
+
 protected:
 	// MATERIAL
 	shared_ptr<UMaterial> m_pMaterial;

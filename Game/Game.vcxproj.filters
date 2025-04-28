@@ -25,7 +25,9 @@
     <ClInclude Include="TestSJ.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="TestSY.h" />
+    <ClInclude Include="TestSY.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -41,7 +43,9 @@
     <ClCompile Include="TestYR.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="TestSY.cpp" />
+    <ClCompile Include="TestSY.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\Default.hlsl">

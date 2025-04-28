@@ -4,6 +4,10 @@
 class USceneComponent : public UActorComponent
 {
 public:
+	USceneComponent() = default;
+	virtual ~USceneComponent() = default;
+
+public:
 	virtual void Init();
 	virtual void Tick();
 	virtual void Render();
