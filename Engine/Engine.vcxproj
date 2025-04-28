@@ -157,6 +157,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClInclude Include="ACharacter.h" />
     <ClInclude Include="APawn.h" />
     <ClInclude Include="ASky.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="UCameraComponent.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Device.h" />
@@ -203,6 +204,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClCompile Include="ACharacter.cpp" />
     <ClCompile Include="APawn.cpp" />
     <ClCompile Include="ASky.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="UCameraComponent.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="DxState.cpp" />
