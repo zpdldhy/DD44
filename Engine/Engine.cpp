@@ -63,6 +63,11 @@ void Engine::Render()
 
 void Engine::Release()
 {
+	{
+		ImGui_ImplDX11_Shutdown();  // DX11 관련 리소스 해제
+		ImGui_ImplWin32_Shutdown(); // Win32 윈도우 관련 연결 해제
+		ImGui::DestroyContext();    // ImGui 컨텍스트 자체 해제
+	}
 	GET_SINGLE(Device)->Release();
 }
 

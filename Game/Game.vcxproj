@@ -119,6 +119,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Libraries\Debug\Lib\;</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>if not exist "$(OutDir)fmod.dll" copy /Y "$(SolutionDir)Libraries\Debug\Lib\FMod\fmod.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
