@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "AActor.h"
 #include "Device.h"
+#include "UScriptComponent.h"
 
 void AActor::Init()
 {
 	CreateConstantBuffer();
 
-	for (auto& component : m_Components)
+	for (auto& component : m_arrComponent)
 	{
 		if (component)
 		{
@@ -14,18 +15,29 @@ void AActor::Init()
 			component->SetOwner(this);
 		}
 	}
+
+	for (auto& script : m_vScript)
+	{
+		script->Init();
+		script->SetOwner(this);
+	}
 }
 
 void AActor::Tick()
 {
 	UpdateWorldMatrix();
 
-	for (auto& component : m_Components)
+	for (auto& component : m_arrComponent)
 	{
 		if (component)
 		{
 			component->Tick();
 		}
+	}
+
+	for (auto& script : m_vScript)
+	{
+		script->Tick();
 	}
 }
 
@@ -37,23 +49,33 @@ void AActor::Render()
 		DC->VSSetConstantBuffers(0, 1, m_pWorldCB.GetAddressOf());
 	}
 
-	for (auto& component : m_Components)
+	for (auto& component : m_arrComponent)
 	{
 		if (component)
 		{
 			component->Render();
 		}
 	}
+
+	for (auto& script : m_vScript)
+	{
+		script->Render();
+	}
 }
 
 void AActor::Destroy()
 {
-	for (auto& component : m_Components)
+	for (auto& component : m_arrComponent)
 	{
 		if (component)
 		{
 			component->Destroy();
 		}
+	}
+
+	for (auto& script : m_vScript)
+	{
+		script->Destroy();
 	}
 }
 

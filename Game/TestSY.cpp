@@ -4,15 +4,15 @@
 #include "UMaterial.h"
 #include "APawn.h"
 #include "ACameraActor.h"
-#include "Input.h"
-#include "Timer.h"
 #include "ASky.h"
+#include "EngineCameraMoveScript.h"
 
 void TestSY::Init()
 {
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
 		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 10.0f });
+		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	}
 
 	{
@@ -49,34 +49,6 @@ void TestSY::Init()
 
 void TestSY::Update()
 {
-	float deltaTime = TIMER->GetDeltaTime() * 10.f;
-
-	if (INPUT->GetButtonDown(W))
-	{
-		m_pCameraActor->AddPosition(Vec3(0.0f, 0.0f, -1.0f) * deltaTime);
-	}
-	if (INPUT->GetButtonDown(A))
-	{
-		m_pCameraActor->AddPosition(Vec3(-1.0f, 0.0f, 0.0f) * deltaTime);
-	}
-	if (INPUT->GetButtonDown(S))
-	{
-		m_pCameraActor->AddPosition(Vec3(0.0f, 0.0f, 1.0f) * deltaTime);
-	}
-	if (INPUT->GetButtonDown(D))
-	{
-		m_pCameraActor->AddPosition(Vec3(1.0f, 0.0f, 0.0f) * deltaTime);
-	}		
-	if (INPUT->GetButtonDown(Q))
-	{
-		m_pCameraActor->AddPosition(Vec3(0.0f, -1.0f, 0.0f) * deltaTime);
-	}
-	if (INPUT->GetButtonDown(E))
-	{
-		m_pCameraActor->AddPosition(Vec3(0.0f, 1.0f, 0.0f) * deltaTime);
-	}
-
-
 	m_pCameraActor->Tick();
 	m_pActor->Tick();
 	m_pSky->Tick();
