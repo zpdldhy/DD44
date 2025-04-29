@@ -2,6 +2,8 @@
 #include <windows.h>
 #include <string>
 #include <tchar.h> 
+#include <locale>
+#include <codecvt>
 
 static void DX_CHECK(HRESULT _hr, const TCHAR* _function)
 {
@@ -41,4 +43,17 @@ static std::wstring SplitPath(std::wstring _filename)
 	std::wstring key = FName;
 	key += Ext;
 	return key;
+}
+
+
+static std::wstring to_mw(const std::string& _src)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.from_bytes(_src);
+}
+
+static std::string to_wm(const std::wstring& _src)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.to_bytes(_src);
 }

@@ -40,6 +40,9 @@
     <Filter Include="Headers\Data">
       <UniqueIdentifier>{e02486f4-92b8-4b1a-875a-740aa34e8fe1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Sky">
+      <UniqueIdentifier>{168048c2-d65f-4442-bbae-75e7951c1b87}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -192,6 +195,12 @@
     <ClInclude Include="Functions.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="ASky.h">
+      <Filter>Object\Sky</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -316,6 +325,12 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Headers</Filter>
+    </ClCompile>
+    <ClCompile Include="ASky.cpp">
+      <Filter>Object\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
