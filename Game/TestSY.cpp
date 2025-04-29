@@ -11,7 +11,7 @@ void TestSY::Init()
 {
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
-		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 10.0f });
+		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	}
 
@@ -22,7 +22,7 @@ void TestSY::Init()
 		m_pStaticMesh->CreateCube();
 		m_pActor->SetMesh(m_pStaticMesh);
 		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
-		m_pActor->SetPosition({ 0.0f, 0.0f, 0.0f });
+		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();

@@ -6,8 +6,6 @@
 struct cbData
 {
 	Matrix matWorld;
-	Matrix matView;
-	Matrix matProj;
 };
 
 enum ComponentType

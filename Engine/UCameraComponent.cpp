@@ -54,7 +54,7 @@ void UCameraComponent::UpdateOrthographicProjection()
 
 void UCameraComponent::UpdatePersPectiveProjection()
 {
-	m_CameraData.matProjection = DirectX::SimpleMath::Matrix::CreatePerspectiveFieldOfView(DirectX::XMConvertToRadians(m_fFov), m_fAspect, 0.1f, 1000.0f);
+	m_CameraData.matProjection = DirectX::XMMatrixPerspectiveFovLH(m_fFov, m_fAspect, m_fNear, m_fFar);
 }
 
 void UCameraComponent::SetOrthographic(float _width, float _height)

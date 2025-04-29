@@ -122,4 +122,6 @@ void AActor::UpdateWorldMatrix()
 	m_vLook.Normalize();
 	m_vRight.Normalize();
 	m_vUp.Normalize();
+
+	m_cbData.matWorld = m_matWorld;
 }
