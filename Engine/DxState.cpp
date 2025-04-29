@@ -216,7 +216,7 @@ void DxState::CreateRasterizerStates()
 		D3D11_RASTERIZER_DESC rsDesc;
 		ZeroMemory(&rsDesc, sizeof(rsDesc));
 		rsDesc.FillMode = D3D11_FILL_SOLID;
-		rsDesc.CullMode = D3D11_CULL_BACK;
+		rsDesc.CullMode = D3D11_CULL_FRONT;
 		rsDesc.FrontCounterClockwise = TRUE;
 		rsDesc.DepthClipEnable = true;
 		HRESULT hr = DEVICE->CreateRasterizerState(&rsDesc, m_pRSSolid.GetAddressOf());

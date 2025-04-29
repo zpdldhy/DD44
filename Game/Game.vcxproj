@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="EngineCameraMoveScript.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Sample.h" />
@@ -148,6 +149,7 @@
     <ClInclude Include="TestYR.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -6,8 +6,6 @@
 struct cbData
 {
 	Matrix matWorld;
-	Matrix matView;
-	Matrix matProj;
 };
 
 enum ComponentType
@@ -18,9 +16,11 @@ enum ComponentType
 
 class AActor : public UObject
 {
-protected:
-	array<shared_ptr<UPrimitiveComponent>, ComponentType::CT_COUNT> m_Components;
 	friend class UCameraComponent;
+
+protected:
+	array<shared_ptr<UPrimitiveComponent>, ComponentType::CT_COUNT> m_arrComponent;
+	vector<shared_ptr<class UScriptComponent>> m_vScript;
 
 	cbData m_cbData;
 	ComPtr<ID3D11Buffer> m_pWorldCB;
@@ -56,14 +56,18 @@ public:
 
 public:
 	template<typename T>
-	shared_ptr<T> GetMesh() { return static_pointer_cast<T>(m_Components[ComponentType::CT_MESH]); }
+	shared_ptr<T> GetMesh() { return static_pointer_cast<T>(m_arrComponent[ComponentType::CT_MESH]); }
+	void SetMesh(shared_ptr<UMeshComponent> _mesh) { m_arrComponent[ComponentType::CT_MESH] = _mesh; }
 
-	void SetMesh(shared_ptr<UMeshComponent> _mesh) { m_Components[ComponentType::CT_MESH] = _mesh; }
+	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }
 
 public:
 	const Vec3& GetPosition() const { return m_vPosition; }
 	const Vec3& GetRotation() const { return m_vRotation; }
 	const Vec3& GetScale() const { return m_vScale; }
+	const Vec3& GetLook() const { return m_vLook; }
+	const Vec3& GetRight() const { return m_vRight; }
+	const Vec3& GetUp() const { return m_vUp; }
 
 	void SetPosition(const Vec3& _pos) { m_vPosition = _pos; }
 	void SetRotation(const Vec3& _rot) { m_vRotation = _rot; }
