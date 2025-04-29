@@ -199,41 +199,45 @@ void UTerrainMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 }
-void UTerrainMeshComponent::CreateGrid(int _col, int _row, float _cellSize)
+void UTerrainMeshComponent::CreateGrid(int _sizeX, int _sizeZ, float _cellSize)
 {
-	int vertices = (_col + 1) * (_row + 1);
-	int indices = _col * _row * 6;
+	int NumCol = _sizeX - 1;
+	int NumRow = _sizeZ - 1;
+
+	int vertices = _sizeX * _sizeZ;
+	int indices = NumCol * NumRow * 6;
 
 	m_vVertexList.resize(vertices);
 	m_vIndexList.resize(indices);
 
 	int vertexIndex = 0;
-	for (int row = 0; row <= _row; ++row)
+	for (int row = 0; row < _sizeZ; ++row)
 	{
-		for (int col = 0; col <= _col; ++col)
+		for (int col = 0; col < _sizeX; ++col)
 		{
-			float x = (col * _cellSize) - (_col * _cellSize * 0.5f);
+			float x = (col * _cellSize) - (NumCol * _cellSize * 0.5f);
 			float y = 0.0f;
-			float z = (row * _cellSize) - (_row * _cellSize * 0.5f);
+			float z = (row * _cellSize) - (NumRow * _cellSize * 0.5f);
 
 			Vec3 pos = Vec3(x, y, z);
 			Vec3 normal = Vec3(0, 1, 0);
 			Vec4 color = Vec4(1, 1, 1, 1);
-			Vec2 uv = Vec2((float)col / _col, (float)row / _row); // 한장의 텍스처
-			//Vec2 uv = Vec2((float)col, (float)row); // 바둑판 배열
+			// *텍스처 uv 0~1 범위 설정 시 픽셀단위로 쪼개져서 단색으로 보이는 것으로 추정
+			//Vec2 uv = Vec2((float)col / NumCol, (float)row / NumRow);
+			Vec2 uv = Vec2(col * 0.1f, row * 0.1f); // 임의로 타일링
 
 			m_vVertexList[vertexIndex++] = PNCT_VERTEX(pos, normal, color, uv);
 		}
 	}
 
 	int iIndex = 0;
-	for (int row = 0; row < _row; ++row)
+	for (int row = 0; row < NumRow; ++row)
 	{
-		for (int col = 0; col < _col; ++col)
+		for (int col = 0; col < NumCol; ++col)
 		{
-			int iTopLeft = row * (_col + 1) + col;
+			int iTopLeft = row * _sizeX + col;
 			int iTopRight = iTopLeft + 1;
-			int iBottomLeft = (row + 1) * (_col + 1) + col;
+			int iBottomLeft = (row + 1) * _sizeX + col;
 			int iBottomRight = iBottomLeft + 1;
 
 			m_vIndexList[iIndex++] = iTopLeft;

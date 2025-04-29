@@ -31,20 +31,52 @@ void TestSY::Init()
 	}
 
 	{
+		DirectX::ScratchImage heightImage;
+		DirectX::LoadFromWICFile(L"../Resources/Texture/height.png", DirectX::WIC_FLAGS_FORCE_RGB, nullptr, heightImage);
+		const DirectX::Image* img = heightImage.GetImage(0, 0, 0);
+		UINT8* pixels = img->pixels;
+		int width = static_cast<int>(img->width);
+		int height = static_cast<int>(img->height);
+
 		m_pPlane = make_shared<AActor>();
 
 		m_pPlaneMesh = make_shared<UTerrainMeshComponent>();
-		m_pPlaneMesh->CreateGrid(10, 10, 10.0f);
+		m_pPlaneMesh->CreateGrid(width, height, 10.0f);
+		for (int y = 0; y < height; ++y)
+		{
+			for (int x = 0; x < width; ++x)
+			{
+				int idx = y * width + x;
+				UINT8 gray = pixels[y * img->rowPitch + x];
+				float heightValue = (gray / 255.0f * 1000.0f) - 500.0f;
+				m_pPlaneMesh->m_vVertexList[idx].pos.y = heightValue;
+			}
+		}
+		m_pPlaneMesh->CreateVertexBuffer();
 		m_pPlane->SetMesh(m_pPlaneMesh);
-		m_pPlane->SetScale({ 10.0f, 10.0f, 10.0f });
-		m_pPlane->SetPosition({ 0.0f, 0.0f, 0.0f });
-		m_pPlane->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-
-		m_pTexture = TEXTURE->Load(L"../Resources/Texture/HeightMap.jpg");
 		m_pPlaneMesh->SetMaterial(material);
+	}
+
+	{
+		//m_pTexture = TEXTURE->Load(L"../Resources/Texture/height.png");
+		//int width = m_pTexture->width;
+		//int height = m_pTexture->height;
+
+		//m_pPlane = make_shared<AActor>();
+
+		//m_pPlaneMesh = make_shared<UTerrainMeshComponent>();
+		//m_pPlaneMesh->CreateGrid(width, height, 10.0f);
+		//m_pPlane->SetMesh(m_pPlaneMesh);
+		//m_pPlane->SetScale({ 10.0f, 10.0f, 10.0f });
+		//m_pPlane->SetPosition({ 0.0f, 0.0f, 0.0f });
+		//m_pPlane->SetRotation({ 0.0f, 0.0f, 0.0f });
+
+		//shared_ptr<UMaterial> material = make_shared<UMaterial>();
+		//material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		//m_pPlaneMesh->SetMaterial(material);
 	}
 
 	{
