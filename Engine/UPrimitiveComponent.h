@@ -27,8 +27,7 @@ public:
 	bool CreateVertexBuffer();
 	bool CreateIndexBuffer();
 public:
-	void PreRender();
-	virtual void Render() override;
-	void PostRender();
+	void PreRender() override;
+	void PostRender() override;
 };
 

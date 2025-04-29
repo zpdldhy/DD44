@@ -29,21 +29,13 @@ void AActor::Tick()
 	}
 }
 
-void AActor::PreRender()
-{
-	m_cbData.matWorld = m_matWorld;
-	Matrix view = Matrix::CreateLookAt(
-		Vec3(0, 0, -5), Vec3(0, 0, 0), Vec3(0, 1, 0));
-	Matrix proj = Matrix::CreatePerspectiveFieldOfView(
-		3.141592f / 4.0f, 800.0f / 600.0f, 0.1f, 100.0f);
-
-	m_cbData.matView = view;
-	m_cbData.matProj = proj;
-}
-
 void AActor::Render()
 {
-	PreRender();
+	if (m_pWorldCB)
+	{
+		DC->UpdateSubresource(m_pWorldCB.Get(), 0, NULL, &m_cbData, 0, 0);
+		DC->VSSetConstantBuffers(0, 1, m_pWorldCB.GetAddressOf());
+	}
 
 	for (auto& component : m_Components)
 	{
@@ -51,17 +43,6 @@ void AActor::Render()
 		{
 			component->Render();
 		}
-	}
-
-	PostRender();
-}
-
-void AActor::PostRender()
-{
-	if (m_pConstantBuffer) 
-	{
-		DC->UpdateSubresource(m_pConstantBuffer.Get(), 0, NULL, &m_cbData, 0, 0);
-		DC->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
 	}
 }
 
@@ -89,11 +70,11 @@ bool AActor::CreateConstantBuffer()
 	sd.pSysMem = &m_cbData;
 
 	HRESULT hr =
-		DEVICE->CreateBuffer(&bd, &sd, m_pConstantBuffer.GetAddressOf());
+		DEVICE->CreateBuffer(&bd, &sd, m_pWorldCB.GetAddressOf());
 
 	if (FAILED(hr))
 	{
-		DX_CHECK(hr, _T("CreateConstantBuffer Failed"));
+		DX_CHECK(hr, _T("CreateWorldBuffer Failed"));
 		return false;
 	}
 

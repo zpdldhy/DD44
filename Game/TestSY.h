@@ -5,7 +5,7 @@ class TestSY : public IExecute
 {
 public:
 	shared_ptr<class UStaticMeshComponent> m_pStaticMesh;
-	shared_ptr<class AActor> m_pActor;
+	shared_ptr<class APawn> m_pActor;
 	shared_ptr<class ACameraActor> m_pCameraActor;
 
 public:

@@ -52,12 +52,6 @@ bool UPrimitiveComponent::CreateIndexBuffer()
 	return true;
 }
 
-void UPrimitiveComponent::Render()
-{
-	PreRender();
-	PostRender();
-}
-
 void UPrimitiveComponent::PreRender()
 {
 	// IA Setting

@@ -20,7 +20,7 @@ class UCameraComponent : public USceneComponent
 {
 	ProjectionType m_ProjectionType = ProjectionType::PT_PERSPECTIVE;
 
-	ComPtr<ID3D11Buffer> m_pCameraBuffer;
+	ComPtr<ID3D11Buffer> m_pCameraCB;
 	CameraConstantData m_CameraData;
 
 	// Projection

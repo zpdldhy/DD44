@@ -18,8 +18,8 @@ void UCameraComponent::Tick()
 
 void UCameraComponent::Render()
 {
-	DC->UpdateSubresource(m_pCameraBuffer.Get(), 0, nullptr, &m_CameraData, 0, 0);
-	DC->VSSetConstantBuffers(1, 1, m_pCameraBuffer.GetAddressOf());
+	DC->UpdateSubresource(m_pCameraCB.Get(), 0, nullptr, &m_CameraData, 0, 0);
+	DC->VSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
 }
 
 void UCameraComponent::CreateCameraBuffer()
@@ -29,11 +29,11 @@ void UCameraComponent::CreateCameraBuffer()
 	pDesc.ByteWidth = sizeof(CameraConstantData);
 	pDesc.Usage = D3D11_USAGE_DEFAULT;
 	pDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	HRESULT hr = DEVICE->CreateBuffer(&pDesc, nullptr, m_pCameraBuffer.GetAddressOf());
+	HRESULT hr = DEVICE->CreateBuffer(&pDesc, nullptr, m_pCameraCB.GetAddressOf());
 
 	if (FAILED(hr))
 	{
-		DX_CHECK(hr, _T(__FUNCTION__));
+		DX_CHECK(hr, _T("CreateCameraBuffer Failed"));
 		assert(false);
 	}
 }
