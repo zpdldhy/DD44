@@ -15,6 +15,5 @@ void ACameraActor::Tick()
 
 void ACameraActor::Render()
 {
-	AActor::Render();
 	m_pCameraComponent->Render();
 }

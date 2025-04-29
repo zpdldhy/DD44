@@ -20,6 +20,9 @@ public:
 	ComPtr<ID3D11Buffer> GetGlowCB() const { return m_pGlowCB; }
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);
+	virtual void Bind();
+
+public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
 	virtual void SetTexture(shared_ptr<Texture> _texture) { m_pTexture = _texture; }
 

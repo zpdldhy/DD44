@@ -2,6 +2,7 @@
 #include "TestSY.h"
 #include "UStaticMeshComponent.h"
 #include "UMaterial.h"
+#include "APawn.h"
 #include "ACameraActor.h"
 #include "Input.h"
 #include "Timer.h"
@@ -15,7 +16,7 @@ void TestSY::Init()
 	}
 
 	{
-		m_pActor = make_shared<AActor>();
+		m_pActor = make_shared<APawn>();
 
 		m_pStaticMesh = make_shared<UStaticMeshComponent>();
 		m_pStaticMesh->CreateCube();

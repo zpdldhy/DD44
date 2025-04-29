@@ -23,7 +23,7 @@ protected:
 	friend class UCameraComponent;
 
 	cbData m_cbData;
-	ComPtr<ID3D11Buffer> m_pConstantBuffer;
+	ComPtr<ID3D11Buffer> m_pWorldCB;
 
 protected:
 	Vec3 m_vLook	= { 0.0f,0.0f,1.0f };
@@ -47,9 +47,7 @@ public:
 public:
 	void Init() override;
 	void Tick() override;
-	void PreRender() override;
 	void Render() override;
-	void PostRender() override;
 	void Destroy() override;
 public:
 	virtual bool CreateConstantBuffer();

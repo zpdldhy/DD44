@@ -80,8 +80,8 @@ class Input : public Singleton<Input>
 public:
 	vector<DWORD> keys;
 public:
-	DWORD _dwKeyState[256];
-	POINT _mouse;
+	DWORD _dwKeyState[256] = { 0, };
+	POINT _mouse = { 0, 0 };
 public:
 	DWORD CheckKey(DWORD _dwKey);
 	bool GetButton(GameKey _key);
