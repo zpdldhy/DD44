@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Sound.h"
 
-
 void Sound::Update()
 {
 	if (m_pSystem)
@@ -115,47 +114,44 @@ void Sound::VolumeDown(float fVolume)
 	}
 }
 
-Sound* SoundManager::Load(std::wstring filename)
+bool SoundManager::Load(ESoundType type, const std::wstring& path)
 {
 	if (m_pSystem == nullptr)
 	{
-		FMOD_RESULT hr = FMOD::System_Create(
-			&m_pSystem);
+		FMOD_RESULT hr = FMOD::System_Create(&m_pSystem);
 		if (hr == FMOD_OK)
 		{
 			m_pSystem->init(32, FMOD_INIT_NORMAL, 0);
 		}
 	}
 
-	auto key = SplitPath(filename);
-	auto data = GetPtr(key);
-	if (data != nullptr)
+	if (m_Sounds[static_cast<int>(type)] != nullptr)
 	{
-		return data; // 이미 로딩된 사운드가 있으면 리턴
+		return true; // 이미 있으면 무시
 	}
 
-	Sound* pSound = new Sound(key); // 새 Sound 객체 생성
-
-	if (pSound->Load(m_pSystem, filename))
+	Sound* pSound = new Sound();
+	if (pSound->Load(m_pSystem, path))
 	{
-		maplist.insert(std::make_pair(key, pSound));
-		return pSound; //  새로 로드한 사운드를 리턴
+		m_Sounds[static_cast<int>(type)] = pSound;
+		return true;
 	}
 	else
 	{
-		delete pSound; //  로드 실패했으면 메모리 해제
-		return nullptr;
+		delete pSound;
+		return false;
 	}
 }
 
-Sound* SoundManager::GetPtr(std::wstring key)
+void SoundManager::LoadAllSounds()
 {
-	auto data = maplist.find(key);
-	if (data != maplist.end())
-	{
-		return data->second;
-	}
-	return nullptr;
+	Load(ESoundType::Bomb, L"../Resources/Sound/bomb.wav");
+	Load(ESoundType::Bgm, L"../Resources/Sound/boss.mp3");
+}
+
+Sound* SoundManager::GetPtr(ESoundType type)
+{
+	return m_Sounds[static_cast<int>(type)];
 }
 
 void SoundManager::Update()

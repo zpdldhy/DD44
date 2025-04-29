@@ -3,21 +3,67 @@
 #include "Input.h"
 #include "DxWrite.h"
 #include "Sound.h"
+#include "UStaticMeshComponent.h"
+#include "UMaterial.h"
+#include "Timer.h"
+
 void TestSJ::Init()
 {
-	m_pBomb = SOUNDMANAGER->Load(L"../Resources/Sound/bomb.wav");
-	//m_pBgm = SOUNDMANAGER->Load(L"../Resources/Sound/Boss.mp3");
+	SOUNDMANAGER->LoadAllSounds();
+
+
+	m_pStaticMesh = make_shared<UStaticMeshComponent>();
+	m_pStaticMesh->CreateCube();
+	shared_ptr<UMaterial> material = make_shared<UMaterial>();
+	material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Glow.hlsl");
+	m_pStaticMesh->SetMaterial(material);
 }
 
 void TestSJ::Update()
 {
-	//m_pBgm->Play2D();
-	if (INPUT->GetButton(A))
 	{
-		m_pBomb->PlayEffect2D();
-	}
+		static bool bGlow = false;
+		static float glowTimer = 0.0f;
 
-	/*if (INPUT->GetButton(A))
+		// R 키를 누르면 발광 시작
+		if (INPUT->GetButtonDown(R))
+		{
+			bGlow = true;
+			glowTimer = 0.1f; // 1초 동안 발광
+		}
+
+		// 발광 중이면 타이머 감소
+		if (bGlow)
+		{
+			glowTimer -= TIMER->GetDeltaTime();
+			if (glowTimer <= 0.0f)
+			{
+				bGlow = false;
+				glowTimer = 0.0f;
+			}
+		}
+
+		// 현재 발광 값 계산
+		float glowPower = bGlow ? 2.0f : 0.0f;
+
+		// Material에 업데이트
+		m_pStaticMesh->GetMaterial()->SetGlowParams(
+			glowPower,
+			Vec3(1.0f, 0.0f, 0.0f) // 빨간색
+		);
+
+	}
+	//Sound
+	{
+		//m_pBgm->Play2D();
+		if (INPUT->GetButton(A))
+		{
+			SOUNDMANAGER->GetPtr(ESoundType::Bomb)->PlayEffect2D();
+		}
+	}
+	//Write
+	{
+		/*if (INPUT->GetButton(A))
 	{
 		DXWRITE->SetFont(L"소야뜰9");
 	}
@@ -75,16 +121,18 @@ void TestSJ::Update()
 			DWRITE_TEXT_ALIGNMENT_TRAILING,
 			DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	}*/
+	}
+
 }
 
 void TestSJ::Render()
 {
-
-
-	//DXWRITE->DrawGlow(
-	//	D2D1::RectF(300, 300, 600, 400),
-	//	L"빛나는 텍스트",
-	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
-	//	D2D1::ColorF::White                   // 메인 텍스트 색
-	//);
+	DXWRITE->DrawGlow
+	(
+		D2D1::RectF(300, 300, 600, 400),
+		L"빛나는 텍스트",
+		D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
+		D2D1::ColorF::White                   // 메인 텍스트 색
+	);
+	m_pStaticMesh->Render();
 }

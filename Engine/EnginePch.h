@@ -24,6 +24,13 @@ using namespace std;
 #include <d3dcompiler.h>
 #include <d3d11shader.h>
 
+// Write2D
+#pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "dwrite.lib")
+#include <d2d1.h>
+#include <d2d1helper.h>
+#include <dwrite.h>
+
 // ImGUI
 #include "imgui.h"
 #include "imgui_impl_dx11.h"

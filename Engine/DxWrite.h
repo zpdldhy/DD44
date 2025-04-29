@@ -1,11 +1,4 @@
 #pragma once
-#include <d2d1.h>
-#include <d2d1helper.h>
-#include <dwrite.h>
-#include <string>
-#include <list>
-#pragma comment(lib, "d2d1.lib")
-#pragma comment(lib, "dwrite.lib")
 #include "Singleton.h"
 
 class DxWrite : public Singleton<DxWrite>
