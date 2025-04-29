@@ -39,7 +39,7 @@ void TestSY::Init()
 		int width = static_cast<int>(img->width);
 		int height = static_cast<int>(img->height);
 
-		m_pPlane = make_shared<AActor>();
+		m_pPlane = make_shared<APawn>();
 
 		m_pPlaneMesh = make_shared<UTerrainMeshComponent>();
 		m_pPlaneMesh->CreateGrid(width, height, 10.0f);
