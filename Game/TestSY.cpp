@@ -16,7 +16,7 @@ void TestSY::Init()
 	}
 
 	{
-		m_pActor = make_shared<AActor>();
+		m_pActor = make_shared<APawn>();
 
 		m_pStaticMesh = make_shared<UStaticMeshComponent>();
 		m_pStaticMesh->CreateCube();

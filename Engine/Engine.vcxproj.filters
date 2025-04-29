@@ -275,12 +275,6 @@
     <ClCompile Include="APawn.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="UObject.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="USkinnedComponent.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="imgui.cpp">
       <Filter>Utils\ImGUI</Filter>
     </ClCompile>
@@ -331,6 +325,12 @@
     </ClCompile>
     <ClCompile Include="Sound.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="USkinnedComponent.cpp">
+      <Filter>Component\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="UObject.cpp">
+      <Filter>Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 #pragma once
-#include "AActor.h"
+#include "APawn.h"
 
-class ASky : public AActor
+class ASky : public APawn
 {
 public:
 	virtual void Init() override;

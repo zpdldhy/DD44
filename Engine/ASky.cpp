@@ -20,7 +20,7 @@ void ASky::Render()
 {
 	DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
-	AActor::Render();
+	APawn::Render();
 
 	DC->RSSetState(STATE->m_pRSSolid.Get());
 }
