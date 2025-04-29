@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "UStaticMeshComponent.h"
+#include "UTerrainMeshComponent.h"
 
-void UStaticMeshComponent::CreateTriangle()
+void UTerrainMeshComponent::CreateTriangle()
 {
 	m_vVertexList.resize(3);
 	m_vIndexList.resize(3);
@@ -20,7 +20,7 @@ void UStaticMeshComponent::CreateTriangle()
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 }
-void UStaticMeshComponent::CreatePlane()
+void UTerrainMeshComponent::CreatePlane()
 {
 	m_vVertexList.resize(4);
 	m_vIndexList.resize(6);
@@ -41,7 +41,7 @@ void UStaticMeshComponent::CreatePlane()
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 }
-void UStaticMeshComponent::CreateCube()
+void UTerrainMeshComponent::CreateCube()
 {
 	m_vVertexList.resize(24);
 	m_vIndexList.resize(36);
@@ -105,7 +105,7 @@ void UStaticMeshComponent::CreateCube()
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 }
-void UStaticMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
+void UTerrainMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
 {
 	m_vVertexList.clear();
 	m_vIndexList.clear();
@@ -199,3 +199,58 @@ void UStaticMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 }
+void UTerrainMeshComponent::CreateGrid(int _sizeX, int _sizeZ, float _cellSize)
+{
+	int NumCol = _sizeX - 1;
+	int NumRow = _sizeZ - 1;
+
+	int vertices = _sizeX * _sizeZ;
+	int indices = NumCol * NumRow * 6;
+
+	m_vVertexList.resize(vertices);
+	m_vIndexList.resize(indices);
+
+	int vertexIndex = 0;
+	for (int row = 0; row < _sizeZ; ++row)
+	{
+		for (int col = 0; col < _sizeX; ++col)
+		{
+			float x = (col * _cellSize) - (NumCol * _cellSize * 0.5f);
+			float y = 0.0f;
+			float z = (row * _cellSize) - (NumRow * _cellSize * 0.5f);
+
+			Vec3 pos = Vec3(x, y, z);
+			Vec3 normal = Vec3(0, 1, 0);
+			Vec4 color = Vec4(1, 1, 1, 1);
+			// *텍스처 uv 0~1 범위 설정 시 픽셀단위로 쪼개져서 단색으로 보이는 것으로 추정
+			//Vec2 uv = Vec2((float)col / NumCol, (float)row / NumRow);
+			Vec2 uv = Vec2(col * 0.1f, row * 0.1f); // 임의로 타일링
+
+			m_vVertexList[vertexIndex++] = PNCT_VERTEX(pos, normal, color, uv);
+		}
+	}
+
+	int iIndex = 0;
+	for (int row = 0; row < NumRow; ++row)
+	{
+		for (int col = 0; col < NumCol; ++col)
+		{
+			int iTopLeft = row * _sizeX + col;
+			int iTopRight = iTopLeft + 1;
+			int iBottomLeft = (row + 1) * _sizeX + col;
+			int iBottomRight = iBottomLeft + 1;
+
+			m_vIndexList[iIndex++] = iTopLeft;
+			m_vIndexList[iIndex++] = iBottomLeft;
+			m_vIndexList[iIndex++] = iTopRight;
+
+			m_vIndexList[iIndex++] = iTopRight;
+			m_vIndexList[iIndex++] = iBottomLeft;
+			m_vIndexList[iIndex++] = iBottomRight;
+		}
+	}
+
+	CreateVertexBuffer();
+	CreateIndexBuffer();
+}
+

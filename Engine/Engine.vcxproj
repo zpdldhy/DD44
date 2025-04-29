@@ -158,6 +158,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClInclude Include="APawn.h" />
     <ClInclude Include="ASky.h" />
     <ClInclude Include="Sound.h" />
+    <ClInclude Include="ATerrainTileActor.h" />
     <ClInclude Include="UCameraComponent.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Device.h" />
@@ -196,6 +197,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClInclude Include="UScriptComponent.h" />
     <ClInclude Include="USkinnedComponent.h" />
     <ClInclude Include="UStaticMeshComponent.h" />
+    <ClInclude Include="UTerrainMeshComponent.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
@@ -206,6 +208,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClCompile Include="APawn.cpp" />
     <ClCompile Include="ASky.cpp" />
     <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="ATerrainTileActor.cpp" />
     <ClCompile Include="UCameraComponent.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="DxState.cpp" />
@@ -256,6 +259,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClCompile Include="UScriptComponent.cpp" />
     <ClCompile Include="USkinnedComponent.cpp" />
     <ClCompile Include="UStaticMeshComponent.cpp" />
+    <ClCompile Include="UTerrainMeshComponent.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
