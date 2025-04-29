@@ -32,7 +32,7 @@ class UCameraComponent : public USceneComponent
 	float m_fFov = 3.14f / 4.0f;
 	float m_fAspect = 800.0f / 600.0f;
 	float m_fNear = 0.1f;
-	float m_fFar = 1000.0f;
+	float m_fFar = 10000.0f;
 	
 public:
 	void Init() override;

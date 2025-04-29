@@ -7,27 +7,6 @@ void EngineCameraMoveScript::Tick()
 {
 	float deltaTime = TIMER->GetDeltaTime() * 10.f;
 
-	auto vLook = m_pOwner->GetLook();
-	auto vRight = m_pOwner->GetRight();
-
-	if (INPUT->GetButtonDown(W))
-		m_pOwner->AddPosition(vLook * deltaTime);
-
-	if (INPUT->GetButtonDown(A))
-		m_pOwner->AddPosition(-vRight * deltaTime);
-
-	if (INPUT->GetButtonDown(S))
-		m_pOwner->AddPosition(-vLook * deltaTime);
-
-	if (INPUT->GetButtonDown(D))
-		m_pOwner->AddPosition(vRight * deltaTime);
-
-	if (INPUT->GetButtonDown(Q))
-		m_pOwner->AddPosition(Vec3(0.0f, -1.0f, 0.0f) * deltaTime);
-
-	if (INPUT->GetButtonDown(E))
-		m_pOwner->AddPosition(Vec3(0.0f, 1.0f, 0.0f) * deltaTime);
-
 	if (INPUT->GetButton(RCLICK))
 		m_pPrevMousePos = INPUT->GetMousePos();
 
@@ -41,4 +20,26 @@ void EngineCameraMoveScript::Tick()
 
 		m_pPrevMousePos = pCurrentMousePointer;
 	}
+
+	if(INPUT->GetButtonDown(LSHIFT))
+		deltaTime *= 10.f;
+
+	if (INPUT->GetButtonDown(W))
+		m_pOwner->AddPosition(m_pOwner->GetLook() * deltaTime);
+
+	if (INPUT->GetButtonDown(A))
+		m_pOwner->AddPosition(-m_pOwner->GetRight() * deltaTime);
+
+	if (INPUT->GetButtonDown(S))
+		m_pOwner->AddPosition(-m_pOwner->GetLook() * deltaTime);
+
+	if (INPUT->GetButtonDown(D))
+		m_pOwner->AddPosition(m_pOwner->GetRight() * deltaTime);
+
+	if (INPUT->GetButtonDown(Q))
+		m_pOwner->AddPosition(Vec3(0.0f, -1.0f, 0.0f) * deltaTime);
+
+	if (INPUT->GetButtonDown(E))
+		m_pOwner->AddPosition(Vec3(0.0f, 1.0f, 0.0f) * deltaTime);
+
 }

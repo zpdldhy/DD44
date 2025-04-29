@@ -9,7 +9,7 @@ public:
 	UPrimitiveComponent() = default;
 	virtual ~UPrimitiveComponent() = default;
 
-protected:
+public:
 	// MATERIAL
 	shared_ptr<UMaterial> m_pMaterial;
 	// MESH DATA

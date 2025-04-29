@@ -42,14 +42,14 @@ void TestSY::Init()
 		m_pPlane = make_shared<APawn>();
 
 		m_pPlaneMesh = make_shared<UTerrainMeshComponent>();
-		m_pPlaneMesh->CreateGrid(width, height, 10.0f);
+		m_pPlaneMesh->CreateGrid(width, height, 1.0f);
 		for (int y = 0; y < height; ++y)
 		{
 			for (int x = 0; x < width; ++x)
 			{
 				int idx = y * width + x;
 				UINT8 gray = pixels[y * img->rowPitch + x];
-				float heightValue = (gray / 255.0f * 1000.0f) - 500.0f;
+				float heightValue = (gray / 255.0f * 500.0f) - 300.0f;
 				m_pPlaneMesh->m_vVertexList[idx].pos.y = heightValue;
 			}
 		}
