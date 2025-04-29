@@ -12,5 +12,6 @@ protected:
 
 public:
 	void AddChild(shared_ptr<UMeshComponent> _child) { m_vChild.push_back(_child); }
+	shared_ptr<UMeshComponent> GetChild(int _index) { return m_vChild[_index]; }
 };
 
