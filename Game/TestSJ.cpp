@@ -122,7 +122,7 @@ void TestSJ::Update()
 			DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	}*/
 	}
-	
+
 }
 
 void TestSJ::Render()
