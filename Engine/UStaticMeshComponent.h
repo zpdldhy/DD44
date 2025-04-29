@@ -4,9 +4,9 @@
 class UStaticMeshComponent : public UMeshComponent
 {
 public:
-	void CreateSphere(int iSliceCount, int iStackCount);
-	void CreateCube();
 	void CreateTriangle();
 	void CreatePlane();
+	void CreateCube();
+	void CreateSphere(int _sliceCount, int _stackCount);
 };
 

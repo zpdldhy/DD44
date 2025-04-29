@@ -1,102 +1,46 @@
 #include "pch.h"
 #include "UStaticMeshComponent.h"
 
-void UStaticMeshComponent::CreateSphere(int iSliceCount, int iStackCount)
+void UStaticMeshComponent::CreateTriangle()
 {
-	m_vVertexList.clear();
-	m_vIndexList.clear();
+	m_vVertexList.resize(3);
+	m_vIndexList.resize(3);
 
-	float radius = 0.5f; // 구 반지름
+	Vec3 vMin = Vec3(0.0f, +0.0f, -1.0f);
+	Vec3 vMax = Vec3(+2.0f, +2.0f, +1.0f);
 
-	// Top Vertex
-	m_vVertexList.push_back(
-		PNCT_VERTEX(
-			Vec3(0.0f, +radius, 0.0f),
-			Vec3(0.0f, +1.0f, 0.0f),
-			Vec4(1, 0, 0, 1),
-			Vec2(0.0f, 0.0f)
-		)
-	);
+	// Front
+	m_vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	m_vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	m_vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
 
-	float phiStep = DD_PI / iStackCount;
-	float thetaStep = 2.0f * DD_PI / iSliceCount;
-
-	// Middle vertices
-	for (int i = 1; i <= iStackCount - 1; ++i)
-	{
-		float phi = i * phiStep;
-
-		for (int j = 0; j <= iSliceCount; ++j)
-		{
-			float theta = j * thetaStep;
-
-			Vec3 pos(
-				radius * sinf(phi) * cosf(theta),
-				radius * cosf(phi),
-				radius * sinf(phi) * sinf(theta)
-			);
-
-			Vec3 normal = pos;
-			normal.Normalize();
-			Vec2 texCoord(theta / (2 * DD_PI), phi / DD_PI);
-
-			m_vVertexList.push_back(
-				PNCT_VERTEX(pos, normal, Vec4(1, 0, 0, 1), texCoord)
-			);
-		}
-	}
-
-	// Bottom Vertex
-	m_vVertexList.push_back(
-		PNCT_VERTEX(
-			Vec3(0.0f, -radius, 0.0f),
-			Vec3(0.0f, -1.0f, 0.0f),
-			Vec4(1, 0, 0, 1),
-			Vec2(0.0f, 1.0f)
-		)
-	);
-
-	// Top stack
-	for (int i = 1; i <= iSliceCount; ++i)
-	{
-		m_vIndexList.push_back(0);
-		m_vIndexList.push_back(i + 1);
-		m_vIndexList.push_back(i);
-	}
-
-	// Middle stacks
-	int baseIndex = 1;
-	int ringVertexCount = iSliceCount + 1;
-	for (int i = 0; i < iStackCount - 2; ++i)
-	{
-		for (int j = 0; j < iSliceCount; ++j)
-		{
-			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j);
-			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
-			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
-
-			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
-			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
-			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
-		}
-	}
-
-	// Bottom stack
-	int southPoleIndex = (int)m_vVertexList.size() - 1;
-	baseIndex = southPoleIndex - ringVertexCount;
-
-	for (int i = 0; i < iSliceCount; ++i)
-	{
-		m_vIndexList.push_back(southPoleIndex);
-		m_vIndexList.push_back(baseIndex + i);
-		m_vIndexList.push_back(baseIndex + i + 1);
-	}
+	int iIndex = 0;
+	m_vIndexList[iIndex++] = 0; m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 2;
 
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 }
+void UStaticMeshComponent::CreatePlane()
+{
+	m_vVertexList.resize(4);
+	m_vIndexList.resize(6);
 
+	Vec3 vMin = Vec3(-100.0f, +0.0f, -100.0f);
+	Vec3 vMax = Vec3(+100.0f, +0.0f, +100.0f);
 
+	// Front
+	m_vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	m_vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	m_vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	m_vVertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+
+	int iIndex = 0;
+	m_vIndexList[iIndex++] = 0; m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 3;
+	m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 2; m_vIndexList[iIndex++] = 3;
+
+	CreateVertexBuffer();
+	CreateIndexBuffer();
+}
 void UStaticMeshComponent::CreateCube()
 {
 	m_vVertexList.resize(24);
@@ -161,42 +105,96 @@ void UStaticMeshComponent::CreateCube()
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 }
-void UStaticMeshComponent::CreateTriangle()
+void UStaticMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
 {
-	m_vVertexList.resize(3);
-	m_vIndexList.resize(3);
+	m_vVertexList.clear();
+	m_vIndexList.clear();
 
-	Vec3 vMin = Vec3(0.0f, +0.0f, -1.0f);
-	Vec3 vMax = Vec3(+2.0f, +2.0f, +1.0f);
+	float radius = 0.5f; // 구 반지름
 
-	// Front
-	m_vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	// Top Vertex
+	m_vVertexList.push_back(
+		PNCT_VERTEX(
+			Vec3(0.0f, +radius, 0.0f),
+			Vec3(0.0f, +1.0f, 0.0f),
+			Vec4(1, 0, 0, 1),
+			Vec2(0.0f, 0.0f)
+		)
+	);
 
-	int iIndex = 0;
-	m_vIndexList[iIndex++] = 0; m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 2;
+	float phiStep = DD_PI / _stackCount;
+	float thetaStep = 2.0f * DD_PI / _sliceCount;
 
-	CreateVertexBuffer();
-	CreateIndexBuffer();
-}
-void UStaticMeshComponent::CreatePlane()
-{
-	m_vVertexList.resize(4);
-	m_vIndexList.resize(6);
+	// Middle vertices
+	for (int i = 1; i <= _stackCount - 1; ++i)
+	{
+		float phi = i * phiStep;
 
-	Vec3 vMin = Vec3(-100.0f, +0.0f, -100.0f);
-	Vec3 vMax = Vec3(+100.0f, +0.0f, +100.0f);
+		for (int j = 0; j <= _sliceCount; ++j)
+		{
+			float theta = j * thetaStep;
 
-	// Front
-	m_vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+			Vec3 pos(
+				radius * sinf(phi) * cosf(theta),
+				radius * cosf(phi),
+				radius * sinf(phi) * sinf(theta)
+			);
 
-	int iIndex = 0;
-	m_vIndexList[iIndex++] = 0; m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 3;
-	m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 2; m_vIndexList[iIndex++] = 3;
+			Vec3 normal = pos;
+			normal.Normalize();
+			Vec2 texCoord(theta / (2 * DD_PI), phi / DD_PI);
+
+			m_vVertexList.push_back(
+				PNCT_VERTEX(pos, normal, Vec4(1, 0, 0, 1), texCoord)
+			);
+		}
+	}
+
+	// Bottom Vertex
+	m_vVertexList.push_back(
+		PNCT_VERTEX(
+			Vec3(0.0f, -radius, 0.0f),
+			Vec3(0.0f, -1.0f, 0.0f),
+			Vec4(1, 0, 0, 1),
+			Vec2(0.0f, 1.0f)
+		)
+	);
+
+	// Top stack
+	for (int i = 1; i <= _sliceCount; ++i)
+	{
+		m_vIndexList.push_back(0);
+		m_vIndexList.push_back(i + 1);
+		m_vIndexList.push_back(i);
+	}
+
+	// Middle stacks
+	int baseIndex = 1;
+	int ringVertexCount = _sliceCount + 1;
+	for (int i = 0; i < _stackCount - 2; ++i)
+	{
+		for (int j = 0; j < _sliceCount; ++j)
+		{
+			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j);
+			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
+			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+
+			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
+			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+		}
+	}
+
+	// Bottom stack
+	int southPoleIndex = (int)m_vVertexList.size() - 1;
+	baseIndex = southPoleIndex - ringVertexCount;
+
+	for (int i = 0; i < _sliceCount; ++i)
+	{
+		m_vIndexList.push_back(southPoleIndex);
+		m_vIndexList.push_back(baseIndex + i);
+		m_vIndexList.push_back(baseIndex + i + 1);
+	}
 
 	CreateVertexBuffer();
 	CreateIndexBuffer();

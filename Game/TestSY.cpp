@@ -6,6 +6,7 @@
 #include "Input.h"
 #include "Timer.h"
 #include "ASky.h"
+#include "UTerrainMeshComponent.h"
 
 void TestSY::Init()
 {
@@ -32,8 +33,8 @@ void TestSY::Init()
 	{
 		m_pPlane = make_shared<AActor>();
 
-		m_pPlaneMesh = make_shared<UStaticMeshComponent>();
-		m_pPlaneMesh->CreatePlane();
+		m_pPlaneMesh = make_shared<UTerrainMeshComponent>();
+		m_pPlaneMesh->CreateGrid(10, 10, 10.0f);
 		m_pPlane->SetMesh(m_pPlaneMesh);
 		m_pPlane->SetScale({ 10.0f, 10.0f, 10.0f });
 		m_pPlane->SetPosition({ 0.0f, 0.0f, 0.0f });
@@ -41,13 +42,15 @@ void TestSY::Init()
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+
+		m_pTexture = TEXTURE->Load(L"../Resources/Texture/HeightMap.jpg");
 		m_pPlaneMesh->SetMaterial(material);
 	}
 
 	{
 		m_pSky = make_shared<ASky>();
 
-		m_pSkyMesh = make_shared<UStaticMeshComponent>();
+		m_pSkyMesh = make_shared<UTerrainMeshComponent>();
 		m_pSkyMesh->CreateSphere(20, 20);
 		m_pSky->SetMesh(m_pSkyMesh);
 

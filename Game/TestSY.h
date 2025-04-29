@@ -7,12 +7,13 @@ public:
 	shared_ptr<class UStaticMeshComponent> m_pStaticMesh;
 	shared_ptr<class AActor> m_pActor;
 
-	shared_ptr<class UStaticMeshComponent> m_pPlaneMesh;
+	shared_ptr<class UTerrainMeshComponent> m_pPlaneMesh;
 	shared_ptr<class AActor> m_pPlane;
+	shared_ptr<class Texture> m_pTexture;
 
 	shared_ptr<class ACameraActor> m_pCameraActor;
 
-	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
+	shared_ptr<class UTerrainMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
 
 public:
