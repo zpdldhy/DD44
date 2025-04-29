@@ -2,12 +2,38 @@
 #include "UMaterial.h"
 #include "Device.h"
 
-
 void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
 {
 	m_pShader = SHADER->Load(_shaderFileName);
 	m_pTexture = TEXTURE->Load(_textureFileName);
 	m_pInputlayout = INPUTLAYOUT->Get();
+}
+
+void UMaterial::Bind()
+{
+    // Material Render
+
+	if (m_pShader)
+	{
+        DC->VSSetShader(m_pShader->m_pVertexShader.Get(), nullptr, 0);
+        DC->PSSetShader(m_pShader->m_pPixelShader.Get(), nullptr, 0);
+	}
+
+	if (m_pTexture)
+	{
+        DC->PSSetShaderResources(0, 1, m_pTexture->m_pTexSRV.GetAddressOf());
+	}
+
+	if (m_pInputlayout)
+	{
+        DC->IASetInputLayout(m_pInputlayout->m_pInputLayout.Get());
+	}
+
+	if (m_pGlowCB)
+	{
+        DC->VSSetConstantBuffers(2, 1, m_pGlowCB.GetAddressOf());
+        DC->PSSetConstantBuffers(2, 1, m_pGlowCB.GetAddressOf());
+	}
 }
 
 

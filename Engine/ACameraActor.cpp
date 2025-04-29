@@ -3,6 +3,7 @@
 
 void ACameraActor::Init()
 {
+	AActor::Init();
 	m_pCameraComponent->Init();
 	m_pCameraComponent->SetOwner(this);
 }
@@ -15,6 +16,5 @@ void ACameraActor::Tick()
 
 void ACameraActor::Render()
 {
-	AActor::Render();
 	m_pCameraComponent->Render();
 }

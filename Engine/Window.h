@@ -11,7 +11,7 @@ class Window
 
 public:
 	bool SetWindowClass(HINSTANCE _hInstance);
-	bool SetWindow(float _windowX = 800.0f, float _windowY = 600.0f);
+	bool SetWindow(float _windowX = 1440.0f, float _windowY = 900.0f);
 	bool ProcessMessage();
 public:
 	bool CheckRun();

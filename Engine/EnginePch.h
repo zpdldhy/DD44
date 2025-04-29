@@ -26,6 +26,13 @@ using namespace std;
 #include <DirectXTex/DirectXTex.h>
 #include <DirectXTex/DirectXTex.inl>
 
+// Write2D
+#pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "dwrite.lib")
+#include <d2d1.h>
+#include <d2d1helper.h>
+#include <dwrite.h>
+
 // ImGUI
 #include "imgui.h"
 #include "imgui_impl_dx11.h"

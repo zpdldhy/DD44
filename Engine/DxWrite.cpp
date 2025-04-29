@@ -30,8 +30,8 @@ HRESULT DxWrite::Create()
 	rtp.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
 	//3D와 연동 가능하게 PREMULTIPLIED 설정.
 	rtp.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED);
-	rtp.dpiX = dpi;
-	rtp.dpiY = dpi;
+	rtp.dpiX = static_cast<FLOAT>(dpi);
+	rtp.dpiY = static_cast<FLOAT>(dpi);
 
 	//D3D11 백버퍼기반으로 D2D 렌더타겟을 생성.
 	hr = m_pd2dFactory->CreateDxgiSurfaceRenderTarget(pBackBuffer.Get(), &rtp, m_pd2dRT.GetAddressOf());
@@ -165,7 +165,7 @@ void DxWrite::DirectDraw(D2D1_RECT_F _layoutRect, std::wstring _msg)
 	m_pd2dRT->BeginDraw();
 	if (m_pd2dRT)
 	{
-		m_pd2dRT->DrawText(_msg.c_str(), _msg.size(), m_pTextFormat.Get(), &_layoutRect, m_pColorBrush.Get());
+		m_pd2dRT->DrawText(_msg.c_str(), static_cast<UINT32>(_msg.size()), m_pTextFormat.Get(), &_layoutRect, m_pColorBrush.Get());
 	}
 	m_pd2dRT->EndDraw();
 }
@@ -175,7 +175,7 @@ void DxWrite::Draw(D2D1_RECT_F _layoutRect, std::wstring _msg)
 	if (m_pd2dRT)
 	{
 		//m_pColorBrush->SetColor(Color);
-		m_pd2dRT->DrawText(_msg.c_str(), _msg.size(), m_pTextFormat.Get(), &_layoutRect, m_pColorBrush.Get());
+		m_pd2dRT->DrawText(_msg.c_str(), static_cast<UINT32>(_msg.size()), m_pTextFormat.Get(), &_layoutRect, m_pColorBrush.Get());
 	}
 }
 
@@ -229,13 +229,13 @@ void DxWrite::DrawGlow(D2D1_RECT_F rect, std::wstring msg, D2D1::ColorF glowColo
 			glowRect.bottom += dy;
 
 			m_pColorBrush->SetColor(glowColor);
-			m_pd2dRT->DrawText(msg.c_str(), msg.size(), m_pTextFormat.Get(), &glowRect, m_pColorBrush.Get());
+			m_pd2dRT->DrawText(msg.c_str(), static_cast<UINT32>(msg.size()), m_pTextFormat.Get(), &glowRect, m_pColorBrush.Get());
 		}
 	}
 
 	// 중앙 본 텍스트
 	m_pColorBrush->SetColor(mainColor);
-	m_pd2dRT->DrawText(msg.c_str(), msg.size(), m_pTextFormat.Get(), &rect, m_pColorBrush.Get());
+	m_pd2dRT->DrawText(msg.c_str(), static_cast<UINT32>(msg.size()), m_pTextFormat.Get(), &rect, m_pColorBrush.Get());
 }
 
 void Typer::Reset(const std::wstring& newText)

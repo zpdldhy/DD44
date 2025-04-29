@@ -1,11 +1,12 @@
 #pragma once
+#include "UActorComponent.h"
 #include "AActor.h"
 
-class APawn : public AActor
+class UScriptComponent : public UActorComponent
 {
 public:
-	APawn() = default;
-	virtual ~APawn() = default;
+	UScriptComponent() = default;
+	virtual ~UScriptComponent() = default;
 
 public:
 	void Init() override;
@@ -14,6 +15,3 @@ public:
 	void Destroy() override;
 };
 
-// APawn
-// 플레이어나 AI가 조종 가능한 Actor
-// 입력, 컨트롤

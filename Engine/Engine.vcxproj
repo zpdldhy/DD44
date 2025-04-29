@@ -157,6 +157,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClInclude Include="ACharacter.h" />
     <ClInclude Include="APawn.h" />
     <ClInclude Include="ASky.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="ATerrainTileActor.h" />
     <ClInclude Include="UCameraComponent.h" />
     <ClInclude Include="Define.h" />
@@ -193,6 +194,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClInclude Include="UObject.h" />
     <ClInclude Include="UPrimitiveComponent.h" />
     <ClInclude Include="USceneComponent.h" />
+    <ClInclude Include="UScriptComponent.h" />
     <ClInclude Include="USkinnedComponent.h" />
     <ClInclude Include="UStaticMeshComponent.h" />
     <ClInclude Include="UTerrainMeshComponent.h" />
@@ -205,6 +207,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClCompile Include="ACharacter.cpp" />
     <ClCompile Include="APawn.cpp" />
     <ClCompile Include="ASky.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="ATerrainTileActor.cpp" />
     <ClCompile Include="UCameraComponent.cpp" />
     <ClCompile Include="Device.cpp" />
@@ -253,6 +256,7 @@ copy "$(SolutionDir)Engine\*.inl" "$(SolutionDir)Libraries\Debug\Include\Engine"
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UPrimitiveComponent.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
+    <ClCompile Include="UScriptComponent.cpp" />
     <ClCompile Include="USkinnedComponent.cpp" />
     <ClCompile Include="UStaticMeshComponent.cpp" />
     <ClCompile Include="UTerrainMeshComponent.cpp" />

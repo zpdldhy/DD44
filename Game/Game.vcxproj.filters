@@ -10,6 +10,9 @@
     <Filter Include="Headers">
       <UniqueIdentifier>{54431514-562b-4a9e-9c11-46b90321147b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Script">
+      <UniqueIdentifier>{565dca02-3e03-4554-8ec9-dfc978045924}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -25,7 +28,12 @@
     <ClInclude Include="TestSJ.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="TestSY.h" />
+    <ClInclude Include="TestSY.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineCameraMoveScript.h">
+      <Filter>Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -41,7 +49,12 @@
     <ClCompile Include="TestYR.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="TestSY.cpp" />
+    <ClCompile Include="TestSY.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineCameraMoveScript.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\Default.hlsl">

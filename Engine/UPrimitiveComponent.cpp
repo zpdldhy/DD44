@@ -18,7 +18,7 @@ bool UPrimitiveComponent::CreateVertexBuffer()
 	if (m_vVertexList.size() <= 0) { return true; }
 	D3D11_BUFFER_DESC pDesc;
 	ZeroMemory(&pDesc, sizeof(pDesc));
-	pDesc.ByteWidth = sizeof(PNCT_VERTEX) * m_vVertexList.size();
+	pDesc.ByteWidth = static_cast<UINT>(sizeof(PNCT_VERTEX)) * static_cast<UINT>(m_vVertexList.size());
 	pDesc.Usage = D3D11_USAGE_DEFAULT;
 	pDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
@@ -52,20 +52,8 @@ bool UPrimitiveComponent::CreateIndexBuffer()
 	return true;
 }
 
-void UPrimitiveComponent::Render()
-{
-	PreRender();
-	PostRender();
-}
-
 void UPrimitiveComponent::PreRender()
 {
-	// Material Render
-	DC->PSSetShaderResources(0, 1, m_pMaterial->GetTexture()->m_pTexSRV.GetAddressOf());
-	DC->VSSetShader(m_pMaterial->GetShader()->m_pVertexShader.Get(), nullptr, 0);
-	DC->PSSetShader(m_pMaterial->GetShader()->m_pPixelShader.Get(), nullptr, 0);
-	DC->IASetInputLayout(m_pMaterial->GetInputlayout()->m_pInputLayout.Get());
-
 	// IA Setting
 	UINT Strides = sizeof(PNCT_VERTEX);
 	UINT Offsets = 0;
@@ -73,11 +61,10 @@ void UPrimitiveComponent::PreRender()
 	DC->IASetIndexBuffer(m_pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	DC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-
-	if (m_pMaterial->GetGlowCB())
+	// Material Render
+	if (m_pMaterial)
 	{
-		DC->VSSetConstantBuffers(2, 1, m_pMaterial->GetGlowCB().GetAddressOf());
-		DC->PSSetConstantBuffers(2, 1, m_pMaterial->GetGlowCB().GetAddressOf());
+		m_pMaterial->Bind();
 	}
 }
 

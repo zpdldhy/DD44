@@ -6,6 +6,9 @@ public:
 	UObject() = default;
 	virtual ~UObject() = default;
 
+protected:
+	wstring m_Name;
+
 public:
 	virtual void Init();
 	virtual void Tick();

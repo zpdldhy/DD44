@@ -1,7 +1,12 @@
 #pragma once
+#include "UObject.h"
 
-class UActorComponent
+class UActorComponent : public UObject
 {
+public:
+	UActorComponent() = default;
+	virtual ~UActorComponent() = default;
+
 protected:
 	class AActor* m_pOwner = nullptr;
 

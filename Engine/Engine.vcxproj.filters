@@ -1,18 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Core">
       <UniqueIdentifier>{e6f178ac-cc43-4ac2-9338-206709a76a9e}</UniqueIdentifier>
     </Filter>
@@ -31,9 +19,6 @@
     <Filter Include="Material">
       <UniqueIdentifier>{912625d0-fb6c-4b48-b33e-38dcf4f0a494}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Mesh">
-      <UniqueIdentifier>{160083ba-d5d3-4f5e-8d5e-b15bda4cb24e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Camera">
       <UniqueIdentifier>{77029347-f335-4252-899b-47766a853dd9}</UniqueIdentifier>
     </Filter>
@@ -46,17 +31,20 @@
     <Filter Include="Utils\ImGUI">
       <UniqueIdentifier>{d7d517c4-cbd4-4729-a5b6-1a413df3da3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component">
+      <UniqueIdentifier>{ac3363d2-7a9f-44d7-9030-54462332771e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Mesh">
+      <UniqueIdentifier>{160083ba-d5d3-4f5e-8d5e-b15bda4cb24e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Data">
+      <UniqueIdentifier>{e02486f4-92b8-4b1a-875a-740aa34e8fe1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Object\Sky">
       <UniqueIdentifier>{168048c2-d65f-4442-bbae-75e7951c1b87}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Define.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -67,9 +55,6 @@
       <Filter>Object</Filter>
     </ClInclude>
     <ClInclude Include="APawn.h">
-      <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="UObject.h">
       <Filter>Object</Filter>
     </ClInclude>
     <ClInclude Include="IExecute.h">
@@ -99,35 +84,20 @@
     <ClInclude Include="Texture.h">
       <Filter>Resources</Filter>
     </ClInclude>
-    <ClInclude Include="EnginePch.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="DxWrite.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="UMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
-    <ClInclude Include="UActorComponent.h">
-      <Filter>Mesh</Filter>
-    </ClInclude>
     <ClInclude Include="USceneComponent.h">
-      <Filter>Mesh</Filter>
+      <Filter>Component\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="UMeshComponent.h">
-      <Filter>Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="UPrimitiveComponent.h">
-      <Filter>Mesh</Filter>
+      <Filter>Component\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="UStaticMeshComponent.h">
-      <Filter>Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="UMeshData.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>Component\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>Core</Filter>
@@ -147,12 +117,6 @@
     <ClInclude Include="UObject.h">
       <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Functions.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="AActor.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -163,9 +127,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="UObject.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="USkinnedComponent.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ACameraActor.h">
@@ -201,8 +162,44 @@
     <ClInclude Include="ImGuiCore.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="USkinnedComponent.h">
+      <Filter>Component\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="UActorComponent.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="UPrimitiveComponent.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="UObject.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="UMeshData.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="EnginePch.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
     <ClInclude Include="ASky.h">
       <Filter>Object\Sky</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="UTerrainMeshComponent.h">
       <Filter>Mesh</Filter>
@@ -212,9 +209,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Device.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -251,35 +245,20 @@
     <ClCompile Include="UMaterial.cpp">
       <Filter>Material</Filter>
     </ClCompile>
-    <ClCompile Include="UActorComponent.cpp">
-      <Filter>Mesh</Filter>
-    </ClCompile>
     <ClCompile Include="USceneComponent.cpp">
-      <Filter>Mesh</Filter>
+      <Filter>Component\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="UMeshComponent.cpp">
-      <Filter>Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="UPrimitiveComponent.cpp">
-      <Filter>Mesh</Filter>
+      <Filter>Component\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="UStaticMeshComponent.cpp">
-      <Filter>Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="Vertex.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="UMeshData.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Component\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="UCameraComponent.cpp">
       <Filter>Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="USkinnedComponent.cpp">
-      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="AActor.cpp">
       <Filter>Object</Filter>
@@ -288,9 +267,6 @@
       <Filter>Object</Filter>
     </ClCompile>
     <ClCompile Include="APawn.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="UObject.cpp">
       <Filter>Object</Filter>
     </ClCompile>
     <ClCompile Include="ACameraActor.cpp">
@@ -303,12 +279,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="APawn.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="UObject.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="USkinnedComponent.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="imgui.cpp">
@@ -335,8 +305,38 @@
     <ClCompile Include="ImGuiCore.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="USkinnedComponent.cpp">
+      <Filter>Component\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="UActorComponent.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="UPrimitiveComponent.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="UObject.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>Headers\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="UMeshData.cpp">
+      <Filter>Headers\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Headers</Filter>
+    </ClCompile>
     <ClCompile Include="ASky.cpp">
       <Filter>Object\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="USkinnedComponent.cpp">
+      <Filter>Component\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="UObject.cpp">
+      <Filter>Object</Filter>
     </ClCompile>
     <ClCompile Include="UTerrainMeshComponent.cpp">
       <Filter>Mesh</Filter>

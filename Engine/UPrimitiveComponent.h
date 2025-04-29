@@ -5,6 +5,10 @@ class UMaterial;
 
 class UPrimitiveComponent : public USceneComponent
 {
+public:
+	UPrimitiveComponent() = default;
+	virtual ~UPrimitiveComponent() = default;
+
 protected:
 	// MATERIAL
 	shared_ptr<UMaterial> m_pMaterial;
@@ -23,8 +27,7 @@ public:
 	bool CreateVertexBuffer();
 	bool CreateIndexBuffer();
 public:
-	void PreRender();
-	virtual void Render() override;
-	void PostRender();
+	void PreRender() override;
+	void PostRender() override;
 };
 
