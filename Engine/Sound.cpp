@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Sound.h"
 
-
 void Sound::Update()
 {
 	if (m_pSystem)

@@ -4,6 +4,17 @@
 #include "FMod/fmod_errors.h"
 #pragma comment(lib, "FMod/fmod_vc.lib")
 
+
+enum class ESoundType
+{
+	Bomb,
+	Bgm,
+	Hit,
+	Die,
+	Max
+};
+
+
 class Sound
 {
 private:
@@ -39,10 +50,12 @@ class SoundManager : public Singleton<SoundManager>
 {
 	friend class Singleton<SoundManager>;
 	FMOD::System* m_pSystem = nullptr;
+
 public:
 	Sound* Load(std::wstring filename);
 	Sound* GetPtr(std::wstring key);
 	void    Update();
+
 private:
 	std::map<std::wstring, Sound*> maplist;
 	SoundManager() {}
