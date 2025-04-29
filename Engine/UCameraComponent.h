@@ -2,7 +2,6 @@
 #include "USceneComponent.h"
 #include "AActor.h"
 #include "Device.h"
-#include "SimpleMath.h"
 
 enum class ProjectionType
 {

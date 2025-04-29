@@ -1,5 +1,6 @@
 #pragma once
-#include "SimpleMath.h"
+#include <DxTk/SimpleMath.h>
+#include <DxTk//SimpleMath.inl>
 
 using uint8 = unsigned __int8;
 
