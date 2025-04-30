@@ -14,7 +14,9 @@ cbuffer CameraBuffer : register(b1)
 cbuffer cbGlowFX : register(b2)
 {
     float g_fGlowPower; // ¹ß±¤ ¼¼±â
+    float3 padding;
     float3 g_vGlowColor; // ¹ß±¤ »ö»ó
+    float dummy;
 }
 
 struct VS_IN

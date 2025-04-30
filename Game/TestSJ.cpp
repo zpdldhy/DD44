@@ -9,6 +9,7 @@
 #include "APawn.h"
 #include "ACameraActor.h"
 #include "Timer.h"
+#include "ImGuiCore.h"
 
 void TestSJ::Init()
 {
@@ -54,6 +55,7 @@ void TestSJ::Init()
 
 void TestSJ::Update()
 {
+	//Glow
 	{
 		static bool bGlow = false;
 		static float glowTimer = 0.0f;
@@ -66,28 +68,14 @@ void TestSJ::Update()
 			glowTimer = maxGlowDuration;
 		}
 
-		//// 발광 중이면 타이머 감소
-		//if (bGlow)
-		//{
-		//	glowTimer -= TIMER->GetDeltaTime();
-		//	if (glowTimer <= 0.0f)
-		//	{
-		//		bGlow = false;
-		//		glowTimer = 0.0f;
-		//	}
-		//}
-
-		//// 현재 발광 값 계산
-		//float glowPower = bGlow ? 2.0f : 0.0f;
 		float glowPower = 0.0f;
 
 		if (bGlow)
 		{
 			glowTimer -= TIMER->GetDeltaTime();
 
-			float ratio = glowTimer / maxGlowDuration; // 1.0 → 0.0
-			//glowPower = ratio * 3.0f;         
-			glowPower = sin(ratio * DD_PI);
+			float ratio = glowTimer / maxGlowDuration; // 1.0 → 0.0 
+			glowPower = 1000000.0f;//ratio*5.0f;
 			
 			if (glowTimer <= 0.0f)
 			{
@@ -96,11 +84,13 @@ void TestSJ::Update()
 			}
 		}
 
-		// Material에 업데이트
-		m_pStaticMesh->GetMaterial()->SetGlowParams(
-			glowPower,
-			Vec3(1.0f, 0.0f, 0.0f) // 빨간색
-		);
+		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+		{
+			m_pStaticMesh->GetMaterial()->SetGlowParams(
+				GUI->GetGlowPower(),//glowPower,
+				GUI->GetGlowColor()
+			);
+		}
 
 	}
 	//Sound
@@ -172,7 +162,7 @@ void TestSJ::Update()
 			DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	}*/
 	}
-	//SKY
+	//Camera
 	{
 		float deltaTime = TIMER->GetDeltaTime() * 10.f;
 

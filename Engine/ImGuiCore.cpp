@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ImGuiCore.h"
 #include "Device.h"
+#include "UMaterial.h"
 
 void ImGuiCore::Init()
 {
@@ -82,6 +83,38 @@ void ImGuiCore::Test()
         
         ImGui::End();
     }
+
+    //Test2
+    {
+        ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_Always);
+        ImGui::Begin("Test - Glow Control", nullptr,
+            ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoResize);
+
+        ImGui::Text("Glow 조절 테스트");
+        ImGui::SliderFloat("Glow Power", &m_fGlowPower, 0.0f, 100.0f);
+
+        // Glow Color 편집 (R, G, B)
+        float color[3] = { m_vGlowColor.x, m_vGlowColor.y, m_vGlowColor.z };
+
+        if (ImGui::ColorEdit3("Glow Color", color, ImGuiColorEditFlags_Float))
+        {
+            // 값이 바뀐 경우에만 반영
+            m_vGlowColor.x = color[0];
+            m_vGlowColor.y = color[1];
+            m_vGlowColor.z = color[2];
+        }
+
+       /* if (m_pTargetMaterial)
+        {
+            m_pTargetMaterial->SetGlowParams(m_fGlowPower, m_vGlowColor);
+        }*/
+
+        ImGui::End();
+    }
+    
+
 
     // 3. Show another simple window.
     if (show_another_window)

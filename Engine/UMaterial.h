@@ -6,7 +6,9 @@
 struct CB_GLOW
 {
 	float g_fGlowPower;
-	DirectX::XMFLOAT3 g_vGlowColor;
+	float padding[3];
+	Vec3 g_vGlowColor;
+	float dummy = 0.0f;
 };
 
 class UMaterial

@@ -84,12 +84,6 @@ void Engine::Run()
 	{
 		if (!_window.ProcessMessage())
 		{
-			timer.Update(); 
-
-			float dt = timer.GetDeltaTime();
-			float fps = timer.GetFPS();
-			OutputDebugStringA(("DeltaTime: " + std::to_string(dt) + " | FPS: " + std::to_string(fps) + "\n").c_str());
-
 			Frame();
 			Render();
 		}
