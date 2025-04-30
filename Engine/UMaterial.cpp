@@ -47,12 +47,22 @@ void UMaterial::Bind()
 }
 
 
-void UMaterial::SetGlowParams(float glowPower, const DirectX::XMFLOAT3& glowColor)
+void UMaterial::SetGlowParams(float _glowPower, const Vec3 _glowColor)
 {
-    CB_GLOW cbData = {};
-    cbData.g_fGlowPower = glowPower;
-    cbData.g_vGlowColor = glowColor;
+    m_tGlowData.g_fGlowPower = _glowPower;
+    m_tGlowData.g_vGlowColor = _glowColor;
 
+    UpdateGlowBuffer();
+}
+
+void UMaterial::SetHitFlashTime(float _time)
+{
+    m_tGlowData.g_fHitFlashTime = _time;
+    UpdateGlowBuffer();
+}
+
+void UMaterial::UpdateGlowBuffer()
+{
     if (!m_pGlowCB)
     {
         D3D11_BUFFER_DESC desc = {};
@@ -61,17 +71,17 @@ void UMaterial::SetGlowParams(float glowPower, const DirectX::XMFLOAT3& glowColo
         desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
         D3D11_SUBRESOURCE_DATA initData = {};
-        initData.pSysMem = &cbData;
+        initData.pSysMem = &m_tGlowData;
 
         HRESULT hr = DEVICE->CreateBuffer(&desc, &initData, m_pGlowCB.GetAddressOf());
         if (FAILED(hr))
         {
-            assert(false && "Glow ConstantBuffer Create Failed!");
+            assert(false && "Failed to create Glow ConstantBuffer");
         }
     }
     else
     {
-        DC->UpdateSubresource(m_pGlowCB.Get(), 0, nullptr, &cbData, 0, 0);
+        DC->UpdateSubresource(m_pGlowCB.Get(), 0, nullptr, &m_tGlowData, 0, 0);
     }
 }
 

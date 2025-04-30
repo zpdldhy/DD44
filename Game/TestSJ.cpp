@@ -39,6 +39,22 @@ void TestSJ::Init()
 	}
 
 	{
+		m_pActor2 = make_shared<APawn>();
+
+		m_pStaticMesh2 = make_shared<UStaticMeshComponent>();
+		m_pStaticMesh2->CreateCube();
+
+		m_pActor2->SetMesh(m_pStaticMesh2);
+		m_pActor2->SetScale({ 1.0f, 1.0f, 1.0f });
+		m_pActor2->SetPosition({ 5.0f, 0.0f, 10.0f }); // 첫 번째 큐브 옆에 배치
+		m_pActor2->SetRotation({ 0.0f, 0.0f, 0.0f });
+
+		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
+		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Dissolve.hlsl");
+		m_pStaticMesh2->SetMaterial(material2);
+	}
+
+	{
 		m_pSky = make_shared<ASky>();
 
 		m_pSkyMesh = make_shared<UStaticMeshComponent>();
@@ -57,11 +73,21 @@ void TestSJ::Init()
 
 	m_pCameraActor->Init();
 	m_pActor->Init();
+	m_pActor2->Init();
 	m_pSky->Init();
 }
 
 void TestSJ::Update()
 {
+
+	shared_ptr<UMaterial> targetMat = nullptr;
+	if (GUI->m_iSelectedActor == 0 && m_pStaticMesh)
+		targetMat = m_pStaticMesh->GetMaterial();
+	else if (GUI->m_iSelectedActor == 1 && m_pStaticMesh2)
+		targetMat = m_pStaticMesh2->GetMaterial();
+
+	// fallback 제거 가능 (선택이 명확하니까)
+	//GUI->SetTargetMaterial(targetMat);
 	//Glow
 	{
 		static bool bGlow = false;
@@ -91,20 +117,47 @@ void TestSJ::Update()
 			}
 		}
 
-		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
-		{
-			m_pStaticMesh->GetMaterial()->SetGlowParams(
-				GUI->GetGlowPower(),//glowPower,
-				GUI->GetGlowColor()
-			);
-		}
+		//if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+		//{
+		//	m_pStaticMesh->GetMaterial()->SetGlowParams(
+		//		GUI->GetGlowPower(),//glowPower,
+		//		GUI->GetGlowColor()
+		//	);
+		//}
 
 	}
 	//Dissolve
 	{
-		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+		/*if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 		{
 			m_pStaticMesh->GetMaterial()->SetDissolveParams(GUI->GetDissolveThreshold());
+		}*/
+	
+		
+			
+
+
+		if (targetMat)
+		{
+			targetMat->SetGlowParams(GUI->m_fGlowPower, GUI->m_vGlowColor);
+			targetMat->SetDissolveParams(GUI->m_fDissolveThreshold);
+		}
+	}
+	//Flesh
+	{
+		static float flashTimer = 0.0f;
+
+		if (INPUT->GetButtonDown(R)) // 피격 가정
+		{
+			flashTimer = 1.0f; // Flash 시작
+		}
+
+		flashTimer -= TIMER->GetDeltaTime() * 3.0f; // 빠르게 사라지게
+		flashTimer = max(flashTimer, 0.0f);
+
+		if (targetMat)
+		{
+			targetMat->SetHitFlashTime(flashTimer);
 		}
 	}
 	//Sound
@@ -180,6 +233,7 @@ void TestSJ::Update()
 	{
 		m_pCameraActor->Tick();
 		m_pActor->Tick();
+		m_pActor2->Tick();
 		m_pSky->Tick();
 	}
 
@@ -196,5 +250,6 @@ void TestSJ::Render()
 	);
 	m_pCameraActor->Render();
 	m_pActor->Render();
+	m_pActor2->Render();
 	m_pSky->Render();
 }

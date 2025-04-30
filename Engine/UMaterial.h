@@ -9,6 +9,8 @@ struct CB_GLOW
 	float padding[3];
 	Vec3 g_vGlowColor;
 	float dummy = 0.0f;
+	float g_fHitFlashTime;
+	float padding2[3];
 };
 
 struct CB_DISSOLVE
@@ -26,10 +28,16 @@ class UMaterial
 	ComPtr<ID3D11Buffer> m_pDissolveCB;
 	ComPtr<ID3D11ShaderResourceView> m_pNoiseSRV;
 public:
-	void SetGlowParams(float glowPower, const DirectX::XMFLOAT3& glowColor);
+	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
+	void SetHitFlashTime(float _flashTime);
+	void UpdateGlowBuffer();
 	ComPtr<ID3D11Buffer> GetGlowCB() const { return m_pGlowCB; }
 	void SetDissolveParams(float threshold);
 	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
+
+public:
+	CB_GLOW m_tGlowData;
+	CB_DISSOLVE m_tDissolveData;
 
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);

@@ -85,22 +85,28 @@ void ImGuiCore::Test()
         ImGui::End();
     }
 
+
     //Test2
     if (m_bShowGlowControl)
     {
         ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_Once); // 창 크기는 한번만 설정
         ImGui::Begin("Test Glow Control", &m_bShowGlowControl, ImGuiWindowFlags_NoResize);
 
+        ImGui::Text("Target Cube");
+        ImGui::RadioButton("Cube 1", &m_iSelectedActor, 0); ImGui::SameLine();
+        ImGui::RadioButton("Cube 2", &m_iSelectedActor, 1);
         ImGui::Text("Glow_Test");
-        ImGui::SliderFloat("Glow Power", &m_fGlowPower, 0.0f, 5.0f);
-
+        
         float color[3] = { m_vGlowColor.x, m_vGlowColor.y, m_vGlowColor.z };
         if (ImGui::ColorEdit3("Glow Color", color, ImGuiColorEditFlags_Float))
         {
             m_vGlowColor = { color[0], color[1], color[2] };
         }
+        ImGui::SliderFloat("Glow Power", &m_fGlowPower, 0.0f, 5.0f);
+              
 
         ImGui::SliderFloat("Dissolve Threshold", &m_fDissolveThreshold, 0.0f, 1.0f);
+
 
         ImGui::End();
     }

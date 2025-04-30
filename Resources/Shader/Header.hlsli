@@ -17,6 +17,7 @@ cbuffer cbGlowFX : register(b2)
     float3 padding;
     float3 g_vGlowColor; // ¹ß±¤ »ö»ó
     float dummy;
+    float g_fHitFlashTime;
 }
 cbuffer cbDissolve : register(b3)
 {
