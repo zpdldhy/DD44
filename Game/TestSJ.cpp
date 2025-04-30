@@ -10,6 +10,7 @@
 #include "ACameraActor.h"
 #include "Timer.h"
 #include "ImGuiCore.h"
+#include "EngineCameraMoveScript.h"
 
 void TestSJ::Init()
 {
@@ -18,7 +19,8 @@ void TestSJ::Init()
 
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
-		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 10.0f });
+		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
+		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	}
 
 	{
@@ -28,7 +30,7 @@ void TestSJ::Init()
 		m_pStaticMesh->CreateCube();
 		m_pActor->SetMesh(m_pStaticMesh);
 		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
-		m_pActor->SetPosition({ 0.0f, 0.0f, 0.0f });
+		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
@@ -176,34 +178,6 @@ void TestSJ::Update()
 	}
 	//Camera
 	{
-		float deltaTime = TIMER->GetDeltaTime() * 10.f;
-
-		if (INPUT->GetButtonDown(W))
-		{
-			m_pCameraActor->AddPosition(Vec3(0.0f, 0.0f, -1.0f) * deltaTime);
-		}
-		if (INPUT->GetButtonDown(A))
-		{
-			m_pCameraActor->AddPosition(Vec3(-1.0f, 0.0f, 0.0f) * deltaTime);
-		}
-		if (INPUT->GetButtonDown(S))
-		{
-			m_pCameraActor->AddPosition(Vec3(0.0f, 0.0f, 1.0f) * deltaTime);
-		}
-		if (INPUT->GetButtonDown(D))
-		{
-			m_pCameraActor->AddPosition(Vec3(1.0f, 0.0f, 0.0f) * deltaTime);
-		}
-		if (INPUT->GetButtonDown(Q))
-		{
-			m_pCameraActor->AddPosition(Vec3(0.0f, -1.0f, 0.0f) * deltaTime);
-		}
-		if (INPUT->GetButtonDown(E))
-		{
-			m_pCameraActor->AddPosition(Vec3(0.0f, 1.0f, 0.0f) * deltaTime);
-		}
-
-
 		m_pCameraActor->Tick();
 		m_pActor->Tick();
 		m_pSky->Tick();
