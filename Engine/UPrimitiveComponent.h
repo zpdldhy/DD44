@@ -9,25 +9,16 @@ public:
 	UPrimitiveComponent() = default;
 	virtual ~UPrimitiveComponent() = default;
 
-public:
+protected:
 	// MATERIAL
 	shared_ptr<UMaterial> m_pMaterial;
-	// MESH DATA
-	ComPtr<ID3D11Buffer> m_pVertexBuffer;
-	ComPtr<ID3D11Buffer> m_pIndexBuffer;
-	vector<PNCT_VERTEX> m_vVertexList;
-	vector<DWORD> m_vIndexList;
-
-
 
 public:
-	void SetMaterial(shared_ptr<UMaterial> _material);
-	shared_ptr<UMaterial> GetMaterial();
+	void SetMaterial(shared_ptr<UMaterial> _material){ m_pMaterial = _material; }
+	shared_ptr<UMaterial> GetMaterial() { return m_pMaterial; }
+
 public:
-	bool CreateVertexBuffer();
-	bool CreateIndexBuffer();
-public:
-	void PreRender() override;
-	void PostRender() override;
+	virtual void PreRender() abstract;
+	virtual void PostRender() abstract;
 };
 

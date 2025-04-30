@@ -22,6 +22,10 @@ void UCameraComponent::Render()
 	DC->VSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
 }
 
+void UCameraComponent::Destroy()
+{
+}
+
 void UCameraComponent::CreateCameraBuffer()
 {
 	D3D11_BUFFER_DESC pDesc;
