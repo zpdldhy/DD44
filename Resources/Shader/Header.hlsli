@@ -1,5 +1,7 @@
 #ifndef COMMON_HLSLI
 #define COMMON_HLSLI
+//#define MAX_BONE 250
+
 cbuffer cb0 : register(b0)
 {
     row_major matrix g_matWorld;
@@ -17,12 +19,30 @@ cbuffer cbGlowFX : register(b2)
     float3 g_vGlowColor; // ¹ß±¤ »ö»ó
 }
 
+//cbuffer AnimationBuffer : register(b3)
+//{
+//    matrix obj_matAnim[MAX_BONE];
+//}
+
 struct VS_IN
 {
     float3 p : POSITION;
     float4 c : COLOR;
     float3 n : NORMAL;
     float2 t : TEXCOORD;
+};
+
+struct PNCTIW_IN
+{
+    float3 p : POSITION;
+    float4 c : COLOR;
+    float3 n : NORMAL;
+    float2 t : TEXCOORD;
+
+    float4 i : INDEX;
+    float4 i2 : SECONDI;
+    float4 w : WEIGHT;
+    float4 w2 : SECONDW;
 };
 
 struct VS_OUT

@@ -43,6 +43,30 @@ bool InputlayoutManager::CreateDefault()
 	return true;
 }
 
+bool InputlayoutManager::CreateIW(ComPtr<ID3DBlob> _pCode)
+{
+	D3D11_INPUT_ELEMENT_DESC layout[] =
+	{
+		{ "POSITION",  0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 12,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 24,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,		0, 40,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+		{ "INDEX",  0, DXGI_FORMAT_R32G32B32A32_FLOAT,	1, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "SECONDI",  0, DXGI_FORMAT_R32G32B32A32_FLOAT,1, 16,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "WEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,	1, 32,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "SECONDW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,	1, 48,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+	};
+	UINT iNumCnt = sizeof(layout) / sizeof(layout[0]);
+
+	shared_ptr<Inputlayout> inputlayout = make_shared<Inputlayout>();
+	inputlayout->Load(m_pCode, layout, iNumCnt);
+	m_mList.insert(make_pair(L"IW", inputlayout));
+
+	return true;
+}
+
 shared_ptr<Inputlayout> InputlayoutManager::Get(wstring _name)
 {
 	auto target = m_mList.find(_name);

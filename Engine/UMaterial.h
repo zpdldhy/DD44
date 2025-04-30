@@ -25,6 +25,7 @@ public:
 public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
 	virtual void SetTexture(shared_ptr<Texture> _texture) { m_pTexture = _texture; }
+	virtual void SetInputlayout(shared_ptr<Inputlayout> _inputlayout) { m_pInputlayout = _inputlayout; }
 
 public:
 	shared_ptr<Shader> GetShader() { return m_pShader; }
