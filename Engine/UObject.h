@@ -10,12 +10,13 @@ protected:
 	wstring m_Name;
 
 public:
-	virtual void Init();
-	virtual void Tick();
-	virtual void PreRender();
-	virtual void Render();
-	virtual void PostRender();
-	virtual void Destroy();
+	virtual void Init() abstract;
+	virtual void Tick() abstract;
+	virtual void Render() abstract;
+	virtual void Destroy() abstract;
+
+public:
+	void SetName(const wstring& _name) { m_Name = _name; }
 };
 
 // UObject
