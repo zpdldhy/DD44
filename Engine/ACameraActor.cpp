@@ -3,6 +3,7 @@
 
 void ACameraActor::Init()
 {
+	AActor::Init();
 	m_pCameraComponent->Init();
 	m_pCameraComponent->SetOwner(this);
 }

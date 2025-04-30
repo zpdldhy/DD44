@@ -19,9 +19,6 @@
     <Filter Include="Material">
       <UniqueIdentifier>{912625d0-fb6c-4b48-b33e-38dcf4f0a494}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Camera">
-      <UniqueIdentifier>{77029347-f335-4252-899b-47766a853dd9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Object">
       <UniqueIdentifier>{cce268ec-dff1-4d21-a0df-a09c046f6176}</UniqueIdentifier>
     </Filter>
@@ -42,6 +39,21 @@
     </Filter>
     <Filter Include="Object\Sky">
       <UniqueIdentifier>{168048c2-d65f-4442-bbae-75e7951c1b87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Camera">
+      <UniqueIdentifier>{8276641c-8aae-47c4-9e81-3136f9c16ef7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Camera">
+      <UniqueIdentifier>{869a41a7-950b-45c9-9377-436cbe4874e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Terrain">
+      <UniqueIdentifier>{db883b90-c3ad-42eb-9e41-ccb074d6db46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Terrain">
+      <UniqueIdentifier>{2f8caf15-6414-4748-998a-486e38e67642}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Script">
+      <UniqueIdentifier>{08cb7475-0a3d-4b3b-8c4a-4e95e3a8ec40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -68,9 +80,6 @@
     </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpleMath.h">
-      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Singleton.h">
       <Filter>Headers\Template</Filter>
@@ -102,9 +111,6 @@
     <ClInclude Include="Timer.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="UCameraComponent.h">
-      <Filter>Camera</Filter>
-    </ClInclude>
     <ClInclude Include="AActor.h">
       <Filter>Object</Filter>
     </ClInclude>
@@ -113,24 +119,6 @@
     </ClInclude>
     <ClInclude Include="APawn.h">
       <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="UObject.h">
-      <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="AActor.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ACharacter.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="APawn.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="UObject.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ACameraActor.h">
-      <Filter>Camera</Filter>
     </ClInclude>
     <ClInclude Include="DxState.h">
       <Filter>Core</Filter>
@@ -171,9 +159,6 @@
     <ClInclude Include="UPrimitiveComponent.h">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="UObject.h">
-      <Filter>Component</Filter>
-    </ClInclude>
     <ClInclude Include="Vertex.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
@@ -201,6 +186,24 @@
     <ClInclude Include="Sound.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="UObject.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ACameraActor.h">
+      <Filter>Object\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="UCameraComponent.h">
+      <Filter>Component\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="ATerrainTileActor.h">
+      <Filter>Object\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="UTerrainMeshComponent.h">
+      <Filter>Component\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="UScriptComponent.h">
+      <Filter>Component\Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -223,9 +226,6 @@
     </ClCompile>
     <ClCompile Include="Shader.cpp">
       <Filter>Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleMath.cpp">
-      <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Window.cpp">
       <Filter>Core</Filter>
@@ -251,9 +251,6 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="UCameraComponent.cpp">
-      <Filter>Camera</Filter>
-    </ClCompile>
     <ClCompile Include="AActor.cpp">
       <Filter>Object</Filter>
     </ClCompile>
@@ -262,18 +259,6 @@
     </ClCompile>
     <ClCompile Include="APawn.cpp">
       <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="ACameraActor.cpp">
-      <Filter>Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="AActor.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ACharacter.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="APawn.cpp">
-      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="imgui.cpp">
       <Filter>Utils\ImGUI</Filter>
@@ -332,11 +317,23 @@
     <ClCompile Include="UObject.cpp">
       <Filter>Object</Filter>
     </ClCompile>
+    <ClCompile Include="ACameraActor.cpp">
+      <Filter>Object\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="UCameraComponent.cpp">
+      <Filter>Component\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="ATerrainTileActor.cpp">
+      <Filter>Object\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="UTerrainMeshComponent.cpp">
+      <Filter>Component\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="UScriptComponent.cpp">
+      <Filter>Component\Script</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SimpleMath.inl">
-      <Filter>Utils</Filter>
-    </None>
     <None Include="..\.gitignore" />
   </ItemGroup>
 </Project>

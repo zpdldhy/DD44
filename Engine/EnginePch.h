@@ -23,6 +23,8 @@ using namespace std;
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <d3d11shader.h>
+#include <DirectXTex/DirectXTex.h>
+#include <DirectXTex/DirectXTex.inl>
 
 // Write2D
 #pragma comment(lib, "d2d1.lib")
@@ -41,8 +43,10 @@ using namespace std;
 #pragma comment(lib, "d3dcompiler.lib")
 #ifndef _DEBUG
 #pragma comment(lib, "DxTk/DirectXTK_r.lib")
+#pragma comment(lib, "DirectXTex/DirectXTex.lib")
 #else
 #pragma comment(lib, "DxTk/DirectXTK_d.lib")
+#pragma comment(lib, "DirectXTex/DirectXTex_debug.lib")
 #endif
 
 // Window º¯¼ö

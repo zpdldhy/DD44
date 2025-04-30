@@ -13,11 +13,11 @@ void APawn::Tick()
 
 void APawn::Render()
 {
-	m_Components[ComponentType::CT_MESH]->PreRender();
+	m_arrComponent[ComponentType::CT_MESH]->PreRender();
 
 	AActor::Render();
 
-	m_Components[ComponentType::CT_MESH]->PostRender();
+	m_arrComponent[ComponentType::CT_MESH]->PostRender();
 }
 
 void APawn::Destroy()

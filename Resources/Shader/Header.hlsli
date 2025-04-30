@@ -2,7 +2,7 @@
 #define COMMON_HLSLI
 cbuffer cb0 : register(b0)
 {
-    matrix g_matWorld;
+    row_major matrix g_matWorld;
 }
 
 cbuffer CameraBuffer : register(b1)
