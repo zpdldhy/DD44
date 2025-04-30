@@ -61,7 +61,7 @@ bool InputlayoutManager::CreateIW(ComPtr<ID3DBlob> _pCode)
 	UINT iNumCnt = sizeof(layout) / sizeof(layout[0]);
 
 	shared_ptr<Inputlayout> inputlayout = make_shared<Inputlayout>();
-	inputlayout->Load(m_pCode, layout, iNumCnt);
+	inputlayout->Load(_pCode, layout, iNumCnt);
 	m_mList.insert(make_pair(L"IW", inputlayout));
 
 	return true;

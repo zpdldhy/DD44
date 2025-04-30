@@ -1,6 +1,6 @@
 #ifndef COMMON_HLSLI
 #define COMMON_HLSLI
-//#define MAX_BONE 250
+#define MAX_BONE 250
 
 cbuffer cb0 : register(b0)
 {
@@ -19,10 +19,10 @@ cbuffer cbGlowFX : register(b2)
     float3 g_vGlowColor; // ¹ß±¤ »ö»ó
 }
 
-//cbuffer AnimationBuffer : register(b3)
-//{
-//    matrix obj_matAnim[MAX_BONE];
-//}
+cbuffer AnimationBuffer : register(b3)
+{
+    matrix obj_matAnim[MAX_BONE];
+}
 
 struct VS_IN
 {

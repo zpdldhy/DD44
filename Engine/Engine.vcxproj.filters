@@ -162,9 +162,6 @@
     <ClInclude Include="Vertex.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
-    <ClInclude Include="UMeshData.h">
-      <Filter>Headers\Data</Filter>
-    </ClInclude>
     <ClInclude Include="EnginePch.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -204,6 +201,9 @@
     <ClInclude Include="UScriptComponent.h">
       <Filter>Component\Script</Filter>
     </ClInclude>
+    <ClInclude Include="AAsset.h" />
+    <ClInclude Include="FbxLoader.h" />
+    <ClInclude Include="UAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -299,9 +299,6 @@
     <ClCompile Include="Vertex.cpp">
       <Filter>Headers\Data</Filter>
     </ClCompile>
-    <ClCompile Include="UMeshData.cpp">
-      <Filter>Headers\Data</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Headers</Filter>
     </ClCompile>
@@ -332,6 +329,9 @@
     <ClCompile Include="UScriptComponent.cpp">
       <Filter>Component\Script</Filter>
     </ClCompile>
+    <ClCompile Include="AAsset.cpp" />
+    <ClCompile Include="FbxLoader.cpp" />
+    <ClCompile Include="UAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

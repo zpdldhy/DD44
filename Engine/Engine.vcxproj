@@ -160,6 +160,7 @@
     <ClInclude Include="FbxLoader.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="ATerrainTileActor.h" />
+    <ClInclude Include="UAnimation.h" />
     <ClInclude Include="UCameraComponent.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Device.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="FbxLoader.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="ATerrainTileActor.cpp" />
+    <ClCompile Include="UAnimation.cpp" />
     <ClCompile Include="UCameraComponent.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="DxState.cpp" />

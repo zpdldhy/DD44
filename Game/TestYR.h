@@ -4,20 +4,15 @@
 
 class APawn;
 
-struct CbAnimData
-{
-	Matrix boneAnim[250];
-};
-
 class TestYR : public IExecute
 {
 public:
 	FbxLoader m_FbxImporter;
 	shared_ptr<APawn> m_pActor;
-	shared_ptr<APawn> m_pActor2;
 
 	shared_ptr<class ACameraActor> m_pCameraActor;
-
+	
+	vector<shared_ptr<APawn>> gizmo;
 
 	// TEMP
 	ComPtr<ID3D11Buffer> _constantBuffer;
