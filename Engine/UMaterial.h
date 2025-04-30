@@ -11,15 +11,26 @@ struct CB_GLOW
 	float dummy = 0.0f;
 };
 
+struct CB_DISSOLVE
+{
+	float g_fDissolveThreshold;
+	float padding[3];
+};
+
 class UMaterial
 {
 	shared_ptr<Shader> m_pShader = nullptr;
 	shared_ptr<Texture> m_pTexture = nullptr;
 	shared_ptr<Inputlayout> m_pInputlayout = nullptr;
 	ComPtr<ID3D11Buffer> m_pGlowCB;
+	ComPtr<ID3D11Buffer> m_pDissolveCB;
+	ComPtr<ID3D11ShaderResourceView> m_pNoiseSRV;
 public:
 	void SetGlowParams(float glowPower, const DirectX::XMFLOAT3& glowColor);
 	ComPtr<ID3D11Buffer> GetGlowCB() const { return m_pGlowCB; }
+	void SetDissolveParams(float threshold);
+	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
+
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);
 	virtual void Bind();

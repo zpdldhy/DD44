@@ -18,6 +18,10 @@ cbuffer cbGlowFX : register(b2)
     float3 g_vGlowColor; // 발광 색상
     float dummy;
 }
+cbuffer cbDissolve : register(b3)
+{
+    float g_fDissolveThreshold;
+}
 
 struct VS_IN
 {
@@ -41,5 +45,6 @@ struct PS_OUT
 };
 
 Texture2D g_txDiffuseA : register(t0);
+Texture2D g_txNoise : register(t1); // 노이즈 텍스처
 SamplerState sample : register(s0);
 #endif

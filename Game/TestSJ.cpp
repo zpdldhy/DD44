@@ -32,7 +32,7 @@ void TestSJ::Init()
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Glow.hlsl");
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Dissolve.hlsl");
 		m_pStaticMesh->SetMaterial(material);
 	}
 
@@ -46,6 +46,11 @@ void TestSJ::Init()
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
 		m_pSkyMesh->SetMaterial(material);
+	}
+
+	{
+		auto noiseTex = TEXTURE->Load(L"../Resources/Texture/Noise.png");
+		m_pStaticMesh->GetMaterial()->SetNoiseTexture(noiseTex);
 	}
 
 	m_pCameraActor->Init();
@@ -92,6 +97,13 @@ void TestSJ::Update()
 			);
 		}
 
+	}
+	//Dissolve
+	{
+		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+		{
+			m_pStaticMesh->GetMaterial()->SetDissolveParams(GUI->GetDissolveThreshold());
+		}
 	}
 	//Sound
 	{

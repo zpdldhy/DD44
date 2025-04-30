@@ -34,6 +34,16 @@ void UMaterial::Bind()
         DC->VSSetConstantBuffers(2, 1, m_pGlowCB.GetAddressOf());
         DC->PSSetConstantBuffers(2, 1, m_pGlowCB.GetAddressOf());
 	}
+
+    if (m_pDissolveCB)
+    {
+        DC->PSSetConstantBuffers(3, 1, m_pDissolveCB.GetAddressOf());
+    }
+
+    if (m_pNoiseSRV)
+    {
+        DC->PSSetShaderResources(1, 1, m_pNoiseSRV.GetAddressOf()); 
+    }
 }
 
 
@@ -63,4 +73,36 @@ void UMaterial::SetGlowParams(float glowPower, const DirectX::XMFLOAT3& glowColo
     {
         DC->UpdateSubresource(m_pGlowCB.Get(), 0, nullptr, &cbData, 0, 0);
     }
+}
+
+void UMaterial::SetDissolveParams(float threshold)
+{
+    CB_DISSOLVE cb = {};
+    cb.g_fDissolveThreshold = threshold;
+
+    if (!m_pDissolveCB)
+    {
+        D3D11_BUFFER_DESC desc = {};
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.ByteWidth = sizeof(CB_DISSOLVE);
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+        D3D11_SUBRESOURCE_DATA initData = {};
+        initData.pSysMem = &cb;
+
+        HRESULT hr = DEVICE->CreateBuffer(&desc, &initData, m_pDissolveCB.GetAddressOf());
+        if (FAILED(hr))
+        {
+            assert(false && "Dissolve ConstantBuffer Create Failed!");
+        }
+    }
+    else
+    {
+        DC->UpdateSubresource(m_pDissolveCB.Get(), 0, nullptr, &cb, 0, 0);
+    }
+}
+
+void UMaterial::SetNoiseTexture(std::shared_ptr<Texture> _tex)
+{
+    m_pNoiseSRV = _tex->m_pTexSRV;
 }

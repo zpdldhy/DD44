@@ -59,6 +59,7 @@ void ImGuiCore::Test()
         ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
         ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
         ImGui::Checkbox("Another Window", &show_another_window);
+        ImGui::Checkbox("Show Glow UI", &m_bShowGlowControl);   // UI박스 ON/OFF
 
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
         ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
@@ -80,40 +81,30 @@ void ImGuiCore::Test()
             ImGuiWindowFlags_NoResize);
 
         ImGui::Text("Hello fucking world!");
-        
+
         ImGui::End();
     }
 
     //Test2
+    if (m_bShowGlowControl)
     {
-        ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_Always);
-        ImGui::Begin("Test - Glow Control", nullptr,
-            ImGuiWindowFlags_NoTitleBar |
-            ImGuiWindowFlags_NoMove |
-            ImGuiWindowFlags_NoResize);
+        ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_Once); // 창 크기는 한번만 설정
+        ImGui::Begin("Test Glow Control", &m_bShowGlowControl, ImGuiWindowFlags_NoResize);
 
-        ImGui::Text("Glow 조절 테스트");
-        ImGui::SliderFloat("Glow Power", &m_fGlowPower, 0.0f, 100.0f);
+        ImGui::Text("Glow_Test");
+        ImGui::SliderFloat("Glow Power", &m_fGlowPower, 0.0f, 5.0f);
 
-        // Glow Color 편집 (R, G, B)
         float color[3] = { m_vGlowColor.x, m_vGlowColor.y, m_vGlowColor.z };
-
         if (ImGui::ColorEdit3("Glow Color", color, ImGuiColorEditFlags_Float))
         {
-            // 값이 바뀐 경우에만 반영
-            m_vGlowColor.x = color[0];
-            m_vGlowColor.y = color[1];
-            m_vGlowColor.z = color[2];
+            m_vGlowColor = { color[0], color[1], color[2] };
         }
 
-       /* if (m_pTargetMaterial)
-        {
-            m_pTargetMaterial->SetGlowParams(m_fGlowPower, m_vGlowColor);
-        }*/
+        ImGui::SliderFloat("Dissolve Threshold", &m_fDissolveThreshold, 0.0f, 1.0f);
 
         ImGui::End();
     }
-    
+
 
 
     // 3. Show another simple window.
