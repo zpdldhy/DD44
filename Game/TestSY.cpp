@@ -9,6 +9,7 @@
 #include "UTerrainMeshComponent.h"
 #include "UMeshResources.h"
 #include "CameraManager.h"
+#include "Input.h"
 
 void TestSY::Init()
 {
@@ -118,6 +119,8 @@ void TestSY::Update()
 
 void TestSY::Render()
 {
+	if (INPUT->GetButtonDown(P))
+		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
 	m_pCameraActor->Render();
 	m_pActor->Render();
 	m_pPlane->Render();

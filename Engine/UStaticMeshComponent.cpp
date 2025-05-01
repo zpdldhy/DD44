@@ -141,8 +141,8 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateCube()
 	vIndexList.resize(36);
 
 	// Transform 넣기 전 Render를 위해 임시로 값 변경
-	Vec3 vMin = Vec3(-0.5f, -0.5f, 0.1f);
-	Vec3 vMax = Vec3(+0.5f, +0.5f, 0.6f);
+	Vec3 vMin = Vec3(-1.f, -1.f, -1.f);
+	Vec3 vMax = Vec3(+1.f, +1.f, +1.f);
 
 	// Front
 	vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));

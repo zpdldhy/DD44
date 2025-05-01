@@ -23,6 +23,7 @@ class CameraManager : public Singleton<CameraManager>
 
 public:
 	void Init();
+	void Tick();
 	void Render(CameraViewType _ViewType);
 	void Destroy();
 

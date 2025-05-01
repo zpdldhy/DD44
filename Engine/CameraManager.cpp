@@ -13,8 +13,17 @@ void CameraManager::Init()
 		assert(false);
 
 	m_pUICameraActor = make_shared<ACameraActor>(ProjectionType::PT_ORTHOGRAPHIC);
+	{
+		m_pUICameraActor->SetPosition(Vec3(0.f, 0.f, 0.f));
+		m_pUICameraActor->Init();
+	}
 
 	CreateCameraBuffer();
+}
+
+void CameraManager::Tick()
+{
+	m_pUICameraActor->Tick();
 }
 
 void CameraManager::Render(CameraViewType _ViewType)

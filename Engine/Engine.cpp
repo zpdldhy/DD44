@@ -44,6 +44,7 @@ void Engine::Frame()
 	}
 	TIMER->Update();
 	
+	CAMERAMANAGER->Tick();
 }
 
 void Engine::Render()

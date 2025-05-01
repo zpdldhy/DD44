@@ -35,7 +35,7 @@ void UCameraComponent::UpdateView()
 
 void UCameraComponent::UpdateOrthographicProjection()
 {	
-	m_matProjection = DirectX::XMMatrixOrthographicLH(m_fWidth, m_fHeight, 0, 1);		
+	m_matProjection = DirectX::XMMatrixOrthographicLH(m_fWidth, m_fHeight, m_fNear, m_fFar);
 }
 
 void UCameraComponent::UpdatePersPectiveProjection()
