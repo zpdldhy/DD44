@@ -2,6 +2,7 @@
 #include "TestYR.h"
 #include "ACameraActor.h"
 #include "EngineCameraMoveScript.h"
+#include "CameraManager.h"
 #include "UStaticMeshComponent.h"
 #include "Input.h"
 #include "UMaterial.h"
@@ -53,6 +54,9 @@ void TestYR::Init()
 	{
 		m_vActorList[i]->Init();
 	}
+
+	CAMERAMANAGER->SetCameraActor(m_pCameraActor);	
+}
 
 	// LOAD ALL TEXTURE
 	{

@@ -61,6 +61,9 @@
     <Filter Include="Utils\ModelLoader">
       <UniqueIdentifier>{8f6c5642-13ff-4574-a53a-45139bd30b99}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{358a3ef2-8a31-4ae2-b9ac-badd8ffa08cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -231,6 +234,9 @@
     <ClInclude Include="FbxLoader.h">
       <Filter>Utils\ModelLoader</Filter>
     </ClInclude>
+    <ClInclude Include="CameraManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
     <ClInclude Include="AssimpLoader.h" />
   </ItemGroup>
   <ItemGroup>
@@ -380,6 +386,9 @@
     </ClCompile>
     <ClCompile Include="FbxLoader.cpp">
       <Filter>Utils\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
     <ClCompile Include="AssimpLoader.cpp">
       <Filter>Utils\ModelLoader</Filter>

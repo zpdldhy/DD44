@@ -4,15 +4,8 @@
 
 class ACameraActor : public AActor
 {
-	shared_ptr<UCameraComponent> m_pCameraComponent;
-
 public:
-	void Init() override;
-	void Tick() override;
-	void Render() override;
-
-public:
-	ACameraActor() : m_pCameraComponent(make_shared<UCameraComponent>(ProjectionType::PT_PERSPECTIVE)) {}
+	ACameraActor(ProjectionType _type = ProjectionType::PT_PERSPECTIVE) { m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)] = static_pointer_cast<USceneComponent>(make_shared<UCameraComponent>(_type)); }
 	~ACameraActor() {}
 };
 
