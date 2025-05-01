@@ -34,6 +34,12 @@ void AAsset::Export(TFbxResource _result, string filepath)
 	{
 		for (int iAnimTrack = 0; iAnimTrack < _result.m_iAnimTrackCount; iAnimTrack++)
 		{
+			// NODE NAME
+			UINT nameSize = static_cast<UINT>(_result.m_vAnimTrackList[iAnimTrack].m_szName.size());
+			fwrite(&nameSize, sizeof(UINT), 1, pFile);
+			fwrite(_result.m_vAnimTrackList[iAnimTrack].m_szName.data(), sizeof(wchar_t), nameSize, pFile);
+
+			//
 			fwrite(&_result.m_vAnimTrackList[iAnimTrack].m_iStartFrame, sizeof(UINT), 1, pFile);
 			fwrite(&_result.m_vAnimTrackList[iAnimTrack].m_iEndFrame, sizeof(UINT), 1, pFile);
 
@@ -116,6 +122,12 @@ TFbxResource AAsset::Load(const char* fileName)
 	result.m_vAnimTrackList.resize(result.m_iAnimTrackCount);
 	for (int iAnimTrack = 0; iAnimTrack < result.m_iAnimTrackCount; iAnimTrack++)
 	{
+		// NODE NAME
+		int nameSize = 0;
+		fread(&nameSize, sizeof(UINT), 1, pFile);
+		result.m_vAnimTrackList[iAnimTrack].m_szName.resize(nameSize);
+		fread(&result.m_vAnimTrackList[iAnimTrack].m_szName[0], sizeof(wchar_t), nameSize, pFile);
+
 		fread(&result.m_vAnimTrackList[iAnimTrack].m_iStartFrame, sizeof(UINT), 1, pFile);
 		fread(&result.m_vAnimTrackList[iAnimTrack].m_iEndFrame, sizeof(UINT), 1, pFile);
 

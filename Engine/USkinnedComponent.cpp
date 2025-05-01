@@ -20,7 +20,7 @@ void USkinnedComponent::PreRender()
 {
 	if (m_pAnim) m_pAnim->Tick();
 
-	if (m_pAnim) m_pAnim->Render(0);
+	if (m_pAnim) m_pAnim->Render();
 
 	UINT Strides[2] = { sizeof(PNCT_VERTEX), sizeof(IW_VERTEX) };
 	UINT Offsets[2] = { 0, 0 };

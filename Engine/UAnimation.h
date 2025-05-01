@@ -8,6 +8,7 @@ struct CbAnimData
 struct AnimList
 {
 	vector<vector<Matrix>> animList;
+	wstring m_szName;
 };
 
 class UAnimation
@@ -22,6 +23,6 @@ public:
 public:
 	void CreateConstantBuffer();
 	void Tick();
-	void Render(int iChild);
+	void Render();
 
 };

@@ -157,6 +157,7 @@ void TestYR::MakeObjectByAsset(TFbxResource _resource)
 			animTrack->animTrackList.resize(_resource.m_iAnimTrackCount);
 			for (int iAnim = 0; iAnim < _resource.m_iAnimTrackCount; iAnim++)
 			{
+				animTrack->animTrackList[iAnim].m_szName = _resource.m_vAnimTrackList[iAnim].m_szName;
 				animTrack->animTrackList[iAnim].animList = _resource.m_vAnimTrackList[iAnim].m_vAnim;
 				animTrack->inversedBone = _resource.m_vInverseBindPose[iMesh];
 			}

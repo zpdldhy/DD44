@@ -44,10 +44,9 @@ void UAnimation::Tick()
 			currentAnimTrackIndex = 0;
 		}
 	}
-
 }
 
-void UAnimation::Render(int iChild)
+void UAnimation::Render()
 {
 
 	// 해당 프레임에 대한 MATRIX 수집

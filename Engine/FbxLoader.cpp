@@ -418,6 +418,7 @@ void FbxLoader::GetAnimation(int _animTrack, AnimTrack* _track)
 {
 	FbxTime::SetGlobalTimeMode(FbxTime::eFrames30);
 	FbxAnimStack* stack = m_pScene->GetSrcObject<FbxAnimStack>(_animTrack);
+	_track->m_szName = to_mw(stack->GetName());
 
 	if (stack == nullptr) nullptr;
 	m_pScene->SetCurrentAnimationStack(stack);

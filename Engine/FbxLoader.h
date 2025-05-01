@@ -17,6 +17,7 @@ struct TIwData
 };
 struct AnimTrack
 {
+	wstring m_szName;
 	UINT m_iStartFrame;
 	UINT m_iEndFrame;
 
