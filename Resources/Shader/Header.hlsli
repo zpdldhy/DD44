@@ -23,6 +23,13 @@ cbuffer cbDissolve : register(b3)
 {
     float g_fDissolveThreshold;
 }
+cbuffer CB_UVDistortion : register(b4)
+{
+    float g_fDistortionStrength; // 왜곡 세기 (예: 0.01 ~ 0.1)
+    float g_fWaveSpeed;          // 시간 흐름 속도 (예: 1.0)
+    float g_fWaveFrequency;      // 파장 (예: 10.0)
+    float g_fDistortionTime;     // 누적 시간 (프레임마다 누적됨)
+};
 
 struct VS_IN
 {

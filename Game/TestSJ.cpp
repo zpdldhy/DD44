@@ -34,7 +34,7 @@ void TestSJ::Init()
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Dissolve.hlsl");
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/uvDistortion.hlsl");
 		m_pStaticMesh->SetMaterial(material);
 	}
 
@@ -79,6 +79,29 @@ void TestSJ::Init()
 
 void TestSJ::Update()
 {
+	//UVDistortion
+	{
+		static bool bUVInitialized = false;
+		if (!bUVInitialized)
+		{
+			m_pStaticMesh->GetMaterial()->SetUVDistortionParams(0.08f, 10.0f, 15.0f); // strength, speed, frequency
+			m_pStaticMesh2->GetMaterial()->SetUVDistortionParams(0.01f, 1.5f, 8.0f);  // optional: 다른 효과
+			bUVInitialized = true;
+		}
+
+		float deltaTime = TIMER->GetDeltaTime();
+
+		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+		{
+			m_pStaticMesh->GetMaterial()->UpdateUVDistortionBuffer(deltaTime);
+		}
+		if (m_pStaticMesh2 && m_pStaticMesh2->GetMaterial())
+		{
+			m_pStaticMesh2->GetMaterial()->UpdateUVDistortionBuffer(deltaTime);
+		}
+	}
+
+
 	shared_ptr<UMaterial> targetMat = nullptr;
 	static int prevSelected = -1;
 	if (GUI->m_iSelectedActor != prevSelected)

@@ -19,6 +19,14 @@ struct CB_DISSOLVE
 	float padding[3];
 };
 
+struct CB_UVDistortion
+{
+	float g_fDistortionStrength;
+	float g_fWaveSpeed;
+	float g_fWaveFrequency;
+	float g_fDistortionTime;
+};
+
 class UMaterial
 {
 	shared_ptr<Shader> m_pShader = nullptr;
@@ -27,6 +35,7 @@ class UMaterial
 	ComPtr<ID3D11Buffer> m_pGlowCB;
 	ComPtr<ID3D11Buffer> m_pDissolveCB;
 	ComPtr<ID3D11ShaderResourceView> m_pNoiseSRV;
+	ComPtr<ID3D11Buffer> m_pUVDistortionCB;
 public:
 	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
 	void SetHitFlashTime(float _flashTime);
@@ -34,10 +43,13 @@ public:
 	ComPtr<ID3D11Buffer> GetGlowCB() const { return m_pGlowCB; }
 	void SetDissolveParams(float threshold);
 	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
+	void SetUVDistortionParams(float _strength, float _speed, float _frequency);
+	void UpdateUVDistortionBuffer(float deltaTime);
 
 public:
 	CB_GLOW m_tGlowData = { 0.0f, };
 	CB_DISSOLVE m_tDissolveData = { 0.0f };
+	CB_UVDistortion m_tUVDistortion = { };
 
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);

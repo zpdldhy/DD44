@@ -44,6 +44,11 @@ void UMaterial::Bind()
     {
         DC->PSSetShaderResources(1, 1, m_pNoiseSRV.GetAddressOf()); 
     }
+
+    if (m_pUVDistortionCB)
+    {
+        DC->PSSetConstantBuffers(4, 1, m_pUVDistortionCB.GetAddressOf()); // register(b4)
+    }
 }
 
 
@@ -85,6 +90,31 @@ void UMaterial::UpdateGlowBuffer()
     }
 }
 
+void UMaterial::UpdateUVDistortionBuffer(float deltaTime)
+{
+
+    m_tUVDistortion.g_fDistortionTime += deltaTime * m_tUVDistortion.g_fWaveSpeed;
+
+    if (!m_pUVDistortionCB)
+    {
+        D3D11_BUFFER_DESC desc = {};
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.ByteWidth = sizeof(CB_UVDistortion);
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+        D3D11_SUBRESOURCE_DATA initData = {};
+        initData.pSysMem = &m_tUVDistortion;
+
+        HRESULT hr = DEVICE->CreateBuffer(&desc, &initData, m_pUVDistortionCB.GetAddressOf());
+        assert(SUCCEEDED(hr));
+    }
+    else
+    {
+        DC->UpdateSubresource(m_pUVDistortionCB.Get(), 0, nullptr, &m_tUVDistortion, 0, 0);
+    }
+}
+
+
 void UMaterial::SetDissolveParams(float threshold)
 {
     CB_DISSOLVE cb = {};
@@ -116,3 +146,11 @@ void UMaterial::SetNoiseTexture(std::shared_ptr<Texture> _tex)
 {
     m_pNoiseSRV = _tex->m_pTexSRV;
 }
+
+void UMaterial::SetUVDistortionParams(float _strength, float _speed, float _frequency)
+{
+    m_tUVDistortion.g_fDistortionStrength = _strength;
+    m_tUVDistortion.g_fWaveSpeed = _speed;
+    m_tUVDistortion.g_fWaveFrequency = _frequency;
+}
+
