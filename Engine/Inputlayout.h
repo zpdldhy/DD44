@@ -16,6 +16,7 @@ private:
 	ComPtr<ID3DBlob> m_pCode;
 public:
 	bool CreateDefault();
+	bool CreateIW(ComPtr<ID3DBlob> _pCode);
 	shared_ptr<Inputlayout> Get(wstring _name = L"Default");
 	void Init(ComPtr<ID3DBlob> _pCode);
 	virtual ~InputlayoutManager();

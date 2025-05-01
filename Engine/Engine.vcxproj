@@ -117,7 +117,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Libraries\Debug\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Libraries\Debug\Include;$(SolutionDir)Libraries\Debug\Include\Fbx;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -152,12 +152,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AActor.h" />
+    <ClInclude Include="AAsset.h" />
     <ClInclude Include="ACameraActor.h" />
     <ClInclude Include="ACharacter.h" />
+    <ClInclude Include="ActorLoader.h" />
     <ClInclude Include="APawn.h" />
     <ClInclude Include="ASky.h" />
+    <ClInclude Include="FbxLoader.h" />
+    <ClInclude Include="CameraManager.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="ATerrainTileActor.h" />
+    <ClInclude Include="UAnimation.h" />
     <ClInclude Include="UCameraComponent.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Device.h" />
@@ -188,7 +193,6 @@
     <ClInclude Include="UMaterial.h" />
     <ClInclude Include="UActorComponent.h" />
     <ClInclude Include="UMeshComponent.h" />
-    <ClInclude Include="UMeshData.h" />
     <ClInclude Include="UMeshResources.h" />
     <ClInclude Include="UObject.h" />
     <ClInclude Include="UPrimitiveComponent.h" />
@@ -196,6 +200,7 @@
     <ClInclude Include="UScriptComponent.h" />
     <ClInclude Include="USkeletalMeshResources.h" />
     <ClInclude Include="USkinnedComponent.h" />
+    <ClInclude Include="USkinnedMeshComponent.h" />
     <ClInclude Include="UStaticMeshComponent.h" />
     <ClInclude Include="UStaticMeshResources.h" />
     <ClInclude Include="UTerrainMeshComponent.h" />
@@ -204,12 +209,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AActor.cpp" />
+    <ClCompile Include="AAsset.cpp" />
     <ClCompile Include="ACameraActor.cpp" />
     <ClCompile Include="ACharacter.cpp" />
+    <ClCompile Include="ActorLoader.cpp" />
     <ClCompile Include="APawn.cpp" />
     <ClCompile Include="ASky.cpp" />
+    <ClCompile Include="FbxLoader.cpp" />
+    <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="ATerrainTileActor.cpp" />
+    <ClCompile Include="UAnimation.cpp" />
     <ClCompile Include="UCameraComponent.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="DxState.cpp" />
@@ -252,7 +262,6 @@
     <ClCompile Include="UMaterial.cpp" />
     <ClCompile Include="UActorComponent.cpp" />
     <ClCompile Include="UMeshComponent.cpp" />
-    <ClCompile Include="UMeshData.cpp" />
     <ClCompile Include="UMeshResources.cpp" />
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UPrimitiveComponent.cpp" />
@@ -260,6 +269,7 @@
     <ClCompile Include="UScriptComponent.cpp" />
     <ClCompile Include="USkeletalMeshResources.cpp" />
     <ClCompile Include="USkinnedComponent.cpp" />
+    <ClCompile Include="USkinnedMeshComponent.cpp" />
     <ClCompile Include="UStaticMeshComponent.cpp" />
     <ClCompile Include="UStaticMeshResources.cpp" />
     <ClCompile Include="UTerrainMeshComponent.cpp" />

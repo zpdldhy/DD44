@@ -9,18 +9,15 @@ enum class ProjectionType
 	PT_PERSPECTIVE,
 };
 
-struct CameraConstantData 
-{
-	Matrix matView;
-	Matrix matProjection;
-};
-
 class UCameraComponent : public USceneComponent
 {
 	ProjectionType m_ProjectionType = ProjectionType::PT_PERSPECTIVE;
 
-	ComPtr<ID3D11Buffer> m_pCameraCB;
-	CameraConstantData m_CameraData;
+	Matrix m_matView;
+	Matrix m_matProjection;
+
+	Vec3 m_vEye;
+	Vec3 m_vLook;
 
 	// Projection
 	// - Orthographic
@@ -29,7 +26,7 @@ class UCameraComponent : public USceneComponent
 
 	// - Perspective
 	float m_fFov = 3.14f / 4.0f;
-	float m_fAspect = 800.0f / 600.0f;
+	float m_fAspect = 1440.0f / 900.0f;
 	float m_fNear = 0.1f;
 	float m_fFar = 10000.0f;
 	
@@ -40,20 +37,26 @@ public:
 	void Destroy() override;
 
 private:
-	void CreateCameraBuffer();
-
-private:
 	void UpdateView();
 	void UpdateOrthographicProjection();
 	void UpdatePersPectiveProjection();
 
 public:
-	//void SetCameraPosition(Vec3 _CameraPosition) { m_vEye = _CameraPosition; }
-	void SetOrthographic(float _width, float _height);
-	void SetPerspective(float _fov, float _aspect, float _near, float _far);
+	void SetOrthographic(float _fWidth, float _fHeight);
+	void SetPerspective(float _fFov, float _fAspect, float _fNear, float _fFar);
+	void SetFov(float _fFov) { m_fFov = _fFov; }
+	void SetAspect(float _fAspect) { m_fAspect = _fAspect; }
+	void SetNear(float _fNear) { m_fNear = _fNear; }
+	void SetFar(float _fFar) { m_fFar = _fFar; }
+
+	Matrix GetView() { return m_matView; }
+	Matrix GetProejction() { return m_matProjection; }
+
+	Vec3 GetCameraPos() { return m_vEye; }
+	Vec3 GetCameraLook() { return m_vLook; }
 
 public:
-	UCameraComponent(ProjectionType _projectionType) : m_ProjectionType(_projectionType) {}
+	UCameraComponent(ProjectionType _projectionType = ProjectionType::PT_PERSPECTIVE) : m_ProjectionType(_projectionType) {}
 	virtual ~UCameraComponent() {}
 };
 

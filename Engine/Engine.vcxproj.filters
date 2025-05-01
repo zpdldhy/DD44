@@ -58,6 +58,12 @@
     <Filter Include="Resources\Mesh">
       <UniqueIdentifier>{88731221-02aa-4668-b59c-dcaf02dd62e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\ModelLoader">
+      <UniqueIdentifier>{8f6c5642-13ff-4574-a53a-45139bd30b99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{358a3ef2-8a31-4ae2-b9ac-badd8ffa08cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -165,9 +171,6 @@
     <ClInclude Include="Vertex.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
-    <ClInclude Include="UMeshData.h">
-      <Filter>Headers\Data</Filter>
-    </ClInclude>
     <ClInclude Include="EnginePch.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -215,6 +218,24 @@
     </ClInclude>
     <ClInclude Include="USkeletalMeshResources.h">
       <Filter>Resources\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="USkinnedMeshComponent.h">
+      <Filter>Component\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="UAnimation.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="AAsset.h">
+      <Filter>Utils\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorLoader.h">
+      <Filter>Utils\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxLoader.h">
+      <Filter>Utils\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -311,9 +332,6 @@
     <ClCompile Include="Vertex.cpp">
       <Filter>Headers\Data</Filter>
     </ClCompile>
-    <ClCompile Include="UMeshData.cpp">
-      <Filter>Headers\Data</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Headers</Filter>
     </ClCompile>
@@ -352,6 +370,24 @@
     </ClCompile>
     <ClCompile Include="USkeletalMeshResources.cpp">
       <Filter>Resources\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="USkinnedMeshComponent.cpp">
+      <Filter>Component\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="UAnimation.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="AAsset.cpp">
+      <Filter>Utils\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorLoader.cpp">
+      <Filter>Utils\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="FbxLoader.cpp">
+      <Filter>Utils\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

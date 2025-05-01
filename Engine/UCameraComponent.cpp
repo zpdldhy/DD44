@@ -3,7 +3,7 @@
 
 void UCameraComponent::Init()
 {
-	CreateCameraBuffer();
+
 }
 
 void UCameraComponent::Tick()
@@ -18,60 +18,46 @@ void UCameraComponent::Tick()
 
 void UCameraComponent::Render()
 {
-	DC->UpdateSubresource(m_pCameraCB.Get(), 0, nullptr, &m_CameraData, 0, 0);
-	DC->VSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
 }
 
 void UCameraComponent::Destroy()
 {
 }
 
-void UCameraComponent::CreateCameraBuffer()
-{
-	D3D11_BUFFER_DESC pDesc;
-	ZeroMemory(&pDesc, sizeof(pDesc));
-	pDesc.ByteWidth = sizeof(CameraConstantData);
-	pDesc.Usage = D3D11_USAGE_DEFAULT;
-	pDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	HRESULT hr = DEVICE->CreateBuffer(&pDesc, nullptr, m_pCameraCB.GetAddressOf());
-
-	if (FAILED(hr))
-	{
-		DX_CHECK(hr, _T("CreateCameraBuffer Failed"));
-		assert(false);
-	}
-}
-
 void UCameraComponent::UpdateView()
 {
-	auto vEye = m_pOwner->m_vPosition;
-	auto vLook = m_pOwner->m_vLook;
-	auto vUp = m_pOwner->m_vUp;
+	m_vEye = m_pOwner->m_vPosition + m_vLocalPosition;	
 
-	m_CameraData.matView = DirectX::XMMatrixLookAtLH(vEye, vEye + vLook, vUp);
+	if (Vec3::Distance(Vec3(0.f, 0.f, 0.f), m_vLocalPosition) < 0.1f)
+		m_vLook = m_pOwner->m_vLook;
+	else
+		m_vLook = -m_vLocalPosition;
+
+	Vec3 vUp = Vec3(0.f, 1.f, 0.f);
+
+	m_matView = DirectX::XMMatrixLookAtLH(m_vEye, m_vEye + m_vLook, vUp);
 }
 
 void UCameraComponent::UpdateOrthographicProjection()
 {	
-	m_CameraData.matProjection = DirectX::XMMatrixOrthographicLH(m_fWidth, m_fHeight, m_fNear, m_fFar);
-		//DirectX::SimpleMath::Matrix::CreateOrthographic(m_fWidth, m_fHeight, 0.1f, 1000.0f);
+	m_matProjection = DirectX::XMMatrixOrthographicLH(m_fWidth, m_fHeight, m_fNear, m_fFar);
 }
 
 void UCameraComponent::UpdatePersPectiveProjection()
 {
-	m_CameraData.matProjection = DirectX::XMMatrixPerspectiveFovLH(m_fFov, m_fAspect, m_fNear, m_fFar);
+	m_matProjection = DirectX::XMMatrixPerspectiveFovLH(m_fFov, m_fAspect, m_fNear, m_fFar);
 }
 
-void UCameraComponent::SetOrthographic(float _width, float _height)
+void UCameraComponent::SetOrthographic(float _fWidth, float _fHeight)
 {
-	m_fWidth = _width;
-	m_fHeight = _height;	
+	m_fWidth = _fWidth;
+	m_fHeight = _fHeight;
 }
 
-void UCameraComponent::SetPerspective(float _fov, float _aspect, float _near, float _far)
+void UCameraComponent::SetPerspective(float _fFov, float _fAspect, float _fNear, float _fFar)
 {
-	m_fFov = _fov;
-	m_fAspect = _aspect;
-	m_fNear = _near;
-	m_fFar = _far;
+	m_fFov = _fFov;
+	m_fAspect = _fAspect;
+	m_fNear = _fNear;
+	m_fFar = _fFar;
 }
