@@ -130,6 +130,12 @@ void TestSY::Init()
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 		m_pStaticMesh->SetMaterial(material);
 
+		auto pCameraComponent = make_shared<UCameraComponent>();
+		pCameraComponent->SetLocalPosition(Vec3(20.f, 20.f, -20.f));
+		m_pActor->SetCameraComponent(pCameraComponent);
+
+		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
+
 		m_pActor->Init();
 	}
 
