@@ -1,7 +1,7 @@
 #pragma once
 #include "IExecute.h"
 #include "ActorLoader.h"
-#include "AssimpLoader.h"
+#include "ObjectLoader.h"
 
 class APawn;
 class UMaterial;
@@ -10,7 +10,7 @@ class TestYR : public IExecute
 {
 public:
 	ActorLoader loader;
-	AssimpLoader objectLoader;
+	ObjectLoader objLoader;
 	vector<shared_ptr<APawn>> m_vActorList;
 	vector<shared_ptr<APawn>> m_vObjList;
 	vector<shared_ptr<UMaterial>> materialList;

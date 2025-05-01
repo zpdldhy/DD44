@@ -161,6 +161,7 @@
     <ClInclude Include="AssimpLoader.h" />
     <ClInclude Include="FbxLoader.h" />
     <ClInclude Include="CameraManager.h" />
+    <ClInclude Include="ObjectLoader.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="ATerrainTileActor.h" />
     <ClInclude Include="UAnimation.h" />
@@ -219,6 +220,7 @@
     <ClCompile Include="AssimpLoader.cpp" />
     <ClCompile Include="FbxLoader.cpp" />
     <ClCompile Include="CameraManager.cpp" />
+    <ClCompile Include="ObjectLoader.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="ATerrainTileActor.cpp" />
     <ClCompile Include="UAnimation.cpp" />

@@ -25,9 +25,9 @@ void TestYR::Init()
 		meshComponent1->SetMaterial(material);
 	
 		// Object 설정
-		object1->SetMesh(meshComponent1);
-		object2->SetMesh(meshComponent1);
-		object3->SetMesh(meshComponent1);
+		object1->SetMeshComponent(meshComponent1);
+		object2->SetMeshComponent(meshComponent1);
+		object3->SetMeshComponent(meshComponent1);
 
 		object1->SetScale(Vec3(10000.0f, 0.03f, 0.03f));
 		object2->SetScale(Vec3(0.03f, 10000.0f, 0.03f));
@@ -56,7 +56,6 @@ void TestYR::Init()
 	}
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);	
-}
 
 	// LOAD ALL TEXTURE
 	{
@@ -85,10 +84,10 @@ void TestYR::Init()
 
 	}
 
-	MakeObject();
+	m_vObjList = objLoader.Load();
 
 	targetObj = m_vObjList[targetIndex];
-	targetObj->GetMesh<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
+	targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
 }
 void TestYR::Update()
 {
@@ -118,7 +117,7 @@ void TestYR::Update()
 		{
 			matIndex = 0;
 		}
-		targetObj->GetMesh<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
+		targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
 	}
 
 	if (INPUT->GetButton(GameKey::Y))
@@ -127,7 +126,7 @@ void TestYR::Update()
 		{
 			matIndex = 0;
 		}
-		targetObj->GetMesh<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
+		targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
 	}
 }
 void TestYR::Render()
@@ -149,41 +148,4 @@ void TestYR::Render()
 	targetObj->Render();
 }
 
-void TestYR::MakeObject()
-{
-	vector<string> objFileNameList = GetFileNames("../Resources/Obj/*.obj");
-	vector<vector<MeshData>> meshes;
-	for (int iFile = 0; iFile < objFileNameList.size(); iFile++)
-	{
-		meshes.emplace_back(objectLoader.Load(objFileNameList[iFile]));
-	}
 
-	// MAKE TEMP MATERIAL
-	shared_ptr<UMaterial> material = make_shared<UMaterial>();
-	wstring path = L"../Resources/Texture/magenta.png";
-	material->Load(path, L"../Resources/Shader/Default.hlsl");
-
-	for (int iObj = 0; iObj < meshes.size(); iObj++)
-	{
-		shared_ptr<APawn> actor = make_shared<APawn>();
-
-		////MESH
-		// TEMP ( CHILD 처리 미흡 ) 
-		shared_ptr<UStaticMeshComponent> rootMesh = make_shared<UStaticMeshComponent>();
-
-		for (int iMesh = 0; iMesh < meshes[iObj].size(); iMesh++)
-		{
-			shared_ptr<UStaticMeshResources> mesh = make_shared<UStaticMeshResources>();
-			mesh->SetVertexList(meshes[iObj][iMesh].m_vVertexList);
-			mesh->SetIndexList(meshes[iObj][iMesh].m_vIndexList);
-			mesh->Bind();
-			rootMesh->SetMesh(mesh);
-			rootMesh->SetMaterial(material);
-		}
-
-		actor->SetMesh(rootMesh);
-		actor->Init();
-		m_vObjList.emplace_back(actor);
-	}
-
-}
