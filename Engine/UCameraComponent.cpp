@@ -22,6 +22,10 @@ void UCameraComponent::Render()
 	DC->VSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
 }
 
+void UCameraComponent::Destroy()
+{
+}
+
 void UCameraComponent::CreateCameraBuffer()
 {
 	D3D11_BUFFER_DESC pDesc;
@@ -49,7 +53,8 @@ void UCameraComponent::UpdateView()
 
 void UCameraComponent::UpdateOrthographicProjection()
 {	
-	m_CameraData.matProjection = DirectX::SimpleMath::Matrix::CreateOrthographic(m_fWidth, m_fHeight, 0.1f, 1000.0f);
+	m_CameraData.matProjection = DirectX::XMMatrixOrthographicLH(m_fWidth, m_fHeight, m_fNear, m_fFar);
+		//DirectX::SimpleMath::Matrix::CreateOrthographic(m_fWidth, m_fHeight, 0.1f, 1000.0f);
 }
 
 void UCameraComponent::UpdatePersPectiveProjection()

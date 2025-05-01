@@ -13,12 +13,6 @@ public:
 	virtual ~USceneComponent() = default;
 
 public:
-	virtual void Init();
-	virtual void Tick();
-	virtual void Render();
-	virtual void Destroy();
-
-public:
 	Vec3 GetLocalPosition() { return m_vLocalPosition; }
 	Vec3 GetLocalRotation() { return m_vLocalRotation; }
 	Vec3 GetLocalScale() { return m_vLocalScale; }

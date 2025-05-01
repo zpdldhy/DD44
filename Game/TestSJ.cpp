@@ -26,8 +26,7 @@ void TestSJ::Init()
 	{
 		m_pActor = make_shared<APawn>();
 
-		m_pStaticMesh = make_shared<UStaticMeshComponent>();
-		m_pStaticMesh->CreateCube();
+		m_pStaticMesh = UStaticMeshComponent::CreateCube();
 		m_pActor->SetMesh(m_pStaticMesh);
 		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
 		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
@@ -57,8 +56,7 @@ void TestSJ::Init()
 	{
 		m_pSky = make_shared<ASky>();
 
-		m_pSkyMesh = make_shared<UStaticMeshComponent>();
-		m_pSkyMesh->CreateSphere(20, 20);
+		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pSky->SetMesh(m_pSkyMesh);
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
