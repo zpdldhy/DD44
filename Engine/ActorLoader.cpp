@@ -149,7 +149,7 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 
 		}
 
-		actor->SetMesh(rootMesh);
+		actor->SetMeshComponent(rootMesh);
 		actorList.emplace_back(actor);
 	}
 

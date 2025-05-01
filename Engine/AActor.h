@@ -8,8 +8,9 @@ struct cbData
 	Matrix matWorld;
 };
 
-enum ComponentType
+enum class ComponentType
 {
+	CT_CAMERA,
 	CT_MESH,
 	CT_COUNT,
 };
@@ -19,16 +20,16 @@ class AActor : public UObject
 	friend class UCameraComponent;
 
 protected:
-	array<shared_ptr<UPrimitiveComponent>, ComponentType::CT_COUNT> m_arrComponent;
+	array<shared_ptr<USceneComponent>, static_cast<size_t>(ComponentType::CT_COUNT)> m_arrComponent;
 	vector<shared_ptr<class UScriptComponent>> m_vScript;
 
 	cbData m_cbData;
 	ComPtr<ID3D11Buffer> m_pWorldCB;
 
 protected:
-	Vec3 m_vLook	= { 0.0f,0.0f,1.0f };
-	Vec3 m_vRight	= { 1.0f,0.0f,0.0f };
-	Vec3 m_vUp		= { 0.0f,1.0f,0.0f };
+	Vec3 m_vLook = { 0.0f,0.0f,1.0f };
+	Vec3 m_vRight = { 1.0f,0.0f,0.0f };
+	Vec3 m_vUp = { 0.0f,1.0f,0.0f };
 
 	Vec3 m_vScale = { 1.0f, 1.0f, 1.0f };
 	Vec3 m_vRotation = { 0.0f, 0.0f, 0.0f };
@@ -55,10 +56,15 @@ public:
 	void UpdateWorldMatrix();
 
 public:
+	// Component
 	template<typename T>
-	shared_ptr<T> GetMesh() { return static_pointer_cast<T>(m_arrComponent[ComponentType::CT_MESH]); }
-	void SetMesh(shared_ptr<UMeshComponent> _mesh) { m_arrComponent[ComponentType::CT_MESH] = _mesh; }
+	shared_ptr<T> GetMeshComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
+	shared_ptr<UCameraComponent> GetCameraComponent() { return static_pointer_cast<UCameraComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)]); }
 
+	void SetMeshComponent(shared_ptr<UMeshComponent> _mesh) { m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)] = static_pointer_cast<USceneComponent>(_mesh); }
+	void SetCameraComponent(shared_ptr<UCameraComponent> _camera) { m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)] = static_pointer_cast<USceneComponent>(_camera); }
+
+	// Script
 	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }
 
 public:
@@ -73,7 +79,7 @@ public:
 	void SetRotation(const Vec3& _rot) { m_vRotation = _rot; }
 	void SetScale(const Vec3& _scale) { m_vScale = _scale; }
 	void AddPosition(const Vec3& _pos) { m_vPosition += _pos; }
-	void AddRotation(const Vec3& _rot) { m_vRotation += _rot; }	
+	void AddRotation(const Vec3& _rot) { m_vRotation += _rot; }
 };
 
 // AActor

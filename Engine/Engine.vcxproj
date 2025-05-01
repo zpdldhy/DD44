@@ -159,6 +159,7 @@
     <ClInclude Include="APawn.h" />
     <ClInclude Include="ASky.h" />
     <ClInclude Include="FbxLoader.h" />
+    <ClInclude Include="CameraManager.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="ATerrainTileActor.h" />
     <ClInclude Include="UAnimation.h" />
@@ -215,6 +216,7 @@
     <ClCompile Include="APawn.cpp" />
     <ClCompile Include="ASky.cpp" />
     <ClCompile Include="FbxLoader.cpp" />
+    <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="ATerrainTileActor.cpp" />
     <ClCompile Include="UAnimation.cpp" />

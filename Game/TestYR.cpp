@@ -2,6 +2,7 @@
 #include "TestYR.h"
 #include "ACameraActor.h"
 #include "EngineCameraMoveScript.h"
+#include "CameraManager.h"
 
 void TestYR::Init()
 {
@@ -51,6 +52,8 @@ void TestYR::Init()
 	{
 		m_vActorList[i]->Init();
 	}
+
+	CAMERAMANAGER->SetCameraActor(m_pCameraActor);	
 }
 void TestYR::Update()
 {

@@ -13,5 +13,6 @@
 #define TYPER		GET_SINGLE(Typer)
 #define TIMER		GET_SINGLE(Timer)
 #define GUI			GET_SINGLE(ImGuiCore)
-#define SOUNDMANAGER GET_SINGLE(SoundManager)
+#define SOUNDMANAGER	GET_SINGLE(SoundManager)
+#define CAMERAMANAGER	GET_SINGLE(CameraManager)
 #define DD_PI		3.1415926f

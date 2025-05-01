@@ -6,8 +6,11 @@
 #include "ACameraActor.h"
 #include "ASky.h"
 #include "EngineCameraMoveScript.h"
+#include "kkongchiMoveScript.h"
 #include "UTerrainMeshComponent.h"
 #include "UMeshResources.h"
+#include "CameraManager.h"
+#include "Input.h"
 
 void TestSY::Init()
 {
@@ -21,14 +24,20 @@ void TestSY::Init()
 		m_pActor = make_shared<APawn>();
 
 		m_pStaticMesh = UStaticMeshComponent::CreateCube();
-		m_pActor->SetMesh(m_pStaticMesh);
+		m_pActor->SetMeshComponent(m_pStaticMesh);
 		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
 		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
-		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
+		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });		
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 		m_pStaticMesh->SetMaterial(material);
+
+		auto pCameraComponent = make_shared<UCameraComponent>();
+		pCameraComponent->SetLocalPosition(Vec3(20.f, 20.f, -20.f));
+		m_pActor->SetCameraComponent(pCameraComponent);
+
+		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
 	}
 
 	{
@@ -61,11 +70,11 @@ void TestSY::Init()
 		m_pPlaneMesh->GetMesh()->SetVertexList(newPlaneVeretexList);
 		m_pPlaneMesh->MeshBind();
 
-		m_pPlane->SetMesh(m_pPlaneMesh);
+		m_pPlane->SetMeshComponent(m_pPlaneMesh);
 		
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		material->Load(L"../Resources/Texture/grass.jpg", L"../Resources/Shader/Default.hlsl");
 		m_pPlaneMesh->SetMaterial(material);
 	}
 
@@ -92,7 +101,7 @@ void TestSY::Init()
 		m_pSky = make_shared<ASky>();
 
 		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
-		m_pSky->SetMesh(m_pSkyMesh);
+		m_pSky->SetMeshComponent(m_pSkyMesh);
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
@@ -103,10 +112,16 @@ void TestSY::Init()
 	m_pActor->Init();
 	m_pPlane->Init();
 	m_pSky->Init();
+
+	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 }
 
 void TestSY::Update()
 {
+	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+	if (INPUT->GetButtonDown(O))
+		CAMERAMANAGER->SetCameraActor(m_pActor);
+
 	m_pCameraActor->Tick();
 	m_pActor->Tick();
 	m_pPlane->Tick();
@@ -114,7 +129,9 @@ void TestSY::Update()
 }
 
 void TestSY::Render()
-{
+{	
+	if (INPUT->GetButtonDown(P))
+		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
 	m_pCameraActor->Render();
 	m_pActor->Render();
 	m_pPlane->Render();
