@@ -156,6 +156,7 @@
     <ClInclude Include="ACharacter.h" />
     <ClInclude Include="APawn.h" />
     <ClInclude Include="ASky.h" />
+    <ClInclude Include="CameraManager.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="ATerrainTileActor.h" />
     <ClInclude Include="UCameraComponent.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="ACharacter.cpp" />
     <ClCompile Include="APawn.cpp" />
     <ClCompile Include="ASky.cpp" />
+    <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="ATerrainTileActor.cpp" />
     <ClCompile Include="UCameraComponent.cpp" />

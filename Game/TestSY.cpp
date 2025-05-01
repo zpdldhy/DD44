@@ -8,6 +8,7 @@
 #include "EngineCameraMoveScript.h"
 #include "UTerrainMeshComponent.h"
 #include "UMeshResources.h"
+#include "CameraManager.h"
 
 void TestSY::Init()
 {
@@ -21,7 +22,7 @@ void TestSY::Init()
 		m_pActor = make_shared<APawn>();
 
 		m_pStaticMesh = UStaticMeshComponent::CreateCube();
-		m_pActor->SetMesh(m_pStaticMesh);
+		m_pActor->SetMeshComponent(m_pStaticMesh);
 		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
 		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
@@ -61,7 +62,7 @@ void TestSY::Init()
 		m_pPlaneMesh->GetMesh()->SetVertexList(newPlaneVeretexList);
 		m_pPlaneMesh->MeshBind();
 
-		m_pPlane->SetMesh(m_pPlaneMesh);
+		m_pPlane->SetMeshComponent(m_pPlaneMesh);
 		
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
@@ -92,7 +93,7 @@ void TestSY::Init()
 		m_pSky = make_shared<ASky>();
 
 		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
-		m_pSky->SetMesh(m_pSkyMesh);
+		m_pSky->SetMeshComponent(m_pSkyMesh);
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
@@ -103,6 +104,8 @@ void TestSY::Init()
 	m_pActor->Init();
 	m_pPlane->Init();
 	m_pSky->Init();
+
+	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 }
 
 void TestSY::Update()

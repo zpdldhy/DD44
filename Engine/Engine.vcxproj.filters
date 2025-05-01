@@ -216,6 +216,7 @@
     <ClInclude Include="USkeletalMeshResources.h">
       <Filter>Resources\Mesh</Filter>
     </ClInclude>
+    <ClInclude Include="CameraManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -353,6 +354,7 @@
     <ClCompile Include="USkeletalMeshResources.cpp">
       <Filter>Resources\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="CameraManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
