@@ -55,6 +55,9 @@
     <Filter Include="Component\Script">
       <UniqueIdentifier>{08cb7475-0a3d-4b3b-8c4a-4e95e3a8ec40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\Mesh">
+      <UniqueIdentifier>{88731221-02aa-4668-b59c-dcaf02dd62e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -201,6 +204,15 @@
     <ClInclude Include="UScriptComponent.h">
       <Filter>Component\Script</Filter>
     </ClInclude>
+    <ClInclude Include="UMeshResources.h">
+      <Filter>Resources\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="UStaticMeshResources.h">
+      <Filter>Resources\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="USkeletalMeshResources.h">
+      <Filter>Resources\Mesh</Filter>
+    </ClInclude>
     <ClInclude Include="AAsset.h" />
     <ClInclude Include="FbxLoader.h" />
     <ClInclude Include="UAnimation.h" />
@@ -328,6 +340,15 @@
     </ClCompile>
     <ClCompile Include="UScriptComponent.cpp">
       <Filter>Component\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="UMeshResources.cpp">
+      <Filter>Resources\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="UStaticMeshResources.cpp">
+      <Filter>Resources\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="USkeletalMeshResources.cpp">
+      <Filter>Resources\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="AAsset.cpp" />
     <ClCompile Include="FbxLoader.cpp" />

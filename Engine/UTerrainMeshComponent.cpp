@@ -1,214 +1,60 @@
 #include "pch.h"
 #include "UTerrainMeshComponent.h"
+#include "UMaterial.h"
 
-void UTerrainMeshComponent::CreateTriangle()
+void UTerrainMeshComponent::Init()
 {
-	m_vVertexList.resize(3);
-	m_vIndexList.resize(3);
-
-	Vec3 vMin = Vec3(0.0f, +0.0f, -1.0f);
-	Vec3 vMax = Vec3(+2.0f, +2.0f, +1.0f);
-
-	// Front
-	m_vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-
-	int iIndex = 0;
-	m_vIndexList[iIndex++] = 0; m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 2;
-
-	CreateVertexBuffer();
-	CreateIndexBuffer();
 }
-void UTerrainMeshComponent::CreatePlane()
+
+void UTerrainMeshComponent::Tick()
 {
-	m_vVertexList.resize(4);
-	m_vIndexList.resize(6);
-
-	Vec3 vMin = Vec3(-100.0f, +0.0f, -100.0f);
-	Vec3 vMax = Vec3(+100.0f, +0.0f, +100.0f);
-
-	// Front
-	m_vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
-
-	int iIndex = 0;
-	m_vIndexList[iIndex++] = 0; m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 3;
-	m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 2; m_vIndexList[iIndex++] = 3;
-
-	CreateVertexBuffer();
-	CreateIndexBuffer();
 }
-void UTerrainMeshComponent::CreateCube()
+
+void UTerrainMeshComponent::PreRender()
 {
-	m_vVertexList.resize(24);
-	m_vIndexList.resize(36);
+	// IA Setting
+	UINT Strides = sizeof(PNCT_VERTEX);
+	UINT Offsets = 0;
+	DC->IASetVertexBuffers(0, 1, m_pMesh->GetVertexBuffer().GetAddressOf(), &Strides, &Offsets);
+	DC->IASetIndexBuffer(m_pMesh->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+	DC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// Transform 넣기 전 Render를 위해 임시로 값 변경
-	Vec3 vMin = Vec3(-0.5f, -0.5f, 0.1f);
-	Vec3 vMax = Vec3(+0.5f, +0.5f, 0.6f);
-
-	// Front
-	m_vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
-	// Back
-	m_vVertexList[4] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
-	m_vVertexList[5] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[6] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[7] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	// Left
-	m_vVertexList[8] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[9] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[10] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[11] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
-	// Right
-	m_vVertexList[12] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[13] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[14] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[15] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
-	// UP
-	m_vVertexList[16] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[17] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[18] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[19] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
-	// Bottom
-	m_vVertexList[20] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[21] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[22] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[23] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
-
-	UINT iIndex = 0;
-	auto& I = m_vIndexList;
-	// Front
-	I[iIndex++] = 0; I[iIndex++] = 1; I[iIndex++] = 2;
-	I[iIndex++] = 0; I[iIndex++] = 2; I[iIndex++] = 3;
-	// Back
-	I[iIndex++] = 6; I[iIndex++] = 5; I[iIndex++] = 4;
-	I[iIndex++] = 7; I[iIndex++] = 6; I[iIndex++] = 4;
-	// Left
-	I[iIndex++] = 8; I[iIndex++] = 9; I[iIndex++] = 10;
-	I[iIndex++] = 8; I[iIndex++] = 10; I[iIndex++] = 11;
-	// Right
-	I[iIndex++] = 12; I[iIndex++] = 13; I[iIndex++] = 14;
-	I[iIndex++] = 12; I[iIndex++] = 14; I[iIndex++] = 15;
-	// Top
-	I[iIndex++] = 16; I[iIndex++] = 17; I[iIndex++] = 18;
-	I[iIndex++] = 16; I[iIndex++] = 18; I[iIndex++] = 19;
-	// Bottom
-	I[iIndex++] = 20; I[iIndex++] = 21; I[iIndex++] = 22;
-	I[iIndex++] = 20; I[iIndex++] = 22; I[iIndex++] = 23;
-
-	CreateVertexBuffer();
-	CreateIndexBuffer();
+	// Material Render
+	if (m_pMaterial)
+	{
+		m_pMaterial->Bind();
+	}
 }
-void UTerrainMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
+
+void UTerrainMeshComponent::PostRender()
 {
-	m_vVertexList.clear();
-	m_vIndexList.clear();
-
-	float radius = 0.5f; // 구 반지름
-
-	// Top Vertex
-	m_vVertexList.push_back(
-		PNCT_VERTEX(
-			Vec3(0.0f, +radius, 0.0f),
-			Vec3(0.0f, +1.0f, 0.0f),
-			Vec4(1, 0, 0, 1),
-			Vec2(0.0f, 0.0f)
-		)
-	);
-
-	float phiStep = DD_PI / _stackCount;
-	float thetaStep = 2.0f * DD_PI / _sliceCount;
-
-	// Middle vertices
-	for (int i = 1; i <= _stackCount - 1; ++i)
-	{
-		float phi = i * phiStep;
-
-		for (int j = 0; j <= _sliceCount; ++j)
-		{
-			float theta = j * thetaStep;
-
-			Vec3 pos(
-				radius * sinf(phi) * cosf(theta),
-				radius * cosf(phi),
-				radius * sinf(phi) * sinf(theta)
-			);
-
-			Vec3 normal = pos;
-			normal.Normalize();
-			Vec2 texCoord(theta / (2 * DD_PI), phi / DD_PI);
-
-			m_vVertexList.push_back(
-				PNCT_VERTEX(pos, normal, Vec4(1, 0, 0, 1), texCoord)
-			);
-		}
-	}
-
-	// Bottom Vertex
-	m_vVertexList.push_back(
-		PNCT_VERTEX(
-			Vec3(0.0f, -radius, 0.0f),
-			Vec3(0.0f, -1.0f, 0.0f),
-			Vec4(1, 0, 0, 1),
-			Vec2(0.0f, 1.0f)
-		)
-	);
-
-	// Top stack
-	for (int i = 1; i <= _sliceCount; ++i)
-	{
-		m_vIndexList.push_back(0);
-		m_vIndexList.push_back(i + 1);
-		m_vIndexList.push_back(i);
-	}
-
-	// Middle stacks
-	int baseIndex = 1;
-	int ringVertexCount = _sliceCount + 1;
-	for (int i = 0; i < _stackCount - 2; ++i)
-	{
-		for (int j = 0; j < _sliceCount; ++j)
-		{
-			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j);
-			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
-			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
-
-			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
-			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
-			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
-		}
-	}
-
-	// Bottom stack
-	int southPoleIndex = (int)m_vVertexList.size() - 1;
-	baseIndex = southPoleIndex - ringVertexCount;
-
-	for (int i = 0; i < _sliceCount; ++i)
-	{
-		m_vIndexList.push_back(southPoleIndex);
-		m_vIndexList.push_back(baseIndex + i);
-		m_vIndexList.push_back(baseIndex + i + 1);
-	}
-
-	CreateVertexBuffer();
-	CreateIndexBuffer();
+	if (m_pMesh->GetIndexCount() <= 0)
+		DC->Draw(m_pMesh->GetVertexCount(), 0);
+	else
+		DC->DrawIndexed(m_pMesh->GetIndexCount(), 0, 0);
 }
+
+void UTerrainMeshComponent::Destroy()
+{
+}
+
 void UTerrainMeshComponent::CreateGrid(int _sizeX, int _sizeZ, float _cellSize)
 {
+	if (m_pMesh)
+		return;
+
+	// Mesh Data Setting
+	vector<PNCT_VERTEX> vVertexList;
+	vector<DWORD> vIndexList;
+
 	int NumCol = _sizeX - 1;
 	int NumRow = _sizeZ - 1;
 
 	int vertices = _sizeX * _sizeZ;
 	int indices = NumCol * NumRow * 6;
 
-	m_vVertexList.resize(vertices);
-	m_vIndexList.resize(indices);
+	vVertexList.resize(vertices);
+	vIndexList.resize(indices);
 
 	int vertexIndex = 0;
 	for (int row = 0; row < _sizeZ; ++row)
@@ -226,7 +72,7 @@ void UTerrainMeshComponent::CreateGrid(int _sizeX, int _sizeZ, float _cellSize)
 			//Vec2 uv = Vec2((float)col / NumCol, (float)row / NumRow);
 			Vec2 uv = Vec2(col * 0.1f, row * 0.1f); // 임의로 타일링
 
-			m_vVertexList[vertexIndex++] = PNCT_VERTEX(pos, normal, color, uv);
+			vVertexList[vertexIndex++] = PNCT_VERTEX(pos, normal, color, uv);
 		}
 	}
 
@@ -240,17 +86,19 @@ void UTerrainMeshComponent::CreateGrid(int _sizeX, int _sizeZ, float _cellSize)
 			int iBottomLeft = (row + 1) * _sizeX + col;
 			int iBottomRight = iBottomLeft + 1;
 
-			m_vIndexList[iIndex++] = iTopLeft;
-			m_vIndexList[iIndex++] = iBottomLeft;
-			m_vIndexList[iIndex++] = iTopRight;
+			vIndexList[iIndex++] = iTopLeft;
+			vIndexList[iIndex++] = iBottomLeft;
+			vIndexList[iIndex++] = iTopRight;
 
-			m_vIndexList[iIndex++] = iTopRight;
-			m_vIndexList[iIndex++] = iBottomLeft;
-			m_vIndexList[iIndex++] = iBottomRight;
+			vIndexList[iIndex++] = iTopRight;
+			vIndexList[iIndex++] = iBottomLeft;
+			vIndexList[iIndex++] = iBottomRight;
 		}
 	}
 
-	CreateVertexBuffer();
-	CreateIndexBuffer();
+	// Mesh Setting
+	m_pMesh = make_shared<UStaticMeshResources>();
+	m_pMesh->SetVertexList(vVertexList);
+	m_pMesh->SetIndexList(vIndexList);
 }
 

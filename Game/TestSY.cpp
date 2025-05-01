@@ -7,6 +7,7 @@
 #include "ASky.h"
 #include "EngineCameraMoveScript.h"
 #include "UTerrainMeshComponent.h"
+#include "UMeshResources.h"
 
 void TestSY::Init()
 {
@@ -19,8 +20,7 @@ void TestSY::Init()
 	{
 		m_pActor = make_shared<APawn>();
 
-		m_pStaticMesh = make_shared<UStaticMeshComponent>();
-		m_pStaticMesh->CreateCube();
+		m_pStaticMesh = UStaticMeshComponent::CreateCube();
 		m_pActor->SetMesh(m_pStaticMesh);
 		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
 		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
@@ -43,6 +43,10 @@ void TestSY::Init()
 
 		m_pPlaneMesh = make_shared<UTerrainMeshComponent>();
 		m_pPlaneMesh->CreateGrid(width, height, 1.0f);
+
+		auto planeVeretexList = m_pPlaneMesh->GetMesh()->GetVertexList();
+		auto newPlaneVeretexList = planeVeretexList;
+
 		for (int y = 0; y < height; ++y)
 		{
 			for (int x = 0; x < width; ++x)
@@ -50,11 +54,15 @@ void TestSY::Init()
 				int idx = y * width + x;
 				UINT8 gray = pixels[y * img->rowPitch + x];
 				float heightValue = (gray / 255.0f * 500.0f) - 300.0f;
-				m_pPlaneMesh->m_vVertexList[idx].pos.y = heightValue;
+				
+				newPlaneVeretexList[idx].pos.y = heightValue;
 			}
 		}
-		m_pPlaneMesh->CreateVertexBuffer();
+		m_pPlaneMesh->GetMesh()->SetVertexList(newPlaneVeretexList);
+		m_pPlaneMesh->MeshBind();
+
 		m_pPlane->SetMesh(m_pPlaneMesh);
+		
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
@@ -83,8 +91,7 @@ void TestSY::Init()
 	{
 		m_pSky = make_shared<ASky>();
 
-		m_pSkyMesh = make_shared<UTerrainMeshComponent>();
-		m_pSkyMesh->CreateSphere(20, 20);
+		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pSky->SetMesh(m_pSkyMesh);
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();

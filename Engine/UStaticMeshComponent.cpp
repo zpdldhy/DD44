@@ -1,88 +1,182 @@
 #include "pch.h"
 #include "UStaticMeshComponent.h"
+#include "UMaterial.h"
 
-void UStaticMeshComponent::CreateTriangle()
+void UStaticMeshComponent::Init()
 {
-	m_vVertexList.resize(3);
-	m_vIndexList.resize(3);
+}
+
+void UStaticMeshComponent::Tick()
+{
+}
+
+void UStaticMeshComponent::PreRender()
+{
+	// IA Setting
+	UINT Strides = sizeof(PNCT_VERTEX);
+	UINT Offsets = 0;
+	DC->IASetVertexBuffers(0, 1, m_pMesh->GetVertexBuffer().GetAddressOf(), &Strides, &Offsets);
+	DC->IASetIndexBuffer(m_pMesh->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+	DC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Material Render
+	if (m_pMaterial)
+	{
+		m_pMaterial->Bind();
+	}
+}
+
+void UStaticMeshComponent::PostRender()
+{
+	if (m_pMesh->GetIndexCount() <= 0)
+		DC->Draw(m_pMesh->GetVertexCount(), 0);
+	else
+		DC->DrawIndexed(m_pMesh->GetIndexCount(), 0, 0);
+}
+
+void UStaticMeshComponent::Destroy()
+{
+}
+
+shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateTriangle()
+{
+	static shared_ptr<UStaticMeshResources> pMesh = nullptr;
+
+	auto pMeshComponent = make_shared<UStaticMeshComponent>();
+
+	if (pMesh)
+	{
+		pMeshComponent->SetMesh(pMesh);
+		return pMeshComponent;
+	}
+
+	// Mesh Data Setting
+	vector<PNCT_VERTEX> vVertexList;
+	vector<DWORD> vIndexList;
+
+	vVertexList.resize(3);
+	vIndexList.resize(3);
 
 	Vec3 vMin = Vec3(0.0f, +0.0f, -1.0f);
 	Vec3 vMax = Vec3(+2.0f, +2.0f, +1.0f);
 
 	// Front
-	m_vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
 
 	int iIndex = 0;
-	m_vIndexList[iIndex++] = 0; m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 2;
+	vIndexList[iIndex++] = 0; vIndexList[iIndex++] = 1; vIndexList[iIndex++] = 2;
 
-	CreateVertexBuffer();
-	CreateIndexBuffer();
+	// Mesh Setting
+	pMesh = make_shared<UStaticMeshResources>();
+	pMesh->SetVertexList(vVertexList);
+	pMesh->SetIndexList(vIndexList);
+	pMesh->Bind();
+
+	// StaticMeshComponent Setting
+	pMeshComponent->SetMesh(pMesh);
+	return pMeshComponent;
 }
-void UStaticMeshComponent::CreatePlane()
+
+shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreatePlane()
 {
-	m_vVertexList.resize(4);
-	m_vIndexList.resize(6);
+	static shared_ptr<UStaticMeshResources> pMesh = nullptr;
+
+	auto pMeshComponent = make_shared<UStaticMeshComponent>();
+
+	if (pMesh)
+	{
+		pMeshComponent->SetMesh(pMesh);
+		return pMeshComponent;
+	}
+
+	// Mesh Data Setting
+	vector<PNCT_VERTEX> vVertexList;
+	vector<DWORD> vIndexList;
+
+	vVertexList.resize(4);
+	vIndexList.resize(6);
 
 	Vec3 vMin = Vec3(-100.0f, +0.0f, -100.0f);
 	Vec3 vMax = Vec3(+100.0f, +0.0f, +100.0f);
 
 	// Front
-	m_vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
 
 	int iIndex = 0;
-	m_vIndexList[iIndex++] = 0; m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 3;
-	m_vIndexList[iIndex++] = 1; m_vIndexList[iIndex++] = 2; m_vIndexList[iIndex++] = 3;
+	vIndexList[iIndex++] = 0; vIndexList[iIndex++] = 1; vIndexList[iIndex++] = 3;
+	vIndexList[iIndex++] = 1; vIndexList[iIndex++] = 2; vIndexList[iIndex++] = 3;
 
-	CreateVertexBuffer();
-	CreateIndexBuffer();
+	// Mesh Setting
+	pMesh = make_shared<UStaticMeshResources>();
+	pMesh->SetVertexList(vVertexList);
+	pMesh->SetIndexList(vIndexList);
+	pMesh->Bind();
+
+	pMeshComponent->SetMesh(pMesh);
+	return pMeshComponent;
 }
-void UStaticMeshComponent::CreateCube()
+
+shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateCube()
 {
-	m_vVertexList.resize(24);
-	m_vIndexList.resize(36);
+	static shared_ptr<UStaticMeshResources> pMesh = nullptr;
+
+	auto pMeshComponent = make_shared<UStaticMeshComponent>();
+
+	if (pMesh)
+	{
+		pMeshComponent->SetMesh(pMesh);
+		return pMeshComponent;
+	}
+
+	// Mesh Data Setting
+	vector<PNCT_VERTEX> vVertexList;
+	vector<DWORD> vIndexList;
+
+	vVertexList.resize(24);
+	vIndexList.resize(36);
 
 	// Transform 넣기 전 Render를 위해 임시로 값 변경
 	Vec3 vMin = Vec3(-0.5f, -0.5f, 0.1f);
 	Vec3 vMax = Vec3(+0.5f, +0.5f, 0.6f);
 
 	// Front
-	m_vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
 	// Back
-	m_vVertexList[4] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
-	m_vVertexList[5] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[6] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[7] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[4] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[5] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[6] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[7] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
 	// Left
-	m_vVertexList[8] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[9] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[10] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[11] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[8] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[9] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[10] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[11] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
 	// Right
-	m_vVertexList[12] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[13] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[14] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[15] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[12] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[13] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[14] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[15] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
 	// UP
-	m_vVertexList[16] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[17] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[18] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[19] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[16] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[17] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[18] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[19] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
 	// Bottom
-	m_vVertexList[20] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	m_vVertexList[21] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	m_vVertexList[22] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	m_vVertexList[23] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[20] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[21] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[22] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[23] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
 
 	UINT iIndex = 0;
-	auto& I = m_vIndexList;
+	auto& I = vIndexList;
 	// Front
 	I[iIndex++] = 0; I[iIndex++] = 1; I[iIndex++] = 2;
 	I[iIndex++] = 0; I[iIndex++] = 2; I[iIndex++] = 3;
@@ -102,18 +196,39 @@ void UStaticMeshComponent::CreateCube()
 	I[iIndex++] = 20; I[iIndex++] = 21; I[iIndex++] = 22;
 	I[iIndex++] = 20; I[iIndex++] = 22; I[iIndex++] = 23;
 
-	CreateVertexBuffer();
-	CreateIndexBuffer();
+	// Mesh Setting
+	pMesh = make_shared<UStaticMeshResources>();
+	pMesh->SetVertexList(vVertexList);
+	pMesh->SetIndexList(vIndexList);
+	pMesh->Bind();
+
+	pMeshComponent->SetMesh(pMesh);
+	return pMeshComponent;
 }
-void UStaticMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
+
+shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
 {
-	m_vVertexList.clear();
-	m_vIndexList.clear();
+	static shared_ptr<UStaticMeshResources> pMesh = nullptr;
+
+	auto pMeshComponent = make_shared<UStaticMeshComponent>();
+
+	if (pMesh)
+	{
+		pMeshComponent->SetMesh(pMesh);
+		return pMeshComponent;
+	}
+
+	// Mesh Data Setting
+	vector<PNCT_VERTEX> vVertexList;
+	vector<DWORD> vIndexList;
+
+	vVertexList.clear();
+	vIndexList.clear();
 
 	float radius = 0.5f; // 구 반지름
 
 	// Top Vertex
-	m_vVertexList.push_back(
+	vVertexList.push_back(
 		PNCT_VERTEX(
 			Vec3(0.0f, +radius, 0.0f),
 			Vec3(0.0f, +1.0f, 0.0f),
@@ -144,14 +259,14 @@ void UStaticMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
 			normal.Normalize();
 			Vec2 texCoord(theta / (2 * DD_PI), phi / DD_PI);
 
-			m_vVertexList.push_back(
+			vVertexList.push_back(
 				PNCT_VERTEX(pos, normal, Vec4(1, 0, 0, 1), texCoord)
 			);
 		}
 	}
 
 	// Bottom Vertex
-	m_vVertexList.push_back(
+	vVertexList.push_back(
 		PNCT_VERTEX(
 			Vec3(0.0f, -radius, 0.0f),
 			Vec3(0.0f, -1.0f, 0.0f),
@@ -163,9 +278,9 @@ void UStaticMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
 	// Top stack
 	for (int i = 1; i <= _sliceCount; ++i)
 	{
-		m_vIndexList.push_back(0);
-		m_vIndexList.push_back(i + 1);
-		m_vIndexList.push_back(i);
+		vIndexList.push_back(0);
+		vIndexList.push_back(i + 1);
+		vIndexList.push_back(i);
 	}
 
 	// Middle stacks
@@ -175,27 +290,33 @@ void UStaticMeshComponent::CreateSphere(int _sliceCount, int _stackCount)
 	{
 		for (int j = 0; j < _sliceCount; ++j)
 		{
-			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j);
-			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
-			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			vIndexList.push_back(baseIndex + i * ringVertexCount + j);
+			vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
+			vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
 
-			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
-			m_vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
-			m_vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+			vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			vIndexList.push_back(baseIndex + i * ringVertexCount + j + 1);
+			vIndexList.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
 		}
 	}
 
 	// Bottom stack
-	int southPoleIndex = (int)m_vVertexList.size() - 1;
+	int southPoleIndex = (int)vVertexList.size() - 1;
 	baseIndex = southPoleIndex - ringVertexCount;
 
 	for (int i = 0; i < _sliceCount; ++i)
 	{
-		m_vIndexList.push_back(southPoleIndex);
-		m_vIndexList.push_back(baseIndex + i);
-		m_vIndexList.push_back(baseIndex + i + 1);
+		vIndexList.push_back(southPoleIndex);
+		vIndexList.push_back(baseIndex + i);
+		vIndexList.push_back(baseIndex + i + 1);
 	}
 
-	CreateVertexBuffer();
-	CreateIndexBuffer();
+	// Mesh Setting
+	pMesh = make_shared<UStaticMeshResources>();
+	pMesh->SetVertexList(vVertexList);
+	pMesh->SetIndexList(vIndexList);
+	pMesh->Bind();
+
+	pMeshComponent->SetMesh(pMesh);
+	return pMeshComponent;
 }

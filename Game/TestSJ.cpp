@@ -5,37 +5,83 @@
 #include "Sound.h"
 #include "UStaticMeshComponent.h"
 #include "UMaterial.h"
+#include "ASky.h"
+#include "APawn.h"
+#include "ACameraActor.h"
 #include "Timer.h"
+#include "ImGuiCore.h"
+#include "EngineCameraMoveScript.h"
 
 void TestSJ::Init()
 {
 	SOUNDMANAGER->LoadAllSounds();
 
 
-	m_pStaticMesh = make_shared<UStaticMeshComponent>();
-	m_pStaticMesh->CreateCube();
-	shared_ptr<UMaterial> material = make_shared<UMaterial>();
-	material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Glow.hlsl");
-	m_pStaticMesh->SetMaterial(material);
+	m_pCameraActor = make_shared<ACameraActor>();
+	{
+		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
+		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
+	}
+
+	{
+		m_pActor = make_shared<APawn>();
+
+		m_pStaticMesh = UStaticMeshComponent::CreateCube();
+		m_pActor->SetMesh(m_pStaticMesh);
+		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
+		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
+		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
+
+		shared_ptr<UMaterial> material = make_shared<UMaterial>();
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Dissolve.hlsl");
+		m_pStaticMesh->SetMaterial(material);
+	}
+
+	{
+		m_pSky = make_shared<ASky>();
+
+		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
+		m_pSky->SetMesh(m_pSkyMesh);
+
+		shared_ptr<UMaterial> material = make_shared<UMaterial>();
+		material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
+		m_pSkyMesh->SetMaterial(material);
+	}
+
+	{
+		auto noiseTex = TEXTURE->Load(L"../Resources/Texture/Noise.png");
+		m_pStaticMesh->GetMaterial()->SetNoiseTexture(noiseTex);
+	}
+
+	m_pCameraActor->Init();
+	m_pActor->Init();
+	m_pSky->Init();
 }
 
 void TestSJ::Update()
 {
+	//Glow
 	{
 		static bool bGlow = false;
 		static float glowTimer = 0.0f;
+		const float maxGlowDuration = 0.5f;
 
 		// R 키를 누르면 발광 시작
 		if (INPUT->GetButtonDown(R))
 		{
 			bGlow = true;
-			glowTimer = 0.1f; // 1초 동안 발광
+			glowTimer = maxGlowDuration;
 		}
 
-		// 발광 중이면 타이머 감소
+		float glowPower = 0.0f;
+
 		if (bGlow)
 		{
 			glowTimer -= TIMER->GetDeltaTime();
+
+			float ratio = glowTimer / maxGlowDuration; // 1.0 → 0.0 
+			glowPower = 1000000.0f;//ratio*5.0f;
+			
 			if (glowTimer <= 0.0f)
 			{
 				bGlow = false;
@@ -43,15 +89,21 @@ void TestSJ::Update()
 			}
 		}
 
-		// 현재 발광 값 계산
-		float glowPower = bGlow ? 2.0f : 0.0f;
+		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+		{
+			m_pStaticMesh->GetMaterial()->SetGlowParams(
+				GUI->GetGlowPower(),//glowPower,
+				GUI->GetGlowColor()
+			);
+		}
 
-		// Material에 업데이트
-		m_pStaticMesh->GetMaterial()->SetGlowParams(
-			glowPower,
-			Vec3(1.0f, 0.0f, 0.0f) // 빨간색
-		);
-
+	}
+	//Dissolve
+	{
+		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+		{
+			m_pStaticMesh->GetMaterial()->SetDissolveParams(GUI->GetDissolveThreshold());
+		}
 	}
 	//Sound
 	{
@@ -122,6 +174,12 @@ void TestSJ::Update()
 			DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	}*/
 	}
+	//Camera
+	{
+		m_pCameraActor->Tick();
+		m_pActor->Tick();
+		m_pSky->Tick();
+	}
 
 }
 
@@ -134,5 +192,7 @@ void TestSJ::Render()
 		D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
 		D2D1::ColorF::White                   // 메인 텍스트 색
 	);
-	m_pStaticMesh->Render();
+	m_pCameraActor->Render();
+	m_pActor->Render();
+	m_pSky->Render();
 }
