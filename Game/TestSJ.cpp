@@ -11,6 +11,7 @@
 #include "Timer.h"
 #include "ImGuiCore.h"
 #include "EngineCameraMoveScript.h"
+#include "CameraManager.h"
 
 void TestSJ::Init()
 {
@@ -43,7 +44,7 @@ void TestSJ::Init()
 		m_pStaticMesh2 = UStaticMeshComponent::CreateCube();
 
 
-		m_pActor2->SetMesh(m_pStaticMesh2);
+		m_pActor2->SetMeshComponent(m_pStaticMesh2);
 		m_pActor2->SetScale({ 1.0f, 1.0f, 1.0f });
 		m_pActor2->SetPosition({ 5.0f, 0.0f, 10.0f }); // 첫 번째 큐브 옆에 배치
 		m_pActor2->SetRotation({ 0.0f, 0.0f, 0.0f });
@@ -73,6 +74,8 @@ void TestSJ::Init()
 	m_pActor->Init();
 	m_pActor2->Init();
 	m_pSky->Init();
+
+	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 }
 
 void TestSJ::Update()
