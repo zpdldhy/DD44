@@ -231,6 +231,7 @@
     <ClInclude Include="FbxLoader.h">
       <Filter>Utils\ModelLoader</Filter>
     </ClInclude>
+    <ClInclude Include="AssimpLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -378,6 +379,9 @@
       <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
     <ClCompile Include="FbxLoader.cpp">
+      <Filter>Utils\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="AssimpLoader.cpp">
       <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
   </ItemGroup>

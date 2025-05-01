@@ -1,14 +1,22 @@
 #pragma once
 #include "IExecute.h"
 #include "ActorLoader.h"
+#include "AssimpLoader.h"
 
 class APawn;
+class UMaterial;
 
 class TestYR : public IExecute
 {
 public:
 	ActorLoader loader;
+	AssimpLoader objectLoader;
 	vector<shared_ptr<APawn>> m_vActorList;
+	vector<shared_ptr<APawn>> m_vObjList;
+	vector<shared_ptr<UMaterial>> materialList;
+	shared_ptr<APawn> targetObj;
+	int targetIndex = 0;
+	int matIndex = 0;
 
 	shared_ptr<class ACameraActor> m_pCameraActor;
 	
@@ -18,5 +26,8 @@ public:
 	virtual void Init() override;
 	virtual void Update() override;
 	virtual void Render() override;
+public:
+	//TEMP
+	void MakeObject();
 };
 

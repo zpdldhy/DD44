@@ -72,6 +72,7 @@
     <FxCompile Include="..\Resources\Shader\uvDistortion.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\Resources\Shader\skinningShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources\Shader\Header.hlsli">
