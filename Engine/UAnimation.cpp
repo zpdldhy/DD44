@@ -57,5 +57,5 @@ void UAnimation::Render()
 	}
 
 	DC->UpdateSubresource(_constantBuffer.Get(), 0, NULL, &currentAnimList, 0, 0);
-	DC->VSSetConstantBuffers(3, 1, _constantBuffer.GetAddressOf());
+	DC->VSSetConstantBuffers(5, 1, _constantBuffer.GetAddressOf());
 }
