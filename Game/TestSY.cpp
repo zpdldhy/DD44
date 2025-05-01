@@ -22,6 +22,7 @@ void TestSY::Init()
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 
 		m_pCameraActor->Init();
+		CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 	}
 
 	// HeightMap Test
@@ -103,7 +104,7 @@ void TestSY::Init()
 
 			auto obj = make_shared<APawn>();
 			auto mesh = UStaticMeshComponent::CreateCube();
-			obj->SetMesh(mesh);
+			obj->SetMeshComponent(mesh);
 			obj->SetScale({ scaleDist(eng), scaleDist(eng), scaleDist(eng) });
 			obj->SetPosition({ x, y + obj->GetScale().y/2, z});
 
@@ -120,7 +121,7 @@ void TestSY::Init()
 		m_pActor = make_shared<APawn>();
 
 		m_pStaticMesh = UStaticMeshComponent::CreateCube();
-		m_pActor->SetMesh(m_pStaticMesh);
+		m_pActor->SetMeshComponent(m_pStaticMesh);
 		m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
 		m_pActor->SetPosition({ 0.0f, 2.5f, 10.0f });
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
@@ -145,12 +146,7 @@ void TestSY::Init()
 		m_pSky->Init();
 	}
 
-	m_pCameraActor->Init();
-	m_pActor->Init();
-	m_pPlane->Init();
-	m_pSky->Init();
-
-	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+	
 }
 
 void TestSY::Update()
