@@ -33,8 +33,24 @@ void TestSJ::Init()
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Dissolve.hlsl");
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/uvDistortion.hlsl");
 		m_pStaticMesh->SetMaterial(material);
+	}
+
+	{
+		m_pActor2 = make_shared<APawn>();
+
+		m_pStaticMesh2 = UStaticMeshComponent::CreateCube();
+
+
+		m_pActor2->SetMesh(m_pStaticMesh2);
+		m_pActor2->SetScale({ 1.0f, 1.0f, 1.0f });
+		m_pActor2->SetPosition({ 5.0f, 0.0f, 10.0f }); // 첫 번째 큐브 옆에 배치
+		m_pActor2->SetRotation({ 0.0f, 0.0f, 0.0f });
+
+		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
+		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Dissolve.hlsl");
+		m_pStaticMesh2->SetMaterial(material2);
 	}
 
 	{
@@ -55,54 +71,134 @@ void TestSJ::Init()
 
 	m_pCameraActor->Init();
 	m_pActor->Init();
+	m_pActor2->Init();
 	m_pSky->Init();
 }
 
 void TestSJ::Update()
 {
-	//Glow
+	//UVDistortion
 	{
-		static bool bGlow = false;
-		static float glowTimer = 0.0f;
-		const float maxGlowDuration = 0.5f;
-
-		// R 키를 누르면 발광 시작
-		if (INPUT->GetButtonDown(R))
+		static bool bUVInitialized = false;
+		if (!bUVInitialized)
 		{
-			bGlow = true;
-			glowTimer = maxGlowDuration;
+			m_pStaticMesh->GetMaterial()->SetUVDistortionParams(0.08f, 10.0f, 15.0f); // strength, speed, frequency
+			m_pStaticMesh2->GetMaterial()->SetUVDistortionParams(0.01f, 1.5f, 8.0f);  // optional: 다른 효과
+			bUVInitialized = true;
 		}
 
-		float glowPower = 0.0f;
-
-		if (bGlow)
-		{
-			glowTimer -= TIMER->GetDeltaTime();
-
-			float ratio = glowTimer / maxGlowDuration; // 1.0 → 0.0 
-			glowPower = 1000000.0f;//ratio*5.0f;
-			
-			if (glowTimer <= 0.0f)
-			{
-				bGlow = false;
-				glowTimer = 0.0f;
-			}
-		}
+		float deltaTime = TIMER->GetDeltaTime();
 
 		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 		{
-			m_pStaticMesh->GetMaterial()->SetGlowParams(
-				GUI->GetGlowPower(),//glowPower,
-				GUI->GetGlowColor()
-			);
+			m_pStaticMesh->GetMaterial()->UpdateUVDistortionBuffer(deltaTime);
 		}
+		if (m_pStaticMesh2 && m_pStaticMesh2->GetMaterial())
+		{
+			m_pStaticMesh2->GetMaterial()->UpdateUVDistortionBuffer(deltaTime);
+		}
+	}
+
+
+	shared_ptr<UMaterial> targetMat = nullptr;
+	static int prevSelected = -1;
+	if (GUI->m_iSelectedActor != prevSelected)
+	{
+		prevSelected = GUI->m_iSelectedActor;
+		GUI->m_bDidInitialApply = false;
+		targetMat = m_pStaticMesh->GetMaterial();
+		if (prevSelected == 0 && m_pStaticMesh)
+		{
+			GUI->SetInitialMaterialValues(m_pStaticMesh->GetMaterial());
+		}
+		else if (prevSelected == 1 && m_pStaticMesh2)
+		{
+			GUI->SetInitialMaterialValues(m_pStaticMesh2->GetMaterial());
+		}
+		return;
+	}
+
+	
+	if (GUI->m_iSelectedActor == 0 && m_pStaticMesh)
+	{
+		targetMat = m_pStaticMesh->GetMaterial();
+	}
+	else if (GUI->m_iSelectedActor == 1 && m_pStaticMesh2)
+	{
+		targetMat = m_pStaticMesh2->GetMaterial();
+	}
+
+	
+	if(targetMat)
+	{
+		targetMat->SetGlowParams(GUI->m_fGlowPower, GUI->m_vGlowColor);
+		targetMat->SetDissolveParams(GUI->m_fDissolveThreshold);
+	}
+
+	
+	// fallback 제거 가능 (선택이 명확하니까)
+	//GUI->SetTargetMaterial(targetMat);
+	//Glow
+	{
+		//static bool bGlow = false;
+		//static float glowTimer = 0.0f;
+		//const float maxGlowDuration = 0.5f;
+
+		//// R 키를 누르면 발광 시작
+		//if (INPUT->GetButtonDown(R))
+		//{
+		//	bGlow = true;
+		//	glowTimer = maxGlowDuration;
+		//}
+
+		//float glowPower = 0.0f;
+
+		//if (bGlow)
+		//{
+		//	glowTimer -= TIMER->GetDeltaTime();
+
+		//	float ratio = glowTimer / maxGlowDuration; // 1.0 → 0.0 
+		//	glowPower = 1.0f;//ratio*5.0f;
+		//	
+		//	if (glowTimer <= 0.0f)
+		//	{
+		//		bGlow = false;
+		//		glowTimer = 0.0f;
+		//	}
+		//}
+
+		//if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+		//{
+		//	m_pStaticMesh->GetMaterial()->SetGlowParams(
+		//		GUI->GetGlowPower(),//glowPower,
+		//		GUI->GetGlowColor()
+		//	);
+		//}
 
 	}
 	//Dissolve
 	{
-		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+		/*if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 		{
 			m_pStaticMesh->GetMaterial()->SetDissolveParams(GUI->GetDissolveThreshold());
+		}*/
+
+	}
+	//Flesh
+	{
+		static float flashTimer = 0.0f;
+
+		if (INPUT->GetButtonDown(R)) // 피격 가정
+		{
+			flashTimer = 1.0f; // Flash 시작
+		}
+
+		flashTimer -= TIMER->GetDeltaTime() * 3.0f; // 빠르게 사라지게
+		flashTimer = max(flashTimer, 0.0f);
+
+		if (targetMat)
+		{
+			targetMat->SetHitFlashTime(flashTimer);
 		}
 	}
 	//Sound
@@ -178,6 +274,7 @@ void TestSJ::Update()
 	{
 		m_pCameraActor->Tick();
 		m_pActor->Tick();
+		m_pActor2->Tick();
 		m_pSky->Tick();
 	}
 
@@ -185,14 +282,15 @@ void TestSJ::Update()
 
 void TestSJ::Render()
 {
-	DXWRITE->DrawGlow
-	(
-		D2D1::RectF(300, 300, 600, 400),
-		L"빛나는 텍스트",
-		D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
-		D2D1::ColorF::White                   // 메인 텍스트 색
-	);
+	//DXWRITE->DrawGlow
+	//(
+	//	D2D1::RectF(300, 300, 600, 400),
+	//	L"빛나는 텍스트",
+	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
+	//	D2D1::ColorF::White                   // 메인 텍스트 색
+	//);
 	m_pCameraActor->Render();
 	m_pActor->Render();
+	m_pActor2->Render();
 	m_pSky->Render();
 }

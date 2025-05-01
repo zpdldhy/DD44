@@ -186,7 +186,7 @@ void Device::PreRender()
     m_pd3dContext->RSSetViewports(1, &m_MainVP);
     m_pd3dContext->OMSetRenderTargets(1, m_pRTV.GetAddressOf(), m_pDSV.Get());
 
-    float ClearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    float ClearColor[] = { 0.1f, 0.25f, 0.4f, 1.0f };
 
     m_pd3dContext->ClearRenderTargetView(m_pRTV.Get(), ClearColor);
     m_pd3dContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
