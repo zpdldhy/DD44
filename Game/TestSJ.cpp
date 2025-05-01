@@ -40,8 +40,8 @@ void TestSJ::Init()
 	{
 		m_pActor2 = make_shared<APawn>();
 
-		m_pStaticMesh2 = make_shared<UStaticMeshComponent>();
-		m_pStaticMesh2->CreateCube();
+		m_pStaticMesh2 = UStaticMeshComponent::CreateCube();
+
 
 		m_pActor2->SetMesh(m_pStaticMesh2);
 		m_pActor2->SetScale({ 1.0f, 1.0f, 1.0f });
