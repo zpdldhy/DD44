@@ -33,7 +33,7 @@ bool ATerrainTileActor::CreateTerrain(const wstring& _texturePath, const wstring
 	material->Load(_texturePath, _shaderPath);
 	m_pTerrainMeshComponent->SetMaterial(material);
 
-	SetMesh(m_pTerrainMeshComponent);
+	SetMeshComponent(m_pTerrainMeshComponent);
 	m_pTerrainMeshComponent->MeshBind();
 
 	return true;
@@ -87,7 +87,7 @@ bool ATerrainTileActor::CreateTerrainFromHeightMap(const std::wstring& heightMap
 	material->Load(texturePath, shaderPath);
 
 	m_pTerrainMeshComponent->SetMaterial(material);
-	SetMesh(m_pTerrainMeshComponent);
+	SetMeshComponent(m_pTerrainMeshComponent);
 
 	return true;
 }
