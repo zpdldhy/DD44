@@ -24,7 +24,7 @@ public:
 	int m_iSelectedActor = -1;
 
 	bool m_bCheckbox = false;
-
+	bool m_bDidInitialApply = false;
 public:
 	void SetInitialMaterialValues(const std::shared_ptr<UMaterial>& mat);
 

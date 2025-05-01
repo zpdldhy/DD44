@@ -79,11 +79,13 @@ void TestSJ::Init()
 
 void TestSJ::Update()
 {
+	shared_ptr<UMaterial> targetMat = nullptr;
 	static int prevSelected = -1;
 	if (GUI->m_iSelectedActor != prevSelected)
 	{
 		prevSelected = GUI->m_iSelectedActor;
-
+		GUI->m_bDidInitialApply = false;
+		targetMat = m_pStaticMesh->GetMaterial();
 		if (prevSelected == 0 && m_pStaticMesh)
 		{
 			GUI->SetInitialMaterialValues(m_pStaticMesh->GetMaterial());
@@ -92,15 +94,21 @@ void TestSJ::Update()
 		{
 			GUI->SetInitialMaterialValues(m_pStaticMesh2->GetMaterial());
 		}
+		return;
 	}
 
-	shared_ptr<UMaterial> targetMat = nullptr;
+	
 	if (GUI->m_iSelectedActor == 0 && m_pStaticMesh)
+	{
 		targetMat = m_pStaticMesh->GetMaterial();
+	}
 	else if (GUI->m_iSelectedActor == 1 && m_pStaticMesh2)
+	{
 		targetMat = m_pStaticMesh2->GetMaterial();
+	}
 
-	if (targetMat)
+	
+	if(targetMat)
 	{
 		targetMat->SetGlowParams(GUI->m_fGlowPower, GUI->m_vGlowColor);
 		targetMat->SetDissolveParams(GUI->m_fDissolveThreshold);
@@ -253,13 +261,13 @@ void TestSJ::Update()
 
 void TestSJ::Render()
 {
-	DXWRITE->DrawGlow
-	(
-		D2D1::RectF(300, 300, 600, 400),
-		L"빛나는 텍스트",
-		D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
-		D2D1::ColorF::White                   // 메인 텍스트 색
-	);
+	//DXWRITE->DrawGlow
+	//(
+	//	D2D1::RectF(300, 300, 600, 400),
+	//	L"빛나는 텍스트",
+	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
+	//	D2D1::ColorF::White                   // 메인 텍스트 색
+	//);
 	m_pCameraActor->Render();
 	m_pActor->Render();
 	m_pActor2->Render();

@@ -36,8 +36,8 @@ public:
 	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
 
 public:
-	CB_GLOW m_tGlowData;
-	CB_DISSOLVE m_tDissolveData;
+	CB_GLOW m_tGlowData = { 0.0f, };
+	CB_DISSOLVE m_tDissolveData = { 0.0f };
 
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);
