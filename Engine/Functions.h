@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include <string>
+#include <vector>
 #include <tchar.h> 
 #include <locale>
 #include <codecvt>

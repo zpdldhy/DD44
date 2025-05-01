@@ -155,6 +155,7 @@
     <ClInclude Include="AAsset.h" />
     <ClInclude Include="ACameraActor.h" />
     <ClInclude Include="ACharacter.h" />
+    <ClInclude Include="ActorLoader.h" />
     <ClInclude Include="APawn.h" />
     <ClInclude Include="ASky.h" />
     <ClInclude Include="FbxLoader.h" />
@@ -191,7 +192,6 @@
     <ClInclude Include="UMaterial.h" />
     <ClInclude Include="UActorComponent.h" />
     <ClInclude Include="UMeshComponent.h" />
-    <ClInclude Include="UMeshData.h" />
     <ClInclude Include="UMeshResources.h" />
     <ClInclude Include="UObject.h" />
     <ClInclude Include="UPrimitiveComponent.h" />
@@ -199,6 +199,7 @@
     <ClInclude Include="UScriptComponent.h" />
     <ClInclude Include="USkeletalMeshResources.h" />
     <ClInclude Include="USkinnedComponent.h" />
+    <ClInclude Include="USkinnedMeshComponent.h" />
     <ClInclude Include="UStaticMeshComponent.h" />
     <ClInclude Include="UStaticMeshResources.h" />
     <ClInclude Include="UTerrainMeshComponent.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="AAsset.cpp" />
     <ClCompile Include="ACameraActor.cpp" />
     <ClCompile Include="ACharacter.cpp" />
+    <ClCompile Include="ActorLoader.cpp" />
     <ClCompile Include="APawn.cpp" />
     <ClCompile Include="ASky.cpp" />
     <ClCompile Include="FbxLoader.cpp" />
@@ -258,7 +260,6 @@
     <ClCompile Include="UMaterial.cpp" />
     <ClCompile Include="UActorComponent.cpp" />
     <ClCompile Include="UMeshComponent.cpp" />
-    <ClCompile Include="UMeshData.cpp" />
     <ClCompile Include="UMeshResources.cpp" />
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UPrimitiveComponent.cpp" />
@@ -266,6 +267,7 @@
     <ClCompile Include="UScriptComponent.cpp" />
     <ClCompile Include="USkeletalMeshResources.cpp" />
     <ClCompile Include="USkinnedComponent.cpp" />
+    <ClCompile Include="USkinnedMeshComponent.cpp" />
     <ClCompile Include="UStaticMeshComponent.cpp" />
     <ClCompile Include="UStaticMeshResources.cpp" />
     <ClCompile Include="UTerrainMeshComponent.cpp" />
