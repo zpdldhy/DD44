@@ -93,9 +93,19 @@ void ImGuiCore::Test()
         ImGui::Begin("Test Glow Control", &m_bShowGlowControl, ImGuiWindowFlags_NoResize);
 
         ImGui::Text("Target Cube");
-        ImGui::RadioButton("Cube 1", &m_iSelectedActor, 0); ImGui::SameLine();
-        ImGui::RadioButton("Cube 2", &m_iSelectedActor, 1);
-        ImGui::Text("Glow_Test");
+        bool checkbox1 = ImGui::RadioButton("Cube 1", &m_iSelectedActor, 0); ImGui::SameLine();
+        bool checkbox2 = ImGui::RadioButton("Cube 2", &m_iSelectedActor, 1);
+        
+        /*if (checkbox1 || checkbox2)
+        {
+            m_bCheckbox = true;
+        }
+
+        if (m_bCheckbox)
+        {
+            m_fGlowPower = ;
+            m_fDissolveThreshold = ;
+        }*/
         
         float color[3] = { m_vGlowColor.x, m_vGlowColor.y, m_vGlowColor.z };
         if (ImGui::ColorEdit3("Glow Color", color, ImGuiColorEditFlags_Float))
@@ -121,5 +131,15 @@ void ImGuiCore::Test()
         if (ImGui::Button("Close Me"))
             show_another_window = false;
         ImGui::End();
+    }
+}
+
+void ImGuiCore::SetInitialMaterialValues(const std::shared_ptr<UMaterial>& mat)
+{
+    if (mat)
+    {
+        m_fGlowPower = mat->m_tGlowData.g_fGlowPower;
+        m_vGlowColor = mat->m_tGlowData.g_vGlowColor;
+        m_fDissolveThreshold = mat->m_tDissolveData.g_fDissolveThreshold;
     }
 }

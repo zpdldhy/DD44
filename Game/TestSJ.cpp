@@ -79,6 +79,20 @@ void TestSJ::Init()
 
 void TestSJ::Update()
 {
+	static int prevSelected = -1;
+	if (GUI->m_iSelectedActor != prevSelected)
+	{
+		prevSelected = GUI->m_iSelectedActor;
+
+		if (prevSelected == 0 && m_pStaticMesh)
+		{
+			GUI->SetInitialMaterialValues(m_pStaticMesh->GetMaterial());
+		}
+		else if (prevSelected == 1 && m_pStaticMesh2)
+		{
+			GUI->SetInitialMaterialValues(m_pStaticMesh2->GetMaterial());
+		}
+	}
 
 	shared_ptr<UMaterial> targetMat = nullptr;
 	if (GUI->m_iSelectedActor == 0 && m_pStaticMesh)
@@ -86,36 +100,43 @@ void TestSJ::Update()
 	else if (GUI->m_iSelectedActor == 1 && m_pStaticMesh2)
 		targetMat = m_pStaticMesh2->GetMaterial();
 
+	if (targetMat)
+	{
+		targetMat->SetGlowParams(GUI->m_fGlowPower, GUI->m_vGlowColor);
+		targetMat->SetDissolveParams(GUI->m_fDissolveThreshold);
+	}
+
+	
 	// fallback 제거 가능 (선택이 명확하니까)
 	//GUI->SetTargetMaterial(targetMat);
 	//Glow
 	{
-		static bool bGlow = false;
-		static float glowTimer = 0.0f;
-		const float maxGlowDuration = 0.5f;
+		//static bool bGlow = false;
+		//static float glowTimer = 0.0f;
+		//const float maxGlowDuration = 0.5f;
 
-		// R 키를 누르면 발광 시작
-		if (INPUT->GetButtonDown(R))
-		{
-			bGlow = true;
-			glowTimer = maxGlowDuration;
-		}
+		//// R 키를 누르면 발광 시작
+		//if (INPUT->GetButtonDown(R))
+		//{
+		//	bGlow = true;
+		//	glowTimer = maxGlowDuration;
+		//}
 
-		float glowPower = 0.0f;
+		//float glowPower = 0.0f;
 
-		if (bGlow)
-		{
-			glowTimer -= TIMER->GetDeltaTime();
+		//if (bGlow)
+		//{
+		//	glowTimer -= TIMER->GetDeltaTime();
 
-			float ratio = glowTimer / maxGlowDuration; // 1.0 → 0.0 
-			glowPower = 1000000.0f;//ratio*5.0f;
-			
-			if (glowTimer <= 0.0f)
-			{
-				bGlow = false;
-				glowTimer = 0.0f;
-			}
-		}
+		//	float ratio = glowTimer / maxGlowDuration; // 1.0 → 0.0 
+		//	glowPower = 1.0f;//ratio*5.0f;
+		//	
+		//	if (glowTimer <= 0.0f)
+		//	{
+		//		bGlow = false;
+		//		glowTimer = 0.0f;
+		//	}
+		//}
 
 		//if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 		//{
@@ -132,16 +153,7 @@ void TestSJ::Update()
 		{
 			m_pStaticMesh->GetMaterial()->SetDissolveParams(GUI->GetDissolveThreshold());
 		}*/
-	
-		
-			
 
-
-		if (targetMat)
-		{
-			targetMat->SetGlowParams(GUI->m_fGlowPower, GUI->m_vGlowColor);
-			targetMat->SetDissolveParams(GUI->m_fDissolveThreshold);
-		}
 	}
 	//Flesh
 	{

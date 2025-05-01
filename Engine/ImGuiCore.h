@@ -21,9 +21,12 @@ public:
 	float m_fDissolveThreshold = 0.5f;
 	bool m_bShowGlowControl = true;
 
-	int m_iSelectedActor = 0;
+	int m_iSelectedActor = -1;
 
+	bool m_bCheckbox = false;
 
+public:
+	void SetInitialMaterialValues(const std::shared_ptr<UMaterial>& mat);
 
 protected:
 	bool show_demo_window = true;

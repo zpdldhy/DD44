@@ -89,7 +89,7 @@ void UMaterial::SetDissolveParams(float threshold)
 {
     CB_DISSOLVE cb = {};
     cb.g_fDissolveThreshold = threshold;
-
+    m_tDissolveData.g_fDissolveThreshold = threshold;
     if (!m_pDissolveCB)
     {
         D3D11_BUFFER_DESC desc = {};
