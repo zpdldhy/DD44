@@ -11,90 +11,125 @@
 #include "UMeshResources.h"
 #include "CameraManager.h"
 #include "Input.h"
+#include <random>
+#include "ATerrainTileActor.h"
 
 void TestSY::Init()
 {
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
-		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
+		m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
+
+		m_pCameraActor->Init();
+	}
+
+	// HeightMap Test
+	{
+		//m_pTerrain = make_shared<ATerrainTileActor>();
+		//m_pTerrain->m_fCellSize = 1.0f;
+
+		//m_pTerrain->CreateTerrainFromHeightMap(
+		//	L"../Resources/Texture/height.png",
+		//	L"../Resources/Texture/kkongchi.jpg",
+		//	L"../Resources/Shader/Default.hlsl"
+		//);
+
+		//m_pTerrain->Init();
+	}
+
+	{
+		m_pTerrain = make_shared<ATerrainTileActor>();
+		m_pTerrain->m_iNumCols = 20;
+		m_pTerrain->m_iNumRows = 20;
+		m_pTerrain->m_fCellSize = 10.0f;
+
+		m_pTerrain->CreateTerrain(L"../Resources/Texture/grass.jpg", L"../Resources/Shader/Default.hlsl");
+
+		auto vertexList = m_pTerrain->m_pTerrainMeshComponent->GetMesh()->GetVertexList();
+		auto newVertexList = vertexList; // *참조가 아닌 복사인 상황
+
+		std::default_random_engine eng((unsigned int)time(nullptr));
+		std::uniform_int_distribution<int> distCol(1, m_pTerrain->m_iNumCols - 2);
+		std::uniform_int_distribution<int> distRow(1, m_pTerrain->m_iNumRows - 2);
+		std::uniform_real_distribution<float> heightDist(10.0f, 40.0f);
+
+		int numHills = 5;
+		for (int h = 0; h < numHills; ++h)
+		{
+			int col = distCol(eng);
+			int row = distRow(eng);
+			float centerHeight = heightDist(eng);
+
+			int centerIdx = row * m_pTerrain->m_iNumCols + col;
+			newVertexList[centerIdx].pos.y += centerHeight;
+
+			for (int dz = -1; dz <= 1; ++dz)
+			{
+				for (int dx = -1; dx <= 1; ++dx)
+				{
+					int nx = col + dx;
+					int nz = row + dz;
+					if (nx < 0 || nx >= m_pTerrain->m_iNumCols || nz < 0 || nz >= m_pTerrain->m_iNumRows)
+						continue;
+
+					int nIdx = nz * m_pTerrain->m_iNumCols + nx;
+					if (nIdx == centerIdx) continue;
+
+					float dist = sqrtf((float)(dx * dx + dz * dz));
+					float offset = std::max<float>(0.0f, centerHeight - dist * 10.0f);
+					newVertexList[nIdx].pos.y += offset;
+				}
+			}
+		}
+
+		m_pTerrain->m_pTerrainMeshComponent->GetMesh()->SetVertexList(newVertexList);
+		m_pTerrain->m_pTerrainMeshComponent->GetMesh()->Bind();
+
+		m_pTerrain->Init();
+	}
+
+	{
+		std::default_random_engine eng((unsigned int)time(nullptr));
+		std::uniform_real_distribution<float> distX(-100.0f, 100.0f);
+		std::uniform_real_distribution<float> distZ(-100.0f, 100.0f);
+		std::uniform_real_distribution<float> scaleDist(3.0f, 8.0f);
+
+		for (int i = 0; i < 30; ++i)
+		{
+			float x = distX(eng);
+			float z = distZ(eng);
+			float y = m_pTerrain->GetHeightAt(x, z);
+
+			auto obj = make_shared<APawn>();
+			auto mesh = UStaticMeshComponent::CreateCube();
+			obj->SetMesh(mesh);
+			obj->SetScale({ scaleDist(eng), scaleDist(eng), scaleDist(eng) });
+			obj->SetPosition({ x, y + obj->GetScale().y/2, z});
+
+			auto mat = make_shared<UMaterial>();
+			mat->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+			mesh->SetMaterial(mat);
+
+			obj->Init();
+			m_vObjects.push_back(obj);
+		}
 	}
 
 	{
 		m_pActor = make_shared<APawn>();
 
 		m_pStaticMesh = UStaticMeshComponent::CreateCube();
-		m_pActor->SetMeshComponent(m_pStaticMesh);
-		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
-		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
-		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });		
+		m_pActor->SetMesh(m_pStaticMesh);
+		m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
+		m_pActor->SetPosition({ 0.0f, 2.5f, 10.0f });
+		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 		m_pStaticMesh->SetMaterial(material);
 
-		auto pCameraComponent = make_shared<UCameraComponent>();
-		pCameraComponent->SetLocalPosition(Vec3(20.f, 20.f, -20.f));
-		m_pActor->SetCameraComponent(pCameraComponent);
-
-		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
-	}
-
-	{
-		DirectX::ScratchImage heightImage;
-		DirectX::LoadFromWICFile(L"../Resources/Texture/height.png", DirectX::WIC_FLAGS_FORCE_RGB, nullptr, heightImage);
-		const DirectX::Image* img = heightImage.GetImage(0, 0, 0);
-		UINT8* pixels = img->pixels;
-		int width = static_cast<int>(img->width);
-		int height = static_cast<int>(img->height);
-
-		m_pPlane = make_shared<APawn>();
-
-		m_pPlaneMesh = make_shared<UTerrainMeshComponent>();
-		m_pPlaneMesh->CreateGrid(width, height, 1.0f);
-
-		auto planeVeretexList = m_pPlaneMesh->GetMesh()->GetVertexList();
-		auto newPlaneVeretexList = planeVeretexList;
-
-		for (int y = 0; y < height; ++y)
-		{
-			for (int x = 0; x < width; ++x)
-			{
-				int idx = y * width + x;
-				UINT8 gray = pixels[y * img->rowPitch + x];
-				float heightValue = (gray / 255.0f * 500.0f) - 300.0f;
-				
-				newPlaneVeretexList[idx].pos.y = heightValue;
-			}
-		}
-		m_pPlaneMesh->GetMesh()->SetVertexList(newPlaneVeretexList);
-		m_pPlaneMesh->MeshBind();
-
-		m_pPlane->SetMeshComponent(m_pPlaneMesh);
-		
-
-		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/grass.jpg", L"../Resources/Shader/Default.hlsl");
-		m_pPlaneMesh->SetMaterial(material);
-	}
-
-	{
-		//m_pTexture = TEXTURE->Load(L"../Resources/Texture/height.png");
-		//int width = m_pTexture->width;
-		//int height = m_pTexture->height;
-
-		//m_pPlane = make_shared<AActor>();
-
-		//m_pPlaneMesh = make_shared<UTerrainMeshComponent>();
-		//m_pPlaneMesh->CreateGrid(width, height, 10.0f);
-		//m_pPlane->SetMesh(m_pPlaneMesh);
-		//m_pPlane->SetScale({ 10.0f, 10.0f, 10.0f });
-		//m_pPlane->SetPosition({ 0.0f, 0.0f, 0.0f });
-		//m_pPlane->SetRotation({ 0.0f, 0.0f, 0.0f });
-
-		//shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		//material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-		//m_pPlaneMesh->SetMaterial(material);
+		m_pActor->Init();
 	}
 
 	{
@@ -106,6 +141,8 @@ void TestSY::Init()
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
 		m_pSkyMesh->SetMaterial(material);
+
+		m_pSky->Init();
 	}
 
 	m_pCameraActor->Init();
@@ -124,8 +161,13 @@ void TestSY::Update()
 
 	m_pCameraActor->Tick();
 	m_pActor->Tick();
-	m_pPlane->Tick();
+	m_pTerrain->Tick();
 	m_pSky->Tick();
+
+	for (auto& obj : m_vObjects)
+	{
+		obj->Tick();
+	}
 }
 
 void TestSY::Render()
@@ -134,8 +176,13 @@ void TestSY::Render()
 		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
 	m_pCameraActor->Render();
 	m_pActor->Render();
-	m_pPlane->Render();
+	m_pTerrain->Render();
 	m_pSky->Render();
+
+	for (auto& obj : m_vObjects)
+	{
+		obj->Render();
+	}
 }
 
 void TestSY::Destroy()

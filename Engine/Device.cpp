@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Device.h"
 #include "DxState.h"
+#include "Input.h"
 
 void Device::CreateDeviceAndSwapChain()
 {
@@ -178,7 +179,10 @@ void Device::Init()
 
 void Device::Frame()
 {
-
+    if (INPUT->GetButton(V))
+    {
+        m_bWireFrame = !m_bWireFrame;
+    }
 }
 
 void Device::PreRender()
