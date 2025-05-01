@@ -1,9 +1,13 @@
 #include "pch.h"
 #include "UCameraComponent.h"
+#include "UStaticMeshComponent.h"
 
 void UCameraComponent::Init()
 {
-
+#ifndef DEBUG
+	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
+		CreateFrustumBox();
+#endif // DEBUG
 }
 
 void UCameraComponent::Tick()
@@ -22,6 +26,14 @@ void UCameraComponent::Render()
 
 void UCameraComponent::Destroy()
 {
+}
+
+void UCameraComponent::CreateFrustumBox()
+{
+	m_pFrustumBox = make_shared<UStaticMeshComponent>();
+	
+	auto mesh = make_shared<UStaticMeshResources>();
+	
 }
 
 void UCameraComponent::UpdateView()

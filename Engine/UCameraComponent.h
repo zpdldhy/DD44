@@ -29,6 +29,9 @@ class UCameraComponent : public USceneComponent
 	float m_fAspect = 1440.0f / 900.0f;
 	float m_fNear = 0.1f;
 	float m_fFar = 10000.0f;
+
+	// Frustum
+	shared_ptr<class UStaticMeshComponent> m_pFrustumBox;
 	
 public:
 	void Init() override;
@@ -37,6 +40,8 @@ public:
 	void Destroy() override;
 
 private:
+	void CreateFrustumBox();
+
 	void UpdateView();
 	void UpdateOrthographicProjection();
 	void UpdatePersPectiveProjection();
