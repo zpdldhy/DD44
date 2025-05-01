@@ -32,6 +32,8 @@ void Engine::Init()
 
 void Engine::Frame()
 {
+	GET_SINGLE(Device)->Frame();
+
 	GUI->Update();
 	
 	_app->Update();

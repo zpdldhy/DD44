@@ -70,7 +70,8 @@ void UTerrainMeshComponent::CreateGrid(int _sizeX, int _sizeZ, float _cellSize)
 			Vec4 color = Vec4(1, 1, 1, 1);
 			// *텍스처 uv 0~1 범위 설정 시 픽셀단위로 쪼개져서 단색으로 보이는 것으로 추정
 			//Vec2 uv = Vec2((float)col / NumCol, (float)row / NumRow);
-			Vec2 uv = Vec2(col * 0.1f, row * 0.1f); // 임의로 타일링
+			Vec2 uv = Vec2(col * 1.0f, (NumRow - row) * 1.0f);
+			//Vec2 uv = Vec2(col * 0.1f, row * 0.1f); // 임의로 타일링
 
 			vVertexList[vertexIndex++] = PNCT_VERTEX(pos, normal, color, uv);
 		}
