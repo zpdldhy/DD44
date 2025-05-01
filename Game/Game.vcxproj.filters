@@ -34,6 +34,7 @@
     <ClInclude Include="EngineCameraMoveScript.h">
       <Filter>Script</Filter>
     </ClInclude>
+    <ClInclude Include="kkongchiMoveScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -55,6 +56,7 @@
     <ClCompile Include="EngineCameraMoveScript.cpp">
       <Filter>Script</Filter>
     </ClCompile>
+    <ClCompile Include="kkongchiMoveScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\Default.hlsl">

@@ -31,6 +31,6 @@ private:
 	void CreateCameraBuffer();
 
 public:
-	void SetCameraActor(shared_ptr<class AActor> _cameraActor);
+	void SetCameraActor(shared_ptr<class AActor> _cameraActor);	
 };
 

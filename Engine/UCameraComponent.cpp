@@ -26,11 +26,16 @@ void UCameraComponent::Destroy()
 
 void UCameraComponent::UpdateView()
 {
-	auto vEye = m_pOwner->m_vPosition;
-	auto vLook = m_pOwner->m_vLook;
-	auto vUp = m_pOwner->m_vUp;
+	m_vEye = m_pOwner->m_vPosition + m_vLocalPosition;	
 
-	m_matView = DirectX::XMMatrixLookAtLH(vEye, vEye + vLook, vUp);
+	if (Vec3::Distance(Vec3(0.f, 0.f, 0.f), m_vLocalPosition) < 0.1f)
+		m_vLook = m_pOwner->m_vLook;
+	else
+		m_vLook = -m_vLocalPosition;
+
+	Vec3 vUp = Vec3(0.f, 1.f, 0.f);
+
+	m_matView = DirectX::XMMatrixLookAtLH(m_vEye, m_vEye + m_vLook, vUp);
 }
 
 void UCameraComponent::UpdateOrthographicProjection()

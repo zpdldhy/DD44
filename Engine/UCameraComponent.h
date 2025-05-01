@@ -16,6 +16,9 @@ class UCameraComponent : public USceneComponent
 	Matrix m_matView;
 	Matrix m_matProjection;
 
+	Vec3 m_vEye;
+	Vec3 m_vLook;
+
 	// Projection
 	// - Orthographic
 	float m_fWidth = 800.0f;
@@ -49,8 +52,11 @@ public:
 	Matrix GetView() { return m_matView; }
 	Matrix GetProejction() { return m_matProjection; }
 
+	Vec3 GetCameraPos() { return m_vEye; }
+	Vec3 GetCameraLook() { return m_vLook; }
+
 public:
-	UCameraComponent(ProjectionType _projectionType) : m_ProjectionType(_projectionType) {}
+	UCameraComponent(ProjectionType _projectionType = ProjectionType::PT_PERSPECTIVE) : m_ProjectionType(_projectionType) {}
 	virtual ~UCameraComponent() {}
 };
 

@@ -31,9 +31,9 @@ void CameraManager::Render(CameraViewType _ViewType)
 	shared_ptr<UCameraComponent> pCameraComponent = nullptr;
 
 	if (_ViewType == CameraViewType::CVT_ACTOR)
-		pCameraComponent = m_pCurrentCameraActor->GetCameraComponent<UCameraComponent>();
+		pCameraComponent = m_pCurrentCameraActor->GetCameraComponent();
 	else if (_ViewType == CameraViewType::CVT_UI)
-		pCameraComponent = m_pUICameraActor->GetCameraComponent<UCameraComponent>();
+		pCameraComponent = m_pUICameraActor->GetCameraComponent();
 
 	m_CameraData.matView = pCameraComponent->GetView();
 	m_CameraData.matProjection = pCameraComponent->GetProejction();
@@ -65,7 +65,7 @@ void CameraManager::CreateCameraBuffer()
 
 void CameraManager::SetCameraActor(shared_ptr<class AActor> _cameraActor)
 {
-	if (_cameraActor->GetCameraComponent<UCameraComponent>() == nullptr)
+	if (_cameraActor->GetCameraComponent() == nullptr)
 		return;
 
 	m_pCurrentCameraActor = _cameraActor;
