@@ -58,6 +58,9 @@
     <Filter Include="Resources\Mesh">
       <UniqueIdentifier>{88731221-02aa-4668-b59c-dcaf02dd62e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{358a3ef2-8a31-4ae2-b9ac-badd8ffa08cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -216,7 +219,9 @@
     <ClInclude Include="USkeletalMeshResources.h">
       <Filter>Resources\Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="CameraManager.h" />
+    <ClInclude Include="CameraManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -354,7 +359,9 @@
     <ClCompile Include="USkeletalMeshResources.cpp">
       <Filter>Resources\Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="CameraManager.cpp" />
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
