@@ -100,7 +100,12 @@ void TestYR::Init()
 			fbxList.emplace_back(AAsset::Load(fileList[iPath].c_str()));
 		}
 	}
-	MakeObjectByAsset(fbxList[0]);
+
+	for (int iAsset = 0; iAsset < fbxList.size(); iAsset++)
+	{
+		MakeObjectByAsset(fbxList[iAsset]);
+
+	}
 	m_pActor->Init();
 }
 void TestYR::Update()
@@ -168,27 +173,23 @@ void TestYR::MakeObjectByAsset(TFbxResource _resource)
 	}
 
 	////MESH
-	shared_ptr<USkinnedComponent> skinnedMesh = make_shared<USkinnedComponent>();
-	skinnedMesh->m_vVertexList = _resource.m_vMeshList[0].m_vVertexList;
-	skinnedMesh->m_vIwList = _resource.m_vMeshList[0].m_vIwList;
-	skinnedMesh->SetMaterial(tempSkinnedMat);
-	skinnedMesh->CreateVertexBuffer();
-	skinnedMesh->CreateIwBuffer();
-	skinnedMesh->m_pAnim = meshAnim[0];
+	shared_ptr<USkinnedComponent> emptyMesh = make_shared<USkinnedComponent>();
 
-	////MESH
-	shared_ptr<USkinnedComponent> tailMesh = make_shared<USkinnedComponent>();
-	tailMesh->m_vVertexList = _resource.m_vMeshList[5].m_vVertexList;
-	tailMesh->m_vIwList = _resource.m_vMeshList[5].m_vIwList;
-	tailMesh->SetMaterial(tempSkinnedMat);
-	tailMesh->CreateVertexBuffer();
-	tailMesh->CreateIwBuffer();
-	tailMesh->m_pAnim = meshAnim[5];
-	
-	shared_ptr<UMaterial> weaponMat = make_shared<UMaterial>();
-	weaponMat->Load(L"../Resources/Texture/Crow_DIFF.png", L"../Resources/Shader/Default.hlsl");
+	for (int iMesh = 0; iMesh < _resource.m_vMeshList.size(); iMesh++)
+	{
+		if (_resource.m_vMeshList[iMesh].m_bSkeleton)
+		{
+			shared_ptr<USkinnedComponent> mesh = make_shared<USkinnedComponent>();
+			mesh->m_vVertexList = _resource.m_vMeshList[iMesh].m_vVertexList;
+			mesh->m_vIwList = _resource.m_vMeshList[iMesh].m_vIwList;
+			mesh->SetMaterial(tempSkinnedMat);
+			mesh->CreateVertexBuffer();
+			mesh->CreateIwBuffer();
+			mesh->m_pAnim = meshAnim[iMesh];
+			emptyMesh->AddChild(mesh);
+		}
 
-	skinnedMesh->AddChild(tailMesh);
+	}
 
-	m_pActor->SetMesh(skinnedMesh);
+	m_pActor->SetMesh(emptyMesh);
 }
