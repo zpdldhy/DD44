@@ -2,6 +2,7 @@
 #include "ImGuiCore.h"
 #include "Device.h"
 #include "UMaterial.h"
+#include "MapToolUI.h"
 
 void ImGuiCore::Init()
 {
@@ -25,6 +26,10 @@ void ImGuiCore::Init()
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(g_hWnd);
 	ImGui_ImplDX11_Init(DEVICE.Get(), DC.Get());
+
+	//m_pMapEditor = make_unique<MapEditorUI>();
+	//m_pObjectEditor = make_unique<ObjectEditorUI>();
+	//m_pEffectEditor = make_unique<EffectEditorUI>();
 }
 
 void ImGuiCore::Update()
@@ -32,8 +37,8 @@ void ImGuiCore::Update()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-
-	Test();
+	
+	//Test();
 }
 
 void ImGuiCore::Render()
@@ -45,6 +50,9 @@ void ImGuiCore::Render()
 
 void ImGuiCore::MapEditor()
 {
+	ImGui::Begin("Editor");
+
+	ImGui::End();
 }
 
 void ImGuiCore::Test()

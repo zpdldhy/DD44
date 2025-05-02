@@ -64,6 +64,9 @@
     <Filter Include="Manager">
       <UniqueIdentifier>{358a3ef2-8a31-4ae2-b9ac-badd8ffa08cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\Editor">
+      <UniqueIdentifier>{80f391cd-42d6-4718-815c-d75b562bf8ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -237,6 +240,15 @@
     <ClInclude Include="CameraManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="EffectEditorUI.h">
+      <Filter>Utils\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectEditorUI.h">
+      <Filter>Utils\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="MapEditorUI.h">
+      <Filter>Utils\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -388,6 +400,15 @@
     </ClCompile>
     <ClCompile Include="CameraManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectEditorUI.cpp">
+      <Filter>Utils\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectEditorUI.cpp">
+      <Filter>Utils\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="MapEditorUI.cpp">
+      <Filter>Utils\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

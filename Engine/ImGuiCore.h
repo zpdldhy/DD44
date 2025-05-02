@@ -5,6 +5,14 @@ class UMaterial;
 
 class ImGuiCore : public Singleton<ImGuiCore>
 {
+private:
+	//std::unique_ptr<class MapEditorUI> m_pMapEditor;
+	//std::unique_ptr<class ObjectEditorUI> m_pObjectEditor;
+	//std::unique_ptr<class EffectEditorUI> m_pEffectEditor;
+public:
+	bool show_map_editor = true;
+	bool show_object_editor = true;
+	bool show_effect_editor = true;
 
 public:
 	void Init();

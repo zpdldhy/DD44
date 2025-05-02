@@ -8,6 +8,8 @@ public:
 	shared_ptr<class APawn> m_pActor;
 
 	shared_ptr<class ATerrainTileActor> m_pTerrain;
+	std::vector<std::shared_ptr<ATerrainTileActor>> m_vTiles;
+	bool m_bEditorWireframe = false;
 
 	shared_ptr<class ACameraActor> m_pCameraActor;
 
@@ -25,6 +27,6 @@ public:
 	void Render() override;
 	void Destroy();
 
-	
+	void DrawTerrainEditorUI();
 };
 
