@@ -64,6 +64,9 @@
     <Filter Include="Manager">
       <UniqueIdentifier>{358a3ef2-8a31-4ae2-b9ac-badd8ffa08cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Collision">
+      <UniqueIdentifier>{d1e06b1e-19b6-4d9e-80b8-cc65e7f9b694}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -237,6 +240,15 @@
     <ClInclude Include="CameraManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="UShapeComponent.h">
+      <Filter>Component\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="UBoxComponent.h">
+      <Filter>Component\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -387,6 +399,15 @@
       <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
     <ClCompile Include="CameraManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="UShapeComponent.cpp">
+      <Filter>Component\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="UBoxComponent.cpp">
+      <Filter>Component\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>

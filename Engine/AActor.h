@@ -2,6 +2,7 @@
 #include "UObject.h"
 #include "UMeshComponent.h"
 #include "UCameraComponent.h"
+#include "UShapeComponent.h"
 
 struct cbData
 {
@@ -11,6 +12,8 @@ struct cbData
 enum class ComponentType
 {
 	CT_CAMERA,
+	CT_SHAPE,
+	CT_TRANSFORM,
 	CT_MESH,
 	CT_COUNT,
 };
@@ -60,9 +63,12 @@ public:
 	template<typename T>
 	shared_ptr<T> GetMeshComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
 	shared_ptr<UCameraComponent> GetCameraComponent() { return static_pointer_cast<UCameraComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)]); }
+	template<typename T>
+	shared_ptr<T> GetShapeComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_SHAPE)]); }
 
 	void SetMeshComponent(shared_ptr<UMeshComponent> _mesh) { m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)] = static_pointer_cast<USceneComponent>(_mesh); }
 	void SetCameraComponent(shared_ptr<UCameraComponent> _camera) { m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)] = static_pointer_cast<USceneComponent>(_camera); }
+	void SetShapeComponent(shared_ptr<UShapeComponent> _shape) { m_arrComponent[static_cast<size_t>(ComponentType::CT_SHAPE)] = static_pointer_cast<USceneComponent>(_shape); }
 
 	// Script
 	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }

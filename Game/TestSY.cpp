@@ -13,6 +13,7 @@
 #include "Input.h"
 #include <random>
 #include "ATerrainTileActor.h"
+#include "UBoxComponent.h"
 
 void TestSY::Init()
 {
@@ -85,7 +86,7 @@ void TestSY::Init()
 		}
 
 		m_pTerrain->m_pTerrainMeshComponent->GetMesh()->SetVertexList(newVertexList);
-		m_pTerrain->m_pTerrainMeshComponent->GetMesh()->Bind();
+		m_pTerrain->m_pTerrainMeshComponent->GetMesh()->Create();
 
 		m_pTerrain->Init();
 	}
@@ -133,6 +134,10 @@ void TestSY::Init()
 		auto pCameraComponent = make_shared<UCameraComponent>();
 		pCameraComponent->SetLocalPosition(Vec3(20.f, 20.f, -20.f));
 		m_pActor->SetCameraComponent(pCameraComponent);
+
+		auto pBoxComponent = make_shared<UBoxComponent>();
+		pBoxComponent->SetBoxSize(Vec3(2.f, 2.f, 2.f));
+		m_pActor->SetShapeComponent(pBoxComponent);
 
 		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
 

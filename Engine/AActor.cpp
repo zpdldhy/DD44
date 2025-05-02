@@ -11,8 +11,8 @@ void AActor::Init()
 	{
 		if (component)
 		{
-			component->Init();
 			component->SetOwner(this);
+			component->Init();
 		}
 	}
 
