@@ -128,8 +128,13 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Libraries\Debug\Lib\;</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\Debug\Include\Engine"</Command>
+      <Command>copy /Y "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\Debug\Include\Engine\"
+if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)Libraries\Debug\Lib\Assimp\assimp-vc143-mtd.dll" "$(SolutionDir)Debug\"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -158,9 +163,11 @@
     <ClInclude Include="ActorLoader.h" />
     <ClInclude Include="APawn.h" />
     <ClInclude Include="ASky.h" />
+    <ClInclude Include="AssimpLoader.h" />
     <ClInclude Include="EffectEditorUI.h" />
     <ClInclude Include="FbxLoader.h" />
     <ClInclude Include="CameraManager.h" />
+    <ClInclude Include="ObjectLoader.h" />
     <ClInclude Include="MapEditorUI.h" />
     <ClInclude Include="ObjectEditorUI.h" />
     <ClInclude Include="Sound.h" />
@@ -218,9 +225,11 @@
     <ClCompile Include="ActorLoader.cpp" />
     <ClCompile Include="APawn.cpp" />
     <ClCompile Include="ASky.cpp" />
+    <ClCompile Include="AssimpLoader.cpp" />
     <ClCompile Include="EffectEditorUI.cpp" />
     <ClCompile Include="FbxLoader.cpp" />
     <ClCompile Include="CameraManager.cpp" />
+    <ClCompile Include="ObjectLoader.cpp" />
     <ClCompile Include="MapEditorUI.cpp" />
     <ClCompile Include="ObjectEditorUI.cpp" />
     <ClCompile Include="Sound.cpp" />
