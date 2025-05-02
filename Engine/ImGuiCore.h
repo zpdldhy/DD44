@@ -11,6 +11,7 @@ public:
 	void Update();
 	void Render();
 
+	void MapEditor();
 	void Test();
 public:
 	float GetGlowPower() const { return m_fGlowPower; }
