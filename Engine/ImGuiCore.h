@@ -1,15 +1,35 @@
 #pragma once
 #include "Singleton.h"
+#include "MapEditorUI.h"
+#include "ObjectEditorUI.h"
+#include "EffectEditorUI.h"
 
 class UMaterial;
 
 class ImGuiCore : public Singleton<ImGuiCore>
 {
+private:
+	std::unique_ptr<class MapEditorUI> m_pMapEditorUI;
+	std::unique_ptr<class ObjectEditorUI> m_pObjectEditorUI;
+	std::unique_ptr<class EffectEditorUI> m_pEffectEditorUI;
+public:
+	bool show_map_editor = true;
+	bool show_object_editor = true;
+	bool show_effect_editor = true;
+
+	MapEditorUI* GetMapEditorUI() const { return m_pMapEditorUI.get(); }
+
+	void SetMapEditorCallback(std::function<void()> callback)
+	{
+		m_pMapEditorUI->SetOnCreateCallback(std::move(callback));
+	}
+
 
 public:
 	void Init();
 	void Update();
 	void Render();
+
 
 	void Test();
 public:
@@ -31,10 +51,10 @@ public:
 protected:
 	bool show_demo_window = true;
 	bool show_another_window = false;
-	Vec4 clear_color = Vec4(0.f);
-
 	bool m_bDark = true;
 
+
+	Vec4 clear_color = Vec4(0.f);
 
 };
 

@@ -25,6 +25,10 @@ void ImGuiCore::Init()
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(g_hWnd);
 	ImGui_ImplDX11_Init(DEVICE.Get(), DC.Get());
+
+	m_pMapEditorUI = make_unique<MapEditorUI>();
+	m_pObjectEditorUI = make_unique<ObjectEditorUI>();
+	m_pEffectEditorUI = make_unique<EffectEditorUI>();
 }
 
 void ImGuiCore::Update()
@@ -32,10 +36,24 @@ void ImGuiCore::Update()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	
 
-	Test();
+	if (show_map_editor && m_pMapEditorUI)
+	{
+		m_pMapEditorUI->Update();
+	}
+	if (show_object_editor && m_pObjectEditorUI)
+	{
+		//m_pObjectEditorUI->Update();
+	}
+	if (show_effect_editor && m_pEffectEditorUI)
+	{
+		//m_pEffectEditorUI->Update();
+	}
+
+	//Test();
 }
-
+ 
 void ImGuiCore::Render()
 {
 	// Rendering
