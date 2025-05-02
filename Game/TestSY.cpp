@@ -63,27 +63,25 @@ void TestSY::Init()
 		m_pSky->Init();
 	}
 
-	m_pMapEditorUI = std::make_unique<MapEditorUI>();
-	m_pMapEditorUI->SetOnCreateCallback([this]()
-		{
-			auto tile = std::make_shared<ATerrainTileActor>();
+	GUI->SetMapEditorCallback([this]()
+	{
+		MapEditorUI* editor = GUI->GetMapEditorUI();
+		if (!editor) return;
 
-			tile->m_iNumCols = m_pMapEditorUI->GetNumCols();
-			tile->m_iNumRows = m_pMapEditorUI->GetNumRows();
-			tile->m_fCellSize = m_pMapEditorUI->GetCellSize();
+		auto tile = std::make_shared<ATerrainTileActor>();
 
-			tile->CreateTerrain(
-				m_pMapEditorUI->GetTexturePath(),
-				m_pMapEditorUI->GetShaderPath()
-			);
+		tile->m_iNumCols = editor->GetNumCols();
+		tile->m_iNumRows = editor->GetNumRows();
+		tile->m_fCellSize = editor->GetCellSize();
 
-			tile->SetPosition(m_pMapEditorUI->GetPosition());
-			tile->SetRotation(m_pMapEditorUI->GetRotation());
-			tile->SetScale(m_pMapEditorUI->GetScale());
+		tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
+		tile->SetPosition(editor->GetPosition());
+		tile->SetRotation(editor->GetRotation());
+		tile->SetScale(editor->GetScale());
 
-			tile->Init();
-			m_vTiles.push_back(tile);
-		});
+		tile->Init();
+		m_vTiles.push_back(tile);
+	});
 }
 
 void TestSY::Update()
@@ -96,7 +94,6 @@ void TestSY::Update()
 	m_pActor->Tick();
 	m_pSky->Tick();
 
-	m_pMapEditorUI->Update();
 	for (auto& tile : m_vTiles)
 		tile->Tick();
 }
