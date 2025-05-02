@@ -15,6 +15,7 @@
 #include "ATerrainTileActor.h"
 #include "ImGuiCore.h"
 #include "DxState.h"
+#include "MapEditorUI.h"
 
 void TestSY::Init()
 {
@@ -25,100 +26,6 @@ void TestSY::Init()
 
 		m_pCameraActor->Init();
 		CAMERAMANAGER->SetCameraActor(m_pCameraActor);
-	}
-
-	// HeightMap Test
-	{
-		//m_pTerrain = make_shared<ATerrainTileActor>();
-		//m_pTerrain->m_fCellSize = 1.0f;
-
-		//m_pTerrain->CreateTerrainFromHeightMap(
-		//	L"../Resources/Texture/height.png",
-		//	L"../Resources/Texture/kkongchi.jpg",
-		//	L"../Resources/Shader/Default.hlsl"
-		//);
-
-		//m_pTerrain->Init();
-	}
-
-	// 랜덤 타일맵
-	{
-		//m_pTerrain = make_shared<ATerrainTileActor>();
-		//m_pTerrain->m_iNumCols = 20;
-		//m_pTerrain->m_iNumRows = 20;
-		//m_pTerrain->m_fCellSize = 10.0f;
-
-		//m_pTerrain->CreateTerrain(L"../Resources/Texture/grass.jpg", L"../Resources/Shader/Default.hlsl");
-
-		//auto vertexList = m_pTerrain->m_pTerrainMeshComponent->GetMesh()->GetVertexList();
-		//auto newVertexList = vertexList; // *참조가 아닌 복사인 상황
-
-		//std::default_random_engine eng((unsigned int)time(nullptr));
-		//std::uniform_int_distribution<int> distCol(1, m_pTerrain->m_iNumCols - 2);
-		//std::uniform_int_distribution<int> distRow(1, m_pTerrain->m_iNumRows - 2);
-		//std::uniform_real_distribution<float> heightDist(10.0f, 40.0f);
-
-		//int numHills = 5;
-		//for (int h = 0; h < numHills; ++h)
-		//{
-		//	int col = distCol(eng);
-		//	int row = distRow(eng);
-		//	float centerHeight = heightDist(eng);
-
-		//	int centerIdx = row * m_pTerrain->m_iNumCols + col;
-		//	newVertexList[centerIdx].pos.y += centerHeight;
-
-		//	for (int dz = -1; dz <= 1; ++dz)
-		//	{
-		//		for (int dx = -1; dx <= 1; ++dx)
-		//		{
-		//			int nx = col + dx;
-		//			int nz = row + dz;
-		//			if (nx < 0 || nx >= m_pTerrain->m_iNumCols || nz < 0 || nz >= m_pTerrain->m_iNumRows)
-		//				continue;
-
-		//			int nIdx = nz * m_pTerrain->m_iNumCols + nx;
-		//			if (nIdx == centerIdx) continue;
-
-		//			float dist = sqrtf((float)(dx * dx + dz * dz));
-		//			float offset = std::max<float>(0.0f, centerHeight - dist * 10.0f);
-		//			newVertexList[nIdx].pos.y += offset;
-		//		}
-		//	}
-		//}
-
-		//m_pTerrain->m_pTerrainMeshComponent->GetMesh()->SetVertexList(newVertexList);
-		//m_pTerrain->m_pTerrainMeshComponent->GetMesh()->Bind();
-
-		//m_pTerrain->Init();
-	}
-
-	// 랜덤 오브젝트
-	{
-		//std::default_random_engine eng((unsigned int)time(nullptr));
-		//std::uniform_real_distribution<float> distX(-100.0f, 100.0f);
-		//std::uniform_real_distribution<float> distZ(-100.0f, 100.0f);
-		//std::uniform_real_distribution<float> scaleDist(3.0f, 8.0f);
-
-		//for (int i = 0; i < 30; ++i)
-		//{
-		//	float x = distX(eng);
-		//	float z = distZ(eng);
-		//	float y = m_pTerrain->GetHeightAt(x, z);
-
-		//	auto obj = make_shared<APawn>();
-		//	auto mesh = UStaticMeshComponent::CreateCube();
-		//	obj->SetMeshComponent(mesh);
-		//	obj->SetScale({ scaleDist(eng), scaleDist(eng), scaleDist(eng) });
-		//	obj->SetPosition({ x, y + obj->GetScale().y/2, z});
-
-		//	auto mat = make_shared<UMaterial>();
-		//	mat->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-		//	mesh->SetMaterial(mat);
-
-		//	obj->Init();
-		//	m_vObjects.push_back(obj);
-		//}
 	}
 
 	{
@@ -133,6 +40,12 @@ void TestSY::Init()
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 		m_pStaticMesh->SetMaterial(material);
+
+		auto pCameraComponent = make_shared<UCameraComponent>();
+		pCameraComponent->SetLocalPosition(Vec3(20.f, 20.f, -20.f));
+		m_pActor->SetCameraComponent(pCameraComponent);
+
+		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
 
 		m_pActor->Init();
 	}
@@ -150,7 +63,27 @@ void TestSY::Init()
 		m_pSky->Init();
 	}
 
-	
+	m_pMapEditorUI = std::make_unique<MapEditorUI>();
+	m_pMapEditorUI->SetOnCreateCallback([this]()
+		{
+			auto tile = std::make_shared<ATerrainTileActor>();
+
+			tile->m_iNumCols = m_pMapEditorUI->GetNumCols();
+			tile->m_iNumRows = m_pMapEditorUI->GetNumRows();
+			tile->m_fCellSize = m_pMapEditorUI->GetCellSize();
+
+			tile->CreateTerrain(
+				m_pMapEditorUI->GetTexturePath(),
+				m_pMapEditorUI->GetShaderPath()
+			);
+
+			tile->SetPosition(m_pMapEditorUI->GetPosition());
+			tile->SetRotation(m_pMapEditorUI->GetRotation());
+			tile->SetScale(m_pMapEditorUI->GetScale());
+
+			tile->Init();
+			m_vTiles.push_back(tile);
+		});
 }
 
 void TestSY::Update()
@@ -161,20 +94,11 @@ void TestSY::Update()
 
 	m_pCameraActor->Tick();
 	m_pActor->Tick();
-	//m_pTerrain->Tick();
 	m_pSky->Tick();
 
-	// Map tool
-	DrawTerrainEditorUI();
-
+	m_pMapEditorUI->Update();
 	for (auto& tile : m_vTiles)
-	{
 		tile->Tick();
-	}
-	for (auto& obj : m_vObjects)
-	{
-		obj->Tick();
-	}
 }
 
 void TestSY::Render()
@@ -190,88 +114,15 @@ void TestSY::Render()
 
 	if (INPUT->GetButtonDown(P))
 		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
+	
 	m_pCameraActor->Render();
 	m_pActor->Render();
-	//m_pTerrain->Render();
-
+	m_pSky->Render();
 
 	for (auto& tile : m_vTiles)
-	{
 		tile->Render();
-	}
-	for (auto& obj : m_vObjects)
-	{
-		obj->Render();
-	}
-
-	m_pSky->Render();
 }
 
 void TestSY::Destroy()
 {
-}
-
-void TestSY::DrawTerrainEditorUI()
-{
-	static int numCols = 20;
-	static int numRows = 20;
-	static float cellSize = 10.0f;
-
-	static float position[3] = { 0.0f, 0.0f, 0.0f };
-	static float rotation[3] = { 0.0f, 0.0f, 0.0f };
-	static float scale[3] = { 1.0f, 1.0f, 1.0f };
-
-	static char texturePath[256] = "../Resources/Texture/grass.jpg";
-	static char shaderPath[256] = "../Resources/Shader/Default.hlsl";
-
-	ImGui::Begin("Terrain Placement");
-
-	// Section: Terrain Configuration
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Terrain Configuration");
-	ImGui::InputInt("Num Cols", &numCols);
-	ImGui::InputInt("Num Rows", &numRows);
-	ImGui::InputFloat("Cell Size", &cellSize);
-	ImGui::Separator(); ImGui::Spacing();
-
-	// Section: Transform (SRT)
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Transform");
-	ImGui::InputFloat3("Position", position);
-	ImGui::InputFloat3("Rotation", rotation);
-	ImGui::InputFloat3("Scale", scale);
-	ImGui::Separator(); ImGui::Spacing();
-
-	// Section: Appearance
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Appearance");
-	ImGui::InputText("Texture Path", texturePath, IM_ARRAYSIZE(texturePath));
-	ImGui::InputText("Shader Path", shaderPath, IM_ARRAYSIZE(shaderPath));
-	ImGui::Spacing(); ImGui::Spacing();
-
-	// Action Button
-	if (ImGui::Button("Create Terrain Tile", ImVec2(-1, 0)))  // -1 = full width
-	{
-		auto tile = make_shared<ATerrainTileActor>();
-		tile->m_iNumCols = numCols;
-		tile->m_iNumRows = numRows;
-		tile->m_fCellSize = cellSize;
-
-		tile->CreateTerrain(
-			std::wstring(texturePath, texturePath + strlen(texturePath)),
-			std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-		);
-
-		tile->SetPosition(Vec3(position[0], position[1], position[2]));
-		tile->SetRotation(Vec3(rotation[0], rotation[1], rotation[2]));
-		tile->SetScale(Vec3(scale[0], scale[1], scale[2]));
-
-		tile->Init();
-		m_vTiles.push_back(tile);
-	}
-
-	// Debug Options
-	ImGui::Separator(); ImGui::Spacing();
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Debug Options");
-	ImGui::Checkbox("Wireframe Mode", &m_bEditorWireframe);
-
-	ImGui::End();
-
 }

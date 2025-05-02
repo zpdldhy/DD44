@@ -1,55 +1,45 @@
 #include "pch.h"
 #include "MapEditorUI.h"
+#include "imgui.h"
 
 void MapEditorUI::Update()
 {
-	ImGui::Begin("Map Editor");
+    ImGui::Begin("Map Editor");
 
-	// Section: Terrain Configuration
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Terrain Configuration");
-	ImGui::InputInt("Num Cols", &numCols);
-	ImGui::InputInt("Num Rows", &numRows);
-	ImGui::InputFloat("Cell Size", &cellSize);
-	ImGui::Separator(); ImGui::Spacing();
+    ImGui::TextColored(ImVec4(1, 1, 1, 1), "Terrain Configuration");
+    ImGui::InputInt("Num Cols", &m_iCols);
+    ImGui::InputInt("Num Rows", &m_iRows);
+    ImGui::InputFloat("Cell Size", &m_fCellSize);
 
-	// Section: Transform (SRT)
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Transform");
-	ImGui::InputFloat3("Position", position);
-	ImGui::InputFloat3("Rotation", rotation);
-	ImGui::InputFloat3("Scale", scale);
-	ImGui::Separator(); ImGui::Spacing();
+    ImGui::Separator(); ImGui::Spacing();
 
-	// Section: Appearance
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Appearance");
-	ImGui::InputText("Texture Path", texturePath, IM_ARRAYSIZE(texturePath));
-	ImGui::InputText("Shader Path", shaderPath, IM_ARRAYSIZE(shaderPath));
-	ImGui::Spacing(); ImGui::Spacing();
+    ImGui::TextColored(ImVec4(1, 1, 1, 1), "Transform");
+    ImGui::InputFloat3("Position", m_fPosition);
+    ImGui::InputFloat3("Rotation", m_fRotation);
+    ImGui::InputFloat3("Scale", m_fScale);
 
-	// Action Button
-	if (ImGui::Button("Create Terrain Tile", ImVec2(-1, 0)))  // -1 = full width
-	{
-		auto tile = make_shared<ATerrainTileActor>();
-		tile->m_iNumCols = numCols;
-		tile->m_iNumRows = numRows;
-		tile->m_fCellSize = cellSize;
+    ImGui::Separator(); ImGui::Spacing();
 
-		tile->CreateTerrain(
-			std::wstring(texturePath, texturePath + strlen(texturePath)),
-			std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-		);
+    ImGui::TextColored(ImVec4(1, 1, 1, 1), "Appearance");
+    ImGui::InputText("Texture File", m_szTextureName, IM_ARRAYSIZE(m_szTextureName));
+    ImGui::InputText("Shader File", m_szShaderName, IM_ARRAYSIZE(m_szShaderName));
 
-		tile->SetPosition(Vec3(position[0], position[1], position[2]));
-		tile->SetRotation(Vec3(rotation[0], rotation[1], rotation[2]));
-		tile->SetScale(Vec3(scale[0], scale[1], scale[2]));
+    ImGui::Spacing();
 
-		tile->Init();
-		m_vTiles.push_back(tile);
-	}
+    if (ImGui::Button("Create Terrain Tile", ImVec2(-1, 0)))
+    {
+        if (m_OnCreate) m_OnCreate();
+    }
 
-	// Debug Options
-	ImGui::Separator(); ImGui::Spacing();
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Debug Options");
-	ImGui::Checkbox("Wireframe Mode", &m_bEditorWireframe);
+    ImGui::End();
+}
 
-	ImGui::End();
+std::wstring MapEditorUI::GetTexturePath() const
+{
+    return L"../Resources/Texture/" + std::wstring(m_szTextureName, m_szTextureName + strlen(m_szTextureName));
+}
+
+std::wstring MapEditorUI::GetShaderPath() const
+{
+    return L"../Resources/Shader/" + std::wstring(m_szShaderName, m_szShaderName + strlen(m_szShaderName));
 }

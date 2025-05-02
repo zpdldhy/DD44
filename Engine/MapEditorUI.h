@@ -1,9 +1,15 @@
 #pragma once
+#include <functional>
 
 class MapEditorUI
 {
 public:
     void Update();
+
+    void SetOnCreateCallback(std::function<void()> callback)
+    {
+        m_OnCreate = std::move(callback);
+    }
 
     int GetNumCols() const { return m_iCols; }
     int GetNumRows() const { return m_iRows; }
@@ -13,9 +19,8 @@ public:
     Vec3 GetRotation() const { return Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]); }
     Vec3 GetScale() const { return Vec3(m_fScale[0], m_fScale[1], m_fScale[2]); }
 
-    wstring GetTexturePath() const { return wstring(m_szTexturePath, m_szTexturePath + strlen(m_szTexturePath)); }
-    wstring GetShaderPath() const { return wstring(m_szShaderPath, m_szShaderPath + strlen(m_szShaderPath)); }
-
+    std::wstring GetTexturePath() const;
+    std::wstring GetShaderPath() const;
 
 private:
     int m_iCols = 20;
@@ -26,7 +31,8 @@ private:
     float m_fRotation[3] = { 0.0f, 0.0f, 0.0f };
     float m_fScale[3] = { 1.0f, 1.0f, 1.0f };
 
-    char m_szTexturePath[256] = "../Resources/Texture/grass.jpg";
-    char m_szShaderPath[256] = "../Resources/Shader/Default.hlsl";
-};
+    char m_szTextureName[256] = "grass.jpg";
+    char m_szShaderName[256] = "Default.hlsl";
 
+    std::function<void()> m_OnCreate;
+};
