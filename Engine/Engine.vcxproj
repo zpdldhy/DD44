@@ -128,8 +128,13 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Libraries\Debug\Lib\;</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\Debug\Include\Engine"</Command>
+      <Command>copy /Y "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\Debug\Include\Engine\"
+if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)Libraries\Debug\Lib\Assimp\assimp-vc143-mtd.dll" "$(SolutionDir)Debug\"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

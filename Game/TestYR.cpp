@@ -9,7 +9,6 @@
 
 void TestYR::Init()
 {
-
 	//Gizmo 세팅
 	{
 		shared_ptr<APawn> object1 = make_shared<APawn>();
@@ -57,37 +56,32 @@ void TestYR::Init()
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);	
 
-	// LOAD ALL TEXTURE
-	{
-		string path = "../Resources/Texture/ObjTexture/*.png";
-		HANDLE hFind;
-		WIN32_FIND_DATAA data;
-		vector<string> fileList;
-		if ((hFind = FindFirstFileA(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
-		{
-			do
-			{
-				string directory = "../Resources/Texture/ObjTexture/";
-				directory += string(data.cFileName);
-				fileList.emplace_back(directory);
-			} while (FindNextFileA(hFind, &data) != 0);
-			FindClose(hFind);
-		}
-
-		for (int iPath = 0; iPath < fileList.size(); iPath++)
-		{
-			shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
-
-			tempMat->Load(to_mw(fileList[iPath]), L"../Resources/Shader/Default.hlsl");
-			materialList.emplace_back(tempMat);
-		}
-
-	}
-
+	//// LOAD ALL TEXTURE
+	//{
+	//	string path = "../Resources/Texture/ObjTexture/*.png";
+	//	HANDLE hFind;
+	//	WIN32_FIND_DATAA data;
+	//	vector<string> fileList;
+	//	if ((hFind = FindFirstFileA(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
+	//	{
+	//		do
+	//		{
+	//			string directory = "../Resources/Texture/ObjTexture/";
+	//			directory += string(data.cFileName);
+	//			fileList.emplace_back(directory);
+	//		} while (FindNextFileA(hFind, &data) != 0);
+	//		FindClose(hFind);
+	//	}
+	//	for (int iPath = 0; iPath < fileList.size(); iPath++)
+	//	{
+	//		shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
+	//		tempMat->Load(to_mw(fileList[iPath]), L"../Resources/Shader/Default.hlsl");
+	//		materialList.emplace_back(tempMat);
+	//	}
+	//}
 	m_vObjList = objLoader.Load();
 
 	targetObj = m_vObjList[targetIndex];
-	targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
 }
 void TestYR::Update()
 {
@@ -96,10 +90,7 @@ void TestYR::Update()
 	{
 		gizmo[i]->Tick();
 	}
-	//for (int i = 0; i < m_vObjList.size(); i++)
-	//{
-	//	m_vObjList[i]->Tick();
-	//}
+
 	targetObj->Tick();
 
 	if (INPUT->GetButton(GameKey::C))
@@ -111,22 +102,25 @@ void TestYR::Update()
 		targetObj = m_vObjList[targetIndex];
 	}
 
-	if (INPUT->GetButton(GameKey::T))
+	// Texture 바꾸기
 	{
-		if (++matIndex >= materialList.size())
+		/*if (INPUT->GetButton(GameKey::T))
 		{
-			matIndex = 0;
+			if (++matIndex >= materialList.size())
+			{
+				matIndex = 0;
+			}
+			targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
 		}
-		targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
-	}
 
-	if (INPUT->GetButton(GameKey::Y))
-	{
-		if (--matIndex < 0)
+		if (INPUT->GetButton(GameKey::Y))
 		{
-			matIndex = 0;
-		}
-		targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
+			if (--matIndex < 0)
+			{
+				matIndex = 0;
+			}
+			targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
+		}*/
 	}
 }
 void TestYR::Render()
@@ -136,15 +130,7 @@ void TestYR::Render()
 	{
 		gizmo[i]->Render();
 	}
-	//for (int i = 0; i < m_vActorList.size(); i++)
-	//{
-	//	m_vActorList[i]->Render();
-	//}
 
-	//for (int i = 0; i < m_vObjList.size(); i++)
-	//{
-	//	m_vObjList[i]->Render();
-	//}
 	targetObj->Render();
 }
 

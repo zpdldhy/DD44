@@ -27,7 +27,5 @@ public:
 	virtual void Update() override;
 	virtual void Render() override;
 public:
-	//TEMP
-	void MakeObject();
 };
 

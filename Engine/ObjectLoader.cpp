@@ -15,7 +15,7 @@ vector<shared_ptr<APawn>> ObjectLoader::Load()
 
 	// MAKE TEMP MATERIAL
 	shared_ptr<UMaterial> material = make_shared<UMaterial>();
-	wstring path = L"../Resources/Texture/magenta.png";
+	wstring path = L"../Resources/Texture/kkongchi.jpg";
 	material->Load(path, L"../Resources/Shader/Default.hlsl");
 
 	for (int iObj = 0; iObj < meshes.size(); iObj++)
