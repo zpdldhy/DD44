@@ -41,9 +41,10 @@ void UTerrainMeshComponent::Destroy()
 void UTerrainMeshComponent::CreateGrid(int _sizeX, int _sizeZ, float _cellSize)
 {
 	if (m_pMesh)
+	{
 		return;
+	}
 
-	// Mesh Data Setting
 	vector<PNCT_VERTEX> vVertexList;
 	vector<DWORD> vIndexList;
 
@@ -51,10 +52,7 @@ void UTerrainMeshComponent::CreateGrid(int _sizeX, int _sizeZ, float _cellSize)
 	int NumRow = _sizeZ - 1;
 
 	int vertices = _sizeX * _sizeZ;
-	int indices = NumCol * NumRow * 6;
-
 	vVertexList.resize(vertices);
-	vIndexList.resize(indices);
 
 	int vertexIndex = 0;
 	for (int row = 0; row < _sizeZ; ++row)
@@ -68,16 +66,13 @@ void UTerrainMeshComponent::CreateGrid(int _sizeX, int _sizeZ, float _cellSize)
 			Vec3 pos = Vec3(x, y, z);
 			Vec3 normal = Vec3(0, 1, 0);
 			Vec4 color = Vec4(1, 1, 1, 1);
-			// *텍스처 uv 0~1 범위 설정 시 픽셀단위로 쪼개져서 단색으로 보이는 것으로 추정
-			//Vec2 uv = Vec2((float)col / NumCol, (float)row / NumRow);
-			Vec2 uv = Vec2(col * 1.0f, (NumRow - row) * 1.0f);
-			//Vec2 uv = Vec2(col * 0.1f, row * 0.1f); // 임의로 타일링
+
+			Vec2 uv = Vec2((float)col, (float)(NumRow - row));
 
 			vVertexList[vertexIndex++] = PNCT_VERTEX(pos, normal, color, uv);
 		}
 	}
 
-	int iIndex = 0;
 	for (int row = 0; row < NumRow; ++row)
 	{
 		for (int col = 0; col < NumCol; ++col)
@@ -87,19 +82,19 @@ void UTerrainMeshComponent::CreateGrid(int _sizeX, int _sizeZ, float _cellSize)
 			int iBottomLeft = (row + 1) * _sizeX + col;
 			int iBottomRight = iBottomLeft + 1;
 
-			vIndexList[iIndex++] = iTopLeft;
-			vIndexList[iIndex++] = iBottomLeft;
-			vIndexList[iIndex++] = iTopRight;
+			vIndexList.push_back(iTopLeft);
+			vIndexList.push_back(iBottomLeft);
+			vIndexList.push_back(iTopRight);
 
-			vIndexList[iIndex++] = iTopRight;
-			vIndexList[iIndex++] = iBottomLeft;
-			vIndexList[iIndex++] = iBottomRight;
+			vIndexList.push_back(iTopRight);
+			vIndexList.push_back(iBottomLeft);
+			vIndexList.push_back(iBottomRight);
 		}
 	}
 
-	// Mesh Setting
 	m_pMesh = make_shared<UStaticMeshResources>();
 	m_pMesh->SetVertexList(vVertexList);
 	m_pMesh->SetIndexList(vIndexList);
 }
+
 

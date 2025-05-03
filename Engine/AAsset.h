@@ -1,5 +1,4 @@
 #pragma once
-//#include <stdio.h>
 #include "FbxLoader.h"
 
 class AAsset

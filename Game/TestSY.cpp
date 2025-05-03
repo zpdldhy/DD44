@@ -13,6 +13,9 @@
 #include "Input.h"
 #include <random>
 #include "ATerrainTileActor.h"
+#include "ImGuiCore.h"
+#include "DxState.h"
+#include "MapEditorUI.h"
 #include "UBoxComponent.h"
 
 void TestSY::Init()
@@ -24,103 +27,6 @@ void TestSY::Init()
 
 		m_pCameraActor->Init();
 		CAMERAMANAGER->SetCameraActor(m_pCameraActor);
-	}
-
-	// HeightMap Test
-	{
-		//m_pTerrain = make_shared<ATerrainTileActor>();
-		//m_pTerrain->m_fCellSize = 1.0f;
-
-		//m_pTerrain->CreateTerrainFromHeightMap(
-		//	L"../Resources/Texture/height.png",
-		//	L"../Resources/Texture/kkongchi.jpg",
-		//	L"../Resources/Shader/Default.hlsl"
-		//);
-
-		//m_pTerrain->Init();
-	}
-
-	{
-		m_pTerrain = make_shared<ATerrainTileActor>();
-		m_pTerrain->m_iNumCols = 20;
-		m_pTerrain->m_iNumRows = 20;
-		m_pTerrain->m_fCellSize = 10.0f;
-
-		m_pTerrain->CreateTerrain(L"../Resources/Texture/grass.jpg", L"../Resources/Shader/Default.hlsl");
-
-		auto vertexList = m_pTerrain->m_pTerrainMeshComponent->GetMesh()->GetVertexList();
-		auto newVertexList = vertexList; // *참조가 아닌 복사인 상황
-
-		std::default_random_engine eng((unsigned int)time(nullptr));
-		std::uniform_int_distribution<int> distCol(1, m_pTerrain->m_iNumCols - 2);
-		std::uniform_int_distribution<int> distRow(1, m_pTerrain->m_iNumRows - 2);
-		std::uniform_real_distribution<float> heightDist(10.0f, 40.0f);
-
-		int numHills = 5;
-		for (int h = 0; h < numHills; ++h)
-		{
-			int col = distCol(eng);
-			int row = distRow(eng);
-			float centerHeight = heightDist(eng);
-
-			int centerIdx = row * m_pTerrain->m_iNumCols + col;
-			newVertexList[centerIdx].pos.y += centerHeight;
-
-			for (int dz = -1; dz <= 1; ++dz)
-			{
-				for (int dx = -1; dx <= 1; ++dx)
-				{
-					int nx = col + dx;
-					int nz = row + dz;
-					if (nx < 0 || nx >= m_pTerrain->m_iNumCols || nz < 0 || nz >= m_pTerrain->m_iNumRows)
-						continue;
-
-					int nIdx = nz * m_pTerrain->m_iNumCols + nx;
-					if (nIdx == centerIdx) continue;
-
-					float dist = sqrtf((float)(dx * dx + dz * dz));
-					float offset = std::max<float>(0.0f, centerHeight - dist * 10.0f);
-					newVertexList[nIdx].pos.y += offset;
-				}
-			}
-		}
-
-		m_pTerrain->m_pTerrainMeshComponent->GetMesh()->SetVertexList(newVertexList);
-		m_pTerrain->m_pTerrainMeshComponent->GetMesh()->Create();
-
-		m_pTerrain->Init();
-	}
-
-	{
-		std::default_random_engine eng((unsigned int)time(nullptr));
-		std::uniform_real_distribution<float> distX(-100.0f, 100.0f);
-		std::uniform_real_distribution<float> distZ(-100.0f, 100.0f);
-		std::uniform_real_distribution<float> scaleDist(3.0f, 8.0f);
-
-		for (int i = 0; i < 30; ++i)
-		{
-			float x = distX(eng);
-			float z = distZ(eng);
-			float y = m_pTerrain->GetHeightAt(x, z);
-
-			auto obj = make_shared<APawn>();
-			auto mesh = UStaticMeshComponent::CreateCube();
-			obj->SetMeshComponent(mesh);
-			auto _scale = Vec3(scaleDist(eng), scaleDist(eng), scaleDist(eng));
-			obj->SetScale(_scale);
-			obj->SetPosition({ x, y + obj->GetScale().y/2, z});
-
-			auto mat = make_shared<UMaterial>();
-			mat->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-			mesh->SetMaterial(mat);
-
-			auto pBoxComponent = make_shared<UBoxComponent>();
-			pBoxComponent->SetBoxSize(_scale + Vec3(1.f, 1.f, 1.f));
-			obj->SetShapeComponent(pBoxComponent);
-
-			obj->Init();
-			m_vObjects.push_back(obj);
-		}
 	}
 
 	{
@@ -137,12 +43,8 @@ void TestSY::Init()
 		m_pStaticMesh->SetMaterial(material);
 
 		auto pCameraComponent = make_shared<UCameraComponent>();
-		pCameraComponent->SetPosition(Vec3(20.f, 20.f, -20.f));
+		pCameraComponent->SetLocalPosition(Vec3(20.f, 20.f, -20.f));
 		m_pActor->SetCameraComponent(pCameraComponent);
-		 
-		auto pBoxComponent = make_shared<UBoxComponent>();
-		pBoxComponent->SetBoxSize(Vec3(6.f, 6.f, 6.f));
-		m_pActor->SetShapeComponent(pBoxComponent);
 
 		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
 
@@ -162,7 +64,25 @@ void TestSY::Init()
 		m_pSky->Init();
 	}
 
-	
+	GUI->SetMapEditorCallback([this]()
+	{
+		MapEditorUI* editor = GUI->GetMapEditorUI();
+		if (!editor) return;
+
+		auto tile = std::make_shared<ATerrainTileActor>();
+
+		tile->m_iNumCols = editor->GetNumCols();
+		tile->m_iNumRows = editor->GetNumRows();
+		tile->m_fCellSize = editor->GetCellSize();
+
+		tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
+		tile->SetPosition(editor->GetPosition());
+		tile->SetRotation(editor->GetRotation());
+		tile->SetScale(editor->GetScale());
+
+		tile->Init();
+		m_vTiles.push_back(tile);
+	});
 }
 
 void TestSY::Update()
@@ -173,28 +93,32 @@ void TestSY::Update()
 
 	m_pCameraActor->Tick();
 	m_pActor->Tick();
-	m_pTerrain->Tick();
 	m_pSky->Tick();
 
-	for (auto& obj : m_vObjects)
-	{
-		obj->Tick();
-	}
+	for (auto& tile : m_vTiles)
+		tile->Tick();
 }
 
 void TestSY::Render()
 {	
+	if (m_bEditorWireframe)
+	{
+		DC->RSSetState(STATE->m_pRSWireFrame.Get());
+	}
+	else
+	{
+		DC->RSSetState(STATE->m_pRSSolid.Get());
+	}
+
 	if (INPUT->GetButtonDown(P))
 		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
+	
 	m_pCameraActor->Render();
 	m_pActor->Render();
-	m_pTerrain->Render();
 	m_pSky->Render();
 
-	for (auto& obj : m_vObjects)
-	{
-		obj->Render();
-	}
+	for (auto& tile : m_vTiles)
+		tile->Render();
 }
 
 void TestSY::Destroy()
