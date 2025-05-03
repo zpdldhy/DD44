@@ -20,7 +20,7 @@ void UBoxComponent::Init()
 		pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
 		pMesh->SetMaterial(pMaterial);
 
-		m_pRange->SetScale(m_vBoxHalfSize);
+		m_pRange->SetScale(m_vScale);
 		m_pRange->SetPosition(m_vCenter);
 
 		m_pRange->Init();
