@@ -81,6 +81,12 @@
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\Resources\Shader\RimLight.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\Effect.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
     <FxCompile Include="..\Resources\Shader\DefaultColor.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>

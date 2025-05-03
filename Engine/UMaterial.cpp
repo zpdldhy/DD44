@@ -50,6 +50,12 @@ void UMaterial::Bind()
     {
         DC->PSSetConstantBuffers(4, 1, m_pUVDistortionCB.GetAddressOf()); // register(b4)
     }
+
+    if (m_pCameraCB)
+    {
+        DC->VSSetConstantBuffers(6, 1, m_pCameraCB.GetAddressOf());
+        DC->PSSetConstantBuffers(6, 1, m_pCameraCB.GetAddressOf());
+    }
 }
 
 
@@ -95,6 +101,13 @@ void UMaterial::UpdateUVDistortionBuffer(float deltaTime)
 {
 
     m_tUVDistortion.g_fDistortionTime += deltaTime * m_tUVDistortion.g_fWaveSpeed;
+
+    //오버플로우방지
+    if (m_tUVDistortion.g_fDistortionTime > 10000.0f)
+    {
+        m_tUVDistortion.g_fDistortionTime -= 10000.0f;
+    }
+        
 
     if (!m_pUVDistortionCB)
     {
@@ -155,3 +168,29 @@ void UMaterial::SetUVDistortionParams(float _strength, float _speed, float _freq
     m_tUVDistortion.g_fWaveFrequency = _frequency;
 }
 
+void UMaterial::SetCameraPos(const Vec3& _cameraPos)
+{
+    m_tCameraData.g_vCameraPos = _cameraPos;
+    UpdateCameraBuffer();
+}
+
+void UMaterial::UpdateCameraBuffer()
+{
+    if (!m_pCameraCB)
+    {
+        D3D11_BUFFER_DESC desc = {};
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.ByteWidth = sizeof(CB_CAMERA);
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+        D3D11_SUBRESOURCE_DATA initData = {};
+        initData.pSysMem = &m_tCameraData;
+
+        HRESULT hr = DEVICE->CreateBuffer(&desc, &initData, m_pCameraCB.GetAddressOf());
+        assert(SUCCEEDED(hr));
+    }
+    else
+    {
+        DC->UpdateSubresource(m_pCameraCB.Get(), 0, nullptr, &m_tCameraData, 0, 0);
+    }
+}
