@@ -101,6 +101,13 @@ void UMaterial::UpdateUVDistortionBuffer(float deltaTime)
 
     m_tUVDistortion.g_fDistortionTime += deltaTime * m_tUVDistortion.g_fWaveSpeed;
 
+    //오버플로우방지
+    if (m_tUVDistortion.g_fDistortionTime > 10000.0f)
+    {
+        m_tUVDistortion.g_fDistortionTime -= 10000.0f;
+    }
+        
+
     if (!m_pUVDistortionCB)
     {
         D3D11_BUFFER_DESC desc = {};

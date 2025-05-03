@@ -90,4 +90,48 @@ struct PS_OUT
 Texture2D g_txDiffuseA : register(t0);
 Texture2D g_txNoise : register(t1); // 노이즈 텍스처
 SamplerState sample : register(s0);
+
+
+///funtion
+//==============================
+// [FX] Shared Utility Functions
+//==============================
+
+float2 GetDistortedUV(float2 uv)
+{
+    float waveX = sin(uv.y * g_fWaveFrequency + g_fDistortionTime * g_fWaveSpeed);
+    float waveY = cos(uv.x * g_fWaveFrequency + g_fDistortionTime * g_fWaveSpeed);
+    return uv + float2(waveX, waveY) * g_fDistortionStrength;
+}
+
+bool ShouldDissolve(float2 distortedUV)
+{
+    float noise = g_txNoise.Sample(sample, distortedUV).r;
+    return noise < g_fDissolveThreshold;
+}
+
+float3 ApplyGlow(float3 baseColor)
+{
+    float3 glow = g_vGlowColor.rgb * g_fGlowPower;
+    float3 toneMapped = (baseColor + glow) / (baseColor + glow + 1.0f);
+    float3 softGlow = lerp(baseColor, toneMapped, saturate(g_fGlowPower));
+    float glowFactor = saturate((g_fGlowPower - 1.0f) * 0.5f);
+    float3 strongGlow = g_vGlowColor.rgb * glowFactor;
+    return lerp(softGlow, strongGlow, glowFactor);
+}
+
+float3 ApplyRimLight(float3 normal, float3 worldPos)
+{
+    float3 N = normalize(normal);
+    float3 V = normalize(g_vCameraPos - worldPos);
+    float rim = pow(1.0 - saturate(dot(N, V)), 1.0);
+    float rimMask = smoothstep(0.2, 0.8, rim);
+    return float3(1.0, 1.0, 1.0) * rimMask * 1.5;
+}
+
+float3 ApplyHitFlash(float3 baseColor)
+{
+    return lerp(baseColor, float3(1.0f, 1.0f, 1.0f), saturate(g_fHitFlashTime));
+}
+
 #endif
