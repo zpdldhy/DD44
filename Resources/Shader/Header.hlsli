@@ -16,9 +16,9 @@ cbuffer CameraBuffer : register(b1)
 cbuffer cbGlowFX : register(b2)
 {
     float g_fGlowPower; // 발광 세기
-    float3 padding;
+    float3 padding_glow;
     float3 g_vGlowColor; // 발광 색상
-    float dummy;
+    float dummy_glow;
     float g_fHitFlashTime;
 }
 cbuffer cbDissolve : register(b3)
@@ -37,6 +37,12 @@ cbuffer AnimationBuffer : register(b5)
 {
     matrix obj_matAnim[MAX_BONE];
 }
+cbuffer CB_Camera : register(b6)
+{
+    float3 g_vCameraPos;
+    float dummy_camera; // 16바이트 정렬용
+};
+
 
 struct VS_IN
 {
@@ -65,6 +71,15 @@ struct VS_OUT
     float4 c : COLOR;
     float3 n : NORMAL;
     float2 t : TEXCOORD;
+};
+
+struct VS_OUT_RIM
+{
+    float4 p : SV_POSITION;
+    float4 c : COLOR;
+    float3 n : NORMAL;
+    float2 t : TEXCOORD;
+    float3 wPos : POSITIONWS;
 };
 
 struct PS_OUT

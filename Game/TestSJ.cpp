@@ -34,7 +34,7 @@ void TestSJ::Init()
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/uvDistortion.hlsl");
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/RimLight.hlsl");
 		m_pStaticMesh->SetMaterial(material);
 	}
 
@@ -80,6 +80,13 @@ void TestSJ::Init()
 
 void TestSJ::Update()
 {
+	//Rim Light
+	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+	{
+		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetCameraPos();
+		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
+	}
+
 	//UVDistortion
 	{
 		static bool bUVInitialized = false;

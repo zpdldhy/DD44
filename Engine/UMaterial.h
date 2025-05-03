@@ -27,6 +27,12 @@ struct CB_UVDistortion
 	float g_fDistortionTime;
 };
 
+struct CB_CAMERA
+{
+	Vec3 g_vCameraPos;
+	float padding;
+};
+
 class UMaterial
 {
 	shared_ptr<Shader> m_pShader = nullptr;
@@ -36,6 +42,7 @@ class UMaterial
 	ComPtr<ID3D11Buffer> m_pDissolveCB;
 	ComPtr<ID3D11ShaderResourceView> m_pNoiseSRV;
 	ComPtr<ID3D11Buffer> m_pUVDistortionCB;
+	ComPtr<ID3D11Buffer> m_pCameraCB;
 public:
 	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
 	void SetHitFlashTime(float _flashTime);
@@ -45,11 +52,14 @@ public:
 	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
 	void SetUVDistortionParams(float _strength, float _speed, float _frequency);
 	void UpdateUVDistortionBuffer(float deltaTime);
+	void SetCameraPos(const Vec3& _cameraPos);
+	void UpdateCameraBuffer();
 
 public:
 	CB_GLOW m_tGlowData = { 0.0f, };
 	CB_DISSOLVE m_tDissolveData = { 0.0f };
 	CB_UVDistortion m_tUVDistortion = { };
+	CB_CAMERA m_tCameraData;
 
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);
