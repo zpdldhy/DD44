@@ -70,3 +70,32 @@ static std::string to_wm(const std::wstring& _src)
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	return converter.to_bytes(_src);
 }
+
+static std::string ReplaceAsterisk(const std::string& pathTemplate, const std::string& filename) {
+	size_t pos = pathTemplate.find('*');
+	if (pos != std::string::npos) {
+		std::string result = pathTemplate;
+		result.replace(pos, 1, filename);
+		return result;
+	}
+	return pathTemplate; // '*'가 없으면 그대로 반환
+}
+
+// 폴더 내부 모든 파일 이름 가져오기
+// _path : "../Resources/fbx/*.fbx"
+static std::vector<std::string> GetFileNames(std::string _path)
+{
+	HANDLE hFind;
+	WIN32_FIND_DATAA data;
+	std::vector<std::string> fileList;
+	if ((hFind = FindFirstFileA(_path.c_str(), &data)) != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			std::string name = to_wm(SplitName(to_mw(data.cFileName)));
+			fileList.emplace_back(ReplaceAsterisk(_path, name));
+		} while (FindNextFileA(hFind, &data) != 0);
+		FindClose(hFind);
+	}
+	return fileList;
+}

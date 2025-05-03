@@ -11,13 +11,22 @@
 #include "UMeshResources.h"
 #include "CameraManager.h"
 #include "Input.h"
+#include <random>
+#include "ATerrainTileActor.h"
+#include "ImGuiCore.h"
+#include "DxState.h"
+#include "MapEditorUI.h"
+#include "UBoxComponent.h"
 
 void TestSY::Init()
 {
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
-		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
+		m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
+
+		m_pCameraActor->Init();
+		CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 	}
 
 	{
@@ -25,76 +34,25 @@ void TestSY::Init()
 
 		m_pStaticMesh = UStaticMeshComponent::CreateCube();
 		m_pActor->SetMeshComponent(m_pStaticMesh);
-		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
-		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
-		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });		
+		m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
+		m_pActor->SetPosition({ 0.0f, 2.5f, 10.0f });
+		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 		m_pStaticMesh->SetMaterial(material);
 
 		auto pCameraComponent = make_shared<UCameraComponent>();
-		pCameraComponent->SetLocalPosition(Vec3(20.f, 20.f, -20.f));
+		pCameraComponent->SetPosition(Vec3(20.f, 20.f, -20.f));
 		m_pActor->SetCameraComponent(pCameraComponent);
 
+		auto pBoxComponent = make_shared<UBoxComponent>();
+		pBoxComponent->SetScale({ 6.f, 6.f, 6.f });
+		m_pActor->SetShapeComponent(pBoxComponent);
+
 		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
-	}
 
-	{
-		DirectX::ScratchImage heightImage;
-		DirectX::LoadFromWICFile(L"../Resources/Texture/height.png", DirectX::WIC_FLAGS_FORCE_RGB, nullptr, heightImage);
-		const DirectX::Image* img = heightImage.GetImage(0, 0, 0);
-		UINT8* pixels = img->pixels;
-		int width = static_cast<int>(img->width);
-		int height = static_cast<int>(img->height);
-
-		m_pPlane = make_shared<APawn>();
-
-		m_pPlaneMesh = make_shared<UTerrainMeshComponent>();
-		m_pPlaneMesh->CreateGrid(width, height, 1.0f);
-
-		auto planeVeretexList = m_pPlaneMesh->GetMesh()->GetVertexList();
-		auto newPlaneVeretexList = planeVeretexList;
-
-		for (int y = 0; y < height; ++y)
-		{
-			for (int x = 0; x < width; ++x)
-			{
-				int idx = y * width + x;
-				UINT8 gray = pixels[y * img->rowPitch + x];
-				float heightValue = (gray / 255.0f * 500.0f) - 300.0f;
-				
-				newPlaneVeretexList[idx].pos.y = heightValue;
-			}
-		}
-		m_pPlaneMesh->GetMesh()->SetVertexList(newPlaneVeretexList);
-		m_pPlaneMesh->MeshBind();
-
-		m_pPlane->SetMeshComponent(m_pPlaneMesh);
-		
-
-		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/grass.jpg", L"../Resources/Shader/Default.hlsl");
-		m_pPlaneMesh->SetMaterial(material);
-	}
-
-	{
-		//m_pTexture = TEXTURE->Load(L"../Resources/Texture/height.png");
-		//int width = m_pTexture->width;
-		//int height = m_pTexture->height;
-
-		//m_pPlane = make_shared<AActor>();
-
-		//m_pPlaneMesh = make_shared<UTerrainMeshComponent>();
-		//m_pPlaneMesh->CreateGrid(width, height, 10.0f);
-		//m_pPlane->SetMesh(m_pPlaneMesh);
-		//m_pPlane->SetScale({ 10.0f, 10.0f, 10.0f });
-		//m_pPlane->SetPosition({ 0.0f, 0.0f, 0.0f });
-		//m_pPlane->SetRotation({ 0.0f, 0.0f, 0.0f });
-
-		//shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		//material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-		//m_pPlaneMesh->SetMaterial(material);
+		m_pActor->Init();
 	}
 
 	{
@@ -106,14 +64,29 @@ void TestSY::Init()
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
 		m_pSkyMesh->SetMaterial(material);
+
+		m_pSky->Init();
 	}
 
-	m_pCameraActor->Init();
-	m_pActor->Init();
-	m_pPlane->Init();
-	m_pSky->Init();
+	GUI->SetMapEditorCallback([this]()
+	{
+		MapEditorUI* editor = GUI->GetMapEditorUI();
+		if (!editor) return;
 
-	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+		auto tile = std::make_shared<ATerrainTileActor>();
+
+		tile->m_iNumCols = editor->GetNumCols();
+		tile->m_iNumRows = editor->GetNumRows();
+		tile->m_fCellSize = editor->GetCellSize();
+
+		tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
+		tile->SetPosition(editor->GetPosition());
+		tile->SetRotation(editor->GetRotation());
+		tile->SetScale(editor->GetScale());
+
+		tile->Init();
+		m_vTiles.push_back(tile);
+	});
 }
 
 void TestSY::Update()
@@ -124,18 +97,32 @@ void TestSY::Update()
 
 	m_pCameraActor->Tick();
 	m_pActor->Tick();
-	m_pPlane->Tick();
 	m_pSky->Tick();
+
+	for (auto& tile : m_vTiles)
+		tile->Tick();
 }
 
 void TestSY::Render()
 {	
+	if (m_bEditorWireframe)
+	{
+		DC->RSSetState(STATE->m_pRSWireFrame.Get());
+	}
+	else
+	{
+		DC->RSSetState(STATE->m_pRSSolid.Get());
+	}
+
 	if (INPUT->GetButtonDown(P))
 		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
+	
 	m_pCameraActor->Render();
 	m_pActor->Render();
-	m_pPlane->Render();
 	m_pSky->Render();
+
+	for (auto& tile : m_vTiles)
+		tile->Render();
 }
 
 void TestSY::Destroy()

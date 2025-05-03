@@ -25,6 +25,7 @@ protected:
 	bool CreateIndexBuffer();
 
 public:
+	virtual void Create() abstract;
 	virtual void Bind() abstract;
 
 public:

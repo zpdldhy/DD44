@@ -12,6 +12,7 @@ public:
 	virtual ~UStaticMeshResources() = default;
 
 public:
+	void Create() override;
 	void Bind() override;
 };
 

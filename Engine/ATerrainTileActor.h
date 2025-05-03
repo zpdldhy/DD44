@@ -6,18 +6,24 @@
 class ATerrainTileActor : public AActor
 {
 public:
-	UTerrainMeshComponent* m_pTerrainMeshComponent;
-	shared_ptr<Texture> m_pHeightMap;
+    shared_ptr<class UTerrainMeshComponent> m_pTerrainMeshComponent = nullptr;
+    shared_ptr<Texture> m_pHeightMap;
 
-	int m_iNumCols = 10;
-	int m_iNumRows = 10;
-	float m_fCellSize = 10.0f;
+    int m_iNumCols = 20;
+    int m_iNumRows = 20;
+    float m_fCellSize = 10.0f;
+
+    std::vector<std::shared_ptr<class APawn>> m_vObjects;
 
 public:
-	virtual void Init() override;
-	virtual void Tick() override;
-	virtual void Render() override;
-};
+    virtual void Init() override;
+    virtual void Tick() override;
+    virtual void Render() override;
 
-// 그리드 크기, 셀 사이즈 관리
-// 높이맵 데이터
+public:
+    bool CreateTerrain(const wstring& _texturePath, const wstring& _shaderPath);
+    bool CreateTerrainFromHeightMap(const std::wstring& heightMapPath, const std::wstring& texturePath, const std::wstring& shaderPath);
+
+    float GetHeightAt(float x, float z);
+
+};
