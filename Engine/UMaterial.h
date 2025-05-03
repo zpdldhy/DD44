@@ -47,13 +47,18 @@ public:
 	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
 	void SetHitFlashTime(float _flashTime);
 	void UpdateGlowBuffer();
-	ComPtr<ID3D11Buffer> GetGlowCB() const { return m_pGlowCB; }
-	void SetDissolveParams(float threshold);
+	void UpdateDissolveBuffer();
+	void UpdateUVDistortionBuffer(float _deltaTime);
+	void UpdateCameraBuffer();
+	void CreateGlowCB();
+	void CreateDissolveCB();
+	void CreateUVDistortionCB();
+	void CreateCameraCB();
+	void SetDissolveParams(float _threshold);
 	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
 	void SetUVDistortionParams(float _strength, float _speed, float _frequency);
-	void UpdateUVDistortionBuffer(float deltaTime);
 	void SetCameraPos(const Vec3& _cameraPos);
-	void UpdateCameraBuffer();
+	
 
 public:
 	CB_GLOW m_tGlowData = { 0.0f, };

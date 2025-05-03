@@ -6,6 +6,9 @@ class UMaterial;
 
 class TestSJ : public IExecute
 {
+private:
+	std::shared_ptr<UMaterial> targetMat = nullptr;
+
 public:
 	virtual void Init() override;
 	virtual void Update() override;
