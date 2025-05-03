@@ -15,7 +15,9 @@ protected:
 	bool CreateIWBuffer();
 
 public:
+	void Create() override;
 	void Bind() override;
+
 public:
 	ComPtr<ID3D11Buffer> GetIwBuffer() { return m_pIWBuffer; }
 	vector<IW_VERTEX> GetIwList() { return m_vIWList; }

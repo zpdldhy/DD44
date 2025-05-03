@@ -96,7 +96,7 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 		shared_ptr<USkeletalMeshResources> mesh = make_shared< USkeletalMeshResources>();
 		mesh->SetVertexList(_resource.m_vMeshList[0].m_vVertexList);
 		mesh->SetIwList(_resource.m_vMeshList[0].m_vIwList);
-		mesh->Bind();
+		mesh->Create();
 		rootMesh->SetMesh(mesh);
 		rootMesh->SetMaterial(tempSkinnedMat);
 		rootMesh->SetAnim(meshAnim[0]);
@@ -110,7 +110,7 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 				shared_ptr<USkeletalMeshResources> mesh = make_shared< USkeletalMeshResources>();
 				mesh->SetVertexList(_resource.m_vMeshList[iMesh].m_vVertexList);
 				mesh->SetIwList(_resource.m_vMeshList[iMesh].m_vIwList);
-				mesh->Bind();
+				mesh->Create();
 				meshComponent->SetMesh(mesh);
 				meshComponent->SetMaterial(tempSkinnedMat);
 				meshComponent->SetAnim(meshAnim[iMesh]);

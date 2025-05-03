@@ -125,7 +125,6 @@ void TestYR::Update()
 }
 void TestYR::Render()
 {
-	m_pCameraActor->Render();
 	for (int i = 0; i < gizmo.size(); i++)
 	{
 		gizmo[i]->Render();

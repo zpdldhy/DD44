@@ -16,6 +16,7 @@
 #include "ImGuiCore.h"
 #include "DxState.h"
 #include "MapEditorUI.h"
+#include "UBoxComponent.h"
 
 void TestSY::Init()
 {
@@ -42,8 +43,12 @@ void TestSY::Init()
 		m_pStaticMesh->SetMaterial(material);
 
 		auto pCameraComponent = make_shared<UCameraComponent>();
-		pCameraComponent->SetLocalPosition(Vec3(20.f, 20.f, -20.f));
+		pCameraComponent->SetPosition(Vec3(20.f, 20.f, -20.f));
 		m_pActor->SetCameraComponent(pCameraComponent);
+
+		auto pBoxComponent = make_shared<UBoxComponent>();
+		pBoxComponent->SetScale({ 6.f, 6.f, 6.f });
+		m_pActor->SetShapeComponent(pBoxComponent);
 
 		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
 

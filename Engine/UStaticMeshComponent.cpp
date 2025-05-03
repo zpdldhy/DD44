@@ -12,18 +12,11 @@ void UStaticMeshComponent::Tick()
 
 void UStaticMeshComponent::PreRender()
 {
-	// IA Setting
-	UINT Strides = sizeof(PNCT_VERTEX);
-	UINT Offsets = 0;
-	DC->IASetVertexBuffers(0, 1, m_pMesh->GetVertexBuffer().GetAddressOf(), &Strides, &Offsets);
-	DC->IASetIndexBuffer(m_pMesh->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-	DC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	// Mesh Bind
+	if (m_pMesh) { m_pMesh->Bind(); }
 
-	// Material Render
-	if (m_pMaterial)
-	{
-		m_pMaterial->Bind();
-	}
+	// Material Bind
+	if (m_pMaterial) { m_pMaterial->Bind(); }
 }
 
 void UStaticMeshComponent::PostRender()
@@ -57,8 +50,8 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateTriangle()
 	vVertexList.resize(3);
 	vIndexList.resize(3);
 
-	Vec3 vMin = Vec3(0.0f, +0.0f, -1.0f);
-	Vec3 vMax = Vec3(+2.0f, +2.0f, +1.0f);
+	Vec3 vMin = Vec3(0.0f, +0.0f, -0.5f);
+	Vec3 vMax = Vec3(+1.0f, +1.0f, +0.5f);
 
 	// Front
 	vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
@@ -72,7 +65,7 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateTriangle()
 	pMesh = make_shared<UStaticMeshResources>();
 	pMesh->SetVertexList(vVertexList);
 	pMesh->SetIndexList(vIndexList);
-	pMesh->Bind();
+	pMesh->Create();
 
 	// StaticMeshComponent Setting
 	pMeshComponent->SetMesh(pMesh);
@@ -98,8 +91,8 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreatePlane()
 	vVertexList.resize(4);
 	vIndexList.resize(6);
 
-	Vec3 vMin = Vec3(-100.0f, +0.0f, -100.0f);
-	Vec3 vMax = Vec3(+100.0f, +0.0f, +100.0f);
+	Vec3 vMin = Vec3(-0.5f, +0.0f, -0.5f);
+	Vec3 vMax = Vec3(+0.5f, +0.0f, +0.5f);
 
 	// Front
 	vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
@@ -115,7 +108,7 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreatePlane()
 	pMesh = make_shared<UStaticMeshResources>();
 	pMesh->SetVertexList(vVertexList);
 	pMesh->SetIndexList(vIndexList);
-	pMesh->Bind();
+	pMesh->Create();
 
 	pMeshComponent->SetMesh(pMesh);
 	return pMeshComponent;
@@ -141,8 +134,8 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateCube()
 	vIndexList.resize(36);
 
 	// Transform 넣기 전 Render를 위해 임시로 값 변경
-	Vec3 vMin = Vec3(-1.f, -1.f, -1.f);
-	Vec3 vMax = Vec3(+1.f, +1.f, +1.f);
+	Vec3 vMin = Vec3(-0.5f, -0.5f, -0.5f);
+	Vec3 vMax = Vec3(+0.5f, +0.5f, +0.5f);
 
 	// Front
 	vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
@@ -200,7 +193,7 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateCube()
 	pMesh = make_shared<UStaticMeshResources>();
 	pMesh->SetVertexList(vVertexList);
 	pMesh->SetIndexList(vIndexList);
-	pMesh->Bind();
+	pMesh->Create();
 
 	pMeshComponent->SetMesh(pMesh);
 	return pMeshComponent;
@@ -315,7 +308,7 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateSphere(int _sliceCo
 	pMesh = make_shared<UStaticMeshResources>();
 	pMesh->SetVertexList(vVertexList);
 	pMesh->SetIndexList(vIndexList);
-	pMesh->Bind();
+	pMesh->Create();
 
 	pMeshComponent->SetMesh(pMesh);
 	return pMeshComponent;

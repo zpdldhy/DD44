@@ -23,6 +23,6 @@ public:
 
 public:
 	void CreateGrid(int _sizeX, int _sizeZ, float _cellSize);
-	void MeshBind() { m_pMesh->Bind(); }
+	void MeshCreate() { m_pMesh->Create(); }
 };
 

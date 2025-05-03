@@ -31,7 +31,7 @@ vector<shared_ptr<APawn>> ObjectLoader::Load()
 			shared_ptr<UStaticMeshResources> mesh = make_shared<UStaticMeshResources>();
 			mesh->SetVertexList(meshes[iObj][iMesh].m_vVertexList);
 			mesh->SetIndexList(meshes[iObj][iMesh].m_vIndexList);
-			mesh->Bind();
+			mesh->Create();
 			rootMesh->SetMesh(mesh);
 			rootMesh->SetMaterial(material);
 		}
