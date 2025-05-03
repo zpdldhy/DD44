@@ -106,12 +106,17 @@ void TestSY::Init()
 			auto obj = make_shared<APawn>();
 			auto mesh = UStaticMeshComponent::CreateCube();
 			obj->SetMeshComponent(mesh);
-			obj->SetScale({ scaleDist(eng), scaleDist(eng), scaleDist(eng) });
+			auto _scale = Vec3(scaleDist(eng), scaleDist(eng), scaleDist(eng));
+			obj->SetScale(_scale);
 			obj->SetPosition({ x, y + obj->GetScale().y/2, z});
 
 			auto mat = make_shared<UMaterial>();
 			mat->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 			mesh->SetMaterial(mat);
+
+			auto pBoxComponent = make_shared<UBoxComponent>();
+			pBoxComponent->SetBoxSize(_scale + Vec3(1.f, 1.f, 1.f));
+			obj->SetShapeComponent(pBoxComponent);
 
 			obj->Init();
 			m_vObjects.push_back(obj);
@@ -136,7 +141,7 @@ void TestSY::Init()
 		m_pActor->SetCameraComponent(pCameraComponent);
 		 
 		auto pBoxComponent = make_shared<UBoxComponent>();
-		pBoxComponent->SetBoxSize(Vec3(2.f, 2.f, 2.f));
+		pBoxComponent->SetBoxSize(Vec3(6.f, 6.f, 6.f));
 		m_pActor->SetShapeComponent(pBoxComponent);
 
 		m_pActor->AddScript(make_shared<kkongchiMoveScript>());

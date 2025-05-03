@@ -7,7 +7,8 @@ protected:
 	Vec3 m_vCenter = Vec3::Zero;
 	Vec3 m_vBoxHalfSize = Vec3::Zero;	// Scale
 
-	shared_ptr<class AActor> m_pRange;
+	shared_ptr<class AActor> m_pRange = nullptr;
+	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
 
 public:
 	UBoxComponent() = default;
@@ -27,6 +28,7 @@ public:
 public:
 	void SetBoxSize(Vec3 _vBoxHalfSize) { m_vBoxHalfSize = _vBoxHalfSize; }
 
-	Vec3 GetBoxSize() { return m_vBoxHalfSize; }
+	const Vec3& GetBoxCenter()  { return m_vCenter; }
+	const Vec3& GetBoxSize() { return m_vBoxHalfSize; }
 };
 
