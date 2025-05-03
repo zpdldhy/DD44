@@ -38,12 +38,12 @@ void UCameraComponent::CreateFrustumBox()
 
 void UCameraComponent::UpdateView()
 {
-	m_vEye = m_pOwner->m_vPosition + m_vLocalPosition;	
+	m_vEye = m_pOwner->GetPosition() + m_vPosition;
 
-	if (Vec3::Distance(Vec3(0.f, 0.f, 0.f), m_vLocalPosition) < 0.1f)
-		m_vLook = m_pOwner->m_vLook;
+	if (Vec3::Distance(Vec3(0.f, 0.f, 0.f), m_vPosition) < 0.1f)
+		m_vLook = m_pOwner->GetLook();
 	else
-		m_vLook = -m_vLocalPosition;
+		m_vLook = -m_vPosition;
 
 	Vec3 vUp = Vec3(0.f, 1.f, 0.f);
 

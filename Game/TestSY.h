@@ -1,5 +1,6 @@
 #pragma once
 #include "IExecute.h"
+#include "MapEditorUI.h"
 
 class TestSY : public IExecute
 {
@@ -7,17 +8,15 @@ public:
 	shared_ptr<class UStaticMeshComponent> m_pStaticMesh;
 	shared_ptr<class APawn> m_pActor;
 
-	shared_ptr<class ATerrainTileActor> m_pTerrain;
-
 	shared_ptr<class ACameraActor> m_pCameraActor;
 
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
 
-	vector<shared_ptr<APawn>> m_vObjects;
-    int m_gridWidth = 20;
-    int m_gridHeight = 20;
-    float m_cellSize = 10.0f;
+	std::unique_ptr<MapEditorUI> m_pMapEditorUI;
+	std::vector<std::shared_ptr<class ATerrainTileActor>> m_vTiles;
+
+	bool m_bEditorWireframe = false;
 
 public:
 	void Init() override;
@@ -25,6 +24,5 @@ public:
 	void Render() override;
 	void Destroy();
 
-	
 };
 
