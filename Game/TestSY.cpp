@@ -132,9 +132,9 @@ void TestSY::Init()
 		m_pStaticMesh->SetMaterial(material);
 
 		auto pCameraComponent = make_shared<UCameraComponent>();
-		pCameraComponent->SetLocalPosition(Vec3(20.f, 20.f, -20.f));
+		pCameraComponent->SetPosition(Vec3(20.f, 20.f, -20.f));
 		m_pActor->SetCameraComponent(pCameraComponent);
-
+		 
 		auto pBoxComponent = make_shared<UBoxComponent>();
 		pBoxComponent->SetBoxSize(Vec3(2.f, 2.f, 2.f));
 		m_pActor->SetShapeComponent(pBoxComponent);
