@@ -105,6 +105,12 @@ public:
 
 	Vec4 m_vRootPos;
 	UINT m_iBoneIndex = 0;
+	// Anim 
+	int repeatThreshold = 2;
+	int repeatCount = 0;
+	int lastMeaningfulFrame = -1;
+	int maxValidFrame = 0;
+
 public:
 	void Init(string _loadFile);
 	void Destroy();
@@ -114,6 +120,7 @@ public:
 	void ParseMesh(FbxNode* _node);
 	bool ParseSkinningMesh(FbxMesh* _mesh);
 	void ParseAnimation();
+	void GetAnimationTrack(int animTrack, int Count);
 	void GetAnimation(int animTrack, AnimTrackData* track);
 	vector<Matrix> GetNodeAnimation(FbxNode* node, AnimTrackData* track);
 public:

@@ -25,6 +25,8 @@ void UAnimInstance::Tick()
 		{
 			currentAnimTrackIndex = 0;
 		}
+		int a = animTrackList[currentAnimTrackIndex].animList[0].size();
+		int b = 0;
 	}
 }
 

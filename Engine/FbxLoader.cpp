@@ -162,7 +162,10 @@ void FbxLoader::ParseMesh(FbxNode* _node)
 		if (pSurface)
 		{
 			string texPath = ParseMaterial(pSurface);
-			m_result.m_mTexPathList.insert(make_pair(i, (to_mw(texPath))));
+			if(!texPath.empty())
+			{
+				m_result.m_mTexPathList.insert(make_pair(i, (to_mw(texPath))));
+			}
 		}
 	}
 	m_result.m_iTexPathCount = m_result.m_mTexPathList.size();
@@ -386,32 +389,61 @@ void FbxLoader::ParseAnimation()
 	int animBoneCount = m_result.m_mSkeletonList.size() + m_result.m_vMeshList.size();
 	int animTrackCount = m_pScene->GetSrcObjectCount<FbxAnimStack>();
 	m_result.m_iAnimTrackCount = animTrackCount;
-	// TEMP ( 빌드 속도 때문에 임시 ) 
-	if (m_result.m_iAnimTrackCount > 3)
-	{
-		m_result.m_iAnimTrackCount = 3;
-	}
-	m_result.m_vAnimTrackList.resize(m_result.m_iAnimTrackCount);
+	
+	//// TEMP ( 빌드 속도 때문에 임시 ) 
+	//if (m_result.m_iAnimTrackCount > 3)
+	//{
+	//	m_result.m_iAnimTrackCount = 3;
+	//}
+	
+	//m_result.m_vAnimTrackList.resize(m_result.m_iAnimTrackCount);
+
+	//// TEMP ( FOR CROW_FINAL )
+	//GetAnimationTrack(50, animBoneCount);
+	//GetAnimationTrack(29, animBoneCount);
+	//GetAnimationTrack(5, animBoneCount);
+	//GetAnimationTrack(44, animBoneCount);
+	//GetAnimationTrack(45, animBoneCount);
+	//GetAnimationTrack(23, animBoneCount);
+
 	for (int iTrack = 0; iTrack < m_result.m_iAnimTrackCount; iTrack++)
 	{
-		AnimTrackData track;
-		track.m_vAnim.resize(animBoneCount);
-		GetAnimation(iTrack, &track);
-		for (int iBone = 0; iBone < m_result.m_iBoneCount; iBone++)
-		{
-			auto iter = m_FbxBones.find(m_result.m_mSkeletonList[iBone].m_szName);
-			if (iter == m_FbxBones.end())
-			{
-				continue;
-			}
-			track.m_vAnim[iBone] = GetNodeAnimation(iter->second.m_node, &track);
-		}
-		for (int iMesh = 0; iMesh < m_result.m_iMeshCount; iMesh++)
-		{
-			track.m_vAnim[m_result.m_iBoneCount+ iMesh] = GetNodeAnimation(m_vMeshes[iMesh], &track);
-		}
-		m_result.m_vAnimTrackList[iTrack] = track;
+		GetAnimationTrack(iTrack, animBoneCount);
 	}
+}
+
+void FbxLoader::GetAnimationTrack(int animTrack, int nodeCount)
+{
+	repeatCount = 0;
+	lastMeaningfulFrame = -1;
+	maxValidFrame = 0;
+	
+	AnimTrackData track;
+	track.m_vAnim.resize(nodeCount);
+	GetAnimation(animTrack, &track);
+	for (int iBone = 0; iBone < m_result.m_iBoneCount; iBone++)
+	{
+		auto iter = m_FbxBones.find(m_result.m_mSkeletonList[iBone].m_szName);
+		if (iter == m_FbxBones.end())
+		{
+			continue;
+		}
+		track.m_vAnim[iBone] = GetNodeAnimation(iter->second.m_node, &track);
+	}
+	for (int iMesh = 0; iMesh < m_result.m_iMeshCount; iMesh++)
+	{
+		track.m_vAnim[m_result.m_iBoneCount + iMesh] = GetNodeAnimation(m_vMeshes[iMesh], &track);
+	}
+
+	if (maxValidFrame > 0)
+	{
+		for (int i = 0; i < m_result.m_iNodeCount; i++)
+		{
+			track.m_vAnim[i].resize(maxValidFrame);
+		}
+	}
+
+	m_result.m_vAnimTrackList.emplace_back(track);
 }
 
 void FbxLoader::GetAnimation(int _animTrack, AnimTrackData* _track)
@@ -433,13 +465,15 @@ void FbxLoader::GetAnimation(int _animTrack, AnimTrackData* _track)
 	FbxTime::EMode TimeMode = FbxTime::GetGlobalTimeMode();
 	FbxLongLong s = start.GetFrameCount(TimeMode);
 	FbxLongLong n = end.GetFrameCount(TimeMode);
+	float endTime = static_cast<float>(TakeInfo->mLocalTimeSpan.GetStop().GetFrameCount());
 	_track->m_iStartFrame = s;
-	_track->m_iEndFrame = n;
+	_track->m_iEndFrame = endTime;
 }
 
 vector<Matrix> FbxLoader::GetNodeAnimation(FbxNode* _node, AnimTrackData* _track)
 {
 	vector<Matrix> ret;
+	Matrix prevMat;
 
 	for (FbxLongLong t = _track->m_iStartFrame; t <= _track->m_iEndFrame; t++)
 	{
@@ -459,6 +493,20 @@ vector<Matrix> FbxLoader::GetNodeAnimation(FbxNode* _node, AnimTrackData* _track
 		FbxAMatrix finalMatrix = correctionR * correctionT * matGlobal;
 		Matrix mat = DxConvertMatrix(ConvertAMatrix(finalMatrix));
 
+		if (t != _track->m_iStartFrame && prevMat == mat) {
+			repeatCount++;
+		}
+		else {
+			repeatCount = 0;
+		}
+
+		if (repeatCount < repeatThreshold) {
+			lastMeaningfulFrame = t;
+		}
+		maxValidFrame = maxValidFrame < lastMeaningfulFrame ? lastMeaningfulFrame : maxValidFrame;
+
+
+		prevMat = mat;
 		ret.emplace_back(mat);
 	}
 	return ret;
