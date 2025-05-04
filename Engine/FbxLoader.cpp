@@ -394,7 +394,7 @@ void FbxLoader::ParseAnimation()
 	m_result.m_vAnimTrackList.resize(m_result.m_iAnimTrackCount);
 	for (int iTrack = 0; iTrack < m_result.m_iAnimTrackCount; iTrack++)
 	{
-		AnimTrack track;
+		AnimTrackData track;
 		track.m_vAnim.resize(animBoneCount);
 		GetAnimation(iTrack, &track);
 		for (int iBone = 0; iBone < m_result.m_iBoneCount; iBone++)
@@ -414,7 +414,7 @@ void FbxLoader::ParseAnimation()
 	}
 }
 
-void FbxLoader::GetAnimation(int _animTrack, AnimTrack* _track)
+void FbxLoader::GetAnimation(int _animTrack, AnimTrackData* _track)
 {
 	FbxTime::SetGlobalTimeMode(FbxTime::eFrames30);
 	FbxAnimStack* stack = m_pScene->GetSrcObject<FbxAnimStack>(_animTrack);
@@ -437,7 +437,7 @@ void FbxLoader::GetAnimation(int _animTrack, AnimTrack* _track)
 	_track->m_iEndFrame = n;
 }
 
-vector<Matrix> FbxLoader::GetNodeAnimation(FbxNode* _node, AnimTrack* _track)
+vector<Matrix> FbxLoader::GetNodeAnimation(FbxNode* _node, AnimTrackData* _track)
 {
 	vector<Matrix> ret;
 

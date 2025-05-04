@@ -5,7 +5,7 @@
 #include "UMaterial.h"
 #include "AAsset.h"
 #include "APawn.h"
-#include "UAnimation.h"
+#include "AnimTrack.h"
 
 void ActorLoader::ConvertFbxToAsset(string _path)
 {
@@ -71,23 +71,17 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 		}
 
 		// Animation
-		vector<shared_ptr<UAnimation>> meshAnim;
+		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 		{
-			shared_ptr<UAnimation> animTrack;
-			for (int iMesh = 0; iMesh < _resource.m_iMeshCount; iMesh++)
+			animInstance->SetInverseBone(_resource.m_vInverseBindPose);
+			animInstance->CreateConstantBuffer();
+			for (int iAnim = 0; iAnim < _resource.m_iAnimTrackCount; iAnim++)
 			{
-				animTrack = make_shared<UAnimation>();
-				animTrack->animTrackList.resize(_resource.m_iAnimTrackCount);
-				for (int iAnim = 0; iAnim < _resource.m_iAnimTrackCount; iAnim++)
-				{
-					animTrack->animTrackList[iAnim].m_szName = _resource.m_vAnimTrackList[iAnim].m_szName;
-					animTrack->animTrackList[iAnim].animList = _resource.m_vAnimTrackList[iAnim].m_vAnim;
-					animTrack->inversedBone = _resource.m_vInverseBindPose[iMesh];
-				}
-				animTrack->CreateConstantBuffer();
-				meshAnim.emplace_back(animTrack);
+				AnimList animTrack;
+				animTrack.m_szName = _resource.m_vAnimTrackList[iAnim].m_szName;
+				animTrack.animList= _resource.m_vAnimTrackList[iAnim].m_vAnim;
+				animInstance->AddTrack(animTrack);
 			}
-
 		}
 
 		////MESH
@@ -99,7 +93,10 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 		mesh->Create();
 		rootMesh->SetMesh(mesh);
 		rootMesh->SetMaterial(tempSkinnedMat);
-		rootMesh->SetAnim(meshAnim[0]);
+		rootMesh->SetBaseAnim(animInstance);
+		shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
+		animTrack->SetBase(animInstance, 0);
+		rootMesh->SetMeshAnim(animTrack);
 
 		//
 		for (int iMesh = 1; iMesh < _resource.m_vMeshList.size(); iMesh++)
@@ -113,7 +110,9 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 				mesh->Create();
 				meshComponent->SetMesh(mesh);
 				meshComponent->SetMaterial(tempSkinnedMat);
-				meshComponent->SetAnim(meshAnim[iMesh]);
+				shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
+				animTrack->SetBase(animInstance, iMesh);
+				meshComponent->SetMeshAnim(animTrack);
 				rootMesh->AddChild(meshComponent);
 			}
 

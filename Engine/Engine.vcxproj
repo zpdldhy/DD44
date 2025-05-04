@@ -171,11 +171,12 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="ObjectLoader.h" />
     <ClInclude Include="MapEditorUI.h" />
     <ClInclude Include="ObjectEditorUI.h" />
+    <ClInclude Include="UAnimInstance.h" />
     <ClInclude Include="UBoxComponent.h" />
     <ClInclude Include="UShapeComponent.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="ATerrainTileActor.h" />
-    <ClInclude Include="UAnimation.h" />
+    <ClInclude Include="AnimTrack.h" />
     <ClInclude Include="UCameraComponent.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Device.h" />
@@ -236,11 +237,12 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="ObjectLoader.cpp" />
     <ClCompile Include="MapEditorUI.cpp" />
     <ClCompile Include="ObjectEditorUI.cpp" />
+    <ClCompile Include="UAnimInstance.cpp" />
     <ClCompile Include="UBoxComponent.cpp" />
     <ClCompile Include="UShapeComponent.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="ATerrainTileActor.cpp" />
-    <ClCompile Include="UAnimation.cpp" />
+    <ClCompile Include="AnimTrack.cpp" />
     <ClCompile Include="UCameraComponent.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="DxState.cpp" />

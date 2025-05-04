@@ -15,7 +15,7 @@ struct TIwData
 		return m_vIndexList.size();
 	}
 };
-struct AnimTrack
+struct AnimTrackData
 {
 	wstring m_szName;
 	UINT m_iStartFrame;
@@ -45,7 +45,7 @@ struct TFbxResource
 	map<int, wstring> m_mTexPathList;
 
 	// AnimData
-	vector<AnimTrack> m_vAnimTrackList;
+	vector<AnimTrackData> m_vAnimTrackList;
 
 	// MESH DATA
 	vector<vector<Matrix>> m_vInverseBindPose;
@@ -114,8 +114,8 @@ public:
 	void ParseMesh(FbxNode* _node);
 	bool ParseSkinningMesh(FbxMesh* _mesh);
 	void ParseAnimation();
-	void GetAnimation(int animTrack, AnimTrack* track);
-	vector<Matrix> GetNodeAnimation(FbxNode* node, AnimTrack* track);
+	void GetAnimation(int animTrack, AnimTrackData* track);
+	vector<Matrix> GetNodeAnimation(FbxNode* node, AnimTrackData* track);
 public:
 	string ParseMaterial(FbxSurfaceMaterial* _pSurface);
 	FbxColor ReadColor(FbxMesh* mesh, DWORD dwVertexColorCount, FbxLayerElementVertexColor* pVertexColorSet, DWORD dwDCCIndex, DWORD dwVertexIndex);

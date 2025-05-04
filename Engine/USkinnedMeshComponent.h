@@ -1,7 +1,8 @@
 #include "UMeshComponent.h"
 #include "USkeletalMeshResources.h"
 
-class UAnimation;
+class AnimTrack;
+class UAnimInstance;
 
 class USkinnedMeshComponent : public UMeshComponent
 {
@@ -11,8 +12,8 @@ public:
 
 protected:
 	shared_ptr<USkeletalMeshResources> m_pMesh = nullptr;
-	shared_ptr<UAnimation> m_pAnim;
-
+	shared_ptr<UAnimInstance> m_pBaseAnim;
+	shared_ptr<AnimTrack> m_pMeshAnim;
 
 public:
 	void Init() override;
@@ -22,7 +23,8 @@ public:
 	void Destroy() override;
 
 public:
-	void SetAnim(shared_ptr<UAnimation> _anim) { m_pAnim = _anim; }
+	void SetBaseAnim(shared_ptr<UAnimInstance> _anim) { m_pBaseAnim = _anim; }
+	void SetMeshAnim(shared_ptr<AnimTrack> _meshAnim) { m_pMeshAnim = _meshAnim; }
 	void SetMesh(shared_ptr<USkeletalMeshResources> _mesh) { m_pMesh = _mesh; }
 	shared_ptr<USkeletalMeshResources> GetMesh() { return m_pMesh; }
 };

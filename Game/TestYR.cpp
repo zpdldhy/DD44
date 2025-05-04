@@ -81,7 +81,7 @@ void TestYR::Init()
 	//}
 	m_vObjList = objLoader.Load();
 
-	targetObj = m_vObjList[targetIndex];
+	targetObj = m_vActorList[targetIndex];
 }
 void TestYR::Update()
 {
@@ -99,7 +99,7 @@ void TestYR::Update()
 		{
 			targetIndex = 0;
 		}
-		targetObj = m_vObjList[targetIndex];
+		targetObj = m_vActorList[targetIndex];
 	}
 
 	// Texture ¹Ù²Ù±â
