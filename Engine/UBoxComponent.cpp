@@ -10,31 +10,14 @@ void UBoxComponent::Init()
 {
 	m_vCenter = m_vPosition + m_pOwner->GetPosition();
 
-	{
-		m_pRange = make_shared<AActor>();
-
-		auto pMesh = UStaticMeshComponent::CreateCube();
-		m_pRange->SetMeshComponent(pMesh);
-
-		auto pMaterial = make_shared<UMaterial>();
-		pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
-		pMesh->SetMaterial(pMaterial);
-
-		m_pRange->SetScale(m_vScale);
-		m_pRange->SetPosition(m_vCenter);
-
-		m_pRange->Init();
-	}
+	CreateCollisionBox();
 }
 
 void UBoxComponent::Tick()
 {
 	m_vCenter = m_vPosition + m_pOwner->GetPosition();
 
-	{
-		m_pRange->SetPosition(m_vCenter);
-		m_pRange->Tick();
-	}
+	UpdateBounds();
 }
 
 void UBoxComponent::PreRender()
@@ -46,7 +29,7 @@ void UBoxComponent::Render()
 	DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
 	DC->RSSetState(STATE->m_pRSWireFrame.Get());
 
-	m_pRange->Render();
+	m_pCollisionRange->Render();
 
 	DC->RSSetState(m_pCurrentRasterizer.Get());
 }
@@ -57,9 +40,28 @@ void UBoxComponent::PostRender()
 
 void UBoxComponent::Destroy()
 {
-	m_pRange->Destroy();
+	m_pCollisionRange->Destroy();
+}
+
+void UBoxComponent::CreateCollisionBox()
+{
+	m_pCollisionRange = make_shared<AActor>();
+
+	auto pMesh = UStaticMeshComponent::CreateCube();
+	m_pCollisionRange->SetMeshComponent(pMesh);
+
+	auto pMaterial = make_shared<UMaterial>();
+	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
+	pMesh->SetMaterial(pMaterial);
+
+	m_pCollisionRange->SetScale(m_vScale);
+	m_pCollisionRange->SetPosition(m_vCenter);
+
+	m_pCollisionRange->Init();
 }
 
 void UBoxComponent::UpdateBounds()
 {
+	m_pCollisionRange->SetPosition(m_vCenter);
+	m_pCollisionRange->Tick();
 }

@@ -24,6 +24,7 @@ void CameraManager::Init()
 void CameraManager::Tick()
 {
 	m_pUICameraActor->Tick();
+	m_pCurrentCameraActor->GetCameraComponent()->SetFrustumVisible(false);
 }
 
 void CameraManager::Render(CameraViewType _ViewType)
