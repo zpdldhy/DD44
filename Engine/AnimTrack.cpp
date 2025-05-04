@@ -8,6 +8,14 @@ void AnimTrack::Render()
 	for (int i = 0; i < animInstance->animTrackList[animInstance->currentAnimTrackIndex].animList.size(); i++)
 	{
 		currentAnimData.boneAnim[i] = animInstance->inverseBindPose[meshIndex][i] * animInstance->animTrackList[animInstance->currentAnimTrackIndex].animList[i][animInstance->animFrame];
+		
+		// 원점에 위치 고정
+		if (animInstance->m_bInPlace)
+		{
+			Matrix inverse = Matrix::CreateTranslation(-(animInstance->rootPos));
+			currentAnimData.boneAnim[i] = currentAnimData.boneAnim[i] * inverse;
+
+		}
 		currentAnimData.boneAnim[i] = currentAnimData.boneAnim[i].Transpose();
 	}
 

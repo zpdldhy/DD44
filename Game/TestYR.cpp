@@ -4,8 +4,10 @@
 #include "EngineCameraMoveScript.h"
 #include "CameraManager.h"
 #include "UStaticMeshComponent.h"
+#include "USkinnedMeshComponent.h"
 #include "Input.h"
 #include "UMaterial.h"
+#include "AnimTrack.h"
 
 void TestYR::Init()
 {
@@ -53,6 +55,9 @@ void TestYR::Init()
 	for (int i = 0; i < m_vActorList.size(); i++)
 	{
 		m_vActorList[i]->Init();
+		auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+		animInstance->CheckInPlace(true);
+		animInstance->SetRootIndex(4);
 	}
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);	
@@ -96,7 +101,7 @@ void TestYR::Update()
 
 	if (INPUT->GetButton(GameKey::C))
 	{
-		if (++targetIndex >= m_vObjList.size())
+		if (++targetIndex >= m_vActorList.size())
 		{
 			targetIndex = 0;
 		}

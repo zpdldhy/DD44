@@ -52,6 +52,11 @@ void AAsset::Export(TFbxResource _result, string filepath)
 		}
 	}
 
+	for (auto& data : _result.m_mSkeletonList)
+	{
+		
+	}
+
 	// INVERSE MAT BONE
 	for (int iMat = 0; iMat < _result.m_iMeshCount; iMat++)
 	{

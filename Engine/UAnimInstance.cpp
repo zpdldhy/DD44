@@ -17,6 +17,16 @@ void UAnimInstance::Tick()
 		animFrame = 0;
 	}
 
+	// ROOTMOTION üũ
+	if (m_bInPlace)
+	{
+		rootPos.x = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._41;
+		//rootPos.y = animTrackList[currentAnimTrackIndex].animList[4][animFrame]._42;
+		rootPos.z = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._43;
+
+	}
+
+
 	if (INPUT->GetButton(R))
 	{
 		animFrame = 0;
