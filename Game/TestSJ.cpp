@@ -27,21 +27,21 @@ void TestSJ::Init()
 	{
 		m_pActor = make_shared<APawn>();
 
-		m_pStaticMesh = UStaticMeshComponent::CreateCube();
+		m_pStaticMesh = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pActor->SetMeshComponent(m_pStaticMesh);
 		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
 		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/uvDistortion.hlsl");
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
 		m_pStaticMesh->SetMaterial(material);
 	}
 
 	{
 		m_pActor2 = make_shared<APawn>();
 
-		m_pStaticMesh2 = UStaticMeshComponent::CreateCube();
+		m_pStaticMesh2 = UStaticMeshComponent::CreateSphere(20, 20);
 
 
 		m_pActor2->SetMeshComponent(m_pStaticMesh2);
@@ -50,7 +50,7 @@ void TestSJ::Init()
 		m_pActor2->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
-		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Dissolve.hlsl");
+		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
 		m_pStaticMesh2->SetMaterial(material2);
 	}
 
@@ -80,25 +80,32 @@ void TestSJ::Init()
 
 void TestSJ::Update()
 {
+	//Rim Light
+	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+	{
+		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetCameraPos();
+		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
+	}
+
 	//UVDistortion
 	{
 		static bool bUVInitialized = false;
 		if (!bUVInitialized)
 		{
-			m_pStaticMesh->GetMaterial()->SetUVDistortionParams(0.08f, 10.0f, 15.0f); // strength, speed, frequency
+			m_pStaticMesh->GetMaterial()->SetUVDistortionParams(0.08f, 1.0f, 15.0f); // strength, speed, frequency
 			m_pStaticMesh2->GetMaterial()->SetUVDistortionParams(0.01f, 1.5f, 8.0f);  // optional: 다른 효과
 			bUVInitialized = true;
 		}
 
-		float deltaTime = TIMER->GetDeltaTime();
+		float delta = TIMER->GetDeltaTime();
 
 		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 		{
-			m_pStaticMesh->GetMaterial()->UpdateUVDistortionBuffer(deltaTime);
+			m_pStaticMesh->GetMaterial()->UpdateUVDistortionBuffer(delta);
 		}
 		if (m_pStaticMesh2 && m_pStaticMesh2->GetMaterial())
 		{
-			m_pStaticMesh2->GetMaterial()->UpdateUVDistortionBuffer(deltaTime);
+			m_pStaticMesh2->GetMaterial()->UpdateUVDistortionBuffer(delta);
 		}
 	}
 

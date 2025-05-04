@@ -89,7 +89,8 @@ void DxWrite::LoadFontResources(const vector<wstring>& fontPaths)
 		{
 			totalFontsAdded += added;
 		}
-	}	
+	}
+
 }
 
 // 동적으로 폰트 변경.
