@@ -11,6 +11,7 @@ enum class ProjectionType
 
 class UCameraComponent : public USceneComponent
 {
+protected:
 	ProjectionType m_ProjectionType = ProjectionType::PT_PERSPECTIVE;
 
 	Matrix m_matView;
@@ -31,7 +32,9 @@ class UCameraComponent : public USceneComponent
 	float m_fFar = 10000.0f;
 
 	// Frustum
-	shared_ptr<class UStaticMeshComponent> m_pFrustumBox;
+	shared_ptr<class AActor> m_pFrustumBox;
+	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
+	bool m_bVisibleFrustumBox = true;
 	
 public:
 	void Init() override;
@@ -41,6 +44,7 @@ public:
 
 private:
 	void CreateFrustumBox();
+	void UpdateFrustumBox();
 
 	void UpdateView();
 	void UpdateOrthographicProjection();
@@ -53,6 +57,7 @@ public:
 	void SetAspect(float _fAspect) { m_fAspect = _fAspect; }
 	void SetNear(float _fNear) { m_fNear = _fNear; }
 	void SetFar(float _fFar) { m_fFar = _fFar; }
+	void SetFrustumVisible(bool _bVisible) { m_bVisibleFrustumBox = _bVisible; }
 
 	Matrix GetView() { return m_matView; }
 	Matrix GetProejction() { return m_matProjection; }
