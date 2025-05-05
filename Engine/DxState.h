@@ -26,6 +26,8 @@ public:
 	ComPtr<ID3D11DepthStencilState> m_pDSSDepthEnable;
 	ComPtr<ID3D11DepthStencilState> m_pDSSDepthEnableZero;
 	ComPtr<ID3D11DepthStencilState> m_pDSSDepthDisableZero;
+	ComPtr<ID3D11DepthStencilState> m_pDSS_StencilWrite;
+	ComPtr<ID3D11DepthStencilState> m_pDSS_StencilMaskEqual;
 
 public:
 	void Create();
