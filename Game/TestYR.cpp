@@ -50,7 +50,7 @@ void TestYR::Init()
 	}
 	m_pCameraActor->Init();
 
-	loader.ConvertFbxToAsset();
+	//loader.ConvertFbxToAsset();
 	m_vActorList = loader.Load();
 	for (int i = 0; i < m_vActorList.size(); i++)
 	{
