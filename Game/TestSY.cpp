@@ -44,6 +44,8 @@ void TestSY::Init()
 
 		auto pCameraComponent = make_shared<UCameraComponent>();
 		pCameraComponent->SetPosition(Vec3(20.f, 20.f, -20.f));
+		pCameraComponent->SetNear(10.f);
+		pCameraComponent->SetFar(100.f);
 		m_pActor->SetCameraComponent(pCameraComponent);
 
 		auto pBoxComponent = make_shared<UBoxComponent>();
