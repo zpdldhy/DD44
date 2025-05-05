@@ -40,3 +40,13 @@ void USkeletalMeshResources::Bind()
 	DC->IASetVertexBuffers(0, 2, pVB, Strides, Offsets);
 	DC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
+
+int USkeletalMeshResources::GetBoneIndex(wstring _name)
+{
+	auto iter = m_vSkeletonList.find(_name);
+	if (iter != m_vSkeletonList.end())
+	{
+		return iter->second.m_iIndex;
+	}
+	return -1;
+}

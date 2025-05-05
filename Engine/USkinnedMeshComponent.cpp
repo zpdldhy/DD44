@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "USkinnedMeshComponent.h"
-#include "UAnimation.h"
+#include "AnimTrack.h"
 #include "UMaterial.h"
 
 void USkinnedMeshComponent::Init()
@@ -9,12 +9,17 @@ void USkinnedMeshComponent::Init()
 
 void USkinnedMeshComponent::Tick()
 {
-	if (m_pAnim) m_pAnim->Tick();
+	if (m_pBaseAnim) m_pBaseAnim->Tick();
+
+	for (auto& child : m_vChild)
+	{
+		child->Tick();
+	}
 }
 
 void USkinnedMeshComponent::PreRender()
 {
-	if (m_pAnim) m_pAnim->Render();
+	if (m_pMeshAnim) m_pMeshAnim->Render();
 
 	if (m_pMesh) { m_pMesh->Bind(); }
 

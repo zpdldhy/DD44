@@ -4,8 +4,10 @@
 #include "EngineCameraMoveScript.h"
 #include "CameraManager.h"
 #include "UStaticMeshComponent.h"
+#include "USkinnedMeshComponent.h"
 #include "Input.h"
 #include "UMaterial.h"
+#include "AnimTrack.h"
 
 void TestYR::Init()
 {
@@ -48,10 +50,15 @@ void TestYR::Init()
 	}
 	m_pCameraActor->Init();
 
+	//loader.ConvertFbxToAsset();
 	m_vActorList = loader.Load();
 	for (int i = 0; i < m_vActorList.size(); i++)
 	{
 		m_vActorList[i]->Init();
+		//auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+		//animInstance->CheckInPlace(true);
+		//int rootIndex = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetMesh()->GetBoneIndex(L"_RollRoot");
+		//animInstance->SetRootIndex(rootIndex);
 	}
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);	
@@ -81,7 +88,7 @@ void TestYR::Init()
 	//}
 	m_vObjList = objLoader.Load();
 
-	targetObj = m_vObjList[targetIndex];
+	targetObj = m_vActorList[targetIndex];
 }
 void TestYR::Update()
 {
@@ -95,11 +102,11 @@ void TestYR::Update()
 
 	if (INPUT->GetButton(GameKey::C))
 	{
-		if (++targetIndex >= m_vObjList.size())
+		if (++targetIndex >= m_vActorList.size())
 		{
 			targetIndex = 0;
 		}
-		targetObj = m_vObjList[targetIndex];
+		targetObj = m_vActorList[targetIndex];
 	}
 
 	// Texture ¹Ù²Ù±â

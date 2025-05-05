@@ -1,13 +1,13 @@
 #pragma once
 #include "UMeshComponent.h"
-#include "UAnimation.h"
+#include "AnimTrack.h"
 
 class USkinnedComponent : public UMeshComponent
 {
 public:
 	ComPtr<ID3D11Buffer> m_pIwBuffer;
 	vector<IW_VERTEX> m_vIwList;
-	shared_ptr<UAnimation> m_pAnim;
+	shared_ptr<AnimTrack> m_pAnim;
 public:
 	virtual void Init() override;
 	virtual void Tick() override;
