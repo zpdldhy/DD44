@@ -103,14 +103,16 @@ void AAsset::Export(TFbxResource _result, string filepath)
 
 }
 
-TFbxResource AAsset::Load(const char* fileName)
+ParsingData AAsset::Load(const char* fileName)
 {
 	FILE* pFile;
 
 	errno_t err = fopen_s(&pFile, fileName, "rb");
 	if (err != 0) { assert(false); }
+	ParsingData parsingData;
 
 	TFbxResource result;
+	result.name = SplitName(to_mw(fileName));
 
 	// HEADER
 	fread(&result.m_iBoneCount, sizeof(UINT), 1, pFile);
@@ -216,8 +218,10 @@ TFbxResource AAsset::Load(const char* fileName)
 			child.m_vIndexList.resize(indexSize);
 			fread(&child.m_vIndexList.at(0), sizeof(DWORD), indexSize, pFile);
 		}
+		parsingData.m_vMeshList.emplace_back(child);
 	}
 
+	parsingData.m_ActorData = result;
 	fclose(pFile);
-	return result;
+	return parsingData;
 }

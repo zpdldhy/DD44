@@ -39,6 +39,7 @@ bool UMeshResources::CreateVertexBuffer()
 
 bool UMeshResources::CreateIndexBuffer()
 {
+	if (m_vIndexList.size() <= 0) { return true; }
 	D3D11_BUFFER_DESC pDesc;
 	ZeroMemory(&pDesc, sizeof(pDesc));
 	pDesc.ByteWidth = sizeof(DWORD) * m_vIndexList.size();

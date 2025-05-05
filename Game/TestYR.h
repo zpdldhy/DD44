@@ -15,6 +15,7 @@ public:
 	vector<shared_ptr<APawn>> m_vObjList;
 	vector<shared_ptr<UMaterial>> materialList;
 	shared_ptr<APawn> targetObj;
+	vector<shared_ptr<UMeshComponent>> meshList;
 	int targetIndex = 0;
 	int matIndex = 0;
 

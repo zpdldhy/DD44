@@ -381,8 +381,8 @@ void FbxLoader::ParseAnimation()
 		FbxVector4 rootP = iter->second.m_node->EvaluateGlobalTransform(0).GetT();
 
 		m_vRootPos.x = -rootP[0];
-		m_vRootPos.y = -rootP[2];
-		m_vRootPos.z = -rootP[1];
+		m_vRootPos.y = -rootP[1];
+		m_vRootPos.z = -rootP[2];
 	}
 
 	// ANIM
@@ -488,7 +488,7 @@ vector<Matrix> FbxLoader::GetNodeAnimation(FbxNode* _node, AnimTrackData* _track
 		correctionR.SetR(FbxVector4(90.0f, 0.0f, 0.0f));
 		FbxAMatrix correctionT;
 		correctionT.SetIdentity();
-		correctionT.SetT(FbxVector4(m_vRootPos.x, m_vRootPos.z, m_vRootPos.y));
+		correctionT.SetT(FbxVector4(m_vRootPos.x, m_vRootPos.y, m_vRootPos.z));
 
 		FbxAMatrix finalMatrix = correctionR * correctionT * matGlobal;
 		Matrix mat = DxConvertMatrix(ConvertAMatrix(finalMatrix));

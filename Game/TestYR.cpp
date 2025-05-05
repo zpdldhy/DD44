@@ -8,6 +8,7 @@
 #include "Input.h"
 #include "UMaterial.h"
 #include "AnimTrack.h"
+#include "ImGuiCore.h"
 
 void TestYR::Init()
 {
@@ -24,7 +25,7 @@ void TestYR::Init()
 		// mesh 생성
 		shared_ptr<UStaticMeshComponent> meshComponent1 = UStaticMeshComponent::CreateCube();
 		meshComponent1->SetMaterial(material);
-	
+
 		// Object 설정
 		object1->SetMeshComponent(meshComponent1);
 		object2->SetMeshComponent(meshComponent1);
@@ -33,11 +34,11 @@ void TestYR::Init()
 		object1->SetScale(Vec3(10000.0f, 0.03f, 0.03f));
 		object2->SetScale(Vec3(0.03f, 10000.0f, 0.03f));
 		object3->SetScale(Vec3(0.03f, 0.03f, 10000.0f));
-		
+
 		object1->Init();
 		object2->Init();
 		object3->Init();
-		
+
 		gizmo.emplace_back(object1);
 		gizmo.emplace_back(object2);
 		gizmo.emplace_back(object3);
@@ -52,16 +53,31 @@ void TestYR::Init()
 
 	//loader.ConvertFbxToAsset();
 	m_vActorList = loader.Load();
+	meshList = loader.LoadMesh();
 	for (int i = 0; i < m_vActorList.size(); i++)
 	{
 		m_vActorList[i]->Init();
+		//if (i == 0)
+		//{
+		//	auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+		//	animInstance->CheckInPlace(true);
+		//	int rootIndex = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetMesh()->GetBoneIndex(L"_RollRoot");
+		//	animInstance->SetRootIndex(rootIndex);
+		//}
+		//if (i == 1)
+		//{
+		//	auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+		//	animInstance->CheckInPlace(true);
+		//	//int rootIndex = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetMesh()->GetBoneIndex(L"_RollRoot");
+		//	animInstance->SetRootIndex(0);
+		//}
 		//auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 		//animInstance->CheckInPlace(true);
 		//int rootIndex = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetMesh()->GetBoneIndex(L"_RollRoot");
 		//animInstance->SetRootIndex(rootIndex);
 	}
 
-	CAMERAMANAGER->SetCameraActor(m_pCameraActor);	
+	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 
 	//// LOAD ALL TEXTURE
 	//{
@@ -86,9 +102,26 @@ void TestYR::Init()
 	//		materialList.emplace_back(tempMat);
 	//	}
 	//}
-	m_vObjList = objLoader.Load();
+	//m_vObjList = objLoader.Load();
 
 	targetObj = m_vActorList[targetIndex];
+
+	GUI->InitMeshDataByCallBack(m_vActorList.size(), meshList.size());
+
+
+
+	GUI->SetObjectCallback([this](int target)
+		{
+			targetIndex = target;
+			targetObj = m_vActorList[targetIndex];
+		}
+	);
+
+	GUI->SetMeshCallback([this](int targetActor, int targetMesh)
+		{
+			m_vActorList[targetActor]->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[targetMesh]);
+		}
+	);
 }
 void TestYR::Update()
 {

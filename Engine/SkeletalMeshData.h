@@ -18,7 +18,7 @@ struct BoneNode
 	vector<wstring> m_vChildName;
 };
 
-struct SkeletonData
+struct Skeleton
 {
 	map<wstring, BoneNode> m_vBonelist;
 };
@@ -36,3 +36,5 @@ struct AnimSequence
 {
 	vector<AnimTrackData> m_vAnimList;
 };
+
+
