@@ -18,10 +18,15 @@ public:
 	bool show_effect_editor = true;
 
 	MapEditorUI* GetMapEditorUI() const { return m_pMapEditorUI.get(); }
+	EffectEditorUI* GetEffectEditorUI() const { return 	m_pEffectEditorUI.get(); }
 
 	void SetMapEditorCallback(std::function<void()> callback)
 	{
 		m_pMapEditorUI->SetOnCreateCallback(std::move(callback));
+	}
+	void SetEffectEditorCallback(std::function<void(int, float, Vec3, float)> callback)
+	{
+		m_pEffectEditorUI->SetEffectApplyCallback(std::move(callback));
 	}
 
 
@@ -32,21 +37,21 @@ public:
 
 
 	void Test();
-public:
-	float GetGlowPower() const { return m_fGlowPower; }
-	Vec3 GetGlowColor() const { return m_vGlowColor; }
-	float GetDissolveThreshold() const { return m_fDissolveThreshold; }
-	float m_fGlowPower;
-	Vec3 m_vGlowColor;
-	float m_fDissolveThreshold = 0.5f;
-	bool m_bShowGlowControl = true;
-
-	int m_iSelectedActor = -1;
-
-	bool m_bCheckbox = false;
-	bool m_bDidInitialApply = false;
-public:
-	void SetInitialMaterialValues(const std::shared_ptr<UMaterial>& mat);
+//public:
+//	float GetGlowPower() const { return m_fGlowPower; }
+//	Vec3 GetGlowColor() const { return m_vGlowColor; }
+//	float GetDissolveThreshold() const { return m_fDissolveThreshold; }
+//	float m_fGlowPower;
+//	Vec3 m_vGlowColor;
+//	float m_fDissolveThreshold = 0.5f;
+//	bool m_bShowGlowControl = true;
+//
+//	int m_iSelectedActor = -1;
+//
+//	bool m_bCheckbox = false;
+//	bool m_bDidInitialApply = false;
+//public:
+//	void SetInitialMaterialValues(const std::shared_ptr<UMaterial>& mat);
 
 protected:
 	bool show_demo_window = true;

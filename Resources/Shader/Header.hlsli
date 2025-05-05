@@ -43,6 +43,11 @@ cbuffer CB_Camera : register(b6)
     float dummy_camera; // 16바이트 정렬용
 };
 
+cbuffer CB_RenderMode : register(b7)
+{
+    int g_iRenderMode;
+    float3 padding_rendermode;
+};
 
 struct VS_IN
 {
@@ -123,6 +128,7 @@ float3 ApplyGlow(float3 baseColor)
 float3 ApplyRimLight(float3 normal, float3 worldPos)
 {
     float3 N = normalize(normal);
+    //float3 N = normalize(mul(normal, (float3x3) g_matWorld));
     float3 V = normalize(g_vCameraPos - worldPos);
     float rim = pow(1.0 - saturate(dot(N, V)), 1.0);
     float rimMask = smoothstep(0.2, 0.8, rim);
