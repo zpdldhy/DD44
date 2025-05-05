@@ -55,10 +55,10 @@ void TestYR::Init()
 	for (int i = 0; i < m_vActorList.size(); i++)
 	{
 		m_vActorList[i]->Init();
-		auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-		animInstance->CheckInPlace(true);
-		int rootIndex = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetMesh()->GetBoneIndex(L"_RollRoot");
-		animInstance->SetRootIndex(rootIndex);
+		//auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+		//animInstance->CheckInPlace(true);
+		//int rootIndex = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetMesh()->GetBoneIndex(L"_RollRoot");
+		//animInstance->SetRootIndex(rootIndex);
 	}
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);	
