@@ -98,6 +98,16 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 		animTrack->SetBase(animInstance, 0);
 		rootMesh->SetMeshAnim(animTrack);
 
+		{
+			// BONE
+			map<wstring, BoneNode> bones;
+			for (auto& data : _resource.m_mSkeletonList)
+			{
+				bones.insert(make_pair(data.second.m_szName, data.second));
+			}
+			mesh->AddSkeleton(bones);
+		}
+
 		//
 		for (int iMesh = 1; iMesh < _resource.m_vMeshList.size(); iMesh++)
 		{
@@ -114,6 +124,16 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 				animTrack->SetBase(animInstance, iMesh);
 				meshComponent->SetMeshAnim(animTrack);
 				rootMesh->AddChild(meshComponent);
+
+				{
+					// BONE
+					map<wstring, BoneNode> bones;
+					for (auto& data : _resource.m_mSkeletonList)
+					{
+						bones.insert(make_pair(data.second.m_szName, data.second));
+					}
+					mesh->AddSkeleton(bones);
+				}
 			}
 
 		}

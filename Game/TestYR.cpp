@@ -57,7 +57,8 @@ void TestYR::Init()
 		m_vActorList[i]->Init();
 		auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 		animInstance->CheckInPlace(true);
-		animInstance->SetRootIndex(4);
+		int rootIndex = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetMesh()->GetBoneIndex(L"_RollRoot");
+		animInstance->SetRootIndex(rootIndex);
 	}
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);	

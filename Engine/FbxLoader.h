@@ -1,4 +1,5 @@
 #pragma once
+#include "SkeletalMeshData.h"
 #include <Fbx/fbxsdk.h>
 #pragma comment(lib, "Fbx/libfbxsdk-md.lib")
 #pragma comment(lib, "Fbx/libxml2-md.lib")
@@ -32,13 +33,13 @@ struct AnimTrackData
 //	UINT m_iMaterialIndex = -1;
 //	vector<Matrix> m_vInverseBindPose;
 //};
-struct BoneNode
-{
-	UINT m_iIndex;
-	wstring m_szName;
-	wstring m_szParentName;
-	vector<wstring> m_vChildName;
-};
+//struct BoneNode
+//{
+//	UINT m_iIndex;
+//	wstring m_szName;
+//	wstring m_szParentName;
+//	vector<wstring> m_vChildName;
+//};
 struct TFbxResource
 {
 	// Material

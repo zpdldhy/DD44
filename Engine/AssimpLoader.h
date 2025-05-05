@@ -1,4 +1,5 @@
 #pragma once
+#include "SkeletalMeshData.h"
 
 class APawn;
 
