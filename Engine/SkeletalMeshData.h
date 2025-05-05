@@ -17,3 +17,22 @@ struct BoneNode
 	wstring m_szParentName;
 	vector<wstring> m_vChildName;
 };
+
+struct SkeletonData
+{
+	map<wstring, BoneNode> m_vBonelist;
+};
+
+struct AnimTrackData
+{
+	wstring m_szName;
+	UINT m_iStartFrame;
+	UINT m_iEndFrame;
+
+	vector<vector<Matrix>> m_vAnim;
+};
+
+struct AnimSequence
+{
+	vector<AnimTrackData> m_vAnimList;
+};

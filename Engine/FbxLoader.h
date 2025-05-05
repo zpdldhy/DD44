@@ -16,14 +16,14 @@ struct TIwData
 		return m_vIndexList.size();
 	}
 };
-struct AnimTrackData
-{
-	wstring m_szName;
-	UINT m_iStartFrame;
-	UINT m_iEndFrame;
-
-	vector<vector<Matrix>> m_vAnim;
-};
+//struct AnimTrackData
+//{
+//	wstring m_szName;
+//	UINT m_iStartFrame;
+//	UINT m_iEndFrame;
+//
+//	vector<vector<Matrix>> m_vAnim;
+//};
 //struct MeshData
 //{
 //	bool m_bSkeleton = false;
