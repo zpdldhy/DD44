@@ -3,6 +3,12 @@
 #include "Shader.h"
 #include "Inputlayout.h"
 
+enum class ERenderMode
+{
+	Default = 0,
+	Silhouette = 1,
+};
+
 struct CB_GLOW
 {
 	float g_fGlowPower;
@@ -33,6 +39,12 @@ struct CB_CAMERA
 	float padding;
 };
 
+struct CB_RMB
+{
+	int iRenderMode = 0;
+	Vec3 padding;
+};
+
 class UMaterial
 {
 	shared_ptr<Shader> m_pShader = nullptr;
@@ -43,6 +55,7 @@ class UMaterial
 	ComPtr<ID3D11ShaderResourceView> m_pNoiseSRV;
 	ComPtr<ID3D11Buffer> m_pUVDistortionCB;
 	ComPtr<ID3D11Buffer> m_pCameraCB;
+	ComPtr<ID3D11Buffer> m_pRenderModeBuffer;
 public:
 	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
 	void SetHitFlashTime(float _flashTime);
@@ -50,14 +63,17 @@ public:
 	void UpdateDissolveBuffer();
 	void UpdateUVDistortionBuffer(float _deltaTime);
 	void UpdateCameraBuffer();
+	void UpdateRenderModeBuffer();
 	void CreateGlowCB();
 	void CreateDissolveCB();
 	void CreateUVDistortionCB();
 	void CreateCameraCB();
+	void CreateRenderModeCB();
 	void SetDissolveParams(float _threshold);
 	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
 	void SetUVDistortionParams(float _strength, float _speed, float _frequency);
 	void SetCameraPos(const Vec3& _cameraPos);
+	void SetRenderMode(ERenderMode _eMode);
 	
 
 public:
@@ -65,6 +81,8 @@ public:
 	CB_DISSOLVE m_tDissolveData = { 0.0f };
 	CB_UVDistortion m_tUVDistortion = { };
 	CB_CAMERA m_tCameraData;
+	CB_RMB m_tRenderModeData;
+	ERenderMode m_eRenderMode = ERenderMode::Default;
 
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);

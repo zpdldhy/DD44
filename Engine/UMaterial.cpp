@@ -12,6 +12,7 @@ void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
     CreateDissolveCB();
     CreateUVDistortionCB();
     CreateCameraCB();
+    CreateRenderModeCB();
 }
 
 void UMaterial::Bind()
@@ -59,6 +60,12 @@ void UMaterial::Bind()
     {
         DC->VSSetConstantBuffers(6, 1, m_pCameraCB.GetAddressOf());
         DC->PSSetConstantBuffers(6, 1, m_pCameraCB.GetAddressOf());
+    }
+
+    if (m_pRenderModeBuffer)
+    {
+        DC->VSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
+        DC->PSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
     }
 }
 
@@ -146,6 +153,22 @@ void UMaterial::CreateCameraCB()
     assert(SUCCEEDED(hr) && "Failed to create Camera ConstantBuffer");
 }
 
+void UMaterial::CreateRenderModeCB()
+{
+    if (m_pRenderModeBuffer) return;
+
+    D3D11_BUFFER_DESC desc = {};
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.ByteWidth = sizeof(CB_RMB);
+    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = &m_tRenderModeData;
+
+    HRESULT hr = DEVICE->CreateBuffer(&desc, &initData, m_pRenderModeBuffer.GetAddressOf());
+    assert(SUCCEEDED(hr) && "Failed to create RenderMode ConstantBuffer");
+}
+
 void UMaterial::UpdateDissolveBuffer()
 {
     if (!m_pDissolveCB)
@@ -175,8 +198,8 @@ void UMaterial::UpdateUVDistortionBuffer(float _deltaTime)
 
     m_tUVDistortion.g_fDistortionTime += _deltaTime * m_tUVDistortion.g_fWaveSpeed;
 
-    if (m_tUVDistortion.g_fDistortionTime > 10000.0f)
-        m_tUVDistortion.g_fDistortionTime -= 10000.0f;
+    m_tUVDistortion.g_fDistortionTime = fmodf(m_tUVDistortion.g_fDistortionTime, DD_PI * 2);
+
 
     if (!m_pUVDistortionCB)
         CreateUVDistortionCB();
@@ -196,7 +219,13 @@ void UMaterial::UpdateCameraBuffer()
     }
 }
 
-
+void UMaterial::UpdateRenderModeBuffer()
+{
+    if (!m_pRenderModeBuffer)
+        CreateRenderModeCB();
+    else
+        DC->UpdateSubresource(m_pRenderModeBuffer.Get(), 0, nullptr, &m_tRenderModeData, 0, 0);
+}
 
 void UMaterial::SetUVDistortionParams(float _strength, float _speed, float _frequency)
 {
@@ -215,5 +244,12 @@ void UMaterial::SetCameraPos(const Vec3& _cameraPos)
 {
     m_tCameraData.g_vCameraPos = _cameraPos;
     UpdateCameraBuffer();
+}
+
+void UMaterial::SetRenderMode(ERenderMode _eMode)
+{
+    m_eRenderMode = _eMode;
+    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
+    UpdateRenderModeBuffer();
 }
 

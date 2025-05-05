@@ -143,11 +143,4 @@ void ImGuiCore::Test()
 	}
 }
 
-//void ImGuiCore::SetInitialMaterialValues(const std::shared_ptr<UMaterial>& mat)
-//{
-//
-//	m_fGlowPower = mat->m_tGlowData.g_fGlowPower;
-//	m_vGlowColor = mat->m_tGlowData.g_vGlowColor;
-//	m_fDissolveThreshold = mat->m_tDissolveData.g_fDissolveThreshold;
-//
-//}
+

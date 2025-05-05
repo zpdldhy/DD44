@@ -12,6 +12,7 @@
 #include "ImGuiCore.h"
 #include "EngineCameraMoveScript.h"
 #include "CameraManager.h"
+#include "DxState.h"
 
 void TestSJ::Init()
 {
@@ -29,7 +30,7 @@ void TestSJ::Init()
 
 		m_pStaticMesh = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pActor->SetMeshComponent(m_pStaticMesh);
-		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
+		m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
 		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
@@ -81,8 +82,6 @@ void TestSJ::Init()
 	(
 		[this](int selected, float glowPower, Vec3 glowColor, float dissolveThreshold)
 		{
-			//std::shared_ptr<UMaterial> targetMat = nullptr;
-
 			if (selected == 0 && m_pStaticMesh)
 			{
 				targetMat = m_pStaticMesh->GetMaterial();
@@ -103,11 +102,27 @@ void TestSJ::Init()
 
 void TestSJ::Update()
 {
+	{
+		static float angle = 0.0f;
+		angle += TIMER->GetDeltaTime();
+		angle = fmodf(angle, DD_PI*2); 
+
+		float radius = 6.0f;
+		float centerX = m_pActor->GetPosition().x;
+		float centerZ = m_pActor->GetPosition().z;
+
+		float x = centerX + radius * cosf(angle);
+		float z = centerZ + radius * sinf(angle);
+
+		Vec3 newPos = { x, 0.0f, z };
+		m_pActor2->SetPosition(newPos);
+	}
 	//Rim Light
 	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 	{
 		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetCameraPos();
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
+		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
 	}
 
 	//UVDistortion
@@ -336,8 +351,29 @@ void TestSJ::Render()
 	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
 	//	D2D1::ColorF::White                   // 메인 텍스트 색
 	//);
+
 	m_pCameraActor->Render();
+
+	// [1] Actor1 먼저 정상 렌더링 (깊이, 스텐실 기록 X)
+	m_pStaticMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
+	DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
 	m_pActor->Render();
+
+	// [2] Actor1 위치에 스텐실 = 1 설정 (깊이 테스트는 하되 기록 X)
+	m_pStaticMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
+	DC->OMSetDepthStencilState(STATE->m_pDSS_StencilWrite.Get(), 1);
+	m_pActor->Render();
+
+	// [3] Actor2 실루엣으로 스텐실 == 1 영역만 출력 (깊이 Disable)
+	m_pStaticMesh2->GetMaterial()->SetRenderMode(ERenderMode::Silhouette);
+	DC->OMSetDepthStencilState(STATE->m_pDSS_StencilMaskEqual.Get(), 1);
 	m_pActor2->Render();
+
+	// [4] Actor2 일반 렌더링 (깊이 Enable)
+	m_pStaticMesh2->GetMaterial()->SetRenderMode(ERenderMode::Default);
+	DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
+	m_pActor2->Render();
+
+	// [5] Skybox
 	m_pSky->Render();
 }
