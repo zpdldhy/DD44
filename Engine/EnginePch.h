@@ -60,13 +60,3 @@ using namespace std;
 // Window º¯¼ö
 extern POINT g_windowSize;
 extern HWND g_hWnd;
-
-struct MeshData
-{
-	bool m_bSkeleton = false;
-	vector<PNCT_VERTEX> m_vVertexList;
-	vector<IW_VERTEX> m_vIwList;
-	vector<DWORD> m_vIndexList;
-	UINT m_iMaterialIndex = -1;
-	vector<Matrix> m_vInverseBindPose;
-};

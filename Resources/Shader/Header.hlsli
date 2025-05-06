@@ -69,11 +69,18 @@ cbuffer CB_Light : register(b8)
     float3 padding_light; // 
 };
 
+cbuffer InverseBoneBuffer : register(b9)
+{
+    matrix obj_matBone[MAX_BONE];
+}
+
 cbuffer CB_Emissive : register(b10)
 {
     float3 g_vEmissiveColor;
     float g_fEmissivePower;
 }
+
+
 
 struct VS_IN
 {
