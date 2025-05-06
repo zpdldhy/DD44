@@ -15,8 +15,8 @@ protected:
 	// Get Prev Viewport
 	D3D11_VIEWPORT m_PrevVP;
 	UINT m_iViewPorts;
-	ID3D11RenderTargetView* m_pPrevRTV;
-	ID3D11DepthStencilView* m_pPrevDSV;
+	ID3D11RenderTargetView* m_pPrevRTV = nullptr;
+	ID3D11DepthStencilView* m_pPrevDSV = nullptr;
 
 public:
 	void CreateViewPortTexture(FLOAT _fWidth, FLOAT _fHeight);
