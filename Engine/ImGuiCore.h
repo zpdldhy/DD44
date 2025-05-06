@@ -24,11 +24,7 @@ public:
 	{
 		m_pMapEditorUI->SetOnCreateCallback(std::move(callback));
 	}
-	void SetEffectEditorCallback(std::function<void(int, float, Vec3, float)> callback)
-	{
-		m_pEffectEditorUI->SetEffectApplyCallback(std::move(callback));
-	}
-
+	
 
 public:
 	void Init();

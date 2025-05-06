@@ -161,6 +161,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="ACameraActor.h" />
     <ClInclude Include="ACharacter.h" />
     <ClInclude Include="ActorLoader.h" />
+    <ClInclude Include="ALight.h" />
     <ClInclude Include="APawn.h" />
     <ClInclude Include="ASky.h" />
     <ClInclude Include="AssimpLoader.h" />
@@ -174,6 +175,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="SkeletalMeshData.h" />
     <ClInclude Include="UAnimInstance.h" />
     <ClInclude Include="UBoxComponent.h" />
+    <ClInclude Include="ULightComponent.h" />
     <ClInclude Include="UShapeComponent.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="ATerrainTileActor.h" />
@@ -227,6 +229,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="ACameraActor.cpp" />
     <ClCompile Include="ACharacter.cpp" />
     <ClCompile Include="ActorLoader.cpp" />
+    <ClCompile Include="ALight.cpp" />
     <ClCompile Include="APawn.cpp" />
     <ClCompile Include="ASky.cpp" />
     <ClCompile Include="AssimpLoader.cpp" />
@@ -240,6 +243,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="SkeletalMeshData.cpp" />
     <ClCompile Include="UAnimInstance.cpp" />
     <ClCompile Include="UBoxComponent.cpp" />
+    <ClCompile Include="ULightComponent.cpp" />
     <ClCompile Include="UShapeComponent.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="ATerrainTileActor.cpp" />

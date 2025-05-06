@@ -45,6 +45,12 @@ struct CB_RMB
 	Vec3 padding;
 };
 
+struct CB_EMISSIVE
+{
+	Vec3 g_vEmissiveColor = Vec3(0, 0, 0);
+	float g_fEmissivePower = 0.0f;
+};
+
 class UMaterial
 {
 	shared_ptr<Shader> m_pShader = nullptr;
@@ -56,6 +62,7 @@ class UMaterial
 	ComPtr<ID3D11Buffer> m_pUVDistortionCB;
 	ComPtr<ID3D11Buffer> m_pCameraCB;
 	ComPtr<ID3D11Buffer> m_pRenderModeBuffer;
+	ComPtr<ID3D11Buffer> m_pEmissiveCB;
 public:
 	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
 	void SetHitFlashTime(float _flashTime);
@@ -64,16 +71,19 @@ public:
 	void UpdateUVDistortionBuffer(float _deltaTime);
 	void UpdateCameraBuffer();
 	void UpdateRenderModeBuffer();
+	void UpdateEmissiveBuffer();
 	void CreateGlowCB();
 	void CreateDissolveCB();
 	void CreateUVDistortionCB();
 	void CreateCameraCB();
 	void CreateRenderModeCB();
+	void CreateEmissiveCB();
 	void SetDissolveParams(float _threshold);
 	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
 	void SetUVDistortionParams(float _strength, float _speed, float _frequency);
 	void SetCameraPos(const Vec3& _cameraPos);
 	void SetRenderMode(ERenderMode _eMode);
+	void SetEmissiveParams(const Vec3& _color, float _power);
 	
 
 public:
@@ -83,6 +93,7 @@ public:
 	CB_CAMERA m_tCameraData;
 	CB_RMB m_tRenderModeData;
 	ERenderMode m_eRenderMode = ERenderMode::Default;
+	CB_EMISSIVE m_tEmissiveData;
 
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);

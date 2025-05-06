@@ -70,6 +70,12 @@
     <Filter Include="Component\Collision">
       <UniqueIdentifier>{d1e06b1e-19b6-4d9e-80b8-cc65e7f9b694}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Light">
+      <UniqueIdentifier>{a298e076-072c-4662-b42c-759c0c927ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Light">
+      <UniqueIdentifier>{bf228db6-d262-40b0-9adf-1d0e57d56b83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -266,6 +272,12 @@
     <ClInclude Include="SkeletalMeshData.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
+    <ClInclude Include="ULightComponent.h">
+      <Filter>Component\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="ALight.h">
+      <Filter>Object\Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -440,6 +452,12 @@
     <ClCompile Include="AnimTrack.cpp" />
     <ClCompile Include="SkeletalMeshData.cpp">
       <Filter>Headers\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="ULightComponent.cpp">
+      <Filter>Component\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="ALight.cpp">
+      <Filter>Object\Light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
