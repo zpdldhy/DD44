@@ -70,13 +70,7 @@ void Engine::Render()
 
 	// 3D World -> Texture Render
 	{
-		m_p3DWorldTexture->BeginViewPort();
-
-		_app->Render();
-
-		m_p3DWorldTexture->EndViewPort();
-		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
-		m_p3DWorld->Render();
+		Render3DWorld();
 	}
 
 	GUI->Render(); // *Fix Location* after _app->Render() 
@@ -141,4 +135,23 @@ void Engine::Create3DWorld()
 	m_p3DWorldTexture->CreateViewPortTexture(1440.f, 900.f);
 
 	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->GetTexture()->SetSRV(m_p3DWorldTexture->GetSRV());
+}
+
+void Engine::Render3DWorld()
+{
+	m_p3DWorldTexture->BeginViewPort();
+	_app->Render();
+	m_p3DWorldTexture->EndViewPort();
+
+	if (m_pCurrentRasterizer)
+		m_pCurrentRasterizer.Reset();
+
+	DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
+	DC->RSSetState(STATE->m_pRSSolidNone.Get());
+
+	CAMERAMANAGER->Render(CameraViewType::CVT_UI);
+	m_p3DWorld->Render();
+
+	DC->RSSetState(m_pCurrentRasterizer.Get());
+	m_pCurrentRasterizer.Reset();
 }
