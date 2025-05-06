@@ -2,6 +2,8 @@
 #define COMMON_HLSLI
 #define MAX_BONE 250
 
+static const float g_fShininess = 32.0f;
+
 cbuffer cb0 : register(b0)
 {
     row_major matrix g_matWorld;
@@ -40,13 +42,31 @@ cbuffer AnimationBuffer : register(b5)
 cbuffer CB_Camera : register(b6)
 {
     float3 g_vCameraPos;
-    float dummy_camera; // 16바이트 정렬용
+    float dummy_camera; 
 };
 
 cbuffer CB_RenderMode : register(b7)
 {
     int g_iRenderMode;
     float3 padding_rendermode;
+};
+
+cbuffer CB_Light : register(b8)
+{
+    float3 g_vLightColor;
+    float g_fIntensity;
+
+    float3 g_vLightDirection;
+    float g_fRange;
+
+    float3 g_vLightPosition;
+    float g_fAngle;
+
+    int g_iLightType; // 0 = Dir, 1 = Point, 2 = Spot
+    float3 g_vAmbientColor;
+
+    float g_fAmbientPower; // 
+    float3 padding_light; // 
 };
 
 struct VS_IN
@@ -138,6 +158,29 @@ float3 ApplyRimLight(float3 normal, float3 worldPos)
 float3 ApplyHitFlash(float3 baseColor)
 {
     return lerp(baseColor, float3(1.0f, 1.0f, 1.0f), saturate(g_fHitFlashTime));
+}
+
+float3 ApplyLambertLighting(float3 normal)
+{
+    float3 lightDir = normalize(-g_vLightDirection);
+    float NdotL = saturate(dot(normal, lightDir));
+    return g_vLightColor * NdotL * g_fIntensity;
+}
+
+float3 ApplySpecular(float3 normal, float3 worldPos)
+{
+    float3 N = normalize(normal);
+    float3 L = normalize(-g_vLightDirection);
+    float3 V = normalize(g_vCameraPos - worldPos);
+    float3 H = normalize(L + V); // Half vector
+
+    float spec = pow(saturate(dot(N, H)), g_fShininess);
+    return g_vLightColor * spec * g_fIntensity* 10.0f ;
+}
+
+float3 ApplyAmbient()
+{
+    return g_vAmbientColor * g_fAmbientPower;
 }
 
 #endif

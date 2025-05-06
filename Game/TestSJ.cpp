@@ -13,6 +13,7 @@
 #include "EngineCameraMoveScript.h"
 #include "CameraManager.h"
 #include "DxState.h"
+#include "ALight.h"
 
 void TestSJ::Init()
 {
@@ -71,6 +72,15 @@ void TestSJ::Init()
 		m_pStaticMesh->GetMaterial()->SetNoiseTexture(noiseTex);
 	}
 
+	m_pLight = make_shared<ALight>();
+	m_pLight->SetPosition(Vec3(0, 0, -10));
+//	m_pLight->SetRotation(Vec3(0, DD_PI, 0)); // 카메라 방향으로 빛 쏘기
+	m_pLight->SetRotation(Vec3(0, 0, 0)); // 카메라 방향으로 빛 쏘기
+	m_pLight->GetLightComponent()->SetAmbientColor(Vec3(0.0f, 0.0f, 1.0f));
+	m_pLight->GetLightComponent()->SetAmbientPower(0.2f);
+
+
+	m_pLight->Init();
 	m_pCameraActor->Init();
 	m_pActor->Init();
 	m_pActor2->Init();
@@ -102,6 +112,7 @@ void TestSJ::Init()
 
 void TestSJ::Update()
 {
+	// 오브젝트 회전
 	{
 		static float angle = 0.0f;
 		angle += TIMER->GetDeltaTime();
@@ -127,24 +138,24 @@ void TestSJ::Update()
 
 	//UVDistortion
 	{
-		static bool bUVInitialized = false;
-		if (!bUVInitialized)
-		{
-			m_pStaticMesh->GetMaterial()->SetUVDistortionParams(0.08f, 1.0f, 15.0f); // strength, speed, frequency
-			m_pStaticMesh2->GetMaterial()->SetUVDistortionParams(0.01f, 1.5f, 8.0f);  // optional: 다른 효과
-			bUVInitialized = true;
-		}
+		//static bool bUVInitialized = false;
+		//if (!bUVInitialized)
+		//{
+		//	m_pStaticMesh->GetMaterial()->SetUVDistortionParams(0.08f, 1.0f, 15.0f); // strength, speed, frequency
+		//	m_pStaticMesh2->GetMaterial()->SetUVDistortionParams(0.01f, 1.5f, 8.0f);  // optional: 다른 효과
+		//	bUVInitialized = true;
+		//}
 
-		float delta = TIMER->GetDeltaTime();
+		//float delta = TIMER->GetDeltaTime();
 
-		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
-		{
-			m_pStaticMesh->GetMaterial()->UpdateUVDistortionBuffer(delta);
-		}
-		if (m_pStaticMesh2 && m_pStaticMesh2->GetMaterial())
-		{
-			m_pStaticMesh2->GetMaterial()->UpdateUVDistortionBuffer(delta);
-		}
+		//if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+		//{
+		//	m_pStaticMesh->GetMaterial()->UpdateUVDistortionBuffer(delta);
+		//}
+		//if (m_pStaticMesh2 && m_pStaticMesh2->GetMaterial())
+		//{
+		//	m_pStaticMesh2->GetMaterial()->UpdateUVDistortionBuffer(delta);
+		//}
 	}
 
 
@@ -264,13 +275,13 @@ void TestSJ::Update()
 			m_pStaticMesh2->GetMaterial()->SetHitFlashTime(flashTimer);
 	}
 	//Sound
-	{
+	/*{
 		SOUNDMANAGER->GetPtr(ESoundType::Bgm)->Play2D();
 		if (INPUT->GetButton(A))
 		{
 			SOUNDMANAGER->GetPtr(ESoundType::Bomb)->PlayEffect2D();
 		}
-	}
+	}*/
 	//Write
 	{
 		/*if (INPUT->GetButton(A))
@@ -351,7 +362,7 @@ void TestSJ::Render()
 	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
 	//	D2D1::ColorF::White                   // 메인 텍스트 색
 	//);
-
+	m_pLight->Render();
 	m_pCameraActor->Render();
 
 	// [1] Actor1 먼저 정상 렌더링 (깊이, 스텐실 기록 X)
