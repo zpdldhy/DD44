@@ -25,8 +25,8 @@ protected:
 	bool CreateIndexBuffer();
 
 public:
-	virtual void Create() {};
-	virtual void Bind() {};
+	virtual void Create() abstract;
+	virtual void Bind() abstract;
 
 public:
 	ComPtr<ID3D11Buffer> GetVertexBuffer() { return m_pVertexBuffer; }

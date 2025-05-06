@@ -214,7 +214,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="USceneComponent.h" />
     <ClInclude Include="UScriptComponent.h" />
     <ClInclude Include="USkeletalMeshResources.h" />
-    <ClInclude Include="USkinnedComponent.h" />
     <ClInclude Include="USkinnedMeshComponent.h" />
     <ClInclude Include="UStaticMeshComponent.h" />
     <ClInclude Include="UStaticMeshResources.h" />
@@ -293,7 +292,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="USceneComponent.cpp" />
     <ClCompile Include="UScriptComponent.cpp" />
     <ClCompile Include="USkeletalMeshResources.cpp" />
-    <ClCompile Include="USkinnedComponent.cpp" />
     <ClCompile Include="USkinnedMeshComponent.cpp" />
     <ClCompile Include="UStaticMeshComponent.cpp" />
     <ClCompile Include="UStaticMeshResources.cpp" />

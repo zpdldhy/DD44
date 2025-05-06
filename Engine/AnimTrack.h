@@ -9,8 +9,7 @@ public:
 	CbAnimData currentAnimData;
 	//vector<AnimList> animTrackList;
 	//vector<Matrix> inverseBone;
-	int meshIndex = 0; 
 public:
 	void Render();
-	void SetBase(shared_ptr<UAnimInstance> _animInstance, int _index) { animInstance = _animInstance; meshIndex = _index; }
+	void SetBase(shared_ptr<UAnimInstance> _animInstance) { animInstance = _animInstance; }
 };

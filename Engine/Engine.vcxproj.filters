@@ -165,9 +165,6 @@
     <ClInclude Include="ImGuiCore.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="USkinnedComponent.h">
-      <Filter>Component\Mesh</Filter>
-    </ClInclude>
     <ClInclude Include="UActorComponent.h">
       <Filter>Component</Filter>
     </ClInclude>
@@ -348,9 +345,6 @@
     </ClCompile>
     <ClCompile Include="ImGuiCore.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="USkinnedComponent.cpp">
-      <Filter>Component\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="UActorComponent.cpp">
       <Filter>Component</Filter>

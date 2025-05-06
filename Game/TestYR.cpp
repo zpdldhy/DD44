@@ -7,6 +7,7 @@
 #include "USkinnedMeshComponent.h"
 #include "Input.h"
 #include "UMaterial.h"
+#include "UAnimInstance.h"
 #include "AnimTrack.h"
 #include "ImGuiCore.h"
 
@@ -79,49 +80,50 @@ void TestYR::Init()
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 
-	//// LOAD ALL TEXTURE
-	//{
-	//	string path = "../Resources/Texture/ObjTexture/*.png";
-	//	HANDLE hFind;
-	//	WIN32_FIND_DATAA data;
-	//	vector<string> fileList;
-	//	if ((hFind = FindFirstFileA(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
-	//	{
-	//		do
-	//		{
-	//			string directory = "../Resources/Texture/ObjTexture/";
-	//			directory += string(data.cFileName);
-	//			fileList.emplace_back(directory);
-	//		} while (FindNextFileA(hFind, &data) != 0);
-	//		FindClose(hFind);
-	//	}
-	//	for (int iPath = 0; iPath < fileList.size(); iPath++)
-	//	{
-	//		shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
-	//		tempMat->Load(to_mw(fileList[iPath]), L"../Resources/Shader/Default.hlsl");
-	//		materialList.emplace_back(tempMat);
-	//	}
-	//}
-	//m_vObjList = objLoader.Load();
-
-	targetObj = m_vActorList[targetIndex];
-
-	GUI->InitMeshDataByCallBack(m_vActorList.size(), meshList.size());
-
-
-
-	GUI->SetObjectCallback([this](int target)
+	// LOAD ALL TEXTURE
+	{
+		string path = "../Resources/Texture/ObjTexture/*.png";
+		HANDLE hFind;
+		WIN32_FIND_DATAA data;
+		vector<string> fileList;
+		if ((hFind = FindFirstFileA(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
 		{
-			targetIndex = target;
-			targetObj = m_vActorList[targetIndex];
+			do
+			{
+				string directory = "../Resources/Texture/ObjTexture/";
+				directory += string(data.cFileName);
+				fileList.emplace_back(directory);
+			} while (FindNextFileA(hFind, &data) != 0);
+			FindClose(hFind);
 		}
-	);
-
-	GUI->SetMeshCallback([this](int targetActor, int targetMesh)
+		for (int iPath = 0; iPath < fileList.size(); iPath++)
 		{
-			m_vActorList[targetActor]->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[targetMesh]);
+			shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
+			tempMat->Load(to_mw(fileList[iPath]), L"../Resources/Shader/Default.hlsl");
+			materialList.emplace_back(tempMat);
 		}
-	);
+	}
+	m_vObjList = objLoader.Load();
+	//m_vObjList[0]->SetScale(Vec3(12.0f, 12.0f, 12.0f));
+
+	targetObj = m_vObjList[targetIndex];
+
+	//GUI->InitMeshDataByCallBack(m_vActorList.size(), meshList.size());
+
+
+
+	//GUI->SetObjectCallback([this](int target)
+	//	{
+	//		targetIndex = target;
+	//		targetObj = m_vActorList[targetIndex];
+	//	}
+	//);
+
+	//GUI->SetMeshCallback([this](int targetActor, int targetMesh)
+	//	{
+	//		m_vActorList[targetActor]->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[targetMesh]);
+	//	}
+	//);
 }
 void TestYR::Update()
 {
@@ -135,16 +137,16 @@ void TestYR::Update()
 
 	if (INPUT->GetButton(GameKey::C))
 	{
-		if (++targetIndex >= m_vActorList.size())
+		if (++targetIndex >= m_vObjList.size())
 		{
 			targetIndex = 0;
 		}
-		targetObj = m_vActorList[targetIndex];
+		targetObj = m_vObjList[targetIndex];
 	}
 
 	// Texture ¹Ù²Ù±â
 	{
-		/*if (INPUT->GetButton(GameKey::T))
+		if (INPUT->GetButton(GameKey::T))
 		{
 			if (++matIndex >= materialList.size())
 			{
@@ -160,7 +162,7 @@ void TestYR::Update()
 				matIndex = 0;
 			}
 			targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
-		}*/
+		}
 	}
 }
 void TestYR::Render()

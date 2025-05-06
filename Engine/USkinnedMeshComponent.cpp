@@ -19,9 +19,14 @@ void USkinnedMeshComponent::Tick()
 
 void USkinnedMeshComponent::PreRender()
 {
+	
 	if (m_pMeshAnim) m_pMeshAnim->Render();
 
-	if (m_pMesh) { m_pMesh->Bind(); }
+	if (m_pMesh) 
+	{ 
+		m_pMesh->Bind();
+		m_pMesh->UpdateBindPoseData();
+	}
 
 	if (m_pMaterial) { m_pMaterial->Bind(); }
 }

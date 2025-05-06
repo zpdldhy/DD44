@@ -49,6 +49,11 @@ cbuffer CB_RenderMode : register(b7)
     float3 padding_rendermode;
 };
 
+cbuffer InverseBoneBuffer : register(b9)
+{
+    matrix obj_matBone[MAX_BONE];
+}
+
 struct VS_IN
 {
     float3 p : POSITION;
