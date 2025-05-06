@@ -1,8 +1,11 @@
 #pragma once
+#include "SkeletalMeshData.h"
 #include <Fbx/fbxsdk.h>
 #pragma comment(lib, "Fbx/libfbxsdk-md.lib")
 #pragma comment(lib, "Fbx/libxml2-md.lib")
 #pragma comment(lib, "Fbx/zlib-md.lib")
+
+
 
 struct TIwData
 {
@@ -15,14 +18,14 @@ struct TIwData
 		return m_vIndexList.size();
 	}
 };
-struct AnimTrack
-{
-	wstring m_szName;
-	UINT m_iStartFrame;
-	UINT m_iEndFrame;
-
-	vector<vector<Matrix>> m_vAnim;
-};
+//struct AnimTrackData
+//{
+//	wstring m_szName;
+//	UINT m_iStartFrame;
+//	UINT m_iEndFrame;
+//
+//	vector<vector<Matrix>> m_vAnim;
+//};
 //struct MeshData
 //{
 //	bool m_bSkeleton = false;
@@ -32,20 +35,21 @@ struct AnimTrack
 //	UINT m_iMaterialIndex = -1;
 //	vector<Matrix> m_vInverseBindPose;
 //};
-struct BoneNode
-{
-	UINT m_iIndex;
-	wstring m_szName;
-	wstring m_szParentName;
-	vector<wstring> m_vChildName;
-};
+//struct BoneNode
+//{
+//	UINT m_iIndex;
+//	wstring m_szName;
+//	wstring m_szParentName;
+//	vector<wstring> m_vChildName;
+//};
 struct TFbxResource
 {
+	wstring name;
 	// Material
 	map<int, wstring> m_mTexPathList;
 
 	// AnimData
-	vector<AnimTrack> m_vAnimTrackList;
+	vector<AnimTrackData> m_vAnimTrackList;
 
 	// MESH DATA
 	vector<vector<Matrix>> m_vInverseBindPose;
@@ -78,6 +82,17 @@ struct TFbxResource
 		m_iNodeCount = 0;
 	}
 };
+
+struct ParsingData
+{
+	TFbxResource m_ActorData;
+
+	vector<MeshData> m_vMeshList;
+	AnimSequence m_AnimData;
+	Skeleton m_Skeleton;
+	vector<wstring> m_vTexPathList;
+};
+
 struct TempNode
 {
 	UINT m_iIndex;
@@ -105,6 +120,12 @@ public:
 
 	Vec4 m_vRootPos;
 	UINT m_iBoneIndex = 0;
+	// Anim 
+	int repeatThreshold = 2;
+	int repeatCount = 0;
+	int lastMeaningfulFrame = -1;
+	int maxValidFrame = 0;
+
 public:
 	void Init(string _loadFile);
 	void Destroy();
@@ -114,8 +135,9 @@ public:
 	void ParseMesh(FbxNode* _node);
 	bool ParseSkinningMesh(FbxMesh* _mesh);
 	void ParseAnimation();
-	void GetAnimation(int animTrack, AnimTrack* track);
-	vector<Matrix> GetNodeAnimation(FbxNode* node, AnimTrack* track);
+	void GetAnimationTrack(int animTrack, int Count);
+	void GetAnimation(int animTrack, AnimTrackData* track);
+	vector<Matrix> GetNodeAnimation(FbxNode* node, AnimTrackData* track);
 public:
 	string ParseMaterial(FbxSurfaceMaterial* _pSurface);
 	FbxColor ReadColor(FbxMesh* mesh, DWORD dwVertexColorCount, FbxLayerElementVertexColor* pVertexColorSet, DWORD dwDCCIndex, DWORD dwVertexIndex);

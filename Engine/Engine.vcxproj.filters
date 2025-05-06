@@ -70,6 +70,12 @@
     <Filter Include="Component\Collision">
       <UniqueIdentifier>{d1e06b1e-19b6-4d9e-80b8-cc65e7f9b694}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Light">
+      <UniqueIdentifier>{a298e076-072c-4662-b42c-759c0c927ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Light">
+      <UniqueIdentifier>{bf228db6-d262-40b0-9adf-1d0e57d56b83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -165,9 +171,6 @@
     <ClInclude Include="ImGuiCore.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="USkinnedComponent.h">
-      <Filter>Component\Mesh</Filter>
-    </ClInclude>
     <ClInclude Include="UActorComponent.h">
       <Filter>Component</Filter>
     </ClInclude>
@@ -228,9 +231,6 @@
     <ClInclude Include="USkinnedMeshComponent.h">
       <Filter>Component\Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="UAnimation.h">
-      <Filter>Resources</Filter>
-    </ClInclude>
     <ClInclude Include="AAsset.h">
       <Filter>Utils\ModelLoader</Filter>
     </ClInclude>
@@ -266,6 +266,17 @@
     </ClInclude>
     <ClInclude Include="CollisionManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="UAnimInstance.h" />
+    <ClInclude Include="AnimTrack.h" />
+    <ClInclude Include="SkeletalMeshData.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="ULightComponent.h">
+      <Filter>Component\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="ALight.h">
+      <Filter>Object\Light</Filter>
     </ClInclude>
     <ClInclude Include="ViewPortTexture.h">
       <Filter>Resources</Filter>
@@ -353,9 +364,6 @@
     <ClCompile Include="ImGuiCore.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="USkinnedComponent.cpp">
-      <Filter>Component\Mesh</Filter>
-    </ClCompile>
     <ClCompile Include="UActorComponent.cpp">
       <Filter>Component</Filter>
     </ClCompile>
@@ -410,9 +418,6 @@
     <ClCompile Include="USkinnedMeshComponent.cpp">
       <Filter>Component\Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="UAnimation.cpp">
-      <Filter>Resources</Filter>
-    </ClCompile>
     <ClCompile Include="AAsset.cpp">
       <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
@@ -448,6 +453,17 @@
     </ClCompile>
     <ClCompile Include="CollisionManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="UAnimInstance.cpp" />
+    <ClCompile Include="AnimTrack.cpp" />
+    <ClCompile Include="SkeletalMeshData.cpp">
+      <Filter>Headers\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="ULightComponent.cpp">
+      <Filter>Component\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="ALight.cpp">
+      <Filter>Object\Light</Filter>
     </ClCompile>
     <ClCompile Include="ViewPortTexture.cpp">
       <Filter>Resources</Filter>

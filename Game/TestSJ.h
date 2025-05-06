@@ -6,6 +6,9 @@ class UMaterial;
 
 class TestSJ : public IExecute
 {
+private:
+	std::shared_ptr<UMaterial> targetMat = nullptr;
+
 public:
 	virtual void Init() override;
 	virtual void Update() override;
@@ -20,5 +23,6 @@ public:
 	shared_ptr<class ACameraActor> m_pCameraActor;
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
+	shared_ptr<class ALight> m_pLight;
 };
 

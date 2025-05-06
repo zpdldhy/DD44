@@ -52,6 +52,21 @@ void AAsset::Export(TFbxResource _result, string filepath)
 		}
 	}
 
+	// BONE
+	for (auto& data : _result.m_mSkeletonList)
+	{
+		// BONE NAME
+		UINT nameSize = static_cast<UINT>(data.second.m_szName.size());
+		fwrite(&nameSize, sizeof(UINT), 1, pFile);
+		fwrite(data.second.m_szName.data(), sizeof(wchar_t), nameSize, pFile);
+
+		// BONE DATA
+		fwrite(&data.second.m_iIndex, sizeof(UINT), 1, pFile);
+		UINT parentNameSize = static_cast<UINT>(data.second.m_szParentName.size());
+		fwrite(&parentNameSize, sizeof(UINT), 1, pFile);
+		fwrite(data.second.m_szParentName.data(), sizeof(wchar_t), parentNameSize, pFile);
+	}
+
 	// INVERSE MAT BONE
 	for (int iMat = 0; iMat < _result.m_iMeshCount; iMat++)
 	{
@@ -63,6 +78,10 @@ void AAsset::Export(TFbxResource _result, string filepath)
 	{
 		auto& child = _result.m_vMeshList[iMesh];
 		// HEADER FOR NODE
+		UINT nameSize = child.m_szName.size();
+		fwrite(&nameSize, sizeof(UINT), 1, pFile);
+		fwrite(child.m_szName.data(), sizeof(wchar_t), nameSize, pFile);
+
 		fwrite(&child.m_bSkeleton, sizeof(bool), 1, pFile);
 		UINT vertexSize = child.m_vVertexList.size();
 		fwrite(&vertexSize, sizeof(UINT), 1, pFile);
@@ -94,8 +113,8 @@ TFbxResource AAsset::Load(const char* fileName)
 
 	errno_t err = fopen_s(&pFile, fileName, "rb");
 	if (err != 0) { assert(false); }
-
 	TFbxResource result;
+	result.name = SplitName(to_mw(fileName));
 
 	// HEADER
 	fread(&result.m_iBoneCount, sizeof(UINT), 1, pFile);
@@ -143,6 +162,28 @@ TFbxResource AAsset::Load(const char* fileName)
 		}
 	}
 
+	// BONE
+	for (int iBone = 0; iBone < result.m_iBoneCount; iBone++)
+	{
+		BoneNode bone;
+		// BONE NAME
+		UINT nameSize;
+		fread(&nameSize, sizeof(UINT), 1, pFile);
+		bone.m_szName.resize(nameSize);
+		fread(&bone.m_szName[0], sizeof(wchar_t), nameSize, pFile);
+
+		// BONE DATA
+		fread(&bone.m_iIndex, sizeof(UINT), 1, pFile);
+
+		UINT parentNameSize;
+		fread(&parentNameSize, sizeof(UINT), 1, pFile);
+		bone.m_szParentName.resize(parentNameSize);
+		fread(&bone.m_szParentName[0], sizeof(wchar_t), parentNameSize, pFile);
+
+		result.m_mSkeletonList.insert(make_pair(bone.m_iIndex, bone));
+	}
+
+
 	// INVERSE MAT BONE
 	result.m_vInverseBindPose.resize(result.m_iMeshCount);
 	for (int iMat = 0; iMat < result.m_iMeshCount; iMat++)
@@ -155,8 +196,13 @@ TFbxResource AAsset::Load(const char* fileName)
 	result.m_vMeshList.resize(result.m_iMeshCount);
 	for (int iMesh = 0; iMesh < result.m_iMeshCount; iMesh++)
 	{
-		// HEADER FOR NODE
 		auto& child = result.m_vMeshList[iMesh];
+		// HEADER FOR NODE
+		UINT nameSize;
+		fread(&nameSize, sizeof(UINT), 1, pFile);
+		child.m_szName.resize(nameSize);
+		fread(&child.m_szName[0], sizeof(wchar_t), nameSize, pFile);
+		
 		fread(&child.m_bSkeleton, sizeof(bool), 1, pFile);
 		UINT vertexSize = 0;
 		fread(&vertexSize, sizeof(UINT), 1, pFile);
@@ -180,7 +226,7 @@ TFbxResource AAsset::Load(const char* fileName)
 			fread(&child.m_vIndexList.at(0), sizeof(DWORD), indexSize, pFile);
 		}
 	}
-
+	
 	fclose(pFile);
 	return result;
 }

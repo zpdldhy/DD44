@@ -12,6 +12,8 @@
 #include "ImGuiCore.h"
 #include "EngineCameraMoveScript.h"
 #include "CameraManager.h"
+#include "DxState.h"
+#include "ALight.h"
 
 void TestSJ::Init()
 {
@@ -29,7 +31,7 @@ void TestSJ::Init()
 
 		m_pStaticMesh = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pActor->SetMeshComponent(m_pStaticMesh);
-		m_pActor->SetScale({ 1.0f, 1.0f, 1.0f });
+		m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
 		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
@@ -51,7 +53,10 @@ void TestSJ::Init()
 
 		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
 		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+		
 		m_pStaticMesh2->SetMaterial(material2);
+		
+		
 	}
 
 	{
@@ -70,23 +75,88 @@ void TestSJ::Init()
 		m_pStaticMesh->GetMaterial()->SetNoiseTexture(noiseTex);
 	}
 
+	m_pLight = make_shared<ALight>();
+	m_pLight->SetPosition(Vec3(0, 0, -10));
+	//	m_pLight->SetRotation(Vec3(0, DD_PI, 0)); // 카메라 방향으로 빛 쏘기
+	m_pLight->SetRotation(Vec3(0, 0, 0)); // 카메라 방향으로 빛 쏘기
+	m_pLight->GetLightComponent()->SetAmbientColor(Vec3(0.0f, 0.0f, 1.0f));
+	m_pLight->GetLightComponent()->SetAmbientPower(0.2f);
+
+
+	m_pLight->Init();
 	m_pCameraActor->Init();
 	m_pActor->Init();
 	m_pActor2->Init();
 	m_pSky->Init();
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+
+	GUI->GetEffectEditorUI()->SetEffectApplyCallback(
+		[this](int selected, float glowPower, Vec3 glowColor, float dissolveThreshold, Vec3 emissiveColor, float emissivePower) {
+			if (selected == 0 && m_pStaticMesh)
+			{
+				targetMat = m_pStaticMesh->GetMaterial();
+			}
+			else if (selected == 1 && m_pStaticMesh2)
+			{
+				targetMat = m_pStaticMesh2->GetMaterial();
+			}
+
+			if (targetMat)
+			{
+				targetMat->SetGlowParams(glowPower, glowColor);
+				targetMat->SetDissolveParams(dissolveThreshold);
+				targetMat->SetEmissiveParams(emissiveColor, emissivePower);
+			}
+		}
+	);
+
+	GUI->GetEffectEditorUI()->SetLightApplyCallback(
+		[this](ELightType lightType, Vec3 lightColor, float intensity, Vec3 ambientColor, float ambientPower)
+		{
+			if (m_pLight && m_pLight->GetLightComponent())
+			{
+				m_pLight->GetLightComponent()->SetLightType(static_cast<ELightType>(lightType));
+				m_pLight->GetLightComponent()->SetColor(lightColor);
+				m_pLight->GetLightComponent()->SetIntensity(intensity);
+				m_pLight->GetLightComponent()->SetAmbientColor(ambientColor);
+				m_pLight->GetLightComponent()->SetAmbientPower(ambientPower);
+			}
+		}
+	);
+
+
 }
 
 void TestSJ::Update()
 {
+	// 오브젝트 회전
+	{
+		static float angle = 0.0f;
+		angle += TIMER->GetDeltaTime();
+		angle = fmodf(angle, DD_PI * 2);
+
+		float radius = 6.0f;
+		float centerX = m_pActor->GetPosition().x;
+		float centerZ = m_pActor->GetPosition().z;
+
+		float x = centerX + radius * cosf(angle);
+		float z = centerZ + radius * sinf(angle);
+
+		Vec3 newPos = { x, 0.0f, z };
+		m_pActor2->SetPosition(newPos);
+	}
 	//Rim Light
 	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 	{
 		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetCameraPos();
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
+		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
 	}
-
+	//Emissive
+	{
+		m_pStaticMesh2->GetMaterial()->SetEmissiveParams(Vec3(0.0f, 1.0f, 0.0f), 0.1f);
+	}
 	//UVDistortion
 	{
 		static bool bUVInitialized = false;
@@ -110,7 +180,8 @@ void TestSJ::Update()
 	}
 
 
-	shared_ptr<UMaterial> targetMat = nullptr;
+	{
+		/*shared_ptr<UMaterial> targetMat = nullptr;
 	static int prevSelected = -1;
 	if (GUI->m_iSelectedActor != prevSelected)
 	{
@@ -126,10 +197,10 @@ void TestSJ::Update()
 			GUI->SetInitialMaterialValues(m_pStaticMesh2->GetMaterial());
 		}
 		return;
-	}
+	}*/
 
-	
-	if (GUI->m_iSelectedActor == 0 && m_pStaticMesh)
+
+	/*if (GUI->m_iSelectedActor == 0 && m_pStaticMesh)
 	{
 		targetMat = m_pStaticMesh->GetMaterial();
 	}
@@ -138,14 +209,16 @@ void TestSJ::Update()
 		targetMat = m_pStaticMesh2->GetMaterial();
 	}
 
-	
+
 	if(targetMat)
 	{
 		targetMat->SetGlowParams(GUI->m_fGlowPower, GUI->m_vGlowColor);
 		targetMat->SetDissolveParams(GUI->m_fDissolveThreshold);
+	}*/
+
+
 	}
 
-	
 	// fallback 제거 가능 (선택이 명확하니까)
 	//GUI->SetTargetMaterial(targetMat);
 	//Glow
@@ -196,29 +269,43 @@ void TestSJ::Update()
 	}
 	//Flesh
 	{
+		//static float flashTimer = 0.0f;
+
+		//if (INPUT->GetButtonDown(R)) // 피격 가정
+		//{
+		//	flashTimer = 1.0f; // Flash 시작
+		//}
+
+		//flashTimer -= TIMER->GetDeltaTime() * 3.0f; // 빠르게 사라지게
+		//flashTimer = max(flashTimer, 0.0f);
+
+		//if (targetMat)
+		//{
+		//	targetMat->SetHitFlashTime(flashTimer);
+		//}
 		static float flashTimer = 0.0f;
 
-		if (INPUT->GetButtonDown(R)) // 피격 가정
-		{
-			flashTimer = 1.0f; // Flash 시작
-		}
+		if (INPUT->GetButtonDown(R))
+			flashTimer = 1.0f;
 
-		flashTimer -= TIMER->GetDeltaTime() * 3.0f; // 빠르게 사라지게
+		flashTimer -= TIMER->GetDeltaTime() * 3.0f;
 		flashTimer = max(flashTimer, 0.0f);
 
-		if (targetMat)
-		{
-			targetMat->SetHitFlashTime(flashTimer);
-		}
+		int selected = GUI->GetEffectEditorUI()->GetSelectedActor(); // 또는 따로 selected 값 가져오기
+
+		if (selected == 0 && m_pStaticMesh)
+			m_pStaticMesh->GetMaterial()->SetHitFlashTime(flashTimer);
+		else if (selected == 1 && m_pStaticMesh2)
+			m_pStaticMesh2->GetMaterial()->SetHitFlashTime(flashTimer);
 	}
 	//Sound
-	{
-		//m_pBgm->Play2D();
+	/*{
+		SOUNDMANAGER->GetPtr(ESoundType::Bgm)->Play2D();
 		if (INPUT->GetButton(A))
 		{
 			SOUNDMANAGER->GetPtr(ESoundType::Bomb)->PlayEffect2D();
 		}
-	}
+	}*/
 	//Write
 	{
 		/*if (INPUT->GetButton(A))
@@ -299,8 +386,29 @@ void TestSJ::Render()
 	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
 	//	D2D1::ColorF::White                   // 메인 텍스트 색
 	//);
+	m_pLight->Render();
 	m_pCameraActor->Render();
+
+	// [1] Actor1 먼저 정상 렌더링 (깊이, 스텐실 기록 X)
+	m_pStaticMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
+	DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
 	m_pActor->Render();
+
+	// [2] Actor1 위치에 스텐실 = 1 설정 (깊이 테스트는 하되 기록 X)
+	m_pStaticMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
+	DC->OMSetDepthStencilState(STATE->m_pDSS_StencilWrite.Get(), 1);
+	m_pActor->Render();
+
+	// [3] Actor2 실루엣으로 스텐실 == 1 영역만 출력 (깊이 Disable)
+	m_pStaticMesh2->GetMaterial()->SetRenderMode(ERenderMode::Silhouette);
+	DC->OMSetDepthStencilState(STATE->m_pDSS_StencilMaskEqual.Get(), 1);
 	m_pActor2->Render();
+
+	// [4] Actor2 일반 렌더링 (깊이 Enable)
+	m_pStaticMesh2->GetMaterial()->SetRenderMode(ERenderMode::Default);
+	DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
+	m_pActor2->Render();
+
+	// [5] Skybox
 	m_pSky->Render();
 }
