@@ -400,4 +400,5 @@ FodyWeavers.xsd
 *.sln.iml
 /Resources
 !/Resources/Shader/
+!/Resources/Shader/**
 /Libraries
