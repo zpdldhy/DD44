@@ -267,6 +267,9 @@
     <ClInclude Include="CollisionManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="ViewPortTexture.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -442,6 +445,9 @@
     </ClCompile>
     <ClCompile Include="CollisionManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewPortTexture.cpp">
+      <Filter>Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

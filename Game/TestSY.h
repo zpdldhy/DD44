@@ -19,31 +19,13 @@ public:
 	bool m_bEditorWireframe = false;
 
 	// ViewPort Texture
-	shared_ptr<class APawn> m_pPlane;
-
-	D3D11_VIEWPORT m_vp;
-	D3D11_TEXTURE2D_DESC	m_TexDesc;
-	ComPtr<ID3D11Texture2D> m_pTexture = nullptr;
-	ComPtr<ID3D11ShaderResourceView> m_pSRV = nullptr;
-	ComPtr<ID3D11RenderTargetView> m_pRenderTargetView = nullptr;
-	ComPtr<ID3D11DepthStencilView> m_pDepthStencilView = nullptr;
-	ComPtr<ID3D11ShaderResourceView> m_pDsvSRV = nullptr;// ±Ì¿Ãπˆ∆€ ∏Æº“Ω∫∫‰
-
-	// Get Prev Viewport
-	D3D11_VIEWPORT m_PrevVP;
-	UINT m_iViewPorts;
-	ID3D11RenderTargetView* m_pPrevRTV;
-	ID3D11DepthStencilView* m_pPrevDSV;
+	shared_ptr<class APawn> m_pPlane = nullptr;
+	shared_ptr<class ViewPortTexture> m_pTexture = nullptr;
 
 public:
 	void Init() override;
 	void Update() override;
 	void Render() override;
 	void Destroy();
-
-public:
-	void CreateViewPortTexture();
-	void BeginViewPort();
-	void EndViewPort();
 };
 

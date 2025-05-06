@@ -218,6 +218,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="UStaticMeshResources.h" />
     <ClInclude Include="UTerrainMeshComponent.h" />
     <ClInclude Include="Vertex.h" />
+    <ClInclude Include="ViewPortTexture.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -295,6 +296,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="UStaticMeshResources.cpp" />
     <ClCompile Include="UTerrainMeshComponent.cpp" />
     <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="ViewPortTexture.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
