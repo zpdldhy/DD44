@@ -22,14 +22,14 @@ LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lPar
         PostQuitMessage(0);
         break;
 
-    case WM_SIZE:
-        if (_wParam != SIZE_MINIMIZED)
-        {
-            UINT width = LOWORD(_lParam);
-            UINT height = HIWORD(_lParam);
+    //case WM_SIZE:
+    //    if (_wParam != SIZE_MINIMIZED)
+    //    {
+    //        UINT width = LOWORD(_lParam);
+    //        UINT height = HIWORD(_lParam);
 
-            GET_SINGLE(Device)->OnResize(width, height);
-        }
+    //        GET_SINGLE(Device)->OnResize(width, height);
+    //    }
         return 0;
     }
     return  DefWindowProc(_hWnd, _message, _wParam, _lParam);

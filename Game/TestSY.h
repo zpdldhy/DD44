@@ -17,7 +17,9 @@ public:
 	std::vector<std::shared_ptr<class ATerrainTileActor>> m_vTiles;
 
 	shared_ptr<class UStaticMeshComponent> m_pObjMesh;
-	shared_ptr<class APawn> m_pObj;
+	shared_ptr<class AActor> m_pObj;
+
+	std::vector<std::shared_ptr<class AActor>> m_vObjects;
 
 	bool m_bEditorWireframe = false;
 
