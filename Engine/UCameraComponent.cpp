@@ -37,12 +37,17 @@ void UCameraComponent::Render()
 {
 	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE && m_bVisibleFrustumBox)
 	{
+		if (m_pCurrentRasterizer)
+			m_pCurrentRasterizer.Reset();
+
 		DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
 		DC->RSSetState(STATE->m_pRSWireFrame.Get());
 
 		m_pFrustumBox->Render();
 
 		DC->RSSetState(m_pCurrentRasterizer.Get());
+
+		m_pCurrentRasterizer.Reset();
 	}
 }
 

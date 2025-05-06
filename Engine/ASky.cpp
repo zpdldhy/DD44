@@ -18,11 +18,16 @@ void ASky::Tick()
 
 void ASky::Render()
 {
+	if (m_pCurrentRasterizer)
+		m_pCurrentRasterizer.Reset();
+
 	DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
 	DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
 	APawn::Render();
 
 	DC->RSSetState(m_pCurrentRasterizer.Get());
+
+	m_pCurrentRasterizer.Reset();
 }
 

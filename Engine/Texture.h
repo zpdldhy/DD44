@@ -14,6 +14,7 @@ public:
 
 public:
 	void SetTextureSize();
+	void SetSRV(ComPtr<ID3D11ShaderResourceView> _pSRV) { m_pTexSRV = _pSRV; }
 	bool LoadTexture(std::wstring _filename);
 	Texture() = default;
 };

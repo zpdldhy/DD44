@@ -14,7 +14,7 @@ void CameraManager::Init()
 
 	m_pUICameraActor = make_shared<ACameraActor>(ProjectionType::PT_ORTHOGRAPHIC);
 	{
-		m_pUICameraActor->SetPosition(Vec3(0.f, 0.f, 0.f));
+		m_pUICameraActor->SetPosition(Vec3(0.f, 0.f, -1.f));
 		m_pUICameraActor->Init();
 	}
 
