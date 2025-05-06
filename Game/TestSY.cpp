@@ -97,12 +97,12 @@ void TestSY::Init()
 		auto pMesh = UStaticMeshComponent::CreatePlane();
 		
 		auto pMaterial = make_shared<UMaterial>();
-		pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/DefaultUI.hlsl");
+		pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 		pMesh->SetMaterial(pMaterial);
 
 		m_pPlane->SetMeshComponent(pMesh);
 		m_pPlane->SetPosition(Vec3(0.f, 0.f, 0.5f));
-		//m_pPlane->SetScale(Vec3(2.f, 2.f, 2.f));
+		m_pPlane->SetScale(Vec3(1440.f, 900.f, 0.f));
 		m_pPlane->Init();
 	}
 	m_pTexture = make_shared<ViewPortTexture>();
@@ -136,9 +136,6 @@ void TestSY::Render()
 	{
 		DC->RSSetState(STATE->m_pRSSolid.Get());
 	}
-
-	if (INPUT->GetButtonDown(P))
-		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
 	
 	m_pCameraActor->Render();
 	m_pActor->Render();
@@ -149,6 +146,7 @@ void TestSY::Render()
 
 	m_pTexture->EndViewPort();
 
+	CAMERAMANAGER->Render(CameraViewType::CVT_UI);
 	m_pPlane->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->GetTexture()->SetSRV(m_pTexture->GetSRV());
 	m_pPlane->Render();
 }
