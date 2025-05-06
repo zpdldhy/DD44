@@ -398,7 +398,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-/Resources
+/Resources/*
 !/Resources/Shader/
-!/Resources/Shader/**
-/Libraries
+/Libraries/
