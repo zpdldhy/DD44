@@ -37,6 +37,9 @@
     <ClInclude Include="kkongchiMoveScript.h">
       <Filter>Script</Filter>
     </ClInclude>
+    <ClInclude Include="Editor.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -60,6 +63,9 @@
     </ClCompile>
     <ClCompile Include="kkongchiMoveScript.cpp">
       <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

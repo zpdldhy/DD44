@@ -17,6 +17,7 @@
 #include "DxState.h"
 #include "MapEditorUI.h"
 #include "UBoxComponent.h"
+#include "ObjectLoader.h"
 
 void TestSY::Init()
 {
@@ -89,6 +90,41 @@ void TestSY::Init()
 		tile->Init();
 		m_vTiles.push_back(tile);
 	});
+
+	{
+		AssimpLoader loader;
+		vector<MeshData> meshList = loader.Load("../Resources/Obj/buggy_floor.obj");
+		if (meshList.empty())
+		{
+			return;
+		}
+
+		auto meshRes = make_shared<UStaticMeshResources>();
+		meshRes->SetVertexList(meshList[0].m_vVertexList); 
+		meshRes->SetIndexList(meshList[0].m_vIndexList);
+		meshRes->Create();
+
+		m_pObjMesh = make_shared<UStaticMeshComponent>();
+		m_pObjMesh->SetMesh(meshRes);
+
+		auto material = make_shared<UMaterial>();
+		material->Load(L"../Resources/Texture/buggyStationTexture.png", L"../Resources/Shader/Default.hlsl");
+		m_pObjMesh->SetMaterial(material);
+
+		m_pObj = make_shared<APawn>();
+		m_pObj->SetMeshComponent(m_pObjMesh);
+
+		Vec3 pos = Vec3(30.0f, 0.0f, 30.0f);
+		if (!m_vTiles.empty())
+		{
+			auto tile = m_vTiles.back();
+			pos.y = tile->GetHeightAt(pos.x, pos.z);
+		}
+
+		m_pObj->SetPosition(pos);
+		m_pObj->SetScale({ 3.0f, 3.0f, 3.0f });
+		m_pObj->Init();
+	}
 }
 
 void TestSY::Update()
@@ -103,6 +139,17 @@ void TestSY::Update()
 
 	for (auto& tile : m_vTiles)
 		tile->Tick();
+
+	if (m_pObj && !m_vTiles.empty())
+	{
+		auto tile = m_vTiles.back();
+		Vec3 pos = m_pObj->GetPosition();
+		pos.y = tile->GetHeightAt(pos.x, pos.z);
+		pos.y += 12;
+		m_pObj->SetPosition(pos);
+	}
+
+	m_pObj->Tick();
 }
 
 void TestSY::Render()
@@ -125,6 +172,8 @@ void TestSY::Render()
 
 	for (auto& tile : m_vTiles)
 		tile->Render();
+
+	m_pObj->Render();
 }
 
 void TestSY::Destroy()

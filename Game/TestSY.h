@@ -16,6 +16,9 @@ public:
 	std::unique_ptr<MapEditorUI> m_pMapEditorUI;
 	std::vector<std::shared_ptr<class ATerrainTileActor>> m_vTiles;
 
+	shared_ptr<class UStaticMeshComponent> m_pObjMesh;
+	shared_ptr<class APawn> m_pObj;
+
 	bool m_bEditorWireframe = false;
 
 public:

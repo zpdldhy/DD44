@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Editor.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
     <ClInclude Include="kkongchiMoveScript.h" />
     <ClInclude Include="Main.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="TestYR.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="kkongchiMoveScript.cpp" />
     <ClCompile Include="Main.cpp" />

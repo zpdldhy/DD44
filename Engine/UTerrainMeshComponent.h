@@ -12,8 +12,7 @@ protected:
 	shared_ptr<UStaticMeshResources> m_pMesh = nullptr;
 
 public:
-	void Init() override;
-	void Tick() override;
+	void Render() override;
 	void PreRender() override;
 	void PostRender() override;
 	void Destroy() override;
