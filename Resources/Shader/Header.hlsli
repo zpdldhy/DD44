@@ -69,6 +69,12 @@ cbuffer CB_Light : register(b8)
     float3 padding_light; // 
 };
 
+cbuffer CB_Emissive : register(b10)
+{
+    float3 g_vEmissiveColor;
+    float g_fEmissivePower;
+}
+
 struct VS_IN
 {
     float3 p : POSITION;

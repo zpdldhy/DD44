@@ -13,6 +13,7 @@ void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
     CreateUVDistortionCB();
     CreateCameraCB();
     CreateRenderModeCB();
+    CreateEmissiveCB();
 }
 
 void UMaterial::Bind()
@@ -66,6 +67,11 @@ void UMaterial::Bind()
     {
         DC->VSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
         DC->PSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
+    }
+
+    if (m_pEmissiveCB)
+    {
+        DC->PSSetConstantBuffers(10, 1, m_pEmissiveCB.GetAddressOf());
     }
 }
 
@@ -169,6 +175,19 @@ void UMaterial::CreateRenderModeCB()
     assert(SUCCEEDED(hr) && "Failed to create RenderMode ConstantBuffer");
 }
 
+void UMaterial::CreateEmissiveCB()
+{
+    D3D11_BUFFER_DESC bd = {};
+    bd.Usage = D3D11_USAGE_DEFAULT;
+    bd.ByteWidth = sizeof(CB_EMISSIVE);
+    bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+    D3D11_SUBRESOURCE_DATA sd = {};
+    sd.pSysMem = &m_tEmissiveData;
+
+    DEVICE->CreateBuffer(&bd, &sd, m_pEmissiveCB.GetAddressOf());
+}
+
 void UMaterial::UpdateDissolveBuffer()
 {
     if (!m_pDissolveCB)
@@ -227,6 +246,15 @@ void UMaterial::UpdateRenderModeBuffer()
         DC->UpdateSubresource(m_pRenderModeBuffer.Get(), 0, nullptr, &m_tRenderModeData, 0, 0);
 }
 
+void UMaterial::UpdateEmissiveBuffer()
+{
+    if (!m_pEmissiveCB)
+        CreateEmissiveCB();
+
+    DC->UpdateSubresource(m_pEmissiveCB.Get(), 0, nullptr, &m_tEmissiveData, 0, 0);
+    DC->PSSetConstantBuffers(10, 1, m_pEmissiveCB.GetAddressOf()); // b10¹ø
+}
+
 void UMaterial::SetUVDistortionParams(float _strength, float _speed, float _frequency)
 {
     m_tUVDistortion.g_fDistortionStrength = _strength;
@@ -251,5 +279,12 @@ void UMaterial::SetRenderMode(ERenderMode _eMode)
     m_eRenderMode = _eMode;
     m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
     UpdateRenderModeBuffer();
+}
+
+void UMaterial::SetEmissiveParams(const Vec3& _color, float _power)
+{
+    m_tEmissiveData.g_vEmissiveColor = _color;
+    m_tEmissiveData.g_fEmissivePower = _power;
+    UpdateEmissiveBuffer();
 }
 
