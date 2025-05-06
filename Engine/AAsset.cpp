@@ -78,6 +78,10 @@ void AAsset::Export(TFbxResource _result, string filepath)
 	{
 		auto& child = _result.m_vMeshList[iMesh];
 		// HEADER FOR NODE
+		UINT nameSize = child.m_szName.size();
+		fwrite(&nameSize, sizeof(UINT), 1, pFile);
+		fwrite(child.m_szName.data(), sizeof(wchar_t), nameSize, pFile);
+
 		fwrite(&child.m_bSkeleton, sizeof(bool), 1, pFile);
 		UINT vertexSize = child.m_vVertexList.size();
 		fwrite(&vertexSize, sizeof(UINT), 1, pFile);
@@ -109,8 +113,8 @@ TFbxResource AAsset::Load(const char* fileName)
 
 	errno_t err = fopen_s(&pFile, fileName, "rb");
 	if (err != 0) { assert(false); }
-
 	TFbxResource result;
+	result.name = SplitName(to_mw(fileName));
 
 	// HEADER
 	fread(&result.m_iBoneCount, sizeof(UINT), 1, pFile);
@@ -192,8 +196,13 @@ TFbxResource AAsset::Load(const char* fileName)
 	result.m_vMeshList.resize(result.m_iMeshCount);
 	for (int iMesh = 0; iMesh < result.m_iMeshCount; iMesh++)
 	{
-		// HEADER FOR NODE
 		auto& child = result.m_vMeshList[iMesh];
+		// HEADER FOR NODE
+		UINT nameSize;
+		fread(&nameSize, sizeof(UINT), 1, pFile);
+		child.m_szName.resize(nameSize);
+		fread(&child.m_szName[0], sizeof(wchar_t), nameSize, pFile);
+		
 		fread(&child.m_bSkeleton, sizeof(bool), 1, pFile);
 		UINT vertexSize = 0;
 		fread(&vertexSize, sizeof(UINT), 1, pFile);
@@ -217,7 +226,7 @@ TFbxResource AAsset::Load(const char* fileName)
 			fread(&child.m_vIndexList.at(0), sizeof(DWORD), indexSize, pFile);
 		}
 	}
-
+	
 	fclose(pFile);
 	return result;
 }

@@ -14,7 +14,6 @@ struct CbAnimData
 class UAnimInstance
 {
 	vector<AnimList> animTrackList;
-	vector<vector<Matrix>> inverseBindPose;
 	float animFrame = 0.0f;
 	UINT currentAnimTrackIndex = 0;
 	bool m_bInPlace;
@@ -28,7 +27,6 @@ public:
 public:
 	void Tick();
 	void CreateConstantBuffer();
-	void SetInverseBone(vector<vector<Matrix>> _boneList);
 	void AddTrack(AnimList _animTrack);
 	void SetRootIndex(int _index) { rootIndex = _index; }
 	void CheckInPlace(bool _inPlace) { m_bInPlace = _inPlace; }
