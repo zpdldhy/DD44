@@ -110,6 +110,7 @@ void FbxLoader::ParseMesh(FbxNode* _node)
 	FbxMesh* mesh = _node->GetMesh();
 	retMesh.m_bSkeleton = ParseSkinningMesh(mesh);
 	retMesh.m_vInverseBindPose = m_result.m_vInverseBindPose[m_result.m_vInverseBindPose.size() - 1];
+	retMesh.m_szName = to_mw(_node->GetName());
 
 	// 기하행렬 ( 초기 정점 위치를 변환할 떄 사용 ) 
 	FbxNode* pNode = mesh->GetNode();
@@ -394,7 +395,7 @@ void FbxLoader::ParseAnimation()
 	{
 		//if (m_result.m_iAnimTrackCount > 50)
 		//{
-		//	m_result.m_iAnimTrackCount = 6;
+		//	m_result.m_iAnimTrackCount = 11;
 		//}
 
 		//// TEMP ( FOR CROW_FINAL )
@@ -403,7 +404,13 @@ void FbxLoader::ParseAnimation()
 		//GetAnimationTrack(5, animBoneCount);
 		//GetAnimationTrack(44, animBoneCount);
 		//GetAnimationTrack(45, animBoneCount);
+		//GetAnimationTrack(46, animBoneCount);
+		//GetAnimationTrack(47, animBoneCount);
+		//GetAnimationTrack(0, animBoneCount);
+		//GetAnimationTrack(15, animBoneCount);
 		//GetAnimationTrack(23, animBoneCount);
+		//GetAnimationTrack(25, animBoneCount);
+
 	}
 
 	for (int iTrack = 0; iTrack < m_result.m_iAnimTrackCount; iTrack++)

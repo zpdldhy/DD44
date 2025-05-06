@@ -5,7 +5,7 @@ class AAsset
 {
 public:
 	static void Export(TFbxResource _result, string fileName);
-	static ParsingData Load(const char* fileName);
+	static TFbxResource Load(const char* fileName);
 
 };
 

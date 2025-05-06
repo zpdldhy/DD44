@@ -28,18 +28,6 @@ public:
 	{
 		m_pEffectEditorUI->SetEffectApplyCallback(std::move(callback));
 	}
-	void InitMeshDataByCallBack(int max, int meshCount)
-	{
-		m_pObjectEditorUI->InitData(max, meshCount);
-	}
-	void SetObjectCallback(std::function<void(int)> callback)
-	{
-		m_pObjectEditorUI->SetTargetObjectNumByCallback(std::move(callback));
-	}
-	void SetMeshCallback(std::function<void(int, int)> callback)
-	{
-		m_pObjectEditorUI->SetMeshCallback(std::move(callback));
-	}
 
 
 public:

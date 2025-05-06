@@ -44,7 +44,7 @@ void ImGuiCore::Update()
 	}
 	if (show_object_editor && m_pObjectEditorUI)
 	{
-		m_pObjectEditorUI->Update();
+		//m_pObjectEditorUI->Update();
 	}
 	if (show_effect_editor && m_pEffectEditorUI)
 	{

@@ -49,7 +49,7 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 	// actor º¯È¯
 	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
 	{
-		auto& _resource = m_vFbxList[iFbx].m_ActorData;
+		auto& _resource = m_vFbxList[iFbx];
 
 		shared_ptr<APawn> actor = make_shared<APawn>();
 		shared_ptr<UMaterial> tempSkinnedMat = make_shared<UMaterial>();
@@ -76,7 +76,6 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 		// Animation
 		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 		{
-			animInstance->SetInverseBone(_resource.m_vInverseBindPose);
 			animInstance->CreateConstantBuffer();
 			for (int iAnim = 0; iAnim < _resource.m_iAnimTrackCount; iAnim++)
 			{
@@ -101,6 +100,7 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 		shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
 		animTrack->SetBase(animInstance);
 		rootMesh->SetMeshAnim(animTrack);
+		rootMesh->SetName(_resource.m_vMeshList[0].m_szName);
 		{
 			// BONE
 			map<wstring, BoneNode> bones;
@@ -128,7 +128,7 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 				animTrack->SetBase(animInstance);
 				meshComponent->SetMeshAnim(animTrack);
 				rootMesh->AddChild(meshComponent);
-
+				meshComponent->SetName(_resource.m_vMeshList[iMesh].m_szName);
 				{
 					// BONE
 					map<wstring, BoneNode> bones;
@@ -169,18 +169,25 @@ vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 			if (data.m_bSkeleton)
 			{
 				meshComponent = make_shared<USkinnedMeshComponent>();
-				meshComponent->SetName(m_vFbxList[iFbx].m_ActorData.name);
+				meshComponent->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
 				shared_ptr<USkeletalMeshResources> mesh = make_shared<USkeletalMeshResources>();
 				mesh->SetVertexList(data.m_vVertexList);
 				dynamic_cast<USkeletalMeshResources*>(mesh.get())->SetIwList(data.m_vIwList);
 				mesh->Create();
 				dynamic_cast<USkinnedMeshComponent*>(meshComponent.get())->SetMesh(mesh);
 				meshComponent->SetMaterial(tempSkinnedMat);
+				// BONE
+				map<wstring, BoneNode> bones;
+				for (auto& data : m_vFbxList[iFbx].m_mSkeletonList)
+				{
+					bones.insert(make_pair(data.second.m_szName, data.second));
+				}
+				mesh->AddSkeleton(bones);
 			}
 			else
 			{
 				meshComponent = make_shared<UStaticMeshComponent>();
-				meshComponent->SetName(m_vFbxList[iFbx].m_ActorData.name);
+				meshComponent->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
 				shared_ptr<UStaticMeshResources> mesh = make_shared<UStaticMeshResources>();
 				mesh->SetVertexList(data.m_vVertexList);
 				mesh->Create();
@@ -193,39 +200,37 @@ vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 	return m_vMeshList;
 }
 
-//vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
-//{
-//	
-//	return vector<shared_ptr<UAnimInstance>>();
-//}
+vector<wstring> ActorLoader::LoadTexPath()
+{
+	vector<wstring> texPathList;
+	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	{
+		for (int iTex = 0; iTex < m_vFbxList[iFbx].m_iTexPathCount; iTex++)
+		{
+			texPathList.emplace_back(m_vFbxList[iFbx].m_mTexPathList[iTex]);
+		}
+	}
+	return texPathList;
+}
 
-//vector<shared_ptr<UMaterial>> ActorLoader::LoadSkinnedMaterial()
-//{
-//	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
-//	{
-//		for (int iTex = 0; iTex < m_vFbxList[iFbx].m_vTexPathList.size(); iTex++)
-//		{
-//			shared_ptr<UMaterial> mat = make_shared<UMaterial>();
-//			mat->Load(m_vFbxList[iFbx].m_vTexPathList[iTex], L"../Resources/Shader/skinningShader.hlsl");
-//			mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
-//			m_vSkinnedMaterialList.emplace_back(mat);
-//		}
-//	}
-//
-//	return m_vSkinnedMaterialList;
-//}
-//
-//vector<shared_ptr<UMaterial>> ActorLoader::LoadStaticMaterial()
-//{
-//	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
-//	{
-//		for (int iTex = 0; iTex < m_vFbxList[iFbx].m_vTexPathList.size(); iTex++)
-//		{
-//			shared_ptr<UMaterial> mat = make_shared<UMaterial>();
-//			mat->Load(m_vFbxList[iFbx].m_vTexPathList[iTex], L"../Resources/Shader/Default.hlsl");
-//			m_vStaticMaterialList.emplace_back(mat);
-//		}
-//	}
-//
-//	return m_vStaticMaterialList;
-//}
+vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
+{
+	vector<shared_ptr<UAnimInstance>> animList;
+	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	{
+		// Animation
+		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
+		{
+			animInstance->CreateConstantBuffer();
+			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
+			{
+				AnimList animTrack;
+				animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
+				animTrack.animList = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_vAnim;
+				animInstance->AddTrack(animTrack);
+			}
+		}
+		animList.emplace_back(animInstance);
+	}	
+	return animList;
+}

@@ -10,17 +10,14 @@ class ActorLoader
 {
 public:
 	FbxLoader m_FbxImporter;
-	vector<ParsingData> m_vFbxList;
+	vector<TFbxResource> m_vFbxList;
 	vector<shared_ptr<UMeshComponent>> m_vMeshList;
-	//vector<shared_ptr<UAnimInstance>> m_vAnimInstanceList;
-	//vector<shared_ptr<UMaterial>> m_vSkinnedMaterialList;
-	//vector<shared_ptr<UMaterial>> m_vStaticMaterialList; 
+	vector<shared_ptr<UAnimInstance>> m_vAnimInstanceList;
 public:
 	void ConvertFbxToAsset(string _path = "../Resources/Fbx/DeathDoor/*.fbx");
 	vector<shared_ptr<APawn>> Load();
 	vector<shared_ptr<UMeshComponent>> LoadMesh();
-	//vector<shared_ptr<UAnimInstance>> LoadAnim();
-	//vector<shared_ptr<UMaterial>> LoadSkinnedMaterial();
-	//vector<shared_ptr<UMaterial>> LoadStaticMaterial();
+	vector<wstring> LoadTexPath();
+	vector<shared_ptr<UAnimInstance>> LoadAnim();
 };
 

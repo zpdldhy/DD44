@@ -55,6 +55,9 @@ void TestYR::Init()
 	//loader.ConvertFbxToAsset();
 	m_vActorList = loader.Load();
 	meshList = loader.LoadMesh();
+	texPathList = loader.LoadTexPath();
+	animInstanceList = loader.LoadAnim();
+
 	for (int i = 0; i < m_vActorList.size(); i++)
 	{
 		m_vActorList[i]->Init();
@@ -82,48 +85,34 @@ void TestYR::Init()
 
 	// LOAD ALL TEXTURE
 	{
-		string path = "../Resources/Texture/ObjTexture/*.png";
-		HANDLE hFind;
-		WIN32_FIND_DATAA data;
-		vector<string> fileList;
-		if ((hFind = FindFirstFileA(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
-		{
-			do
-			{
-				string directory = "../Resources/Texture/ObjTexture/";
-				directory += string(data.cFileName);
-				fileList.emplace_back(directory);
-			} while (FindNextFileA(hFind, &data) != 0);
-			FindClose(hFind);
-		}
-		for (int iPath = 0; iPath < fileList.size(); iPath++)
-		{
-			shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
-			tempMat->Load(to_mw(fileList[iPath]), L"../Resources/Shader/Default.hlsl");
-			materialList.emplace_back(tempMat);
-		}
+		//string path = "../Resources/Texture/ObjTexture/*.png";
+		//HANDLE hFind;
+		//WIN32_FIND_DATAA data;
+		//vector<string> fileList;
+		//if ((hFind = FindFirstFileA(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
+		//{
+		//	do
+		//	{
+		//		string directory = "../Resources/Texture/ObjTexture/";
+		//		directory += string(data.cFileName);
+		//		fileList.emplace_back(directory);
+		//	} while (FindNextFileA(hFind, &data) != 0);
+		//	FindClose(hFind);
+		//}
+		//for (int iPath = 0; iPath < fileList.size(); iPath++)
+		//{
+		//	shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
+		//	tempMat->Load(to_mw(fileList[iPath]), L"../Resources/Shader/Default.hlsl");
+		//	materialList.emplace_back(tempMat);
+		//}
 	}
 	m_vObjList = objLoader.Load();
+	vector<shared_ptr<UMeshComponent>> objMesh = objLoader.LoadMesh();
+	meshList.insert(meshList.end(), objMesh.begin(), objMesh.end());
 	//m_vObjList[0]->SetScale(Vec3(12.0f, 12.0f, 12.0f));
 
-	targetObj = m_vObjList[targetIndex];
+	targetObj = m_vActorList[targetIndex];
 
-	//GUI->InitMeshDataByCallBack(m_vActorList.size(), meshList.size());
-
-
-
-	//GUI->SetObjectCallback([this](int target)
-	//	{
-	//		targetIndex = target;
-	//		targetObj = m_vActorList[targetIndex];
-	//	}
-	//);
-
-	//GUI->SetMeshCallback([this](int targetActor, int targetMesh)
-	//	{
-	//		m_vActorList[targetActor]->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[targetMesh]);
-	//	}
-	//);
 }
 void TestYR::Update()
 {
@@ -137,32 +126,32 @@ void TestYR::Update()
 
 	if (INPUT->GetButton(GameKey::C))
 	{
-		if (++targetIndex >= m_vObjList.size())
+		if (++targetIndex >= m_vActorList.size())
 		{
 			targetIndex = 0;
 		}
-		targetObj = m_vObjList[targetIndex];
+		targetObj = m_vActorList[targetIndex];
 	}
 
 	// Texture ¹Ù²Ù±â
 	{
-		if (INPUT->GetButton(GameKey::T))
-		{
-			if (++matIndex >= materialList.size())
-			{
-				matIndex = 0;
-			}
-			targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
-		}
+		//if (INPUT->GetButton(GameKey::T))
+		//{
+		//	if (++matIndex >= materialList.size())
+		//	{
+		//		matIndex = 0;
+		//	}
+		//	targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
+		//}
 
-		if (INPUT->GetButton(GameKey::Y))
-		{
-			if (--matIndex < 0)
-			{
-				matIndex = 0;
-			}
-			targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
-		}
+		//if (INPUT->GetButton(GameKey::Y))
+		//{
+		//	if (--matIndex < 0)
+		//	{
+		//		matIndex = 0;
+		//	}
+		//	targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
+		//}
 	}
 }
 void TestYR::Render()

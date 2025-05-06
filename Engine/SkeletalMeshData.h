@@ -3,6 +3,7 @@
 struct MeshData
 {
 	bool m_bSkeleton = false;
+	wstring m_szName;
 	vector<PNCT_VERTEX> m_vVertexList;
 	vector<IW_VERTEX> m_vIwList;
 	vector<DWORD> m_vIndexList;

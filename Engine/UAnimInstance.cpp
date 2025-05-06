@@ -59,11 +59,6 @@ void UAnimInstance::CreateConstantBuffer()
 	return;
 }
 
-void UAnimInstance::SetInverseBone(vector<vector<Matrix>> _boneList)
-{
-	inverseBindPose = _boneList;
-}
-
 void UAnimInstance::AddTrack(AnimList _animTrack)
 {
 	animTrackList.emplace_back(_animTrack);
