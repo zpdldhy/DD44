@@ -10,6 +10,10 @@
 #include "Timer.h" 
 #include "ImGuiCore.h"
 #include "CameraManager.h"
+#include "AActor.h"
+#include "UStaticMeshComponent.h"
+#include "UMaterial.h"
+#include "ViewPortTexture.h"
 
 void Engine::Init()
 {
@@ -31,6 +35,7 @@ void Engine::Init()
 	_app->Init();
 
 	CAMERAMANAGER->Init();
+	Create3DWorld();
 }
 
 void Engine::Frame()
@@ -47,6 +52,7 @@ void Engine::Frame()
 	TIMER->Update();
 	
 	CAMERAMANAGER->Tick();
+	m_p3DWorld->Tick();
 }
 
 void Engine::Render()
@@ -62,8 +68,15 @@ void Engine::Render()
 	DxWrite::GetInstance()->DrawMultiline(rect, text);*/
 	CAMERAMANAGER->Render(CameraViewType::CVT_ACTOR);
 
+	// 3D World -> Texture Render
 	{
+		m_p3DWorldTexture->BeginViewPort();
+
 		_app->Render();
+
+		m_p3DWorldTexture->EndViewPort();
+		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
+		m_p3DWorld->Render();
 	}
 
 	GUI->Render(); // *Fix Location* after _app->Render() 
@@ -107,4 +120,25 @@ Engine::Engine(HINSTANCE hInstance, shared_ptr<IExecute> app)
 {
 	_hInstance = hInstance;
 	_app = app;
+}
+
+void Engine::Create3DWorld()
+{
+	m_p3DWorld = make_shared<AActor>();
+
+	auto pMesh = UStaticMeshComponent::CreatePlane();
+
+	auto pMaterial = make_shared<UMaterial>();
+	pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+	pMesh->SetMaterial(pMaterial);
+
+	m_p3DWorld->SetMeshComponent(pMesh);
+	m_p3DWorld->SetPosition(Vec3(0.f, 0.f, 1.f));
+	m_p3DWorld->SetScale(Vec3(1440.f, 900.f, 0.f));
+	m_p3DWorld->Init();
+
+	m_p3DWorldTexture = make_shared<ViewPortTexture>();
+	m_p3DWorldTexture->CreateViewPortTexture(1440.f, 900.f);
+
+	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->GetTexture()->SetSRV(m_p3DWorldTexture->GetSRV());
 }

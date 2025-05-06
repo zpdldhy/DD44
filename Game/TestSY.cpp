@@ -17,7 +17,6 @@
 #include "DxState.h"
 #include "MapEditorUI.h"
 #include "UBoxComponent.h"
-#include "ViewPortTexture.h"
 
 void TestSY::Init()
 {
@@ -90,23 +89,6 @@ void TestSY::Init()
 		tile->Init();
 		m_vTiles.push_back(tile);
 	});
-
-	{
-		m_pPlane = make_shared<APawn>();
-		
-		auto pMesh = UStaticMeshComponent::CreatePlane();
-		
-		auto pMaterial = make_shared<UMaterial>();
-		pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-		pMesh->SetMaterial(pMaterial);
-
-		m_pPlane->SetMeshComponent(pMesh);
-		m_pPlane->SetPosition(Vec3(0.f, 0.f, 0.5f));
-		m_pPlane->SetScale(Vec3(1440.f, 900.f, 0.f));
-		m_pPlane->Init();
-	}
-	m_pTexture = make_shared<ViewPortTexture>();
-	m_pTexture->CreateViewPortTexture(1440.f, 900.f);
 }
 
 void TestSY::Update()
@@ -118,7 +100,6 @@ void TestSY::Update()
 	m_pCameraActor->Tick();
 	m_pActor->Tick();
 	m_pSky->Tick();
-	m_pPlane->Tick();
 
 	for (auto& tile : m_vTiles)
 		tile->Tick();
@@ -126,8 +107,6 @@ void TestSY::Update()
 
 void TestSY::Render()
 {	
-	m_pTexture->BeginViewPort();
-
 	if (m_bEditorWireframe)
 	{
 		DC->RSSetState(STATE->m_pRSWireFrame.Get());
@@ -143,12 +122,6 @@ void TestSY::Render()
 
 	for (auto& tile : m_vTiles)
 		tile->Render();
-
-	m_pTexture->EndViewPort();
-
-	CAMERAMANAGER->Render(CameraViewType::CVT_UI);
-	m_pPlane->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->GetTexture()->SetSRV(m_pTexture->GetSRV());
-	m_pPlane->Render();
 }
 
 void TestSY::Destroy()

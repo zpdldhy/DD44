@@ -18,10 +18,6 @@ public:
 
 	bool m_bEditorWireframe = false;
 
-	// ViewPort Texture
-	shared_ptr<class APawn> m_pPlane = nullptr;
-	shared_ptr<class ViewPortTexture> m_pTexture = nullptr;
-
 public:
 	void Init() override;
 	void Update() override;
