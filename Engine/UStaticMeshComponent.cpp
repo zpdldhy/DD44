@@ -91,13 +91,13 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreatePlane()
 	vVertexList.resize(4);
 	vIndexList.resize(6);
 
-	Vec3 vMin = Vec3(-0.5f, +0.0f, -0.5f);
-	Vec3 vMax = Vec3(+0.5f, +0.0f, +0.5f);
+	Vec3 vMin = Vec3(-0.5f, -0.5f, -0.f);
+	Vec3 vMax = Vec3(+0.5f, +0.5f, +0.f);
 
 	// Front
 	vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
 	vVertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
 
 	int iIndex = 0;

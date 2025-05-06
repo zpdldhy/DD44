@@ -25,22 +25,6 @@ protected:
 	array<shared_ptr<USceneComponent>, static_cast<size_t>(ComponentType::CT_COUNT)> m_arrComponent;
 	vector<shared_ptr<class UScriptComponent>> m_vScript;
 
-//protected:
-//	Vec3 m_vLook = { 0.0f,0.0f,1.0f };
-//	Vec3 m_vRight = { 1.0f,0.0f,0.0f };
-//	Vec3 m_vUp = { 0.0f,1.0f,0.0f };
-//
-//	Vec3 m_vScale = { 1.0f, 1.0f, 1.0f };
-//	Vec3 m_vRotation = { 0.0f, 0.0f, 0.0f };
-//	Vec3 m_vPosition = { 0.0f, 0.0f, 0.0f };
-//
-//	Matrix m_matOffset = Matrix::Identity;
-//	Matrix m_matWorld = Matrix::Identity;
-//	Matrix m_matScale = Matrix::Identity;
-//	Matrix m_matRotation = Matrix::Identity;
-//	Matrix m_matTrans = Matrix::Identity;
-//	Matrix m_matParent = Matrix::Identity;
-
 public:
 	AActor();
 	virtual ~AActor() = default;

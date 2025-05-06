@@ -7,6 +7,7 @@ enum class ProjectionType
 {
 	PT_ORTHOGRAPHIC,
 	PT_PERSPECTIVE,
+	PT_UI,
 };
 
 class UCameraComponent : public USceneComponent
@@ -22,8 +23,8 @@ protected:
 
 	// Projection
 	// - Orthographic
-	float m_fWidth = 800.0f;
-	float m_fHeight = 600.0f;
+	float m_fWidth = 1440.0f;
+	float m_fHeight = 900.0f;
 
 	// - Perspective
 	float m_fFov = 3.14f / 4.0f;

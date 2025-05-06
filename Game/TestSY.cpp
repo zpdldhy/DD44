@@ -115,9 +115,6 @@ void TestSY::Render()
 	{
 		DC->RSSetState(STATE->m_pRSSolid.Get());
 	}
-
-	if (INPUT->GetButtonDown(P))
-		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
 	
 	m_pCameraActor->Render();
 	m_pActor->Render();

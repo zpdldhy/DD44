@@ -26,12 +26,17 @@ void UBoxComponent::PreRender()
 
 void UBoxComponent::Render()
 {
+	if (m_pCurrentRasterizer)
+		m_pCurrentRasterizer.Reset();
+
 	DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
 	DC->RSSetState(STATE->m_pRSWireFrame.Get());
 
 	m_pCollisionRange->Render();
 
 	DC->RSSetState(m_pCurrentRasterizer.Get());
+
+	m_pCurrentRasterizer.Reset();
 }
 
 void UBoxComponent::PostRender()

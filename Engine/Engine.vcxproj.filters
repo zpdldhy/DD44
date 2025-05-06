@@ -278,6 +278,12 @@
     <ClInclude Include="ALight.h">
       <Filter>Object\Light</Filter>
     </ClInclude>
+    <ClInclude Include="ViewPortTexture.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="AUIActor.h">
+      <Filter>Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -458,6 +464,12 @@
     </ClCompile>
     <ClCompile Include="ALight.cpp">
       <Filter>Object\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewPortTexture.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="AUIActor.cpp">
+      <Filter>Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
