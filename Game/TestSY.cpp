@@ -19,6 +19,7 @@
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
+#include "ObjectManager.h"
 
 void TestSY::Init()
 {
@@ -27,7 +28,6 @@ void TestSY::Init()
 		m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 
-		m_pCameraActor->Init();
 		CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 	}
 
@@ -55,8 +55,6 @@ void TestSY::Init()
 		m_pActor->SetShapeComponent(pBoxComponent);
 
 		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
-
-		m_pActor->Init();
 	}
 
 	{
@@ -68,8 +66,6 @@ void TestSY::Init()
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
 		m_pSkyMesh->SetMaterial(material);
-
-		m_pSky->Init();
 	}
 
 	// UIs
@@ -180,6 +176,10 @@ void TestSY::Init()
 		tile->Init();
 		m_vTiles.push_back(tile);
 	});
+
+	OBJECTMANAGER->AddActor(m_pActor);
+	OBJECTMANAGER->AddActor(m_pCameraActor);
+	OBJECTMANAGER->AddActor(m_pSky);	
 }
 
 void TestSY::Update()
@@ -187,10 +187,6 @@ void TestSY::Update()
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 	if (INPUT->GetButtonDown(O))
 		CAMERAMANAGER->SetCameraActor(m_pActor);
-
-	m_pCameraActor->Tick();
-	m_pActor->Tick();
-	m_pSky->Tick();
 
 	for (auto& tile : m_vTiles)
 		tile->Tick();
@@ -200,7 +196,7 @@ void TestSY::Update()
 		pUI->Tick();
 	}
 
-	UIMANAGER->SetRenderUIList(m_vUIs);
+	UIMANAGER->SetUIList(m_vUIs);
 }
 
 void TestSY::Render()
@@ -213,10 +209,6 @@ void TestSY::Render()
 	{
 		DC->RSSetState(STATE->m_pRSSolid.Get());
 	}
-	
-	m_pCameraActor->Render();
-	m_pActor->Render();
-	m_pSky->Render();
 
 	for (auto& tile : m_vTiles)
 		tile->Render();

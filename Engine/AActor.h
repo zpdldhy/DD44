@@ -16,27 +16,44 @@ enum class ComponentType
 	CT_COUNT,
 };
 
-class AActor : public UObject
+class AActor : public enable_shared_from_this<AActor>
 {
-	friend class UCameraComponent;
-
-protected:
-	shared_ptr<USceneComponent> m_pTransform = nullptr;
-	array<shared_ptr<USceneComponent>, static_cast<size_t>(ComponentType::CT_COUNT)> m_arrComponent;
-	vector<shared_ptr<class UScriptComponent>> m_vScript;
-
 public:
 	AActor();
 	virtual ~AActor() = default;
 
 public:
-	void Init() override;
-	void Tick() override;
-	void Render() override;
-	void Destroy() override;
+	virtual void Init();
+	virtual void Tick();
+	virtual void Render();
+	virtual void Destroy();
+
+	//--------------------------------------------------------------------------------------
+	// Actor 상태
+	//--------------------------------------------------------------------------------------
+protected:
+	UINT m_ActorIndex = 0;	// 고유 번호. 빠른 Actor 삭제 로직에서 필요하다.
+	bool m_bDestroy = false;
+	function<void(shared_ptr<AActor>)> m_fOnDestroyCallback = nullptr;
 
 public:
+	void SetActorIndex(UINT _iIndex) { m_ActorIndex = _iIndex; }
+	UINT GetActorIndex() { return m_ActorIndex; }
+
+	bool IsDestroy() { return m_bDestroy; }
+	void SetDestroy(bool _bDead) { m_bDestroy = _bDead; }
+	void SetDestroyFunction(function<void(shared_ptr<AActor>)> _function) { m_fOnDestroyCallback = _function; }
+
+	//--------------------------------------------------------------------------------------
 	// Component
+	//--------------------------------------------------------------------------------------
+protected:
+	friend class UCameraComponent;
+	shared_ptr<USceneComponent> m_pTransform = nullptr;
+	array<shared_ptr<USceneComponent>, static_cast<size_t>(ComponentType::CT_COUNT)> m_arrComponent;
+	vector<shared_ptr<class UScriptComponent>> m_vScript;
+
+public:
 	template<typename T>
 	shared_ptr<T> GetMeshComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
 	shared_ptr<UCameraComponent> GetCameraComponent() { return static_pointer_cast<UCameraComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)]); }
@@ -50,8 +67,6 @@ public:
 	void SetShapeComponent(shared_ptr<UShapeComponent> _shape) { m_arrComponent[static_cast<size_t>(ComponentType::CT_SHAPE)] = static_pointer_cast<USceneComponent>(_shape); }
 	void SetLightComponent(shared_ptr<ULightComponent> _light) { m_arrComponent[static_cast<size_t>(ComponentType::CT_LIGHT)] = static_pointer_cast<USceneComponent>(_light); }
 		
-	
-
 	// Script
 	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }
 

@@ -158,7 +158,7 @@ void UCameraComponent::CreateFrustumBox()
 void UCameraComponent::UpdateFrustumBox()
 {
 	m_pFrustumBox->SetPosition(m_vEye);
-	m_pFrustumBox->SetRotation(m_pOwner->GetRotation());
+	m_pFrustumBox->SetRotation(m_pOwner.lock()->GetRotation());
 
 	m_pFrustumBox->Tick();
 
@@ -167,10 +167,10 @@ void UCameraComponent::UpdateFrustumBox()
 
 void UCameraComponent::UpdateView()
 {
-	m_vEye = m_pOwner->GetPosition() + m_vPosition;
+	m_vEye = m_pOwner.lock()->GetPosition() + m_vPosition;
 
 	if (Vec3::Distance(Vec3(0.f, 0.f, 0.f), m_vPosition) < 0.1f)
-		m_vLook = m_pOwner->GetLook();
+		m_vLook = m_pOwner.lock()->GetLook();
 	else
 		m_vLook = -m_vPosition;
 

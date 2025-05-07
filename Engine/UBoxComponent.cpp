@@ -8,14 +8,14 @@
 
 void UBoxComponent::Init()
 {
-	m_vCenter = m_vPosition + m_pOwner->GetPosition();
+	m_vCenter = m_vPosition + m_pOwner.lock()->GetPosition();
 
 	CreateCollisionBox();
 }
 
 void UBoxComponent::Tick()
 {
-	m_vCenter = m_vPosition + m_pOwner->GetPosition();
+	m_vCenter = m_vPosition + m_pOwner.lock()->GetPosition();
 
 	UpdateBounds();
 }

@@ -2,6 +2,7 @@
 #include "AActor.h"
 #include "Device.h"
 #include "UScriptComponent.h"
+#include "ObjectManager.h"
 
 AActor::AActor()
 {
@@ -15,20 +16,25 @@ void AActor::Init()
 	{
 		if (component)
 		{
-			component->SetOwner(this);
+			component->SetOwner(shared_from_this());
 			component->Init();
 		}
 	}
 
 	for (auto& script : m_vScript)
 	{
-		script->SetOwner(this);
+		script->SetOwner(shared_from_this());
 		script->Init();
 	}
 }
 
 void AActor::Tick()
 {
+	// Actor
+	if (m_bDestroy == true && m_fOnDestroyCallback != nullptr)
+		m_fOnDestroyCallback(shared_from_this());
+
+	// Component
 	for (auto& component : m_arrComponent)
 	{
 		if (component)
@@ -73,4 +79,6 @@ void AActor::Destroy()
 	{
 		script->Destroy();
 	}
+
+	m_fOnDestroyCallback = nullptr;
 }
