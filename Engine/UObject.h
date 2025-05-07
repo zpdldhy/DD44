@@ -17,6 +17,7 @@ public:
 
 public:
 	void SetName(const wstring& _name) { m_Name = _name; }
+	const wstring& GetName() { return m_Name; }
 };
 
 // UObject

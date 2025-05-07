@@ -60,3 +60,12 @@ using namespace std;
 // Window º¯¼ö
 extern POINT g_windowSize;
 extern HWND g_hWnd;
+
+struct PrefabData
+{
+    int rootMeshIndex;
+    int childMeshCount;
+    int childIndexList[10];
+    int meshType;
+    int materialIndex;
+};

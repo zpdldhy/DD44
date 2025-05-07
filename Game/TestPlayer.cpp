@@ -14,6 +14,8 @@ void TestPlayer::Init()
 	shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
 	{
 		loader = make_shared<ActorLoader>();
+		//loader->ConvertFbxToAsset();
+
 		player = loader->LoadOne("../Resources/Asset/crow_final.asset");
 		auto cameraComponent = make_shared<UCameraComponent>();
 		cameraComponent->SetPosition(Vec3(20.0f, 20.0f, -20.0f));

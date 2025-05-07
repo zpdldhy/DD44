@@ -3,6 +3,7 @@
 #include "MapEditorUI.h"
 #include "ObjectEditorUI.h"
 #include "EffectEditorUI.h"
+#include "ObjectModifyUI.h"
 
 class ImGuiCore : public Singleton<ImGuiCore>
 {
@@ -10,6 +11,7 @@ private:
 	std::unique_ptr<class MapEditorUI> m_pMapEditorUI;
 	std::unique_ptr<class ObjectEditorUI> m_pObjectEditorUI;
 	std::unique_ptr<class EffectEditorUI> m_pEffectEditorUI;
+	std::unique_ptr<class ObjectModifyUI> m_pObjectModifyUI;
 
 public:
 	bool m_bEditorToolVisible = true;
@@ -17,6 +19,7 @@ public:
 	MapEditorUI* GetMapEditorUI() const { return m_pMapEditorUI.get(); }
 	ObjectEditorUI* GetObjectEditorUI() const { return m_pObjectEditorUI.get(); }
 	EffectEditorUI* GetEffectEditorUI() const { return 	m_pEffectEditorUI.get(); }
+	ObjectModifyUI* GetOMEditorUI() const { return 	m_pObjectModifyUI.get(); }
 
 	void SetMapEditorCallback(std::function<void()> callback)
 	{

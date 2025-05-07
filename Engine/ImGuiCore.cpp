@@ -29,6 +29,7 @@ void ImGuiCore::Init()
 	m_pMapEditorUI = make_unique<MapEditorUI>();
 	m_pObjectEditorUI = make_unique<ObjectEditorUI>();
 	m_pEffectEditorUI = make_unique<EffectEditorUI>();
+	m_pObjectModifyUI = make_unique<ObjectModifyUI>();
 }
 
 void ImGuiCore::Update()
@@ -74,6 +75,11 @@ void ImGuiCore::Update()
 			if (ImGui::BeginTabItem("Effect Editor"))
 			{
 				if (m_pEffectEditorUI) m_pEffectEditorUI->DrawUI();
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("OM Editor"))
+			{
+				if (m_pObjectModifyUI) m_pObjectModifyUI->DrawUI();
 				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();

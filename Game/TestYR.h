@@ -5,6 +5,7 @@
 
 class APawn;
 class UAnimInstance;
+class Texture;
 
 class TestYR : public IExecute
 {
@@ -18,7 +19,8 @@ public:
 
 	vector<shared_ptr<AActor>> m_vImGuiList;
 
-	
+	vector<shared_ptr<Texture>> m_vTextureList;
+
 	//// actor에 넣을 컴포넌트들 준비
 	vector<shared_ptr<UMeshComponent>> meshList;
 	vector<wstring> texPathList;

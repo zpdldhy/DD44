@@ -287,6 +287,7 @@
     <ClInclude Include="UIManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectModifyUI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -474,6 +475,7 @@
     <ClCompile Include="UIManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
+    <ClCompile Include="ObjectModifyUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

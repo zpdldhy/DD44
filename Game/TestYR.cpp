@@ -10,6 +10,8 @@
 #include "UAnimInstance.h"
 #include "AnimTrack.h"
 #include "ImGuiCore.h"
+#include "ObjectModifyUI.h"
+#include "Texture.h"
 
 void TestYR::Init()
 {
@@ -25,16 +27,20 @@ void TestYR::Init()
 
 		// mesh 생성
 		shared_ptr<UStaticMeshComponent> meshComponent1 = UStaticMeshComponent::CreateCube();
+		shared_ptr<UStaticMeshComponent> meshComponent2 = UStaticMeshComponent::CreateCube();
+		shared_ptr<UStaticMeshComponent> meshComponent3 = UStaticMeshComponent::CreateCube();
 		meshComponent1->SetMaterial(material);
+		meshComponent2->SetMaterial(material);
+		meshComponent3->SetMaterial(material);
 
 		// Object 설정
 		object1->SetMeshComponent(meshComponent1);
-		object2->SetMeshComponent(meshComponent1);
-		object3->SetMeshComponent(meshComponent1);
+		object2->SetMeshComponent(meshComponent2);
+		object3->SetMeshComponent(meshComponent3);
 
-		object1->SetScale(Vec3(10000.0f, 0.03f, 0.03f));
-		object2->SetScale(Vec3(0.03f, 10000.0f, 0.03f));
-		object3->SetScale(Vec3(0.03f, 0.03f, 10000.0f));
+		object1->SetScale(Vec3(1000.0f, 0.03f, 0.03f));
+		object2->SetScale(Vec3(0.03f, 1000.0f, 0.03f));
+		object3->SetScale(Vec3(0.03f, 0.03f, 1000.0f));
 
 		object1->Init();
 		object2->Init();
@@ -85,26 +91,25 @@ void TestYR::Init()
 
 	// LOAD ALL TEXTURE
 	{
-		//string path = "../Resources/Texture/ObjTexture/*.png";
-		//HANDLE hFind;
-		//WIN32_FIND_DATAA data;
-		//vector<string> fileList;
-		//if ((hFind = FindFirstFileA(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
-		//{
-		//	do
-		//	{
-		//		string directory = "../Resources/Texture/ObjTexture/";
-		//		directory += string(data.cFileName);
-		//		fileList.emplace_back(directory);
-		//	} while (FindNextFileA(hFind, &data) != 0);
-		//	FindClose(hFind);
-		//}
-		//for (int iPath = 0; iPath < fileList.size(); iPath++)
-		//{
-		//	shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
-		//	tempMat->Load(to_mw(fileList[iPath]), L"../Resources/Shader/Default.hlsl");
-		//	materialList.emplace_back(tempMat);
-		//}
+		string path = "../Resources/Texture/ObjTexture/*.png";
+		HANDLE hFind;
+		WIN32_FIND_DATAA data;
+		vector<string> fileList;
+		if ((hFind = FindFirstFileA(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				string directory = "../Resources/Texture/ObjTexture/";
+				directory += string(data.cFileName);
+				fileList.emplace_back(directory);
+			} while (FindNextFileA(hFind, &data) != 0);
+			FindClose(hFind);
+		}
+		for (int iPath = 0; iPath < fileList.size(); iPath++)
+		{
+			shared_ptr<Texture> texture = TEXTURE->Get(to_mw(fileList[iPath]));
+			m_vTextureList.emplace_back(texture);
+		}
 	}
 	//m_vObjList = objLoader.Load();
 	//vector<shared_ptr<UMeshComponent>> objMesh = objLoader.LoadMesh();
@@ -113,71 +118,62 @@ void TestYR::Init()
 
 	//targetObj = m_vActorList[targetIndex];
 
-	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
-		{
-			AssimpLoader loader;
-			//vector<MeshData> meshList = loader.Load(objPath);
-			if (meshList.empty())
-				return;
+	//GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+	//	{
+	//		AssimpLoader loader;
+	//		//vector<MeshData> meshList = loader.Load(objPath);
+	//		if (meshList.empty())
+	//			return;
+	//		// Mesh Component 생성
+	//		shared_ptr<UMeshComponent> meshComp = meshList[meshType];
+	//		// 머티리얼 설정
+	//		auto mat = make_shared<UMaterial>();
+	//		mat->Load(
+	//			std::wstring(texPath, texPath + strlen(texPath)),
+	//			std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+	//		);
+	//		if (meshType == 0)
+	//		{
+	//			// Animation 세팅
+	//			shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
+	//			animTrack->SetBase(animInstanceList[0]);
+	//			dynamic_cast<USkinnedMeshComponent*>(meshComp.get())->SetBaseAnim(animInstanceList[0]);
+	//			dynamic_cast<USkinnedMeshComponent*>(meshComp.get())->SetMeshAnim(animTrack);
+	//			
+	//			// Material INPUTLAYOUT 
+	//			mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+	//		}
+	//		meshComp->SetMaterial(mat);
+	//		// Actor 생성
+	//		shared_ptr<AActor> actor;
+	//		if (actorType == 0)
+	//		{
+	//			actor = make_shared<APawn>(); // ACharacter로 교체 가능
+	//		}
+	//		else if (actorType == 1)
+	//		{
+	//			actor = make_shared<APawn>(); // AEnemy로 교체 가능
+	//		}
+	//		else if (actorType == 2)
+	//		{
+	//			actor = make_shared<APawn>(); // AObject로 교체 가능
+	//		}
+	//		actor->SetMeshComponent(meshComp);
+	//		//// 타일이 있다면 위치 보정
+	//		//if (!m_vTiles.empty())
+	//		//{
+	//		//	float y = m_vTiles.back()->GetHeightAt(pos.x, pos.z);
+	//		//	pos.y = y + scale.y / 2.0f;
+	//		//}
+	//		actor->SetPosition(pos);
+	//		actor->SetRotation(rot);
+	//		actor->SetScale(scale);
+	//		actor->Init();
+	//		m_vImGuiList.push_back(actor);
+	//	});
 
-			// Mesh Component 생성
-			shared_ptr<UMeshComponent> meshComp = meshList[meshType];
-
-			// 머티리얼 설정
-			auto mat = make_shared<UMaterial>();
-			mat->Load(
-				std::wstring(texPath, texPath + strlen(texPath)),
-				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-			);
-
-			if (meshType == 0)
-			{
-				// Animation 세팅
-				shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
-				animTrack->SetBase(animInstanceList[0]);
-				dynamic_cast<USkinnedMeshComponent*>(meshComp.get())->SetBaseAnim(animInstanceList[0]);
-				dynamic_cast<USkinnedMeshComponent*>(meshComp.get())->SetMeshAnim(animTrack);
-				
-				// Material INPUTLAYOUT 
-				mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
-			}
-
-			meshComp->SetMaterial(mat);
-
-			// Actor 생성
-			shared_ptr<AActor> actor;
-			if (actorType == 0)
-			{
-				actor = make_shared<APawn>(); // ACharacter로 교체 가능
-			}
-			else if (actorType == 1)
-			{
-				actor = make_shared<APawn>(); // AEnemy로 교체 가능
-			}
-			else if (actorType == 2)
-			{
-				actor = make_shared<APawn>(); // AObject로 교체 가능
-			}
-
-			actor->SetMeshComponent(meshComp);
-
-			//// 타일이 있다면 위치 보정
-			//if (!m_vTiles.empty())
-			//{
-			//	float y = m_vTiles.back()->GetHeightAt(pos.x, pos.z);
-			//	pos.y = y + scale.y / 2.0f;
-			//}
-
-
-			actor->SetPosition(pos);
-			actor->SetRotation(rot);
-			actor->SetScale(scale);
-			actor->Init();
-
-			m_vImGuiList.push_back(actor);
-		});
-
-
+	GUI->GetOMEditorUI()->SetMeshList(meshList);
+	GUI->GetOMEditorUI()->SetTexList(m_vTextureList);
 
 }
 void TestYR::Update()

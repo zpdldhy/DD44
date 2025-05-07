@@ -393,30 +393,30 @@ void FbxLoader::ParseAnimation()
 
 	// TEMP FOR 까마귀 ( 애니메이션 개많음. 추려서 파싱) 
 	{
-		//if (m_result.m_iAnimTrackCount > 50)
-		//{
-		//	m_result.m_iAnimTrackCount = 11;
-		//}
+		if (m_result.m_iAnimTrackCount > 50)
+		{
+			m_result.m_iAnimTrackCount = 11;
+		}
 
-		//// TEMP ( FOR CROW_FINAL )
-		//GetAnimationTrack(50, animBoneCount);
-		//GetAnimationTrack(29, animBoneCount);
-		//GetAnimationTrack(5, animBoneCount);
-		//GetAnimationTrack(44, animBoneCount);
-		//GetAnimationTrack(45, animBoneCount);
-		//GetAnimationTrack(46, animBoneCount);
-		//GetAnimationTrack(47, animBoneCount);
-		//GetAnimationTrack(0, animBoneCount);
-		//GetAnimationTrack(15, animBoneCount);
-		//GetAnimationTrack(23, animBoneCount);
-		//GetAnimationTrack(25, animBoneCount);
+		// TEMP ( FOR CROW_FINAL )
+		GetAnimationTrack(50, animBoneCount);
+		GetAnimationTrack(29, animBoneCount);
+		GetAnimationTrack(5, animBoneCount);
+		GetAnimationTrack(44, animBoneCount);
+		GetAnimationTrack(45, animBoneCount);
+		GetAnimationTrack(46, animBoneCount);
+		GetAnimationTrack(47, animBoneCount);
+		GetAnimationTrack(0, animBoneCount);
+		GetAnimationTrack(15, animBoneCount);
+		GetAnimationTrack(23, animBoneCount);
+		GetAnimationTrack(25, animBoneCount);
 
 	}
 
-	for (int iTrack = 0; iTrack < m_result.m_iAnimTrackCount; iTrack++)
-	{
-		GetAnimationTrack(iTrack, animBoneCount);
-	}
+	//for (int iTrack = 0; iTrack < m_result.m_iAnimTrackCount; iTrack++)
+	//{
+	//	GetAnimationTrack(iTrack, animBoneCount);
+	//}
 }
 
 void FbxLoader::GetAnimationTrack(int animTrack, int nodeCount)
