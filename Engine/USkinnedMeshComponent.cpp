@@ -2,24 +2,38 @@
 #include "USkinnedMeshComponent.h"
 #include "AnimTrack.h"
 #include "UMaterial.h"
+#include "AActor.h"
 
 void USkinnedMeshComponent::Init()
 {
+	USceneComponent::Init();
+
+	for (auto& child : m_vChild)
+	{
+		child->SetOwner(m_pOwner);
+		child->Init();
+	}
+
 }
 
 void USkinnedMeshComponent::Tick()
 {
+	m_matParent = m_pOwner->GetWorld();
+
 	if (m_pBaseAnim) m_pBaseAnim->Tick();
 
 	for (auto& child : m_vChild)
 	{
 		child->Tick();
 	}
+	USceneComponent::Tick();
+
 }
 
 void USkinnedMeshComponent::PreRender()
 {
-	
+	USceneComponent::Render();
+
 	if (m_pMeshAnim) m_pMeshAnim->Render();
 
 	if (m_pMesh) 

@@ -106,12 +106,78 @@ void TestYR::Init()
 		//	materialList.emplace_back(tempMat);
 		//}
 	}
-	m_vObjList = objLoader.Load();
-	vector<shared_ptr<UMeshComponent>> objMesh = objLoader.LoadMesh();
-	meshList.insert(meshList.end(), objMesh.begin(), objMesh.end());
+	//m_vObjList = objLoader.Load();
+	//vector<shared_ptr<UMeshComponent>> objMesh = objLoader.LoadMesh();
+	//meshList.insert(meshList.end(), objMesh.begin(), objMesh.end());
 	//m_vObjList[0]->SetScale(Vec3(12.0f, 12.0f, 12.0f));
 
-	targetObj = m_vActorList[targetIndex];
+	//targetObj = m_vActorList[targetIndex];
+
+	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+		{
+			AssimpLoader loader;
+			//vector<MeshData> meshList = loader.Load(objPath);
+			if (meshList.empty())
+				return;
+
+			// Mesh Component 생성
+			shared_ptr<UMeshComponent> meshComp = meshList[meshType];
+
+			// 머티리얼 설정
+			auto mat = make_shared<UMaterial>();
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+
+			if (meshType == 0)
+			{
+				// Animation 세팅
+				shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
+				animTrack->SetBase(animInstanceList[0]);
+				dynamic_cast<USkinnedMeshComponent*>(meshComp.get())->SetBaseAnim(animInstanceList[0]);
+				dynamic_cast<USkinnedMeshComponent*>(meshComp.get())->SetMeshAnim(animTrack);
+				
+				// Material INPUTLAYOUT 
+				mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+			}
+
+			meshComp->SetMaterial(mat);
+
+			// Actor 생성
+			shared_ptr<AActor> actor;
+			if (actorType == 0)
+			{
+				actor = make_shared<APawn>(); // ACharacter로 교체 가능
+			}
+			else if (actorType == 1)
+			{
+				actor = make_shared<APawn>(); // AEnemy로 교체 가능
+			}
+			else if (actorType == 2)
+			{
+				actor = make_shared<APawn>(); // AObject로 교체 가능
+			}
+
+			actor->SetMeshComponent(meshComp);
+
+			//// 타일이 있다면 위치 보정
+			//if (!m_vTiles.empty())
+			//{
+			//	float y = m_vTiles.back()->GetHeightAt(pos.x, pos.z);
+			//	pos.y = y + scale.y / 2.0f;
+			//}
+
+
+			actor->SetPosition(pos);
+			actor->SetRotation(rot);
+			actor->SetScale(scale);
+			actor->Init();
+
+			m_vImGuiList.push_back(actor);
+		});
+
+
 
 }
 void TestYR::Update()
@@ -122,16 +188,32 @@ void TestYR::Update()
 		gizmo[i]->Tick();
 	}
 
-	targetObj->Tick();
+	//if (targetObj)
+	//{
+	//	targetObj->Tick();
+	//}
 
-	if (INPUT->GetButton(GameKey::C))
+	for (auto& actor : m_vImGuiList)
 	{
-		if (++targetIndex >= m_vActorList.size())
-		{
-			targetIndex = 0;
-		}
-		targetObj = m_vActorList[targetIndex];
+		actor->Tick();
 	}
+
+	//if (INPUT->GetButton(GameKey::C))
+	//{
+	//	if (++targetIndex >= m_vActorList.size())
+	//	{
+	//		targetIndex = 0;
+	//	}
+	//	targetObj = m_vActorList[targetIndex];
+	//}
+
+	//if (INPUT->GetButton(GameKey::R))
+	//{
+	//	
+	//	auto m_pAnimInstance = dynamic_cast<USkinnedMeshComponent*>(targetObj->GetMeshComponent<USkinnedMeshComponent>().get())->GetAnimInstance();
+	//	int targetIndex = m_pAnimInstance->GetAnimIndex(L"Arrow_bomb");
+	//	m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
+	//}
 
 	// Texture 바꾸기
 	{
@@ -161,7 +243,12 @@ void TestYR::Render()
 		gizmo[i]->Render();
 	}
 
-	targetObj->Render();
+	/*targetObj->Render();*/
+
+	for (auto& actor : m_vImGuiList)
+	{
+		actor->Render();
+	}
 }
 
 
