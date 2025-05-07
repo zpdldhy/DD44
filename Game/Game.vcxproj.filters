@@ -40,8 +40,6 @@
     <ClInclude Include="Editor.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="TestPlayer.h" />
-    <ClInclude Include="PlayerMoveScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -66,29 +64,8 @@
     <ClCompile Include="kkongchiMoveScript.cpp">
       <Filter>Script</Filter>
     </ClCompile>
-    <ClCompile Include="TestPlayer.cpp" />
-    <ClCompile Include="PlayerMoveScript.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\Resources\Shader\Default.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Resources\Shader\Sky.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Resources\Shader\Effect.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Resources\Shader\DefaultColor.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Resources\Shader\Header.hlsli">
-      <Filter>Shader</Filter>
-    </None>
+    <ClCompile Include="Editor.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -33,9 +33,9 @@ void ActorLoader::ConvertFbxToAsset(string _path)
 	}
 }
 
-vector<shared_ptr<APawn>> ActorLoader::Load()
+vector<shared_ptr<AActor>> ActorLoader::Load()
 {
-	vector<shared_ptr<APawn>> actorList;
+	vector<shared_ptr<AActor>> actorList;
 	// 파일 이름 
 	vector<string> fileNames = GetFileNames("../Resources/Asset/*.asset");
 
@@ -78,6 +78,7 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 	// Animation
 	shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 	{
+		animInstance->SetName(SplitName(to_mw(_path)));
 		animInstance->CreateConstantBuffer();
 		for (int iAnim = 0; iAnim < resource.m_iAnimTrackCount; iAnim++)
 		{
@@ -86,6 +87,7 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 			animTrack.animList = resource.m_vAnimTrackList[iAnim].m_vAnim;
 			animInstance->AddTrack(animTrack);
 		}
+		m_vAnimInstanceList.emplace_back(animInstance);
 	}
 
 	////MESH
@@ -126,7 +128,7 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 			mesh->SetInverseBindPose(resource.m_vInverseBindPose[iMesh]);
 			meshComponent->SetMesh(mesh);
 			meshComponent->SetMaterial(tempSkinnedMat);
-			shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
+			shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
 			animTrack->SetBase(animInstance);
 			meshComponent->SetMeshAnim(animTrack);
 			rootMesh->AddChild(meshComponent);
@@ -171,6 +173,7 @@ vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 				meshComponent->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
 				shared_ptr<USkeletalMeshResources> mesh = make_shared<USkeletalMeshResources>();
 				mesh->SetVertexList(data.m_vVertexList);
+				mesh->SetInverseBindPose(m_vFbxList[iFbx].m_vInverseBindPose[iMesh]);
 				dynamic_cast<USkeletalMeshResources*>(mesh.get())->SetIwList(data.m_vIwList);
 				mesh->Create();
 				dynamic_cast<USkinnedMeshComponent*>(meshComponent.get())->SetMesh(mesh);
@@ -214,22 +217,22 @@ vector<wstring> ActorLoader::LoadTexPath()
 
 vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
 {
-	vector<shared_ptr<UAnimInstance>> animList;
-	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
-	{
-		// Animation
-		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
-		{
-			animInstance->CreateConstantBuffer();
-			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
-			{
-				AnimList animTrack;
-				animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
-				animTrack.animList = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_vAnim;
-				animInstance->AddTrack(animTrack);
-			}
-		}
-		animList.emplace_back(animInstance);
-	}	
-	return animList;
+	//vector<shared_ptr<UAnimInstance>> animList;
+	//for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	//{
+	//	// Animation
+	//	shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
+	//	{
+	//		animInstance->CreateConstantBuffer();
+	//		for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
+	//		{
+	//			AnimList animTrack;
+	//			animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
+	//			animTrack.animList = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_vAnim;
+	//			animInstance->AddTrack(animTrack);
+	//		}
+	//	}
+	//	animList.emplace_back(animInstance);
+	//}	
+	return m_vAnimInstanceList;
 }

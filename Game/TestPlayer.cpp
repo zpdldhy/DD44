@@ -20,10 +20,10 @@ void TestPlayer::Init()
 		player->SetCameraComponent(cameraComponent);
 		player->AddScript(movement);
 
-		vector<shared_ptr<UMeshComponent>> meshList = loader->LoadMesh();
-		dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetAnimInstance(player->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance());
-		dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetTargetBoneIndex(43);
-		player->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[2]);
+		//map<wstring, shared_ptr<UMeshComponent>> meshList = loader->LoadMesh();
+		//dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetAnimInstance(player->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance());
+		//dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetTargetBoneIndex(43);
+		//player->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[2]);
 		player->Init();
 	}
 	// 카메라 세팅

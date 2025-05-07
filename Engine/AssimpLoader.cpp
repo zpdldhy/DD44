@@ -65,6 +65,7 @@ void AssimpLoader::ParseMesh(UINT index, const aiMesh* pMesh)
 		material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
 	}
 
+	m_meshes[index].m_szName = to_mw(pMesh->mName.C_Str());
 
 	m_meshes[index].m_vVertexList.reserve(pMesh->mNumVertices);
 	m_meshes[index].m_vIndexList.reserve(pMesh->mNumFaces * 3);

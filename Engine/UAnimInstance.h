@@ -10,9 +10,9 @@ struct CbAnimData
 	Matrix boneAnim[250];
 };
 
-
 class UAnimInstance
 {
+	wstring m_modelName;
 	vector<AnimList> animTrackList;
 	float animFrame = 0.0f;
 	UINT currentAnimTrackIndex = 0;
@@ -30,11 +30,12 @@ public:
 	void Tick();
 	void CreateConstantBuffer();
 	void AddTrack(AnimList _animTrack);
-	void SetRootIndex(int _index) { rootIndex = _index; }
+ 	void SetRootIndex(int _index) { rootIndex = _index; }
 	void CheckInPlace(bool _inPlace) { m_bInPlace = _inPlace; }
 	int GetAnimIndex(wstring _animName);
 	void SetCurrentAnimTrack(int _index);
 	void PlayOnce(int _index);
 	Matrix GetBoneAnim(int _boneIndex);
+	void SetName(wstring _name) { m_modelName = _name; }
 };
 
