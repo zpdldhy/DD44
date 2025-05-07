@@ -92,40 +92,78 @@ void TestSY::Init()
 		m_vTiles.push_back(tile);
 	});
 
+	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
 	{
-		//AssimpLoader loader;
-		//vector<MeshData> meshList = loader.Load("../Resources/Obj/buggy_floor.obj");
-		//if (meshList.empty())
-		//{
-		//	return;
-		//}
+		AssimpLoader loader;
+		vector<MeshData> meshList = loader.Load(objPath);
+		if (meshList.empty())
+			return;
 
-		//auto meshRes = make_shared<UStaticMeshResources>();
-		//meshRes->SetVertexList(meshList[0].m_vVertexList); 
-		//meshRes->SetIndexList(meshList[0].m_vIndexList);
-		//meshRes->Create();
+		// Mesh Component 생성
+		shared_ptr<UMeshComponent> meshComp;
+		if (meshType == 0)
+		{
+			// SkinnedMeshComponent 설정 시 향후 확장
+			meshComp = make_shared<UStaticMeshComponent>();
 
-		//m_pObjMesh = make_shared<UStaticMeshComponent>();
-		//m_pObjMesh->SetMesh(meshRes);
+			auto meshRes = make_shared<UStaticMeshResources>();
+			meshRes->SetVertexList(meshList[0].m_vVertexList);
+			meshRes->SetIndexList(meshList[0].m_vIndexList);
+			meshRes->Create();
 
-		//auto material = make_shared<UMaterial>();
-		//material->Load(L"../Resources/Texture/buggyStationTexture.png", L"../Resources/Shader/Default.hlsl");
-		//m_pObjMesh->SetMaterial(material);
+			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
+		}
+		else if (meshType == 1)
+		{
+			meshComp = make_shared<UStaticMeshComponent>();
 
-		//m_pObj = make_shared<APawn>();
-		//m_pObj->SetMeshComponent(m_pObjMesh);
+			auto meshRes = make_shared<UStaticMeshResources>();
+			meshRes->SetVertexList(meshList[0].m_vVertexList);
+			meshRes->SetIndexList(meshList[0].m_vIndexList);
+			meshRes->Create();
 
-		//Vec3 pos = Vec3(30.0f, 0.0f, 30.0f);
-		//if (!m_vTiles.empty())
-		//{
-		//	auto tile = m_vTiles.back();
-		//	pos.y = tile->GetHeightAt(pos.x, pos.z);
-		//}
+			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
+		}
 
-		//m_pObj->SetPosition(pos);
-		//m_pObj->SetScale({ 3.0f, 3.0f, 3.0f });
-		//m_pObj->Init();
-	}
+		// 머티리얼 설정
+		auto mat = make_shared<UMaterial>();
+		mat->Load(
+			std::wstring(texPath, texPath + strlen(texPath)),
+			std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+		);
+		meshComp->SetMaterial(mat);
+
+		// Actor 생성
+		shared_ptr<AActor> actor;
+		if (actorType == 0)
+		{
+			actor = make_shared<APawn>(); // ACharacter로 교체 가능
+		}
+		else if (actorType == 1)
+		{
+			actor = make_shared<APawn>(); // AEnemy로 교체 가능
+		}
+		else if (actorType == 2)
+		{
+			actor = make_shared<APawn>(); // AObject로 교체 가능
+		}
+
+		actor->SetMeshComponent(meshComp);
+
+		// 타일이 있다면 위치 보정
+		if (!m_vTiles.empty())
+		{
+			float y = m_vTiles.back()->GetHeightAt(pos.x, pos.z);
+			pos.y = y + scale.y / 2.0f;
+		}
+
+		actor->SetPosition(pos);
+		actor->SetRotation(rot);
+		actor->SetScale(scale);
+		actor->Init();
+
+		m_vObjects.push_back(actor);
+	});
 }
 
 void TestSY::Update()
@@ -140,125 +178,13 @@ void TestSY::Update()
 
 	for (auto& tile : m_vTiles)
 		tile->Tick();
-
-	if (ImGui::Begin("Object Placement Tool"))
-	{
-		static const char* actorTypes[] = { "Character", "Enemy", "Object"};
-		static int currentActorType = 0;
-
-		static const char* meshTypes[] = { "Skinned", "Static", "Terrain" };
-		static int currentMeshType = 0;
-
-		static float position[3] = { 0.0f, 0.0f, 0.0f };
-		static float rotation[3] = { 0.0f, 0.0f, 0.0f };
-		static float scale[3] = { 1.0f, 1.0f, 1.0f };
-
-		static char texturePath[256] = "../Resources/Texture/kkongchi.jpg";
-		static char shaderPath[256] = "../Resources/Shader/Default.hlsl";
-		static char ObjPath[256] = "../Resources/Obj/buggy_floor.obj";
-
-		ImGui::Text("Actor Type");
-		ImGui::Combo("##ActorType", &currentActorType, actorTypes, IM_ARRAYSIZE(actorTypes));
-
-		ImGui::Text("Mesh");
-		ImGui::Combo("##MeshCombo", &currentMeshType, meshTypes, IM_ARRAYSIZE(meshTypes));
-
-		ImGui::InputFloat3("Position", position);
-		ImGui::InputFloat3("Rotation", rotation);
-		ImGui::InputFloat3("Scale", scale);
-
-		ImGui::InputText("Texture Path", texturePath, IM_ARRAYSIZE(texturePath));
-		ImGui::InputText("Shader Path", shaderPath, IM_ARRAYSIZE(shaderPath));
-		ImGui::InputText("Obj Path", ObjPath, IM_ARRAYSIZE(ObjPath));
-
-		if (ImGui::Button("Create"))
-		{
-			AssimpLoader loader;
-			vector<MeshData> meshList = loader.Load(ObjPath);
-
-			if (!meshList.empty())
-			{
-				shared_ptr<UMeshComponent> meshComp;
-				if (currentMeshType == 0)
-				{
-
-				}
-				else if (currentMeshType == 1)
-				{
-					meshComp = make_shared<UStaticMeshComponent>();
-
-					auto meshRes = make_shared<UStaticMeshResources>();
-					meshRes->SetVertexList(meshList[0].m_vVertexList);
-					meshRes->SetIndexList(meshList[0].m_vIndexList);
-					meshRes->Create();
-
-					dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
-				}
-				else if (currentMeshType == 2)
-				{
-
-				}
-
-				//auto meshComp = make_shared<UStaticMeshComponent>();
-
-				//auto meshRes = make_shared<UStaticMeshResources>();
-				//meshRes->SetVertexList(meshList[0].m_vVertexList);
-				//meshRes->SetIndexList(meshList[0].m_vIndexList);
-				//meshRes->Create();
-
-				//meshComp->SetMesh(meshRes);
-
-				auto mat = make_shared<UMaterial>();
-				mat->Load(
-					std::wstring(texturePath, texturePath + strlen(texturePath)),
-					std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-				);
-				meshComp->SetMaterial(mat);
-
-				shared_ptr<AActor> actor;
-				if (currentActorType == 0)
-				{
-					//actor = make_shared<ACharacter>();
-				}
-				else if (currentActorType == 1)
-				{
-					actor = make_shared<APawn>();
-				}
-				else if (currentActorType == 2)
-				{
-					actor = make_shared<APawn>();
-				}
-					
-				//auto actor = make_shared<APawn>();
-				actor->SetMeshComponent(meshComp);
-				Vec3 pos(position[0], position[1], position[2]);
-
-				actor->SetPosition(pos);
-				actor->SetRotation(Vec3(rotation[0], rotation[1], rotation[2]));
-				actor->SetScale(Vec3(scale[0], scale[1], scale[2]));
-				actor->Init();
-
-				m_vObjects.push_back(actor);
-			}
-		}
-	}
-	ImGui::End();
-
+	
 	for (auto& objects : m_vObjects)
 		objects->Tick();
 }
 
 void TestSY::Render()
 {	
-	if (m_bEditorWireframe)
-	{
-		DC->RSSetState(STATE->m_pRSWireFrame.Get());
-	}
-	else
-	{
-		DC->RSSetState(STATE->m_pRSSolid.Get());
-	}
-
 	if (INPUT->GetButtonDown(P))
 		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
 	
@@ -271,7 +197,6 @@ void TestSY::Render()
 
 	for (auto& objects : m_vObjects)
 		objects->Render();
-	
 }
 
 void TestSY::Destroy()

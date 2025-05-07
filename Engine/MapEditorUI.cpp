@@ -2,10 +2,8 @@
 #include "MapEditorUI.h"
 #include "imgui.h"
 
-void MapEditorUI::Update()
+void MapEditorUI::DrawUI()
 {
-    ImGui::Begin("Map Editor");
-
     ImGui::TextColored(ImVec4(1, 1, 1, 1), "Terrain Configuration");
     ImGui::InputInt("Num Cols", &m_iCols);
     ImGui::InputInt("Num Rows", &m_iRows);
@@ -30,8 +28,6 @@ void MapEditorUI::Update()
     {
         if (m_OnCreate) m_OnCreate();
     }
-
-    ImGui::End();
 }
 
 std::wstring MapEditorUI::GetTexturePath() const

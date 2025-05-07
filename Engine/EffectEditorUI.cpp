@@ -2,10 +2,8 @@
 #include "EffectEditorUI.h"
 #include "imgui.h"
 
-void EffectEditorUI::Update()
+void EffectEditorUI::DrawUI()
 {
-    ImGui::Begin("Effect Editor");
-
     ////¹öÆ°
     //if (ImGui::Button("Cube 1"))    m_iSelectedActor = 0;
     //ImGui::SameLine();
@@ -30,7 +28,4 @@ void EffectEditorUI::Update()
         m_OnEffectApply(m_iSelectedActor, m_fGlowPower, GetGlowColor(), m_fDissolveThreshold);
         bFirstRun = false;
     }
-
-    ImGui::End();
-  
 }
