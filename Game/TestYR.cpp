@@ -106,9 +106,9 @@ void TestYR::Init()
 		//	materialList.emplace_back(tempMat);
 		//}
 	}
-	m_vObjList = objLoader.Load();
-	vector<shared_ptr<UMeshComponent>> objMesh = objLoader.LoadMesh();
-	meshList.insert(meshList.end(), objMesh.begin(), objMesh.end());
+	//m_vObjList = objLoader.Load();
+	//vector<shared_ptr<UMeshComponent>> objMesh = objLoader.LoadMesh();
+	//meshList.insert(meshList.end(), objMesh.begin(), objMesh.end());
 	//m_vObjList[0]->SetScale(Vec3(12.0f, 12.0f, 12.0f));
 
 	targetObj = m_vActorList[targetIndex];
@@ -131,6 +131,14 @@ void TestYR::Update()
 			targetIndex = 0;
 		}
 		targetObj = m_vActorList[targetIndex];
+	}
+
+	if (INPUT->GetButton(GameKey::R))
+	{
+		
+		auto m_pAnimInstance = dynamic_cast<USkinnedMeshComponent*>(targetObj->GetMeshComponent<USkinnedMeshComponent>().get())->GetAnimInstance();
+		int targetIndex = m_pAnimInstance->GetAnimIndex(L"Arrow_bomb");
+		m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
 	}
 
 	// Texture ¹Ù²Ù±â

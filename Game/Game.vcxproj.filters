@@ -37,6 +37,8 @@
     <ClInclude Include="kkongchiMoveScript.h">
       <Filter>Script</Filter>
     </ClInclude>
+    <ClInclude Include="TestPlayer.h" />
+    <ClInclude Include="PlayerMoveScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -61,6 +63,8 @@
     <ClCompile Include="kkongchiMoveScript.cpp">
       <Filter>Script</Filter>
     </ClCompile>
+    <ClCompile Include="TestPlayer.cpp" />
+    <ClCompile Include="PlayerMoveScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\Default.hlsl">

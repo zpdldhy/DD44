@@ -8,12 +8,14 @@
 void UAnimInstance::Tick()
 {
 	animFrame += TIMER->GetDeltaTime() * 30.0f;
-	if (animFrame == 0)
-	{
-		int a = 0;
-	}
+	
 	if (animFrame >= animTrackList[currentAnimTrackIndex].animList[0].size())
 	{
+		if (m_bOnPlayOnce)
+		{
+			currentAnimTrackIndex = prevIndex;
+			m_bOnPlayOnce = false;
+		}
 		animFrame = 0;
 	}
 
@@ -26,8 +28,9 @@ void UAnimInstance::Tick()
 
 	}
 
-
-	if (INPUT->GetButton(R))
+	
+	// 애니메이션 파싱 확인 용
+	/*if (INPUT->GetButton(R))
 	{
 		animFrame = 0;
 		currentAnimTrackIndex++;
@@ -35,9 +38,7 @@ void UAnimInstance::Tick()
 		{
 			currentAnimTrackIndex = 0;
 		}
-		int a = animTrackList[currentAnimTrackIndex].animList[0].size();
-		int b = 0;
-	}
+	}*/
 }
 
 void UAnimInstance::CreateConstantBuffer()
@@ -62,4 +63,49 @@ void UAnimInstance::CreateConstantBuffer()
 void UAnimInstance::AddTrack(AnimList _animTrack)
 {
 	animTrackList.emplace_back(_animTrack);
+}
+
+int UAnimInstance::GetAnimIndex(wstring _animName)
+{
+	for (int iTrack = 0; iTrack < animTrackList.size(); iTrack++)
+	{
+		if (animTrackList[iTrack].m_szName.compare(_animName) == 0)
+		{
+			return iTrack;
+		}
+	}
+	return 0;
+}
+
+void UAnimInstance::SetCurrentAnimTrack(int _index)
+{
+	if(m_bOnPlayOnce) { return; }
+	if (_index < 0 || _index >= animTrackList.size())
+	{
+		return;
+	}
+	// 이 부분을 애니메이션 활용에 따라 다를 것 같아서 추가 구상 필요
+	if (currentAnimTrackIndex == _index)
+	{
+		return;
+	}
+	animFrame = 0;
+	currentAnimTrackIndex  =  _index;
+}
+
+void UAnimInstance::PlayOnce(int _index)
+{
+	animFrame = 0;
+	prevIndex = currentAnimTrackIndex;
+	currentAnimTrackIndex = _index;
+	m_bOnPlayOnce = true;
+}
+
+Matrix UAnimInstance::GetBoneAnim(int _boneIndex)
+{
+	if (_boneIndex >= animTrackList[currentAnimTrackIndex].animList.size())
+	{
+		return Matrix();
+	}
+	return animTrackList[currentAnimTrackIndex].animList[_boneIndex][animFrame];
 }

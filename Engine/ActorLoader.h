@@ -16,6 +16,7 @@ public:
 public:
 	void ConvertFbxToAsset(string _path = "../Resources/Fbx/DeathDoor/*.fbx");
 	vector<shared_ptr<APawn>> Load();
+	shared_ptr<APawn> LoadOne(string _path);
 	vector<shared_ptr<UMeshComponent>> LoadMesh();
 	vector<wstring> LoadTexPath();
 	vector<shared_ptr<UAnimInstance>> LoadAnim();

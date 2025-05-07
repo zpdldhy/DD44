@@ -19,10 +19,12 @@ class UAnimInstance
 	bool m_bInPlace;
 	Vec3 rootPos;
 	int rootIndex;
+	int prevIndex;
 	
 	ComPtr<ID3D11Buffer> _constantBuffer;
 public:
 	friend class AnimTrack;
+	bool m_bOnPlayOnce;
 
 public:
 	void Tick();
@@ -30,5 +32,9 @@ public:
 	void AddTrack(AnimList _animTrack);
 	void SetRootIndex(int _index) { rootIndex = _index; }
 	void CheckInPlace(bool _inPlace) { m_bInPlace = _inPlace; }
+	int GetAnimIndex(wstring _animName);
+	void SetCurrentAnimTrack(int _index);
+	void PlayOnce(int _index);
+	Matrix GetBoneAnim(int _boneIndex);
 };
 

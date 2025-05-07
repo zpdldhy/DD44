@@ -155,7 +155,8 @@ void ViewPortTexture::SetViewPort(FLOAT _fWidth, FLOAT _fHeight)
 
 void ViewPortTexture::ClearViewPort()
 {
-	const FLOAT color[] = { 1.f, 1.f, 0.f, 1.f };
+	const FLOAT color[] = { 0.1f, 0.25f, 0.4f, 1.0f };
+
 	DC->ClearRenderTargetView(m_pRenderTargetView.Get(), color);
 	DC->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0, 0);
 	DC->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_STENCIL, 1.0, 0);

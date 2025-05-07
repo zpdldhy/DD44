@@ -48,6 +48,7 @@ public:
 	const Vec3& GetLook() const { return m_vLook; }
 	const Vec3& GetRight() const { return m_vRight; }
 	const Vec3& GetUp() const { return m_vUp; }
+	const Matrix& GetWorld() const { return m_matWorld; }
 
 	void SetPosition(const Vec3& _pos) { m_vPosition = _pos; }
 	void SetRotation(const Vec3& _rot) { m_vRotation = _rot; }
