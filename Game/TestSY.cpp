@@ -19,6 +19,8 @@
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
+#include "ObjectLoader.h"
+#include "ACharacter.h"
 
 void TestSY::Init()
 {
@@ -180,6 +182,79 @@ void TestSY::Init()
 		tile->Init();
 		m_vTiles.push_back(tile);
 	});
+
+	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+	{
+		AssimpLoader loader;
+		vector<MeshData> meshList = loader.Load(objPath);
+		if (meshList.empty())
+			return;
+
+		// Mesh Component 생성
+		shared_ptr<UMeshComponent> meshComp;
+		if (meshType == 0)
+		{
+			// SkinnedMeshComponent 설정 시 향후 확장
+			meshComp = make_shared<UStaticMeshComponent>();
+
+			auto meshRes = make_shared<UStaticMeshResources>();
+			meshRes->SetVertexList(meshList[0].m_vVertexList);
+			meshRes->SetIndexList(meshList[0].m_vIndexList);
+			meshRes->Create();
+
+			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
+		}
+		else if (meshType == 1)
+		{
+			meshComp = make_shared<UStaticMeshComponent>();
+
+			auto meshRes = make_shared<UStaticMeshResources>();
+			meshRes->SetVertexList(meshList[0].m_vVertexList);
+			meshRes->SetIndexList(meshList[0].m_vIndexList);
+			meshRes->Create();
+
+			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
+		}
+
+		// 머티리얼 설정
+		auto mat = make_shared<UMaterial>();
+		mat->Load(
+			std::wstring(texPath, texPath + strlen(texPath)),
+			std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+		);
+		meshComp->SetMaterial(mat);
+
+		// Actor 생성
+		shared_ptr<AActor> actor;
+		if (actorType == 0)
+		{
+			actor = make_shared<APawn>(); // ACharacter로 교체 가능
+		}
+		else if (actorType == 1)
+		{
+			actor = make_shared<APawn>(); // AEnemy로 교체 가능
+		}
+		else if (actorType == 2)
+		{
+			actor = make_shared<APawn>(); // AObject로 교체 가능
+		}
+
+		actor->SetMeshComponent(meshComp);
+
+		// 타일이 있다면 위치 보정
+		if (!m_vTiles.empty())
+		{
+			float y = m_vTiles.back()->GetHeightAt(pos.x, pos.z);
+			pos.y = y + scale.y / 2.0f;
+		}
+
+		actor->SetPosition(pos);
+		actor->SetRotation(rot);
+		actor->SetScale(scale);
+		actor->Init();
+
+		m_vObjects.push_back(actor);
+	});
 }
 
 void TestSY::Update()
@@ -194,6 +269,9 @@ void TestSY::Update()
 
 	for (auto& tile : m_vTiles)
 		tile->Tick();
+	
+	for (auto& objects : m_vObjects)
+		objects->Tick();
 
 	for (auto& pUI : m_vUIs)
 	{
@@ -213,6 +291,9 @@ void TestSY::Render()
 	{
 		DC->RSSetState(STATE->m_pRSSolid.Get());
 	}
+
+	if (INPUT->GetButtonDown(P))
+		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
 	
 	m_pCameraActor->Render();
 	m_pActor->Render();
@@ -220,6 +301,9 @@ void TestSY::Render()
 
 	for (auto& tile : m_vTiles)
 		tile->Render();
+
+	for (auto& objects : m_vObjects)
+		objects->Render();
 }
 
 void TestSY::Destroy()
