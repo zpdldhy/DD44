@@ -7,7 +7,6 @@ enum class ProjectionType
 {
 	PT_ORTHOGRAPHIC,
 	PT_PERSPECTIVE,
-	PT_UI,
 };
 
 class UCameraComponent : public USceneComponent
