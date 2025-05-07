@@ -3,7 +3,7 @@
 class AUIActor : public AActor
 {
 public:
-	AUIActor();
+	AUIActor() = default;
 	virtual ~AUIActor() = default;
 };
 

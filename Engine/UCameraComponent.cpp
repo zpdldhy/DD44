@@ -13,8 +13,6 @@ void UCameraComponent::Init()
 		UpdateOrthographicProjection();
 	else if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
 		UpdatePersPectiveProjection();
-	else if (m_ProjectionType == ProjectionType::PT_UI)
-		m_matProjection = Matrix::Identity;
 
 #ifndef DEBUG
 	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
@@ -30,8 +28,6 @@ void UCameraComponent::Tick()
 		UpdateOrthographicProjection();
 	else if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
 		UpdatePersPectiveProjection();
-	else if (m_ProjectionType == ProjectionType::PT_UI)
-		m_matProjection = Matrix::Identity;
 
 #ifndef DEBUG
 	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
@@ -42,7 +38,7 @@ void UCameraComponent::Tick()
 void UCameraComponent::Render()
 {
 #ifndef DEBUG
-	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE && m_bVisibleFrustumBox)
+	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE && m_bVisibleFrustumBox == true)
 	{
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();

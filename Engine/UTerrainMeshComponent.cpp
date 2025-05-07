@@ -2,24 +2,25 @@
 #include "UTerrainMeshComponent.h"
 #include "UMaterial.h"
 
-void UTerrainMeshComponent::Init()
+void UTerrainMeshComponent::Render()
 {
-}
+	PreRender();
 
-void UTerrainMeshComponent::Tick()
-{
+	//if (m_pWorldCB)
+	//{
+	//	DC->UpdateSubresource(m_pWorldCB.Get(), 0, NULL, &m_cbData, 0, 0);
+	//	DC->VSSetConstantBuffers(0, 1, m_pWorldCB.GetAddressOf());
+	//}
+
+	PostRender();
 }
 
 void UTerrainMeshComponent::PreRender()
 {
-	// IA Setting
-	UINT Strides = sizeof(PNCT_VERTEX);
-	UINT Offsets = 0;
-	DC->IASetVertexBuffers(0, 1, m_pMesh->GetVertexBuffer().GetAddressOf(), &Strides, &Offsets);
-	DC->IASetIndexBuffer(m_pMesh->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-	DC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// Material Render
+	if (m_pMesh)
+	{
+		m_pMesh->Bind();
+	}
 	if (m_pMaterial)
 	{
 		m_pMaterial->Bind();

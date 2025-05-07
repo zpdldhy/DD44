@@ -28,7 +28,7 @@ void ViewPortTexture::CreateViewPortTexture(FLOAT _fWidth, FLOAT _fHeight)
 
 	// Create ShaderResourceView
 	// Material에서 texture로 가지게 되는 부분
-	hr = DEVICE->CreateShaderResourceView(m_pTexture.Get(), NULL, m_pSRV.GetAddressOf());
+	hr = DEVICE->CreateShaderResourceView(m_pTexture.Get(), NULL, m_pTexSRV.GetAddressOf());
 
 	if (FAILED(hr))
 	{

@@ -37,6 +37,9 @@
     <ClInclude Include="kkongchiMoveScript.h">
       <Filter>Script</Filter>
     </ClInclude>
+    <ClInclude Include="Editor.h">
+      <Filter>Game</Filter>
+    </ClInclude>
     <ClInclude Include="TestPlayer.h" />
     <ClInclude Include="PlayerMoveScript.h" />
   </ItemGroup>

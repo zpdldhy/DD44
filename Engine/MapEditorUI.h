@@ -4,7 +4,7 @@
 class MapEditorUI
 {
 public:
-    void Update();
+    void DrawUI();
 
     void SetOnCreateCallback(std::function<void()> callback)
     {

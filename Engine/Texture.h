@@ -6,15 +6,15 @@
 class Texture
 {
 public:
-	ComPtr<ID3D11Resource> m_pTexture;
-	ComPtr<ID3D11ShaderResourceView> m_pTexSRV;
+	ComPtr<ID3D11Resource> m_pTexture = nullptr;
+	ComPtr<ID3D11ShaderResourceView> m_pTexSRV = nullptr;
+	wstring m_pFilePath;
 
 	UINT width = 0;
 	UINT height = 0;
 
 public:
-	void SetTextureSize();
-	void SetSRV(ComPtr<ID3D11ShaderResourceView> _pSRV) { m_pTexSRV = _pSRV; }
+	void SetTextureSize();	
 	bool LoadTexture(std::wstring _filename);
 	Texture() = default;
 };

@@ -5,7 +5,7 @@
 class EffectEditorUI
 {
 public:
-    void Update();
+    void DrawUI();
 
     void SetEffectApplyCallback(std::function<void(int, float, Vec3, float, Vec3, float)> callback)
     {
