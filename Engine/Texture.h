@@ -8,6 +8,7 @@ class Texture
 public:
 	ComPtr<ID3D11Resource> m_pTexture = nullptr;
 	ComPtr<ID3D11ShaderResourceView> m_pTexSRV = nullptr;
+	wstring m_pFilePath;
 
 	UINT width = 0;
 	UINT height = 0;

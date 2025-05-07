@@ -284,6 +284,9 @@
     <ClInclude Include="AUIActor.h">
       <Filter>Object</Filter>
     </ClInclude>
+    <ClInclude Include="UIManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -385,9 +388,6 @@
     <ClCompile Include="Sound.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="USkinnedComponent.cpp">
-      <Filter>Component\Mesh</Filter>
-    </ClCompile>
     <ClCompile Include="UObject.cpp">
       <Filter>Object</Filter>
     </ClCompile>
@@ -470,6 +470,9 @@
     </ClCompile>
     <ClCompile Include="AUIActor.cpp">
       <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="UIManager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
