@@ -1,13 +1,13 @@
 #pragma once
+#include "Texture.h"
 
-class ViewPortTexture
+class ViewPortTexture : public Texture
 {
 protected:
 	// Current Viewport
 	D3D11_VIEWPORT m_CurrentVP;
 	D3D11_TEXTURE2D_DESC	m_TexDesc;
 	ComPtr<ID3D11Texture2D> m_pTexture = nullptr;
-	ComPtr<ID3D11ShaderResourceView> m_pSRV = nullptr;
 	ComPtr<ID3D11RenderTargetView> m_pRenderTargetView = nullptr;
 	ComPtr<ID3D11DepthStencilView> m_pDepthStencilView = nullptr;
 	ComPtr<ID3D11ShaderResourceView> m_pDsvSRV = nullptr;// ±Ì¿Ãπˆ∆€ ∏Æº“Ω∫∫‰
@@ -26,9 +26,5 @@ public:
 private:
 	void SetViewPort(FLOAT _fWidth, FLOAT _fHeight);
 	void ClearViewPort();
-
-public:
-	ComPtr<ID3D11ShaderResourceView> GetSRV() { return m_pSRV; }
-
 };
 

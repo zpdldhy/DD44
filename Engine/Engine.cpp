@@ -123,7 +123,7 @@ void Engine::Create3DWorld()
 	auto pMesh = UStaticMeshComponent::CreatePlane();
 
 	auto pMaterial = make_shared<UMaterial>();
-	pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+	pMaterial->Load(L"", L"../Resources/Shader/Default.hlsl");
 	pMesh->SetMaterial(pMaterial);
 
 	m_p3DWorld->SetMeshComponent(pMesh);
@@ -134,7 +134,7 @@ void Engine::Create3DWorld()
 	m_p3DWorldTexture = make_shared<ViewPortTexture>();
 	m_p3DWorldTexture->CreateViewPortTexture(1440.f, 900.f);
 
-	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->GetTexture()->SetSRV(m_p3DWorldTexture->GetSRV());
+	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(m_p3DWorldTexture);
 }
 
 void Engine::Render3DWorld()
