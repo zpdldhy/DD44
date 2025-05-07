@@ -3,6 +3,7 @@
 struct MeshData
 {
 	bool m_bSkeleton = false;
+	wstring m_szName;
 	vector<PNCT_VERTEX> m_vVertexList;
 	vector<IW_VERTEX> m_vIwList;
 	vector<DWORD> m_vIndexList;
@@ -18,7 +19,7 @@ struct BoneNode
 	vector<wstring> m_vChildName;
 };
 
-struct SkeletonData
+struct Skeleton
 {
 	map<wstring, BoneNode> m_vBonelist;
 };
@@ -36,3 +37,5 @@ struct AnimSequence
 {
 	vector<AnimTrackData> m_vAnimList;
 };
+
+

@@ -5,6 +5,8 @@
 #pragma comment(lib, "Fbx/libxml2-md.lib")
 #pragma comment(lib, "Fbx/zlib-md.lib")
 
+
+
 struct TIwData
 {
 	vector<UINT> m_vIndexList;
@@ -42,6 +44,7 @@ struct TIwData
 //};
 struct TFbxResource
 {
+	wstring name;
 	// Material
 	map<int, wstring> m_mTexPathList;
 
@@ -79,6 +82,17 @@ struct TFbxResource
 		m_iNodeCount = 0;
 	}
 };
+
+struct ParsingData
+{
+	TFbxResource m_ActorData;
+
+	vector<MeshData> m_vMeshList;
+	AnimSequence m_AnimData;
+	Skeleton m_Skeleton;
+	vector<wstring> m_vTexPathList;
+};
+
 struct TempNode
 {
 	UINT m_iIndex;

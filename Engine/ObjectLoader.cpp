@@ -35,10 +35,15 @@ vector<shared_ptr<APawn>> ObjectLoader::Load()
 			rootMesh->SetMesh(mesh);
 			rootMesh->SetMaterial(material);
 		}
-
+		m_vMeshList.emplace_back(rootMesh);
 		actor->SetMeshComponent(rootMesh);
 		actor->Init();
-		objList.emplace_back(actor);
+		m_vObjList.emplace_back(actor);
 	}
-	return objList;
+	return m_vObjList;
+}
+
+vector<shared_ptr<UMeshComponent>> ObjectLoader::LoadMesh()
+{
+	return m_vMeshList;
 }

@@ -19,6 +19,8 @@ void Texture::SetTextureSize()
 
 bool Texture::LoadTexture(std::wstring _filename)
 {
+	m_pFilePath = _filename;
+
 	HRESULT hr = DirectX::CreateWICTextureFromFile(
 		DEVICE.Get(),
 		_filename.c_str(),

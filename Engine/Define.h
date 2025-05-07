@@ -15,4 +15,6 @@
 #define GUI			GET_SINGLE(ImGuiCore)
 #define SOUNDMANAGER	GET_SINGLE(SoundManager)
 #define CAMERAMANAGER	GET_SINGLE(CameraManager)
+#define UIMANAGER		GET_SINGLE(UIManager)
+
 #define DD_PI		3.1415926f

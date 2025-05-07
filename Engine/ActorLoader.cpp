@@ -6,6 +6,9 @@
 #include "AAsset.h"
 #include "APawn.h"
 #include "AnimTrack.h"
+#include "USkeletalMeshResources.h"
+#include "UStaticMeshResources.h"
+#include "Inputlayout.h"
 
 void ActorLoader::ConvertFbxToAsset(string _path)
 {
@@ -37,17 +40,17 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 	vector<string> fileNames = GetFileNames("../Resources/Asset/*.asset");
 
 	// TFbxResource ÆÄ½Ì
-	vector<TFbxResource> fbxList;
+
 	for (int iPath = 0; iPath < fileNames.size(); iPath++)
 	{
-		fbxList.emplace_back(AAsset::Load(fileNames[iPath].c_str()));
+		m_vFbxList.emplace_back(AAsset::Load(fileNames[iPath].c_str()));
 	}
 
 	// actor º¯È¯
-	for (int iFbx = 0; iFbx < fbxList.size(); iFbx++)
+	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
 	{
-		auto& _resource = fbxList[iFbx];
-		
+		auto& _resource = m_vFbxList[iFbx];
+
 		shared_ptr<APawn> actor = make_shared<APawn>();
 		shared_ptr<UMaterial> tempSkinnedMat = make_shared<UMaterial>();
 		// TEXTURE
@@ -73,13 +76,12 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 		// Animation
 		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 		{
-			animInstance->SetInverseBone(_resource.m_vInverseBindPose);
 			animInstance->CreateConstantBuffer();
 			for (int iAnim = 0; iAnim < _resource.m_iAnimTrackCount; iAnim++)
 			{
 				AnimList animTrack;
 				animTrack.m_szName = _resource.m_vAnimTrackList[iAnim].m_szName;
-				animTrack.animList= _resource.m_vAnimTrackList[iAnim].m_vAnim;
+				animTrack.animList = _resource.m_vAnimTrackList[iAnim].m_vAnim;
 				animInstance->AddTrack(animTrack);
 			}
 		}
@@ -91,13 +93,14 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 		mesh->SetVertexList(_resource.m_vMeshList[0].m_vVertexList);
 		mesh->SetIwList(_resource.m_vMeshList[0].m_vIwList);
 		mesh->Create();
+		mesh->SetInverseBindPose(_resource.m_vInverseBindPose[0]);
 		rootMesh->SetMesh(mesh);
 		rootMesh->SetMaterial(tempSkinnedMat);
 		rootMesh->SetBaseAnim(animInstance);
 		shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
-		animTrack->SetBase(animInstance, 0);
+		animTrack->SetBase(animInstance);
 		rootMesh->SetMeshAnim(animTrack);
-
+		rootMesh->SetName(_resource.m_vMeshList[0].m_szName);
 		{
 			// BONE
 			map<wstring, BoneNode> bones;
@@ -118,13 +121,14 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 				mesh->SetVertexList(_resource.m_vMeshList[iMesh].m_vVertexList);
 				mesh->SetIwList(_resource.m_vMeshList[iMesh].m_vIwList);
 				mesh->Create();
+				mesh->SetInverseBindPose(_resource.m_vInverseBindPose[iMesh]);
 				meshComponent->SetMesh(mesh);
 				meshComponent->SetMaterial(tempSkinnedMat);
 				shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
-				animTrack->SetBase(animInstance, iMesh);
+				animTrack->SetBase(animInstance);
 				meshComponent->SetMeshAnim(animTrack);
 				rootMesh->AddChild(meshComponent);
-
+				meshComponent->SetName(_resource.m_vMeshList[iMesh].m_szName);
 				{
 					// BONE
 					map<wstring, BoneNode> bones;
@@ -143,4 +147,90 @@ vector<shared_ptr<APawn>> ActorLoader::Load()
 	}
 
 	return actorList;
+}
+
+vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
+{
+	// TEMP MESH TEXTUER
+	shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
+	wstring path = L"../Resources/Texture/magenta.png";
+	tempMat->Load(path, L"../Resources/Shader/Default.hlsl");
+
+	shared_ptr<UMaterial> tempSkinnedMat = make_shared<UMaterial>();
+	tempSkinnedMat->Load(path, L"../Resources/Shader/skinningShader.hlsl");
+	tempSkinnedMat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+
+	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	{
+		for (int iMesh = 0; iMesh < m_vFbxList[iFbx].m_vMeshList.size(); iMesh++)
+		{
+			auto& data = m_vFbxList[iFbx].m_vMeshList[iMesh];
+			shared_ptr<UMeshComponent> meshComponent;
+			if (data.m_bSkeleton)
+			{
+				meshComponent = make_shared<USkinnedMeshComponent>();
+				meshComponent->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
+				shared_ptr<USkeletalMeshResources> mesh = make_shared<USkeletalMeshResources>();
+				mesh->SetVertexList(data.m_vVertexList);
+				dynamic_cast<USkeletalMeshResources*>(mesh.get())->SetIwList(data.m_vIwList);
+				mesh->Create();
+				dynamic_cast<USkinnedMeshComponent*>(meshComponent.get())->SetMesh(mesh);
+				meshComponent->SetMaterial(tempSkinnedMat);
+				// BONE
+				map<wstring, BoneNode> bones;
+				for (auto& data : m_vFbxList[iFbx].m_mSkeletonList)
+				{
+					bones.insert(make_pair(data.second.m_szName, data.second));
+				}
+				mesh->AddSkeleton(bones);
+			}
+			else
+			{
+				meshComponent = make_shared<UStaticMeshComponent>();
+				meshComponent->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
+				shared_ptr<UStaticMeshResources> mesh = make_shared<UStaticMeshResources>();
+				mesh->SetVertexList(data.m_vVertexList);
+				mesh->Create();
+				dynamic_cast<UStaticMeshComponent*>(meshComponent.get())->SetMesh(mesh);
+				meshComponent->SetMaterial(tempMat);
+			}
+			m_vMeshList.emplace_back(meshComponent);
+		}
+	}
+	return m_vMeshList;
+}
+
+vector<wstring> ActorLoader::LoadTexPath()
+{
+	vector<wstring> texPathList;
+	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	{
+		for (int iTex = 0; iTex < m_vFbxList[iFbx].m_iTexPathCount; iTex++)
+		{
+			texPathList.emplace_back(m_vFbxList[iFbx].m_mTexPathList[iTex]);
+		}
+	}
+	return texPathList;
+}
+
+vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
+{
+	vector<shared_ptr<UAnimInstance>> animList;
+	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	{
+		// Animation
+		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
+		{
+			animInstance->CreateConstantBuffer();
+			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
+			{
+				AnimList animTrack;
+				animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
+				animTrack.animList = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_vAnim;
+				animInstance->AddTrack(animTrack);
+			}
+		}
+		animList.emplace_back(animInstance);
+	}	
+	return animList;
 }

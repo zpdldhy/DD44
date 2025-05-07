@@ -126,4 +126,5 @@ void AssimpLoader::GetCenter(const aiMesh* _pMesh)
 		maxPos.z = max(maxPos.z, v.z);
 	}
 	center = (minPos + maxPos) * 0.5f;
+	center.y = (minPos.y);
 }

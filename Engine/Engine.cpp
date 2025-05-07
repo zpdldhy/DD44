@@ -10,6 +10,11 @@
 #include "Timer.h" 
 #include "ImGuiCore.h"
 #include "CameraManager.h"
+#include "AActor.h"
+#include "UStaticMeshComponent.h"
+#include "UMaterial.h"
+#include "ViewPortTexture.h"
+#include "UIManager.h"
 
 void Engine::Init()
 {
@@ -30,7 +35,14 @@ void Engine::Init()
 	}
 	_app->Init();
 
-	CAMERAMANAGER->Init();
+	// Manager 초기화
+	{
+		CAMERAMANAGER->Init();
+		UIMANAGER->Init();
+	}
+
+	// ViewPort를 이용한 3DWorld Texture Rendering
+	Create3DWorld();
 }
 
 void Engine::Frame()
@@ -46,7 +58,12 @@ void Engine::Frame()
 	}
 	TIMER->Update();
 	
-	CAMERAMANAGER->Tick();
+	// Manager Tick
+	{
+		CAMERAMANAGER->Tick();
+	}
+
+	m_p3DWorld->Tick();
 }
 
 void Engine::Render()
@@ -54,14 +71,36 @@ void Engine::Render()
 	GET_SINGLE(Device)->PreRender();
 	DXWRITE->m_pd2dRT->BeginDraw();
 
-	D2D1_RECT_F rt = {0.0f, 0.0f, 800.0f, 600.0f };
+	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
 	DXWRITE->Draw(rt, TIMER->m_szTime);
 
-	D2D1_RECT_F rect = D2D1::RectF(50, 50, 400, 200);
-	/*std::wstring text = L"이것은 멀티라인 텍스트입니다.\n자동 줄바꿈도 되고, 영역을 벗어나지 않아요!\n글씨 크기를 바꾸면 자동으로 맞춰집니다.";
-	DxWrite::GetInstance()->DrawMultiline(rect, text);*/
 	CAMERAMANAGER->Render(CameraViewType::CVT_ACTOR);
-	_app->Render();
+
+	// 3D World -> Texture Render
+	{
+		m_p3DWorldTexture->BeginViewPort();
+		// Clinet Render
+		_app->Render();
+		m_p3DWorldTexture->EndViewPort();
+
+		// 3DWorld를 보여주는 평면은 Rasterizer = SolidNone으로 고정
+		if (m_pCurrentRasterizer)
+			m_pCurrentRasterizer.Reset();
+
+		DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
+		DC->RSSetState(STATE->m_pRSSolidNone.Get());
+
+		{
+			CAMERAMANAGER->Render(CameraViewType::CVT_UI);
+			m_p3DWorld->Render();
+		}
+
+		DC->RSSetState(m_pCurrentRasterizer.Get());
+		m_pCurrentRasterizer.Reset();
+	}	
+
+	UIMANAGER->Render();
+
 	GUI->Render(); // *Fix Location* after _app->Render() 
 
 	DXWRITE->m_pd2dRT->EndDraw();
@@ -70,6 +109,8 @@ void Engine::Render()
 
 void Engine::Release()
 {
+	UIMANAGER->Destroy();
+
 	{
 		ImGui_ImplDX11_Shutdown();  // DX11 관련 리소스 해제
 		ImGui_ImplWin32_Shutdown(); // Win32 윈도우 관련 연결 해제
@@ -103,4 +144,25 @@ Engine::Engine(HINSTANCE hInstance, shared_ptr<IExecute> app)
 {
 	_hInstance = hInstance;
 	_app = app;
+}
+
+void Engine::Create3DWorld()
+{
+	m_p3DWorld = make_shared<AActor>();
+
+	auto pMesh = UStaticMeshComponent::CreatePlane();
+
+	auto pMaterial = make_shared<UMaterial>();
+	pMaterial->Load(L"", L"../Resources/Shader/Default.hlsl");
+	pMesh->SetMaterial(pMaterial);
+
+	m_p3DWorld->SetMeshComponent(pMesh);
+	m_p3DWorld->SetPosition(Vec3(0.f, 0.f, 1.f));
+	m_p3DWorld->SetScale(Vec3(1440.f, 900.f, 0.f));
+	m_p3DWorld->Init();
+
+	m_p3DWorldTexture = make_shared<ViewPortTexture>();
+	m_p3DWorldTexture->CreateViewPortTexture(1440.f, 900.f);
+
+	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(m_p3DWorldTexture);
 }

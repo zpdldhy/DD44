@@ -161,9 +161,11 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="ACameraActor.h" />
     <ClInclude Include="ACharacter.h" />
     <ClInclude Include="ActorLoader.h" />
+    <ClInclude Include="ALight.h" />
     <ClInclude Include="APawn.h" />
     <ClInclude Include="ASky.h" />
     <ClInclude Include="AssimpLoader.h" />
+    <ClInclude Include="AUIActor.h" />
     <ClInclude Include="EffectEditorUI.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="FbxLoader.h" />
@@ -174,6 +176,8 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="SkeletalMeshData.h" />
     <ClInclude Include="UAnimInstance.h" />
     <ClInclude Include="UBoxComponent.h" />
+    <ClInclude Include="UIManager.h" />
+    <ClInclude Include="ULightComponent.h" />
     <ClInclude Include="UShapeComponent.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="ATerrainTileActor.h" />
@@ -214,12 +218,12 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="USceneComponent.h" />
     <ClInclude Include="UScriptComponent.h" />
     <ClInclude Include="USkeletalMeshResources.h" />
-    <ClInclude Include="USkinnedComponent.h" />
     <ClInclude Include="USkinnedMeshComponent.h" />
     <ClInclude Include="UStaticMeshComponent.h" />
     <ClInclude Include="UStaticMeshResources.h" />
     <ClInclude Include="UTerrainMeshComponent.h" />
     <ClInclude Include="Vertex.h" />
+    <ClInclude Include="ViewPortTexture.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -228,9 +232,11 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="ACameraActor.cpp" />
     <ClCompile Include="ACharacter.cpp" />
     <ClCompile Include="ActorLoader.cpp" />
+    <ClCompile Include="ALight.cpp" />
     <ClCompile Include="APawn.cpp" />
     <ClCompile Include="ASky.cpp" />
     <ClCompile Include="AssimpLoader.cpp" />
+    <ClCompile Include="AUIActor.cpp" />
     <ClCompile Include="EffectEditorUI.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="FbxLoader.cpp" />
@@ -241,6 +247,8 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="SkeletalMeshData.cpp" />
     <ClCompile Include="UAnimInstance.cpp" />
     <ClCompile Include="UBoxComponent.cpp" />
+    <ClCompile Include="UIManager.cpp" />
+    <ClCompile Include="ULightComponent.cpp" />
     <ClCompile Include="UShapeComponent.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="ATerrainTileActor.cpp" />
@@ -293,12 +301,12 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="USceneComponent.cpp" />
     <ClCompile Include="UScriptComponent.cpp" />
     <ClCompile Include="USkeletalMeshResources.cpp" />
-    <ClCompile Include="USkinnedComponent.cpp" />
     <ClCompile Include="USkinnedMeshComponent.cpp" />
     <ClCompile Include="UStaticMeshComponent.cpp" />
     <ClCompile Include="UStaticMeshResources.cpp" />
     <ClCompile Include="UTerrainMeshComponent.cpp" />
     <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="ViewPortTexture.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>

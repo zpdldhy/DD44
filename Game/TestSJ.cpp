@@ -13,6 +13,7 @@
 #include "EngineCameraMoveScript.h"
 #include "CameraManager.h"
 #include "DxState.h"
+#include "ALight.h"
 
 void TestSJ::Init()
 {
@@ -52,7 +53,10 @@ void TestSJ::Init()
 
 		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
 		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+		
 		m_pStaticMesh2->SetMaterial(material2);
+		
+		
 	}
 
 	{
@@ -71,6 +75,15 @@ void TestSJ::Init()
 		m_pStaticMesh->GetMaterial()->SetNoiseTexture(noiseTex);
 	}
 
+	m_pLight = make_shared<ALight>();
+	m_pLight->SetPosition(Vec3(0, 0, -10));
+	//	m_pLight->SetRotation(Vec3(0, DD_PI, 0)); // 카메라 방향으로 빛 쏘기
+	m_pLight->SetRotation(Vec3(0, 0, 0)); // 카메라 방향으로 빛 쏘기
+	m_pLight->GetLightComponent()->SetAmbientColor(Vec3(0.0f, 0.0f, 1.0f));
+	m_pLight->GetLightComponent()->SetAmbientPower(0.2f);
+
+
+	m_pLight->Init();
 	m_pCameraActor->Init();
 	m_pActor->Init();
 	m_pActor2->Init();
@@ -78,10 +91,8 @@ void TestSJ::Init()
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 
-	GUI->SetEffectEditorCallback
-	(
-		[this](int selected, float glowPower, Vec3 glowColor, float dissolveThreshold)
-		{
+	GUI->GetEffectEditorUI()->SetEffectApplyCallback(
+		[this](int selected, float glowPower, Vec3 glowColor, float dissolveThreshold, Vec3 emissiveColor, float emissivePower) {
 			if (selected == 0 && m_pStaticMesh)
 			{
 				targetMat = m_pStaticMesh->GetMaterial();
@@ -95,17 +106,35 @@ void TestSJ::Init()
 			{
 				targetMat->SetGlowParams(glowPower, glowColor);
 				targetMat->SetDissolveParams(dissolveThreshold);
+				targetMat->SetEmissiveParams(emissiveColor, emissivePower);
 			}
 		}
 	);
+
+	GUI->GetEffectEditorUI()->SetLightApplyCallback(
+		[this](ELightType lightType, Vec3 lightColor, float intensity, Vec3 ambientColor, float ambientPower)
+		{
+			if (m_pLight && m_pLight->GetLightComponent())
+			{
+				m_pLight->GetLightComponent()->SetLightType(static_cast<ELightType>(lightType));
+				m_pLight->GetLightComponent()->SetColor(lightColor);
+				m_pLight->GetLightComponent()->SetIntensity(intensity);
+				m_pLight->GetLightComponent()->SetAmbientColor(ambientColor);
+				m_pLight->GetLightComponent()->SetAmbientPower(ambientPower);
+			}
+		}
+	);
+
+
 }
 
 void TestSJ::Update()
 {
+	// 오브젝트 회전
 	{
 		static float angle = 0.0f;
 		angle += TIMER->GetDeltaTime();
-		angle = fmodf(angle, DD_PI*2); 
+		angle = fmodf(angle, DD_PI * 2);
 
 		float radius = 6.0f;
 		float centerX = m_pActor->GetPosition().x;
@@ -124,7 +153,10 @@ void TestSJ::Update()
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
 		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
 	}
-
+	//Emissive
+	{
+		m_pStaticMesh2->GetMaterial()->SetEmissiveParams(Vec3(0.0f, 1.0f, 0.0f), 0.1f);
+	}
 	//UVDistortion
 	{
 		static bool bUVInitialized = false;
@@ -148,7 +180,8 @@ void TestSJ::Update()
 	}
 
 
-	/*shared_ptr<UMaterial> targetMat = nullptr;
+	{
+		/*shared_ptr<UMaterial> targetMat = nullptr;
 	static int prevSelected = -1;
 	if (GUI->m_iSelectedActor != prevSelected)
 	{
@@ -183,6 +216,8 @@ void TestSJ::Update()
 		targetMat->SetDissolveParams(GUI->m_fDissolveThreshold);
 	}*/
 
+
+	}
 
 	// fallback 제거 가능 (선택이 명확하니까)
 	//GUI->SetTargetMaterial(targetMat);
@@ -264,13 +299,13 @@ void TestSJ::Update()
 			m_pStaticMesh2->GetMaterial()->SetHitFlashTime(flashTimer);
 	}
 	//Sound
-	{
+	/*{
 		SOUNDMANAGER->GetPtr(ESoundType::Bgm)->Play2D();
 		if (INPUT->GetButton(A))
 		{
 			SOUNDMANAGER->GetPtr(ESoundType::Bomb)->PlayEffect2D();
 		}
-	}
+	}*/
 	//Write
 	{
 		/*if (INPUT->GetButton(A))
@@ -351,7 +386,7 @@ void TestSJ::Render()
 	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
 	//	D2D1::ColorF::White                   // 메인 텍스트 색
 	//);
-
+	m_pLight->Render();
 	m_pCameraActor->Render();
 
 	// [1] Actor1 먼저 정상 렌더링 (깊이, 스텐실 기록 X)

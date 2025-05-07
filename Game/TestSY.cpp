@@ -17,6 +17,8 @@
 #include "DxState.h"
 #include "MapEditorUI.h"
 #include "UBoxComponent.h"
+#include "AUIActor.h"
+#include "UIManager.h"
 #include "ObjectLoader.h"
 #include "ACharacter.h"
 
@@ -70,6 +72,95 @@ void TestSY::Init()
 		m_pSkyMesh->SetMaterial(material);
 
 		m_pSky->Init();
+	}
+
+	// UIs
+	{
+		// Ability
+		{
+			auto pUIArrowBack = make_shared<AUIActor>();
+			pUIArrowBack->SetScale(Vec3(169.f, 166.f, 0.f) * 0.6f);
+			pUIArrowBack->SetPosition(Vec3(-600.f, 370.f, 0.9f));
+
+			{
+				auto pMesh = UStaticMeshComponent::CreatePlane();
+				pUIArrowBack->SetMeshComponent(pMesh);
+
+				auto pMaterial = make_shared<UMaterial>();
+				pMaterial->Load(L"../Resources/Texture/hud_abilty_box.png", L"../Resources/Shader/Default.hlsl");
+				pMesh->SetMaterial(pMaterial);
+			}
+
+			pUIArrowBack->Init();
+			m_vUIs.emplace_back(pUIArrowBack);
+
+			auto pUIArrowFrame = make_shared<AUIActor>();
+			pUIArrowFrame->SetScale(Vec3(182.f, 181.f, 0.f) * 0.6f);
+			pUIArrowFrame->SetPosition(pUIArrowBack->GetPosition() + Vec3(0.f, 0.f, -0.1f));
+
+			{
+				auto pMesh = UStaticMeshComponent::CreatePlane();
+				pUIArrowFrame->SetMeshComponent(pMesh);
+
+				auto pMaterial = make_shared<UMaterial>();
+				pMaterial->Load(L"../Resources/Texture/hud_abilty_frame_chipped.png", L"../Resources/Shader/Default.hlsl");
+				pMesh->SetMaterial(pMaterial);
+			}
+
+			pUIArrowFrame->Init();
+			m_vUIs.emplace_back(pUIArrowFrame);
+
+			auto pUIArrow = make_shared<AUIActor>();
+			pUIArrow->SetScale(Vec3(107.f, 108.f, 0.f) * 0.4f);
+			pUIArrow->SetPosition(pUIArrowBack->GetPosition() + Vec3(-5.f, -5.f, -0.1f));
+
+			{
+				auto pMesh = UStaticMeshComponent::CreatePlane();
+				pUIArrow->SetMeshComponent(pMesh);
+
+				auto pMaterial = make_shared<UMaterial>();
+				pMaterial->Load(L"../Resources/Texture/Icon_Arrow.png", L"../Resources/Shader/Default.hlsl");
+				pMesh->SetMaterial(pMaterial);
+			}
+
+			pUIArrow->Init();
+			m_vUIs.emplace_back(pUIArrow);
+		}
+
+		// Energe
+		{
+			auto pUIEnergyBack = make_shared<AUIActor>();
+			pUIEnergyBack->SetScale(Vec3(64.f, 64.f, 0.f) * 0.5f);
+			pUIEnergyBack->SetPosition(Vec3(-500.f, 360.f, 0.9f));
+
+			{
+				auto pMesh = UStaticMeshComponent::CreatePlane();
+				pUIEnergyBack->SetMeshComponent(pMesh);
+
+				auto pMaterial = make_shared<UMaterial>();
+				pMaterial->Load(L"../Resources/Texture/MP_Box.png", L"../Resources/Shader/Default.hlsl");
+				pMesh->SetMaterial(pMaterial);
+			}
+
+			pUIEnergyBack->Init();
+			m_vUIs.emplace_back(pUIEnergyBack);
+
+			auto pUIEnergy = make_shared<AUIActor>();
+			pUIEnergy->SetScale(Vec3(64.f, 64.f, 0.f) * 0.5f);
+			pUIEnergy->SetPosition(pUIEnergyBack->GetPosition() + Vec3(0.f, 0.f, -0.1f));
+
+			{
+				auto pMesh = UStaticMeshComponent::CreatePlane();
+				pUIEnergy->SetMeshComponent(pMesh);
+
+				auto pMaterial = make_shared<UMaterial>();
+				pMaterial->Load(L"../Resources/Texture/MP_Blip.png", L"../Resources/Shader/Default.hlsl");
+				pMesh->SetMaterial(pMaterial);
+			}
+
+			pUIEnergy->Init();
+			m_vUIs.emplace_back(pUIEnergy);
+		}
 	}
 
 	GUI->SetMapEditorCallback([this]()
@@ -181,10 +272,26 @@ void TestSY::Update()
 	
 	for (auto& objects : m_vObjects)
 		objects->Tick();
+
+	for (auto& pUI : m_vUIs)
+	{
+		pUI->Tick();
+	}
+
+	UIMANAGER->SetRenderUIList(m_vUIs);
 }
 
 void TestSY::Render()
 {	
+	if (m_bEditorWireframe)
+	{
+		DC->RSSetState(STATE->m_pRSWireFrame.Get());
+	}
+	else
+	{
+		DC->RSSetState(STATE->m_pRSSolid.Get());
+	}
+
 	if (INPUT->GetButtonDown(P))
 		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
 	

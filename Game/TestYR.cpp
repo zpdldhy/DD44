@@ -7,7 +7,9 @@
 #include "USkinnedMeshComponent.h"
 #include "Input.h"
 #include "UMaterial.h"
+#include "UAnimInstance.h"
 #include "AnimTrack.h"
+#include "ImGuiCore.h"
 
 void TestYR::Init()
 {
@@ -24,7 +26,7 @@ void TestYR::Init()
 		// mesh 생성
 		shared_ptr<UStaticMeshComponent> meshComponent1 = UStaticMeshComponent::CreateCube();
 		meshComponent1->SetMaterial(material);
-	
+
 		// Object 설정
 		object1->SetMeshComponent(meshComponent1);
 		object2->SetMeshComponent(meshComponent1);
@@ -33,11 +35,11 @@ void TestYR::Init()
 		object1->SetScale(Vec3(10000.0f, 0.03f, 0.03f));
 		object2->SetScale(Vec3(0.03f, 10000.0f, 0.03f));
 		object3->SetScale(Vec3(0.03f, 0.03f, 10000.0f));
-		
+
 		object1->Init();
 		object2->Init();
 		object3->Init();
-		
+
 		gizmo.emplace_back(object1);
 		gizmo.emplace_back(object2);
 		gizmo.emplace_back(object3);
@@ -52,43 +54,65 @@ void TestYR::Init()
 
 	//loader.ConvertFbxToAsset();
 	m_vActorList = loader.Load();
+	meshList = loader.LoadMesh();
+	texPathList = loader.LoadTexPath();
+	animInstanceList = loader.LoadAnim();
+
 	for (int i = 0; i < m_vActorList.size(); i++)
 	{
 		m_vActorList[i]->Init();
+		//if (i == 0)
+		//{
+		//	auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+		//	animInstance->CheckInPlace(true);
+		//	int rootIndex = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetMesh()->GetBoneIndex(L"_RollRoot");
+		//	animInstance->SetRootIndex(rootIndex);
+		//}
+		//if (i == 1)
+		//{
+		//	auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+		//	animInstance->CheckInPlace(true);
+		//	//int rootIndex = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetMesh()->GetBoneIndex(L"_RollRoot");
+		//	animInstance->SetRootIndex(0);
+		//}
 		//auto animInstance = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 		//animInstance->CheckInPlace(true);
 		//int rootIndex = m_vActorList[i]->GetMeshComponent<USkinnedMeshComponent>()->GetMesh()->GetBoneIndex(L"_RollRoot");
 		//animInstance->SetRootIndex(rootIndex);
 	}
 
-	CAMERAMANAGER->SetCameraActor(m_pCameraActor);	
+	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 
-	//// LOAD ALL TEXTURE
-	//{
-	//	string path = "../Resources/Texture/ObjTexture/*.png";
-	//	HANDLE hFind;
-	//	WIN32_FIND_DATAA data;
-	//	vector<string> fileList;
-	//	if ((hFind = FindFirstFileA(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
-	//	{
-	//		do
-	//		{
-	//			string directory = "../Resources/Texture/ObjTexture/";
-	//			directory += string(data.cFileName);
-	//			fileList.emplace_back(directory);
-	//		} while (FindNextFileA(hFind, &data) != 0);
-	//		FindClose(hFind);
-	//	}
-	//	for (int iPath = 0; iPath < fileList.size(); iPath++)
-	//	{
-	//		shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
-	//		tempMat->Load(to_mw(fileList[iPath]), L"../Resources/Shader/Default.hlsl");
-	//		materialList.emplace_back(tempMat);
-	//	}
-	//}
+	// LOAD ALL TEXTURE
+	{
+		//string path = "../Resources/Texture/ObjTexture/*.png";
+		//HANDLE hFind;
+		//WIN32_FIND_DATAA data;
+		//vector<string> fileList;
+		//if ((hFind = FindFirstFileA(path.c_str(), &data)) != INVALID_HANDLE_VALUE)
+		//{
+		//	do
+		//	{
+		//		string directory = "../Resources/Texture/ObjTexture/";
+		//		directory += string(data.cFileName);
+		//		fileList.emplace_back(directory);
+		//	} while (FindNextFileA(hFind, &data) != 0);
+		//	FindClose(hFind);
+		//}
+		//for (int iPath = 0; iPath < fileList.size(); iPath++)
+		//{
+		//	shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
+		//	tempMat->Load(to_mw(fileList[iPath]), L"../Resources/Shader/Default.hlsl");
+		//	materialList.emplace_back(tempMat);
+		//}
+	}
 	m_vObjList = objLoader.Load();
+	vector<shared_ptr<UMeshComponent>> objMesh = objLoader.LoadMesh();
+	meshList.insert(meshList.end(), objMesh.begin(), objMesh.end());
+	//m_vObjList[0]->SetScale(Vec3(12.0f, 12.0f, 12.0f));
 
 	targetObj = m_vActorList[targetIndex];
+
 }
 void TestYR::Update()
 {
@@ -111,23 +135,23 @@ void TestYR::Update()
 
 	// Texture 바꾸기
 	{
-		/*if (INPUT->GetButton(GameKey::T))
-		{
-			if (++matIndex >= materialList.size())
-			{
-				matIndex = 0;
-			}
-			targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
-		}
+		//if (INPUT->GetButton(GameKey::T))
+		//{
+		//	if (++matIndex >= materialList.size())
+		//	{
+		//		matIndex = 0;
+		//	}
+		//	targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
+		//}
 
-		if (INPUT->GetButton(GameKey::Y))
-		{
-			if (--matIndex < 0)
-			{
-				matIndex = 0;
-			}
-			targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
-		}*/
+		//if (INPUT->GetButton(GameKey::Y))
+		//{
+		//	if (--matIndex < 0)
+		//	{
+		//		matIndex = 0;
+		//	}
+		//	targetObj->GetMeshComponent<UStaticMeshComponent>()->SetMaterial(materialList[matIndex]);
+		//}
 	}
 }
 void TestYR::Render()

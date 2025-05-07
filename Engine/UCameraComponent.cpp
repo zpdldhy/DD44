@@ -29,21 +29,30 @@ void UCameraComponent::Tick()
 	else if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
 		UpdatePersPectiveProjection();
 
+#ifndef DEBUG
 	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
 		UpdateFrustumBox();
+#endif // DEBUG
 }
 
 void UCameraComponent::Render()
 {
-	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE && m_bVisibleFrustumBox)
+#ifndef DEBUG
+	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE && m_bVisibleFrustumBox == true)
 	{
+		if (m_pCurrentRasterizer)
+			m_pCurrentRasterizer.Reset();
+
 		DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
 		DC->RSSetState(STATE->m_pRSWireFrame.Get());
 
 		m_pFrustumBox->Render();
 
 		DC->RSSetState(m_pCurrentRasterizer.Get());
+
+		m_pCurrentRasterizer.Reset();
 	}
+#endif // DEBUG
 }
 
 void UCameraComponent::Destroy()
