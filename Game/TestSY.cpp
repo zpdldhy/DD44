@@ -21,6 +21,8 @@
 #include "UIManager.h"
 #include "ObjectLoader.h"
 #include "ACharacter.h"
+#include "ActorLoader.h"
+#include "PlayerMoveScript.h"
 
 void TestSY::Init()
 {
@@ -34,31 +36,31 @@ void TestSY::Init()
 	}
 
 	{
-		m_pActor = make_shared<APawn>();
+		//m_pActor = make_shared<APawn>();
 
-		m_pStaticMesh = UStaticMeshComponent::CreateCube();
-		m_pActor->SetMeshComponent(m_pStaticMesh);
-		m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
-		m_pActor->SetPosition({ 0.0f, 2.5f, 10.0f });
-		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
+		//m_pStaticMesh = UStaticMeshComponent::CreateCube();
+		//m_pActor->SetMeshComponent(m_pStaticMesh);
+		//m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
+		//m_pActor->SetPosition({ 0.0f, 2.5f, 10.0f });
+		//m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
-		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-		m_pStaticMesh->SetMaterial(material);
+		//shared_ptr<UMaterial> material = make_shared<UMaterial>();
+		//material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		//m_pStaticMesh->SetMaterial(material);
 
-		auto pCameraComponent = make_shared<UCameraComponent>();
-		pCameraComponent->SetPosition(Vec3(20.f, 20.f, -20.f));
-		pCameraComponent->SetNear(10.f);
-		pCameraComponent->SetFar(100.f);
-		m_pActor->SetCameraComponent(pCameraComponent);
+		//auto pCameraComponent = make_shared<UCameraComponent>();
+		//pCameraComponent->SetPosition(Vec3(20.f, 20.f, -20.f));
+		//pCameraComponent->SetNear(10.f);
+		//pCameraComponent->SetFar(100.f);
+		//m_pActor->SetCameraComponent(pCameraComponent);
 
-		auto pBoxComponent = make_shared<UBoxComponent>();
-		pBoxComponent->SetScale({ 6.f, 6.f, 6.f });
-		m_pActor->SetShapeComponent(pBoxComponent);
+		//auto pBoxComponent = make_shared<UBoxComponent>();
+		//pBoxComponent->SetScale({ 6.f, 6.f, 6.f });
+		//m_pActor->SetShapeComponent(pBoxComponent);
 
-		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
+		//m_pActor->AddScript(make_shared<kkongchiMoveScript>());
 
-		m_pActor->Init();
+		//m_pActor->Init();
 	}
 
 	{
@@ -163,6 +165,37 @@ void TestSY::Init()
 		}
 	}
 
+	GUI->SetCharacterEditorCallback(
+		[this](int actorType, int compType, const char* assetPath, Vec3 pos, Vec3 rot, Vec3 scale, int scriptType)
+		{
+			auto loader = std::make_shared<ActorLoader>();
+			auto actor = loader->LoadOne(assetPath);
+			if (!actor) return;
+
+			actor->SetPosition(pos);
+			actor->SetRotation(rot);
+			actor->SetScale(scale);
+
+			auto cam = std::make_shared<UCameraComponent>();
+			cam->SetPosition(Vec3(10, 10, -10));
+			actor->SetCameraComponent(cam);
+
+			if (scriptType == 1)
+				actor->AddScript(std::make_shared<PlayerMoveScript>());
+			else if (scriptType == 2)
+				//actor->AddScript(std::make_shared<EnemyAIScript>());
+
+			if (!m_vTiles.empty())
+			{
+				float y = m_vTiles.back()->GetHeightAt(pos.x, pos.z);
+				actor->SetPosition(Vec3(pos.x, y + scale.y / 2.0f, pos.z));
+			}
+
+			actor->Init();
+			m_vCharacters.push_back(actor);
+		}
+	);
+
 	GUI->SetMapEditorCallback([this]()
 	{
 		MapEditorUI* editor = GUI->GetMapEditorUI();
@@ -264,7 +297,7 @@ void TestSY::Update()
 		CAMERAMANAGER->SetCameraActor(m_pActor);
 
 	m_pCameraActor->Tick();
-	m_pActor->Tick();
+	//m_pActor->Tick();
 	m_pSky->Tick();
 
 	for (auto& tile : m_vTiles)
@@ -272,6 +305,9 @@ void TestSY::Update()
 	
 	for (auto& objects : m_vObjects)
 		objects->Tick();
+
+	for (auto& characters : m_vCharacters)
+		characters->Tick();
 
 	for (auto& pUI : m_vUIs)
 	{
@@ -296,7 +332,7 @@ void TestSY::Render()
 		CAMERAMANAGER->Render(CameraViewType::CVT_UI);
 	
 	m_pCameraActor->Render();
-	m_pActor->Render();
+	//m_pActor->Render();
 	m_pSky->Render();
 
 	for (auto& tile : m_vTiles)
@@ -304,6 +340,9 @@ void TestSY::Render()
 
 	for (auto& objects : m_vObjects)
 		objects->Render();
+
+	for (auto& characters : m_vCharacters)
+		characters->Render();
 }
 
 void TestSY::Destroy()

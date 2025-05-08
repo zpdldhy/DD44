@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "ObjectEditorUI.h"
 #include "PrefabLoader.h"
-#include "AActor.h"
 
 void ObjectEditorUI::DrawUI()
 {
@@ -118,23 +117,9 @@ void ObjectEditorUI::DrawUI()
                 m_fPosition[0] = data.Translation.x; m_fPosition[1] = data.Translation.y; m_fPosition[2] = data.Translation.z;
             }
         }
-
-        if (ImGui::Button("Instantiate Prefab"))
-        {
-            PrefabData data;
-            std::string path = "../Resources/Prefab/" + selectedPrefabName + ".prefab.json";
-            if (PREFAB->Load(path, data))
-            {
-                // To-Do
-            }
-        }
     }
-
     ImGui::Separator(); ImGui::Spacing();
-
 }
-
-
 int ObjectEditorUI::GetActorIndexFromName(const std::string& name)
 {
     if (name == "Character")

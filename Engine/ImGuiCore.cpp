@@ -26,6 +26,7 @@ void ImGuiCore::Init()
 	ImGui_ImplWin32_Init(g_hWnd);
 	ImGui_ImplDX11_Init(DEVICE.Get(), DC.Get());
 
+	m_pCharacterEditorUI = make_unique<CharacterEditorUI>();
 	m_pMapEditorUI = make_unique<MapEditorUI>();
 	m_pObjectEditorUI = make_unique<ObjectEditorUI>();
 	m_pEffectEditorUI = make_unique<EffectEditorUI>();
@@ -61,6 +62,11 @@ void ImGuiCore::Update()
 
 		if (ImGui::BeginTabBar("EditorTabs"))
 		{
+			if (ImGui::BeginTabItem("Character Editor"))
+			{
+				if (m_pCharacterEditorUI) m_pCharacterEditorUI->DrawUI();
+				ImGui::EndTabItem();
+			}
 			if (ImGui::BeginTabItem("Map Editor"))
 			{
 				if (m_pMapEditorUI) m_pMapEditorUI->DrawUI();

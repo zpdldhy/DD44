@@ -290,6 +290,9 @@
     <ClInclude Include="PrefabLoader.h">
       <Filter>Utils\ModelLoader</Filter>
     </ClInclude>
+    <ClInclude Include="CharacterEditorUI.h">
+      <Filter>Utils\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -479,6 +482,9 @@
     </ClCompile>
     <ClCompile Include="PrefabLoader.cpp">
       <Filter>Utils\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterEditorUI.cpp">
+      <Filter>Utils\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
