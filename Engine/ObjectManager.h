@@ -8,7 +8,6 @@ class ObjectManager : public Singleton<ObjectManager>
 	vector<shared_ptr<class AActor>> m_vRenderActorList;	// Render ÀÌÈÄ Clear
 
 public:
-	void Init();
 	void Tick();
 	void Render();
 	void Destroy();

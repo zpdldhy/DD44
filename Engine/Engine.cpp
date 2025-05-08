@@ -38,7 +38,6 @@ void Engine::Init()
 
 	// Manager ÃÊ±âÈ­
 	{
-		OBJECTMANAGER->Init();
 		CAMERAMANAGER->Init();
 		UIMANAGER->Init();
 	}

@@ -4,14 +4,6 @@
 
 UINT ObjectManager::ActorCount = 0;
 
-void ObjectManager::Init()
-{
-	for (auto& pActor : m_vActorList)
-	{
-		pActor.second->Init();
-	}
-}
-
 void ObjectManager::Tick()
 {
 	for (auto pActor = m_vActorList.begin();pActor!=m_vActorList.end();)
@@ -46,6 +38,7 @@ void ObjectManager::Destroy()
 void ObjectManager::AddActor(shared_ptr<class AActor> _pActor)
 {
 	_pActor->SetActorIndex(ActorCount);
+	_pActor->Init();
 	m_vActorList.insert(make_pair(ActorCount, _pActor));
 
 	ActorCount++;
@@ -56,6 +49,7 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 	for (auto& pActor : _vActorList)
 	{
 		pActor->SetActorIndex(ActorCount);
+		pActor->Init();
 		m_vActorList.insert(make_pair(ActorCount, pActor));
 
 		ActorCount++;

@@ -9,14 +9,14 @@ void UStaticMeshComponent::Init()
 
 	for (auto& child : m_vChild)
 	{
-		child->SetOwner(m_pOwner);
+		child->SetOwner(GetOwner());
 		child->Init();
 	}
 }
 
 void UStaticMeshComponent::Tick()
 {
-	m_matParent = m_pOwner->GetWorld();
+	m_matParent = GetOwner()->GetWorld();
 
 	if (m_pAnim)
 	{
