@@ -16,7 +16,7 @@ void EffectEditorUI::DrawUI()
 
     // --- Glow Settings ---
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Glow");
-    static float glowPower = 1.0f;
+    static float glowPower = 0.0f;
     static float glowColor[3] = { 1.0f, 1.0f, 1.0f };
     ImGui::SliderFloat("Glow Power", &glowPower, 0.0f, 5.0f);
     ImGui::ColorEdit3("Glow Color", glowColor);
@@ -29,7 +29,7 @@ void EffectEditorUI::DrawUI()
     // --- Emissive ---
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Emissive");
     static float emissiveColor[3] = { 1.0f, 1.0f, 1.0f };
-    static float emissivePower = 1.0f;
+    static float emissivePower = 0.0f;
     ImGui::ColorEdit3("Emissive Color", emissiveColor);
     ImGui::SliderFloat("Emissive Power", &emissivePower, 0.0f, 10.0f);
 
@@ -71,8 +71,8 @@ void EffectEditorUI::DrawUI()
     static int selectedLightType = 0;
     static float lightColor[3] = { 1.0f, 1.0f, 1.0f };
     static float ambientColor[3] = { 0.1f, 0.1f, 0.1f };
-    static float lightIntensity = 1.0f;
-    static float ambientPower = 1.0f;
+    static float lightIntensity = 0.0f;
+    static float ambientPower = 0.0f;
 
     ImGui::Text("Light Type");
     ImGui::Combo("##LightType", &selectedLightType, lightTypes, IM_ARRAYSIZE(lightTypes));
