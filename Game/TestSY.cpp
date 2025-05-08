@@ -87,8 +87,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			pUIArrowBack->Init();
-			m_vUIs.emplace_back(pUIArrowBack);
+			UIMANAGER->AddUI(pUIArrowBack);
 
 			auto pUIArrowFrame = make_shared<AUIActor>();
 			pUIArrowFrame->SetScale(Vec3(182.f, 181.f, 0.f) * 0.6f);
@@ -103,8 +102,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			pUIArrowFrame->Init();
-			m_vUIs.emplace_back(pUIArrowFrame);
+			UIMANAGER->AddUI(pUIArrowFrame);
 
 			auto pUIArrow = make_shared<AUIActor>();
 			pUIArrow->SetScale(Vec3(107.f, 108.f, 0.f) * 0.4f);
@@ -119,8 +117,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			pUIArrow->Init();
-			m_vUIs.emplace_back(pUIArrow);
+			UIMANAGER->AddUI(pUIArrow);
 		}
 
 		// Energe
@@ -138,8 +135,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			pUIEnergyBack->Init();
-			m_vUIs.emplace_back(pUIEnergyBack);
+			UIMANAGER->AddUI(pUIEnergyBack);
 
 			auto pUIEnergy = make_shared<AUIActor>();
 			pUIEnergy->SetScale(Vec3(64.f, 64.f, 0.f) * 0.5f);
@@ -154,8 +150,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			pUIEnergy->Init();
-			m_vUIs.emplace_back(pUIEnergy);
+			UIMANAGER->AddUI(pUIEnergy);
 		}
 	}
 
@@ -175,8 +170,7 @@ void TestSY::Init()
 		tile->SetRotation(editor->GetRotation());
 		tile->SetScale(editor->GetScale());
 
-		tile->Init();
-		m_vTiles.push_back(tile);
+		OBJECTMANAGER->AddActor(tile);
 	});
 
 	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
@@ -236,20 +230,11 @@ void TestSY::Init()
 		}
 
 		actor->SetMeshComponent(meshComp);
-
-		// 타일이 있다면 위치 보정
-		if (!m_vTiles.empty())
-		{
-			float y = m_vTiles.back()->GetHeightAt(pos.x, pos.z);
-			pos.y = y + scale.y / 2.0f;
-		}
-
 		actor->SetPosition(pos);
 		actor->SetRotation(rot);
 		actor->SetScale(scale);
-		actor->Init();
 
-		m_vObjects.push_back(actor);
+		OBJECTMANAGER->AddActor(actor);
 	});
 
 	OBJECTMANAGER->AddActor(m_pActor);
@@ -266,18 +251,7 @@ void TestSY::Update()
 	if (INPUT->GetButton(I))
 	{
 		m_pActor->SetDelete(true);
-		m_vUIs[0]->SetDelete(true);
-		m_vUIs[1]->SetDelete(true);
-		m_vUIs[2]->SetDelete(true);
 	}
-
-	for (auto& tile : m_vTiles)
-		tile->Tick();
-	
-	for (auto& objects : m_vObjects)
-		objects->Tick();
-
-	UIMANAGER->SetUIList(m_vUIs);
 }
 
 void TestSY::Render()
@@ -290,12 +264,6 @@ void TestSY::Render()
 	{
 		DC->RSSetState(STATE->m_pRSSolid.Get());
 	}
-
-	for (auto& tile : m_vTiles)
-		tile->Render();
-
-	for (auto& objects : m_vObjects)
-		objects->Render();
 }
 
 void TestSY::Destroy()
