@@ -39,7 +39,6 @@ void Engine::Init()
 	// Manager 초기화
 	{
 		CAMERAMANAGER->Init();
-		UIMANAGER->Init();
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering

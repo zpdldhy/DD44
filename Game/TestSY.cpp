@@ -277,11 +277,6 @@ void TestSY::Update()
 	for (auto& objects : m_vObjects)
 		objects->Tick();
 
-	for (auto& pUI : m_vUIs)
-	{
-		pUI->Tick();
-	}
-
 	UIMANAGER->SetUIList(m_vUIs);
 }
 

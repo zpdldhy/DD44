@@ -31,7 +31,7 @@ public:
 
 	shared_ptr<class ACameraActor> m_pCameraActor;
 	
-	vector<shared_ptr<APawn>> gizmo;
+	vector<shared_ptr<AActor>> gizmo;
 
 public:
 	virtual void Init() override;

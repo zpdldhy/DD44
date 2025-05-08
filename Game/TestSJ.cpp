@@ -15,6 +15,7 @@
 #include "DxState.h"
 #include "ALight.h"
 #include "ActorLoader.h"
+#include "ObjectManager.h"
 
 void TestSJ::Init()
 {
@@ -83,13 +84,6 @@ void TestSJ::Init()
 	m_pLight->GetLightComponent()->SetAmbientColor(Vec3(0.0f, 0.0f, 1.0f));
 	m_pLight->GetLightComponent()->SetAmbientPower(0.2f);
 
-
-	m_pLight->Init();
-	m_pCameraActor->Init();
-	m_pActor->Init();
-	m_pActor2->Init();
-	m_pSky->Init();
-
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 
 	GUI->SetEffectEditorCallback(
@@ -136,9 +130,15 @@ void TestSJ::Init()
 		m_pSwordActor->SetMeshComponent(m_vMeshList[2]);
 		m_pSwordActor->SetPosition(Vec3(20.f, 0.0f, 0.0f));
 		m_pSwordActor->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-		m_pSwordActor->Init();
 	}
 
+
+	OBJECTMANAGER->AddActor(m_pLight);
+	OBJECTMANAGER->AddActor(m_pCameraActor);
+	OBJECTMANAGER->AddActor(m_pActor);
+	OBJECTMANAGER->AddActor(m_pActor2);
+	OBJECTMANAGER->AddActor(m_pSky);
+	OBJECTMANAGER->AddActor(m_pSwordActor);
 }
 
 void TestSJ::Update()
@@ -380,14 +380,6 @@ void TestSJ::Update()
 			DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	}*/
 	}
-	//Camera
-	{
-		m_pCameraActor->Tick();
-		m_pActor->Tick();
-		m_pActor2->Tick();
-		m_pSky->Tick();
-	}
-
 
 	// 검
 	{
@@ -405,8 +397,6 @@ void TestSJ::Render()
 	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
 	//	D2D1::ColorF::White                   // 메인 텍스트 색
 	//);
-	m_pLight->Render();
-	m_pCameraActor->Render();
 
 	// [1] Actor1 먼저 정상 렌더링 (깊이, 스텐실 기록 X)
 	m_pStaticMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
@@ -427,9 +417,6 @@ void TestSJ::Render()
 	m_pStaticMesh2->GetMaterial()->SetRenderMode(ERenderMode::Default);
 	DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
 	m_pActor2->Render();
-
-	// [5] Skybox
-	m_pSky->Render();
 
 	// 검
 	{

@@ -10,6 +10,8 @@
 #include "UAnimInstance.h"
 #include "AnimTrack.h"
 #include "ImGuiCore.h"
+#include "UIManager.h"
+#include "ObjectManager.h"
 
 void TestYR::Init()
 {
@@ -34,15 +36,13 @@ void TestYR::Init()
 
 		object1->SetScale(Vec3(10000.0f, 0.03f, 0.03f));
 		object2->SetScale(Vec3(0.03f, 10000.0f, 0.03f));
-		object3->SetScale(Vec3(0.03f, 0.03f, 10000.0f));
-
-		object1->Init();
-		object2->Init();
-		object3->Init();
+		object3->SetScale(Vec3(0.03f, 0.03f, 10000.0f));		
 
 		gizmo.emplace_back(object1);
 		gizmo.emplace_back(object2);
 		gizmo.emplace_back(object3);
+
+		OBJECTMANAGER->AddActorList(gizmo);
 	}
 
 	m_pCameraActor = make_shared<ACameraActor>();
@@ -50,7 +50,7 @@ void TestYR::Init()
 		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	}
-	m_pCameraActor->Init();
+	OBJECTMANAGER->AddActor(m_pCameraActor);
 
 	//loader.ConvertFbxToAsset();
 	/*m_vActorList = loader.Load();
@@ -187,12 +187,6 @@ void TestYR::Init()
 }
 void TestYR::Update()
 {
-	m_pCameraActor->Tick();
-	for (int i = 0; i < gizmo.size(); i++)
-	{
-		gizmo[i]->Tick();
-	}
-
 	//if (targetObj)
 	//{
 	//	targetObj->Tick();
