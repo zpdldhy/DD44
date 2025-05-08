@@ -9,8 +9,8 @@
 
 void PlayerMoveScript::Init()
 {
-	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetPosition();
-	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	m_vLook = m_pOwner->GetPosition() - m_pOwner->GetCameraComponent()->GetPosition();
+	m_pAnimInstance = m_pOwner->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 }
 
 void PlayerMoveScript::Tick()
@@ -28,22 +28,22 @@ void PlayerMoveScript::Tick()
 	Vec3 moveDir;
 	if (INPUT->GetButtonDown(UP))
 	{
-		moveDir += m_vLook * m_fSpeed * deltaTime;
+		moveDir += m_vLook;
 	}
 
 	if (INPUT->GetButtonDown(LEFT))
 	{
-		moveDir += -m_vRight * m_fSpeed * deltaTime;
+		moveDir += -m_vRight;// * m_fSpeed * deltaTime;
 	}
 
 	if (INPUT->GetButtonDown(DOWN))
 	{
-		moveDir += -m_vLook * m_fSpeed * deltaTime;
+		moveDir += -m_vLook;// * m_fSpeed * deltaTime;
 	}
 
 	if (INPUT->GetButtonDown(RIGHT))
 	{
-		moveDir += m_vRight * m_fSpeed * deltaTime;
+		moveDir += m_vRight;// * m_fSpeed * deltaTime;
 	}
 
 	if (INPUT->GetButtonDown(LCLICK))
@@ -64,16 +64,31 @@ void PlayerMoveScript::Tick()
 			int targetIndex = m_pAnimInstance->GetAnimIndex(L"Run");
 			m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
 		}
+
 		// 이동
-		Vec3 pos = moveDir;// * m_fSpeed * deltaTime;
-		GetOwner()->AddPosition(pos);
-		moveDir.Normalize();
+		{
+			moveDir.Normalize();
+			Vec3 pos = moveDir * m_fSpeed * deltaTime;
+			m_pOwner->AddPosition(pos);
+		}
 
 		// 회전		
-		float targetYaw = atan2f(moveDir.x, moveDir.z);
-		Vec3 rot = GetOwner()->GetRotation();
-		rot.y = targetYaw;
-		GetOwner()->SetRotation(rot);
+		{
+			float targetYaw = atan2f(moveDir.x, moveDir.z);
+			Vec3 currentRot = m_pOwner->GetRotation();
+			float currentYaw = currentRot.y;
+
+			// 각도 차이 계산 (-π ~ π 범위로)
+			float angleDiff = targetYaw - currentYaw;
+			while (angleDiff > DD_PI)  angleDiff -= DD_PI * 2;
+			while (angleDiff < -DD_PI) angleDiff += DD_PI * 2;
+
+			// Lerp 계산
+			float smoothedYaw = currentRot.y + angleDiff * m_fRotationSpeed * deltaTime;
+
+			currentRot.y = smoothedYaw;
+			m_pOwner->SetRotation(currentRot);
+		}
 	}
 	else
 	{

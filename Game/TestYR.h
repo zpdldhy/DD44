@@ -21,6 +21,7 @@ public:
 	
 	//// actor에 넣을 컴포넌트들 준비
 	vector<shared_ptr<UMeshComponent>> meshList;
+	vector<shared_ptr<UMeshComponent>> tempmeshList;
 	vector<wstring> texPathList;
 	vector<shared_ptr<UAnimInstance>> animInstanceList;
 
