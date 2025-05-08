@@ -7,7 +7,7 @@
 
 void UAnimInstance::Tick()
 {
-	animFrame += TIMER->GetDeltaTime() * 30.0f;
+	animFrame += TIMER->GetDeltaTime() * m_fAnimPlayRate;
 	
 	if (animFrame >= animTrackList[currentAnimTrackIndex].animList[0].size())
 	{

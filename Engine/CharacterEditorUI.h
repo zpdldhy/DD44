@@ -25,6 +25,7 @@ private:
     int m_iActorType = 0;       // 0: Character, 1: Enemy
     int m_iComponentType = 0;   // 0: Skinned, 1: Static
     int m_iScriptType = 0;      // 0 = None, 1 = PlayerMoveScript, 2 = EnemyAIScript
+    char m_szAssetPath[256] = "../Resources/Asset/crow_final.asset";
 
     float m_fPosition[3] = { 0.0f, 0.0f, 0.0f };
     float m_fRotation[3] = { 0.0f, 0.0f, 0.0f };
