@@ -16,7 +16,7 @@ void EngineCameraMoveScript::Tick()
 		float fYaw = (pCurrentMousePointer.x - m_pPrevMousePos.x) * deltaTime / 4.f;
 		float fPitch = (pCurrentMousePointer.y - m_pPrevMousePos.y) * deltaTime / 4.f;
 
-		m_pOwner->AddRotation(Vec3(fPitch, fYaw, 0.0f));
+		m_pOwner.lock()->AddRotation(Vec3(fPitch, fYaw, 0.0f));
 
 		m_pPrevMousePos = pCurrentMousePointer;
 	}
@@ -25,21 +25,21 @@ void EngineCameraMoveScript::Tick()
 		deltaTime *= 10.f;
 
 	if (INPUT->GetButtonDown(W))
-		m_pOwner->AddPosition(m_pOwner->GetLook() * deltaTime);
+		m_pOwner.lock()->AddPosition(m_pOwner.lock()->GetLook() * deltaTime);
 
 	if (INPUT->GetButtonDown(A))
-		m_pOwner->AddPosition(-m_pOwner->GetRight() * deltaTime);
+		m_pOwner.lock()->AddPosition(-m_pOwner.lock()->GetRight() * deltaTime);
 
 	if (INPUT->GetButtonDown(S))
-		m_pOwner->AddPosition(-m_pOwner->GetLook() * deltaTime);
+		m_pOwner.lock()->AddPosition(-m_pOwner.lock()->GetLook() * deltaTime);
 
 	if (INPUT->GetButtonDown(D))
-		m_pOwner->AddPosition(m_pOwner->GetRight() * deltaTime);
+		m_pOwner.lock()->AddPosition(m_pOwner.lock()->GetRight() * deltaTime);
 
 	if (INPUT->GetButtonDown(Q))
-		m_pOwner->AddPosition(Vec3(0.0f, -1.0f, 0.0f) * deltaTime);
+		m_pOwner.lock()->AddPosition(Vec3(0.0f, -1.0f, 0.0f) * deltaTime);
 
 	if (INPUT->GetButtonDown(E))
-		m_pOwner->AddPosition(Vec3(0.0f, 1.0f, 0.0f) * deltaTime);
+		m_pOwner.lock()->AddPosition(Vec3(0.0f, 1.0f, 0.0f) * deltaTime);
 
 }

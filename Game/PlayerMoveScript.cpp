@@ -9,8 +9,8 @@
 
 void PlayerMoveScript::Init()
 {
-	m_vLook = m_pOwner->GetPosition() - m_pOwner->GetCameraComponent()->GetPosition();
-	m_pAnimInstance = m_pOwner->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetPosition();
+	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 }
 
 void PlayerMoveScript::Tick()
@@ -69,13 +69,13 @@ void PlayerMoveScript::Tick()
 		{
 			moveDir.Normalize();
 			Vec3 pos = moveDir * m_fSpeed * deltaTime;
-			m_pOwner->AddPosition(pos);
+			GetOwner()->AddPosition(pos);
 		}
 
 		// 회전		
 		{
 			float targetYaw = atan2f(moveDir.x, moveDir.z);
-			Vec3 currentRot = m_pOwner->GetRotation();
+			Vec3 currentRot = GetOwner()->GetRotation();
 			float currentYaw = currentRot.y;
 
 			// 각도 차이 계산 (-π ~ π 범위로)
@@ -87,7 +87,7 @@ void PlayerMoveScript::Tick()
 			float smoothedYaw = currentRot.y + angleDiff * m_fRotationSpeed * deltaTime;
 
 			currentRot.y = smoothedYaw;
-			m_pOwner->SetRotation(currentRot);
+			GetOwner()->SetRotation(currentRot);
 		}
 	}
 	else

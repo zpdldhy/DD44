@@ -16,5 +16,6 @@
 #define SOUNDMANAGER	GET_SINGLE(SoundManager)
 #define CAMERAMANAGER	GET_SINGLE(CameraManager)
 #define UIMANAGER		GET_SINGLE(UIManager)
+#define OBJECTMANAGER	GET_SINGLE(ObjectManager)
 
 #define DD_PI		3.1415926f
