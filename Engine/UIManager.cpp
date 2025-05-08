@@ -10,8 +10,16 @@ void UIManager::Init()
 
 void UIManager::Tick()
 {
-	for (auto& pUIActor : m_vUIList)
-		pUIActor->Tick();
+	for (auto pUI = m_vUIList.begin();pUI!= m_vUIList.end();)
+	{
+		if (pUI->get()->IsDelete() == true)
+			pUI = m_vUIList.erase(pUI);
+		else
+		{
+			pUI->get()->Tick();
+			pUI++;
+		}
+	}
 
 	m_vRenderUIList = m_vUIList;
 }
@@ -28,8 +36,4 @@ void UIManager::Destroy()
 {
 	m_vUIList.clear();	
 	m_vRenderUIList.clear();
-}
-
-void UIManager::DeleteUI(shared_ptr<class AActor> _pActor)
-{
 }

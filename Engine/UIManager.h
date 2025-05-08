@@ -15,7 +15,5 @@ public:
 public:
 	void SetUIList(vector<shared_ptr<class AUIActor>> _vUIList) { m_vUIList = _vUIList; }
 	void AddUI(shared_ptr<class AUIActor> _pUIActor) { m_vUIList.emplace_back(_pUIActor); }
-
-	void DeleteUI(shared_ptr<class AActor> _pActor);
 };
 
