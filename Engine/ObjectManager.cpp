@@ -14,10 +14,17 @@ void ObjectManager::Init()
 
 void ObjectManager::Tick()
 {
-	for (auto& pActor : m_vActorList)
+	for (auto pActor = m_vActorList.begin();pActor!=m_vActorList.end();)
 	{
-		pActor.second->Tick();
-		m_vRenderActorList.emplace_back(pActor.second);	// 임시 사용.
+		// 죽는건가
+		if (pActor->second->IsDelete() == true)
+			pActor = m_vActorList.erase(pActor);
+		else
+		{
+			pActor->second->Tick();
+			m_vRenderActorList.emplace_back(pActor->second);	// 임시 사용.
+			pActor++;
+		}		
 	}
 }
 
@@ -39,10 +46,6 @@ void ObjectManager::Destroy()
 void ObjectManager::AddActor(shared_ptr<class AActor> _pActor)
 {
 	_pActor->SetActorIndex(ActorCount);
-	_pActor->SetDestroyFunction(
-		[this](std::shared_ptr<AActor> objToRemove) { this->DeleteActor(objToRemove); }
-	);
-
 	m_vActorList.insert(make_pair(ActorCount, _pActor));
 
 	ActorCount++;
@@ -53,23 +56,8 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 	for (auto& pActor : _vActorList)
 	{
 		pActor->SetActorIndex(ActorCount);
-		pActor->SetDestroyFunction(
-			[this](std::shared_ptr<AActor> objToRemove) { this->DeleteActor(objToRemove); }
-		);
-
 		m_vActorList.insert(make_pair(ActorCount, pActor));
 
 		ActorCount++;
-	}
-}
-
-void ObjectManager::DeleteActor(shared_ptr<class AActor> _pActor)
-{
-	for (auto iter = m_vActorList.begin(); iter != m_vActorList.end();)
-	{
-		if (iter->first == _pActor->GetActorIndex())
-			iter = m_vActorList.erase(iter);
-		else
-			iter++;
 	}
 }

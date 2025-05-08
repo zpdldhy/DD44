@@ -188,6 +188,9 @@ void TestSY::Update()
 	if (INPUT->GetButtonDown(O))
 		CAMERAMANAGER->SetCameraActor(m_pActor);
 
+	if (INPUT->GetButton(I))
+		m_pActor->SetDelete(true);
+
 	for (auto& tile : m_vTiles)
 		tile->Tick();
 

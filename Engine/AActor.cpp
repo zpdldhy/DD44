@@ -30,10 +30,6 @@ void AActor::Init()
 
 void AActor::Tick()
 {
-	// Actor
-	if (m_bDestroy == true && m_fOnDestroyCallback != nullptr)
-		m_fOnDestroyCallback(shared_from_this());
-
 	// Component
 	for (auto& component : m_arrComponent)
 	{
@@ -79,6 +75,4 @@ void AActor::Destroy()
 	{
 		script->Destroy();
 	}
-
-	m_fOnDestroyCallback = nullptr;
 }

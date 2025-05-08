@@ -16,7 +16,5 @@ public:
 public:
 	void AddActor(shared_ptr<class AActor> _pActor);
 	void AddActorList(vector<shared_ptr<class AActor>> _vActorList);
-
-	void DeleteActor(shared_ptr<class AActor> _pActor);
 };
 

@@ -32,17 +32,15 @@ public:
 	// Actor 상태
 	//--------------------------------------------------------------------------------------
 protected:
-	UINT m_ActorIndex = 0;	// 고유 번호. 빠른 Actor 삭제 로직에서 필요하다.
-	bool m_bDestroy = false;
-	function<void(shared_ptr<AActor>)> m_fOnDestroyCallback = nullptr;
+	UINT m_ActorIndex = 0;	// 고유 번호. 해당 Actor를 빠르게 찾는 로직에서 필요하다.
+	bool m_bDelete = false;	
 
 public:
 	void SetActorIndex(UINT _iIndex) { m_ActorIndex = _iIndex; }
 	UINT GetActorIndex() { return m_ActorIndex; }
 
-	bool IsDestroy() { return m_bDestroy; }
-	void SetDestroy(bool _bDead) { m_bDestroy = _bDead; }
-	void SetDestroyFunction(function<void(shared_ptr<AActor>)> _function) { m_fOnDestroyCallback = _function; }
+	bool IsDelete() { return m_bDelete; }
+	void SetDelete(bool _bDelete) { m_bDelete = _bDelete; }	
 
 	//--------------------------------------------------------------------------------------
 	// Component
