@@ -6,9 +6,8 @@
 
 void CameraManager::Init()
 {	
-	// Set Actor!! 
-	// In Client!! 
-	// Not in Engine!!
+	// No CameraActor!! 
+	// Set in client
 	if(m_pCurrentCameraActor == nullptr)
 		assert(false);
 
@@ -29,15 +28,13 @@ void CameraManager::Tick()
 
 void CameraManager::Render(CameraViewType _ViewType)
 {
-	shared_ptr<UCameraComponent> pCameraComponent = nullptr;
-
 	if (_ViewType == CameraViewType::CVT_ACTOR)
-		pCameraComponent = m_pCurrentCameraActor->GetCameraComponent();
+		m_pCurrentComponent = m_pCurrentCameraActor->GetCameraComponent();
 	else if (_ViewType == CameraViewType::CVT_UI)
-		pCameraComponent = m_pUICameraActor->GetCameraComponent();
+		m_pCurrentComponent = m_pUICameraActor->GetCameraComponent();
 
-	m_CameraData.matView = pCameraComponent->GetView();
-	m_CameraData.matProjection = pCameraComponent->GetProejction();
+	m_CameraData.matView = m_pCurrentComponent->GetView();
+	m_CameraData.matProjection = m_pCurrentComponent->GetProjection();
 
 	DC->UpdateSubresource(m_pCameraCB.Get(), 0, nullptr, &m_CameraData, 0, 0);
 	DC->VSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
@@ -72,3 +69,22 @@ void CameraManager::SetCameraActor(shared_ptr<class AActor> _cameraActor)
 	m_pCurrentCameraActor = _cameraActor;
 }
 
+shared_ptr<class AActor> CameraManager::GetCameraActor()
+{
+	return m_pCurrentCameraActor;
+}
+
+shared_ptr<class UCameraComponent> CameraManager::GetCurrentCameraComponent()
+{
+	return m_pCurrentComponent;
+}
+
+Matrix CameraManager::GetCurrentView()
+{
+	return m_pCurrentComponent->GetView();
+}
+
+Matrix CameraManager::GetCurrentProjection()
+{
+	return m_pCurrentComponent->GetProjection();
+}

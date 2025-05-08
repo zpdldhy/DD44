@@ -60,7 +60,7 @@ public:
 	void SetFrustumVisible(bool _bVisible) { m_bVisibleFrustumBox = _bVisible; }
 
 	Matrix GetView() { return m_matView; }
-	Matrix GetProejction() { return m_matProjection; }
+	Matrix GetProjection() { return m_matProjection; }
 
 	Vec3 GetCameraPos() { return m_vEye; }
 	Vec3 GetCameraLook() { return m_vLook; }

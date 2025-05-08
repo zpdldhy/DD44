@@ -20,6 +20,7 @@ class CameraManager : public Singleton<CameraManager>
 
 	shared_ptr<class AActor> m_pCurrentCameraActor = nullptr;
 	shared_ptr<class AActor> m_pUICameraActor = nullptr;	// Canvers
+	shared_ptr<class UCameraComponent> m_pCurrentComponent = nullptr;
 
 public:
 	void Init();
@@ -32,5 +33,9 @@ private:
 
 public:
 	void SetCameraActor(shared_ptr<class AActor> _cameraActor);	
+	shared_ptr<class AActor> GetCameraActor();
+	shared_ptr<class UCameraComponent> GetCurrentCameraComponent();
+	Matrix GetCurrentView();
+	Matrix GetCurrentProjection();
 };
 
