@@ -2,67 +2,97 @@
 #include "EffectEditorUI.h"
 #include "imgui.h"
 
-void EffectEditorUI::Update()
+void EffectEditorUI::DrawUI()
 {
-    // [1] ÀÌÆåÆ® °ü·Ã UI
-    ImGui::Begin("Effect Editor");
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Effect Settings");
 
+    // --- Target Selection ---
     static const char* cubeNames[] = { "Cube 1", "Cube 2" };
-    ImGui::Combo("Target Cube", &m_iSelectedActor, cubeNames, IM_ARRAYSIZE(cubeNames));
+    static int selectedCube = 0;
+    ImGui::Text("Target Cube");
+    ImGui::Combo("##TargetCube", &selectedCube, cubeNames, IM_ARRAYSIZE(cubeNames));
 
-    ImGui::SliderFloat("Glow Power", &m_fGlowPower, 0.0f, 5.0f);
-    ImGui::ColorEdit3("Glow Color", m_vGlowColor);
-    ImGui::SliderFloat("Dissolve", &m_fDissolveThreshold, 0.0f, 1.0f);
+    ImGui::Separator(); ImGui::Spacing();
 
-    ImGui::ColorEdit3("Emissive Color", m_vEmissiveColor);
-    ImGui::SliderFloat("Emissive Power", &m_fEmissivePower, 0.0f, 10.0f);
+    // --- Glow Settings ---
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Glow");
+    static float glowPower = 0.0f;
+    static float glowColor[3] = { 1.0f, 1.0f, 1.0f };
+    ImGui::SliderFloat("Glow Power", &glowPower, 0.0f, 5.0f);
+    ImGui::ColorEdit3("Glow Color", glowColor);
 
-    if (ImGui::Button("Apply Effect") && m_OnEffectApply)
+    // --- Dissolve ---
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Dissolve");
+    static float dissolveThreshold = 0.0f;
+    ImGui::SliderFloat("Dissolve", &dissolveThreshold, 0.0f, 1.0f);
+
+    // --- Emissive ---
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Emissive");
+    static float emissiveColor[3] = { 1.0f, 1.0f, 1.0f };
+    static float emissivePower = 0.0f;
+    ImGui::ColorEdit3("Emissive Color", emissiveColor);
+    ImGui::SliderFloat("Emissive Power", &emissivePower, 0.0f, 10.0f);
+
+    ImGui::Spacing(); ImGui::Spacing();
+
+    // --- Apply Effect ---
+    if (ImGui::Button("Apply Effect", ImVec2(-1, 0)) && m_OnEffectApply)
     {
-        m_OnEffectApply(m_iSelectedActor, 
-            m_fGlowPower,
-            GetGlowColor(),
-            m_fDissolveThreshold,
-            GetEmissiveColor(),
-            m_fEmissivePower);
-    }
-
-    static bool bFirstRun = true;
-    if (bFirstRun && m_OnEffectApply)
-    {
-        m_OnEffectApply(m_iSelectedActor,
-            m_fGlowPower,
-            GetGlowColor(),
-            m_fDissolveThreshold,
-            GetEmissiveColor(),
-            m_fEmissivePower);
-        bFirstRun = false;
-    }
-
-    ImGui::End();
-
-    // [2] ±¤¿ø ¼³Á¤ UI
-    ImGui::Begin("Light Editor");
-
-    static const char* lightTypes[] = { "Directional", "Point", "Spot" };
-    ImGui::Combo("Light Type", &m_iSelectedLightType, lightTypes, IM_ARRAYSIZE(lightTypes));
-
-    ImGui::ColorEdit3("Light Color", m_vLightColor);
-    ImGui::SliderFloat("Light Intensity", &m_fLightIntensity, 0.0f, 5.0f);
-
-    ImGui::ColorEdit3("Ambient Color", m_vAmbientColor);
-    ImGui::SliderFloat("Ambient Power", &m_fAmbientPower, 0.0f, 2.0f);
-
-    if (ImGui::Button("Apply Light") && m_OnLightApply)
-    {
-        m_OnLightApply(
-            static_cast<ELightType>(m_iSelectedLightType),
-            GetLightColor(),
-            m_fLightIntensity,
-            GetAmbientColor(),
-            m_fAmbientPower
+        m_OnEffectApply(
+            selectedCube,
+            glowPower,
+            Vec3(glowColor[0], glowColor[1], glowColor[2]),
+            dissolveThreshold,
+            Vec3(emissiveColor[0], emissiveColor[1], emissiveColor[2]),
+            emissivePower
         );
     }
 
-    ImGui::End();
+    static bool firstRun = true;
+    if (firstRun && m_OnEffectApply)
+    {
+        m_OnEffectApply(
+            selectedCube,
+            glowPower,
+            Vec3(glowColor[0], glowColor[1], glowColor[2]),
+            dissolveThreshold,
+            Vec3(emissiveColor[0], emissiveColor[1], emissiveColor[2]),
+            emissivePower
+        );
+        firstRun = false;
+    }
+
+    ImGui::Separator(); ImGui::Spacing();
+
+    // --- Lighting Settings ---
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Lighting");
+
+    static const char* lightTypes[] = { "Directional", "Point", "Spot" };
+    static int selectedLightType = 0;
+    static float lightColor[3] = { 1.0f, 1.0f, 1.0f };
+    static float ambientColor[3] = { 0.1f, 0.1f, 0.1f };
+    static float lightIntensity = 0.0f;
+    static float ambientPower = 0.0f;
+
+    ImGui::Text("Light Type");
+    ImGui::Combo("##LightType", &selectedLightType, lightTypes, IM_ARRAYSIZE(lightTypes));
+
+    ImGui::ColorEdit3("Light Color", lightColor);
+    ImGui::SliderFloat("Light Intensity", &lightIntensity, 0.0f, 5.0f);
+
+    ImGui::ColorEdit3("Ambient Color", ambientColor);
+    ImGui::SliderFloat("Ambient Power", &ambientPower, 0.0f, 2.0f);
+
+    ImGui::Spacing();
+
+    if (ImGui::Button("Apply Light", ImVec2(-1, 0)) && m_OnLightApply)
+    {
+        m_OnLightApply(
+            static_cast<ELightType>(selectedLightType),
+            Vec3(lightColor[0], lightColor[1], lightColor[2]),
+            lightIntensity,
+            Vec3(ambientColor[0], ambientColor[1], ambientColor[2]),
+            ambientPower
+        );
+    }
 }

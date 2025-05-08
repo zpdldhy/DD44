@@ -2,25 +2,23 @@
 #include "MapEditorUI.h"
 #include "imgui.h"
 
-void MapEditorUI::Update()
+void MapEditorUI::DrawUI()
 {
-    ImGui::Begin("Map Editor");
-
-    ImGui::TextColored(ImVec4(1, 1, 1, 1), "Terrain Configuration");
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Terrain Configuration");
     ImGui::InputInt("Num Cols", &m_iCols);
     ImGui::InputInt("Num Rows", &m_iRows);
     ImGui::InputFloat("Cell Size", &m_fCellSize);
 
     ImGui::Separator(); ImGui::Spacing();
 
-    ImGui::TextColored(ImVec4(1, 1, 1, 1), "Transform");
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Transform");
     ImGui::InputFloat3("Position", m_fPosition);
     ImGui::InputFloat3("Rotation", m_fRotation);
     ImGui::InputFloat3("Scale", m_fScale);
 
     ImGui::Separator(); ImGui::Spacing();
 
-    ImGui::TextColored(ImVec4(1, 1, 1, 1), "Appearance");
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Appearance");
     ImGui::InputText("Texture File", m_szTextureName, IM_ARRAYSIZE(m_szTextureName));
     ImGui::InputText("Shader File", m_szShaderName, IM_ARRAYSIZE(m_szShaderName));
 
@@ -30,8 +28,6 @@ void MapEditorUI::Update()
     {
         if (m_OnCreate) m_OnCreate();
     }
-
-    ImGui::End();
 }
 
 std::wstring MapEditorUI::GetTexturePath() const

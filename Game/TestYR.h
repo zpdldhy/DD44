@@ -11,10 +11,13 @@ class TestYR : public IExecute
 public:
 	ActorLoader loader;
 	ObjectLoader objLoader;
-	vector<shared_ptr<APawn>> m_vActorList;
+	vector<shared_ptr<AActor>> m_vActorList;
 	vector<shared_ptr<APawn>> m_vObjList;
 	vector<shared_ptr<UMaterial>> materialList;
-	shared_ptr<APawn> targetObj;
+	shared_ptr<AActor> targetObj;
+
+	vector<shared_ptr<AActor>> m_vImGuiList;
+
 	
 	//// actor에 넣을 컴포넌트들 준비
 	vector<shared_ptr<UMeshComponent>> meshList;

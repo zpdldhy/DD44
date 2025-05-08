@@ -1,17 +1,34 @@
 #include "pch.h"
 #include "UStaticMeshComponent.h"
 #include "UMaterial.h"
+#include "AActor.h"
 
 void UStaticMeshComponent::Init()
 {
+	USceneComponent::Init();
+
+	for (auto& child : m_vChild)
+	{
+		child->SetOwner(m_pOwner);
+		child->Init();
+	}
 }
 
 void UStaticMeshComponent::Tick()
 {
+	m_matParent = m_pOwner->GetWorld();
+
+	if (m_pAnim)
+	{
+		auto mat = m_pAnim->GetBoneAnim(targetBoneIndex);
+		SetPosition(Vec3(mat._41, mat._42, mat._43));
+	}
+	USceneComponent::Tick();
 }
 
 void UStaticMeshComponent::PreRender()
 {
+	USceneComponent::Render();
 	// Mesh Bind
 	if (m_pMesh) { m_pMesh->Bind(); }
 

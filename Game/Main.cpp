@@ -5,10 +5,11 @@
 #include "TestYR.h"
 #include "TestSY.h"
 #include "TestSJ.h"
+#include "TestPlayer.h"
 
 int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCmdLine, int _nCmdShow)
 {
-    shared_ptr<IExecute> app = make_shared<TestSY>();
+    shared_ptr<IExecute> app = make_shared<TestPlayer>();
 
     Engine game(_hInstance, app);
     game.Run();

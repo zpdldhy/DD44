@@ -75,6 +75,7 @@ public:
 	const Vec3& GetLook() const { return m_pTransform->GetLook(); }
 	const Vec3& GetRight() const { return m_pTransform->GetRight(); }
 	const Vec3& GetUp() const { return m_pTransform->GetUp(); }
+	const Matrix& GetWorld() const { return m_pTransform->GetWorld(); }
 
 	void SetPosition(const Vec3& _pos) { m_pTransform->SetPosition(_pos); }
 	void SetRotation(const Vec3& _rot) { m_pTransform->SetRotation(_rot); }
