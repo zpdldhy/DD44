@@ -14,11 +14,6 @@ public:
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
 
-	std::vector<std::shared_ptr<class ATerrainTileActor>> m_vTiles;
-	std::vector<std::shared_ptr<class AActor>> m_vObjects;
-
-	std::vector<std::shared_ptr<class AUIActor>> m_vUIs;
-
 	bool m_bEditorWireframe = false;
 
 public:
