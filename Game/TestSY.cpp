@@ -36,27 +36,27 @@ void TestSY::Init()
 	}
 
 	{
-		//m_pActor = make_shared<APawn>();
+		m_pActor = make_shared<APawn>();
 
-		//m_pStaticMesh = UStaticMeshComponent::CreateCube();
-		//m_pActor->SetMeshComponent(m_pStaticMesh);
-		//m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
-		//m_pActor->SetPosition({ 0.0f, 2.5f, 10.0f });
-		//m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
+		m_pStaticMesh = UStaticMeshComponent::CreateCube();
+		m_pActor->SetMeshComponent(m_pStaticMesh);
+		m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
+		m_pActor->SetPosition({ 0.0f, 2.5f, 10.0f });
+		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
-		//shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		//material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-		//m_pStaticMesh->SetMaterial(material);
+		shared_ptr<UMaterial> material = make_shared<UMaterial>();
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		m_pStaticMesh->SetMaterial(material);
 
-		//auto pCameraComponent = make_shared<UCameraComponent>();
-		//pCameraComponent->SetPosition(Vec3(20.f, 20.f, -20.f));
-		//pCameraComponent->SetNear(10.f);
-		//pCameraComponent->SetFar(100.f);
-		//m_pActor->SetCameraComponent(pCameraComponent);
+		auto pCameraComponent = make_shared<UCameraComponent>();
+		pCameraComponent->SetPosition(Vec3(20.f, 20.f, -20.f));
+		pCameraComponent->SetNear(10.f);
+		pCameraComponent->SetFar(100.f);
+		m_pActor->SetCameraComponent(pCameraComponent);
 
-		//auto pBoxComponent = make_shared<UBoxComponent>();
-		//pBoxComponent->SetScale({ 6.f, 6.f, 6.f });
-		//m_pActor->SetShapeComponent(pBoxComponent);
+		auto pBoxComponent = make_shared<UBoxComponent>();
+		pBoxComponent->SetScale({ 6.f, 6.f, 6.f });
+		m_pActor->SetShapeComponent(pBoxComponent);
 
 		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
 	}
@@ -208,8 +208,7 @@ void TestSY::Init()
 		tile->SetRotation(editor->GetRotation());
 		tile->SetScale(editor->GetScale());
 
-		tile->Init();
-		m_vTiles.push_back(tile);
+		OBJECTMANAGER->AddActor(tile);
 	});
 
 	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
@@ -270,19 +269,11 @@ void TestSY::Init()
 
 		actor->SetMeshComponent(meshComp);
 
-		// 타일이 있다면 위치 보정
-		if (!m_vTiles.empty())
-		{
-			float y = m_vTiles.back()->GetHeightAt(pos.x, pos.z);
-			pos.y = y + scale.y / 2.0f;
-		}
-
 		actor->SetPosition(pos);
 		actor->SetRotation(rot);
 		actor->SetScale(scale);
-		actor->Init();
 
-		m_vObjects.push_back(actor);
+		OBJECTMANAGER->AddActor(actor);
 	});
 
 	OBJECTMANAGER->AddActor(m_pActor);
@@ -304,17 +295,7 @@ void TestSY::Update()
 		m_vUIs[2]->SetDelete(true);
 	}
 
-	for (auto& tile : m_vTiles)
-		tile->Tick();
-	
-	for (auto& objects : m_vObjects)
-		objects->Tick();
-
 	UIMANAGER->SetUIList(m_vUIs);
-	for (auto& characters : m_vCharacters)
-		characters->Tick();
-
-
 }
 
 void TestSY::Render()
@@ -327,15 +308,6 @@ void TestSY::Render()
 	{
 		DC->RSSetState(STATE->m_pRSSolid.Get());
 	}
-
-	for (auto& tile : m_vTiles)
-		tile->Render();
-
-	for (auto& objects : m_vObjects)
-		objects->Render();
-
-	for (auto& characters : m_vCharacters)
-		characters->Render();
 }
 
 void TestSY::Destroy()
