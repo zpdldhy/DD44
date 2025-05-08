@@ -53,10 +53,15 @@ void TestYR::Init()
 	m_pCameraActor->Init();
 
 	//loader.ConvertFbxToAsset();
-	m_vActorList = loader.Load();
+	/*m_vActorList = loader.Load();
 	meshList = loader.LoadMesh();
 	texPathList = loader.LoadTexPath();
-	animInstanceList = loader.LoadAnim();
+	animInstanceList = loader.LoadAnim();*/
+
+	loader.LoadOne("../Resources/Asset/crow_final.asset");
+	tempmeshList = loader.LoadMesh();
+
+
 
 	for (int i = 0; i < m_vActorList.size(); i++)
 	{
