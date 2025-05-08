@@ -91,7 +91,7 @@ void TestSJ::Init()
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 
-	GUI->GetEffectEditorUI()->SetEffectApplyCallback(
+	GUI->SetEffectEditorCallback(
 		[this](int selected, float glowPower, Vec3 glowColor, float dissolveThreshold, Vec3 emissiveColor, float emissivePower) {
 			if (selected == 0 && m_pStaticMesh)
 			{
@@ -111,7 +111,7 @@ void TestSJ::Init()
 		}
 	);
 
-	GUI->GetEffectEditorUI()->SetLightApplyCallback(
+	GUI->SetLightEditorCallback(
 		[this](ELightType lightType, Vec3 lightColor, float intensity, Vec3 ambientColor, float ambientPower)
 		{
 			if (m_pLight && m_pLight->GetLightComponent())
