@@ -12,5 +12,6 @@ protected:
 
 public:
 	void SetOwner(shared_ptr<class AActor> _pOwner) { m_pOwner = _pOwner; }
+	shared_ptr<class AActor> GetOwner() { return m_pOwner.lock(); }
 };
 

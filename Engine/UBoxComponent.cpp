@@ -8,7 +8,7 @@
 
 void UBoxComponent::Init()
 {
-	m_vCenter = m_vPosition + m_pOwner.lock()->GetPosition();
+	m_vCenter = m_vPosition + GetOwner()->GetPosition();
 
 	CreateCollisionBox();
 }
