@@ -102,6 +102,11 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 	}
 }
 
+shared_ptr<class AActor> ObjectManager::GetActor(UINT _iIndex)
+{
+	return m_vActorList.find(_iIndex)->second;
+}
+
 void ObjectManager::CheckStencilList()
 {
 	for (auto& pActor : m_vRenderActorList)

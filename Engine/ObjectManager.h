@@ -19,6 +19,8 @@ public:
 public:
 	void AddActor(shared_ptr<class AActor> _pActor);
 	void AddActorList(vector<shared_ptr<class AActor>> _vActorList);
+	
+	shared_ptr<class AActor> GetActor(UINT _iIndex);
 
 private:
 	void CheckStencilList();
