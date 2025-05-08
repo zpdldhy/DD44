@@ -14,6 +14,7 @@
 #include "CameraManager.h"
 #include "DxState.h"
 #include "ALight.h"
+#include "ActorLoader.h"
 
 void TestSJ::Init()
 {
@@ -125,6 +126,18 @@ void TestSJ::Init()
 		}
 	);
 
+	// 메쉬 파싱
+	{
+		m_pLoader = make_shared<ActorLoader>();
+		m_pLoader->LoadOne("../Resources/Asset/crow_final.asset");
+		m_vMeshList = m_pLoader->LoadMesh();
+		// 2번 인덱스가 검. meshComponent 타고타고 UObject의 이름 확인해보면, "detailSword_weaponTexuture1".
+		m_pSwordActor = make_shared<APawn>();
+		m_pSwordActor->SetMeshComponent(m_vMeshList[2]);
+		m_pSwordActor->SetPosition(Vec3(20.f, 0.0f, 0.0f));
+		m_pSwordActor->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+		m_pSwordActor->Init();
+	}
 
 }
 
@@ -375,6 +388,12 @@ void TestSJ::Update()
 		m_pSky->Tick();
 	}
 
+
+	// 검
+	{
+		// 
+		//m_pSwordActor->Tick();
+	}
 }
 
 void TestSJ::Render()
@@ -411,4 +430,9 @@ void TestSJ::Render()
 
 	// [5] Skybox
 	m_pSky->Render();
+
+	// 검
+	{
+		m_pSwordActor->Render();
+	}
 }

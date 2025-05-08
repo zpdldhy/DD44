@@ -76,7 +76,7 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 		}
 		tempSkinnedMat->SetInputlayout(inputlayout);
 		
-		tempMat->Load(texPath, L"../Resources/Shader/skinningShader.hlsl");
+		tempMat->Load(texPath, L"../Resources/Shader/Default.hlsl");
 	}
 
 	// Animation
@@ -109,6 +109,7 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 	animTrack->SetBase(animInstance);
 	rootMesh->SetMeshAnim(animTrack);
 	rootMesh->SetName(resource.m_vMeshList[0].m_szName);
+	m_vMeshList.emplace_back(rootMesh);
 	{
 		// BONE
 		map<wstring, BoneNode> bones;
