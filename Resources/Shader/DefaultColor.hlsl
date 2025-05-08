@@ -7,7 +7,12 @@ VS_OUT VS(VS_IN input)
     float4 vLocal = float4(input.p, 1.0f);
     float4 vWorld = mul(vLocal, g_matWorld);
     float4 vView = mul(vWorld, g_matView);
-    float4 vProj = mul(vView, g_matProj);
+    
+    float4x4 projNoNearFar = g_matProj;
+    projNoNearFar._33 = 1.0f;
+    projNoNearFar._43 = -0.1f;
+    
+    float4 vProj = mul(vView, projNoNearFar);
     
     output.p = vProj;
     output.c = input.c;

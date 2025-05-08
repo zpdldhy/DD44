@@ -40,6 +40,8 @@
     <ClInclude Include="Editor.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerMoveScript.h" />
+    <ClInclude Include="TestPlayer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -67,5 +69,12 @@
     <ClCompile Include="Editor.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerMoveScript.cpp" />
+    <ClCompile Include="TestPlayer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

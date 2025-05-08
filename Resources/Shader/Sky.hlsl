@@ -11,9 +11,13 @@ VS_OUT VS(VS_IN input)
     viewNoTrans._41 = 0;
     viewNoTrans._42 = 0;
     viewNoTrans._43 = 0;
+    
+    float4x4 projNoNearFar = g_matProj;
+    projNoNearFar._33 = 1.0f;
+    projNoNearFar._43 = -0.1f;
 
     float4 vView = mul(vWorld, viewNoTrans);
-    float4 vProj = mul(vView, g_matProj);
+    float4 vProj = mul(vView, projNoNearFar);
 
     output.p = vProj.xyzz;
     output.c = input.c;

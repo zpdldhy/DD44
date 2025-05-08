@@ -12,7 +12,7 @@ public:
 	virtual ~PlayerMoveScript() = default;
 public:
 	float m_fSpeed  = 13.0f; 
-	float m_fRotationSpeed = 1.0f;
+	float m_fRotationSpeed = 8.0f;
 	Vec3 m_vLook;
 	Vec3 m_vRight;
 

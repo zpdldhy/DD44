@@ -54,6 +54,8 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 
 	shared_ptr<APawn> actor = make_shared<APawn>();
 	shared_ptr<UMaterial> tempSkinnedMat = make_shared<UMaterial>();
+	shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
+
 	
 	// TEXTURE
 	for (auto& iter : resource.m_mTexPathList)
@@ -64,15 +66,17 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 		wstring texPath = path + data;
 
 		tempSkinnedMat->Load(texPath, L"../Resources/Shader/skinningShader.hlsl");
-
 		shared_ptr<Shader> shader = SHADER->Get(L"../Resources/Shader/skinningShader.hlsl");
 		shared_ptr<Inputlayout> inputlayout = make_shared<Inputlayout>();
+
 		// INPUTLAYOUT 
 		{
 			INPUTLAYOUT->CreateIW(shader->m_pCode);
 			inputlayout = INPUTLAYOUT->Get(L"IW");
 		}
 		tempSkinnedMat->SetInputlayout(inputlayout);
+		
+		tempMat->Load(texPath, L"../Resources/Shader/Default.hlsl");
 	}
 
 	// Animation
@@ -105,6 +109,7 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 	animTrack->SetBase(animInstance);
 	rootMesh->SetMeshAnim(animTrack);
 	rootMesh->SetName(resource.m_vMeshList[0].m_szName);
+	m_vMeshList.emplace_back(rootMesh);
 	{
 		// BONE
 		map<wstring, BoneNode> bones;
@@ -118,19 +123,20 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 	//
 	for (int iMesh = 1; iMesh < resource.m_vMeshList.size(); iMesh++)
 	{
+		shared_ptr<UMeshComponent> meshComponent;
 		if (resource.m_vMeshList[iMesh].m_bSkeleton)
 		{
-			shared_ptr<USkinnedMeshComponent> meshComponent = make_shared<USkinnedMeshComponent>();
+			meshComponent = make_shared<USkinnedMeshComponent>();
 			shared_ptr<USkeletalMeshResources> mesh = make_shared< USkeletalMeshResources>();
 			mesh->SetVertexList(resource.m_vMeshList[iMesh].m_vVertexList);
 			mesh->SetIwList(resource.m_vMeshList[iMesh].m_vIwList);
 			mesh->Create();
 			mesh->SetInverseBindPose(resource.m_vInverseBindPose[iMesh]);
-			meshComponent->SetMesh(mesh);
+			dynamic_cast<USkinnedMeshComponent*>(meshComponent.get())->SetMesh(mesh);
 			meshComponent->SetMaterial(tempSkinnedMat);
 			shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
 			animTrack->SetBase(animInstance);
-			meshComponent->SetMeshAnim(animTrack);
+			dynamic_cast<USkinnedMeshComponent*>(meshComponent.get())->SetMeshAnim(animTrack);
 			rootMesh->AddChild(meshComponent);
 			meshComponent->SetName(resource.m_vMeshList[iMesh].m_szName);
 			{
@@ -143,6 +149,17 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 				mesh->AddSkeleton(bones);
 			}
 		}
+		else
+		{
+			meshComponent = make_shared<UStaticMeshComponent>();
+			meshComponent->SetName(resource.m_vMeshList[iMesh].m_szName);
+			shared_ptr<UStaticMeshResources> mesh = make_shared<UStaticMeshResources>();
+			mesh->SetVertexList(resource.m_vMeshList[iMesh].m_vVertexList);
+			mesh->Create();
+			dynamic_cast<UStaticMeshComponent*>(meshComponent.get())->SetMesh(mesh);
+			meshComponent->SetMaterial(tempMat);
+		}
+		m_vMeshList.emplace_back(meshComponent);
 	}
 	m_vFbxList.emplace_back(resource);
 	actor->SetMeshComponent(rootMesh);
@@ -153,52 +170,52 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 {
 	// TEMP MESH TEXTUER
-	shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
-	wstring path = L"../Resources/Texture/magenta.png";
-	tempMat->Load(path, L"../Resources/Shader/Default.hlsl");
+	//shared_ptr<UMaterial> tempMat = make_shared<UMaterial>();
+	//wstring path = L"../Resources/Texture/magenta.png";
+	//tempMat->Load(path, L"../Resources/Shader/Default.hlsl");
 
-	shared_ptr<UMaterial> tempSkinnedMat = make_shared<UMaterial>();
-	tempSkinnedMat->Load(path, L"../Resources/Shader/skinningShader.hlsl");
-	tempSkinnedMat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+	//shared_ptr<UMaterial> tempSkinnedMat = make_shared<UMaterial>();
+	//tempSkinnedMat->Load(path, L"../Resources/Shader/skinningShader.hlsl");
+	//tempSkinnedMat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
 
-	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
-	{
-		for (int iMesh = 0; iMesh < m_vFbxList[iFbx].m_vMeshList.size(); iMesh++)
-		{
-			auto& data = m_vFbxList[iFbx].m_vMeshList[iMesh];
-			shared_ptr<UMeshComponent> meshComponent;
-			if (data.m_bSkeleton)
-			{
-				meshComponent = make_shared<USkinnedMeshComponent>();
-				meshComponent->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
-				shared_ptr<USkeletalMeshResources> mesh = make_shared<USkeletalMeshResources>();
-				mesh->SetVertexList(data.m_vVertexList);
-				mesh->SetInverseBindPose(m_vFbxList[iFbx].m_vInverseBindPose[iMesh]);
-				dynamic_cast<USkeletalMeshResources*>(mesh.get())->SetIwList(data.m_vIwList);
-				mesh->Create();
-				dynamic_cast<USkinnedMeshComponent*>(meshComponent.get())->SetMesh(mesh);
-				meshComponent->SetMaterial(tempSkinnedMat);
-				// BONE
-				map<wstring, BoneNode> bones;
-				for (auto& data : m_vFbxList[iFbx].m_mSkeletonList)
-				{
-					bones.insert(make_pair(data.second.m_szName, data.second));
-				}
-				mesh->AddSkeleton(bones);
-			}
-			else
-			{
-				meshComponent = make_shared<UStaticMeshComponent>();
-				meshComponent->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
-				shared_ptr<UStaticMeshResources> mesh = make_shared<UStaticMeshResources>();
-				mesh->SetVertexList(data.m_vVertexList);
-				mesh->Create();
-				dynamic_cast<UStaticMeshComponent*>(meshComponent.get())->SetMesh(mesh);
-				meshComponent->SetMaterial(tempMat);
-			}
-			m_vMeshList.emplace_back(meshComponent);
-		}
-	}
+	//for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	//{
+	//	for (int iMesh = 0; iMesh < m_vFbxList[iFbx].m_vMeshList.size(); iMesh++)
+	//	{
+	//		auto& data = m_vFbxList[iFbx].m_vMeshList[iMesh];
+	//		shared_ptr<UMeshComponent> meshComponent;
+	//		if (data.m_bSkeleton)
+	//		{
+	//			meshComponent = make_shared<USkinnedMeshComponent>();
+	//			meshComponent->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
+	//			shared_ptr<USkeletalMeshResources> mesh = make_shared<USkeletalMeshResources>();
+	//			mesh->SetVertexList(data.m_vVertexList);
+	//			mesh->SetInverseBindPose(m_vFbxList[iFbx].m_vInverseBindPose[iMesh]);
+	//			dynamic_cast<USkeletalMeshResources*>(mesh.get())->SetIwList(data.m_vIwList);
+	//			mesh->Create();
+	//			dynamic_cast<USkinnedMeshComponent*>(meshComponent.get())->SetMesh(mesh);
+	//			meshComponent->SetMaterial(tempSkinnedMat);
+	//			// BONE
+	//			map<wstring, BoneNode> bones;
+	//			for (auto& data : m_vFbxList[iFbx].m_mSkeletonList)
+	//			{
+	//				bones.insert(make_pair(data.second.m_szName, data.second));
+	//			}
+	//			mesh->AddSkeleton(bones);
+	//		}
+	//		else
+	//		{
+	//			meshComponent = make_shared<UStaticMeshComponent>();
+	//			meshComponent->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
+	//			shared_ptr<UStaticMeshResources> mesh = make_shared<UStaticMeshResources>();
+	//			mesh->SetVertexList(data.m_vVertexList);
+	//			mesh->Create();
+	//			dynamic_cast<UStaticMeshComponent*>(meshComponent.get())->SetMesh(mesh);
+	//			meshComponent->SetMaterial(tempMat);
+	//		}
+	//		m_vMeshList.emplace_back(meshComponent);
+	//	}
+	//}
 	return m_vMeshList;
 }
 

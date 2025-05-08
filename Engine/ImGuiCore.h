@@ -33,10 +33,14 @@ public:
 	{
 		m_pObjectEditorUI->SetOnCreateCallback(std::move(callback));
 	}
-	//void SetEffectEditorCallback(std::function<void(int, float, Vec3, float)> callback)
-	//{
-	//	//m_pEffectEditorUI->SetEffectApplyCallback(std::move(callback));
-	//}
+	void SetEffectEditorCallback(std::function<void(int, float, Vec3, float, Vec3, float)> callback)
+	{
+		m_pEffectEditorUI->SetEffectApplyCallback(std::move(callback));
+	}
+	void SetLightEditorCallback(std::function<void(ELightType, Vec3, float, Vec3, float)> callback)
+	{
+		m_pEffectEditorUI->SetLightApplyCallback(std::move(callback));
+	}
 
 public:
 	void Init();

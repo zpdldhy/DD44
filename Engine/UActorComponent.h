@@ -8,9 +8,10 @@ public:
 	virtual ~UActorComponent() = default;
 
 protected:
-	class AActor* m_pOwner = nullptr;
+	weak_ptr<class AActor> m_pOwner;
 
 public:
-	void SetOwner(AActor* _owner) { m_pOwner = _owner; }
+	void SetOwner(shared_ptr<class AActor> _pOwner) { m_pOwner = _pOwner; }
+	shared_ptr<class AActor> GetOwner() { return m_pOwner.lock(); }
 };
 

@@ -15,6 +15,7 @@
 #include "UMaterial.h"
 #include "ViewPortTexture.h"
 #include "UIManager.h"
+#include "ObjectManager.h"
 
 void Engine::Init()
 {
@@ -38,7 +39,6 @@ void Engine::Init()
 	// Manager 초기화
 	{
 		CAMERAMANAGER->Init();
-		UIMANAGER->Init();
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
@@ -47,6 +47,12 @@ void Engine::Init()
 
 void Engine::Frame()
 {
+	// Object Tick
+	{
+		OBJECTMANAGER->Tick();
+		UIMANAGER->Tick();
+	}
+
 	GET_SINGLE(Device)->Frame();
 
 	GUI->Update();
@@ -76,11 +82,12 @@ void Engine::Render()
 
 	CAMERAMANAGER->Render(CameraViewType::CVT_ACTOR);
 
+	_app->Render();
 	// 3D World -> Texture Render
 	{
 		m_p3DWorldTexture->BeginViewPort();
-		// Clinet Render
-		_app->Render();
+		// ObjectList Render
+		OBJECTMANAGER->Render();
 		m_p3DWorldTexture->EndViewPort();
 
 		// 3DWorld를 보여주는 평면은 Rasterizer = SolidNone으로 고정
@@ -109,6 +116,7 @@ void Engine::Render()
 
 void Engine::Release()
 {
+	OBJECTMANAGER->Destroy();
 	UIMANAGER->Destroy();
 
 	{
