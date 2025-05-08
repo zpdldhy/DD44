@@ -53,6 +53,8 @@ struct CB_EMISSIVE
 
 class UMaterial
 {
+	bool m_bUseStencil = false;
+
 	shared_ptr<Shader> m_pShader = nullptr;
 	shared_ptr<Texture> m_pTexture = nullptr;
 	shared_ptr<Inputlayout> m_pInputlayout = nullptr;
@@ -84,6 +86,9 @@ public:
 	void SetCameraPos(const Vec3& _cameraPos);
 	void SetRenderMode(ERenderMode _eMode);
 	void SetEmissiveParams(const Vec3& _color, float _power);
+
+	void SetUseStencil(bool _bUseStencil) { m_bUseStencil = _bUseStencil; }
+	bool IsUseStencil() { return m_bUseStencil; }
 	
 
 public:
