@@ -76,91 +76,86 @@ void TestSY::Init()
 
 	// UIs
 	{
-		//// Ability
-		//{
-		//	auto pUIArrowBack = make_shared<AUIActor>();
-		//	pUIArrowBack->SetScale(Vec3(169.f, 166.f, 0.f) * 0.6f);
-		//	pUIArrowBack->SetPosition(Vec3(-600.f, 370.f, 0.9f));
+		// Ability
+		{
+			auto pUIArrowBack = make_shared<AUIActor>();
+			pUIArrowBack->SetScale(Vec3(169.f, 166.f, 0.f) * 0.6f);
+			pUIArrowBack->SetPosition(Vec3(-600.f, 370.f, 0.9f));
 
-		//	{
-		//		auto pMesh = UStaticMeshComponent::CreatePlane();
-		//		pUIArrowBack->SetMeshComponent(pMesh);
+			{
+				auto pMesh = UStaticMeshComponent::CreatePlane();
+				pUIArrowBack->SetMeshComponent(pMesh);
 
-		//		auto pMaterial = make_shared<UMaterial>();
-		//		pMaterial->Load(L"../Resources/Texture/hud_abilty_box.png", L"../Resources/Shader/Default.hlsl");
-		//		pMesh->SetMaterial(pMaterial);
-		//	}
+				auto pMaterial = make_shared<UMaterial>();
+				pMaterial->Load(L"../Resources/Texture/hud_abilty_box.png", L"../Resources/Shader/Default.hlsl");
+				pMesh->SetMaterial(pMaterial);
+			}
 
-		//	pUIArrowBack->Init();
-		//	m_vUIs.emplace_back(pUIArrowBack);
+			UIMANAGER->AddUI(pUIArrowBack);
 
-		//	auto pUIArrowFrame = make_shared<AUIActor>();
-		//	pUIArrowFrame->SetScale(Vec3(182.f, 181.f, 0.f) * 0.6f);
-		//	pUIArrowFrame->SetPosition(pUIArrowBack->GetPosition() + Vec3(0.f, 0.f, -0.1f));
+			auto pUIArrowFrame = make_shared<AUIActor>();
+			pUIArrowFrame->SetScale(Vec3(182.f, 181.f, 0.f) * 0.6f);
+			pUIArrowFrame->SetPosition(pUIArrowBack->GetPosition() + Vec3(0.f, 0.f, -0.1f));
 
-		//	{
-		//		auto pMesh = UStaticMeshComponent::CreatePlane();
-		//		pUIArrowFrame->SetMeshComponent(pMesh);
+			{
+				auto pMesh = UStaticMeshComponent::CreatePlane();
+				pUIArrowFrame->SetMeshComponent(pMesh);
 
-		//		auto pMaterial = make_shared<UMaterial>();
-		//		pMaterial->Load(L"../Resources/Texture/hud_abilty_frame_chipped.png", L"../Resources/Shader/Default.hlsl");
-		//		pMesh->SetMaterial(pMaterial);
-		//	}
+				auto pMaterial = make_shared<UMaterial>();
+				pMaterial->Load(L"../Resources/Texture/hud_abilty_frame_chipped.png", L"../Resources/Shader/Default.hlsl");
+				pMesh->SetMaterial(pMaterial);
+			}
 
-		//	pUIArrowFrame->Init();
-		//	m_vUIs.emplace_back(pUIArrowFrame);
+			UIMANAGER->AddUI(pUIArrowFrame);
 
-		//	auto pUIArrow = make_shared<AUIActor>();
-		//	pUIArrow->SetScale(Vec3(107.f, 108.f, 0.f) * 0.4f);
-		//	pUIArrow->SetPosition(pUIArrowBack->GetPosition() + Vec3(-5.f, -5.f, -0.1f));
+			auto pUIArrow = make_shared<AUIActor>();
+			pUIArrow->SetScale(Vec3(107.f, 108.f, 0.f) * 0.4f);
+			pUIArrow->SetPosition(pUIArrowBack->GetPosition() + Vec3(-5.f, -5.f, -0.1f));
 
-		//	{
-		//		auto pMesh = UStaticMeshComponent::CreatePlane();
-		//		pUIArrow->SetMeshComponent(pMesh);
+			{
+				auto pMesh = UStaticMeshComponent::CreatePlane();
+				pUIArrow->SetMeshComponent(pMesh);
 
-		//		auto pMaterial = make_shared<UMaterial>();
-		//		pMaterial->Load(L"../Resources/Texture/Icon_Arrow.png", L"../Resources/Shader/Default.hlsl");
-		//		pMesh->SetMaterial(pMaterial);
-		//	}
+				auto pMaterial = make_shared<UMaterial>();
+				pMaterial->Load(L"../Resources/Texture/Icon_Arrow.png", L"../Resources/Shader/Default.hlsl");
+				pMesh->SetMaterial(pMaterial);
+			}
 
-		//	pUIArrow->Init();
-		//	m_vUIs.emplace_back(pUIArrow);
-		//}
+			UIMANAGER->AddUI(pUIArrow);
+		}
 
-		//// Energe
-		//{
-		//	auto pUIEnergyBack = make_shared<AUIActor>();
-		//	pUIEnergyBack->SetScale(Vec3(64.f, 64.f, 0.f) * 0.5f);
-		//	pUIEnergyBack->SetPosition(Vec3(-500.f, 360.f, 0.9f));
+		// Energe
+		{
+			auto pUIEnergyBack = make_shared<AUIActor>();
+			pUIEnergyBack->SetScale(Vec3(64.f, 64.f, 0.f) * 0.5f);
+			pUIEnergyBack->SetPosition(Vec3(-500.f, 360.f, 0.9f));
 
-		//	{
-		//		auto pMesh = UStaticMeshComponent::CreatePlane();
-		//		pUIEnergyBack->SetMeshComponent(pMesh);
+			{
+				auto pMesh = UStaticMeshComponent::CreatePlane();
+				pUIEnergyBack->SetMeshComponent(pMesh);
 
-		//		auto pMaterial = make_shared<UMaterial>();
-		//		pMaterial->Load(L"../Resources/Texture/MP_Box.png", L"../Resources/Shader/Default.hlsl");
-		//		pMesh->SetMaterial(pMaterial);
-		//	}
+				auto pMaterial = make_shared<UMaterial>();
+				pMaterial->Load(L"../Resources/Texture/MP_Box.png", L"../Resources/Shader/Default.hlsl");
+				pMesh->SetMaterial(pMaterial);
+			}
 
-		//	pUIEnergyBack->Init();
-		//	m_vUIs.emplace_back(pUIEnergyBack);
+			UIMANAGER->AddUI(pUIEnergyBack);
 
-		//	auto pUIEnergy = make_shared<AUIActor>();
-		//	pUIEnergy->SetScale(Vec3(64.f, 64.f, 0.f) * 0.5f);
-		//	pUIEnergy->SetPosition(pUIEnergyBack->GetPosition() + Vec3(0.f, 0.f, -0.1f));
+			auto pUIEnergy = make_shared<AUIActor>();
+			pUIEnergy->SetScale(Vec3(64.f, 64.f, 0.f) * 0.5f);
+			pUIEnergy->SetPosition(pUIEnergyBack->GetPosition() + Vec3(0.f, 0.f, -0.1f));
 
-		//	{
-		//		auto pMesh = UStaticMeshComponent::CreatePlane();
-		//		pUIEnergy->SetMeshComponent(pMesh);
+			{
+				auto pMesh = UStaticMeshComponent::CreatePlane();
+				pUIEnergy->SetMeshComponent(pMesh);
 
-		//		auto pMaterial = make_shared<UMaterial>();
-		//		pMaterial->Load(L"../Resources/Texture/MP_Blip.png", L"../Resources/Shader/Default.hlsl");
-		//		pMesh->SetMaterial(pMaterial);
-		//	}
+				auto pMaterial = make_shared<UMaterial>();
+				pMaterial->Load(L"../Resources/Texture/MP_Blip.png", L"../Resources/Shader/Default.hlsl");
+				pMesh->SetMaterial(pMaterial);
+			}
 
-		//	pUIEnergy->Init();
-		//	m_vUIs.emplace_back(pUIEnergy);
-		//}
+			UIMANAGER->AddUI(pUIEnergy);
+		}
 	}
 
 	GUI->SetCharacterEditorCallback(
@@ -183,7 +178,7 @@ void TestSY::Init()
 			else if (scriptType == 2)
 				//actor->AddScript(std::make_shared<EnemyAIScript>());
 
-			actor->Init();
+				actor->Init();
 			OBJECTMANAGER->AddActor(actor);
 		}
 	);
@@ -264,7 +259,6 @@ void TestSY::Init()
 		}
 
 		actor->SetMeshComponent(meshComp);
-
 		actor->SetPosition(pos);
 		actor->SetRotation(rot);
 		actor->SetScale(scale);
@@ -286,12 +280,8 @@ void TestSY::Update()
 	if (INPUT->GetButton(I))
 	{
 		m_pActor->SetDelete(true);
-		m_vUIs[0]->SetDelete(true);
-		m_vUIs[1]->SetDelete(true);
-		m_vUIs[2]->SetDelete(true);
 	}
 
-	//UIMANAGER->SetUIList(m_vUIs);
 
 	// 하나의 actor 조작 가능
 	{

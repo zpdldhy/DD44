@@ -55,10 +55,9 @@ void TestSJ::Init()
 
 		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
 		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+		material2->SetUseStencil(true);
 		
-		m_pStaticMesh2->SetMaterial(material2);
-		
-		
+		m_pStaticMesh2->SetMaterial(material2);		
 	}
 
 	{
@@ -380,12 +379,6 @@ void TestSJ::Update()
 			DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	}*/
 	}
-
-	// 검
-	{
-		// 
-		//m_pSwordActor->Tick();
-	}
 }
 
 void TestSJ::Render()
@@ -397,29 +390,4 @@ void TestSJ::Render()
 	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
 	//	D2D1::ColorF::White                   // 메인 텍스트 색
 	//);
-
-	// [1] Actor1 먼저 정상 렌더링 (깊이, 스텐실 기록 X)
-	m_pStaticMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
-	DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
-	m_pActor->Render();
-
-	// [2] Actor1 위치에 스텐실 = 1 설정 (깊이 테스트는 하되 기록 X)
-	m_pStaticMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
-	DC->OMSetDepthStencilState(STATE->m_pDSS_StencilWrite.Get(), 1);
-	m_pActor->Render();
-
-	// [3] Actor2 실루엣으로 스텐실 == 1 영역만 출력 (깊이 Disable)
-	m_pStaticMesh2->GetMaterial()->SetRenderMode(ERenderMode::Silhouette);
-	DC->OMSetDepthStencilState(STATE->m_pDSS_StencilMaskEqual.Get(), 1);
-	m_pActor2->Render();
-
-	// [4] Actor2 일반 렌더링 (깊이 Enable)
-	m_pStaticMesh2->GetMaterial()->SetRenderMode(ERenderMode::Default);
-	DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
-	m_pActor2->Render();
-
-	// 검
-	{
-		m_pSwordActor->Render();
-	}
 }
