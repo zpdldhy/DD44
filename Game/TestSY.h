@@ -16,10 +16,18 @@ public:
 
 	bool m_bEditorWireframe = false;
 
+	// Mouse Picking
+	Vec3 m_vMouseLay;
+	Vec3 m_vCameraPos;
+
+
 public:
 	void Init() override;
 	void Update() override;
 	void Render() override;
 	void Destroy();
+
+private:
+	void SetClickPos();
 };
 

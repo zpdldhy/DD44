@@ -22,6 +22,8 @@
 #include "ObjectLoader.h"
 #include "ACharacter.h"
 #include "ObjectManager.h"
+#include "Timer.h"
+#include "Functions.h"
 
 void TestSY::Init()
 {
@@ -30,7 +32,7 @@ void TestSY::Init()
 		m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 
-		CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+		CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 	}
 
 	{
@@ -155,107 +157,111 @@ void TestSY::Init()
 	}
 
 	GUI->SetMapEditorCallback([this]()
-	{
-		MapEditorUI* editor = GUI->GetMapEditorUI();
-		if (!editor) return;
+		{
+			MapEditorUI* editor = GUI->GetMapEditorUI();
+			if (!editor) return;
 
-		auto tile = std::make_shared<ATerrainTileActor>();
+			auto tile = std::make_shared<ATerrainTileActor>();
 
-		tile->m_iNumCols = editor->GetNumCols();
-		tile->m_iNumRows = editor->GetNumRows();
-		tile->m_fCellSize = editor->GetCellSize();
+			tile->m_iNumCols = editor->GetNumCols();
+			tile->m_iNumRows = editor->GetNumRows();
+			tile->m_fCellSize = editor->GetCellSize();
 
-		tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
-		tile->SetPosition(editor->GetPosition());
-		tile->SetRotation(editor->GetRotation());
-		tile->SetScale(editor->GetScale());
+			tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
+			tile->SetPosition(editor->GetPosition());
+			tile->SetRotation(editor->GetRotation());
+			tile->SetScale(editor->GetScale());
 
-		OBJECTMANAGER->AddActor(tile);
-	});
+			OBJECTMANAGER->AddActor(tile);
+		});
 
 	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
-	{
-		AssimpLoader loader;
-		vector<MeshData> meshList = loader.Load(objPath);
-		if (meshList.empty())
-			return;
-
-		// Mesh Component 생성
-		shared_ptr<UMeshComponent> meshComp;
-		if (meshType == 0)
 		{
-			// SkinnedMeshComponent 설정 시 향후 확장
-			meshComp = make_shared<UStaticMeshComponent>();
+			AssimpLoader loader;
+			vector<MeshData> meshList = loader.Load(objPath);
+			if (meshList.empty())
+				return;
 
-			auto meshRes = make_shared<UStaticMeshResources>();
-			meshRes->SetVertexList(meshList[0].m_vVertexList);
-			meshRes->SetIndexList(meshList[0].m_vIndexList);
-			meshRes->Create();
+			// Mesh Component 생성
+			shared_ptr<UMeshComponent> meshComp;
+			if (meshType == 0)
+			{
+				// SkinnedMeshComponent 설정 시 향후 확장
+				meshComp = make_shared<UStaticMeshComponent>();
 
-			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
-		}
-		else if (meshType == 1)
-		{
-			meshComp = make_shared<UStaticMeshComponent>();
+				auto meshRes = make_shared<UStaticMeshResources>();
+				meshRes->SetVertexList(meshList[0].m_vVertexList);
+				meshRes->SetIndexList(meshList[0].m_vIndexList);
+				meshRes->Create();
 
-			auto meshRes = make_shared<UStaticMeshResources>();
-			meshRes->SetVertexList(meshList[0].m_vVertexList);
-			meshRes->SetIndexList(meshList[0].m_vIndexList);
-			meshRes->Create();
+				dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
+			}
+			else if (meshType == 1)
+			{
+				meshComp = make_shared<UStaticMeshComponent>();
 
-			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
-		}
+				auto meshRes = make_shared<UStaticMeshResources>();
+				meshRes->SetVertexList(meshList[0].m_vVertexList);
+				meshRes->SetIndexList(meshList[0].m_vIndexList);
+				meshRes->Create();
 
-		// 머티리얼 설정
-		auto mat = make_shared<UMaterial>();
-		mat->Load(
-			std::wstring(texPath, texPath + strlen(texPath)),
-			std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-		);
-		meshComp->SetMaterial(mat);
+				dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
+			}
 
-		// Actor 생성
-		shared_ptr<AActor> actor;
-		if (actorType == 0)
-		{
-			actor = make_shared<APawn>(); // ACharacter로 교체 가능
-		}
-		else if (actorType == 1)
-		{
-			actor = make_shared<APawn>(); // AEnemy로 교체 가능
-		}
-		else if (actorType == 2)
-		{
-			actor = make_shared<APawn>(); // AObject로 교체 가능
-		}
+			// 머티리얼 설정
+			auto mat = make_shared<UMaterial>();
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+			meshComp->SetMaterial(mat);
 
-		actor->SetMeshComponent(meshComp);
-		actor->SetPosition(pos);
-		actor->SetRotation(rot);
-		actor->SetScale(scale);
+			// Actor 생성
+			shared_ptr<AActor> actor;
+			if (actorType == 0)
+			{
+				actor = make_shared<APawn>(); // ACharacter로 교체 가능
+			}
+			else if (actorType == 1)
+			{
+				actor = make_shared<APawn>(); // AEnemy로 교체 가능
+			}
+			else if (actorType == 2)
+			{
+				actor = make_shared<APawn>(); // AObject로 교체 가능
+			}
 
-		OBJECTMANAGER->AddActor(actor);
-	});
+			actor->SetMeshComponent(meshComp);
+			actor->SetPosition(pos);
+			actor->SetRotation(rot);
+			actor->SetScale(scale);
+
+			OBJECTMANAGER->AddActor(actor);
+		});
 
 	OBJECTMANAGER->AddActor(m_pActor);
 	OBJECTMANAGER->AddActor(m_pCameraActor);
-	OBJECTMANAGER->AddActor(m_pSky);	
+	OBJECTMANAGER->AddActor(m_pSky);
 }
 
 void TestSY::Update()
 {
-	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 	if (INPUT->GetButtonDown(O))
-		CAMERAMANAGER->SetCameraActor(m_pActor);
+		CAMERAMANAGER->Set3DCameraActor(m_pActor);
 
 	if (INPUT->GetButton(I))
 	{
 		m_pActor->SetDelete(true);
 	}
+
+	// Mouse Picking
+	if (INPUT->GetButton(LCLICK))
+		SetClickPos();
 }
 
 void TestSY::Render()
-{	
+{
 	if (m_bEditorWireframe)
 	{
 		DC->RSSetState(STATE->m_pRSWireFrame.Get());
@@ -268,4 +274,26 @@ void TestSY::Render()
 
 void TestSY::Destroy()
 {
+}
+
+void TestSY::SetClickPos()
+{
+	POINT mousePos = INPUT->GetMousePos();
+	float deltaTime = TIMER->GetDeltaTime() * 10.f;
+
+	float fWinSizeX = static_cast<float>(g_windowSize.x);
+	float fWinSizeY = static_cast<float>(g_windowSize.y);
+
+	// To NDC
+	Vec3 vMouseEnd(0.f, 0.f, 1.f);
+	vMouseEnd.x = (2.f * static_cast<float>(mousePos.x) / fWinSizeX) - 1.f;
+	vMouseEnd.y = 1.f - (2.f * static_cast<float>(mousePos.y) / fWinSizeY);
+
+	Matrix mProjViewInvert = Matrix::Identity;
+	(CAMERAMANAGER->Get3DView() * CAMERAMANAGER->Get3DProjection()).Invert(mProjViewInvert);
+
+	vMouseEnd = Vec3::Transform(vMouseEnd, mProjViewInvert);
+
+	m_vCameraPos = CAMERAMANAGER->Get3DCameraComponent()->GetCameraPos();
+	m_vMouseLay = vMouseEnd - m_vCameraPos;
 }

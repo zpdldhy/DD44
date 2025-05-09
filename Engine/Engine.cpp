@@ -156,6 +156,9 @@ Engine::Engine(HINSTANCE hInstance, shared_ptr<IExecute> app)
 
 void Engine::Create3DWorld()
 {
+	float fWinSizeX = static_cast<float>(g_windowSize.x);
+	float fWinSizeY = static_cast<float>(g_windowSize.y);
+
 	m_p3DWorld = make_shared<AActor>();
 
 	auto pMesh = UStaticMeshComponent::CreatePlane();
@@ -166,11 +169,11 @@ void Engine::Create3DWorld()
 
 	m_p3DWorld->SetMeshComponent(pMesh);
 	m_p3DWorld->SetPosition(Vec3(0.f, 0.f, 1.f));
-	m_p3DWorld->SetScale(Vec3(1440.f, 900.f, 0.f));
+	m_p3DWorld->SetScale(Vec3(fWinSizeX, fWinSizeY, 0.f));
 	m_p3DWorld->Init();
 
 	m_p3DWorldTexture = make_shared<ViewPortTexture>();
-	m_p3DWorldTexture->CreateViewPortTexture(1440.f, 900.f);
+	m_p3DWorldTexture->CreateViewPortTexture(fWinSizeX, fWinSizeY);
 
 	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(m_p3DWorldTexture);
 }

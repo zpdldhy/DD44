@@ -35,7 +35,7 @@ void TestPlayer::Init()
 			m_pCameraActor->SetPosition(player->GetPosition());
 			m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 		}
-		CAMERAMANAGER->SetCameraActor(player);
+		CAMERAMANAGER->Set3DCameraActor(player);
 		OBJECTMANAGER->AddActor(m_pCameraActor);
 	}
 

@@ -18,9 +18,10 @@ class CameraManager : public Singleton<CameraManager>
 	ComPtr<ID3D11Buffer> m_pCameraCB;
 	CameraConstantData m_CameraData;
 
-	shared_ptr<class AActor> m_pCurrentCameraActor = nullptr;
+	shared_ptr<class AActor> m_p3DCameraActor = nullptr;
 	shared_ptr<class AActor> m_pUICameraActor = nullptr;	// Canvers
-	shared_ptr<class UCameraComponent> m_pCurrentComponent = nullptr;
+	shared_ptr<class UCameraComponent> m_p3DComponent = nullptr;
+	shared_ptr<class UCameraComponent> m_pUIComponent = nullptr;
 
 public:
 	void Init();
@@ -32,10 +33,16 @@ private:
 	void CreateCameraBuffer();
 
 public:
-	void SetCameraActor(shared_ptr<class AActor> _cameraActor);	
-	shared_ptr<class AActor> GetCameraActor();
-	shared_ptr<class UCameraComponent> GetCurrentCameraComponent();
-	Matrix GetCurrentView();
-	Matrix GetCurrentProjection();
+	void Set3DCameraActor(shared_ptr<class AActor> _cameraActor);	
+	shared_ptr<class AActor> Get3DCameraActor();
+
+	// Get
+	shared_ptr<class UCameraComponent> Get3DCameraComponent();
+	Matrix Get3DView();
+	Matrix Get3DProjection();
+
+	shared_ptr<class UCameraComponent> GetUICameraComponent();
+	Matrix GetUIView();
+	Matrix GetUIProjection();
 };
 

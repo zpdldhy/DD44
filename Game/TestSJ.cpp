@@ -83,7 +83,7 @@ void TestSJ::Init()
 	m_pLight->GetLightComponent()->SetAmbientColor(Vec3(0.0f, 0.0f, 1.0f));
 	m_pLight->GetLightComponent()->SetAmbientPower(0.2f);
 
-	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 
 	GUI->SetEffectEditorCallback(
 		[this](int selected, float glowPower, Vec3 glowColor, float dissolveThreshold, Vec3 emissiveColor, float emissivePower) {
