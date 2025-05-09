@@ -17,9 +17,7 @@ public:
 	bool m_bEditorWireframe = false;
 
 	// Mouse Picking
-	Vec3 m_vMouseLay;
-	Vec3 m_vCameraPos;
-
+	Ray m_vMouseRay;
 
 public:
 	void Init() override;

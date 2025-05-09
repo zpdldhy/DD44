@@ -18,7 +18,7 @@ void TestPlayer::Init()
 		loader = make_shared<ActorLoader>();
 		player = loader->LoadOne("../Resources/Asset/crow_final.asset");
 		auto cameraComponent = make_shared<UCameraComponent>();
-		cameraComponent->SetPosition(Vec3(20.0f, 20.0f, -20.0f));
+		cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
 		player->SetCameraComponent(cameraComponent);
 		player->AddScript(movement);
 

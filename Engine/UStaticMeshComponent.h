@@ -28,6 +28,7 @@ public:
 	void SetAnimInstance(shared_ptr<UAnimInstance> _anim) { m_pAnim = _anim; }
 	void SetTargetBoneIndex(int _index) { targetBoneIndex = _index; }
 public:
+	static shared_ptr<UStaticMeshComponent> CreateRay();
 	static shared_ptr<UStaticMeshComponent> CreateTriangle();
 	static shared_ptr<UStaticMeshComponent> CreatePlane();
 	static shared_ptr<UStaticMeshComponent> CreateCube();

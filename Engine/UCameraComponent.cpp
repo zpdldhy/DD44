@@ -81,7 +81,7 @@ void UCameraComponent::CreateFrustumBox()
 	vertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0.f, 0.f, +1.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
 	vertexList[1] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0.f, 0.f, +1.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
 	vertexList[2] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0.f, 0.f, +1.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
-	vertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0.f, 0.f, +1.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
+	vertexList[3] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0.f, 0.f, +1.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));	
 	// Back
 	vertexList[4] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0.f, 0.f, -1.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
 	vertexList[5] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0.f, 0.f, -1.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
@@ -150,7 +150,8 @@ void UCameraComponent::CreateFrustumBox()
 	pMesh->SetMaterial(pMaterial);
 
 	m_pFrustumBox->SetMeshComponent(pMesh);
-	m_pFrustumBox->SetScale(m_vScale);
+	m_pFrustumBox->SetPosition(m_vEye);
+	m_pFrustumBox->SetScale(m_vLocalScale);
 
 	m_pFrustumBox->Init();	
 }
@@ -167,12 +168,12 @@ void UCameraComponent::UpdateFrustumBox()
 
 void UCameraComponent::UpdateView()
 {
-	m_vEye = m_pOwner.lock()->GetPosition() + m_vPosition;
+	m_vEye = m_pOwner.lock()->GetPosition() + m_vLocalPosition;
 
-	if (Vec3::Distance(Vec3(0.f, 0.f, 0.f), m_vPosition) < 0.1f)
+	if (Vec3::Distance(Vec3(0.f, 0.f, 0.f), m_vLocalPosition) < 0.1f)
 		m_vLook = m_pOwner.lock()->GetLook();
 	else
-		m_vLook = -m_vPosition;
+		m_vLook = -m_vLocalPosition;
 
 	Vec3 vUp = Vec3(0.f, 1.f, 0.f);
 

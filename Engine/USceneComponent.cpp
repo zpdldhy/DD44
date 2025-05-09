@@ -52,23 +52,40 @@ bool USceneComponent::CreateConstantBuffer()
 
 void USceneComponent::UpdateWorldMatrix()
 {
-	m_matScale = Matrix::CreateScale(m_vScale);
+	// Set Local
+	m_matScale = Matrix::CreateScale(m_vLocalScale);
 
-	m_matRotation = Matrix::CreateRotationZ(m_vRotation.z);
-	m_matRotation *= Matrix::CreateRotationX(m_vRotation.x);
-	m_matRotation *= Matrix::CreateRotationY(m_vRotation.y);
+	m_matRotation = Matrix::CreateRotationZ(m_vLocalRight.z);
+	m_matRotation *= Matrix::CreateRotationX(m_vLocalRight.x);
+	m_matRotation *= Matrix::CreateRotationY(m_vLocalRight.y);
 
-	m_matTrans = Matrix::CreateTranslation(m_vPosition);
+	m_matTrans = Matrix::CreateTranslation(m_vLocalPosition);
 
-	m_matWorld = m_matOffset * m_matScale * m_matRotation * m_matTrans * m_matParent;
+	// Set Matrix
+	m_matLocal = m_matScale * m_matRotation * m_matTrans;
+	m_matWorld = m_matLocal * m_matParent;
 
-	m_vLook.x = m_matWorld._31; m_vLook.y = m_matWorld._32; m_vLook.z = m_matWorld._33;
-	m_vRight.x = m_matWorld._11; m_vRight.y = m_matWorld._12; m_vRight.z = m_matWorld._13;
-	m_vUp.x = m_matWorld._21; m_vUp.y = m_matWorld._22; m_vUp.z = m_matWorld._23;
+	// Set Local
+	m_vLocalLook.x = m_matWorld._31; m_vLocalLook.y = m_matWorld._32; m_vLocalLook.z = m_matWorld._33;
+	m_vLocalRight.x = m_matWorld._11; m_vLocalRight.y = m_matWorld._12; m_vLocalRight.z = m_matWorld._13;
+	m_vLocalUp.x = m_matWorld._21; m_vLocalUp.y = m_matWorld._22; m_vLocalUp.z = m_matWorld._23;
 
-	m_vLook.Normalize();
-	m_vRight.Normalize();
-	m_vUp.Normalize();
+	m_vLocalLook.Normalize();
+	m_vLocalRight.Normalize();
+	m_vLocalUp.Normalize();
+
+	// Set World
+	m_vWorldLook.x = m_matWorld._31; m_vWorldLook.y = m_matWorld._32; m_vWorldLook.z = m_matWorld._33;
+	m_vWorldRight.x = m_matWorld._11; m_vWorldRight.y = m_matWorld._12; m_vWorldRight.z = m_matWorld._13;
+	m_vWorldUp.x = m_matWorld._21; m_vWorldUp.y = m_matWorld._22; m_vWorldUp.z = m_matWorld._23;
+
+	m_vWorldLook.Normalize();
+	m_vWorldRight.Normalize();
+	m_vWorldUp.Normalize();
+
+	m_vWorldScale = m_vLocalScale * m_vParentScale;
+	m_vWorldRotation = m_vLocalRotation + m_vParentRotation;
+	m_vWorldPosition = m_vLocalPosition + m_vParentPosition;
 
 	m_cbData.matWorld = m_matWorld;
 }
