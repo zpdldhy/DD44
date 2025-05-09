@@ -453,6 +453,7 @@ void TestSY::Update()
 				//staticComp->CopyFrom(selectedMesh); // 역시 복사 함수 필요
 			}
 
+
 			//if (!m_vMeshList.empty() && m_iSelectedMeshIndex == 0) // crow만 skinned
 			//{
 			//	auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[0]);
@@ -475,11 +476,46 @@ void TestSY::Update()
 			//	}
 			//}
 
+			//if (!m_vMeshList.empty() && m_iSelectedMeshIndex > 0)
+			//{
+			//	auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[0]);
+			//	auto staticComp = std::dynamic_pointer_cast<UStaticMeshComponent>(m_vMeshList[m_iSelectedMeshIndex]);
+
+			//	if (skinned && staticComp && m_pLoader && !m_pLoader->m_vAnimInstanceList.empty())
+			//	{
+			//		auto anim = m_pLoader->m_vAnimInstanceList[0];
+
+			//		// 선택된 본 인덱스의 애니메이션 행렬 가져오기
+			//		Matrix boneMatrix = anim->GetBoneAnim(m_iSelectedBoneIndex);
+
+			//		// static mesh의 로컬 변환과 곱해서 최종 위치 계산
+			//		Matrix local = staticComp->GetLocalTransform();
+			//		Matrix world = boneMatrix * local;
+
+			//		staticComp->SetWorldTransform(world);
+			//	}
+			//}
+
 			actor->SetMeshComponent(selectedMesh);
 			actor->SetScale(Vec3(10.f, 10.f, 10.f));
 			actor->Init();
 			m_vPreviewActors.push_back(actor);
 			OBJECTMANAGER->AddActorList(m_vPreviewActors);
+		}
+	}
+
+	if (ImGui::Button("Attach Selected Mesh to Bone"))
+	{
+		// crow (index 0) = skinned
+		auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[0]);
+
+		// 선택된 static mesh
+		auto staticComp = std::dynamic_pointer_cast<UStaticMeshComponent>(m_vMeshList[m_iSelectedMeshIndex]);
+
+		if (skinned && staticComp && m_iSelectedMeshIndex != 0)
+		{
+			staticComp->SetTargetBoneIndex(m_iSelectedBoneIndex); // 해당 본 인덱스
+			skinned->AddChild(staticComp);                         // 자식으로 등록
 		}
 	}
 }
