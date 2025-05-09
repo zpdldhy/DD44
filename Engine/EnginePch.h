@@ -44,6 +44,10 @@ using namespace std;
 #include <Assimp/postprocess.h>
 #include <Assimp/cimport.h>
 
+// JSON
+#include "JSON/json.hpp"
+using json = nlohmann::json;
+
 // LIBS
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")

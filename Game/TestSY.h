@@ -2,6 +2,7 @@
 #include "IExecute.h"
 #include "MapEditorUI.h"
 #include "ObjectEditorUI.h"
+#include "ActorLoader.h"
 
 class TestSY : public IExecute
 {
@@ -15,6 +16,24 @@ public:
 	shared_ptr<class ASky> m_pSky;
 
 	bool m_bEditorWireframe = false;
+
+	// Mesh, Animation
+	std::shared_ptr<ActorLoader> m_pLoader;
+	std::vector<std::shared_ptr<UMeshComponent>> m_vMeshList;
+
+	int m_iSelectedMeshIndex = 0;
+	int m_iSelectedAnimIndex = 0;
+	int m_iSelectedCompType = 0; // 0 = Skinned, 1 = Static
+	int m_iSelectedBoneIndex = 0;
+
+	std::vector<std::string> m_vMeshLabels;
+	std::vector<const char*> m_vMeshLabelPtrs;
+	std::vector<std::string> m_vBoneLabels;
+	std::vector<const char*> m_vBoneLabelPtrs;
+
+	//std::shared_ptr<APawn> m_pPreviewActor;
+	std::vector<std::shared_ptr<AActor>> m_vPreviewActors;
+	
 
 public:
 	void Init() override;
