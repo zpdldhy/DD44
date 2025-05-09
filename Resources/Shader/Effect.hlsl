@@ -32,6 +32,7 @@ float4 PS(VS_OUT_RIM input) : SV_Target
     float4 texColor = g_txDiffuseA.Sample(sample, distortedUV);
     float3 baseColor = texColor.rgb;
 
+
     // 4. 조명 계산
     float3 ambient = ApplyAmbient();
     float3 diffuse = ApplyLambertLighting(input.n);

@@ -14,6 +14,7 @@ void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
     CreateCameraCB();
     CreateRenderModeCB();
     CreateEmissiveCB();
+    CreateMaterialCB();
 }
 
 void UMaterial::Bind()
@@ -72,6 +73,12 @@ void UMaterial::Bind()
     if (m_pEmissiveCB)
     {
         DC->PSSetConstantBuffers(10, 1, m_pEmissiveCB.GetAddressOf());
+    }
+
+    if (m_pCBMaterial)
+    {
+        UpdateMaterialBuffer();
+        DC->PSSetConstantBuffers(11, 1, m_pCBMaterial.GetAddressOf()); 
     }
 }
 
@@ -188,6 +195,18 @@ void UMaterial::CreateEmissiveCB()
     DEVICE->CreateBuffer(&bd, &sd, m_pEmissiveCB.GetAddressOf());
 }
 
+void UMaterial::CreateMaterialCB()
+{
+    D3D11_BUFFER_DESC bd = {};
+    bd.Usage = D3D11_USAGE_DYNAMIC;
+    bd.ByteWidth = sizeof(CB_Material);
+    bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    HRESULT hr = DEVICE->CreateBuffer(&bd, nullptr, m_pCBMaterial.GetAddressOf());
+    assert(SUCCEEDED(hr));
+}
+
 void UMaterial::UpdateDissolveBuffer()
 {
     if (!m_pDissolveCB)
@@ -255,6 +274,17 @@ void UMaterial::UpdateEmissiveBuffer()
     DC->PSSetConstantBuffers(10, 1, m_pEmissiveCB.GetAddressOf()); // b10¹ø
 }
 
+void UMaterial::UpdateMaterialBuffer()
+{
+    if (!m_pCBMaterial)
+        CreateMaterialCB();
+
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    DC->Map(m_pCBMaterial.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    memcpy(mapped.pData, &m_tMaterialData, sizeof(CB_Material));
+    DC->Unmap(m_pCBMaterial.Get(), 0);
+}
+
 void UMaterial::SetUVDistortionParams(float _strength, float _speed, float _frequency)
 {
     m_tUVDistortion.g_fDistortionStrength = _strength;
@@ -286,5 +316,13 @@ void UMaterial::SetEmissiveParams(const Vec3& _color, float _power)
     m_tEmissiveData.g_vEmissiveColor = _color;
     m_tEmissiveData.g_fEmissivePower = _power;
     UpdateEmissiveBuffer();
+}
+
+void UMaterial::SetMaterialParams(const Vec4& _ambient, const Vec4& _diffuse, const Vec4& _specular, const Vec4& _emissive)
+{
+    m_tMaterialData.vMaterialAmbient = _ambient;
+    m_tMaterialData.vMaterialDiffuse = _diffuse;
+    m_tMaterialData.vMaterialSpecular = _specular;
+    m_tMaterialData.vMaterialEmissive = _emissive;
 }
 

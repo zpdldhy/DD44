@@ -39,6 +39,12 @@ void TestSJ::Init()
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+		material->SetMaterialParams(
+			Vec4(0.1f, 0.1f, 0.1f, 1.0f),  // Ambient
+			Vec4(1.0f, 1.0f, 1.0f, 1.0f),  // Diffuse
+			Vec4(1.0f, 1.0f, 1.0f, 1.0f),  // Specular
+			Vec4(0.0f, 0.0f, 0.0f, 1.0f)   // Emissive (이미 따로 세팅도 있지만 초기값이 중요함)
+		);
 		m_pStaticMesh->SetMaterial(material);
 	}
 
@@ -55,6 +61,12 @@ void TestSJ::Init()
 
 		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
 		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+		material2->SetMaterialParams(
+			Vec4(0.05f, 0.05f, 0.05f, 1.0f),
+			Vec4(0.7f, 0.7f, 1.0f, 1.0f),
+			Vec4(1.0f, 1.0f, 1.0f, 1.0f),
+			Vec4(0.0f, 0.0f, 0.0f, 1.0f)
+		);
 		
 		m_pStaticMesh2->SetMaterial(material2);
 		
@@ -81,8 +93,8 @@ void TestSJ::Init()
 	m_pLight->SetPosition(Vec3(0, 0, -10));
 	//	m_pLight->SetRotation(Vec3(0, DD_PI, 0)); // 카메라 방향으로 빛 쏘기
 	m_pLight->SetRotation(Vec3(0, 0, 0)); // 카메라 방향으로 빛 쏘기
-	m_pLight->GetLightComponent()->SetAmbientColor(Vec3(0.0f, 0.0f, 1.0f));
-	m_pLight->GetLightComponent()->SetAmbientPower(0.2f);
+	m_pLight->GetLightComponent()->SetAmbientColor(Vec3(0.0f, 0.0f, 0.0f));
+	m_pLight->GetLightComponent()->SetAmbientPower(0.0f);
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 
@@ -96,6 +108,11 @@ void TestSJ::Init()
 			{
 				targetMat = m_pStaticMesh2->GetMaterial();
 			}
+			else if (selected == 2)
+			{
+				targetMat = m_vMeshList[2]->GetMaterial(); 
+			}
+				
 
 			if (targetMat)
 			{
@@ -128,8 +145,17 @@ void TestSJ::Init()
 		// 2번 인덱스가 검. meshComponent 타고타고 UObject의 이름 확인해보면, "detailSword_weaponTexuture1".
 		m_pSwordActor = make_shared<APawn>();
 		m_pSwordActor->SetMeshComponent(m_vMeshList[2]);
-		m_pSwordActor->SetPosition(Vec3(20.f, 0.0f, 0.0f));
+		m_pSwordActor->SetPosition(Vec3(10.f, 0.0f, 25.0f));
 		m_pSwordActor->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+		//Sword
+		{
+			m_vMeshList[2]->GetMaterial()->SetMaterialParams(
+				Vec4(0.1f, 0.1f, 0.1f, 1.0f),    // 약간의 ambient 반사
+				Vec4(1.0f, 1.0f, 1.0f, 1.0f),    // diffuse 없음 (금속은 diffuse 거의 없음)
+				Vec4(1.0f, 1.0f, 1.0f, 1.0f),    // 강한 specular 반사 (빛받으면 번쩍)
+				Vec4(1.0f, 0.1f, 0.1f, 5.0f)     // 붉은 발광 (자체 색)
+			);
+		}
 	}
 
 
@@ -143,6 +169,7 @@ void TestSJ::Init()
 
 void TestSJ::Update()
 {
+	
 	// 오브젝트 회전
 	{
 		static float angle = 0.0f;
@@ -310,7 +337,26 @@ void TestSJ::Update()
 			m_pStaticMesh->GetMaterial()->SetHitFlashTime(flashTimer);
 		else if (selected == 1 && m_pStaticMesh2)
 			m_pStaticMesh2->GetMaterial()->SetHitFlashTime(flashTimer);
+		else if (selected == 2)
+		{
+			m_vMeshList[2]->GetMaterial()->SetHitFlashTime(flashTimer);
+		}
 	}
+
+	//검 빛나는 효과
+	//{
+	//	static float time = 0.0f;
+	//	time += TIMER->GetDeltaTime();
+	//	time = fmodf(time, DD_PI * 2);
+	//	// 사인 곡선을 사용해 0 ~ 1 사이로 변동하는 값 생성
+	//	float flashValue = (sinf(time * 4.0f) + 1.0f) * 0.5f; // 주기 1.57초 정도
+
+	//	if (m_vMeshList.size() > 2 && m_vMeshList[2])
+	//	{
+	//		m_vMeshList[2]->GetMaterial()->SetHitFlashTime(flashValue);
+	//	}
+	//}
+
 	//Sound
 	/*{
 		SOUNDMANAGER->GetPtr(ESoundType::Bgm)->Play2D();
@@ -384,7 +430,7 @@ void TestSJ::Update()
 	// 검
 	{
 		// 
-		//m_pSwordActor->Tick();
+		m_pSwordActor->Tick();
 	}
 }
 

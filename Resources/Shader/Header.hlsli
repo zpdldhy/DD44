@@ -80,7 +80,13 @@ cbuffer CB_Emissive : register(b10)
     float g_fEmissivePower;
 }
 
-
+cbuffer CB_Material : register(b11)
+{
+    float4 g_vMaterialAmbient;       // 물체의 ambient 반사율
+    float4 g_vMaterialDiffuse;       // 물체의 diffuse 반사율
+    float4 g_vMaterialSpecular;      // 물체의 specular 반사율
+    float4 g_vMaterialEmissive;      // 물체의 emissive 자발광 색
+};
 
 struct VS_IN
 {
@@ -120,11 +126,21 @@ struct VS_OUT_RIM
     float3 wPos : POSITIONWS;
 };
 
+//struct PS_OUT
+//{
+//    float4 c : SV_Target;
+//};
+#ifdef USE_BLOOM
+struct PS_OUT {
+    float4 color : SV_Target0;
+    float4 bloom : SV_Target1;
+};
+#else
 struct PS_OUT
 {
     float4 c : SV_Target;
 };
-
+#endif
 Texture2D g_txDiffuseA : register(t0);
 Texture2D g_txNoise : register(t1); // 노이즈 텍스처
 SamplerState sample : register(s0);
@@ -177,23 +193,41 @@ float3 ApplyLambertLighting(float3 normal)
 {
     float3 lightDir = normalize(-g_vLightDirection);
     float NdotL = saturate(dot(normal, lightDir));
-    return g_vLightColor * NdotL * g_fIntensity;
+    //return g_vLightColor * NdotL * g_fIntensity;
+    return g_vLightColor * g_vMaterialDiffuse.rgb * NdotL * g_fIntensity;
 }
 
+//float3 ApplySpecular(float3 normal, float3 worldPos)
+//{
+//    float3 N = normalize(normal);
+//    float3 L = normalize(-g_vLightDirection);
+//    float3 V = normalize(g_vCameraPos - worldPos);
+//    float3 H = normalize(L + V); // Half vector
+
+//    float spec = pow(saturate(dot(N, H)), g_fShininess);
+//    //return g_vLightColor * spec * g_fIntensity* 10.0f ;
+//    return g_vLightColor * g_vMaterialSpecular.rgb * spec * g_fIntensity * 10.0f;
+//}
 float3 ApplySpecular(float3 normal, float3 worldPos)
 {
     float3 N = normalize(normal);
     float3 L = normalize(-g_vLightDirection);
     float3 V = normalize(g_vCameraPos - worldPos);
-    float3 H = normalize(L + V); // Half vector
+    float3 R = reflect(-L, N); // 정반사 벡터 사용 (Phong 모델)
 
-    float spec = pow(saturate(dot(N, H)), g_fShininess);
-    return g_vLightColor * spec * g_fIntensity* 10.0f ;
+    float spec = pow(saturate(dot(R, V)), g_fShininess);
+
+    // 메탈릭 반짝임 강조
+    float3 specularColor = g_vLightColor * g_vMaterialSpecular.rgb * spec * g_fIntensity * 20.0f;
+
+    return specularColor;
 }
 
 float3 ApplyAmbient()
 {
-    return g_vAmbientColor * g_fAmbientPower;
+    //return g_vAmbientColor * g_fAmbientPower;
+    return g_vAmbientColor * g_fAmbientPower * g_vMaterialAmbient.rgb;
+
 }
 
 #endif

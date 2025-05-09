@@ -51,6 +51,14 @@ struct CB_EMISSIVE
 	float g_fEmissivePower = 0.0f;
 };
 
+struct CB_Material
+{
+	DirectX::XMFLOAT4 vMaterialAmbient;
+	DirectX::XMFLOAT4 vMaterialDiffuse;
+	DirectX::XMFLOAT4 vMaterialSpecular;
+	DirectX::XMFLOAT4 vMaterialEmissive;
+};
+
 class UMaterial
 {
 	shared_ptr<Shader> m_pShader = nullptr;
@@ -63,6 +71,7 @@ class UMaterial
 	ComPtr<ID3D11Buffer> m_pCameraCB;
 	ComPtr<ID3D11Buffer> m_pRenderModeBuffer;
 	ComPtr<ID3D11Buffer> m_pEmissiveCB;
+	ComPtr<ID3D11Buffer> m_pCBMaterial;
 public:
 	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
 	void SetHitFlashTime(float _flashTime);
@@ -72,18 +81,22 @@ public:
 	void UpdateCameraBuffer();
 	void UpdateRenderModeBuffer();
 	void UpdateEmissiveBuffer();
+	void UpdateMaterialBuffer();
 	void CreateGlowCB();
 	void CreateDissolveCB();
 	void CreateUVDistortionCB();
 	void CreateCameraCB();
 	void CreateRenderModeCB();
 	void CreateEmissiveCB();
+	void CreateMaterialCB();
 	void SetDissolveParams(float _threshold);
 	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
 	void SetUVDistortionParams(float _strength, float _speed, float _frequency);
 	void SetCameraPos(const Vec3& _cameraPos);
 	void SetRenderMode(ERenderMode _eMode);
 	void SetEmissiveParams(const Vec3& _color, float _power);
+	void SetMaterialParams(const Vec4& _ambient, const Vec4& _diffuse, const Vec4& _specular, const Vec4& _emissive);
+	
 	
 
 public:
@@ -94,6 +107,7 @@ public:
 	CB_RMB m_tRenderModeData;
 	ERenderMode m_eRenderMode = ERenderMode::Default;
 	CB_EMISSIVE m_tEmissiveData;
+	CB_Material m_tMaterialData;
 
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);

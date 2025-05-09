@@ -21,7 +21,7 @@ void ULightComponent::PushLightData()
 {
 	m_tCBLight.vLightColor = m_vColor;
 	m_tCBLight.fIntensity = m_fIntensity;
-	m_tCBLight.vLightDirection = GetLook();      // Zรเ forward
+	m_tCBLight.vLightDirection = { 1.0f , 0.0f , 0.0f };//GetLook();      // Zรเ forward
 	m_tCBLight.fRange = m_fRange;
 	m_tCBLight.vLightPosition = GetPosition();
 	m_tCBLight.fAngle = m_fAngle;
