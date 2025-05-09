@@ -77,11 +77,7 @@ void TestSJ::Init()
 	}
 
 	m_pLight = make_shared<ALight>();
-	m_pLight->SetPosition(Vec3(0, 0, -10));
-	//	m_pLight->SetRotation(Vec3(0, DD_PI, 0)); // 카메라 방향으로 빛 쏘기
-	m_pLight->SetRotation(Vec3(0, 0, 0)); // 카메라 방향으로 빛 쏘기
-	m_pLight->GetLightComponent()->SetAmbientColor(Vec3(0.0f, 0.0f, 1.0f));
-	m_pLight->GetLightComponent()->SetAmbientPower(0.2f);
+
 
 	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
 
@@ -94,6 +90,10 @@ void TestSJ::Init()
 			else if (selected == 1 && m_pStaticMesh2)
 			{
 				targetMat = m_pStaticMesh2->GetMaterial();
+			}
+			else if (selected == 2)
+			{
+				targetMat = m_vMeshList[2]->GetMaterial();
 			}
 
 			if (targetMat)
@@ -127,8 +127,9 @@ void TestSJ::Init()
 		// 2번 인덱스가 검. meshComponent 타고타고 UObject의 이름 확인해보면, "detailSword_weaponTexuture1".
 		m_pSwordActor = make_shared<APawn>();
 		m_pSwordActor->SetMeshComponent(m_vMeshList[2]);
-		m_pSwordActor->SetPosition(Vec3(20.f, 0.0f, 0.0f));
+		m_pSwordActor->SetPosition(Vec3(10.f, 0.0f, 25.0f));
 		m_pSwordActor->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+		m_vMeshList[2]->GetMaterial()->SetUseStencil(true);
 	}
 
 

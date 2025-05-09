@@ -51,9 +51,18 @@ struct CB_EMISSIVE
 	float g_fEmissivePower = 0.0f;
 };
 
+struct CB_Material
+{
+	Vec4 vMaterialAmbient = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Vec4 vMaterialDiffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Vec4 vMaterialSpecular = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Vec4 vMaterialEmissive = { 1.0f, 1.0f, 1.0f, 1.0f };
+};
+
 class UMaterial
 {
 	bool m_bUseStencil = false;
+	bool m_bUseBloom = false;
 
 	shared_ptr<Shader> m_pShader = nullptr;
 	shared_ptr<Texture> m_pTexture = nullptr;
@@ -65,30 +74,37 @@ class UMaterial
 	ComPtr<ID3D11Buffer> m_pCameraCB;
 	ComPtr<ID3D11Buffer> m_pRenderModeBuffer;
 	ComPtr<ID3D11Buffer> m_pEmissiveCB;
+	ComPtr<ID3D11Buffer> m_pCBMaterial;
 public:
-	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
-	void SetHitFlashTime(float _flashTime);
-	void UpdateGlowBuffer();
-	void UpdateDissolveBuffer();
-	void UpdateUVDistortionBuffer(float _deltaTime);
-	void UpdateCameraBuffer();
-	void UpdateRenderModeBuffer();
-	void UpdateEmissiveBuffer();
 	void CreateGlowCB();
 	void CreateDissolveCB();
 	void CreateUVDistortionCB();
 	void CreateCameraCB();
 	void CreateRenderModeCB();
 	void CreateEmissiveCB();
+	void CreateMaterialCB();
+	void UpdateGlowBuffer();
+	void UpdateDissolveBuffer();
+	void UpdateUVDistortionBuffer(float _deltaTime);
+	void UpdateCameraBuffer();
+	void UpdateRenderModeBuffer();
+	void UpdateEmissiveBuffer();
+	void UpdateMaterialBuffer();
+	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
+	void SetHitFlashTime(float _flashTime);
 	void SetDissolveParams(float _threshold);
 	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
 	void SetUVDistortionParams(float _strength, float _speed, float _frequency);
 	void SetCameraPos(const Vec3& _cameraPos);
 	void SetRenderMode(ERenderMode _eMode);
 	void SetEmissiveParams(const Vec3& _color, float _power);
+	void SetMaterialParams(const Vec4& _ambient, const Vec4& _diffuse, const Vec4& _specular, const Vec4& _emissive);
 
 	void SetUseStencil(bool _bUseStencil) { m_bUseStencil = _bUseStencil; }
 	bool IsUseStencil() { return m_bUseStencil; }
+	
+	void SetUseBloom(bool b_UseBloom) { m_bUseBloom = b_UseBloom; }
+	bool IsUseBloom() const { return m_bUseBloom; }
 	
 
 public:
@@ -99,6 +115,7 @@ public:
 	CB_RMB m_tRenderModeData;
 	ERenderMode m_eRenderMode = ERenderMode::Default;
 	CB_EMISSIVE m_tEmissiveData;
+	CB_Material m_tMaterialData;
 
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);

@@ -10,6 +10,7 @@ class ObjectManager : public Singleton<ObjectManager>
 	// Stencil Check¿ë
 	vector<shared_ptr<class AActor>> m_vPreRenderActorList;		// 
 	vector<shared_ptr<class AActor>> m_vPostRenderActorList;	// 
+	vector<shared_ptr<AActor>> m_vBloomActorList;
 
 public:
 	void Tick();
@@ -19,6 +20,7 @@ public:
 public:
 	void AddActor(shared_ptr<class AActor> _pActor);
 	void AddActorList(vector<shared_ptr<class AActor>> _vActorList);
+
 	
 	shared_ptr<class AActor> GetActor(UINT _iIndex);
 

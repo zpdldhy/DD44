@@ -44,9 +44,12 @@ void ObjectManager::Render()
 		pRenderActor->Render();
 
 		// [2] Actor1 위치에 스텐실 = 1 설정 (깊이 테스트는 하되 기록 X)
-		pMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
-		DC->OMSetDepthStencilState(STATE->m_pDSS_StencilWrite.Get(), 1);
-		pRenderActor->Render();
+		if (!pMesh->GetMaterial()->IsUseStencil())
+		{
+			pMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
+			DC->OMSetDepthStencilState(STATE->m_pDSS_StencilWrite.Get(), 1);
+			pRenderActor->Render();
+		}
 	}
 
 	for (auto& pRenderActor : m_vPostRenderActorList)
@@ -112,17 +115,23 @@ void ObjectManager::CheckStencilList()
 	for (auto& pActor : m_vRenderActorList)
 	{
 		auto pMesh = pActor->GetMeshComponent<UMeshComponent>();
+		auto pMat = (pMesh ? pMesh->GetMaterial() : nullptr);
 
-		if (pMesh == nullptr || pMesh->GetMaterial() == nullptr)
+		// 기본 예외 처리
+		if (pMesh == nullptr || pMat == nullptr)
 		{
 			m_vPreRenderActorList.emplace_back(pActor);
 			continue;
 		}
 
-		if (pMesh->GetMaterial()->IsUseStencil() == false)
-			m_vPreRenderActorList.emplace_back(pActor);
-		else
+		// 스텐실용 추가
+		if (pMat->IsUseStencil())
 			m_vPostRenderActorList.emplace_back(pActor);
+		
+		if (pMat->IsUseBloom())
+			m_vBloomActorList.emplace_back(pActor);
+
+		m_vPreRenderActorList.emplace_back(pActor);
 	}
 }
 
@@ -131,4 +140,5 @@ void ObjectManager::ClearRenderList()
 	m_vRenderActorList.clear();
 	m_vPreRenderActorList.clear();
 	m_vPostRenderActorList.clear();
+	m_vBloomActorList.clear();
 }

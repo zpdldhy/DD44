@@ -137,6 +137,28 @@ void Device::SetDefaultState()
     m_pd3dContext->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
 }
 
+void Device::CreateBloomRenderTarget()
+{
+    D3D11_TEXTURE2D_DESC desc = {};
+    desc.Width = g_windowSize.x;
+    desc.Height = g_windowSize.y;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT; // Bloom용 고정밀
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+    HRESULT hr = m_pd3dDevice->CreateTexture2D(&desc, nullptr, m_pBloomTexture.GetAddressOf());
+    DX_CHECK(hr, _T("CreateBloomRenderTarget - Texture"));
+
+    hr = m_pd3dDevice->CreateRenderTargetView(m_pBloomTexture.Get(), nullptr, m_pBloomRTV.GetAddressOf());
+    DX_CHECK(hr, _T("CreateBloomRenderTarget - RTV"));
+
+    hr = m_pd3dDevice->CreateShaderResourceView(m_pBloomTexture.Get(), nullptr, m_pBloomSRV.GetAddressOf());
+    DX_CHECK(hr, _T("CreateBloomRenderTarget - SRV"));
+}
+
 void Device::OnResize(UINT _width, UINT _height)
 {
     if (!m_pSwapChain) return;
@@ -174,6 +196,7 @@ void Device::Init()
     CreateDeviceAndSwapChain();
     CreateRenderTargetView();
     CreateDepthStencilBuffer();
+    CreateBloomRenderTarget();
     SetViewport();
 }
 
@@ -188,20 +211,29 @@ void Device::Frame()
 void Device::PreRender()
 {
     m_pd3dContext->RSSetViewports(1, &m_MainVP);
-    m_pd3dContext->OMSetRenderTargets(1, m_pRTV.GetAddressOf(), m_pDSV.Get());
 
-    //float ClearColor[] = { 0.1f, 0.25f, 0.4f, 1.0f };
-    float ClearColor[] = { 1.0f, 0.0f, 1.0f, 1.0f };
+    //todo bloom 분기 조절하기.
+    bool bUseBloom = true;
 
-    m_pd3dContext->ClearRenderTargetView(m_pRTV.Get(), ClearColor);
+    if (bUseBloom)
+    {
+        ID3D11RenderTargetView* rtvs[2] = { m_pRTV.Get(), m_pBloomRTV.Get() };
+        m_pd3dContext->OMSetRenderTargets(2, rtvs, m_pDSV.Get());
+
+        float black[4] = { 0, 0, 0, 1 };
+        m_pd3dContext->ClearRenderTargetView(m_pBloomRTV.Get(), black);
+    }
+    else
+    {
+        m_pd3dContext->OMSetRenderTargets(1, m_pRTV.GetAddressOf(), m_pDSV.Get());
+    }
+
+    float clearColor[4] = { 0.1f, 0.25f, 0.4f, 1.0f };
+    m_pd3dContext->ClearRenderTargetView(m_pRTV.Get(), clearColor);
     m_pd3dContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
-    m_pd3dContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+    m_pd3dContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     SetDefaultState();
-    
-    //m_pd3dContext->PSSetSamplers(0, 1, STATE->_linearSS.GetAddressOf());
-    //_pd3dContext->OMSetBlendState(TDxState::GetInstance().m_pAlphaBlend.Get(), 0, -1);
 }
 
 void Device::Render()

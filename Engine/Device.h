@@ -21,12 +21,18 @@ class Device : public Singleton<Device>
     // DxState
     bool m_bWireFrame = false;
 
+    // Bloom
+    ComPtr<ID3D11RenderTargetView> m_pBloomRTV;
+    ComPtr<ID3D11ShaderResourceView> m_pBloomSRV;
+    ComPtr<ID3D11Texture2D> m_pBloomTexture;
+
 private:
     void CreateDeviceAndSwapChain();
     void CreateRenderTargetView();
     void CreateDepthStencilBuffer();
     void SetViewport();
     void SetDefaultState();
+    void CreateBloomRenderTarget();
 
 public:
     void OnResize(UINT _width, UINT _height);
