@@ -417,6 +417,7 @@ void TestSY::Update()
 
 		if (ImGui::Button("Create Actor"))
 		{
+			// *임의로 Actor 생성 -> mesh component 만드는 구조로
 			auto actor = std::make_shared<APawn>();
 			auto selectedMesh = m_vMeshList[m_iSelectedMeshIndex];
 
@@ -443,7 +444,9 @@ void TestSY::Update()
 				//staticComp->CopyFrom(selectedMesh); // 역시 복사 함수 필요
 			}
 
-
+			// * 메쉬의 본을 찾아 설정해주도록
+			// 본을 넘겨주는 작업이 필요
+			// 
 			//if (!m_vMeshList.empty() && m_iSelectedMeshIndex == 0) // crow만 skinned
 			//{
 			//	auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[0]);
@@ -466,6 +469,7 @@ void TestSY::Update()
 			//	}
 			//}
 
+			// *본 행렬을 받아서 본 애니메이션을 월드에 곱해주는 방향으로
 			//if (!m_vMeshList.empty() && m_iSelectedMeshIndex > 0)
 			//{
 			//	auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[0]);
