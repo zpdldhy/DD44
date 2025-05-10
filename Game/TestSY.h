@@ -3,6 +3,7 @@
 #include "MapEditorUI.h"
 #include "ObjectEditorUI.h"
 #include "ActorLoader.h"
+#include "PrefabLoader.h"
 
 class TestSY : public IExecute
 {
@@ -16,6 +17,9 @@ public:
 	shared_ptr<class ASky> m_pSky;
 
 	bool m_bEditorWireframe = false;
+
+	// Prefab
+	std::vector<PrefabData> m_vPrefabList;
 
 	// Mesh, Animation
 	std::shared_ptr<ActorLoader> m_pLoader;

@@ -28,6 +28,7 @@
 #include "USkinnedMeshComponent.h"
 #include "ActorLoader.h"
 #include "USkeletalMeshResources.h"
+#include "PrefabLoader.h"
 
 void TestSY::Init()
 {
@@ -284,6 +285,7 @@ void TestSY::Update()
 		m_pActor->SetDelete(true);
 	}
 
+	// 캐릭터 에디터 툴
 	{
 		static std::vector<std::string> meshNames;
 		static std::vector<const char*> meshNamePtrs;
@@ -303,10 +305,12 @@ void TestSY::Update()
 			{
 				std::wstring wname = m_vMeshList[i]->GetName();
 				std::string name(wname.begin(), wname.end());
-
 				meshNames.push_back(name);
 				meshNamePtrs.push_back(meshNames.back().c_str());
 			}
+
+			m_pLoader->LoadAnim();
+			m_iSelectedAnimIndex = 0;
 		}
 
 		// ===== Mesh / Component / Animation 선택 =====
@@ -346,13 +350,13 @@ void TestSY::Update()
 			ImGui::TextColored(ImVec4(0, 1, 0, 1), "Root component set.");
 		}
 
-		// ===== Bone Browser =====
+		// ===== Bone Browser 및 Attach 기능 =====
 		if (m_pRootComponent)
 		{
-			auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_pRootComponent);
-			if (skinned)
+			auto skinnedRoot = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_pRootComponent);
+			if (skinnedRoot)
 			{
-				auto skeletalMesh = skinned->GetMesh();
+				auto skeletalMesh = skinnedRoot->GetMesh();
 				if (skeletalMesh)
 				{
 					const auto& boneMap = skeletalMesh->GetSkeletonList();
@@ -365,8 +369,10 @@ void TestSY::Update()
 
 						for (auto it = boneMap.begin(); it != boneMap.end(); ++it)
 						{
-							const std::wstring& wname = it->first;
-							std::string boneName(wname.begin(), wname.end());
+							const auto& boneNameW = it->first;
+							const BoneNode& bone = it->second;
+
+							std::string boneName(boneNameW.begin(), boneNameW.end());
 							boneNames.push_back(boneName);
 							boneNamePtrs.push_back(boneNames.back().c_str());
 						}
@@ -374,59 +380,86 @@ void TestSY::Update()
 						if (!boneNamePtrs.empty())
 							ImGui::Combo("Attach Bone", &m_iSelectedBoneIndex, boneNamePtrs.data(), (int)boneNamePtrs.size());
 					}
-				}
-			}
-		}
 
-		// ===== 자식 컴포넌트 Attach =====
-		if (ImGui::Button("Attach To Root"))
-		{
-			if (m_pRootComponent)
-			{
-				auto skinnedRoot = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_pRootComponent);
-				auto childMesh = m_vMeshList[m_iSelectedMeshIndex];
-
-				if (skinnedRoot && childMesh)
-				{
-					auto skinnedChild = std::dynamic_pointer_cast<USkinnedMeshComponent>(childMesh);
-					auto staticChild = std::dynamic_pointer_cast<UStaticMeshComponent>(childMesh);
-
-					if (skinnedChild)
+					if (ImGui::Button("Attach To Root"))
 					{
-						auto anim = skinnedRoot->GetAnimInstance();
-						skinnedChild->SetBaseAnim(anim);
-						//skinnedChild->SetTargetBoneIndex(m_iSelectedBoneIndex);
-						skinnedRoot->AddChild(skinnedChild);
-						ImGui::TextColored(ImVec4(0, 1, 0, 1), "Skinned child attached to root.");
-					}
-					else if (staticChild)
-					{
-						auto anim = skinnedRoot->GetAnimInstance();
-						staticChild->SetAnimInstance(anim);
-						staticChild->SetTargetBoneIndex(m_iSelectedBoneIndex);
-						skinnedRoot->AddChild(staticChild);
-						ImGui::TextColored(ImVec4(0, 1, 0, 1), "Static child attached to root.");
+						auto skinnedChild = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[m_iSelectedMeshIndex]);
+						auto staticChild = std::dynamic_pointer_cast<UStaticMeshComponent>(m_vMeshList[m_iSelectedMeshIndex]);
+
+						if (skinnedChild)
+						{
+							auto anim = skinnedRoot->GetAnimInstance();
+							skinnedChild->SetBaseAnim(anim);
+							//skinnedChild->SetTargetBoneIndex(m_iSelectedBoneIndex);
+							skinnedRoot->AddChild(skinnedChild);
+							ImGui::TextColored(ImVec4(0, 1, 0, 1), "Skinned child attached to root.");
+						}
+						else if (staticChild)
+						{
+							auto anim = skinnedRoot->GetAnimInstance();
+							staticChild->SetAnimInstance(anim);
+							staticChild->SetTargetBoneIndex(m_iSelectedBoneIndex);
+							skinnedRoot->AddChild(staticChild);
+							ImGui::TextColored(ImVec4(0, 1, 0, 1), "Static child attached to root.");
+						}
 					}
 				}
 			}
 		}
 
-		// ===== 최종 Actor 생성 =====
-		if (ImGui::Button("Finalize Actor"))
+		// ===== 스크립트 부착 =====
+		static int scriptType = 0;
+		const char* scriptTypes[] = { "None", "PlayerMoveScript", "EnemyAIScript" };
+		ImGui::Combo("Script", &scriptType, scriptTypes, IM_ARRAYSIZE(scriptTypes));
+
+		// ===== Actor 최종 생성 =====
+		if (ImGui::Button("Finalize Actor Creation"))
 		{
 			if (m_pRootComponent)
 			{
 				auto actor = std::make_shared<APawn>();
 				actor->SetMeshComponent(m_pRootComponent);
-				actor->SetScale(Vec3(10.f, 10.f, 10.f));
+				actor->SetPosition(Vec3(0.f, 0.f, 0.f));
+
+				// 스크립트 부착
+				if (scriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
+				//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
+
 				actor->Init();
 				m_vPreviewActors.push_back(actor);
-				OBJECTMANAGER->AddActorList(m_vPreviewActors);
-				ImGui::TextColored(ImVec4(0, 1, 0, 1), "Actor finalized with attached components.");
+				OBJECTMANAGER->AddActor(actor);
+
+				ImGui::TextColored(ImVec4(0, 1, 0, 1), "Actor finalized and created.");
+				m_pRootComponent = nullptr;  // 초기화
+			}
+			else
+			{
+				ImGui::TextColored(ImVec4(1, 0, 0, 1), "Root Component not set.");
 			}
 		}
 
+		// ===== 월드 배치 저장 =====
+		static char savePath[256] = "../Resources/Prafab/MyScene.scene.json";
+		ImGui::InputText("Save Path", savePath, IM_ARRAYSIZE(savePath));
+
+		if (ImGui::Button("Save Scene"))
+		{
+			if (PREFAB->SaveScene(savePath, m_vPrefabList))
+			{
+				ImGui::TextColored(ImVec4(0, 1, 0, 1), "Scene saved.");
+			}
+		}
+
+		if (ImGui::Button("Load Scene"))
+		{
+			if (PREFAB->LoadScene(savePath, m_vPrefabList))
+			{
+				OBJECTMANAGER->AddActorList(m_vPreviewActors);
+				ImGui::TextColored(ImVec4(0, 1, 0, 1), "Scene loaded.");
+			}
+		}
 	}
+
 }
 
 void TestSY::Render()
