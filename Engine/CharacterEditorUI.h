@@ -1,6 +1,7 @@
 #pragma once
 #include "FbxLoader.h"
 #include "ActorLoader.h"
+#include "PrefabLoader.h"
 
 class CharacterEditorUI
 {
@@ -37,6 +38,12 @@ private:
     std::shared_ptr<ActorLoader> m_pLoader;
     std::vector<std::shared_ptr<UMeshComponent>> m_vMeshList;
     std::shared_ptr<UMeshComponent> m_pRootComponent;
+
+    //std::shared_ptr<APawn> m_pPreviewActor;
+    std::vector<std::shared_ptr<AActor>> m_vPreviewActors;
+
+    // Prefab
+    std::vector<PrefabData> m_vPrefabList;
 
     std::function<void(
         std::shared_ptr<UMeshComponent> rootComponent,

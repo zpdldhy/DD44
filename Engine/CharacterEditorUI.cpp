@@ -2,6 +2,7 @@
 #include "CharacterEditorUI.h"
 #include "USkinnedMeshComponent.h"
 #include "UStaticMeshComponent.h"
+#include "ObjectManager.h"
 
 bool CharacterEditorUI::m_bRootSet = false;
 bool CharacterEditorUI::m_bChildAttached = false;
@@ -237,6 +238,94 @@ void CharacterEditorUI::DrawUI()
         m_bChildAttached = false;
     }
 
+    ImGui::Separator();
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Character Save/Load");
+
+    static char characterSavePath[256] = "../Resources/Prefab/MyCharacter.prefab.json";
+    ImGui::InputText("Character Path##Save", characterSavePath, IM_ARRAYSIZE(characterSavePath));
+
+    if (ImGui::Button("Save##Character"))
+    {
+        CharacterPrefabData data;
+        data.Name = "MyCharacter";
+        data.RootMeshPath = m_szAssetPath;
+        data.ShaderPath = m_szShaderName;
+        data.TexturePath = m_szTextureName;
+        data.ScriptType = m_iSelectedScriptIndex;
+        data.AnimIndex = m_iSelectedAnimIndex;
+
+        auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
+        data.AnimSpeed = animInstance ? animInstance->m_fAnimPlayRate : 1.0f;
+
+        data.Scale = Vec3(m_fScale[0], m_fScale[1], m_fScale[2]);
+        data.Rotation = Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]);
+        data.Translation = Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]);
+
+        // 자식 메쉬 정보 수집 (필요 시 확장 가능)
+        for (int i = 0; i < m_iChildIndex; ++i)
+        {
+            auto child = m_pRootComponent->GetChild(i);
+            if (child)
+            {
+                CharacterPrefabData::ChildMeshData childData;
+                // 경로 정보는 없으니 이름을 임시 저장하거나, 로직 확장 필요
+                childData.MeshPath = "Unknown";
+                childData.TargetBoneIndex = m_iSelectedBoneIndex;
+                data.ChildMeshes.push_back(childData);
+            }
+        }
+
+        PREFAB->SaveCharacter(data, characterSavePath);
+    }
+
+    static char characterLoadPath[256] = "../Resources/Prefab/MyCharacter.prefab.json";
+    ImGui::InputText("Character Path##Load", characterLoadPath, IM_ARRAYSIZE(characterLoadPath));
+
+    if (ImGui::Button("Load##Character"))
+    {
+        CharacterPrefabData data;
+        if (PREFAB->LoadCharacter(characterLoadPath, data))
+        {
+            // 에셋 경로 적용
+            strcpy_s(m_szAssetPath, data.RootMeshPath.c_str());
+
+            // 쉐이더 / 텍스처 경로 적용
+            strcpy_s(m_szShaderName, data.ShaderPath.c_str());
+            strcpy_s(m_szTextureName, data.TexturePath.c_str());
+
+            // 스크립트, 애니메이션 설정
+            m_iSelectedScriptIndex = data.ScriptType;
+            m_iSelectedAnimIndex = data.AnimIndex;
+
+            // 애니메이션 속도는 로더에서 추후 적용 필요
+            auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
+            if (animInstance)
+            {
+                animInstance->m_fAnimPlayRate = data.AnimSpeed;
+            }
+
+            // Transform 적용
+            m_fScale[0] = data.Scale.x; m_fScale[1] = data.Scale.y; m_fScale[2] = data.Scale.z;
+            m_fRotation[0] = data.Rotation.x; m_fRotation[1] = data.Rotation.y; m_fRotation[2] = data.Rotation.z;
+            m_fPosition[0] = data.Translation.x; m_fPosition[1] = data.Translation.y; m_fPosition[2] = data.Translation.z;
+
+            // 캐릭터 로드 후 메시 로드 실행 유도
+            if (!m_pLoader)
+            {
+                m_pLoader = std::make_shared<ActorLoader>();
+            }
+            m_pLoader->LoadOne(m_szAssetPath);
+            m_vMeshList = m_pLoader->LoadMesh();
+            m_iSelectedMeshIndex = 0;
+
+            // 자식 메쉬는 현재 로직 상에서는 경로 기반이 아니라 추가 로직 필요
+            // 향후 확장 예정
+        }
+    }
+
+    ImGui::Separator();
+
+    // 새로운 캐릭터 생성 시 초기화
     if (ImGui::Button("Reset"))
     {
         m_pRootComponent = nullptr;

@@ -5,6 +5,19 @@
 #include "ActorLoader.h"
 #include "PrefabLoader.h"
 
+struct FCharacterBuildData
+{
+	std::shared_ptr<UMeshComponent> RootComponent;
+	Vec3 Position;
+	Vec3 Rotation;
+	Vec3 Scale;
+	int ScriptType;
+	std::string TexturePath;
+	std::string ShaderPath;
+	int AnimIndex;
+	float AnimSpeed;
+};
+
 class TestSY : public IExecute
 {
 public:

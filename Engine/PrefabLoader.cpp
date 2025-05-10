@@ -99,3 +99,72 @@ bool PrefabLoader::LoadScene(const std::string& _filepath, std::vector<PrefabDat
 
     return true;
 }
+
+bool PrefabLoader::SaveCharacter(const CharacterPrefabData& data, const std::string& filePath)
+{
+    json j;
+    j["Name"] = data.Name;
+    j["RootMeshPath"] = data.RootMeshPath;
+    j["ShaderPath"] = data.ShaderPath;
+    j["TexturePath"] = data.TexturePath;
+    j["ScriptType"] = data.ScriptType;
+    j["AnimIndex"] = data.AnimIndex;
+    j["AnimSpeed"] = data.AnimSpeed;
+
+    j["Scale"] = { data.Scale.x, data.Scale.y, data.Scale.z };
+    j["Rotation"] = { data.Rotation.x, data.Rotation.y, data.Rotation.z };
+    j["Translation"] = { data.Translation.x, data.Translation.y, data.Translation.z };
+
+    for (const auto& child : data.ChildMeshes)
+    {
+        j["ChildMeshes"].push_back({
+            { "MeshPath", child.MeshPath },
+            { "TargetBoneIndex", child.TargetBoneIndex }
+            });
+    }
+
+    std::ofstream file(filePath);
+    if (!file.is_open()) return false;
+
+    file << j.dump(4);
+    return true;
+}
+
+bool PrefabLoader::LoadCharacter(const std::string& filePath, CharacterPrefabData& data)
+{
+    std::ifstream file(filePath);
+    if (!file.is_open()) return false;
+
+    json j;
+    file >> j;
+
+    data.Name = j["Name"];
+    data.RootMeshPath = j["RootMeshPath"];
+    data.ShaderPath = j["ShaderPath"];
+    data.TexturePath = j["TexturePath"];
+    data.ScriptType = j["ScriptType"];
+    data.AnimIndex = j["AnimIndex"];
+    data.AnimSpeed = j["AnimSpeed"];
+
+    auto s = j["Scale"];
+    data.Scale = Vec3(s[0], s[1], s[2]);
+
+    auto r = j["Rotation"];
+    data.Rotation = Vec3(r[0], r[1], r[2]);
+
+    auto t = j["Translation"];
+    data.Translation = Vec3(t[0], t[1], t[2]);
+
+    if (j.contains("ChildMeshes"))
+    {
+        for (const auto& child : j["ChildMeshes"])
+        {
+            CharacterPrefabData::ChildMeshData childData;
+            childData.MeshPath = child["MeshPath"];
+            childData.TargetBoneIndex = child["TargetBoneIndex"];
+            data.ChildMeshes.push_back(childData);
+        }
+    }
+
+    return true;
+}
