@@ -71,7 +71,14 @@ void CharacterEditorUI::DrawUI()
         }
         ImGui::Combo("Anim", &m_iSelectedAnimIndex, animNamePtrs.data(), (int)animNamePtrs.size());
 
-        ImGui::SliderFloat("Anim Speed", &animInstance->m_fAnimPlayRate, 1.0f, 60.0f, "%.1f");
+        static float tempAnimPlayRate = 1.0f;
+        if (tempAnimPlayRate == 1.0f)
+            tempAnimPlayRate = animInstance->m_fAnimPlayRate;
+
+        ImGui::SliderFloat("Anim Speed", &tempAnimPlayRate, 1.0f, 60.0f, "%.1f");
+        animInstance->m_fAnimPlayRate = tempAnimPlayRate;
+
+        animInstance->SetCurrentAnimTrack(m_iSelectedAnimIndex);
     }
 
     // Child Mesh ¼³Á¤

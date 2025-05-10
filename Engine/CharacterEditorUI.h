@@ -39,9 +39,6 @@ private:
     std::vector<std::shared_ptr<UMeshComponent>> m_vMeshList;
     std::shared_ptr<UMeshComponent> m_pRootComponent;
 
-    //std::shared_ptr<APawn> m_pPreviewActor;
-    std::vector<std::shared_ptr<AActor>> m_vPreviewActors;
-
     // Prefab
     std::vector<PrefabData> m_vPrefabList;
 
