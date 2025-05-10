@@ -2,7 +2,6 @@
 #include "CharacterEditorUI.h"
 #include "USkinnedMeshComponent.h"
 #include "UStaticMeshComponent.h"
-#include "ObjectManager.h"
 
 bool CharacterEditorUI::m_bRootSet = false;
 bool CharacterEditorUI::m_bChildAttached = false;
