@@ -138,6 +138,8 @@ public:
 	void GetAnimationTrack(int animTrack, int Count);
 	void GetAnimation(int animTrack, AnimTrackData* track);
 	vector<Matrix> GetNodeAnimation(FbxNode* node, AnimTrackData* track);
+
+
 public:
 	string ParseMaterial(FbxSurfaceMaterial* _pSurface);
 	FbxColor ReadColor(FbxMesh* mesh, DWORD dwVertexColorCount, FbxLayerElementVertexColor* pVertexColorSet, DWORD dwDCCIndex, DWORD dwVertexIndex);

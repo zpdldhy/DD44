@@ -26,6 +26,9 @@
 #include "PlayerMoveScript.h"
 #include "UAnimInstance.h"
 #include "USkinnedMeshComponent.h"
+#include "ActorLoader.h"
+#include "USkeletalMeshResources.h"
+#include "PrefabLoader.h"
 
 void TestSY::Init()
 {
@@ -159,29 +162,29 @@ void TestSY::Init()
 	}
 
 	GUI->SetCharacterEditorCallback(
-		[this](int actorType, int compType, const char* assetPath, Vec3 pos, Vec3 rot, Vec3 scale, int scriptType)
+		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position, const Vec3& rotation, const Vec3& scale, int scriptType)
 		{
-			auto loader = std::make_shared<ActorLoader>();
-			auto actor = loader->LoadOne(assetPath);
-			if (!actor) return;
+			if (!rootComponent)
+			{
+				return;
+			}
 
-			actor->SetPosition(pos);
-			actor->SetRotation(rot);
+			auto actor = std::make_shared<AActor>();
+			actor->SetMeshComponent(rootComponent);
+
+			actor->SetPosition(position);
+			actor->SetRotation(rotation);
 			actor->SetScale(scale);
+
+			if (scriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
+			//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
 
 			auto cam = std::make_shared<UCameraComponent>();
 			cam->SetPosition(Vec3(10, 10, -10));
 			actor->SetCameraComponent(cam);
 
-			if (scriptType == 1)
-				actor->AddScript(std::make_shared<PlayerMoveScript>());
-			else if (scriptType == 2)
-				//actor->AddScript(std::make_shared<EnemyAIScript>());
-
-				actor->Init();
 			OBJECTMANAGER->AddActor(actor);
-		}
-	);
+		});
 
 	GUI->SetMapEditorCallback([this]()
 	{
@@ -281,251 +284,14 @@ void TestSY::Update()
 	{
 		m_pActor->SetDelete(true);
 	}
-
-
-	// 하나의 actor 조작 가능
-	{
-		//if (ImGui::Button("Load Asset"))
-		//{
-		//	const char* meshNames[] = { "crow", "eye", "sword", "sword_effect1", "sword_effect2", "sword_effect3" };
-
-		//	m_pLoader = std::make_shared<ActorLoader>();
-		//	m_pLoader->LoadOne("../Resources/Asset/crow_final.asset");
-
-		//	m_vMeshList = m_pLoader->LoadMesh();
-		//	m_iSelectedMeshIndex = 0;
-
-		//	m_vMeshLabelPtrs.clear();
-		//	for (int i = 0; i < m_vMeshList.size(); ++i)
-		//	{
-		//		m_vMeshLabelPtrs.push_back(meshNames[i]);
-		//	}
-
-		//	// 애니메이션도 함께 로드
-		//	m_pLoader->LoadAnim();
-		//	m_iSelectedAnimIndex = 0;
-		//}
-
-		//if (!m_vMeshList.empty())
-		//{
-		//	ImGui::Combo("Mesh", &m_iSelectedMeshIndex, m_vMeshLabelPtrs.data(), (int)m_vMeshLabelPtrs.size());
-
-		//	// 애니메이션 간단 리스트
-		//	if (!m_pLoader->m_vAnimInstanceList.empty())
-		//	{
-		//		auto animInstance = m_pLoader->m_vAnimInstanceList[0];
-		//		const auto& animList = animInstance->GetAnimTrackList();
-
-		//		static std::vector<std::string> animNames;
-		//		static std::vector<const char*> animNamePtrs;
-
-		//		animNames.clear();
-		//		animNamePtrs.clear();
-
-		//		for (const auto& anim : animList)
-		//		{
-		//			std::wstring wname = anim.m_szName;
-		//			std::string name(wname.begin(), wname.end());
-		//			animNames.push_back(name);
-		//			animNamePtrs.push_back(animNames.back().c_str());
-		//		}
-
-		//		ImGui::Combo("Anim", &m_iSelectedAnimIndex, animNamePtrs.data(), (int)animNamePtrs.size());
-		//		ImGui::SliderFloat("Anim Speed", &animInstance->m_fAnimPlayRate, 1.0f, 60.0f, "%.1f");
-		//	}
-
-		//	if (ImGui::Button("Create Actor"))
-		//	{
-		//		m_pPreviewActor = std::make_shared<APawn>();
-		//		auto selectedMesh = m_vMeshList[m_iSelectedMeshIndex];
-		//		m_pPreviewActor->SetMeshComponent(selectedMesh);
-
-		//		// 애니메이션 적용
-		//		if (!m_pLoader->m_vAnimInstanceList.empty())
-		//		{
-		//			auto anim = m_pLoader->m_vAnimInstanceList[0];
-		//			anim->SetCurrentAnimTrack(m_iSelectedAnimIndex);
-
-		//			auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(selectedMesh);
-		//			if (skinned)
-		//			{
-		//				//skinned->SetAnimInstance(anim);
-		//			}
-		//		}
-
-		//		m_pPreviewActor->SetPosition(Vec3(20.f, 0.f, 0.f));
-		//		m_pPreviewActor->SetScale(Vec3(10.f, 10.f, 10.f));
-		//		OBJECTMANAGER->AddActor(m_pPreviewActor);
-		//	}
-		//}
-	}
-
-	// 다수의 actor 생성 및 bone 붙이기
-	{
-		if (ImGui::Button("Load Asset"))
-		{
-			const char* meshNames[] = { "crow", "eye", "sword", "sword_effect1", "sword_effect2", "sword_effect3" };
-
-			m_pLoader = std::make_shared<ActorLoader>();
-			m_pLoader->LoadOne("../Resources/Asset/crow_final.asset");
-
-			m_vMeshList = m_pLoader->LoadMesh();
-			m_iSelectedMeshIndex = 0;
-
-			m_vMeshLabelPtrs.clear();
-			for (int i = 0; i < m_vMeshList.size(); ++i)
-			{
-				m_vMeshLabelPtrs.push_back(meshNames[i]);
-			}
-
-			// 애니메이션도 함께 로드
-			m_pLoader->LoadAnim();
-			m_iSelectedAnimIndex = 0;
-		}
-
-		if (!m_vMeshList.empty())
-		{
-			const char* compTypes[] = { "Skinned", "Static" };
-
-			ImGui::Combo("Mesh", &m_iSelectedMeshIndex, m_vMeshLabelPtrs.data(), (int)m_vMeshLabelPtrs.size());
-			ImGui::Combo("Component Type", &m_iSelectedCompType, compTypes, IM_ARRAYSIZE(compTypes));
-
-			// 애니메이션 간단 리스트
-			if (!m_pLoader->m_vAnimInstanceList.empty())
-			{
-				auto animInstance = m_pLoader->m_vAnimInstanceList[0];
-				const auto& animList = animInstance->GetAnimTrackList();
-
-				static std::vector<std::string> animNames;
-				static std::vector<const char*> animNamePtrs;
-
-				animNames.clear();
-				animNamePtrs.clear();
-
-				for (const auto& anim : animList)
-				{
-					std::wstring wname = anim.m_szName;
-					std::string name(wname.begin(), wname.end());
-					animNames.push_back(name);
-					animNamePtrs.push_back(animNames.back().c_str());
-				}
-
-				ImGui::Combo("Anim", &m_iSelectedAnimIndex, animNamePtrs.data(), (int)animNamePtrs.size());
-				ImGui::SliderFloat("Anim Speed", &animInstance->m_fAnimPlayRate, 1.0f, 60.0f, "%.1f");
-			}
-		}
-
-		if (ImGui::Button("Create Actor"))
-		{
-			// *임의로 Actor 생성 -> mesh component 만드는 구조로
-			auto actor = std::make_shared<APawn>();
-			auto selectedMesh = m_vMeshList[m_iSelectedMeshIndex];
-
-			std::shared_ptr<UMeshComponent> meshComp;
-
-			if (m_iSelectedCompType == 0) // Skinned
-			{
-				meshComp = std::make_shared<USkinnedMeshComponent>();
-				auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(meshComp);
-
-				//skinned->CopyFrom(selectedMesh); // 복사 함수 직접 구현 필요
-
-				if (!m_pLoader->m_vAnimInstanceList.empty())
-				{
-					auto anim = m_pLoader->m_vAnimInstanceList[0];
-					anim->SetCurrentAnimTrack(m_iSelectedAnimIndex);
-					//skinned->SetAnimInstance(anim);
-				}
-			}
-			else // Static
-			{
-				meshComp = std::make_shared<UStaticMeshComponent>();
-				auto staticComp = std::dynamic_pointer_cast<UStaticMeshComponent>(meshComp);
-				//staticComp->CopyFrom(selectedMesh); // 역시 복사 함수 필요
-			}
-
-			// * 메쉬의 본을 찾아 설정해주도록
-			// 본을 넘겨주는 작업이 필요
-			// 
-			//if (!m_vMeshList.empty() && m_iSelectedMeshIndex == 0) // crow만 skinned
-			//{
-			//	auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[0]);
-			//	if (skinned)
-			//	{
-			//		const auto& boneList = skinned->GetBoneList();
-
-			//		m_vBoneLabels.clear();
-			//		m_vBoneLabelPtrs.clear();
-
-			//		for (const auto& bone : boneList)
-			//		{
-			//			std::wstring wname = bone.m_szName;
-			//			std::string name(wname.begin(), wname.end());
-			//			m_vBoneLabels.push_back(name);
-			//			m_vBoneLabelPtrs.push_back(m_vBoneLabels.back().c_str());
-			//		}
-
-			//		ImGui::Combo("Attach Bone", &m_iSelectedBoneIndex, m_vBoneLabelPtrs.data(), (int)m_vBoneLabelPtrs.size());
-			//	}
-			//}
-
-			// *본 행렬을 받아서 본 애니메이션을 월드에 곱해주는 방향으로
-			//if (!m_vMeshList.empty() && m_iSelectedMeshIndex > 0)
-			//{
-			//	auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[0]);
-			//	auto staticComp = std::dynamic_pointer_cast<UStaticMeshComponent>(m_vMeshList[m_iSelectedMeshIndex]);
-
-			//	if (skinned && staticComp && m_pLoader && !m_pLoader->m_vAnimInstanceList.empty())
-			//	{
-			//		auto anim = m_pLoader->m_vAnimInstanceList[0];
-
-			//		// 선택된 본 인덱스의 애니메이션 행렬 가져오기
-			//		Matrix boneMatrix = anim->GetBoneAnim(m_iSelectedBoneIndex);
-
-			//		// static mesh의 로컬 변환과 곱해서 최종 위치 계산
-			//		Matrix local = staticComp->GetLocalTransform();
-			//		Matrix world = boneMatrix * local;
-
-			//		staticComp->SetWorldTransform(world);
-			//	}
-			//}
-
-			actor->SetMeshComponent(selectedMesh);
-			actor->SetScale(Vec3(10.f, 10.f, 10.f));
-			actor->Init();
-			m_vPreviewActors.push_back(actor);
-			OBJECTMANAGER->AddActorList(m_vPreviewActors);
-		}
-	}
-
-	if (ImGui::Button("Attach Selected Mesh to Bone"))
-	{
-		// crow (index 0) = skinned
-		auto skinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[0]);
-
-		// 선택된 static mesh
-		auto staticComp = std::dynamic_pointer_cast<UStaticMeshComponent>(m_vMeshList[m_iSelectedMeshIndex]);
-
-		if (skinned && staticComp && m_iSelectedMeshIndex != 0)
-		{
-			staticComp->SetTargetBoneIndex(m_iSelectedBoneIndex); // 해당 본 인덱스
-			skinned->AddChild(staticComp);                         // 자식으로 등록
-		}
-	}
 }
 
 void TestSY::Render()
 {	
-	if (m_bEditorWireframe)
-	{
-		DC->RSSetState(STATE->m_pRSWireFrame.Get());
-	}
-	else
-	{
-		DC->RSSetState(STATE->m_pRSSolid.Get());
-	}
+
 }
 
 void TestSY::Destroy()
 {
 }
+
