@@ -425,6 +425,7 @@ void TestSY::Update()
 				ImGui::TextColored(ImVec4(0, 1, 0, 1), "Actor finalized with attached components.");
 			}
 		}
+
 	}
 }
 
