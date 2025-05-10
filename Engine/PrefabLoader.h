@@ -15,7 +15,7 @@ struct PrefabData
 	Vec3 Translation;
 };
 
-struct CharacterPrefabData
+struct PrefabCharacterData
 {
     std::string Name;
 
@@ -49,7 +49,7 @@ public:
 	bool SaveScene(const std::string& _filepath, const std::vector<PrefabData>& _placedPrefabs);
 	bool LoadScene(const std::string& _filepath, std::vector<PrefabData>& _placedPrefabs);
 
-    bool SaveCharacter(const CharacterPrefabData& _data, const std::string& _filePath);
-    bool LoadCharacter(const std::string& _filePath, CharacterPrefabData& _data);
+    bool SaveCharacter(const PrefabCharacterData& _data, const std::string& _filePath);
+    bool LoadCharacter(const std::string& _filePath, PrefabCharacterData& _data);
 };
 

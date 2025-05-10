@@ -245,7 +245,7 @@ void CharacterEditorUI::DrawUI()
 
     if (ImGui::Button("Save##Character"))
     {
-        CharacterPrefabData data;
+        PrefabCharacterData data;
         data.Name = "MyCharacter";
         data.RootMeshPath = m_szAssetPath;
         data.ShaderPath = m_szShaderName;
@@ -266,7 +266,7 @@ void CharacterEditorUI::DrawUI()
             auto child = m_pRootComponent->GetChild(i);
             if (child)
             {
-                CharacterPrefabData::ChildMeshData childData;
+                PrefabCharacterData::ChildMeshData childData;
                 // 경로 정보는 없으니 이름을 임시 저장하거나, 로직 확장 필요
                 childData.MeshPath = "Unknown";
                 childData.TargetBoneIndex = m_iSelectedBoneIndex;
@@ -282,7 +282,7 @@ void CharacterEditorUI::DrawUI()
 
     if (ImGui::Button("Load##Character"))
     {
-        CharacterPrefabData data;
+        PrefabCharacterData data;
         if (PREFAB->LoadCharacter(characterLoadPath, data))
         {
             // 에셋 경로 적용

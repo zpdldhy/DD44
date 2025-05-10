@@ -100,7 +100,7 @@ bool PrefabLoader::LoadScene(const std::string& _filepath, std::vector<PrefabDat
     return true;
 }
 
-bool PrefabLoader::SaveCharacter(const CharacterPrefabData& data, const std::string& filePath)
+bool PrefabLoader::SaveCharacter(const PrefabCharacterData& data, const std::string& filePath)
 {
     json j;
     j["Name"] = data.Name;
@@ -130,7 +130,7 @@ bool PrefabLoader::SaveCharacter(const CharacterPrefabData& data, const std::str
     return true;
 }
 
-bool PrefabLoader::LoadCharacter(const std::string& filePath, CharacterPrefabData& data)
+bool PrefabLoader::LoadCharacter(const std::string& filePath, PrefabCharacterData& data)
 {
     std::ifstream file(filePath);
     if (!file.is_open()) return false;
@@ -159,7 +159,7 @@ bool PrefabLoader::LoadCharacter(const std::string& filePath, CharacterPrefabDat
     {
         for (const auto& child : j["ChildMeshes"])
         {
-            CharacterPrefabData::ChildMeshData childData;
+            PrefabCharacterData::ChildMeshData childData;
             childData.MeshPath = child["MeshPath"];
             childData.TargetBoneIndex = child["TargetBoneIndex"];
             data.ChildMeshes.push_back(childData);
