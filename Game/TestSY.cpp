@@ -162,29 +162,29 @@ void TestSY::Init()
 	}
 
 	GUI->SetCharacterEditorCallback(
-		[this](int actorType, int compType, const char* assetPath, Vec3 pos, Vec3 rot, Vec3 scale, int scriptType)
+		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position, const Vec3& rotation, const Vec3& scale, int scriptType)
 		{
-			auto loader = std::make_shared<ActorLoader>();
-			auto actor = loader->LoadOne(assetPath);
-			if (!actor) return;
+			if (!rootComponent)
+			{
+				return;
+			}
 
-			actor->SetPosition(pos);
-			actor->SetRotation(rot);
+			auto actor = std::make_shared<AActor>();
+			actor->SetMeshComponent(rootComponent);
+
+			actor->SetPosition(position);
+			actor->SetRotation(rotation);
 			actor->SetScale(scale);
+
+			if (scriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
+			//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
 
 			auto cam = std::make_shared<UCameraComponent>();
 			cam->SetPosition(Vec3(10, 10, -10));
 			actor->SetCameraComponent(cam);
 
-			if (scriptType == 1)
-				actor->AddScript(std::make_shared<PlayerMoveScript>());
-			else if (scriptType == 2)
-				//actor->AddScript(std::make_shared<EnemyAIScript>());
-
-				actor->Init();
 			OBJECTMANAGER->AddActor(actor);
-		}
-	);
+		});
 
 	GUI->SetMapEditorCallback([this]()
 	{

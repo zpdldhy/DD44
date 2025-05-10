@@ -18,9 +18,6 @@ public:
 
 	bool m_bEditorWireframe = false;
 
-	// Prefab
-	std::vector<PrefabData> m_vPrefabList;
-
 	// Mesh, Animation
 	std::shared_ptr<ActorLoader> m_pLoader;
 	std::shared_ptr<UMeshComponent> m_pRootComponent = nullptr;
@@ -38,6 +35,9 @@ public:
 
 	//std::shared_ptr<APawn> m_pPreviewActor;
 	std::vector<std::shared_ptr<AActor>> m_vPreviewActors;
+
+	// Prefab
+	std::vector<PrefabData> m_vPrefabList;
 	
 
 public:

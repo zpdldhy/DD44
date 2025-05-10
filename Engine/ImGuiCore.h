@@ -21,7 +21,7 @@ public:
 	ObjectEditorUI* GetObjectEditorUI() const { return m_pObjectEditorUI.get(); }
 	EffectEditorUI* GetEffectEditorUI() const { return 	m_pEffectEditorUI.get(); }
 
-	void SetCharacterEditorCallback(std::function<void(int, int, const char*, Vec3, Vec3, Vec3, int)> callback)
+	void SetCharacterEditorCallback(std::function<void(std::shared_ptr<UMeshComponent>, const Vec3&, const Vec3&, const Vec3&, int) > callback)
 	{
 		m_pCharacterEditorUI->SetOnCreateCallback(std::move(callback));
 	}
