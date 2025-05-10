@@ -16,6 +16,7 @@ public:
 	virtual void Destroy() abstract;
 
 public:
+	wstring& GetName() { return m_Name; }
 	void SetName(const wstring& _name) { m_Name = _name; }
 };
 

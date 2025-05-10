@@ -19,6 +19,7 @@ public:
 
 	// Mesh, Animation
 	std::shared_ptr<ActorLoader> m_pLoader;
+	std::shared_ptr<UMeshComponent> m_pRootComponent = nullptr;
 	std::vector<std::shared_ptr<UMeshComponent>> m_vMeshList;
 
 	int m_iSelectedMeshIndex = 0;
@@ -40,5 +41,7 @@ public:
 	void Update() override;
 	void Render() override;
 	void Destroy();
+
+	int GetBoneIndexByName(const std::wstring& boneName);
 };
 

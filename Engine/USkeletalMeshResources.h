@@ -36,5 +36,9 @@ public:
 	void AddSkeleton(map<wstring, BoneNode> _boneList) { m_vSkeletonList = _boneList; }
 	void SetInverseBindPose(vector<Matrix> _inverseBindPose);
 	int GetBoneIndex(wstring _name);
+	const std::map<std::wstring, BoneNode>& GetSkeletonList() const
+	{
+		return m_vSkeletonList;
+	}
 };
 
