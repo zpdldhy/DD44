@@ -20,7 +20,7 @@ ALight::ALight()
     m_pLightComponent->SetIntensity(0.5f);
 
     auto mesh = UStaticMeshComponent::CreateSphere(10, 10);
-    mesh->SetScale(Vec3(1.f, 1.f, 1.f)); // 작게 만들기
+    mesh->SetLocalScale(Vec3(1.f, 1.f, 1.f)); // 작게 만들기
 
     auto material = make_shared<UMaterial>();
     material->Load(L"../Resources/Texture/white.png", L"../Resources/Shader/Default.hlsl");

@@ -21,7 +21,7 @@ void ULightComponent::PushLightData()
 {
 	m_tCBLight.vLightColor_Intensity = Vec4(m_vColor.x, m_vColor.y, m_vColor.z, m_fIntensity);
 	m_tCBLight.vLightDirection_Range = Vec4(GetDirection().x, GetDirection().y, GetDirection().z, m_fRange);
-	m_tCBLight.vLightPosition_Angle = Vec4(GetPosition().x, GetPosition().y, GetPosition().z, m_fAngle);
+	m_tCBLight.vLightPosition_Angle = Vec4(GetLocalPosition().x, GetLocalPosition().y, GetLocalPosition().z, m_fAngle);
 	m_tCBLight.vType_AmbientColor = Vec4(static_cast<float>(m_eLightType), m_vAmbientColor.x, m_vAmbientColor.y, m_vAmbientColor.z);
 	m_tCBLight.vAmbientPower_Padding = Vec4(m_fAmbientPower, 0.0f, 0.0f, 0.0f);
 	DC->UpdateSubresource(m_pCBLight.Get(), 0, nullptr, &m_tCBLight, 0, 0);
