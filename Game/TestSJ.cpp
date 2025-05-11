@@ -161,7 +161,7 @@ void TestSJ::Update()
 	//Rim Light
 	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 	{
-		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetCameraPos();
+		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetLocalPosition();
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
 		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
 	}

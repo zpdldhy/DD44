@@ -311,30 +311,29 @@ void TestSY::SetClickPos()
 	float fWinSizeX = static_cast<float>(g_windowSize.x);
 	float fWinSizeY = static_cast<float>(g_windowSize.y);
 
+	auto pCamera = CAMERAMANAGER->Get3DCameraComponent();
+
 	// To NDC
 	Vec3 vMouseEnd(0.f, 0.f, 1.f);
 	vMouseEnd.x = (2.f * static_cast<float>(mousePos.x) / fWinSizeX) - 1.f;
 	vMouseEnd.y = 1.f - (2.f * static_cast<float>(mousePos.y) / fWinSizeY);
 
 	Matrix mProjViewInvert = Matrix::Identity;
-	(CAMERAMANAGER->Get3DView() * CAMERAMANAGER->Get3DProjection()).Invert(mProjViewInvert);
+	(pCamera->GetView() * pCamera->GetProjection()).Invert(mProjViewInvert);
 
 	vMouseEnd = Vec3::Transform(vMouseEnd, mProjViewInvert);
 
-	m_vMouseRay.position = CAMERAMANAGER->Get3DCameraComponent()->GetCameraPos();
+	m_vMouseRay.position = pCamera->GetLocalPosition();
 	m_vMouseRay.direction = vMouseEnd - m_vMouseRay.position;
 
 	Vec3 vMouseMiddle = (vMouseEnd + m_vMouseRay.position) / 2.f;
 
 	auto pActor = make_shared<APawn>();
 
-	auto pMesh = UStaticMeshComponent::CreateRay();
+	auto pMesh = UStaticMeshComponent::CreateRay(m_vMouseRay.position, vMouseEnd);
 	pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	
 	pActor->SetMeshComponent(pMesh);
-	pActor->SetPosition(vMouseMiddle);
-	//pActor->SetRotation(Vec3(0.f, DD_PI / 2.f, 0.f));
-	pActor->SetScale(Vec3(100.f, 100.f, 100.f));
 
 	auto pMaterial = make_shared<UMaterial>();
 	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");	
