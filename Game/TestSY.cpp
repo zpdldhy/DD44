@@ -184,7 +184,7 @@ void TestSY::Init()
 			//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
 
 			auto cam = std::make_shared<UCameraComponent>();
-			cam->SetPosition(Vec3(10, 10, -10));
+			cam->SetLocalPosition(Vec3(10, 10, -10));
 			actor->SetCameraComponent(cam);
 
 			OBJECTMANAGER->AddActor(actor);
@@ -303,8 +303,6 @@ void TestSY::Destroy()
 {
 }
 
-}
-
 void TestSY::SetClickPos()
 {
 	POINT mousePos = INPUT->GetMousePos();
@@ -314,20 +312,19 @@ void TestSY::SetClickPos()
 	float fWinSizeY = static_cast<float>(g_windowSize.y);
 
 	// To NDC
-	Vec3 vMouseStart(0.f, 0.f, 0.f);
 	Vec3 vMouseEnd(0.f, 0.f, 1.f);
-	vMouseStart.x=vMouseEnd.x = (2.f * static_cast<float>(mousePos.x) / fWinSizeX) - 1.f;
-	vMouseStart.x=vMouseEnd.y = 1.f - (2.f * static_cast<float>(mousePos.y) / fWinSizeY);
+	vMouseEnd.x = (2.f * static_cast<float>(mousePos.x) / fWinSizeX) - 1.f;
+	vMouseEnd.y = 1.f - (2.f * static_cast<float>(mousePos.y) / fWinSizeY);
 
 	Matrix mProjViewInvert = Matrix::Identity;
 	(CAMERAMANAGER->Get3DView() * CAMERAMANAGER->Get3DProjection()).Invert(mProjViewInvert);
 
-	vMouseStart= Vec3::Transform(vMouseStart, mProjViewInvert);	
 	vMouseEnd = Vec3::Transform(vMouseEnd, mProjViewInvert);
-	Vec3 vMouseMiddle = (vMouseEnd + vMouseStart) / 2.f;
 
 	m_vMouseRay.position = CAMERAMANAGER->Get3DCameraComponent()->GetCameraPos();
 	m_vMouseRay.direction = vMouseEnd - m_vMouseRay.position;
+
+	Vec3 vMouseMiddle = (vMouseEnd + m_vMouseRay.position) / 2.f;
 
 	auto pActor = make_shared<APawn>();
 
@@ -336,7 +333,7 @@ void TestSY::SetClickPos()
 	
 	pActor->SetMeshComponent(pMesh);
 	pActor->SetPosition(vMouseMiddle);
-	pActor->SetRotation(Vec3(0.f, DD_PI / 2.f, 0.f));
+	//pActor->SetRotation(Vec3(0.f, DD_PI / 2.f, 0.f));
 	pActor->SetScale(Vec3(100.f, 100.f, 100.f));
 
 	auto pMaterial = make_shared<UMaterial>();
