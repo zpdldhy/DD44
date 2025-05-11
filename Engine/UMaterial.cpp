@@ -221,3 +221,9 @@ void UMaterial::SetMaterialParams(const Vec4& _ambient, const Vec4& _diffuse, co
 	m_tMaterialData.vMaterialSpecular = _specular;
 	m_tMaterialData.vMaterialEmissive = _emissive;
 }
+
+void UMaterial::SetUseBloom(bool b_UseBloom)
+{
+	m_bUseBloom = b_UseBloom;
+	m_tEffectData.g_bUseBloom = b_UseBloom ? 1 : 0;
+}

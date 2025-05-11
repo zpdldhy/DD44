@@ -4,6 +4,7 @@
 #include "UMeshComponent.h"
 #include "UMaterial.h"
 #include "DxState.h"
+#include "BlurManager.h"
 
 UINT ObjectManager::ActorCount = 0;
 
@@ -72,6 +73,12 @@ void ObjectManager::Render()
 		pMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
 		DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
 		pRenderActor->Render();
+	}
+
+	if (m_vBloomActorList.size() > 0)
+	{
+		BLUR->Blur(GET_SINGLE(Device)->GetBloomSRV());            // Bloom source: SV_Target1 결과
+		BLUR->RenderCombine(GET_SINGLE(Device)->GetSceneSRV());   // Scene: SV_Target0 결과
 	}
 
 	ClearRenderList();

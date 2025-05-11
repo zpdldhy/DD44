@@ -10,11 +10,12 @@ struct CB_Blur
     Vec2 g_vDirection;
 };
 
-class BlurManager
+class BlurManager : public Singleton<BlurManager>
 {
 public:
     void Init(UINT width, UINT height);
     void Blur(const ComPtr<ID3D11ShaderResourceView>& input);
+    void RenderCombine(const ComPtr<ID3D11ShaderResourceView>& sceneSRV);
 
     ComPtr<ID3D11ShaderResourceView> GetResultSRV() { return m_pResultSRV; }
 
@@ -39,4 +40,5 @@ private:
     // Shader and fullscreen quad
     shared_ptr<Shader> m_pBlurShader;
     shared_ptr<UStaticMeshComponent> m_pScreenQuad;
+    shared_ptr<Shader> m_pCombineShader;
 };

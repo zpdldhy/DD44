@@ -22,6 +22,8 @@ cbuffer CB_Effect : register(b2)
     float4 g_vDissolve; // x = Threshold
     float4 g_vFlashTime; // x = HitFlashTime
     float4 g_vDistortion; // x = Strength, y = Speed, z = Frequency, w = Time
+    int g_bUseBloom; 
+    float3 padding_Bloom;
 };
 
 // b3는 현재 blur에서 사용중.

@@ -76,7 +76,7 @@ shared_ptr<APawn> ActorLoader::LoadOne(string _path)
 		}
 		tempSkinnedMat->SetInputlayout(inputlayout);
 		
-		tempMat->Load(L"../Resources/Texture/sword.png", L"../Resources/Shader/effect.hlsl");
+		tempMat->Load(L"../Resources/Texture/sword.png", L"../Resources/Shader/Effect.hlsl");
 	}
 
 	// Animation

@@ -94,6 +94,9 @@
     <FxCompile Include="..\Resources\Shader\Blur.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\Resources\Shader\CombineShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources\Shader\Header.hlsli">

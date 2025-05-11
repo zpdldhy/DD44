@@ -165,6 +165,7 @@ void TestSJ::Update()
 		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetCameraPos();
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
 		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
+		m_vMeshList[2]->GetMaterial()->SetCameraPos(camPos);
 	}
 	//Emissive
 	{
@@ -314,6 +315,8 @@ void TestSJ::Update()
 			m_pStaticMesh->GetMaterial()->SetHitFlashTime(flashTimer);
 		else if (selected == 1 && m_pStaticMesh2)
 			m_pStaticMesh2->GetMaterial()->SetHitFlashTime(flashTimer);
+		else if (selected == 2)
+			m_vMeshList[2]->GetMaterial()->SetHitFlashTime(flashTimer);
 	}
 	//Sound
 	/*{

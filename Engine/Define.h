@@ -18,5 +18,6 @@
 #define UIMANAGER		GET_SINGLE(UIManager)
 #define OBJECTMANAGER	GET_SINGLE(ObjectManager)
 #define PREFAB      GET_SINGLE(PrefabLoader)
+#define BLUR		GET_SINGLE(BlurManager)
 
 #define DD_PI		3.1415926f

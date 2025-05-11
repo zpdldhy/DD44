@@ -16,31 +16,10 @@ struct CB_EFFECT
 	Vec4 g_vDissolve;        // x = DissolveThreshold
 	Vec4 g_vFlashTime;       // x = HitFlashTime
 	Vec4 g_vDistortion;      // x = Strength, y = Speed, z = Frequency, w = Time
+	int g_bUseBloom = 0;
+	Vec3 _padding;
 };
 
-//struct CB_GLOW
-//{
-//	float g_fGlowPower;
-//	float padding[3];
-//	Vec3 g_vGlowColor;
-//	float dummy = 0.0f;
-//	float g_fHitFlashTime;
-//	float padding2[3];
-//};
-//
-//struct CB_DISSOLVE
-//{
-//	float g_fDissolveThreshold;
-//	float padding[3];
-//};
-//
-//struct CB_UVDistortion
-//{
-//	float g_fDistortionStrength;
-//	float g_fWaveSpeed;
-//	float g_fWaveFrequency;
-//	float g_fDistortionTime;
-//};
 
 struct CB_CAMERA
 {
@@ -54,11 +33,6 @@ struct CB_RMB
 	Vec3 padding;
 };
 
-//struct CB_EMISSIVE
-//{
-//	Vec3 g_vEmissiveColor = Vec3(0, 0, 0);
-//	float g_fEmissivePower = 0.0f;
-//};
 
 struct CB_Material
 {
@@ -105,7 +79,7 @@ public:
 	void SetUseStencil(bool _bUseStencil) { m_bUseStencil = _bUseStencil; }
 	bool IsUseStencil() { return m_bUseStencil; }
 	
-	void SetUseBloom(bool b_UseBloom) { m_bUseBloom = b_UseBloom; }
+	void SetUseBloom(bool b_UseBloom);
 	bool IsUseBloom() const { return m_bUseBloom; }
 	
 
