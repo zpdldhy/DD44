@@ -34,7 +34,7 @@ float4 PS(VS_OUT_RIM input) : SV_Target
 
     // 4. 조명 계산
     float3 ambient = ApplyAmbient();
-    float3 diffuse = ApplyLambertLighting(input.n);
+    float3 diffuse = ApplyLambertLighting(input.n, input.wPos);
     float3 specular = ApplySpecular(input.n, input.wPos);
     float3 emissive = g_vEmissiveColor * g_fEmissivePower;
 
@@ -50,4 +50,5 @@ float4 PS(VS_OUT_RIM input) : SV_Target
 
     // 8. 출력
     return float4(litColor, texColor.a);
+    
 }
