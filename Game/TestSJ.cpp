@@ -21,6 +21,7 @@
 void TestSJ::Init()
 {
 	SOUNDMANAGER->LoadAllSounds();
+
 	LIGHTMANAGER->Init();
 
 	m_pCameraActor = make_shared<ACameraActor>();
