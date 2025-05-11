@@ -86,7 +86,7 @@ void TestYR::Init()
 		//animInstance->SetRootIndex(rootIndex);
 	}
 
-	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 
 	// LOAD ALL TEXTURE
 	{
