@@ -184,7 +184,7 @@ void UCameraComponent::UpdateView()
 	m_matView = DirectX::XMMatrixLookAtLH(m_vWorldPosition, m_vWorldPosition + m_vLook, vUp);
 
 	// Update Rotate - Look이 바꼈기 때문.
-	m_vLocalLook = m_matView.Backward();
+	m_vLocalLook = m_matView.Forward();
 	m_vLocalRight = m_matView.Left();
 	m_vLocalUp = m_matView.Up();
 

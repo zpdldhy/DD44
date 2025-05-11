@@ -340,4 +340,11 @@ void TestSY::SetClickPos()
 	pMesh->SetMaterial(pMaterial);
 
 	OBJECTMANAGER->AddActor(pActor);
+
+	Plane p1(Vec3(100.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
+	Plane p2(Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
+
+	float d = p1.DotNormal(Vec3(0.f, 0.f, 2.f));
+	
+	int i = 0;
 }
