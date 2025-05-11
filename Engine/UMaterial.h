@@ -9,29 +9,38 @@ enum class ERenderMode
 	Silhouette = 1,
 };
 
-struct CB_GLOW
+struct CB_EFFECT
 {
-	float g_fGlowPower;
-	float padding[3];
-	Vec3 g_vGlowColor;
-	float dummy = 0.0f;
-	float g_fHitFlashTime;
-	float padding2[3];
+	Vec4 g_vGlow;            // x = GlowPower, yzw = GlowColor
+	Vec4 g_vEmissive;        // x = EmissivePower, yzw = EmissiveColor
+	Vec4 g_vDissolve;        // x = DissolveThreshold
+	Vec4 g_vFlashTime;       // x = HitFlashTime
+	Vec4 g_vDistortion;      // x = Strength, y = Speed, z = Frequency, w = Time
 };
 
-struct CB_DISSOLVE
-{
-	float g_fDissolveThreshold;
-	float padding[3];
-};
-
-struct CB_UVDistortion
-{
-	float g_fDistortionStrength;
-	float g_fWaveSpeed;
-	float g_fWaveFrequency;
-	float g_fDistortionTime;
-};
+//struct CB_GLOW
+//{
+//	float g_fGlowPower;
+//	float padding[3];
+//	Vec3 g_vGlowColor;
+//	float dummy = 0.0f;
+//	float g_fHitFlashTime;
+//	float padding2[3];
+//};
+//
+//struct CB_DISSOLVE
+//{
+//	float g_fDissolveThreshold;
+//	float padding[3];
+//};
+//
+//struct CB_UVDistortion
+//{
+//	float g_fDistortionStrength;
+//	float g_fWaveSpeed;
+//	float g_fWaveFrequency;
+//	float g_fDistortionTime;
+//};
 
 struct CB_CAMERA
 {
@@ -45,11 +54,11 @@ struct CB_RMB
 	Vec3 padding;
 };
 
-struct CB_EMISSIVE
-{
-	Vec3 g_vEmissiveColor = Vec3(0, 0, 0);
-	float g_fEmissivePower = 0.0f;
-};
+//struct CB_EMISSIVE
+//{
+//	Vec3 g_vEmissiveColor = Vec3(0, 0, 0);
+//	float g_fEmissivePower = 0.0f;
+//};
 
 struct CB_Material
 {
@@ -67,29 +76,22 @@ class UMaterial
 	shared_ptr<Shader> m_pShader = nullptr;
 	shared_ptr<Texture> m_pTexture = nullptr;
 	shared_ptr<Inputlayout> m_pInputlayout = nullptr;
-	ComPtr<ID3D11Buffer> m_pGlowCB;
-	ComPtr<ID3D11Buffer> m_pDissolveCB;
+	ComPtr<ID3D11Buffer> m_pEffectCB;
 	ComPtr<ID3D11ShaderResourceView> m_pNoiseSRV;
-	ComPtr<ID3D11Buffer> m_pUVDistortionCB;
 	ComPtr<ID3D11Buffer> m_pCameraCB;
 	ComPtr<ID3D11Buffer> m_pRenderModeBuffer;
-	ComPtr<ID3D11Buffer> m_pEmissiveCB;
 	ComPtr<ID3D11Buffer> m_pCBMaterial;
 public:
-	void CreateGlowCB();
-	void CreateDissolveCB();
-	void CreateUVDistortionCB();
+	void CreateEffectCB();
 	void CreateCameraCB();
 	void CreateRenderModeCB();
-	void CreateEmissiveCB();
 	void CreateMaterialCB();
-	void UpdateGlowBuffer();
-	void UpdateDissolveBuffer();
-	void UpdateUVDistortionBuffer(float _deltaTime);
+	
+	void UpdateEffectBuffer();
 	void UpdateCameraBuffer();
 	void UpdateRenderModeBuffer();
-	void UpdateEmissiveBuffer();
 	void UpdateMaterialBuffer();
+	
 	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
 	void SetHitFlashTime(float _flashTime);
 	void SetDissolveParams(float _threshold);
@@ -108,13 +110,10 @@ public:
 	
 
 public:
-	CB_GLOW m_tGlowData = { 0.0f, };
-	CB_DISSOLVE m_tDissolveData = { 0.0f };
-	CB_UVDistortion m_tUVDistortion = { };
+	CB_EFFECT m_tEffectData = {};
 	CB_CAMERA m_tCameraData;
 	CB_RMB m_tRenderModeData;
 	ERenderMode m_eRenderMode = ERenderMode::Default;
-	CB_EMISSIVE m_tEmissiveData;
 	CB_Material m_tMaterialData;
 
 public:

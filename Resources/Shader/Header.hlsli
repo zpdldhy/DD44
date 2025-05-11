@@ -15,25 +15,16 @@ cbuffer CameraBuffer : register(b1)
     row_major matrix g_matProj;
 };
 
-cbuffer cbGlowFX : register(b2)
+cbuffer CB_Effect : register(b2)
 {
-    float g_fGlowPower; // 발광 세기
-    float3 padding_glow;
-    float3 g_vGlowColor; // 발광 색상
-    float dummy_glow;
-    float g_fHitFlashTime;
-}
-cbuffer cbDissolve : register(b3)
-{
-    float g_fDissolveThreshold;
-}
-cbuffer CB_UVDistortion : register(b4)
-{
-    float g_fDistortionStrength; // 왜곡 세기 (예: 0.01 ~ 0.1)
-    float g_fWaveSpeed; // 시간 흐름 속도 (예: 1.0)
-    float g_fWaveFrequency; // 파장 (예: 10.0)
-    float g_fDistortionTime; // 누적 시간 (프레임마다 누적됨)
+    float4 g_vGlow; // x = Power, yzw = Color
+    float4 g_vEmissive; // x = Power, yzw = Color
+    float4 g_vDissolve; // x = Threshold
+    float4 g_vFlashTime; // x = HitFlashTime
+    float4 g_vDistortion; // x = Strength, y = Speed, z = Frequency, w = Time
 };
+
+// b3는 현재 blur에서 사용중.
 
 cbuffer AnimationBuffer : register(b5)
 {
@@ -62,22 +53,16 @@ cbuffer CB_Light : register(b8)
     float3 g_vLightPosition;
     float g_fAngle;
 
-    int g_iLightType; // 0 = Dir, 1 = Point, 2 = Spot
+    int g_iLightType; 
     float3 g_vAmbientColor;
 
-    float g_fAmbientPower; // 
-    float3 padding_light; // 
+    float g_fAmbientPower; 
+    float3 padding_light; 
 };
 
 cbuffer InverseBoneBuffer : register(b9)
 {
     matrix obj_matBone[MAX_BONE];
-}
-
-cbuffer CB_Emissive : register(b10)
-{
-    float3 g_vEmissiveColor;
-    float g_fEmissivePower;
 }
 
 cbuffer CB_Material : register(b11)
@@ -87,6 +72,7 @@ cbuffer CB_Material : register(b11)
     float4 g_vMaterialSpecular; // 물체의 specular 반사율
     float4 g_vMaterialEmissive; // 물체의 emissive 자발광 색
 };
+
 
 struct VS_IN
 {
@@ -126,10 +112,17 @@ struct VS_OUT_RIM
     float3 wPos : POSITIONWS;
 };
 
+#ifdef USE_BLOOM
+struct PS_OUT {
+    float4 color : SV_Target0;
+    float4 bloom : SV_Target1;
+};
+#else
 struct PS_OUT
 {
     float4 c : SV_Target;
 };
+#endif
 
 Texture2D g_txDiffuseA : register(t0);
 Texture2D g_txNoise : register(t1); // 노이즈 텍스처
@@ -143,24 +136,27 @@ SamplerState sample : register(s0);
 
 float2 GetDistortedUV(float2 uv)
 {
-    float waveX = sin(uv.y * g_fWaveFrequency + g_fDistortionTime * g_fWaveSpeed);
-    float waveY = cos(uv.x * g_fWaveFrequency + g_fDistortionTime * g_fWaveSpeed);
-    return uv + float2(waveX, waveY) * g_fDistortionStrength;
+    float waveX = sin(uv.y * g_vDistortion.z + g_vDistortion.w * g_vDistortion.y);
+    float waveY = cos(uv.x * g_vDistortion.z + g_vDistortion.w * g_vDistortion.y);
+    return uv + float2(waveX, waveY) * g_vDistortion.x;
 }
 
 bool ShouldDissolve(float2 distortedUV)
 {
     float noise = g_txNoise.Sample(sample, distortedUV).r;
-    return noise < g_fDissolveThreshold;
+    return noise < g_vDissolve.x;
 }
 
 float3 ApplyGlow(float3 baseColor)
 {
-    float3 glow = g_vGlowColor.rgb * g_fGlowPower;
+    float glowPower = g_vGlow.x;
+    float3 glowColor = g_vGlow.yzw;
+
+    float3 glow = glowColor * glowPower;
     float3 toneMapped = (baseColor + glow) / (baseColor + glow + 1.0f);
-    float3 softGlow = lerp(baseColor, toneMapped, saturate(g_fGlowPower));
-    float glowFactor = saturate((g_fGlowPower - 1.0f) * 0.5f);
-    float3 strongGlow = g_vGlowColor.rgb * glowFactor;
+    float3 softGlow = lerp(baseColor, toneMapped, saturate(glowPower));
+    float glowFactor = saturate((glowPower - 1.0f) * 0.5f);
+    float3 strongGlow = glowColor * glowFactor;
     return lerp(softGlow, strongGlow, glowFactor);
 }
 
@@ -176,7 +172,7 @@ float3 ApplyRimLight(float3 normal, float3 worldPos)
 
 float3 ApplyHitFlash(float3 baseColor)
 {
-    return lerp(baseColor, float3(1.0f, 1.0f, 1.0f), saturate(g_fHitFlashTime));
+    return lerp(baseColor, float3(1.0f, 0.1f, 0.1f), saturate(g_vFlashTime.x));
 }
 
 float3 ApplyLambertLighting(float3 normal)

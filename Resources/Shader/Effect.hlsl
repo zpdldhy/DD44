@@ -17,7 +17,6 @@ VS_OUT_RIM VS(VS_IN input)
 
 float4 PS(VS_OUT_RIM input) : SV_Target
 {
-    // 실루엣 렌더링 모드
     if (g_iRenderMode == 1)
         return float4(0.2f, 0.2f, 0.2f, 1.0f);
 
@@ -36,18 +35,18 @@ float4 PS(VS_OUT_RIM input) : SV_Target
     float3 ambient = ApplyAmbient();
     float3 diffuse = ApplyLambertLighting(input.n);
     float3 specular = ApplySpecular(input.n, input.wPos);
-    float3 emissive = g_vEmissiveColor * g_fEmissivePower;
+
+    float3 emissive = g_vEmissive.yzw * g_vEmissive.x;
 
     // 5. 조명 적용
     float3 litColor = baseColor * (ambient + diffuse) + specular;
 
-    // 6. Emissive 직접 더함
+    // 6. Emissive 더함
     litColor += emissive;
 
-    // 7. Glow, HitFlash 등 후처리 효과
+    // 7. Glow, HitFlash
     litColor = ApplyGlow(litColor);
     litColor = ApplyHitFlash(litColor);
 
-    // 8. 출력
     return float4(litColor, texColor.a);
 }

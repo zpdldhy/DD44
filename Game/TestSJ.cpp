@@ -129,7 +129,7 @@ void TestSJ::Init()
 		m_pSwordActor->SetMeshComponent(m_vMeshList[2]);
 		m_pSwordActor->SetPosition(Vec3(10.f, 0.0f, 25.0f));
 		m_pSwordActor->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-		m_vMeshList[2]->GetMaterial()->SetUseStencil(true);
+		m_vMeshList[2]->GetMaterial()->SetUseBloom(true);
 	}
 
 
@@ -175,8 +175,8 @@ void TestSJ::Update()
 		static bool bUVInitialized = false;
 		if (!bUVInitialized)
 		{
-			m_pStaticMesh->GetMaterial()->SetUVDistortionParams(0.08f, 1.0f, 15.0f); // strength, speed, frequency
-			m_pStaticMesh2->GetMaterial()->SetUVDistortionParams(0.01f, 1.5f, 8.0f);  // optional: 다른 효과
+			m_pStaticMesh->GetMaterial()->SetUVDistortionParams(0.08f, 1.0f, 15.0f);
+			m_pStaticMesh2->GetMaterial()->SetUVDistortionParams(0.01f, 1.5f, 8.0f);
 			bUVInitialized = true;
 		}
 
@@ -184,11 +184,15 @@ void TestSJ::Update()
 
 		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 		{
-			m_pStaticMesh->GetMaterial()->UpdateUVDistortionBuffer(delta);
+			auto material = m_pStaticMesh->GetMaterial();
+			material->m_tEffectData.g_vDistortion.w += delta * material->m_tEffectData.g_vDistortion.y; // Time += dt * speed
+			material->m_tEffectData.g_vDistortion.w = fmodf(material->m_tEffectData.g_vDistortion.w, DD_PI * 2);
 		}
 		if (m_pStaticMesh2 && m_pStaticMesh2->GetMaterial())
 		{
-			m_pStaticMesh2->GetMaterial()->UpdateUVDistortionBuffer(delta);
+			auto material = m_pStaticMesh2->GetMaterial();
+			material->m_tEffectData.g_vDistortion.w += delta * material->m_tEffectData.g_vDistortion.y;
+			material->m_tEffectData.g_vDistortion.w = fmodf(material->m_tEffectData.g_vDistortion.w, DD_PI * 2);
 		}
 	}
 

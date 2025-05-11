@@ -296,6 +296,9 @@
     <ClInclude Include="CharacterEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="BlurManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -491,6 +494,9 @@
     </ClCompile>
     <ClCompile Include="CharacterEditorUI.cpp">
       <Filter>Utils\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="BlurManager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

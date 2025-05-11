@@ -5,11 +5,11 @@ class ObjectManager : public Singleton<ObjectManager>
 {
 	static UINT ActorCount;
 	map<UINT, shared_ptr<class AActor>> m_vActorList;
-	vector<shared_ptr<class AActor>> m_vRenderActorList;	// Render ÀÌÈÄ Clear
+	vector<shared_ptr<class AActor>> m_vRenderActorList;	
 
 	// Stencil Check¿ë
-	vector<shared_ptr<class AActor>> m_vPreRenderActorList;		// 
-	vector<shared_ptr<class AActor>> m_vPostRenderActorList;	// 
+	vector<shared_ptr<class AActor>> m_vPreRenderActorList;	
+	vector<shared_ptr<class AActor>> m_vPostRenderActorList;
 	vector<shared_ptr<AActor>> m_vBloomActorList;
 
 public:
