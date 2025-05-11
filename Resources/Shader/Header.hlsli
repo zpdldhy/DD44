@@ -1,6 +1,7 @@
 #ifndef COMMON_HLSLI
 #define COMMON_HLSLI
 #define MAX_BONE 250
+#define MAX_LIGHTS 4
 
 static const float g_fShininess = 32.0f;
 
@@ -42,7 +43,7 @@ cbuffer AnimationBuffer : register(b5)
 cbuffer CB_Camera : register(b6)
 {
     float3 g_vCameraPos;
-    float dummy_camera; 
+    float dummy_camera;
 };
 
 cbuffer CB_RenderMode : register(b7)
@@ -51,23 +52,22 @@ cbuffer CB_RenderMode : register(b7)
     float3 padding_rendermode;
 };
 
-cbuffer CB_Light : register(b8)
+struct LightData
 {
-    float3 g_vLightColor;
-    float g_fIntensity;
-
-    float3 g_vLightDirection;
-    float g_fRange;
-
-    float3 g_vLightPosition;
-    float g_fAngle;
-
-    int g_iLightType; // 0 = Dir, 1 = Point, 2 = Spot
-    float3 g_vAmbientColor;
-
-    float g_fAmbientPower; // 
-    float3 padding_light; // 
+    float4 vLightColor_Intensity; // (RGB, Intensity)
+    float4 vLightDirection_Range; // (XYZ, Range)
+    float4 vLightPosition_Angle; // (XYZ, Angle)
+    float4 vType_AmbientColor; // (iLightType, Ambient RGB)
+    float4 vAmbientPower_Padding; // (AmbientPower, padding)
 };
+
+cbuffer CB_LightArray : register(b8)
+{
+    LightData g_arrLights[MAX_LIGHTS];
+    int g_iNumLights;
+    float3 padding_light;
+}
+
 
 cbuffer InverseBoneBuffer : register(b9)
 {
@@ -173,27 +173,122 @@ float3 ApplyHitFlash(float3 baseColor)
     return lerp(baseColor, float3(1.0f, 1.0f, 1.0f), saturate(g_fHitFlashTime));
 }
 
-float3 ApplyLambertLighting(float3 normal)
+float3 UnpackLightColor(int index)
 {
-    float3 lightDir = normalize(-g_vLightDirection);
-    float NdotL = saturate(dot(normal, lightDir));
-    return g_vLightColor * NdotL * g_fIntensity;
+    return g_arrLights[index].vLightColor_Intensity.rgb;
+}
+float UnpackIntensity(int index)
+{
+    return g_arrLights[index].vLightColor_Intensity.a;
+}
+float3 UnpackLightDirection(int index)
+{
+    return g_arrLights[index].vLightDirection_Range.rgb;
+}
+float UnpackRange(int index)
+{
+    return g_arrLights[index].vLightDirection_Range.a;
+}
+float3 UnpackLightPosition(int index)
+{
+    return g_arrLights[index].vLightPosition_Angle.rgb;
+}
+float UnpackAngle(int index)
+{
+    return g_arrLights[index].vLightPosition_Angle.a;
+}
+int UnpackType(int index)
+{
+    return (int) g_arrLights[index].vType_AmbientColor.x;
+}
+float3 UnpackAmbientColor(int index)
+{
+    return g_arrLights[index].vType_AmbientColor.yzw;
+}
+float UnpackAmbientPower(int index)
+{
+    return g_arrLights[index].vAmbientPower_Padding.x;
+}
+
+float3 ApplyLambertLighting(float3 normal, float3 worldPos)
+{
+    float3 result = float3(0, 0, 0);
+    for (int i = 0; i < g_iNumLights; ++i)
+    {
+        float3 lightDir;
+        float attenuation = 1.0f;
+
+        int type = UnpackType(i);
+        if (type == 0)
+        {
+            lightDir = normalize(-UnpackLightDirection(i));
+        }
+        else
+        {
+            float3 toLight = UnpackLightPosition(i) - worldPos;
+            float dist = length(toLight);
+            lightDir = normalize(toLight);
+            attenuation = saturate(1.0 - dist / UnpackRange(i));
+
+            if (type == 2)
+            {
+                float3 spotDir = normalize(-UnpackLightDirection(i));
+                float spotFactor = dot(lightDir, spotDir);
+                float spotCos = cos(radians(UnpackAngle(i)));
+                float spotEffect = smoothstep(spotCos, spotCos + 0.1f, spotFactor);
+                attenuation *= spotEffect;
+            }
+        }
+
+        float NdotL = saturate(dot(normal, lightDir));
+        result += UnpackLightColor(i) * NdotL * UnpackIntensity(i) * attenuation;
+    }
+    return result;
 }
 
 float3 ApplySpecular(float3 normal, float3 worldPos)
 {
-    float3 N = normalize(normal);
-    float3 L = normalize(-g_vLightDirection);
-    float3 V = normalize(g_vCameraPos - worldPos);
-    float3 H = normalize(L + V); // Half vector
+    float3 result = float3(0, 0, 0);
+    for (int i = 0; i < g_iNumLights; ++i)
+    {
+        float3 lightDir;
+        float attenuation = 1.0f;
 
-    float spec = pow(saturate(dot(N, H)), g_fShininess);
-    return g_vLightColor * spec * g_fIntensity* 10.0f ;
+        int type = UnpackType(i);
+        if (type == 0)
+        {
+            lightDir = normalize(-UnpackLightDirection(i));
+        }
+        else
+        {
+            float3 toLight = UnpackLightPosition(i) - worldPos;
+            float dist = length(toLight);
+            lightDir = normalize(toLight);
+            attenuation = saturate(1.0 - dist / UnpackRange(i));
+
+            if (type == 2)
+            {
+                float3 spotDir = normalize(-UnpackLightDirection(i));
+                float spotFactor = dot(lightDir, spotDir);
+                float spotCos = cos(radians(UnpackAngle(i)));
+                float spotEffect = smoothstep(spotCos, spotCos + 0.1f, spotFactor);
+                attenuation *= spotEffect;
+            }
+        }
+
+        float3 N = normalize(normal);
+        float3 V = normalize(g_vCameraPos - worldPos);
+        float3 R = reflect(-lightDir, N);
+
+        float spec = pow(saturate(dot(R, V)), g_fShininess);
+        result += UnpackLightColor(i) * spec * UnpackIntensity(i) * attenuation * 10.0f;
+    }
+    return result;
 }
 
 float3 ApplyAmbient()
 {
-    return g_vAmbientColor * g_fAmbientPower;
+    return UnpackAmbientColor(0) * UnpackAmbientPower(0);
 }
 
 #endif

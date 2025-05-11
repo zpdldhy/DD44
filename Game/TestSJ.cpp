@@ -16,25 +16,27 @@
 #include "ALight.h"
 #include "ActorLoader.h"
 #include "ObjectManager.h"
+#include "LightManager.h"
 
 void TestSJ::Init()
 {
 	SOUNDMANAGER->LoadAllSounds();
 
+	LIGHTMANAGER->Init();
 
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
-		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
+		m_pCameraActor->SetPosition({ 0.0f, 0.0f, -15.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	}
 
 	{
 		m_pActor = make_shared<APawn>();
-
-		m_pStaticMesh = UStaticMeshComponent::CreateSphere(20, 20);
+		m_pStaticMesh = UStaticMeshComponent::CreateCube();
+		//m_pStaticMesh = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pActor->SetMeshComponent(m_pStaticMesh);
 		m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
-		m_pActor->SetPosition({ 0.0f, 0.0f, 10.0f });
+		m_pActor->SetPosition({ 0.0f, 0.0f, 0.0f });
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
@@ -76,12 +78,14 @@ void TestSJ::Init()
 		m_pStaticMesh->GetMaterial()->SetNoiseTexture(noiseTex);
 	}
 
-	m_pLight = make_shared<ALight>();
-	m_pLight->SetPosition(Vec3(0, 0, -10));
-	//	m_pLight->SetRotation(Vec3(0, DD_PI, 0)); // 카메라 방향으로 빛 쏘기
-	m_pLight->SetRotation(Vec3(0, 0, 0)); // 카메라 방향으로 빛 쏘기
-	m_pLight->GetLightComponent()->SetAmbientColor(Vec3(0.0f, 0.0f, 1.0f));
-	m_pLight->GetLightComponent()->SetAmbientPower(0.2f);
+	{
+		m_pLight = make_shared<ALight>();
+		m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+		m_pLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
+		m_pLight->GetLightComponent()->SetAmbientPower(0.3f);
+
+	}
+	
 
 	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 
@@ -131,17 +135,35 @@ void TestSJ::Init()
 		m_pSwordActor->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	}
 
+	{
+		m_pPointLight = make_shared<ALight>();
 
+		m_pPointLight->SetPosition(Vec3(10.0f, 10.0f, 10.0f)); // 눈에 띄도록 위로 띄움
+
+		auto lightComp = m_pPointLight->GetLightComponent();
+		lightComp->SetLightType(ELightType::Point);
+		lightComp->SetColor(Vec3(0.0f, 0.3f, 1.0f));     // 파란빛
+		lightComp->SetIntensity(2.0f);
+		lightComp->SetRange(20.0f);                      // 빛 퍼짐 정도
+	}
+
+	OBJECTMANAGER->AddActor(m_pPointLight);
 	OBJECTMANAGER->AddActor(m_pLight);
 	OBJECTMANAGER->AddActor(m_pCameraActor);
 	OBJECTMANAGER->AddActor(m_pActor);
 	OBJECTMANAGER->AddActor(m_pActor2);
 	OBJECTMANAGER->AddActor(m_pSky);
 	OBJECTMANAGER->AddActor(m_pSwordActor);
+
+	LIGHTMANAGER->Clear();
+	LIGHTMANAGER->RegisterLight(m_pLight);
+	LIGHTMANAGER->RegisterLight(m_pPointLight);
 }
 
 void TestSJ::Update()
 {
+	/*m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	LIGHTMANAGER->UpdateLightCB();*/
 	// 오브젝트 회전
 	{
 		static float angle = 0.0f;
@@ -168,28 +190,29 @@ void TestSJ::Update()
 	//Emissive
 	{
 		m_pStaticMesh2->GetMaterial()->SetEmissiveParams(Vec3(0.0f, 1.0f, 0.0f), 0.1f);
+
 	}
 	//UVDistortion
-	{
-		static bool bUVInitialized = false;
-		if (!bUVInitialized)
-		{
-			m_pStaticMesh->GetMaterial()->SetUVDistortionParams(0.08f, 1.0f, 15.0f); // strength, speed, frequency
-			m_pStaticMesh2->GetMaterial()->SetUVDistortionParams(0.01f, 1.5f, 8.0f);  // optional: 다른 효과
-			bUVInitialized = true;
-		}
+	//{
+	//	static bool bUVInitialized = false;
+	//	if (!bUVInitialized)
+	//	{
+	//		m_pStaticMesh->GetMaterial()->SetUVDistortionParams(0.08f, 1.0f, 15.0f); // strength, speed, frequency
+	//		m_pStaticMesh2->GetMaterial()->SetUVDistortionParams(0.01f, 1.5f, 8.0f);  // optional: 다른 효과
+	//		bUVInitialized = true;
+	//	}
 
-		float delta = TIMER->GetDeltaTime();
+	//	float delta = TIMER->GetDeltaTime();
 
-		if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
-		{
-			m_pStaticMesh->GetMaterial()->UpdateUVDistortionBuffer(delta);
-		}
-		if (m_pStaticMesh2 && m_pStaticMesh2->GetMaterial())
-		{
-			m_pStaticMesh2->GetMaterial()->UpdateUVDistortionBuffer(delta);
-		}
-	}
+	//	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+	//	{
+	//		m_pStaticMesh->GetMaterial()->UpdateUVDistortionBuffer(delta);
+	//	}
+	//	if (m_pStaticMesh2 && m_pStaticMesh2->GetMaterial())
+	//	{
+	//		m_pStaticMesh2->GetMaterial()->UpdateUVDistortionBuffer(delta);
+	//	}
+	//}
 
 
 	{
@@ -379,6 +402,35 @@ void TestSJ::Update()
 			DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	}*/
 	}
+	if (INPUT->GetButton(U)) // X- (왼쪽)
+		m_pPointLight->AddPosition(Vec3(-0.1f, 0.f, 0.f));
+	if (INPUT->GetButton(O)) // X+ (오른쪽)
+		m_pPointLight->AddPosition(Vec3(0.1f, 0.f, 0.f));
+
+	if (INPUT->GetButton(J)) // Y- (아래)
+		m_pPointLight->AddPosition(Vec3(0.f, -0.1f, 0.f));
+	if (INPUT->GetButton(L)) // Y+ (위)
+		m_pPointLight->AddPosition(Vec3(0.f, 0.1f, 0.f));
+
+	if (INPUT->GetButton(I)) // Z+ (앞으로)
+		m_pPointLight->AddPosition(Vec3(0.f, 0.f, 0.1f));
+	if (INPUT->GetButton(K)) // Z- (뒤로)
+		m_pPointLight->AddPosition(Vec3(0.f, 0.f, -0.1f));
+
+	if (INPUT->GetButton(Z)) // 위쪽 (+Y)
+		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 1.f, 0.f));
+	if (INPUT->GetButton(X)) // 아래쪽 (-Y)
+		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, -1.f, 0.f));
+	if (INPUT->GetButton(C)) // 왼쪽 (-X)
+		m_pLight->GetLightComponent()->SetDirection(Vec3(-1.f, 0.f, 0.f));
+	if (INPUT->GetButton(B)) // 오른쪽 (+X)
+		m_pLight->GetLightComponent()->SetDirection(Vec3(1.f, 0.f, 0.f));
+	if (INPUT->GetButton(N)) // 앞으로 (-Z)
+		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, -1.f));
+	if (INPUT->GetButton(M)) // 뒤로 (+Z)
+		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, 1.f));
+
+	LIGHTMANAGER->UpdateLightCB();
 }
 
 void TestSJ::Render()

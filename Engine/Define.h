@@ -18,5 +18,6 @@
 #define UIMANAGER		GET_SINGLE(UIManager)
 #define OBJECTMANAGER	GET_SINGLE(ObjectManager)
 #define PREFAB      GET_SINGLE(PrefabLoader)
+#define LIGHTMANAGER GET_SINGLE(LightManager)
 
 #define DD_PI		3.1415926f
