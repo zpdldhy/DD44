@@ -40,7 +40,7 @@ private:
     std::shared_ptr<UMeshComponent> m_pRootComponent;
 
     // Prefab
-    std::vector<PrefabData> m_vPrefabList;
+    std::vector<std::string> m_vCharacterPrefabList;
 
     std::function<void(
         std::shared_ptr<UMeshComponent> rootComponent,

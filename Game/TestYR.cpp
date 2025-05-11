@@ -118,72 +118,43 @@ void TestYR::Init()
 
 	//targetObj = m_vActorList[targetIndex];
 
-	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
 		{
 			AssimpLoader loader;
-			//vector<MeshData> meshList = loader.Load(objPath);
+			vector<MeshData> meshList = loader.Load(objPath);
 			if (meshList.empty())
 				return;
 
-			// Mesh Component 생성
-			shared_ptr<UMeshComponent> meshComp = meshList[meshType];
+			auto meshComp = make_shared<UStaticMeshComponent>();
 
-			// 머티리얼 설정
+			auto meshRes = make_shared<UStaticMeshResources>();
+			meshRes->SetVertexList(meshList[0].m_vVertexList);
+			meshRes->SetIndexList(meshList[0].m_vIndexList);
+			meshRes->Create();
+
+			meshComp->SetMesh(meshRes);
+
 			auto mat = make_shared<UMaterial>();
 			mat->Load(
 				std::wstring(texPath, texPath + strlen(texPath)),
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
 			);
-
-			if (meshType == 0)
-			{
-				// Animation 세팅
-				shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
-				animTrack->SetBase(animInstanceList[0]);
-				dynamic_cast<USkinnedMeshComponent*>(meshComp.get())->SetBaseAnim(animInstanceList[0]);
-				dynamic_cast<USkinnedMeshComponent*>(meshComp.get())->SetMeshAnim(animTrack);
-				
-				// Material INPUTLAYOUT 
-				mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
-			}
-
 			meshComp->SetMaterial(mat);
 
-			// Actor 생성
-			shared_ptr<AActor> actor;
-			if (actorType == 0)
+			// Snap 적용 여부 확인
+			if (GUI->GetObjectEditorUI()->IsSnapEnabled())
 			{
-				actor = make_shared<APawn>(); // ACharacter로 교체 가능
-			}
-			else if (actorType == 1)
-			{
-				actor = make_shared<APawn>(); // AEnemy로 교체 가능
-			}
-			else if (actorType == 2)
-			{
-				actor = make_shared<APawn>(); // AObject로 교체 가능
+				pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 1.0f);
 			}
 
+			auto actor = make_shared<APawn>();
 			actor->SetMeshComponent(meshComp);
-
-			//// 타일이 있다면 위치 보정
-			//if (!m_vTiles.empty())
-			//{
-			//	float y = m_vTiles.back()->GetHeightAt(pos.x, pos.z);
-			//	pos.y = y + scale.y / 2.0f;
-			//}
-
-
 			actor->SetPosition(pos);
 			actor->SetRotation(rot);
 			actor->SetScale(scale);
-			actor->Init();
 
-			m_vImGuiList.push_back(actor);
+			OBJECTMANAGER->AddActor(actor);
 		});
-
-
-
 }
 void TestYR::Update()
 {

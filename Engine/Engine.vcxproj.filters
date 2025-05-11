@@ -296,6 +296,9 @@
     <ClInclude Include="CharacterEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="PrefabData.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -491,6 +494,9 @@
     </ClCompile>
     <ClCompile Include="CharacterEditorUI.cpp">
       <Filter>Utils\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="PrefabData.cpp">
+      <Filter>Headers\Data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

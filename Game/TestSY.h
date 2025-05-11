@@ -22,5 +22,6 @@ public:
 	void Render() override;
 	void Destroy();
 
+	void LoadAllPrefabs(const std::string& extension);
 };
 
