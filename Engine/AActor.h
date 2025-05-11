@@ -32,10 +32,13 @@ public:
 	// Actor 상태
 	//--------------------------------------------------------------------------------------
 protected:
+	wstring m_szName;
 	UINT m_ActorIndex = 0;	// 고유 번호. 해당 Actor를 빠르게 찾는 로직에서 필요하다.
 	bool m_bDelete = false;	
 
 public:
+	void SetActorName(wstring _szName) { m_szName = _szName; }
+
 	void SetActorIndex(UINT _iIndex) { m_ActorIndex = _iIndex; }
 	UINT GetActorIndex() { return m_ActorIndex; }
 
@@ -52,6 +55,7 @@ protected:
 	vector<shared_ptr<class UScriptComponent>> m_vScript;
 
 public:
+	shared_ptr<USceneComponent> GetTransform() { return m_pTransform; }
 	template<typename T>
 	shared_ptr<T> GetMeshComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
 	shared_ptr<UCameraComponent> GetCameraComponent() { return static_pointer_cast<UCameraComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)]); }
@@ -69,21 +73,17 @@ public:
 	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }
 
 public:
-	const Vec3& GetPosition() const { return m_pTransform->GetPosition(); }
-	const Vec3& GetRotation() const { return m_pTransform->GetRotation(); }
-	const Vec3& GetScale() const { return m_pTransform->GetScale(); }
-	const Vec3& GetLook() const { return m_pTransform->GetLook(); }
-	const Vec3& GetRight() const { return m_pTransform->GetRight(); }
-	const Vec3& GetUp() const { return m_pTransform->GetUp(); }
+	const Vec3& GetPosition() const { return m_pTransform->GetLocalPosition(); }
+	const Vec3& GetRotation() const { return m_pTransform->GetLocalRotation(); }
+	const Vec3& GetScale() const { return m_pTransform->GetLocalScale(); }
+	const Vec3& GetLook() const { return m_pTransform->GetLocalLook(); }
+	const Vec3& GetRight() const { return m_pTransform->GetLocalRight(); }
+	const Vec3& GetUp() const { return m_pTransform->GetLocalUp(); }
 	const Matrix& GetWorld() const { return m_pTransform->GetWorld(); }
 
-	void SetPosition(const Vec3& _pos) { m_pTransform->SetPosition(_pos); }
-	void SetRotation(const Vec3& _rot) { m_pTransform->SetRotation(_rot); }
-	void SetScale(const Vec3& _scale) { m_pTransform->SetScale(_scale); }
-	void AddPosition(const Vec3& _pos) { m_pTransform->AddPosition(_pos); }
-	void AddRotation(const Vec3& _rot) { m_pTransform->AddRotation(_rot); }
+	void SetPosition(const Vec3& _pos) { m_pTransform->SetLocalPosition(_pos); }
+	void SetRotation(const Vec3& _rot) { m_pTransform->SetLocalRotation(_rot); }
+	void SetScale(const Vec3& _scale) { m_pTransform->SetLocalScale(_scale); }
+	void AddPosition(const Vec3& _pos) { m_pTransform->AddLocalPosition(_pos); }
+	void AddRotation(const Vec3& _rot) { m_pTransform->AddLocalRotation(_rot); }
 };
-
-// AActor
-// 위치, 회전, 스케일
-// Component 정보

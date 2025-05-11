@@ -8,14 +8,14 @@
 
 void UBoxComponent::Init()
 {
-	m_vCenter = m_vPosition + GetOwner()->GetPosition();
+	m_vCenter = m_vLocalPosition + GetOwner()->GetPosition();
 
 	CreateCollisionBox();
 }
 
 void UBoxComponent::Tick()
 {
-	m_vCenter = m_vPosition + m_pOwner.lock()->GetPosition();
+	m_vCenter = m_vLocalPosition + m_pOwner.lock()->GetPosition();
 
 	UpdateBounds();
 }
@@ -59,7 +59,7 @@ void UBoxComponent::CreateCollisionBox()
 	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
 	pMesh->SetMaterial(pMaterial);
 
-	m_pCollisionRange->SetScale(m_vScale);
+	m_pCollisionRange->SetScale(m_vLocalScale);
 	m_pCollisionRange->SetPosition(m_vCenter);
 
 	m_pCollisionRange->Init();

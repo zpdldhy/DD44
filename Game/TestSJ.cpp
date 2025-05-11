@@ -87,7 +87,7 @@ void TestSJ::Init()
 	}
 	
 
-	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 
 	GUI->SetEffectEditorCallback(
 		[this](int selected, float glowPower, Vec3 glowColor, float dissolveThreshold, Vec3 emissiveColor, float emissivePower) {

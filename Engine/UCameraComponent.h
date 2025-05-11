@@ -22,12 +22,12 @@ protected:
 
 	// Projection
 	// - Orthographic
-	float m_fWidth = 1440.0f;
-	float m_fHeight = 900.0f;
+	float m_fWidth = static_cast<float>(g_windowSize.x);
+	float m_fHeight = static_cast<float>(g_windowSize.y);
 
 	// - Perspective
 	float m_fFov = 3.14f / 4.0f;
-	float m_fAspect = 1440.0f / 900.0f;
+	float m_fAspect = static_cast<float>(g_windowSize.x) / static_cast<float>(g_windowSize.y);
 	float m_fNear = 0.1f;
 	float m_fFar = 5000.0f;
 
@@ -60,7 +60,7 @@ public:
 	void SetFrustumVisible(bool _bVisible) { m_bVisibleFrustumBox = _bVisible; }
 
 	Matrix GetView() { return m_matView; }
-	Matrix GetProejction() { return m_matProjection; }
+	Matrix GetProjection() { return m_matProjection; }
 
 	Vec3 GetCameraPos() { return m_vEye; }
 	Vec3 GetCameraLook() { return m_vLook; }
