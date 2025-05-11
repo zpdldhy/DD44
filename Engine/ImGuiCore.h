@@ -29,7 +29,7 @@ public:
 	{
 		m_pMapEditorUI->SetOnCreateCallback(std::move(callback));
 	}
-	void SetObjectEditorCallback(std::function<void(int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)> callback)
+	void SetObjectEditorCallback(std::function<void(const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)> callback)
 	{
 		m_pObjectEditorUI->SetOnCreateCallback(std::move(callback));
 	}

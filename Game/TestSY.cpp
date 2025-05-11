@@ -43,6 +43,8 @@ void TestSY::Init()
 		CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 	}
 
+	//LoadAllPrefabs(".map.json");
+
 	{
 		m_pActor = make_shared<APawn>();
 		m_pActor->SetActorName(L"kkongchi");
@@ -209,69 +211,43 @@ void TestSY::Init()
 		OBJECTMANAGER->AddActor(tile);
 	});
 
-	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
-	{
-		AssimpLoader loader;
-		vector<MeshData> meshList = loader.Load(objPath);
-		if (meshList.empty())
-			return;
-
-		// Mesh Component 생성
-		shared_ptr<UMeshComponent> meshComp;
-		if (meshType == 0)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
 		{
-			// SkinnedMeshComponent 설정 시 향후 확장
-			meshComp = make_shared<UStaticMeshComponent>();
+			AssimpLoader loader;
+			vector<MeshData> meshList = loader.Load(objPath);
+			if (meshList.empty())
+				return;
+
+			auto meshComp = make_shared<UStaticMeshComponent>();
 
 			auto meshRes = make_shared<UStaticMeshResources>();
 			meshRes->SetVertexList(meshList[0].m_vVertexList);
 			meshRes->SetIndexList(meshList[0].m_vIndexList);
 			meshRes->Create();
 
-			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
-		}
-		else if (meshType == 1)
-		{
-			meshComp = make_shared<UStaticMeshComponent>();
+			meshComp->SetMesh(meshRes);
 
-			auto meshRes = make_shared<UStaticMeshResources>();
-			meshRes->SetVertexList(meshList[0].m_vVertexList);
-			meshRes->SetIndexList(meshList[0].m_vIndexList);
-			meshRes->Create();
+			auto mat = make_shared<UMaterial>();
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+			meshComp->SetMaterial(mat);
 
-			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
-		}
+			// Snap 적용 여부 확인
+			if (GUI->GetObjectEditorUI()->IsSnapEnabled())
+			{
+				pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
+			}
 
-		// 머티리얼 설정
-		auto mat = make_shared<UMaterial>();
-		mat->Load(
-			std::wstring(texPath, texPath + strlen(texPath)),
-			std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-		);
-		meshComp->SetMaterial(mat);
+			auto actor = make_shared<APawn>();
+			actor->SetMeshComponent(meshComp);
+			actor->SetPosition(pos);
+			actor->SetRotation(rot);
+			actor->SetScale(scale);
 
-		// Actor 생성
-		shared_ptr<AActor> actor;
-		if (actorType == 0)
-		{
-			actor = make_shared<APawn>(); // ACharacter로 교체 가능
-		}
-		else if (actorType == 1)
-		{
-			actor = make_shared<APawn>(); // AEnemy로 교체 가능
-		}
-		else if (actorType == 2)
-		{
-			actor = make_shared<APawn>(); // AObject로 교체 가능
-		}
-
-		actor->SetMeshComponent(meshComp);
-		actor->SetPosition(pos);
-		actor->SetRotation(rot);
-		actor->SetScale(scale);
-
-		OBJECTMANAGER->AddActor(actor);
-	});
+			OBJECTMANAGER->AddActor(actor);
+		});
 
 	OBJECTMANAGER->AddActor(m_pActor);
 	OBJECTMANAGER->AddActor(m_pCameraActor);
@@ -341,4 +317,52 @@ void TestSY::SetClickPos()
 	pMesh->SetMaterial(pMaterial);
 
 	OBJECTMANAGER->AddActor(pActor);
+}
+void TestSY::LoadAllPrefabs(const std::string& extension)
+{
+	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
+
+	for (const auto& file : files)
+	{
+		if (extension == ".map.json")
+		{
+			PrefabMapData mapData;
+			if (PREFAB->LoadMapTile(file, mapData))
+			{
+				auto tile = std::make_shared<ATerrainTileActor>();
+				tile->m_iNumCols = mapData.Cols;
+				tile->m_iNumRows = mapData.Rows;
+				tile->m_fCellSize = mapData.CellSize;
+				tile->CreateTerrain(to_mw(mapData.TexturePath), to_mw(mapData.ShaderPath));
+				tile->SetPosition(mapData.Position);
+				tile->SetRotation(mapData.Rotation);
+				tile->SetScale(mapData.Scale);
+				OBJECTMANAGER->AddActor(tile);
+			}
+		}
+		else if (extension == ".character.json")
+		{
+			PrefabCharacterData characterData;
+			if (PREFAB->LoadCharacter(file, characterData))
+			{
+				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
+				actor->SetPosition(characterData.Translation);
+				actor->SetRotation(characterData.Rotation);
+				actor->SetScale(characterData.Scale);
+				OBJECTMANAGER->AddActor(actor);
+			}
+		}
+		else if (extension == ".object.json")
+		{
+			PrefabData objData;
+			if (PREFAB->Load(file, objData))
+			{
+				auto actor = std::make_shared<AActor>(); // 필요에 따라 오브젝트 타입으로 변경
+				actor->SetPosition(objData.Translation);
+				actor->SetRotation(objData.Rotation);
+				actor->SetScale(objData.Scale);
+				OBJECTMANAGER->AddActor(actor);
+			}
+		}
+	}
 }

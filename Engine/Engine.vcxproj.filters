@@ -300,6 +300,9 @@
       <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="LightData.h" />
+    <ClInclude Include="PrefabData.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -498,6 +501,9 @@
     </ClCompile>
     <ClCompile Include="LightManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="PrefabData.cpp">
+      <Filter>Headers\Data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

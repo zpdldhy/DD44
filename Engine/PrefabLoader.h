@@ -1,44 +1,6 @@
 #pragma once
 #include "Singleton.h"
-
-struct PrefabData
-{
-	std::string Name;
-	std::string ActorType;
-
-	std::string MeshPath;
-	std::string ShaderPath;
-	std::string TexturePath;
-
-	Vec3 Scale;
-	Vec3 Rotation;
-	Vec3 Translation;
-};
-
-struct PrefabCharacterData
-{
-    std::string Name;
-
-    std::string RootMeshPath;
-    std::string ShaderPath;
-    std::string TexturePath;
-
-    int ScriptType;
-
-    int AnimIndex;
-    float AnimSpeed;
-
-    Vec3 Scale;
-    Vec3 Rotation;
-    Vec3 Translation;
-
-    struct ChildMeshData
-    {
-        std::string MeshPath;
-        int TargetBoneIndex;
-    };
-    std::vector<ChildMeshData> ChildMeshes;
-};
+#include "PrefabData.h"
 
 class PrefabLoader : public Singleton<PrefabLoader>
 {
@@ -51,5 +13,15 @@ public:
 
     bool SaveCharacter(const PrefabCharacterData& _data, const std::string& _filePath);
     bool LoadCharacter(const std::string& _filePath, PrefabCharacterData& _data);
+
+    bool SaveMapTile(const PrefabMapData& data, const std::string& filePath);
+    bool LoadMapTile(const std::string& filePath, PrefabMapData& data);
+
+	bool SaveObject(const PrefabObjectData& _prefab, const std::string& _filePath);
+	bool LoadObject(const std::string& _filePath, PrefabObjectData& _prefab);
+
+public:
+	std::vector<std::string> GetPrefabFileList(const std::string& directory, const std::string& extension);
+	std::vector<std::string> GetPrefabFileNames(const std::string& directory, const std::string& extension);
 };
 
