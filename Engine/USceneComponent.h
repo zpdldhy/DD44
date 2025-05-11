@@ -10,7 +10,9 @@ class USceneComponent : public UActorComponent
 {
 protected:
 	cbData m_cbData;
-	ComPtr<ID3D11Buffer> m_pWorldCB;
+	static ComPtr<ID3D11Buffer> m_pWorldCB;
+
+	shared_ptr<USceneComponent> m_pParentTransform = nullptr;
 
 	// Local Transform
 	Vec3 m_vLocalLook = { 0.0f,0.0f,1.0f };
@@ -20,11 +22,6 @@ protected:
 	Vec3 m_vLocalScale = { 1.0f, 1.0f, 1.0f };
 	Vec3 m_vLocalRotation = { 0.0f, 0.0f, 0.0f };
 	Vec3 m_vLocalPosition = { 0.0f, 0.0f, 0.0f };
-
-	// Parent Transform
-	Vec3 m_vParentScale = { 1.0f, 1.0f, 1.0f };
-	Vec3 m_vParentRotation = { 0.0f, 0.0f, 0.0f };
-	Vec3 m_vParentPosition = { 0.0f, 0.0f, 0.0f };
 
 	// World Transform
 	Vec3 m_vWorldLook = { 0.0f,0.0f,1.0f };
@@ -84,7 +81,6 @@ public:
 
 	// Matrix
 	const Matrix& GetWorld() const { return m_matWorld; }
-	void SetParentMatrix(const Matrix& _m) { m_matParent = _m; }
-	void SetParentTransform(const Vec3& _scale, const Vec3& _rot, const Vec3& _pos) { m_vParentScale = _scale; m_vParentRotation = _rot; m_vParentPosition = _pos; }
+	void SetParentTransform(shared_ptr<USceneComponent> _pTransform) { if (_pTransform.get() != this) m_pParentTransform = _pTransform; }
 };
 

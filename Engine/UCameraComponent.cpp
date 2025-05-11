@@ -7,6 +7,8 @@
 
 void UCameraComponent::Init()
 {
+	USceneComponent::Init();
+
 	UpdateView();
 
 	if (m_ProjectionType == ProjectionType::PT_ORTHOGRAPHIC)
@@ -22,6 +24,8 @@ void UCameraComponent::Init()
 
 void UCameraComponent::Tick()
 {
+	USceneComponent::Tick();
+
 	UpdateView();
 
 	if (m_ProjectionType == ProjectionType::PT_ORTHOGRAPHIC)
@@ -168,7 +172,7 @@ void UCameraComponent::UpdateFrustumBox()
 
 void UCameraComponent::UpdateView()
 {
-	m_vEye = m_pOwner.lock()->GetPosition() + m_vLocalPosition;
+	m_vEye = m_vWorldPosition;
 
 	if (Vec3::Distance(Vec3(0.f, 0.f, 0.f), m_vLocalPosition) < 0.1f)
 		m_vLook = m_pOwner.lock()->GetLook();
@@ -177,7 +181,25 @@ void UCameraComponent::UpdateView()
 
 	Vec3 vUp = Vec3(0.f, 1.f, 0.f);
 
+	m_vLook.Normalize();
+
 	m_matView = DirectX::XMMatrixLookAtLH(m_vEye, m_vEye + m_vLook, vUp);
+
+	//// Update Rotate - Look이 바꼈기 때문.
+	//m_vLocalLook = m_matView.Backward();
+	//m_vLocalRight = m_matView.Right();
+	//m_vLocalUp = m_matView.Up();
+
+	//m_matLocal._31 = m_vLocalLook.x; m_matLocal._32 = m_vLocalLook.y; m_matLocal._33 = m_vLocalLook.z;
+	//m_matLocal._11= m_vLocalRight.x; m_matLocal._12= m_vLocalRight.y; m_matLocal._13= m_vLocalRight.z;
+	//m_matLocal._21 = m_vLocalUp.x;	 m_matLocal._22 = m_vLocalUp.y;	  m_matLocal._23 = m_vLocalUp.z;
+
+	//Quaternion rotQuat;
+	//m_matLocal.Decompose(m_vLocalScale, rotQuat, m_vLocalPosition);
+
+	//m_vLocalRotation.x = rotQuat.x;
+	//m_vLocalRotation.y = rotQuat.y;
+	//m_vLocalRotation.z = rotQuat.z;
 }
 
 void UCameraComponent::UpdateOrthographicProjection()

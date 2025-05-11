@@ -31,12 +31,14 @@ void TestSY::Init()
 	{
 		m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
+		m_pCameraActor->SetActorName(L"EnginCamera");
 
 		CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 	}
 
 	{
 		m_pActor = make_shared<APawn>();
+		m_pActor->SetActorName(L"kkongchi");
 
 		m_pStaticMesh = UStaticMeshComponent::CreateCube();
 		m_pActor->SetMeshComponent(m_pStaticMesh);
@@ -306,7 +308,8 @@ void TestSY::SetClickPos()
 	pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	
 	pActor->SetMeshComponent(pMesh);
-	pActor->SetPosition(vMouseEnd);
+	pActor->SetPosition(vMouseMiddle);
+	pActor->SetRotation(Vec3(0.f, DD_PI / 2.f, 0.f));
 	pActor->SetScale(Vec3(100.f, 100.f, 100.f));
 
 	auto pMaterial = make_shared<UMaterial>();

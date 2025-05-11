@@ -32,10 +32,13 @@ public:
 	// Actor 상태
 	//--------------------------------------------------------------------------------------
 protected:
+	wstring m_szName;
 	UINT m_ActorIndex = 0;	// 고유 번호. 해당 Actor를 빠르게 찾는 로직에서 필요하다.
 	bool m_bDelete = false;	
 
 public:
+	void SetActorName(wstring _szName) { m_szName = _szName; }
+
 	void SetActorIndex(UINT _iIndex) { m_ActorIndex = _iIndex; }
 	UINT GetActorIndex() { return m_ActorIndex; }
 
@@ -52,6 +55,7 @@ protected:
 	vector<shared_ptr<class UScriptComponent>> m_vScript;
 
 public:
+	shared_ptr<USceneComponent> GetTransform() { return m_pTransform; }
 	template<typename T>
 	shared_ptr<T> GetMeshComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
 	shared_ptr<UCameraComponent> GetCameraComponent() { return static_pointer_cast<UCameraComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)]); }
@@ -83,7 +87,3 @@ public:
 	void AddPosition(const Vec3& _pos) { m_pTransform->AddLocalPosition(_pos); }
 	void AddRotation(const Vec3& _rot) { m_pTransform->AddLocalRotation(_rot); }
 };
-
-// AActor
-// 위치, 회전, 스케일
-// Component 정보
