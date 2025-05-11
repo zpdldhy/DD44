@@ -9,7 +9,7 @@
 
 void PlayerMoveScript::Init()
 {
-	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetPosition();
+	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetLocalPosition();
 	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 }
 

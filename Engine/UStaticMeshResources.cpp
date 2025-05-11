@@ -13,5 +13,5 @@ void UStaticMeshResources::Bind()
 	UINT Offsets = 0;
 	DC->IASetVertexBuffers(0, 1, m_pVertexBuffer.GetAddressOf(), &Strides, &Offsets);
 	DC->IASetIndexBuffer(m_pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	DC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	DC->IASetPrimitiveTopology(m_Topology);
 }

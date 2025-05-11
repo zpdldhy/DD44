@@ -24,6 +24,7 @@ public:
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
 	shared_ptr<class ALight> m_pLight;
+	shared_ptr<class ALight> m_pPointLight;
 
 	shared_ptr<class ActorLoader> m_pLoader;
 	vector<shared_ptr<class UMeshComponent>> m_vMeshList;

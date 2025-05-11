@@ -21,7 +21,7 @@ void UStaticMeshComponent::Tick()
 	if (m_pAnim)
 	{
 		auto mat = m_pAnim->GetBoneAnim(targetBoneIndex);
-		SetPosition(Vec3(mat._41, mat._42, mat._43)); // *Rotation¿∫?
+		SetLocalPosition(Vec3(mat._41, mat._42, mat._43)); // *Rotation¿∫?
 	}
 	USceneComponent::Tick();
 }
@@ -46,6 +46,39 @@ void UStaticMeshComponent::PostRender()
 
 void UStaticMeshComponent::Destroy()
 {
+}
+
+shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateRay()
+{
+	static shared_ptr<UStaticMeshResources> pMesh = nullptr;
+
+	auto pMeshComponent = make_shared<UStaticMeshComponent>();
+
+	if (pMesh)
+	{
+		pMeshComponent->SetMesh(pMesh);
+		return pMeshComponent;
+	}
+
+	// Mesh Data Setting
+	vector<PNCT_VERTEX> vVertexList;
+
+	vVertexList.resize(2);
+
+	Vec3 vMin = Vec3(+0.0f, +0.0f, -0.5f);
+	Vec3 vMax = Vec3(+0.0f, +0.0f, +0.5f);
+
+	vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, 0), Vec4(1, 1, 0, 1), Vec2(0, 0));
+	vVertexList[1] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 0), Vec4(1, 1, 0, 1), Vec2(0, 1));
+
+	// Mesh Setting
+	pMesh = make_shared<UStaticMeshResources>();
+	pMesh->SetVertexList(vVertexList);
+	pMesh->Create();
+
+	// StaticMeshComponent Setting
+	pMeshComponent->SetMesh(pMesh);
+	return pMeshComponent;
 }
 
 shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateTriangle()
@@ -165,25 +198,25 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateCube()
 	vVertexList[6] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
 	vVertexList[7] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
 	// Left
-	vVertexList[8] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	vVertexList[9] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	vVertexList[10] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	vVertexList[11] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[8] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(-1, 0, 0), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[9] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(-1, 0, 0), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[10] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(-1, 0, 0), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[11] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(-1, 0, 0), Vec4(1, 0, 0, 1), Vec2(1, 1));
 	// Right
-	vVertexList[12] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	vVertexList[13] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	vVertexList[14] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	vVertexList[15] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[12] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(1, 0, 0), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[13] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(1, 0, 0), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[14] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(1, 0, 0), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[15] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(1, 0, 0), Vec4(1, 0, 0, 1), Vec2(1, 1));
 	// UP
-	vVertexList[16] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	vVertexList[17] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	vVertexList[18] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	vVertexList[19] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[16] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMin.z), Vec3(0, 1, 0), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[17] = PNCT_VERTEX(Vec3(vMin.x, vMax.y, vMax.z), Vec3(0, 1, 0), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[18] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMax.z), Vec3(0, 1, 0), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[19] = PNCT_VERTEX(Vec3(vMax.x, vMax.y, vMin.z), Vec3(0, 1, 0), Vec4(1, 0, 0, 1), Vec2(1, 1));
 	// Bottom
-	vVertexList[20] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(0, 1));
-	vVertexList[21] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 0));
-	vVertexList[22] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(1, 0));
-	vVertexList[23] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, 0, 1), Vec4(1, 0, 0, 1), Vec2(1, 1));
+	vVertexList[20] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMax.z), Vec3(0, -1, 0), Vec4(1, 0, 0, 1), Vec2(0, 1));
+	vVertexList[21] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, -1, 0), Vec4(1, 0, 0, 1), Vec2(0, 0));
+	vVertexList[22] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0, -1, 0), Vec4(1, 0, 0, 1), Vec2(1, 0));
+	vVertexList[23] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0, -1, 0), Vec4(1, 0, 0, 1), Vec2(1, 1));
 
 	UINT iIndex = 0;
 	auto& I = vIndexList;

@@ -8,8 +8,8 @@ class ObjectManager : public Singleton<ObjectManager>
 	vector<shared_ptr<class AActor>> m_vRenderActorList;	// Render 이후 Clear
 
 	// Stencil Check용
-	vector<shared_ptr<class AActor>> m_vPreRenderActorList;		// 
-	vector<shared_ptr<class AActor>> m_vPostRenderActorList;	// 
+	vector<shared_ptr<class AActor>> m_vPreRenderActorList;		// stencil 미사용
+	vector<shared_ptr<class AActor>> m_vPostRenderActorList;	// stencil 사용
 
 public:
 	void Tick();

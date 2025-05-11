@@ -13,17 +13,30 @@ public:
 
 protected:
 	cbData m_cbData;
-	ComPtr<ID3D11Buffer> m_pWorldCB;
+	static ComPtr<ID3D11Buffer> m_pWorldCB;
 
-	Vec3 m_vLook = { 0.0f,0.0f,1.0f };
-	Vec3 m_vRight = { 1.0f,0.0f,0.0f };
-	Vec3 m_vUp = { 0.0f,1.0f,0.0f };
+	shared_ptr<USceneComponent> m_pParentTransform = nullptr;
 
-	Vec3 m_vScale = { 1.0f, 1.0f, 1.0f };
-	Vec3 m_vRotation = { 0.0f, 0.0f, 0.0f };
-	Vec3 m_vPosition = { 0.0f, 0.0f, 0.0f };
+	// Local Transform
+	Vec3 m_vLocalLook = { 0.0f,0.0f,1.0f };
+	Vec3 m_vLocalRight = { 1.0f,0.0f,0.0f };
+	Vec3 m_vLocalUp = { 0.0f,1.0f,0.0f };
 
-	Matrix m_matOffset = Matrix::Identity;
+	Vec3 m_vLocalScale = { 1.0f, 1.0f, 1.0f };
+	Vec3 m_vLocalRotation = { 0.0f, 0.0f, 0.0f };
+	Vec3 m_vLocalPosition = { 0.0f, 0.0f, 0.0f };
+
+	// World Transform
+	Vec3 m_vWorldLook = { 0.0f,0.0f,1.0f };
+	Vec3 m_vWorldRight = { 1.0f,0.0f,0.0f };
+	Vec3 m_vWorldUp = { 0.0f,1.0f,0.0f };
+
+	Vec3 m_vWorldScale = { 1.0f, 1.0f, 1.0f };
+	Vec3 m_vWorldRotation = { 0.0f, 0.0f, 0.0f };
+	Vec3 m_vWorldPosition = { 0.0f, 0.0f, 0.0f };
+
+	// Matrix
+	Matrix m_matLocal = Matrix::Identity;
 	Matrix m_matWorld = Matrix::Identity;
 	Matrix m_matScale = Matrix::Identity;
 	Matrix m_matRotation = Matrix::Identity;
@@ -45,20 +58,32 @@ private:
 	void UpdateWorldMatrix();
 
 public:
-	const Vec3 GetPosition() const { return m_vPosition; }
-	const Vec3 GetRotation() const { return m_vRotation; }
-	const Vec3 GetScale() const { return m_vScale; }
-	const Vec3& GetLook() const { return m_vLook; }
-	const Vec3& GetRight() const { return m_vRight; }
-	const Vec3& GetUp() const { return m_vUp; }
+	// Local
+	const Vec3& GetLocalPosition() const { return m_vLocalPosition; }
+	const Vec3& GetLocalRotation() const { return m_vLocalRotation; }
+	const Vec3& GetLocalScale() const { return m_vLocalScale; }
+	const Vec3& GetLocalLook() const { return m_vLocalLook; }
+	const Vec3& GetLocalRight() const { return m_vLocalRight; }
+	const Vec3& GetLocalUp() const { return m_vLocalUp; }
+
+	void SetLocalPosition(const Vec3& _pos) { m_vLocalPosition = _pos; }
+	void SetLocalRotation(const Vec3& _rot) { m_vLocalRotation = _rot; }
+	void SetLocalScale(const Vec3& _scale) { m_vLocalScale = _scale; }
+
+	void AddLocalPosition(const Vec3& _pos) { m_vLocalPosition += _pos; }
+	void AddLocalRotation(const Vec3& _rot) { m_vLocalRotation += _rot; }
+	void AddLocalScale(const Vec3& _scale) { m_vLocalScale += _scale; }
+
+	// World
+	const Vec3& GetWorldPosition() const { return m_vWorldPosition; }
+	const Vec3& GetWorldRotation() const { return m_vWorldRotation; }
+	const Vec3& GetWorldScale() const { return m_vWorldScale; }
+	const Vec3& GetWorldLook() const { return m_vWorldLook; }
+	const Vec3& GetWorldRight() const { return m_vWorldRight; }
+	const Vec3& GetWorldUp() const { return m_vWorldUp; }
+
+	// Matrix
 	const Matrix& GetWorld() const { return m_matWorld; }
-
-	void SetPosition(const Vec3& _pos) { m_vPosition = _pos; }
-	void SetRotation(const Vec3& _rot) { m_vRotation = _rot; }
-	void SetScale(const Vec3& _scale) { m_vScale = _scale; }
-
-	void AddPosition(const Vec3& _pos) { m_vPosition += _pos; }
-	void AddRotation(const Vec3& _rot) { m_vRotation += _rot; }
-	void AddScale(const Vec3& _scale) { m_vScale += _scale; }
+	void SetParentTransform(shared_ptr<USceneComponent> _pTransform) { if (_pTransform.get() != this) m_pParentTransform = _pTransform; }
 };
 

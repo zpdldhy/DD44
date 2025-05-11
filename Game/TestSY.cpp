@@ -29,6 +29,8 @@
 #include "ActorLoader.h"
 #include "USkeletalMeshResources.h"
 #include "PrefabLoader.h"
+#include "Timer.h"
+#include "Functions.h"
 
 void TestSY::Init()
 {
@@ -36,36 +38,38 @@ void TestSY::Init()
 	{
 		m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
+		m_pCameraActor->SetActorName(L"EnginCamera");
 
-		CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+		CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 	}
 
 	//LoadAllPrefabs(".map.json");
 
 	{
-		//m_pActor = make_shared<APawn>();
+		m_pActor = make_shared<APawn>();
+		m_pActor->SetActorName(L"kkongchi");
 
-		//m_pStaticMesh = UStaticMeshComponent::CreateCube();
-		//m_pActor->SetMeshComponent(m_pStaticMesh);
-		//m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
-		//m_pActor->SetPosition({ 0.0f, 2.5f, 10.0f });
-		//m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
+		m_pStaticMesh = UStaticMeshComponent::CreateCube();
+		m_pActor->SetMeshComponent(m_pStaticMesh);
+		m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
+		m_pActor->SetPosition({ 0.0f, 0.0f, 0.0f });
+		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
-		//shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		//material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-		//m_pStaticMesh->SetMaterial(material);
+		shared_ptr<UMaterial> material = make_shared<UMaterial>();
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		m_pStaticMesh->SetMaterial(material);
 
-		//auto pCameraComponent = make_shared<UCameraComponent>();
-		//pCameraComponent->SetPosition(Vec3(20.f, 20.f, -20.f));
-		//pCameraComponent->SetNear(10.f);
-		//pCameraComponent->SetFar(100.f);
-		//m_pActor->SetCameraComponent(pCameraComponent);
+		auto pCameraComponent = make_shared<UCameraComponent>();
+		pCameraComponent->SetLocalPosition(Vec3(20.f, 0.f, -0.f));
+		pCameraComponent->SetNear(10.f);
+		pCameraComponent->SetFar(100.f);
+		m_pActor->SetCameraComponent(pCameraComponent);
 
-		//auto pBoxComponent = make_shared<UBoxComponent>();
-		//pBoxComponent->SetScale({ 6.f, 6.f, 6.f });
-		//m_pActor->SetShapeComponent(pBoxComponent);
+		auto pBoxComponent = make_shared<UBoxComponent>();
+		pBoxComponent->SetLocalScale({ 6.f, 6.f, 6.f });
+		m_pActor->SetShapeComponent(pBoxComponent);
 
-		//m_pActor->AddScript(make_shared<kkongchiMoveScript>());
+		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
 	}
 
 	{
@@ -182,7 +186,7 @@ void TestSY::Init()
 			//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
 
 			auto cam = std::make_shared<UCameraComponent>();
-			cam->SetPosition(Vec3(10, 10, -10));
+			cam->SetLocalPosition(Vec3(10, 10, -10));
 			actor->SetCameraComponent(cam);
 
 			OBJECTMANAGER->AddActor(actor);
@@ -245,22 +249,25 @@ void TestSY::Init()
 			OBJECTMANAGER->AddActor(actor);
 		});
 
-
-	//OBJECTMANAGER->AddActor(m_pActor);
+	OBJECTMANAGER->AddActor(m_pActor);
 	OBJECTMANAGER->AddActor(m_pCameraActor);
 	OBJECTMANAGER->AddActor(m_pSky);	
 }
 
 void TestSY::Update()
 {
-	CAMERAMANAGER->SetCameraActor(m_pCameraActor);
+	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 	if (INPUT->GetButtonDown(O))
-		CAMERAMANAGER->SetCameraActor(m_pActor);
+		CAMERAMANAGER->Set3DCameraActor(m_pActor);
 
 	if (INPUT->GetButton(I))
 	{
 		m_pActor->SetDelete(true);
 	}
+
+	// Mouse Picking
+	if (INPUT->GetButton(LCLICK))
+		SetClickPos();
 }
 
 void TestSY::Render()
@@ -272,6 +279,45 @@ void TestSY::Destroy()
 {
 }
 
+void TestSY::SetClickPos()
+{
+	POINT mousePos = INPUT->GetMousePos();
+	float deltaTime = TIMER->GetDeltaTime() * 10.f;
+
+	float fWinSizeX = static_cast<float>(g_windowSize.x);
+	float fWinSizeY = static_cast<float>(g_windowSize.y);
+
+	// To NDC
+	Vec3 vMouseEnd(0.f, 0.f, 1.f);
+	vMouseEnd.x = (2.f * static_cast<float>(mousePos.x) / fWinSizeX) - 1.f;
+	vMouseEnd.y = 1.f - (2.f * static_cast<float>(mousePos.y) / fWinSizeY);
+
+	Matrix mProjViewInvert = Matrix::Identity;
+	(CAMERAMANAGER->Get3DView() * CAMERAMANAGER->Get3DProjection()).Invert(mProjViewInvert);
+
+	vMouseEnd = Vec3::Transform(vMouseEnd, mProjViewInvert);
+
+	m_vMouseRay.position = CAMERAMANAGER->Get3DCameraComponent()->GetCameraPos();
+	m_vMouseRay.direction = vMouseEnd - m_vMouseRay.position;
+
+	Vec3 vMouseMiddle = (vMouseEnd + m_vMouseRay.position) / 2.f;
+
+	auto pActor = make_shared<APawn>();
+
+	auto pMesh = UStaticMeshComponent::CreateRay();
+	pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	
+	pActor->SetMeshComponent(pMesh);
+	pActor->SetPosition(vMouseMiddle);
+	//pActor->SetRotation(Vec3(0.f, DD_PI / 2.f, 0.f));
+	pActor->SetScale(Vec3(100.f, 100.f, 100.f));
+
+	auto pMaterial = make_shared<UMaterial>();
+	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");	
+	pMesh->SetMaterial(pMaterial);
+
+	OBJECTMANAGER->AddActor(pActor);
+}
 void TestSY::LoadAllPrefabs(const std::string& extension)
 {
 	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
