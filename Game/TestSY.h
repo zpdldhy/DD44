@@ -2,6 +2,8 @@
 #include "IExecute.h"
 #include "MapEditorUI.h"
 #include "ObjectEditorUI.h"
+#include "ActorLoader.h"
+#include "PrefabLoader.h"
 
 class TestSY : public IExecute
 {
@@ -13,8 +15,6 @@ public:
 
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
-
-	bool m_bEditorWireframe = false;
 
 	// Mouse Picking
 	Ray m_vMouseRay;

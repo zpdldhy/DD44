@@ -5,13 +5,6 @@
 void UTerrainMeshComponent::Render()
 {
 	PreRender();
-
-	//if (m_pWorldCB)
-	//{
-	//	DC->UpdateSubresource(m_pWorldCB.Get(), 0, NULL, &m_cbData, 0, 0);
-	//	DC->VSSetConstantBuffers(0, 1, m_pWorldCB.GetAddressOf());
-	//}
-
 	PostRender();
 }
 

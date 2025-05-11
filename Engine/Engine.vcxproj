@@ -166,6 +166,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="ASky.h" />
     <ClInclude Include="AssimpLoader.h" />
     <ClInclude Include="AUIActor.h" />
+    <ClInclude Include="CharacterEditorUI.h" />
     <ClInclude Include="EffectEditorUI.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="FbxLoader.h" />
@@ -174,6 +175,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="MapEditorUI.h" />
     <ClInclude Include="ObjectEditorUI.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="PrefabLoader.h" />
     <ClInclude Include="SkeletalMeshData.h" />
     <ClInclude Include="UAnimInstance.h" />
     <ClInclude Include="UBoxComponent.h" />
@@ -238,6 +240,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="ASky.cpp" />
     <ClCompile Include="AssimpLoader.cpp" />
     <ClCompile Include="AUIActor.cpp" />
+    <ClCompile Include="CharacterEditorUI.cpp" />
     <ClCompile Include="EffectEditorUI.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="FbxLoader.cpp" />
@@ -246,6 +249,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="MapEditorUI.cpp" />
     <ClCompile Include="ObjectEditorUI.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="PrefabLoader.cpp" />
     <ClCompile Include="SkeletalMeshData.cpp" />
     <ClCompile Include="UAnimInstance.cpp" />
     <ClCompile Include="UBoxComponent.cpp" />

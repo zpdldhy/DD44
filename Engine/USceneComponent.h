@@ -8,6 +8,9 @@ struct cbData
 
 class USceneComponent : public UActorComponent
 {
+public:
+	bool m_bUseBoneMatrix = false;
+
 protected:
 	cbData m_cbData;
 	static ComPtr<ID3D11Buffer> m_pWorldCB;

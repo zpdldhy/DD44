@@ -22,6 +22,13 @@
 #include "ObjectLoader.h"
 #include "ACharacter.h"
 #include "ObjectManager.h"
+#include "ActorLoader.h"
+#include "PlayerMoveScript.h"
+#include "UAnimInstance.h"
+#include "USkinnedMeshComponent.h"
+#include "ActorLoader.h"
+#include "USkeletalMeshResources.h"
+#include "PrefabLoader.h"
 #include "Timer.h"
 #include "Functions.h"
 
@@ -158,92 +165,117 @@ void TestSY::Init()
 		}
 	}
 
-	GUI->SetMapEditorCallback([this]()
+	GUI->SetCharacterEditorCallback(
+		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position, const Vec3& rotation, const Vec3& scale, int scriptType)
 		{
-			MapEditorUI* editor = GUI->GetMapEditorUI();
-			if (!editor) return;
-
-			auto tile = std::make_shared<ATerrainTileActor>();
-
-			tile->m_iNumCols = editor->GetNumCols();
-			tile->m_iNumRows = editor->GetNumRows();
-			tile->m_fCellSize = editor->GetCellSize();
-
-			tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
-			tile->SetPosition(editor->GetPosition());
-			tile->SetRotation(editor->GetRotation());
-			tile->SetScale(editor->GetScale());
-
-			OBJECTMANAGER->AddActor(tile);
-		});
-
-	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
-		{
-			AssimpLoader loader;
-			vector<MeshData> meshList = loader.Load(objPath);
-			if (meshList.empty())
+			if (!rootComponent)
+			{
 				return;
-
-			// Mesh Component 생성
-			shared_ptr<UMeshComponent> meshComp;
-			if (meshType == 0)
-			{
-				// SkinnedMeshComponent 설정 시 향후 확장
-				meshComp = make_shared<UStaticMeshComponent>();
-
-				auto meshRes = make_shared<UStaticMeshResources>();
-				meshRes->SetVertexList(meshList[0].m_vVertexList);
-				meshRes->SetIndexList(meshList[0].m_vIndexList);
-				meshRes->Create();
-
-				dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
-			}
-			else if (meshType == 1)
-			{
-				meshComp = make_shared<UStaticMeshComponent>();
-
-				auto meshRes = make_shared<UStaticMeshResources>();
-				meshRes->SetVertexList(meshList[0].m_vVertexList);
-				meshRes->SetIndexList(meshList[0].m_vIndexList);
-				meshRes->Create();
-
-				dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
 			}
 
-			// 머티리얼 설정
-			auto mat = make_shared<UMaterial>();
-			mat->Load(
-				std::wstring(texPath, texPath + strlen(texPath)),
-				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-			);
-			meshComp->SetMaterial(mat);
+			auto actor = std::make_shared<AActor>();
+			actor->SetMeshComponent(rootComponent);
 
-			// Actor 생성
-			shared_ptr<AActor> actor;
-			if (actorType == 0)
-			{
-				actor = make_shared<APawn>(); // ACharacter로 교체 가능
-			}
-			else if (actorType == 1)
-			{
-				actor = make_shared<APawn>(); // AEnemy로 교체 가능
-			}
-			else if (actorType == 2)
-			{
-				actor = make_shared<APawn>(); // AObject로 교체 가능
-			}
-
-			actor->SetMeshComponent(meshComp);
-			actor->SetPosition(pos);
-			actor->SetRotation(rot);
+			actor->SetPosition(position);
+			actor->SetRotation(rotation);
 			actor->SetScale(scale);
+
+			if (scriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
+			//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
+
+			auto cam = std::make_shared<UCameraComponent>();
+			cam->SetPosition(Vec3(10, 10, -10));
+			actor->SetCameraComponent(cam);
 
 			OBJECTMANAGER->AddActor(actor);
 		});
 
+	GUI->SetMapEditorCallback([this]()
+	{
+		MapEditorUI* editor = GUI->GetMapEditorUI();
+		if (!editor) return;
+
+		auto tile = std::make_shared<ATerrainTileActor>();
+
+		tile->m_iNumCols = editor->GetNumCols();
+		tile->m_iNumRows = editor->GetNumRows();
+		tile->m_fCellSize = editor->GetCellSize();
+
+		tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
+		tile->SetPosition(editor->GetPosition());
+		tile->SetRotation(editor->GetRotation());
+		tile->SetScale(editor->GetScale());
+
+		OBJECTMANAGER->AddActor(tile);
+	});
+
+	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+	{
+		AssimpLoader loader;
+		vector<MeshData> meshList = loader.Load(objPath);
+		if (meshList.empty())
+			return;
+
+		// Mesh Component 생성
+		shared_ptr<UMeshComponent> meshComp;
+		if (meshType == 0)
+		{
+			// SkinnedMeshComponent 설정 시 향후 확장
+			meshComp = make_shared<UStaticMeshComponent>();
+
+			auto meshRes = make_shared<UStaticMeshResources>();
+			meshRes->SetVertexList(meshList[0].m_vVertexList);
+			meshRes->SetIndexList(meshList[0].m_vIndexList);
+			meshRes->Create();
+
+			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
+		}
+		else if (meshType == 1)
+		{
+			meshComp = make_shared<UStaticMeshComponent>();
+
+			auto meshRes = make_shared<UStaticMeshResources>();
+			meshRes->SetVertexList(meshList[0].m_vVertexList);
+			meshRes->SetIndexList(meshList[0].m_vIndexList);
+			meshRes->Create();
+
+			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
+		}
+
+		// 머티리얼 설정
+		auto mat = make_shared<UMaterial>();
+		mat->Load(
+			std::wstring(texPath, texPath + strlen(texPath)),
+			std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+		);
+		meshComp->SetMaterial(mat);
+
+		// Actor 생성
+		shared_ptr<AActor> actor;
+		if (actorType == 0)
+		{
+			actor = make_shared<APawn>(); // ACharacter로 교체 가능
+		}
+		else if (actorType == 1)
+		{
+			actor = make_shared<APawn>(); // AEnemy로 교체 가능
+		}
+		else if (actorType == 2)
+		{
+			actor = make_shared<APawn>(); // AObject로 교체 가능
+		}
+
+		actor->SetMeshComponent(meshComp);
+		actor->SetPosition(pos);
+		actor->SetRotation(rot);
+		actor->SetScale(scale);
+
+		OBJECTMANAGER->AddActor(actor);
+	});
+
 	OBJECTMANAGER->AddActor(m_pActor);
 	OBJECTMANAGER->AddActor(m_pCameraActor);
-	OBJECTMANAGER->AddActor(m_pSky);
+	OBJECTMANAGER->AddActor(m_pSky);	
 }
 
 void TestSY::Update()
@@ -263,19 +295,14 @@ void TestSY::Update()
 }
 
 void TestSY::Render()
-{
-	if (m_bEditorWireframe)
-	{
-		DC->RSSetState(STATE->m_pRSWireFrame.Get());
-	}
-	else
-	{
-		DC->RSSetState(STATE->m_pRSSolid.Get());
-	}
+{	
+
 }
 
 void TestSY::Destroy()
 {
+}
+
 }
 
 void TestSY::SetClickPos()
