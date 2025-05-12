@@ -17,13 +17,14 @@ public:
 
 
 private:
-    int m_iCurrentActorType = 0;
-    int m_iCurrentMeshType = 0;
+    bool m_bSnapEnabled = false;
+    bool m_bShowObjectList = false;
+
+    int m_iSelectedPlacedIndex = -1;
 
     float m_fPosition[3] = { 0.0f, 0.0f, 0.0f };
     float m_fRotation[3] = { 0.0f, 0.0f, 0.0f };
     float m_fScale[3] = { 1.0f, 1.0f, 1.0f };
-    bool m_bSnapEnabled = false;
 
     char m_szTexturePath[256] = "../Resources/Texture/kkongchi.jpg";
     char m_szShaderPath[256] = "../Resources/Shader/Default.hlsl";

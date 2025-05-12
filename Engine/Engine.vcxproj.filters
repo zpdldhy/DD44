@@ -303,6 +303,9 @@
     <ClInclude Include="PrefabData.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
+    <ClInclude Include="ActorListUI.h">
+      <Filter>Utils\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -504,6 +507,9 @@
     </ClCompile>
     <ClCompile Include="PrefabData.cpp">
       <Filter>Headers\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorListUI.cpp">
+      <Filter>Utils\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

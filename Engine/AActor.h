@@ -38,6 +38,7 @@ protected:
 
 public:
 	void SetActorName(wstring _szName) { m_szName = _szName; }
+	const std::wstring& GetActorName() const { return m_szName; }
 
 	void SetActorIndex(UINT _iIndex) { m_ActorIndex = _iIndex; }
 	UINT GetActorIndex() { return m_ActorIndex; }
@@ -71,6 +72,7 @@ public:
 		
 	// Script
 	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }
+	const std::vector<std::shared_ptr<UScriptComponent>>& GetScriptList() const { return m_vScript; }
 
 public:
 	const Vec3& GetPosition() const { return m_pTransform->GetLocalPosition(); }

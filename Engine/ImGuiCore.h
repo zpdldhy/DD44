@@ -4,6 +4,7 @@
 #include "ObjectEditorUI.h"
 #include "EffectEditorUI.h"
 #include "CharacterEditorUI.h"
+#include "ActorListUI.h"
 
 class ImGuiCore : public Singleton<ImGuiCore>
 {
@@ -12,6 +13,7 @@ private:
 	std::unique_ptr<class MapEditorUI> m_pMapEditorUI;
 	std::unique_ptr<class ObjectEditorUI> m_pObjectEditorUI;
 	std::unique_ptr<class EffectEditorUI> m_pEffectEditorUI;
+	std::unique_ptr<class ActorListUI> m_pActorListUI;
 
 public:
 	bool m_bEditorToolVisible = true;
