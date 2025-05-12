@@ -2,6 +2,8 @@
 #include "EngineCameraMoveScript.h"
 #include "Input.h"
 #include "Timer.h"
+#include "CollisionManager.h"
+#include "AActor.h"
 
 void EngineCameraMoveScript::Tick()
 {

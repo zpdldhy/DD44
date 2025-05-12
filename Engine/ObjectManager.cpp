@@ -107,6 +107,17 @@ shared_ptr<class AActor> ObjectManager::GetActor(UINT _iIndex)
 	return m_vActorList.find(_iIndex)->second;
 }
 
+// 임시 사용
+vector<shared_ptr<class AActor>>& ObjectManager::GetActorList()
+{
+	vector<shared_ptr<class AActor>> vList;
+
+	for (auto pActor : m_vActorList)
+		vList.emplace_back(pActor.second);
+
+	return vList;
+}
+
 void ObjectManager::CheckStencilList()
 {
 	for (auto& pActor : m_vRenderActorList)

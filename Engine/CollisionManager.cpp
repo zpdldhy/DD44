@@ -1,8 +1,11 @@
 #include "pch.h"
 #include "CollisionManager.h"
+#include "ObjectManager.h"
 
 void CollisionManager::Tick()
 {
+	m_vCollisionActor = OBJECTMANAGER->GetActorList();
+
 	m_vCollisionActor.clear();
 }
 
