@@ -80,6 +80,11 @@ cbuffer CB_Emissive : register(b10)
     float g_fEmissivePower;
 }
 
+cbuffer CB_Blur : register(b11)
+{
+    float2 g_vTexelSize; // (1 / 화면 너비, 1 / 화면 높이)
+    float2 g_vDirection; // (1, 0): 가로 블러 / (0, 1): 세로 블러
+};
 
 
 struct VS_IN

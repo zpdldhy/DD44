@@ -16,6 +16,7 @@
 #include "ViewPortTexture.h"
 #include "UIManager.h"
 #include "ObjectManager.h"
+#include "PostProcessManager.h"
 
 void Engine::Init()
 {
@@ -43,6 +44,7 @@ void Engine::Init()
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
 	Create3DWorld();
+	POSTPROCESS->Init(static_cast<UINT>(g_windowSize.x), static_cast<UINT>(g_windowSize.y));
 }
 
 void Engine::Frame()
@@ -89,6 +91,11 @@ void Engine::Render()
 		// ObjectList Render
 		OBJECTMANAGER->Render();
 		m_p3DWorldTexture->EndViewPort();
+
+		POSTPROCESS->Blur(m_p3DWorldTexture->GetSRV());                    // 2-pass Blur
+		POSTPROCESS->RenderCombine(m_p3DWorldTexture->GetSRV());           // Combine 결과를 백버퍼에 출력
+
+		m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(POSTPROCESS->GetBlurResultSRV().Get());
 
 		// 3DWorld를 보여주는 평면은 Rasterizer = SolidNone으로 고정
 		if (m_pCurrentRasterizer)

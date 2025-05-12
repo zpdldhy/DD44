@@ -19,6 +19,9 @@ protected:
 	ID3D11DepthStencilView* m_pPrevDSV = nullptr;
 
 public:
+	ID3D11ShaderResourceView* GetSRV() const { return m_pTexSRV.Get(); }
+
+public:
 	void CreateViewPortTexture(FLOAT _fWidth, FLOAT _fHeight);
 	void BeginViewPort();
 	void EndViewPort();
