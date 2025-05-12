@@ -25,7 +25,7 @@ public:
 	void PostRender();
 
 private:
-	void ClearViewPort(vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList);
+	void ClearRTV(vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList);
 
 	//2-pass 가우시안 블러 생성
 	void Blur(const ComPtr<ID3D11ShaderResourceView>& input);

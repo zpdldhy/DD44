@@ -13,7 +13,6 @@
 #include "AActor.h"
 #include "UStaticMeshComponent.h"
 #include "UMaterial.h"
-#include "ViewPortTexture.h"
 #include "UIManager.h"
 #include "ObjectManager.h"
 #include "PostProcessManager.h"
@@ -45,6 +44,11 @@ void Engine::Init()
 	// ViewPort를 이용한 3DWorld Texture Rendering
 	Create3DWorld();
 	POSTPROCESS->Init(static_cast<UINT>(g_windowSize.x), static_cast<UINT>(g_windowSize.y));
+
+	world.CreateViewPortTexture(1440.f, 900.f);
+	blur.CreateViewPortTexture(1440.f, 900.f);
+	bloom.CreateViewPortTexture(1440.f, 900.f);
+	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(world.GetSRV());
 }
 
 void Engine::Frame()
@@ -84,13 +88,6 @@ void Engine::Render()
 
 	CAMERAMANAGER->Render(CameraViewType::CVT_ACTOR);
 
-	ViewPortTexture world;
-	ViewPortTexture blur;
-	ViewPortTexture bloom;
-	world.CreateViewPortTexture(1440.f, 900.f);
-	blur.CreateViewPortTexture(1440.f, 900.f);
-	bloom.CreateViewPortTexture(1440.f, 900.f);
-
 	_app->Render();
 	// 3D World -> Texture Render
 	{
@@ -106,8 +103,6 @@ void Engine::Render()
 		//POSTPROCESS->RenderCombine(m_p3DWorldTexture->GetSRV());           // Combine 결과를 백버퍼에 출력
 
 		//m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(POSTPROCESS->GetBlurResultSRV().Get());
-
-		m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(blur.GetSRV());
 
 		// 3DWorld를 보여주는 평면은 Rasterizer = SolidNone으로 고정
 		if (m_pCurrentRasterizer)

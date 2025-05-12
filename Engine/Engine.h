@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include "ViewPortTexture.h"
 class IExecute;
 
 class Engine
@@ -12,6 +13,10 @@ class Engine
 	shared_ptr<class AActor> m_p3DWorld = nullptr;
 	shared_ptr<class ViewPortTexture> m_p3DWorldTexture = nullptr;
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
+
+	ViewPortTexture world;
+	ViewPortTexture blur;
+	ViewPortTexture bloom;
 
 public:
 	Engine(HINSTANCE _hInstance, shared_ptr<IExecute> _app);
