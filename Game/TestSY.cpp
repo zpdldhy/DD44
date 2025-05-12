@@ -278,6 +278,7 @@ void TestSY::Init()
 	OBJECTMANAGER->AddActor(m_pSky);	
 }
 
+
 void TestSY::Update()
 {
 	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
