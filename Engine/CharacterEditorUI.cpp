@@ -90,6 +90,7 @@ void CharacterEditorUI::DrawUI()
 
             if (m_pRootComponent)
             {
+                m_pRootComponent->SetMeshPath(to_mw(m_szAssetPath));
                 m_bRootSet = true;
             }
         }
@@ -157,8 +158,12 @@ void CharacterEditorUI::DrawUI()
 
                     parent->AddChild(skinnedChild);
 
+                    // *에러 발생 가능성 있음
+                    // 1. m_iChildIndex++ : child의 child로 만들어짐
+                    // 2. asset path : 동일한 asset에서 가져오는 것으로 설정됨
                     if (m_pRootComponent->GetChild(m_iChildIndex++))
                     {
+                        m_pRootComponent->GetChild(m_iChildIndex - 1)->SetMeshPath(to_mw(m_szAssetPath));
                         m_bChildAttached = true;
                     }
                 }
@@ -175,8 +180,10 @@ void CharacterEditorUI::DrawUI()
 
                     parent->AddChild(staticChild);
 
+                    // *에러 발생 가능성 있음
                     if (m_pRootComponent->GetChild(m_iChildIndex++))
                     {
+                        m_pRootComponent->GetChild(m_iChildIndex - 1)->SetMeshPath(to_mw(m_szAssetPath));
                         m_bChildAttached = true;
                     }
                 }
@@ -188,14 +195,20 @@ void CharacterEditorUI::DrawUI()
             {
                 auto child = m_vMeshList[m_iSelectedMeshIndex];
                 staticRoot->AddChild(child);
-                ImGui::TextColored(ImVec4(0, 1, 0, 1), "Child attached to root.");
+                
+                // *에러 발생 가능성 있음
+                if (m_pRootComponent->GetChild(m_iChildIndex++))
+                {
+                    m_pRootComponent->GetChild(m_iChildIndex - 1)->SetMeshPath(to_mw(m_szAssetPath));
+                    m_bChildAttached = true;
+                }
             }
         }
     }
 
     if (m_bChildAttached)
     {
-        ImGui::TextColored(ImVec4(0, 1, 0, 1), "Skinned child attached to root.");
+        ImGui::TextColored(ImVec4(0, 1, 0, 1), "child attached to root.");
     }
 
     // Material 설정

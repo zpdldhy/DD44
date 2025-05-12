@@ -7,12 +7,6 @@ void ObjectEditorUI::DrawUI()
     // 式式式式式式式式式式式式式式式式式式式式式式式 Object Configuration 式式式式式式式式式式式式式式式式式式式式式式式
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Object Configuration");
 
-    //static const char* actorTypes[] = { "Character", "Enemy", "Object" };
-    //static const char* meshTypes[] = { "Skinned", "Static" };
-
-    //ImGui::Text("Actor Type");   ImGui::SameLine(100); ImGui::Combo("##ActorType", &m_iCurrentActorType, actorTypes, IM_ARRAYSIZE(actorTypes));
-    //ImGui::Text("Mesh Type");    ImGui::SameLine(100); ImGui::Combo("##MeshType", &m_iCurrentMeshType, meshTypes, IM_ARRAYSIZE(meshTypes));
-
     ImGui::Separator(); ImGui::Spacing();
 
     // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Transform 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
@@ -36,8 +30,6 @@ void ObjectEditorUI::DrawUI()
     if (ImGui::Button("Create", ImVec2(-1, 0)) && m_OnCreate)
     {
         m_OnCreate(
-            //m_iCurrentActorType,
-            //m_iCurrentMeshType,
             m_szTexturePath,
             m_szShaderPath,
             m_szObjPath,
@@ -69,7 +61,7 @@ void ObjectEditorUI::DrawUI()
         PrefabLoader().SaveObject(data, "../Resources/Prefab/" + data.Name + ".object.json");
     }
 
-    if (ImGui::Button("Load Prefab", ImVec2(-1, 0)))
+    if (ImGui::Button("Load Prefab##File", ImVec2(-1, 0)))
     {
         PrefabObjectData data;
         std::string path = "../Resources/Prefab/" + std::string(prefabName) + ".object.json";
@@ -101,7 +93,7 @@ void ObjectEditorUI::DrawUI()
 
     if (!selectedPrefabName.empty())
     {
-        if (ImGui::Button("Load Prefab"))
+        if (ImGui::Button("Load Prefab##List"))
         {
             PrefabObjectData data;
             std::string path = "../Resources/Prefab/" + selectedPrefabName + ".object.json";

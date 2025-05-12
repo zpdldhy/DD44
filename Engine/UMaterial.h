@@ -55,6 +55,9 @@ class UMaterial
 {
 	bool m_bUseStencil = false;
 
+	std::wstring m_TexturePath;
+	std::wstring m_ShaderPath;
+
 	shared_ptr<Shader> m_pShader = nullptr;
 	shared_ptr<Texture> m_pTexture = nullptr;
 	shared_ptr<Inputlayout> m_pInputlayout = nullptr;
@@ -113,6 +116,8 @@ public:
 	shared_ptr<Shader> GetShader() { return m_pShader; }
 	shared_ptr<Texture> GetTexture() { return m_pTexture; }
 	shared_ptr<Inputlayout> GetInputlayout() { return m_pInputlayout; }
+	const std::wstring& GetTexturePath() const { return m_TexturePath; }
+	const std::wstring& GetShaderPath() const { return m_ShaderPath; }
 
 public:
 	UMaterial() {}

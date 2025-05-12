@@ -19,8 +19,11 @@ public:
 public:
 	void AddActor(shared_ptr<class AActor> _pActor);
 	void AddActorList(vector<shared_ptr<class AActor>> _vActorList);
+
+	void RemoveActor(std::shared_ptr<class AActor> _pActor);
 	
 	shared_ptr<class AActor> GetActor(UINT _iIndex);
+	const map<UINT, shared_ptr<class AActor>>& GetActorList() const;
 
 private:
 	void CheckStencilList();
