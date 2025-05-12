@@ -139,8 +139,10 @@ vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
 			}
 		}
 		animList.emplace_back(animInstance);
-	}	
-	return m_vAnimInstanceList;
+	}
+	m_vAnimInstanceList = animList;
+
+	return animList;
 }
 
 shared_ptr<APawn> ActorLoader::LoadOneActor(string _path)

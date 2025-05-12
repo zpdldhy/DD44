@@ -2,6 +2,8 @@
 #include "CharacterEditorUI.h"
 #include "USkinnedMeshComponent.h"
 #include "UStaticMeshComponent.h"
+#include "AnimTrack.h"
+#include "Inputlayout.h"
 
 bool CharacterEditorUI::m_bRootSet = false;
 bool CharacterEditorUI::m_bChildAttached = false;
@@ -27,6 +29,7 @@ void CharacterEditorUI::DrawUI()
         }
         m_pLoader->LoadOne(m_szAssetPath);
         m_vMeshList = m_pLoader->LoadMesh();
+        m_vAnimList = m_pLoader->LoadAnim();
     }
 
     // Mesh List 순회
@@ -50,9 +53,29 @@ void CharacterEditorUI::DrawUI()
         }
 
         ImGui::Combo("Mesh List", &m_iSelectedMeshIndex, meshDisplayNamePtrs.data(), (int)meshDisplayNamePtrs.size());
+        ImGui::InputText("Texture File##Root", m_szTextureName, IM_ARRAYSIZE(m_szTextureName));
+        ImGui::InputText("Shader File", m_szShaderName, IM_ARRAYSIZE(m_szShaderName));
     }
 
-    if (m_pLoader && !m_pLoader->m_vAnimInstanceList.empty())
+    if (!m_vMeshList.empty())
+    {
+        if (ImGui::Button("Make Mesh Component"))
+        {
+            m_pRootComponent = m_vMeshList[m_iSelectedMeshIndex];
+            if (m_pRootComponent)
+            {
+                m_pRootComponent->SetMeshPath(to_mw(m_szAssetPath));
+            }
+
+            auto mat = std::make_shared<UMaterial>();
+            mat->Load(to_mw(m_szTextureName), to_mw(m_szShaderName));
+            mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+            m_pRootComponent->SetMaterial(mat);
+        }
+    }
+
+    //if (m_pLoader && !m_pLoader->m_vAnimInstanceList.empty())
+    if (m_pLoader && !m_vAnimList.empty())
     {
         auto animInstance = m_pLoader->m_vAnimInstanceList[0];
         const auto& animList = animInstance->GetAnimTrackList();
@@ -78,29 +101,16 @@ void CharacterEditorUI::DrawUI()
         ImGui::SliderFloat("Anim Speed", &tempAnimPlayRate, 1.0f, 60.0f, "%.1f");
         animInstance->m_fAnimPlayRate = tempAnimPlayRate;
 
-        animInstance->SetCurrentAnimTrack(m_iSelectedAnimIndex);
-    }
-
-    // Child Mesh 설정
-    if (!m_vMeshList.empty())
-    {
-        ImGui::InputText("Texture File##Root", m_szTextureName, IM_ARRAYSIZE(m_szTextureName));
-        ImGui::InputText("Shader File", m_szShaderName, IM_ARRAYSIZE(m_szShaderName));
-
-        if (ImGui::Button("Set As Root Component"))
+        if (ImGui::Button("Set Anim Instance"))
         {
-            m_pRootComponent = m_vMeshList[m_iSelectedMeshIndex];
-            if (m_pRootComponent)
-            {
-                m_pRootComponent->SetMeshPath(to_mw(m_szAssetPath));
-                m_bRootSet = true;
-
-                //auto mat = std::make_shared<UMaterial>();
-                //mat->Load(to_mw(m_szTextureName), to_mw(m_szShaderName));
-                //m_pRootComponent->SetMaterial(mat);
-            }
+            dynamic_cast<USkinnedMeshComponent*>(m_pRootComponent.get())->SetBaseAnim(animInstance);
+            shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
+            animTrack->SetBase(animInstance);
+            dynamic_cast<USkinnedMeshComponent*>(m_pRootComponent.get())->SetMeshAnim(animTrack);
+            animInstance->SetCurrentAnimTrack(m_iSelectedAnimIndex);
         }
     }
+
     if (m_bRootSet)
     {
         ImGui::TextColored(ImVec4(0, 1, 0, 1), "Root component set.");
