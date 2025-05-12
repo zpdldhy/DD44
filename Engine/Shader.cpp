@@ -87,6 +87,80 @@ bool Shader::CreatePixelShader(std::wstring _filename)
 	if (errorCode) errorCode->Release();
 	return true;
 }
+
+ComPtr<ID3D11GeometryShader> Shader::CreateGeometryShader(ComPtr<ID3DBlob> blob)
+{
+	ComPtr<ID3D11GeometryShader> gs;
+	HRESULT hr = DEVICE->CreateGeometryShader(
+		blob->GetBufferPointer(),
+		blob->GetBufferSize(),
+		nullptr,
+		gs.GetAddressOf());
+	if (FAILED(hr))
+	{
+		DX_CHECK(hr, _T(__FUNCTION__));
+		return nullptr;
+	}
+	return gs;
+}
+
+ComPtr<ID3DBlob> Shader::CompileVS(const std::wstring& file, const std::string& entry)
+{
+	ComPtr<ID3DBlob> blob;
+	ComPtr<ID3DBlob> errorBlob;
+	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+#if _DEBUG
+	flags |= D3DCOMPILE_DEBUG;
+	flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+	HRESULT hr = D3DCompileFromFile(file.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		entry.c_str(), "vs_5_0", flags, 0, blob.GetAddressOf(), errorBlob.GetAddressOf());
+	if (FAILED(hr))
+	{
+		DX_CHECK(hr, _T(__FUNCTION__));
+		return nullptr;
+	}
+	return blob;
+}
+
+ComPtr<ID3DBlob> Shader::CompileGS(const std::wstring& file, const std::string& entry, bool streamOut)
+{
+	ComPtr<ID3DBlob> blob;
+	ComPtr<ID3DBlob> errorBlob;
+	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+#if _DEBUG
+	flags |= D3DCOMPILE_DEBUG;
+	flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+	HRESULT hr = D3DCompileFromFile(file.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		entry.c_str(), "gs_5_0", flags, 0, blob.GetAddressOf(), errorBlob.GetAddressOf());
+	if (FAILED(hr))
+	{
+		DX_CHECK(hr, _T(__FUNCTION__));
+		return nullptr;
+	}
+	return blob;
+}
+
+ComPtr<ID3DBlob> Shader::CompilePS(const std::wstring& file, const std::string& entry)
+{
+	ComPtr<ID3DBlob> blob;
+	ComPtr<ID3DBlob> errorBlob;
+	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+#if _DEBUG
+	flags |= D3DCOMPILE_DEBUG;
+	flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+	HRESULT hr = D3DCompileFromFile(file.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		entry.c_str(), "ps_5_0", flags, 0, blob.GetAddressOf(), errorBlob.GetAddressOf());
+	if (FAILED(hr))
+	{
+		DX_CHECK(hr, _T(__FUNCTION__));
+		return nullptr;
+	}
+	return blob;
+}
+
 void Shader::Release()
 {
 }

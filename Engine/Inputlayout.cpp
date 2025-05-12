@@ -90,3 +90,19 @@ InputlayoutManager::~InputlayoutManager()
 {
 	m_mList.clear();
 }
+
+
+bool InputlayoutManager::CreateParticleLayout(ComPtr<ID3DBlob> code)
+{
+	D3D11_INPUT_ELEMENT_DESC layout[] = {
+		{ "POSITION",  0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "VELOCITY", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "SIZE",     0, DXGI_FORMAT_R32G32_FLOAT,		0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "AGE",      0, DXGI_FORMAT_R32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TYPE",     0, DXGI_FORMAT_R32_UINT,		0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+	auto inputlayout = make_shared<Inputlayout>();
+	inputlayout->Load(code, layout, ARRAYSIZE(layout));
+	m_mList[L"Particle"] = inputlayout;
+	return true;
+}

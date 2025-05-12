@@ -6,13 +6,19 @@ class Shader
 public:
 	ComPtr<ID3D11VertexShader> m_pVertexShader;
 	ComPtr<ID3D11PixelShader> m_pPixelShader;
-public:
 	ComPtr<ID3DBlob> m_pCode;
+
 public:
 	bool Load(wstring);
 	bool CreateVertexShader(wstring);
 	bool CreatePixelShader(wstring);
 	virtual void Release();
+
+	ComPtr<ID3DBlob> CompileVS(const std::wstring& file, const std::string& entry);
+	ComPtr<ID3DBlob> CompileGS(const std::wstring& file, const std::string& entry, bool streamOut);
+	ComPtr<ID3DBlob> CompilePS(const std::wstring& file, const std::string& entry);
+
+	ComPtr<ID3D11GeometryShader> CreateGeometryShader(ComPtr<ID3DBlob> blob);
 };
 
 class ShaderManager : public Singleton<ShaderManager>

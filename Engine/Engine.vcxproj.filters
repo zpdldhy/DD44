@@ -76,6 +76,9 @@
     <Filter Include="Object\Light">
       <UniqueIdentifier>{bf228db6-d262-40b0-9adf-1d0e57d56b83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Particle">
+      <UniqueIdentifier>{92646043-84cf-42a4-bdf7-e4693be2df1b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
