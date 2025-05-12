@@ -93,8 +93,8 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateTriangle()
 	vVertexList.resize(3);
 	vIndexList.resize(3);
 
-	Vec3 vMin = Vec3(0.0f, +0.0f, -0.5f);
-	Vec3 vMax = Vec3(+1.0f, +1.0f, +0.5f);
+	Vec3 vMin = Vec3(-0.5f, -0.5f, -0.0f);
+	Vec3 vMax = Vec3(+0.5f, +0.5f, +0.0f);
 
 	// Front
 	vVertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0, 0, -1), Vec4(1, 0, 0, 1), Vec2(0, 1));

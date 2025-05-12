@@ -72,6 +72,19 @@ void TestSY::Init()
 	}
 
 	{
+		auto pActor = make_shared<APawn>();
+
+		auto pMesh = UStaticMeshComponent::CreateTriangle();
+		pActor->SetMeshComponent(pMesh);
+
+		auto pMaterial = make_shared<UMaterial>();
+		pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
+		pMesh->SetMaterial(pMaterial);
+
+		OBJECTMANAGER->AddActor(pActor);
+	}
+
+	{
 		m_pSky = make_shared<ASky>();
 
 		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
@@ -342,16 +355,32 @@ void TestSY::SetClickPos()
 
 	OBJECTMANAGER->AddActor(pActor);
 
-	Plane p1(Vec3(100.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
-	Plane p2(Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
+	// Check RayToPlane
+	//Plane p1(Vec3(100.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
+	//Plane p2(Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
 
-	float d = p1.DotNormal(Vec3(0.f, 0.f, 2.f));
-	float dot = p1.Normal().Dot(Vec3(0.f, 0.f, 1.f));
+	//float d = p1.DotNormal(Vec3(0.f, 0.f, 2.f));
+	//float dot = p1.Normal().Dot(Vec3(0.f, 0.f, 1.f));
 
-	bool col = CollisionManager::RayToPlane(m_vMouseRay, p1);
+	//bool col = CollisionManager::RayToPlane(m_vMouseRay, p1);
 
-	if (col == true)
-		int k = 0;
-	
-	int i = 0;
+	//if (col == true)
+	//	int k = 0;
+
+	// Check GetInterSection, PointInPolygon
+	Vec3 v0 = Vec3(-0.5f, -0.5f, 0.f);
+	Vec3 v1 = Vec3(-0.5f, +0.5f, 0.f);
+	Vec3 v2 = Vec3(+0.5f, -0.5f, 0.f);
+	Vec3 normal = Vec3(0.f, 0.f, -1.f);
+	Vec3 inter;
+
+	bool bInter = CollisionManager::GetIntersection(m_vMouseRay, v0, normal, inter);
+
+	if (bInter == true)
+	{
+		bool col = CollisionManager::PointInPolygon(inter, normal, v0, v1, v2);
+
+		if (col == true)
+			int i = 0;
+	}
 }
