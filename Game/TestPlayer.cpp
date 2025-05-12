@@ -16,16 +16,43 @@ void TestPlayer::Init()
 	shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
 	{
 		loader = make_shared<ActorLoader>();
-		player = loader->LoadOne("../Resources/Asset/crow_final.asset");
+		player = loader->LoadOneActor("../Resources/Asset/crow_final.asset");
+		meshList = loader->LoadMesh();
 		auto cameraComponent = make_shared<UCameraComponent>();
 		cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
 		player->SetCameraComponent(cameraComponent);
 		player->AddScript(movement);
 
-		//map<wstring, shared_ptr<UMeshComponent>> meshList = loader->LoadMesh();
-		//dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetAnimInstance(player->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance());
-		//dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetTargetBoneIndex(43);
-		//player->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[2]);
+		#pragma region ChildMeshes
+		{
+			auto animInstance = player->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+
+			{
+				auto weapon = dynamic_cast<UStaticMeshComponent*>(meshList[2].get());
+
+				Matrix matBone = animInstance->GetBoneAnim(43);
+				weapon->SetMatBone(matBone);
+
+				weapon->SetAnimInstance(animInstance);
+				weapon->SetTargetBoneIndex(43);
+				weapon->SetLocalPosition(Vec3(-1.15f, 0.2f, -0.8f));
+				player->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[2]);
+			}
+
+			{
+				auto eye = dynamic_cast<UStaticMeshComponent*>(meshList[1].get());
+
+				Matrix matBone = animInstance->GetBoneAnim(57);
+				eye->SetMatBone(matBone);
+
+				eye->SetAnimInstance(animInstance);
+				eye->SetTargetBoneIndex(57);
+				// Idle
+				eye->SetLocalPosition(Vec3(-0.45f, 0.36f, -0.25f));
+				player->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[1]);
+			}
+		}
+		#pragma endregion
 		OBJECTMANAGER->AddActor(player);
 	}
 	// 카메라 세팅
@@ -80,20 +107,9 @@ void TestPlayer::Init()
 
 void TestPlayer::Update()
 {
-	m_pCameraActor->Tick();
-	for (int i = 0; i < gizmo.size(); i++)
-	{
-		gizmo[i]->Tick();
-	}
-
-	player->Tick();
+	
 }
 
 void TestPlayer::Render()
 {
-	player->Render();
-	for (int i = 0; i < gizmo.size(); i++)
-	{
-		gizmo[i]->Render();
-	}
 }

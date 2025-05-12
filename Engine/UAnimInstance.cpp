@@ -19,7 +19,7 @@ void UAnimInstance::Tick()
 		animFrame = 0;
 	}
 
-	// ROOTMOTION üũ
+	// ROOTMOTION
 	if (m_bInPlace)
 	{
 		rootPos.x = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._41;

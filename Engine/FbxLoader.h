@@ -5,8 +5,6 @@
 #pragma comment(lib, "Fbx/libxml2-md.lib")
 #pragma comment(lib, "Fbx/zlib-md.lib")
 
-
-
 struct TIwData
 {
 	vector<UINT> m_vIndexList;
@@ -18,30 +16,7 @@ struct TIwData
 		return m_vIndexList.size();
 	}
 };
-//struct AnimTrackData
-//{
-//	wstring m_szName;
-//	UINT m_iStartFrame;
-//	UINT m_iEndFrame;
-//
-//	vector<vector<Matrix>> m_vAnim;
-//};
-//struct MeshData
-//{
-//	bool m_bSkeleton = false;
-//	vector<PNCT_VERTEX> m_vVertexList;
-//	vector<IW_VERTEX> m_vIwList;
-//	vector<DWORD> m_vIndexList;
-//	UINT m_iMaterialIndex = -1;
-//	vector<Matrix> m_vInverseBindPose;
-//};
-//struct BoneNode
-//{
-//	UINT m_iIndex;
-//	wstring m_szName;
-//	wstring m_szParentName;
-//	vector<wstring> m_vChildName;
-//};
+
 struct TFbxResource
 {
 	wstring name;
@@ -83,15 +58,15 @@ struct TFbxResource
 	}
 };
 
-struct ParsingData
-{
-	TFbxResource m_ActorData;
-
-	vector<MeshData> m_vMeshList;
-	AnimSequence m_AnimData;
-	Skeleton m_Skeleton;
-	vector<wstring> m_vTexPathList;
-};
+//struct ParsingData
+//{
+//	TFbxResource m_ActorData;
+//
+//	vector<MeshData> m_vMeshList;
+//	AnimSequence m_AnimData;
+//	Skeleton m_Skeleton;
+//	vector<wstring> m_vTexPathList;
+//};
 
 struct TempNode
 {
@@ -120,6 +95,8 @@ public:
 
 	Vec4 m_vRootPos;
 	UINT m_iBoneIndex = 0;
+	Vec4 m_vStaticRootPos;
+
 	// Anim 
 	int repeatThreshold = 2;
 	int repeatCount = 0;
@@ -138,7 +115,6 @@ public:
 	void GetAnimationTrack(int animTrack, int Count);
 	void GetAnimation(int animTrack, AnimTrackData* track);
 	vector<Matrix> GetNodeAnimation(FbxNode* node, AnimTrackData* track);
-
 
 public:
 	string ParseMaterial(FbxSurfaceMaterial* _pSurface);

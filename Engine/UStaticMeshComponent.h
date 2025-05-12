@@ -33,4 +33,8 @@ public:
 	static shared_ptr<UStaticMeshComponent> CreatePlane();
 	static shared_ptr<UStaticMeshComponent> CreateCube();
 	static shared_ptr<UStaticMeshComponent> CreateSphere(int _sliceCount, int _stackCount);
+
+	//TEMP Áö¿ï°Í
+	Matrix matBone;
+	void SetMatBone(Matrix mat) { matBone = mat; }
 };
