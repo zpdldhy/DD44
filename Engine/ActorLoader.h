@@ -15,10 +15,15 @@ public:
 	vector<shared_ptr<UAnimInstance>> m_vAnimInstanceList;
 public:
 	void ConvertFbxToAsset(string _path = "../Resources/Fbx/DeathDoor/*.fbx");
-	vector<shared_ptr<AActor>> Load();
-	shared_ptr<APawn> LoadOne(string _path);
+	void LoadAllAsset();
+	void LoadOne(string _path);
 	vector<shared_ptr<UMeshComponent>> LoadMesh();
 	vector<wstring> LoadTexPath();
 	vector<shared_ptr<UAnimInstance>> LoadAnim();
+
+	// prefab전 바로 사용을 위한 
+	shared_ptr<APawn> LoadOneActor(string _path);
+	vector<shared_ptr<APawn>> LoadAllActor();
+
 };
 

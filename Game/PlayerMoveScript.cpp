@@ -33,20 +33,20 @@ void PlayerMoveScript::Tick()
 
 	if (INPUT->GetButtonDown(LEFT))
 	{
-		moveDir += -m_vRight;// * m_fSpeed * deltaTime;
+		moveDir += -m_vRight;
 	}
 
 	if (INPUT->GetButtonDown(DOWN))
 	{
-		moveDir += -m_vLook;// * m_fSpeed * deltaTime;
+		moveDir += -m_vLook;
 	}
 
 	if (INPUT->GetButtonDown(RIGHT))
 	{
-		moveDir += m_vRight;// * m_fSpeed * deltaTime;
+		moveDir += m_vRight;
 	}
 
-	if (INPUT->GetButtonDown(LCLICK))
+	if (INPUT->GetButton(LCLICK))
 	{
 		m_bAttack  = true;
 		int targetIndex = m_pAnimInstance->GetAnimIndex(L"Slash_Light_R_new");

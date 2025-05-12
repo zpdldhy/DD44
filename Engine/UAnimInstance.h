@@ -25,6 +25,7 @@ class UAnimInstance
 public:
 	friend class AnimTrack;
 	bool m_bOnPlayOnce;
+	bool m_bPlay;
 
 public:
 	void Tick();
@@ -40,6 +41,6 @@ public:
 
 public:
 	const std::vector<AnimList>& GetAnimTrackList() const { return animTrackList; }
-	float m_fAnimPlayRate = 30.0f;
+	float m_fAnimPlayRate = 25.0f;
 };
 
