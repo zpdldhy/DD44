@@ -42,11 +42,26 @@ void ActorListUI::DrawUI()
         {
             auto actor = it->second;
 
-            // 현재 SRT 값
+            // 선택 변경 감지
             if (m_iSelectedActorID != m_iLastActorID)
             {
-                m_iLastActorID = m_iSelectedActorID;
+                if (m_iLastActorID >= 0)
+                {
+                    auto prevIt = actorMap.find(m_iLastActorID);
+                    if (prevIt != actorMap.end())
+                    {
+                        auto prevActor = prevIt->second;
+                        auto prevMeshComp = prevActor->GetMeshComponent<UMeshComponent>();
+                        if (prevMeshComp && prevMeshComp->GetMaterial())
+                            prevMeshComp->GetMaterial()->SetGlowParams(0.0f, Vec3(0.0f, 0.0f, 0.0f));
+                    }
+                }
 
+                auto meshComp = actor->GetMeshComponent<UMeshComponent>();
+                if (meshComp && meshComp->GetMaterial())
+                    meshComp->GetMaterial()->SetGlowParams(0.7f, Vec3(1.0f, 0.0f, 0.0f));
+
+                m_iLastActorID = m_iSelectedActorID;
                 m_vPosition = actor->GetPosition();
                 m_vRotation = actor->GetRotation();
                 m_vScale = actor->GetScale();
