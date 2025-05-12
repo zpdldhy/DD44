@@ -12,9 +12,21 @@ struct CB_Blur
 
 class PostProcessManager : public Singleton<PostProcessManager>
 {
+	// Get Prev Viewport
+	D3D11_VIEWPORT m_PrevVP;
+	UINT m_iPrevViewPorts = 0;
+	ID3D11RenderTargetView* m_pPrevRTV = nullptr;
+	ID3D11DepthStencilView* m_pPrevDSV = nullptr;
+
 public:
-	//후처리용 텍스처 및 shader초기화
+	// 후처리용 텍스처 및 shader초기화
 	void Init(UINT width, UINT height);
+	void PreRender(UINT _iViewPortCount, vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList, vector<D3D11_VIEWPORT> _VPList);
+	void PostRender();
+
+private:
+	void ClearViewPort(vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList);
+
 	//2-pass 가우시안 블러 생성
 	void Blur(const ComPtr<ID3D11ShaderResourceView>& input);
 	//Blur 결과와 원본을 합성해 최종 렌더링

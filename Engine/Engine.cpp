@@ -84,18 +84,30 @@ void Engine::Render()
 
 	CAMERAMANAGER->Render(CameraViewType::CVT_ACTOR);
 
+	ViewPortTexture world;
+	ViewPortTexture blur;
+	ViewPortTexture bloom;
+	world.CreateViewPortTexture(1440.f, 900.f);
+	blur.CreateViewPortTexture(1440.f, 900.f);
+	bloom.CreateViewPortTexture(1440.f, 900.f);
+
 	_app->Render();
 	// 3D World -> Texture Render
 	{
-		m_p3DWorldTexture->BeginViewPort();
+		vector<ID3D11RenderTargetView*> RTVList = { world.GetRTV(), blur.GetRTV() , bloom.GetRTV() };
+		vector<D3D11_VIEWPORT> VPList = { world.GetVP(), blur.GetVP() , bloom.GetVP() };
+
+		POSTPROCESS->PreRender(2, RTVList, world.GetDSV(), VPList);
 		// ObjectList Render
 		OBJECTMANAGER->Render();
-		m_p3DWorldTexture->EndViewPort();
+		POSTPROCESS->PostRender();
 
-		POSTPROCESS->Blur(m_p3DWorldTexture->GetSRV());                    // 2-pass Blur
-		POSTPROCESS->RenderCombine(m_p3DWorldTexture->GetSRV());           // Combine 결과를 백버퍼에 출력
+		//POSTPROCESS->Blur(m_p3DWorldTexture->GetSRV());                    // 2-pass Blur
+		//POSTPROCESS->RenderCombine(m_p3DWorldTexture->GetSRV());           // Combine 결과를 백버퍼에 출력
 
-		m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(POSTPROCESS->GetBlurResultSRV().Get());
+		//m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(POSTPROCESS->GetBlurResultSRV().Get());
+
+		m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(blur.GetSRV());
 
 		// 3DWorld를 보여주는 평면은 Rasterizer = SolidNone으로 고정
 		if (m_pCurrentRasterizer)
@@ -171,7 +183,7 @@ void Engine::Create3DWorld()
 	auto pMesh = UStaticMeshComponent::CreatePlane();
 
 	auto pMaterial = make_shared<UMaterial>();
-	pMaterial->Load(L"", L"../Resources/Shader/Default.hlsl");
+	pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PRDefault.hlsl");
 	pMesh->SetMaterial(pMaterial);
 
 	m_p3DWorld->SetMeshComponent(pMesh);
@@ -182,5 +194,5 @@ void Engine::Create3DWorld()
 	m_p3DWorldTexture = make_shared<ViewPortTexture>();
 	m_p3DWorldTexture->CreateViewPortTexture(fWinSizeX, fWinSizeY);
 
-	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(m_p3DWorldTexture);
+	//m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(m_p3DWorldTexture);
 }

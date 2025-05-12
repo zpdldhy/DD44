@@ -322,6 +322,14 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
+    <None Include="..\Resources\Shader\PRHeader.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Resources\Shader\PRDefault.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

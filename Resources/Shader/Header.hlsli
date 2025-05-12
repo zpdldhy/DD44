@@ -127,7 +127,9 @@ struct VS_OUT_RIM
 
 struct PS_OUT
 {
-    float4 c : SV_Target;
+    float4 c : SV_Target0;
+    float4 c1 : SV_Target1;
+    float4 c2 : SV_Target2;
 };
 
 Texture2D g_txDiffuseA : register(t0);
