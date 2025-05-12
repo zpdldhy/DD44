@@ -3,7 +3,6 @@
 
 void CollisionManager::Tick()
 {
-
 	m_vCollisionActor.clear();
 }
 
@@ -14,24 +13,19 @@ void CollisionManager::Destroy()
 
 bool CollisionManager::RayToPlane(const Ray& _ray, const Plane& _plane)
 {
-	// Ray의 Start Point와 Plane의 거리
+	// Ray의 Start Point와 Plane의 거리, normal 방향쪽에 있으면 양수
 	float d = _plane.DotNormal(_ray.position);
-	// Ray의 방향과 Plane의 Normal 내적	
 
-	// 평면 위의 점
-	if (d == 0) return true;
+	Vec3 dir = _ray.direction;
+	Vec3 normal = _plane.Normal();
+	dir.Normalize();
+	normal.Normalize();
 
-	// 법선과 같은 방향
-	else if (d > 0)
-	{
+	// Ray의 방향과 Plane의 Normal 내적
+	float dot = normal.Dot(dir);
 
-	}
+	if (d * dot <= 0)
+		return true;
 
-	// 
-	else
-	{
-
-	}
-
-	return true;
+	return false;
 }

@@ -31,6 +31,7 @@
 #include "PrefabLoader.h"
 #include "Timer.h"
 #include "Functions.h"
+#include "CollisionManager.h"
 
 void TestSY::Init()
 {
@@ -323,7 +324,7 @@ void TestSY::SetClickPos()
 
 	vMouseEnd = Vec3::Transform(vMouseEnd, mProjViewInvert);
 
-	m_vMouseRay.position = pCamera->GetLocalPosition();
+	m_vMouseRay.position = pCamera->GetWorldPosition();
 	m_vMouseRay.direction = vMouseEnd - m_vMouseRay.position;
 
 	Vec3 vMouseMiddle = (vMouseEnd + m_vMouseRay.position) / 2.f;
@@ -345,6 +346,12 @@ void TestSY::SetClickPos()
 	Plane p2(Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
 
 	float d = p1.DotNormal(Vec3(0.f, 0.f, 2.f));
+	float dot = p1.Normal().Dot(Vec3(0.f, 0.f, 1.f));
+
+	bool col = CollisionManager::RayToPlane(m_vMouseRay, p1);
+
+	if (col == true)
+		int k = 0;
 	
 	int i = 0;
 }
