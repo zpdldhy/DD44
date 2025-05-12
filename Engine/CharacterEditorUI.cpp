@@ -84,14 +84,20 @@ void CharacterEditorUI::DrawUI()
     // Child Mesh 설정
     if (!m_vMeshList.empty())
     {
+        ImGui::InputText("Texture File##Root", m_szTextureName, IM_ARRAYSIZE(m_szTextureName));
+        ImGui::InputText("Shader File", m_szShaderName, IM_ARRAYSIZE(m_szShaderName));
+
         if (ImGui::Button("Set As Root Component"))
         {
             m_pRootComponent = m_vMeshList[m_iSelectedMeshIndex];
-
             if (m_pRootComponent)
             {
                 m_pRootComponent->SetMeshPath(to_mw(m_szAssetPath));
                 m_bRootSet = true;
+
+                //auto mat = std::make_shared<UMaterial>();
+                //mat->Load(to_mw(m_szTextureName), to_mw(m_szShaderName));
+                //m_pRootComponent->SetMaterial(mat);
             }
         }
     }
@@ -139,6 +145,8 @@ void CharacterEditorUI::DrawUI()
                 ImGui::Combo("Attach Bone", &selectedBoneIndex, boneNamePtrs.data(), (int)boneNamePtrs.size());
             }
 
+            ImGui::InputText("Texture File", m_szChildTextureName, IM_ARRAYSIZE(m_szChildTextureName));
+
             if (ImGui::Button("Attach To Root"))
             {
                 auto parent = m_pRootComponent;
@@ -152,19 +160,24 @@ void CharacterEditorUI::DrawUI()
 
                     if (auto skinnedParent = std::dynamic_pointer_cast<USkinnedMeshComponent>(parent))
                     {
+                        auto mat = std::make_shared<UMaterial>();
+                        mat->Load(to_mw(m_szChildTextureName), to_mw(m_szShaderName));
+                        skinnedChild->SetMaterial(mat);
+
                         auto anim = skinnedParent->GetAnimInstance();
                         skinnedChild->SetBaseAnim(anim);
                     }
-
+                    auto prevLastChild = m_pRootComponent->GetChildren().empty() ? nullptr : m_pRootComponent->GetChildren().back();
                     parent->AddChild(skinnedChild);
 
-                    // *에러 발생 가능성 있음
-                    // 1. m_iChildIndex++ : child의 child로 만들어짐
-                    // 2. asset path : 동일한 asset에서 가져오는 것으로 설정됨
-                    if (m_pRootComponent->GetChild(m_iChildIndex++))
+                    if (!m_pRootComponent->GetChildren().empty() && m_pRootComponent->GetChildren().back() != prevLastChild)
                     {
-                        m_pRootComponent->GetChild(m_iChildIndex - 1)->SetMeshPath(to_mw(m_szAssetPath));
-                        m_bChildAttached = true;
+                        auto lastChild = m_pRootComponent->GetChildren().back();
+                        if (lastChild)
+                        {
+                            lastChild->SetMeshPath(to_mw(m_szAssetPath));
+                            m_bChildAttached = true;
+                        }
                     }
                 }
                 else
@@ -173,34 +186,51 @@ void CharacterEditorUI::DrawUI()
 
                     if (auto skinnedParent = std::dynamic_pointer_cast<USkinnedMeshComponent>(parent))
                     {
+                        auto mat = std::make_shared<UMaterial>();
+                        mat->Load(to_mw(m_szChildTextureName), to_mw(m_szShaderName));
+                        staticChild->SetMaterial(mat);
+
                         auto anim = skinnedParent->GetAnimInstance();
                         staticChild->SetAnimInstance(anim);
                         staticChild->SetTargetBoneIndex(selectedBoneIndex);
                     }
-
+                    auto prevLastChild = m_pRootComponent->GetChildren().empty() ? nullptr : m_pRootComponent->GetChildren().back();
                     parent->AddChild(staticChild);
 
-                    // *에러 발생 가능성 있음
-                    if (m_pRootComponent->GetChild(m_iChildIndex++))
+                    if (!m_pRootComponent->GetChildren().empty() && m_pRootComponent->GetChildren().back() != prevLastChild)
                     {
-                        m_pRootComponent->GetChild(m_iChildIndex - 1)->SetMeshPath(to_mw(m_szAssetPath));
-                        m_bChildAttached = true;
+                        auto lastChild = m_pRootComponent->GetChildren().back();
+                        if (lastChild)
+                        {
+                            lastChild->SetMeshPath(to_mw(m_szAssetPath));
+                            m_bChildAttached = true;
+                        }
                     }
                 }
             }
         }
+        // StaticRoot인 경우 없으면 삭제
         else if (staticRoot)
         {
             if (ImGui::Button("Attach To Root"))
             {
                 auto child = m_vMeshList[m_iSelectedMeshIndex];
-                staticRoot->AddChild(child);
+                auto prevLastChild = m_pRootComponent->GetChildren().empty() ? nullptr : m_pRootComponent->GetChildren().back();
                 
-                // *에러 발생 가능성 있음
-                if (m_pRootComponent->GetChild(m_iChildIndex++))
+                auto mat = std::make_shared<UMaterial>();
+                mat->Load(to_mw(m_szChildTextureName), to_mw(m_szShaderName));
+                child->SetMaterial(mat);
+
+                staticRoot->AddChild(child);
+
+                if (!m_pRootComponent->GetChildren().empty() && m_pRootComponent->GetChildren().back() != prevLastChild)
                 {
-                    m_pRootComponent->GetChild(m_iChildIndex - 1)->SetMeshPath(to_mw(m_szAssetPath));
-                    m_bChildAttached = true;
+                    auto lastChild = m_pRootComponent->GetChildren().back();
+                    if (lastChild)
+                    {
+                        lastChild->SetMeshPath(to_mw(m_szAssetPath));
+                        m_bChildAttached = true;
+                    }
                 }
             }
         }
@@ -209,16 +239,6 @@ void CharacterEditorUI::DrawUI()
     if (m_bChildAttached)
     {
         ImGui::TextColored(ImVec4(0, 1, 0, 1), "child attached to root.");
-    }
-
-    // Material 설정
-    if (!m_vMeshList.empty())
-    {
-        ImGui::Separator();
-        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Material Configuration");
-
-        ImGui::InputText("Texture File", m_szTextureName, IM_ARRAYSIZE(m_szTextureName));
-        ImGui::InputText("Shader File", m_szShaderName, IM_ARRAYSIZE(m_szShaderName));
     }
 
     // 스크립트 설정

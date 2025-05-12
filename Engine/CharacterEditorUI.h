@@ -22,6 +22,7 @@ public:
 
 private:
     char m_szTextureName[256] = "../Resources/Texture/kkongchi.jpg";
+    char m_szChildTextureName[256] = "../Resources/Texture/kkongchi.jpg";
     char m_szShaderName[256] = "../Resources/Shader/Default.hlsl";
     char m_szAssetPath[256] = "../Resources/Asset/crow_final.asset";
 
