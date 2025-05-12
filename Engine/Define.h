@@ -19,6 +19,5 @@
 #define OBJECTMANAGER	GET_SINGLE(ObjectManager)
 #define PREFAB      GET_SINGLE(PrefabLoader)
 #define LIGHTMANAGER GET_SINGLE(LightManager)
-#define COLLISION	GET_SINGLE(CollisionManager)
 
 #define DD_PI		3.1415926f

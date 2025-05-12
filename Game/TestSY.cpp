@@ -32,6 +32,7 @@
 #include "Timer.h"
 #include "Functions.h"
 #include "CollisionManager.h"
+#include "MousePicking.h"
 
 void TestSY::Init()
 {
@@ -280,7 +281,7 @@ void TestSY::Update()
 	}
 
 	// Mouse Picking
-	if (INPUT->GetButton(LCLICK))
+	if (INPUT->GetButtonDown(LCLICK))
 		SetClickPos();
 }
 
@@ -295,32 +296,13 @@ void TestSY::Destroy()
 
 void TestSY::SetClickPos()
 {
-	POINT mousePos = INPUT->GetMousePos();
-	float deltaTime = TIMER->GetDeltaTime() * 10.f;
+	MousePicking m_vRay;
 
-	float fWinSizeX = static_cast<float>(g_windowSize.x);
-	float fWinSizeY = static_cast<float>(g_windowSize.y);
-
-	auto pCamera = CAMERAMANAGER->Get3DCameraComponent();
-
-	// To NDC
-	Vec3 vMouseEnd(0.f, 0.f, 1.f);
-	vMouseEnd.x = (2.f * static_cast<float>(mousePos.x) / fWinSizeX) - 1.f;
-	vMouseEnd.y = 1.f - (2.f * static_cast<float>(mousePos.y) / fWinSizeY);
-
-	Matrix mProjViewInvert = Matrix::Identity;
-	(pCamera->GetView() * pCamera->GetProjection()).Invert(mProjViewInvert);
-
-	vMouseEnd = Vec3::Transform(vMouseEnd, mProjViewInvert);
-
-	m_vMouseRay.position = pCamera->GetWorldPosition();
-	m_vMouseRay.direction = vMouseEnd - m_vMouseRay.position;
-
-	Vec3 vMouseMiddle = (vMouseEnd + m_vMouseRay.position) / 2.f;
+	m_vRay.Click();
 
 	auto pActor = make_shared<APawn>();
 
-	auto pMesh = UStaticMeshComponent::CreateRay(m_vMouseRay.position, vMouseEnd);
+	auto pMesh = UStaticMeshComponent::CreateRay(m_vRay.position, m_vRay.m_vMouseEndPos);
 	pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	
 	pActor->SetMeshComponent(pMesh);
@@ -350,11 +332,11 @@ void TestSY::SetClickPos()
 	Vec3 normal = Vec3(0.f, 0.f, -1.f);
 	Vec3 inter;
 
-	bool bInter = CollisionManager::GetIntersection(m_vMouseRay, v0, normal, inter);
+	bool bInter = Collision::GetIntersection(m_vRay, v0, normal, inter);
 
 	if (bInter == true)
 	{
-		bool col = CollisionManager::PointInPolygon(inter, normal, v0, v1, v2);
+		bool col = Collision::PointInPolygon(inter, normal, v0, v1, v2);
 
 		if (col == true)
 			int i = 0;

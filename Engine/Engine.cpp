@@ -52,7 +52,6 @@ void Engine::Frame()
 	{
 		OBJECTMANAGER->Tick();
 		UIMANAGER->Tick();
-		COLLISION->Tick();
 	}
 
 	GET_SINGLE(Device)->Frame();
@@ -118,9 +117,7 @@ void Engine::Render()
 
 void Engine::Release()
 {
-	OBJECTMANAGER->Destroy();
-	UIMANAGER->Destroy();
-	COLLISION->Destroy();
+	UIMANAGER->Destroy();	
 
 	{
 		ImGui_ImplDX11_Shutdown();  // DX11 包访 府家胶 秦力

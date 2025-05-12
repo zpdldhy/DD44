@@ -2,19 +2,22 @@
 #include "CollisionManager.h"
 #include "ObjectManager.h"
 
-void CollisionManager::Tick()
+void Collision::CheckCollision(vector<shared_ptr<class AActor>> _vActorList)
 {
-	m_vCollisionActor = OBJECTMANAGER->GetActorList();
+	_vActorList = OBJECTMANAGER->GetActorList();	// 임시 코드, Quad 구현 후 제거
 
-	m_vCollisionActor.clear();
+	for(auto& pObj : _vActorList)
+	{
+		for (auto& pSub : _vActorList)
+		{
+			if (pObj == pSub) continue;
+		}
+	}
+
+	_vActorList.clear();
 }
 
-void CollisionManager::Destroy()
-{
-	m_vCollisionActor.clear();
-}
-
-bool CollisionManager::RayToPlane(const Ray& _ray, const Plane& _plane)
+bool Collision::RayToPlane(const Ray& _ray, const Plane& _plane)
 {
 	// Ray의 Start Point와 Plane의 거리, normal 방향쪽에 있으면 양수
 	float d = _plane.DotNormal(_ray.position);
@@ -33,7 +36,7 @@ bool CollisionManager::RayToPlane(const Ray& _ray, const Plane& _plane)
 	return false;
 }
 
-bool CollisionManager::GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& inter)
+bool Collision::GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& inter)
 {
 	float dot1 = _normal.Dot(_ray.direction);
 	float dot2 = _normal.Dot(_point - _ray.position);
@@ -47,7 +50,7 @@ bool CollisionManager::GetIntersection(const Ray& _ray, const Vec3& _point, cons
 	return true;
 }
 
-bool CollisionManager::PointInPolygon(const Vec3& _inter, const Vec3& _faceNormal, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2)
+bool Collision::PointInPolygon(const Vec3& _inter, const Vec3& _faceNormal, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2)
 {
 	Vec3 d0 = _v1 - _v0;
 	Vec3 d1 = _v2 - _v1;
