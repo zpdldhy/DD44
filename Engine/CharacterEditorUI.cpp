@@ -244,10 +244,12 @@ void CharacterEditorUI::DrawUI()
         m_bChildAttached = false;
     }
 
-    ImGui::Separator();
+    ImGui::Separator(); ImGui::Spacing();
+
+    // Prefab Save/Load
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Character Save/Load");
 
-    static char characterSavePath[256] = "../Resources/Prefab/MyCharacter.prefab.json";
+    static char characterSavePath[256] = "../Resources/Prefab/MyCharacter.character.json";
     ImGui::InputText("Character Path##Save", characterSavePath, IM_ARRAYSIZE(characterSavePath));
 
     if (ImGui::Button("Save##Character"))
@@ -284,7 +286,7 @@ void CharacterEditorUI::DrawUI()
         PREFAB->SaveCharacter(data, characterSavePath);
     }
 
-    static char characterLoadPath[256] = "../Resources/Prefab/MyCharacter.prefab.json";
+    static char characterLoadPath[256] = "../Resources/Prefab/MyCharacter.character.json";
     ImGui::InputText("Character Path##Load", characterLoadPath, IM_ARRAYSIZE(characterLoadPath));
 
     if (ImGui::Button("Load##Character"))
@@ -329,7 +331,51 @@ void CharacterEditorUI::DrawUI()
         }
     }
 
-    ImGui::Separator();
+    ImGui::Separator(); ImGui::Spacing();
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Character Prefab Browser");
+
+    m_vCharacterPrefabList = PREFAB->GetPrefabFileNames("../Resources/Prefab/", ".character.json");
+    static std::string selectedCharacterPrefab = "";
+
+    for (const auto& name : m_vCharacterPrefabList)
+    {
+        if (ImGui::Selectable(name.c_str(), selectedCharacterPrefab == name))
+            selectedCharacterPrefab = name;
+    }
+
+    if (!selectedCharacterPrefab.empty() && ImGui::Button("Load Selected Character Prefab"))
+    {
+        PrefabCharacterData data;
+        std::string fullPath = "../Resources/Prefab/" + selectedCharacterPrefab + ".character.json";
+        if (PREFAB->LoadCharacter(fullPath, data))
+        {
+            strcpy_s(m_szAssetPath, data.RootMeshPath.c_str());
+            strcpy_s(m_szShaderName, data.ShaderPath.c_str());
+            strcpy_s(m_szTextureName, data.TexturePath.c_str());
+
+            m_iSelectedScriptIndex = data.ScriptType;
+            m_iSelectedAnimIndex = data.AnimIndex;
+
+            auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
+            if (animInstance)
+            {
+                animInstance->m_fAnimPlayRate = data.AnimSpeed;
+            }
+
+            m_fScale[0] = data.Scale.x; m_fScale[1] = data.Scale.y; m_fScale[2] = data.Scale.z;
+            m_fRotation[0] = data.Rotation.x; m_fRotation[1] = data.Rotation.y; m_fRotation[2] = data.Rotation.z;
+            m_fPosition[0] = data.Translation.x; m_fPosition[1] = data.Translation.y; m_fPosition[2] = data.Translation.z;
+
+            if (!m_pLoader)
+            {
+                m_pLoader = std::make_shared<ActorLoader>();
+            }
+            m_pLoader->LoadOne(m_szAssetPath);
+            m_vMeshList = m_pLoader->LoadMesh();
+            m_iSelectedMeshIndex = 0;
+        }
+    }
+    ImGui::Separator(); ImGui::Spacing();
 
     // 새로운 캐릭터 생성 시 초기화
     if (ImGui::Button("Reset"))

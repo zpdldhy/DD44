@@ -13,6 +13,9 @@
     <Filter Include="Script">
       <UniqueIdentifier>{565dca02-3e03-4554-8ec9-dfc978045924}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Prefab">
+      <UniqueIdentifier>{4c236e50-0c9b-4856-98ca-b71f6cea1d4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -92,6 +95,9 @@
   <ItemGroup>
     <None Include="..\Resources\Shader\Header.hlsli">
       <Filter>Shader</Filter>
+    </None>
+    <None Include="..\Resources\Prefab\MyTile.prefab.json">
+      <Filter>Prefab</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -27,5 +27,6 @@ public:
 
 private:
 	void SetClickPos();
+	void LoadAllPrefabs(const std::string& extension);
 };
 

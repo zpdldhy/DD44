@@ -34,5 +34,7 @@ private:
     char m_szTextureName[256] = "grass.jpg";
     char m_szShaderName[256] = "Default.hlsl";
 
+    std::vector<std::string> m_vMapPrafabList;
+
     std::function<void()> m_OnCreate;
 };
