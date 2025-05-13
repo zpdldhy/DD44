@@ -50,9 +50,22 @@ TFbxResource FbxLoader::Load(string _loadFile)
 
 	// 본 파싱 및 메시 리스트화
 	PreProcess(m_pRootNode);
+	
 	m_result.m_iBoneCount = m_result.m_mSkeletonList.size();
 	m_result.m_iMeshCount = m_vMeshes.size();
 	m_result.m_iNodeCount = m_result.m_iMeshCount + m_result.m_iBoneCount;
+
+	// 원점에 위치시키기 위해
+	//auto iter = m_FbxBones.find(L"Armature");
+	auto iter = m_FbxBones.find(L"_Root"); // ONLY FOR MAGE
+	if (iter != m_FbxBones.end())
+	{
+		FbxVector4 rootP = iter->second.m_node->EvaluateGlobalTransform(0).GetT();
+
+		m_vRootPos.x = -rootP[0];
+		m_vRootPos.y = -rootP[1];
+		m_vRootPos.z = -rootP[2];
+	}
 
 	// mesh 처리
 	for (auto& mesh : m_vMeshes)
@@ -67,18 +80,7 @@ TFbxResource FbxLoader::Load(string _loadFile)
 }
 
 void FbxLoader::PreProcess(FbxNode* _node)
-{
-	// crow_final 저장
-	if (!strcmp(_node->GetName(),"crow_final"))
-	{
-		int a = 0;
-		FbxVector4 rootP = _node->EvaluateGlobalTransform(0).GetT();
-
-		m_vStaticRootPos.x = -rootP[0];
-		m_vStaticRootPos.y = -rootP[1];
-		m_vStaticRootPos.z = -rootP[2];
-	}
-	
+{	
 	// skeleton인지 확인
 	if (_node->GetNodeAttribute() && _node->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eSkeleton)
 	{
@@ -146,14 +148,18 @@ void FbxLoader::ParseMesh(FbxNode* _node)
 	geom.SetR(rot);
 	geom.SetS(scale);
 
+	FbxAMatrix correctionMat;
+	correctionMat.SetT(FbxVector4(m_vRootPos.x, m_vRootPos.y, m_vRootPos.z));
+
+	if (!retMesh.m_bSkeleton)
+	{
+		geom = correctionMat * globalTransform * geom;
+	}
+
 	FbxAMatrix normalMatrix = geom;
 	normalMatrix = normalMatrix.Inverse();
 	normalMatrix = normalMatrix.Transpose();
 
-	if (!retMesh.m_bSkeleton)
-	{
-		geom = globalTransform * geom;
-	}
 	// 레이어
 	vector<FbxLayerElementUV*> VertexUVSet;
 	vector<FbxLayerElementVertexColor*> VertexColorSet;
@@ -404,23 +410,12 @@ bool FbxLoader::ParseSkinningMesh(FbxMesh* _mesh)
 
 void FbxLoader::ParseAnimation()
 {
-	// 애니메이션 시 원점에 위치시키기 위해
-	auto iter = m_FbxBones.find(L"Armature");
-	if (iter != m_FbxBones.end())
-	{
-		FbxVector4 rootP = iter->second.m_node->EvaluateGlobalTransform(0).GetT();
-
-		m_vRootPos.x = -rootP[0];
-		m_vRootPos.y = -rootP[1];
-		m_vRootPos.z = -rootP[2];
-	}
-
 	// ANIM
 	int animBoneCount = m_result.m_mSkeletonList.size() + m_result.m_vMeshList.size();
 	int animTrackCount = m_pScene->GetSrcObjectCount<FbxAnimStack>();
 	m_result.m_iAnimTrackCount = animTrackCount;
 
-	// TEMP FOR crow_final ( 애니메이션 개많음. 추려서 파싱 ) 
+	// ONLY FOR crow_final ( 애니메이션 많음. 추려서 파싱 ) 
 	{
 		//vector<int> targetAnimList = { 50, 29, 5, 44, 45, 46, 47, 0, 15, 23, 25};
 		//int size = targetAnimList.size();

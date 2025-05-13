@@ -65,6 +65,10 @@ vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 
 	shared_ptr<UMaterial> tempSkinnedMat = make_shared<UMaterial>();
 	tempSkinnedMat->Load(path, L"../Resources/Shader/skinningShader.hlsl");
+
+	//shared_ptr<Shader> shader = SHADER->Get(L"../Resources/Shader/skinningShader.hlsl");
+	//shared_ptr<Inputlayout> inputlayout = make_shared<Inputlayout>();
+	//INPUTLAYOUT->CreateIW(shader->m_pCode);
 	tempSkinnedMat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
 
 	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
@@ -84,6 +88,7 @@ vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 				mesh->Create();
 				dynamic_cast<USkinnedMeshComponent*>(meshComponent.get())->SetMesh(mesh);
 				meshComponent->SetMaterial(tempSkinnedMat);
+
 				// BONE
 				map<wstring, BoneNode> bones;
 				for (auto& data : m_vFbxList[iFbx].m_mSkeletonList)
@@ -129,6 +134,7 @@ vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
 		// Animation
 		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 		{
+			animInstance->SetName(SplitName(m_vFbxList[iFbx].name));
 			animInstance->CreateConstantBuffer();
 			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
 			{
