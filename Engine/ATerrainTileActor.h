@@ -25,5 +25,5 @@ public:
     bool CreateTerrainFromHeightMap(const std::wstring& heightMapPath, const std::wstring& texturePath, const std::wstring& shaderPath);
 
     float GetHeightAt(float x, float z);
-
+    int GetCellIndexAt(float x, float z);
 };
