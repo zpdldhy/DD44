@@ -85,17 +85,17 @@ void Engine::Frame()
 void Engine::Render()
 {
 	GET_SINGLE(Device)->PreRender();
-	DXWRITE->m_pd2dRT->BeginDraw();
+	//DXWRITE->m_pd2dRT->BeginDraw();
 
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
-	DXWRITE->Draw(rt, TIMER->m_szTime);
+	//DXWRITE->Draw(rt, TIMER->m_szTime);
 
 	CAMERAMANAGER->Render(CameraViewType::CVT_ACTOR);
 
 	_app->Render();
 	// 3D World -> Texture Render
 	{
-		vector<ID3D11RenderTargetView*> RTVList = { world->GetRTV() , blur->GetRTV(), bloom->GetRTV()	};
+		vector<ID3D11RenderTargetView*> RTVList = { world->GetRTV() , blur->GetRTV(), bloom->GetRTV() };
 		vector<D3D11_VIEWPORT> VPList = { world->GetVP() , blur->GetVP(), bloom->GetVP() };
 
 		POSTPROCESS->PreRender(3, RTVList, world->GetDSV(), VPList);
@@ -128,7 +128,7 @@ void Engine::Render()
 
 	GUI->Render(); // *Fix Location* after _app->Render() 
 
-	DXWRITE->m_pd2dRT->EndDraw();
+	//DXWRITE->m_pd2dRT->EndDraw();
 	GET_SINGLE(Device)->PostRender();
 }
 

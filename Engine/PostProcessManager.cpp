@@ -44,36 +44,36 @@ void PostProcessManager::Init(UINT width, UINT height)
 
 void PostProcessManager::PreRender(UINT _iViewPortCount, vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList, vector<D3D11_VIEWPORT> _VPList)
 {
-	//m_iPrevViewPorts = 1;
+	m_iPrevViewPorts = 1;
 
-	//DC->OMGetRenderTargets(m_iPrevViewPorts, &m_pPrevRTV, &m_pPrevDSV);
+	DC->OMGetRenderTargets(m_iPrevViewPorts, &m_pPrevRTV, &m_pPrevDSV);
 
-	//ID3D11ShaderResourceView* pNullSRV = nullptr;
-	//DC->PSSetShaderResources(0, 1, &pNullSRV);
+	ID3D11ShaderResourceView* pNullSRV = nullptr;
+	DC->PSSetShaderResources(0, 1, &pNullSRV);
 
-	//ID3D11RenderTargetView* pNullRTV = nullptr;
-	//DC->OMSetRenderTargets(1, &pNullRTV, NULL);
+	ID3D11RenderTargetView* pNullRTV = nullptr;
+	DC->OMSetRenderTargets(1, &pNullRTV, NULL);
 
-	//DC->OMSetRenderTargets(_iViewPortCount, _RTVList.data(), _DSVList);
+	DC->OMSetRenderTargets(_iViewPortCount, _RTVList.data(), _DSVList);
 
-	//DC->RSGetViewports(&m_iPrevViewPorts, &m_PrevVP);
-	//DC->RSSetViewports(_iViewPortCount, _VPList.data());
+	DC->RSGetViewports(&m_iPrevViewPorts, &m_PrevVP);
+	DC->RSSetViewports(_iViewPortCount, _VPList.data());
 
-	//ClearRTV(_RTVList, _DSVList);
+	ClearRTV(_RTVList, _DSVList);
 }
 
 void PostProcessManager::PostRender()
 {
-	//ID3D11ShaderResourceView* pNullSRV = nullptr;
-	//DC->PSSetShaderResources(0, 1, &pNullSRV);
+	ID3D11ShaderResourceView* pNullSRV = nullptr;
+	DC->PSSetShaderResources(0, 1, &pNullSRV);
 
-	//ID3D11RenderTargetView* pNullRTV = nullptr;
-	//DC->OMSetRenderTargets(1, &pNullRTV, NULL);
+	ID3D11RenderTargetView* pNullRTV = nullptr;
+	DC->OMSetRenderTargets(1, &pNullRTV, NULL);
 
-	//DC->RSSetViewports(m_iPrevViewPorts, &m_PrevVP);
-	//DC->OMSetRenderTargets(1, &m_pPrevRTV, m_pPrevDSV);
-	//m_pPrevRTV->Release(); m_pPrevRTV = nullptr;
-	//m_pPrevDSV->Release(); m_pPrevDSV = nullptr;
+	DC->RSSetViewports(m_iPrevViewPorts, &m_PrevVP);
+	DC->OMSetRenderTargets(1, &m_pPrevRTV, m_pPrevDSV);
+	m_pPrevRTV->Release(); m_pPrevRTV = nullptr;
+	m_pPrevDSV->Release(); m_pPrevDSV = nullptr;
 }
 
 void PostProcessManager::ClearRTV(vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList)
