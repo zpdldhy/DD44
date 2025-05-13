@@ -48,7 +48,7 @@ void PostProcessManager::PreRender(UINT _iViewPortCount, vector<ID3D11RenderTarg
 
 	ClearRTV(_RTVList, _DSVList);
 	
-	DC->OMGetRenderTargets(1, &m_pPrevRTV, &m_pPrevDSV);
+	DC->OMGetRenderTargets(_iViewPortCount, &m_pPrevRTV, &m_pPrevDSV);
 	DC->OMSetRenderTargets(_iViewPortCount, _RTVList.data(), _DSVList);
 
 	//DC->RSGetViewports(&m_iPrevViewPorts, &m_PrevVP);
