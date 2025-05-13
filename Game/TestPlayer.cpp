@@ -26,7 +26,7 @@ void TestPlayer::Init()
 		//dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetAnimInstance(player->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance());
 		//dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetTargetBoneIndex(43);
 		//player->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[2]);
-		OBJECTMANAGER->AddActor(player);
+		OBJECT->AddActor(player);
 	}
 	// 카메라 세팅
 	{
@@ -35,8 +35,8 @@ void TestPlayer::Init()
 			m_pCameraActor->SetPosition(player->GetPosition());
 			m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 		}
-		CAMERAMANAGER->Set3DCameraActor(player);
-		OBJECTMANAGER->AddActor(m_pCameraActor);
+		CAMERA->Set3DCameraActor(player);
+		OBJECT->AddActor(m_pCameraActor);
 	}
 
 	//Gizmo 세팅
@@ -67,9 +67,9 @@ void TestPlayer::Init()
 		object2->SetScale(Vec3(0.03f, 1000.0f, 0.03f));
 		object3->SetScale(Vec3(0.03f, 0.03f, 1000.0f));
 
-		OBJECTMANAGER->AddActor(object1);
-		OBJECTMANAGER->AddActor(object2);
-		OBJECTMANAGER->AddActor(object3);
+		OBJECT->AddActor(object1);
+		OBJECT->AddActor(object2);
+		OBJECT->AddActor(object3);
 
 
 		gizmo.emplace_back(object1);

@@ -1,17 +1,17 @@
 #include "pch.h"
-#include "MousePicking.h"
+#include "MouseRay.h"
 #include "Input.h"
 #include "UCameraComponent.h"
 #include "CameraManager.h"
 
-void MousePicking::Click()
+void MouseRay::Click()
 {
 	m_pMouseWinPos = INPUT->GetMousePos();
 
 	float fWinSizeX = static_cast<float>(g_windowSize.x);
 	float fWinSizeY = static_cast<float>(g_windowSize.y);
 
-	auto pCamera = CAMERAMANAGER->Get3DCameraComponent();
+	auto pCamera = CAMERA->Get3DCameraComponent();
 
 	// To NDC
 	m_vMouseEndPos = Vec3(0.f, 0.f, 1.f);

@@ -42,7 +42,7 @@ void TestYR::Init()
 		gizmo.emplace_back(object2);
 		gizmo.emplace_back(object3);
 
-		OBJECTMANAGER->AddActorList(gizmo);
+		OBJECT->AddActorList(gizmo);
 	}
 
 	m_pCameraActor = make_shared<ACameraActor>();
@@ -50,7 +50,7 @@ void TestYR::Init()
 		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	}
-	OBJECTMANAGER->AddActor(m_pCameraActor);
+	OBJECT->AddActor(m_pCameraActor);
 
 	//loader.ConvertFbxToAsset();
 	/*m_vActorList = loader.Load();
@@ -86,7 +86,7 @@ void TestYR::Init()
 		//animInstance->SetRootIndex(rootIndex);
 	}
 
-	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
+	CAMERA->Set3DCameraActor(m_pCameraActor);
 
 	// LOAD ALL TEXTURE
 	{
@@ -153,7 +153,7 @@ void TestYR::Init()
 			actor->SetRotation(rot);
 			actor->SetScale(scale);
 
-			OBJECTMANAGER->AddActor(actor);
+			OBJECT->AddActor(actor);
 		});
 }
 void TestYR::Update()

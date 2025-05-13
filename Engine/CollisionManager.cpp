@@ -4,13 +4,17 @@
 
 void Collision::CheckCollision(vector<shared_ptr<class AActor>> _vActorList)
 {
-	_vActorList = OBJECTMANAGER->GetActorList();	// 임시 코드, Quad 구현 후 제거
+	_vActorList = OBJECT->GetActorList();	// 임시 코드, Quad 구현 후 제거
 
 	for(auto& pObj : _vActorList)
 	{
 		for (auto& pSub : _vActorList)
 		{
 			if (pObj == pSub) continue;
+
+			// Actor의 어떤거랑 비교를 해야하나?
+
+
 		}
 	}
 
@@ -36,7 +40,7 @@ bool Collision::RayToPlane(const Ray& _ray, const Plane& _plane)
 	return false;
 }
 
-bool Collision::GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& inter)
+bool Collision::GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& _inter)
 {
 	float dot1 = _normal.Dot(_ray.direction);
 	float dot2 = _normal.Dot(_point - _ray.position);
@@ -46,7 +50,7 @@ bool Collision::GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3&
 	if (Dt < 0 || Dt>1)
 		return false;
 
-	inter = _ray.position + _ray.direction * Dt;
+	_inter = _ray.position + _ray.direction * Dt;
 	return true;
 }
 
@@ -69,4 +73,12 @@ bool Collision::PointInPolygon(const Vec3& _inter, const Vec3& _faceNormal, cons
 	if (d < 0.f) return false;
 
 	return true;
+}
+
+bool Collision::CheckMousePicking(const Ray& _ray, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2, const Vec3& _normal, Vec3& _inter)
+{
+	if (GetIntersection(_ray, _v0, _normal, _inter) == false)
+		return false;
+
+	return PointInPolygon(_inter, _normal, _v0, _v1, _v2);
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-class MousePicking :  public Ray
+class MouseRay :  public Ray
 {
 public:
 	POINT m_pMouseWinPos = { 0, 0 };
