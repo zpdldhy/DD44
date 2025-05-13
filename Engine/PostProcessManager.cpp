@@ -4,46 +4,31 @@
 #include "Shader.h"
 #include "Inputlayout.h"
 #include "UStaticMeshComponent.h"
+#include "ViewPortTexture.h"
+#include "AActor.h"
+#include "UMaterial.h"
 
-void PostProcessManager::Init(UINT width, UINT height)
+void PostProcessManager::Init(UINT _count)
 {
-	// 텍스처 공통 설정
-	D3D11_TEXTURE2D_DESC texDesc = {};
-	texDesc.Width = width;
-	texDesc.Height = height;
-	texDesc.MipLevels = 1;
-	texDesc.ArraySize = 1;
-	texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.Usage = D3D11_USAGE_DEFAULT;
-	texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	m_iMRTCount = _count;
 
-	// Temp 텍스처 생성
-	DEVICE->CreateTexture2D(&texDesc, nullptr, m_pTempTex.GetAddressOf());
-	DEVICE->CreateRenderTargetView(m_pTempTex.Get(), nullptr, m_pTempRTV.GetAddressOf());
-	DEVICE->CreateShaderResourceView(m_pTempTex.Get(), nullptr, m_pTempSRV.GetAddressOf());
+	for (int i = 0; i < _count; i++)
+	{
+		auto pMRT = make_shared<ViewPortTexture>();
+		pMRT->CreateViewPortTexture(static_cast<FLOAT>(g_windowSize.x), static_cast<FLOAT>(g_windowSize.y));
+		m_vMRTList.emplace_back(pMRT);
+		m_vRTVList.emplace_back(pMRT->GetRTV());
+		m_vVPList.emplace_back(pMRT->GetVP());
+		m_vSRTList.emplace_back(pMRT->GetSRV());
+	}
 
-	// Result 텍스처 생성
-	DEVICE->CreateTexture2D(&texDesc, nullptr, m_pResultTex.GetAddressOf());
-	DEVICE->CreateRenderTargetView(m_pResultTex.Get(), nullptr, m_pResultRTV.GetAddressOf());
-	DEVICE->CreateShaderResourceView(m_pResultTex.Get(), nullptr, m_pResultSRV.GetAddressOf());
-
-	// Constant Buffer (Blur용)
-	D3D11_BUFFER_DESC bd = {};
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(CB_Blur);
-	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	DEVICE->CreateBuffer(&bd, nullptr, m_pBlurCB.GetAddressOf());
-
-	// 셰이더 로드
-	m_pBlurShader = SHADER->Load(L"../Resources/Shader/Blur.hlsl");
-	m_pCombineShader = SHADER->Load(L"../Resources/Shader/CombineShader.hlsl");
-
-	CreateInputLayout();
+	CreatePostProcessor();
 }
 
-void PostProcessManager::PreRender(UINT _iViewPortCount, vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList, vector<D3D11_VIEWPORT> _VPList)
+void PostProcessManager::PreRender()
 {
+	m_p3DWorld->Tick();
+
 	m_iPrevViewPorts = 1;
 
 	DC->OMGetRenderTargets(m_iPrevViewPorts, &m_pPrevRTV, &m_pPrevDSV);
@@ -54,12 +39,12 @@ void PostProcessManager::PreRender(UINT _iViewPortCount, vector<ID3D11RenderTarg
 	ID3D11RenderTargetView* pNullRTV = nullptr;
 	DC->OMSetRenderTargets(1, &pNullRTV, NULL);
 
-	DC->OMSetRenderTargets(_iViewPortCount, _RTVList.data(), _DSVList);
+	DC->OMSetRenderTargets(m_vMRTList.size(), m_vRTVList.data(), m_vMRTList[0]->GetDSV());
 
 	DC->RSGetViewports(&m_iPrevViewPorts, &m_PrevVP);
-	DC->RSSetViewports(_iViewPortCount, _VPList.data());
+	DC->RSSetViewports(m_vMRTList.size(), m_vVPList.data());
 
-	ClearRTV(_RTVList, _DSVList);
+	ClearRTV(m_vRTVList, m_vMRTList[0]->GetDSV());
 }
 
 void PostProcessManager::PostRender()
@@ -76,6 +61,35 @@ void PostProcessManager::PostRender()
 	m_pPrevDSV->Release(); m_pPrevDSV = nullptr;
 }
 
+void PostProcessManager::Present()
+{
+	DC->PSSetShaderResources(0, m_vSRTList.size(), m_vSRTList.data());
+
+	m_p3DWorld->Render();
+
+	ID3D11ShaderResourceView* nullSRV[3] = { nullptr, };
+	DC->PSSetShaderResources(0, m_vSRTList.size(), nullSRV);
+}
+
+void PostProcessManager::CreatePostProcessor()
+{
+	float fWinSizeX = static_cast<float>(g_windowSize.x);
+	float fWinSizeY = static_cast<float>(g_windowSize.y);
+
+	m_p3DWorld = make_shared<AActor>();
+
+	auto pMesh = UStaticMeshComponent::CreatePlane();
+
+	auto pMaterial = make_shared<UMaterial>();
+	pMaterial->Load(L"", L"../Resources/Shader/PRDefault.hlsl");
+	pMesh->SetMaterial(pMaterial);
+
+	m_p3DWorld->SetMeshComponent(pMesh);
+	m_p3DWorld->SetPosition(Vec3(0.f, 0.f, 1.f));
+	m_p3DWorld->SetScale(Vec3(fWinSizeX, fWinSizeY, 0.f));
+	m_p3DWorld->Init();
+}
+
 void PostProcessManager::ClearRTV(vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList)
 {
 	const FLOAT color[] = { 0.1f, 0.25f, 0.4f, 1.0f };
@@ -85,24 +99,6 @@ void PostProcessManager::ClearRTV(vector<ID3D11RenderTargetView*> _RTVList, ID3D
 
 	DC->ClearDepthStencilView(_DSVList, D3D11_CLEAR_DEPTH, 1.0, 0);
 	DC->ClearDepthStencilView(_DSVList, D3D11_CLEAR_STENCIL, 1.0, 0);
-}
-
-void PostProcessManager::CreateInputLayout()
-{
-	// Input Layout 정의 (셰이더의 입력 구조와 일치해야 함)
-	D3D11_INPUT_ELEMENT_DESC layout[] =
-	{
-		{ "POSITION",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD",  0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-
-	UINT iNumCnt = sizeof(layout) / sizeof(layout[0]);
-
-	//// 쉐이더 코드로부터 InputLayout 생성
-	//if (!m_pBlurShader->LoadInputLayout(layout, iNumCnt))
-	//{
-	//    DX_CHECK(E_FAIL, _T("Failed to create input layout"));
-	//}
 }
 
 void PostProcessManager::Blur(const ComPtr<ID3D11ShaderResourceView>& input)

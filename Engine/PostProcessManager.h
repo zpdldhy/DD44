@@ -3,6 +3,7 @@
 
 class UStaticMeshComponent;
 class Shader;
+class ViewPortTexture;
 
 struct CB_Blur
 {
@@ -12,6 +13,15 @@ struct CB_Blur
 
 class PostProcessManager : public Singleton<PostProcessManager>
 {
+	UINT m_iMRTCount = 0;
+	vector<shared_ptr<ViewPortTexture>> m_vMRTList;
+	vector<ID3D11RenderTargetView*> m_vRTVList;
+	vector<ID3D11ShaderResourceView*> m_vSRTList;
+	vector<D3D11_VIEWPORT> m_vVPList;
+
+	// MRT를 합쳐 출력하는 Actor
+	shared_ptr<class AActor> m_p3DWorld = nullptr;
+
 	// Get Prev Viewport
 	D3D11_VIEWPORT m_PrevVP;
 	UINT m_iPrevViewPorts = 0;
@@ -20,12 +30,19 @@ class PostProcessManager : public Singleton<PostProcessManager>
 
 public:
 	// 후처리용 텍스처 및 shader초기화
-	void Init(UINT width, UINT height);
-	void PreRender(UINT _iViewPortCount, vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList, vector<D3D11_VIEWPORT> _VPList);
+	void Init(UINT _count);
+	void PreRender();
 	void PostRender();
+	void Present();
 
 private:
+	void CreatePostProcessor();
 	void ClearRTV(vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList);
+
+public:
+	shared_ptr<ViewPortTexture> GetMRT(UINT iIndex) { return m_vMRTList[iIndex]; }
+
+	//////////////////////////////////////////////////////////////////////////////////
 
 	//2-pass 가우시안 블러 생성
 	void Blur(const ComPtr<ID3D11ShaderResourceView>& input);
@@ -34,7 +51,7 @@ private:
 	//블러 결과 텍스쳐를 외부에서 접근가능
 	ComPtr<ID3D11ShaderResourceView> GetBlurResultSRV() const { return m_pResultSRV; }
 	ComPtr<ID3D11Texture2D> GetBlurTexture() const { return m_pResultTex; }
-	void CreateInputLayout();
+
 private:
 	void BlurPass(const ComPtr<ID3D11ShaderResourceView>& input,
 		const ComPtr<ID3D11RenderTargetView>& output,

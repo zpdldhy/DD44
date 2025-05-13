@@ -42,17 +42,7 @@ void Engine::Init()
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
-	Create3DWorld();
-	POSTPROCESS->Init(static_cast<UINT>(g_windowSize.x), static_cast<UINT>(g_windowSize.y));
-
-	world = make_shared<ViewPortTexture>();
-	blur = make_shared<ViewPortTexture>();
-	bloom = make_shared<ViewPortTexture>();
-
-	world->CreateViewPortTexture(1440.f, 900.f);
-	blur->CreateViewPortTexture(1440.f, 900.f);
-	bloom->CreateViewPortTexture(1440.f, 900.f);
-	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(bloom);
+	POSTPROCESS->Init(3);
 }
 
 void Engine::Frame()
@@ -78,35 +68,27 @@ void Engine::Frame()
 	{
 		CAMERAMANAGER->Tick();
 	}
-
-	m_p3DWorld->Tick();
 }
 
 void Engine::Render()
 {
 	GET_SINGLE(Device)->PreRender();
-	//DXWRITE->m_pd2dRT->BeginDraw();
+	DXWRITE->m_pd2dRT->BeginDraw();
 
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
-	//DXWRITE->Draw(rt, TIMER->m_szTime);
+	DXWRITE->Draw(rt, TIMER->m_szTime);
 
 	CAMERAMANAGER->Render(CameraViewType::CVT_ACTOR);
 
 	_app->Render();
 	// 3D World -> Texture Render
 	{
-		vector<ID3D11RenderTargetView*> RTVList = { world->GetRTV() , blur->GetRTV(), bloom->GetRTV() };
-		vector<D3D11_VIEWPORT> VPList = { world->GetVP() , blur->GetVP(), bloom->GetVP() };
-
-		POSTPROCESS->PreRender(3, RTVList, world->GetDSV(), VPList);
-		// ObjectList Render
-		OBJECTMANAGER->Render();
+		POSTPROCESS->PreRender();		
+		OBJECTMANAGER->Render();	// ObjectList Render
 		POSTPROCESS->PostRender();
 
 		//POSTPROCESS->Blur(m_p3DWorldTexture->GetSRV());                    // 2-pass Blur
-		//POSTPROCESS->RenderCombine(m_p3DWorldTexture->GetSRV());           // Combine 결과를 백버퍼에 출력
-
-		//m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(POSTPROCESS->GetBlurResultSRV().Get());
+		//POSTPROCESS->RenderCombine(m_p3DWorldTexture->GetSRV());           // Combine 결과를 백버퍼에 출력		
 
 		// 3DWorld를 보여주는 평면은 Rasterizer = SolidNone으로 고정
 		if (m_pCurrentRasterizer)
@@ -117,7 +99,7 @@ void Engine::Render()
 
 		{
 			CAMERAMANAGER->Render(CameraViewType::CVT_UI);
-			m_p3DWorld->Render();
+			POSTPROCESS->Present();
 		}
 
 		DC->RSSetState(m_pCurrentRasterizer.Get());
@@ -128,7 +110,7 @@ void Engine::Render()
 
 	GUI->Render(); // *Fix Location* after _app->Render() 
 
-	//DXWRITE->m_pd2dRT->EndDraw();
+	DXWRITE->m_pd2dRT->EndDraw();
 	GET_SINGLE(Device)->PostRender();
 }
 
@@ -170,23 +152,4 @@ Engine::Engine(HINSTANCE hInstance, shared_ptr<IExecute> app)
 {
 	_hInstance = hInstance;
 	_app = app;
-}
-
-void Engine::Create3DWorld()
-{
-	float fWinSizeX = static_cast<float>(g_windowSize.x);
-	float fWinSizeY = static_cast<float>(g_windowSize.y);
-
-	m_p3DWorld = make_shared<AActor>();
-
-	auto pMesh = UStaticMeshComponent::CreatePlane();
-
-	auto pMaterial = make_shared<UMaterial>();
-	pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PRDefault.hlsl");
-	pMesh->SetMaterial(pMaterial);
-
-	m_p3DWorld->SetMeshComponent(pMesh);
-	m_p3DWorld->SetPosition(Vec3(0.f, 0.f, 1.f));
-	m_p3DWorld->SetScale(Vec3(fWinSizeX, fWinSizeY, 0.f));
-	m_p3DWorld->Init();
 }

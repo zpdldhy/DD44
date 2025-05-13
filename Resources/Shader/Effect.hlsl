@@ -57,7 +57,7 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
 
     // 8. Ãâ·Â
     output.c = float4(litColor, texColor.a);
-    output.c1 = float4(0.f, 0.f, 0.f, 1.f);
+    output.c1 = float4(litColor, texColor.a);
     output.c2 = float4(0.f, 0.f, 0.f, 1.f);
     
     return output;
