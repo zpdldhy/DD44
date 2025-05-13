@@ -306,6 +306,7 @@
     <ClInclude Include="ActorListUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="QuadTree.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -511,6 +512,7 @@
     <ClCompile Include="ActorListUI.cpp">
       <Filter>Utils\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="QuadTree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
