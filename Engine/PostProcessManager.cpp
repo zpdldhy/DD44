@@ -44,15 +44,9 @@ void PostProcessManager::Init(UINT width, UINT height)
 
 void PostProcessManager::PreRender(UINT _iViewPortCount, vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList, vector<D3D11_VIEWPORT> _VPList)
 {
-	m_iPrevViewPorts = 1;
+	//m_iPrevViewPorts = 1;
 
-	ClearRTV(_RTVList, _DSVList);
-	
-	DC->OMGetRenderTargets(_iViewPortCount, &m_pPrevRTV, &m_pPrevDSV);
-	DC->OMSetRenderTargets(_iViewPortCount, _RTVList.data(), _DSVList);
-
-	//DC->RSGetViewports(&m_iPrevViewPorts, &m_PrevVP);
-	//DC->OMGetRenderTargets(1, &m_pPrevRTV, &m_pPrevDSV);
+	//DC->OMGetRenderTargets(m_iPrevViewPorts, &m_pPrevRTV, &m_pPrevDSV);
 
 	//ID3D11ShaderResourceView* pNullSRV = nullptr;
 	//DC->PSSetShaderResources(0, 1, &pNullSRV);
@@ -62,15 +56,14 @@ void PostProcessManager::PreRender(UINT _iViewPortCount, vector<ID3D11RenderTarg
 
 	//DC->OMSetRenderTargets(_iViewPortCount, _RTVList.data(), _DSVList);
 
-	//ClearViewPort(_RTVList, _DSVList);
-
+	//DC->RSGetViewports(&m_iPrevViewPorts, &m_PrevVP);
 	//DC->RSSetViewports(_iViewPortCount, _VPList.data());
+
+	//ClearRTV(_RTVList, _DSVList);
 }
 
 void PostProcessManager::PostRender()
 {
-	DC->OMSetRenderTargets(1, &m_pPrevRTV, m_pPrevDSV);
-
 	//ID3D11ShaderResourceView* pNullSRV = nullptr;
 	//DC->PSSetShaderResources(0, 1, &pNullSRV);
 
@@ -79,8 +72,8 @@ void PostProcessManager::PostRender()
 
 	//DC->RSSetViewports(m_iPrevViewPorts, &m_PrevVP);
 	//DC->OMSetRenderTargets(1, &m_pPrevRTV, m_pPrevDSV);
-	m_pPrevRTV->Release(); m_pPrevRTV = nullptr;
-	m_pPrevDSV->Release(); m_pPrevDSV = nullptr;
+	//m_pPrevRTV->Release(); m_pPrevRTV = nullptr;
+	//m_pPrevDSV->Release(); m_pPrevDSV = nullptr;
 }
 
 void PostProcessManager::ClearRTV(vector<ID3D11RenderTargetView*> _RTVList, ID3D11DepthStencilView* _DSVList)
@@ -90,8 +83,8 @@ void PostProcessManager::ClearRTV(vector<ID3D11RenderTargetView*> _RTVList, ID3D
 	for (auto& RTV : _RTVList)
 		DC->ClearRenderTargetView(RTV, color);
 
-	//DC->ClearDepthStencilView(_DSVList, D3D11_CLEAR_DEPTH, 1.0, 0);
-	//DC->ClearDepthStencilView(_DSVList, D3D11_CLEAR_STENCIL, 1.0, 0);
+	DC->ClearDepthStencilView(_DSVList, D3D11_CLEAR_DEPTH, 1.0, 0);
+	DC->ClearDepthStencilView(_DSVList, D3D11_CLEAR_STENCIL, 1.0, 0);
 }
 
 void PostProcessManager::CreateInputLayout()

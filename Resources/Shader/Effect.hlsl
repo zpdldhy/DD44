@@ -15,11 +15,18 @@ VS_OUT_RIM VS(VS_IN input)
     return output;
 }
 
-float4 PS(VS_OUT_RIM input) : SV_Target
+PS_OUT PS(VS_OUT_RIM input) : SV_Target
 {
+    PS_OUT output = (PS_OUT) 0;
+    
     // ½Ç·ç¿§ ·»´õ¸µ ¸ðµå
     if (g_iRenderMode == 1)
-        return float4(0.2f, 0.2f, 0.2f, 1.0f);
+    {
+        output.c = float4(0.2f, 0.2f, 0.2f, 1.0f);
+        output.c1 = float4(0.2f, 0.2f, 0.2f, 1.0f);
+        output.c2 = float4(0.2f, 0.2f, 0.2f, 1.0f);
+        return output;
+    }
 
     // 1. UV ¿Ö°î
     float2 distortedUV = GetDistortedUV(input.t);
@@ -49,6 +56,9 @@ float4 PS(VS_OUT_RIM input) : SV_Target
     litColor = ApplyHitFlash(litColor);
 
     // 8. Ãâ·Â
-    return float4(litColor, texColor.a);
+    output.c = float4(litColor, texColor.a);
+    output.c1 = float4(0.f, 0.f, 0.f, 1.f);
+    output.c2 = float4(0.f, 0.f, 0.f, 1.f);
     
+    return output;
 }

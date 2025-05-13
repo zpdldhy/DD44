@@ -26,5 +26,7 @@ PS_OUT PS(VS_OUT input)
 {
     PS_OUT psOut = (PS_OUT) 0;
     psOut.c = input.c;
+    psOut.c1 = input.c;
+    psOut.c2 = input.c;
     return psOut;
 }

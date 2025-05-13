@@ -45,10 +45,14 @@ void Engine::Init()
 	Create3DWorld();
 	POSTPROCESS->Init(static_cast<UINT>(g_windowSize.x), static_cast<UINT>(g_windowSize.y));
 
-	world.CreateViewPortTexture(1440.f, 900.f);
-	blur.CreateViewPortTexture(1440.f, 900.f);
-	bloom.CreateViewPortTexture(1440.f, 900.f);
-	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(world.GetSRV());
+	world = make_shared<ViewPortTexture>();
+	blur = make_shared<ViewPortTexture>();
+	bloom = make_shared<ViewPortTexture>();
+
+	world->CreateViewPortTexture(1440.f, 900.f);
+	blur->CreateViewPortTexture(1440.f, 900.f);
+	bloom->CreateViewPortTexture(1440.f, 900.f);
+	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(bloom);
 }
 
 void Engine::Frame()
@@ -91,10 +95,10 @@ void Engine::Render()
 	_app->Render();
 	// 3D World -> Texture Render
 	{
-		vector<ID3D11RenderTargetView*> RTVList = { world.GetRTV(), blur.GetRTV() , bloom.GetRTV() };
-		vector<D3D11_VIEWPORT> VPList = { world.GetVP(), blur.GetVP() , bloom.GetVP() };
+		vector<ID3D11RenderTargetView*> RTVList = { world->GetRTV() , blur->GetRTV(), bloom->GetRTV()	};
+		vector<D3D11_VIEWPORT> VPList = { world->GetVP() , blur->GetVP(), bloom->GetVP() };
 
-		POSTPROCESS->PreRender(2, RTVList, world.GetDSV(), VPList);
+		POSTPROCESS->PreRender(3, RTVList, world->GetDSV(), VPList);
 		// ObjectList Render
 		OBJECTMANAGER->Render();
 		POSTPROCESS->PostRender();
@@ -185,9 +189,4 @@ void Engine::Create3DWorld()
 	m_p3DWorld->SetPosition(Vec3(0.f, 0.f, 1.f));
 	m_p3DWorld->SetScale(Vec3(fWinSizeX, fWinSizeY, 0.f));
 	m_p3DWorld->Init();
-
-	m_p3DWorldTexture = make_shared<ViewPortTexture>();
-	m_p3DWorldTexture->CreateViewPortTexture(fWinSizeX, fWinSizeY);
-
-	//m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(m_p3DWorldTexture);
 }
