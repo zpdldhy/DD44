@@ -140,3 +140,26 @@ float ATerrainTileActor::GetHeightAt(float x, float z)
 		return height;
 	}
 }
+
+int ATerrainTileActor::GetCellIndexAt(float x, float z)
+{
+	int numCols = m_iNumCols;
+	int numRows = m_iNumRows;
+	float cellSize = m_fCellSize;
+
+	float halfWidth = (numCols - 1) * 0.5f * cellSize;
+	float halfHeight = (numRows - 1) * 0.5f * cellSize;
+
+	float gridX = (x + halfWidth) / cellSize;
+	float gridZ = (z + halfHeight) / cellSize;
+
+	int col = (int)gridX;
+	int row = (int)gridZ;
+
+	if (col < 0 || col >= numCols - 1 || row < 0 || row >= numRows - 1)
+	{
+		return -1; // ¹üÀ§ ¹Û
+	}
+
+	return row * numCols + col;
+}
