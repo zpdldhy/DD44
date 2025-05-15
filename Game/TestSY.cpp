@@ -32,7 +32,6 @@
 #include "Timer.h"
 #include "Functions.h"
 #include "CollisionManager.h"
-#include "MouseRay.h"
 
 void TestSY::Init()
 {
@@ -289,7 +288,7 @@ void TestSY::Update()
 	}
 
 	// Mouse Picking
-	if (INPUT->GetButtonDown(LCLICK))
+	if (INPUT->GetButton(LCLICK))
 		SetClickPos();
 }
 
@@ -310,41 +309,42 @@ void TestSY::SetClickPos()
 
 	// Ray ∞°Ω√»≠
 	auto pActor = make_shared<APawn>();
-
-	auto pMesh = UStaticMeshComponent::CreateRay(m_vRay.position, m_vRay.m_vMouseEndPos);
+	
+	auto pMesh = UStaticMeshComponent::CreateRay(m_vRay.position, m_vRay.EndPos);
 	pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	
 	pActor->SetMeshComponent(pMesh);
-
+	
 	auto pMaterial = make_shared<UMaterial>();
 	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");	
 	pMesh->SetMaterial(pMaterial);
-
+	
 	OBJECT->AddActor(pActor);
 
-	// Check RayToPlane
-	//Plane p1(Vec3(100.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
-	//Plane p2(Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
+	//// Check GetInterSection, PointInPolygon
+	//Vec3 v0 = Vec3(-0.5f, -0.5f, 0.f);
+	//Vec3 v1 = Vec3(-0.5f, +0.5f, 0.f);
+	//Vec3 v2 = Vec3(+0.5f, -0.5f, 0.f);
+	//Vec3 normal = Vec3(0.f, 0.f, -1.f);
+	//Vec3 inter;
+	//
+	//bool col = Collision::CheckMousePicking(m_vRay, v0, v1, v2, normal, inter);
+	//
+	//if (col)
+	//	int i = 0;
 
-	//float d = p1.DotNormal(Vec3(0.f, 0.f, 2.f));
-	//float dot = p1.Normal().Dot(Vec3(0.f, 0.f, 1.f));
-
-	//bool col = CollisionManager::RayToPlane(m_vMouseRay, p1);
-
-	//if (col == true)
-	//	int k = 0;
-
-	// Check GetInterSection, PointInPolygon
-	Vec3 v0 = Vec3(-0.5f, -0.5f, 0.f);
-	Vec3 v1 = Vec3(-0.5f, +0.5f, 0.f);
-	Vec3 v2 = Vec3(+0.5f, -0.5f, 0.f);
-	Vec3 normal = Vec3(0.f, 0.f, -1.f);
 	Vec3 inter;
 
-	bool col = Collision::CheckMousePicking(m_vRay, v0, v1, v2, normal, inter);
+	auto vList = OBJECT->GetActorList();
 
-	if (col)
-		int i = 0;
+	for (auto& iter : vList)
+	{
+		auto pActor = iter.second;
+		auto shapeComponent = pActor->GetShapeComponent<UBoxComponent>();
+		if (shapeComponent == nullptr) continue;
+		if (Collision::CheckAABBToRay(m_vRay, shapeComponent->GetBounds(), inter))
+			int i = 0;
+	}
 }
 
 void TestSY::LoadAllPrefabs(const std::string& extension)

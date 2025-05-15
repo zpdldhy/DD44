@@ -173,7 +173,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="CameraManager.h" />
     <ClInclude Include="LightData.h" />
     <ClInclude Include="LightManager.h" />
-    <ClInclude Include="MouseRay.h" />
     <ClInclude Include="ActorListUI.h" />
     <ClInclude Include="ObjectLoader.h" />
     <ClInclude Include="MapEditorUI.h" />
@@ -181,6 +180,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="PrefabData.h" />
     <ClInclude Include="PrefabLoader.h" />
+    <ClInclude Include="ShapeData.h" />
     <ClInclude Include="SkeletalMeshData.h" />
     <ClInclude Include="UAnimInstance.h" />
     <ClInclude Include="UBoxComponent.h" />
@@ -251,7 +251,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="FbxLoader.cpp" />
     <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="LightManager.cpp" />
-    <ClCompile Include="MouseRay.cpp" />
     <ClCompile Include="ActorListUI.cpp" />
     <ClCompile Include="ObjectLoader.cpp" />
     <ClCompile Include="MapEditorUI.cpp" />
@@ -259,6 +258,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="PrefabData.cpp" />
     <ClCompile Include="PrefabLoader.cpp" />
+    <ClCompile Include="ShapeData.cpp" />
     <ClCompile Include="SkeletalMeshData.cpp" />
     <ClCompile Include="UAnimInstance.cpp" />
     <ClCompile Include="UBoxComponent.cpp" />

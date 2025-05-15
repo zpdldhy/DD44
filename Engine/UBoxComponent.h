@@ -4,8 +4,10 @@
 class UBoxComponent : public UShapeComponent
 {
 protected:
-	Vec3 m_vCenter = Vec3::Zero;
+	// 실제 연산
+	Box m_Box;
 
+	// 범위 표기
 	shared_ptr<class AActor> m_pCollisionRange = nullptr;
 	vector<PNCT_VERTEX> m_vVertexList;
 	vector<DWORD> m_vIndexList;
@@ -25,10 +27,14 @@ public:
 	void Destroy() override;
 
 public:
-	void CreateCollisionBox();
-	void UpdateBounds() override;
+	virtual void UpdateBounds() override;
+	const Box& const GetBounds() { return m_Box; }
 
 public:
-	const Vec3& GetBoxCenter()  { return m_vCenter; }
+	void CreateCollisionRange();
+	void UpdateCollisionRange();
+
+public:
+	const Vec3& GetBoxCenter()  { return m_Box.vCenter; }
 };
 
