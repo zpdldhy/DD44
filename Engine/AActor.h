@@ -39,6 +39,8 @@ protected:
 public:
 	// *이거 움직일 수 있는 애들은 true로 따로 빼줘야함
 	bool m_bUpdateQuadTree = false;
+	bool bRender = true;
+	bool bCollision = true;
 
 public:
 	void SetActorName(wstring _szName) { m_szName = _szName; }

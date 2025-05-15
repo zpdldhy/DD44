@@ -19,8 +19,6 @@ struct QuadTreeNode
     Bounds bounds;
     std::vector<UINT> vActorIndices;
     std::unique_ptr<QuadTreeNode> pChildren[4];
-    bool bRender = true;
-    bool bCollision = true;
 };
 
 class QuadTree
