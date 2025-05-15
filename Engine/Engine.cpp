@@ -87,15 +87,31 @@ void Engine::Render()
 		OBJECTMANAGER->Render();	// ObjectList Render
 		POSTPROCESS->PostRender();
 
-		//POSTPROCESS->Blur(m_p3DWorldTexture->GetSRV());                    // 2-pass Blur
-		//POSTPROCESS->RenderCombine(m_p3DWorldTexture->GetSRV());           // Combine 결과를 백버퍼에 출력		
+		//POSTPROCESS->BlurPass(
+		//	POSTPROCESS->GetMRT(1)->GetSRV(), // output.c2 → Emissive
+		//	POSTPROCESS->GetTempRTV(),        // 수평 Blur 결과
+		//	Vec2(1, 0));
 
-		// 3DWorld를 보여주는 평면은 Rasterizer = SolidNone으로 고정
+		//POSTPROCESS->BlurPass(
+		//	POSTPROCESS->GetTempSRV(),        // 수평 결과
+		//	POSTPROCESS->GetFinalRTV(),       // 최종 결과
+		//	Vec2(0, 1));
+
+	
+		//auto srv = POSTPROCESS->GetFinalSRV();
+		//assert(srv != nullptr); // nullptr이면 문제 확정
+		//POSTPROCESS->SetSRVToSlot(1, srv);
+
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
 
 		DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
+
+
+		ID3D11RenderTargetView* rtv = GET_SINGLE(Device)->GetBackBufferRTV();
+		ID3D11DepthStencilView* dsv = GET_SINGLE(Device)->GetDepthStencilView();
+		DC->OMSetRenderTargets(1, &rtv, dsv); // 이거 꼭 다시 설정해줘야 함
 
 		{
 			CAMERAMANAGER->Render(CameraViewType::CVT_UI);

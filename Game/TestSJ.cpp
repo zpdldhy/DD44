@@ -17,6 +17,7 @@
 #include "ActorLoader.h"
 #include "ObjectManager.h"
 #include "LightManager.h"
+#include "PostProcessManager.h"
 
 void TestSJ::Init()
 {
@@ -40,7 +41,7 @@ void TestSJ::Init()
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
 		m_pStaticMesh->SetMaterial(material);
 	}
 
@@ -56,7 +57,7 @@ void TestSJ::Init()
 		m_pActor2->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
-		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
 		material2->SetUseStencil(true);
 		
 		m_pStaticMesh2->SetMaterial(material2);		
@@ -417,18 +418,31 @@ void TestSJ::Update()
 	if (INPUT->GetButton(K)) // Z- (뒤로)
 		m_pPointLight->AddPosition(Vec3(0.f, 0.f, -0.1f));
 
-	if (INPUT->GetButton(Z)) // 위쪽 (+Y)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 1.f, 0.f));
-	if (INPUT->GetButton(X)) // 아래쪽 (-Y)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, -1.f, 0.f));
-	if (INPUT->GetButton(C)) // 왼쪽 (-X)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(-1.f, 0.f, 0.f));
-	if (INPUT->GetButton(B)) // 오른쪽 (+X)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(1.f, 0.f, 0.f));
-	if (INPUT->GetButton(N)) // 앞으로 (-Z)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, -1.f));
-	if (INPUT->GetButton(M)) // 뒤로 (+Z)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, 1.f));
+	//if (INPUT->GetButton(Z)) // 위쪽 (+Y)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 1.f, 0.f));
+	//if (INPUT->GetButton(X)) // 아래쪽 (-Y)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, -1.f, 0.f));
+	//if (INPUT->GetButton(C)) // 왼쪽 (-X)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(-1.f, 0.f, 0.f));
+	//if (INPUT->GetButton(B)) // 오른쪽 (+X)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(1.f, 0.f, 0.f));
+	//if (INPUT->GetButton(N)) // 앞으로 (-Z)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, -1.f));
+	//if (INPUT->GetButton(M)) // 뒤로 (+Z)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, 1.f));
+
+	if (INPUT->GetButtonDown(B))
+	{
+		m_fBlurScale += 0.5f;
+		m_fBlurScale = min(m_fBlurScale, 10.0f); // 최대 제한
+	}
+	if (INPUT->GetButtonDown(N))
+	{
+		m_fBlurScale -= 0.5f;
+		m_fBlurScale = max(m_fBlurScale, 0.5f); // 최소 제한
+	}
+
+	POSTPROCESS->SetBlurScale(m_fBlurScale);
 
 	LIGHTMANAGER->UpdateLightCB();
 }

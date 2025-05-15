@@ -7,6 +7,7 @@
 #include "ViewPortTexture.h"
 #include "AActor.h"
 #include "UMaterial.h"
+#include "Dxstate.h"
 
 void PostProcessManager::Init(UINT _count)
 {
@@ -17,13 +18,48 @@ void PostProcessManager::Init(UINT _count)
 		auto pMRT = make_shared<ViewPortTexture>();
 		pMRT->CreateViewPortTexture(static_cast<FLOAT>(g_windowSize.x), static_cast<FLOAT>(g_windowSize.y));
 		m_vMRTList.emplace_back(pMRT);
-		m_vRTVList.emplace_back(pMRT->GetRTV());
-		m_vVPList.emplace_back(pMRT->GetVP());
-		m_vSRTList.emplace_back(pMRT->GetSRV());
+		m_vRTVList.emplace_back(pMRT->GetRTV());	// Pre, Post에서 갈아끼우는 용도
+		m_vVPList.emplace_back(pMRT->GetVP());		// Pre, Post에서 갈아끼우는 용도
+		m_vSRTList.emplace_back(pMRT->GetSRV());	// MRT 결과로 나오는 Texture
 	}
+
+	{
+		m_pBlurShader = SHADER->Load(L"../Resources/Shader/Blur.hlsl");
+
+		D3D11_BUFFER_DESC bd = {};
+		bd.Usage = D3D11_USAGE_DEFAULT;
+		bd.ByteWidth = sizeof(CB_Blur);
+		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bd.CPUAccessFlags = 0;
+		
+		HRESULT hr = DEVICE->CreateBuffer(&bd, nullptr, m_pBlurCB.GetAddressOf());
+		assert(SUCCEEDED(hr));
+
+		D3D11_TEXTURE2D_DESC desc = {};
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Width = g_windowSize.x;
+		desc.Height = g_windowSize.y;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.SampleDesc.Count = 1;
+		desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+		DEVICE->CreateTexture2D(&desc, nullptr, m_pTempTex.GetAddressOf());
+		DEVICE->CreateRenderTargetView(m_pTempTex.Get(), nullptr, m_pTempRTV.GetAddressOf());
+		DEVICE->CreateShaderResourceView(m_pTempTex.Get(), nullptr, m_pTempSRV.GetAddressOf());
+
+		DEVICE->CreateTexture2D(&desc, nullptr, m_pFinalTex.GetAddressOf());
+		DEVICE->CreateRenderTargetView(m_pFinalTex.Get(), nullptr, m_pFinalRTV.GetAddressOf());
+		DEVICE->CreateShaderResourceView(m_pFinalTex.Get(), nullptr, m_pFinalSRV.GetAddressOf());
+	}
+	
+
 
 	CreatePostProcessor();
 }
+
 
 void PostProcessManager::PreRender()
 {
@@ -63,8 +99,12 @@ void PostProcessManager::PostRender()
 
 void PostProcessManager::Present()
 {
-	DC->PSSetShaderResources(0, m_vSRTList.size(), m_vSRTList.data());
+	m_tBlurCB.g_vTexelSize = Vec2(1.0f / g_windowSize.x, 1.0f / g_windowSize.y);
 
+	DC->UpdateSubresource(m_pBlurCB.Get(), 0, nullptr, &m_tBlurCB, 0, 0);
+	DC->PSSetConstantBuffers(11, 1, m_pBlurCB.GetAddressOf());
+
+	DC->PSSetShaderResources(0, m_vSRTList.size(), m_vSRTList.data());
 	m_p3DWorld->Render();
 
 	ID3D11ShaderResourceView* nullSRV[3] = { nullptr, };
@@ -101,63 +141,79 @@ void PostProcessManager::ClearRTV(vector<ID3D11RenderTargetView*> _RTVList, ID3D
 	DC->ClearDepthStencilView(_DSVList, D3D11_CLEAR_STENCIL, 1.0, 0);
 }
 
-void PostProcessManager::Blur(const ComPtr<ID3D11ShaderResourceView>& input)
+//void PostProcessManager::BlurPass(const ComPtr<ID3D11ShaderResourceView>& _input, const ComPtr<ID3D11RenderTargetView>& _output, Vec2 _direction)
+//{
+//	// 1. 입력 텍스처로부터 해상도 정보 가져오기
+//	ComPtr<ID3D11Resource> res;
+//	_input->GetResource(res.GetAddressOf());
+//
+//	ComPtr<ID3D11Texture2D> tex;
+//	res.As(&tex);
+//
+//	D3D11_TEXTURE2D_DESC desc = {};
+//	tex->GetDesc(&desc);
+//
+//	// 2. Viewport 수동 설정
+//	D3D11_VIEWPORT vp = {};
+//	vp.TopLeftX = 0;
+//	vp.TopLeftY = 0;
+//	vp.Width = static_cast<FLOAT>(desc.Width);
+//	vp.Height = static_cast<FLOAT>(desc.Height);
+//	vp.MinDepth = 0.0f;
+//	vp.MaxDepth = 1.0f;
+//	DC->RSSetViewports(1, &vp);
+//
+//	// 3. Blur ConstantBuffer 업데이트
+//	CB_Blur cb = {};
+//	cb.g_vTexelSize = Vec2(1.0f / desc.Width, 1.0f / desc.Height);
+//	cb.g_vDirection = _direction;
+//	DC->UpdateSubresource(m_pBlurCB.Get(), 0, nullptr, &cb, 0, 0);
+//	DC->PSSetConstantBuffers(11, 1, m_pBlurCB.GetAddressOf());
+//
+//	// 4. 출력용 RTV 바인딩 및 Clear
+//	DC->OMSetRenderTargets(1, _output.GetAddressOf(), nullptr);
+//	float clearColor[4] = { 0, 0, 0, 0 };
+//	DC->ClearRenderTargetView(_output.Get(), clearColor);
+//
+//	// 5. Depth Test 비활성화
+//	DC->OMSetDepthStencilState(STATE->m_pDSSDepthDisableZero.Get(), 0);
+//
+//	// 6. Shader 및 입력 리소스 바인딩
+//	DC->VSSetShader(m_pBlurShader->m_pVertexShader.Get(), nullptr, 0);
+//	DC->PSSetShader(m_pBlurShader->m_pPixelShader.Get(), nullptr, 0);
+//	DC->PSSetShaderResources(0, 1, _input.GetAddressOf());
+//
+//
+//
+//	// 8. Depth 상태 복원
+//	DC->OMSetDepthStencilState(nullptr, 0);
+//
+//	// 9. 리소스 정리
+//	ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
+//	DC->PSSetShaderResources(0, 1, nullSRV);
+//
+//	ID3D11RenderTargetView* nullRTV = nullptr;
+//	DC->OMSetRenderTargets(1, &nullRTV, nullptr);
+//
+//
+//	ID3D11Resource* debugRes = nullptr;
+//	POSTPROCESS->GetFinalSRV()->GetResource(&debugRes);
+//	ID3D11Texture2D* debugTex = nullptr;
+//	debugRes->QueryInterface(&debugTex);
+//
+//	D3D11_TEXTURE2D_DESC d = {};
+//	debugTex->GetDesc(&d);
+//	wchar_t buf[128];
+//	swprintf_s(buf, L"[FINAL] size: %d x %d\n", d.Width, d.Height);
+//	OutputDebugStringW(buf);
+//
+//	debugTex->Release();
+//}
+
+void PostProcessManager::SetSRVToSlot(int _index, const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& _srv)
 {
-	BlurPass(input, m_pTempRTV, Vec2(1, 0));   // 수평 블러
-	BlurPass(m_pTempSRV, m_pResultRTV, Vec2(0, 1)); // 수직 블러
-}
+	if (m_vSRTList.size() <= _index)
+		m_vSRTList.resize(_index + 1);
 
-void PostProcessManager::BlurPass(const ComPtr<ID3D11ShaderResourceView>& input, const ComPtr<ID3D11RenderTargetView>& output, Vec2 direction)
-{
-	// 텍셀 사이즈 계산
-	D3D11_TEXTURE2D_DESC texDesc = {};
-	m_pTempTex->GetDesc(&texDesc);
-
-	CB_Blur cb = {};
-	cb.g_vTexelSize = Vec2(1.0f / texDesc.Width, 1.0f / texDesc.Height);
-	cb.g_vDirection = direction;
-
-	// ConstantBuffer에 데이터 전송
-	DC->UpdateSubresource(m_pBlurCB.Get(), 0, nullptr, &cb, 0, 0);
-	DC->PSSetConstantBuffers(11, 1, m_pBlurCB.GetAddressOf());
-
-	// 렌더 타겟 설정 및 Clear
-	DC->OMSetRenderTargets(1, output.GetAddressOf(), nullptr);
-	float clearColor[4] = { 0, 0, 0, 0 };
-	DC->ClearRenderTargetView(output.Get(), clearColor);
-
-	// 셰이더 설정
-	DC->VSSetShader(m_pBlurShader->m_pVertexShader.Get(), nullptr, 0);
-	DC->PSSetShader(m_pBlurShader->m_pPixelShader.Get(), nullptr, 0);
-
-	// 인풋 텍스처 설정
-	DC->PSSetShaderResources(0, 1, input.GetAddressOf());
-
-
-
-
-	// SRV 해제
-	ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
-	DC->PSSetShaderResources(0, 1, nullSRV);
-}
-
-void PostProcessManager::RenderCombine(const ComPtr<ID3D11ShaderResourceView>& sceneSRV)
-{
-	// 백버퍼에 렌더링 준비
-	ID3D11RenderTargetView* backBufferRTV = GET_SINGLE(Device)->GetBackBufferRTV();
-	ID3D11DepthStencilView* dsv = GET_SINGLE(Device)->GetDepthStencilView();
-	DC->OMSetRenderTargets(1, &backBufferRTV, dsv);
-
-	// Combine 셰이더 바인딩
-	DC->VSSetShader(m_pCombineShader->m_pVertexShader.Get(), nullptr, 0);
-	DC->PSSetShader(m_pCombineShader->m_pPixelShader.Get(), nullptr, 0);
-
-	// 텍스처 바인딩 (t0 = 원본, t1 = 블러 결과)
-	DC->PSSetShaderResources(0, 1, sceneSRV.GetAddressOf());
-	DC->PSSetShaderResources(1, 1, m_pResultSRV.GetAddressOf());
-
-
-	// SRV 해제
-	ID3D11ShaderResourceView* nullSRV[2] = { nullptr, nullptr };
-	DC->PSSetShaderResources(0, 2, nullSRV);
+	m_vSRTList[_index] = _srv.Get();
 }

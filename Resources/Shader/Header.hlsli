@@ -133,7 +133,7 @@ struct PS_OUT
 };
 
 Texture2D g_txDiffuseA : register(t0);
-Texture2D g_txNoise : register(t1); // 노이즈 텍스처
+//Texture2D g_txNoise : register(t1); // 노이즈 텍스처
 SamplerState sample : register(s0);
 
 
@@ -151,8 +151,9 @@ float2 GetDistortedUV(float2 uv)
 
 bool ShouldDissolve(float2 distortedUV)
 {
-    float noise = g_txNoise.Sample(sample, distortedUV).r;
-    return noise < g_fDissolveThreshold;
+    //float noise = g_txNoise.Sample(sample, distortedUV).r;
+    //return noise < g_fDissolveThreshold;
+    return false;
 }
 
 float3 ApplyGlow(float3 baseColor)

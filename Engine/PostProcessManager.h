@@ -9,6 +9,8 @@ struct CB_Blur
 {
 	Vec2 g_vTexelSize;
 	Vec2 g_vDirection;
+	float g_fBlurScale;
+	Vec3 padding;
 };
 
 class PostProcessManager : public Singleton<PostProcessManager>
@@ -28,6 +30,8 @@ class PostProcessManager : public Singleton<PostProcessManager>
 	ID3D11RenderTargetView* m_pPrevRTV = nullptr;
 	ID3D11DepthStencilView* m_pPrevDSV = nullptr;
 
+	CB_Blur m_tBlurCB = {};
+
 public:
 	// 후처리용 텍스처 및 shader초기화
 	void Init(UINT _count);
@@ -41,44 +45,30 @@ private:
 
 public:
 	shared_ptr<ViewPortTexture> GetMRT(UINT iIndex) { return m_vMRTList[iIndex]; }
+	
+	//void BlurPass(const ComPtr<ID3D11ShaderResourceView>& input,	const ComPtr<ID3D11RenderTargetView>& output,	Vec2 direction);
 
-	//////////////////////////////////////////////////////////////////////////////////
+	ComPtr<ID3D11RenderTargetView> GetTempRTV() const { return m_pTempRTV; }
+	ComPtr<ID3D11ShaderResourceView> GetTempSRV() const { return m_pTempSRV; }
+	ComPtr<ID3D11RenderTargetView> GetFinalRTV() const { return m_pFinalRTV; }
+	ComPtr<ID3D11ShaderResourceView> GetFinalSRV() const { return m_pFinalSRV; }
+	void SetBlurScale(float _scale) { m_tBlurCB.g_fBlurScale = _scale;}
 
-	//2-pass 가우시안 블러 생성
-	void Blur(const ComPtr<ID3D11ShaderResourceView>& input);
-	//Blur 결과와 원본을 합성해 최종 렌더링
-	void RenderCombine(const ComPtr<ID3D11ShaderResourceView>& sceneSRV);
-	//블러 결과 텍스쳐를 외부에서 접근가능
-	ComPtr<ID3D11ShaderResourceView> GetBlurResultSRV() const { return m_pResultSRV; }
-	ComPtr<ID3D11Texture2D> GetBlurTexture() const { return m_pResultTex; }
-
-private:
-	void BlurPass(const ComPtr<ID3D11ShaderResourceView>& input,
-		const ComPtr<ID3D11RenderTargetView>& output,
-		Vec2 direction);
+	void SetSRVToSlot(int _index, const ComPtr<ID3D11ShaderResourceView>& _srv);
 
 private:
-	// Temp
+	// Temp -> Final 구조 (Blur용 전용 텍스처)
 	ComPtr<ID3D11Texture2D> m_pTempTex;
 	ComPtr<ID3D11RenderTargetView> m_pTempRTV;
 	ComPtr<ID3D11ShaderResourceView> m_pTempSRV;
 
-	// Result
-	ComPtr<ID3D11Texture2D> m_pResultTex;
-	ComPtr<ID3D11RenderTargetView> m_pResultRTV;
-	ComPtr<ID3D11ShaderResourceView> m_pResultSRV;
+	// Final Blur 결과 저장
+	ComPtr<ID3D11Texture2D> m_pFinalTex;
+	ComPtr<ID3D11RenderTargetView> m_pFinalRTV;
+	ComPtr<ID3D11ShaderResourceView> m_pFinalSRV;
 
-	// Constant Buffer 
-	ComPtr<ID3D11Buffer> m_pBlurCB;
-
-
-	// 셰이더 및 화면용 
+	// Blur Shader 및 CBuffer
 	std::shared_ptr<Shader> m_pBlurShader;
-	std::shared_ptr<Shader> m_pCombineShader;
-
-	ComPtr<ID3D11Texture2D> m_pCombinedTex;
-	ComPtr<ID3D11RenderTargetView> m_pCombinedRTV;
-	ComPtr<ID3D11ShaderResourceView> m_pCombinedSRV;
-
+	ComPtr<ID3D11Buffer> m_pBlurCB;
 };
 

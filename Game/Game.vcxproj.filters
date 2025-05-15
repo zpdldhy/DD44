@@ -94,6 +94,9 @@
     <FxCompile Include="..\Resources\Shader\ComBineShader.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\Resources\Shader\PREffect.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources\Shader\Header.hlsli">

@@ -38,4 +38,14 @@ Texture2D g_txBlur : register(t1);      // Blur
 Texture2D g_txBloom : register(t2);     // Bloom
 
 SamplerState sample : register(s0);
+
+
+cbuffer CB_Blur : register(b11)
+{
+    float2 g_vTexelSize; // (1 / 화면 너비, 1 / 화면 높이)
+    float2 g_vDirection; // (1, 0): 가로 블러 / (0, 1): 세로 블러
+    float g_fBlurScale;
+    float3 padding_blur;
+};
+
 #endif

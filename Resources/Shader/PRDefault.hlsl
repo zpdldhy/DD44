@@ -21,8 +21,28 @@ PS_OUT PS(VS_OUT input)
 {
      
     PS_OUT psOut = (PS_OUT) 0;
-    float4 texColor = g_txDefault.Sample(sample, input.t);
-    texColor.a *= input.c.a;
-    psOut.c = texColor;
+    
+    float2 uv = input.t;
+    
+    float4 original = g_txDefault.Sample(sample, input.t);
+    float4 bloom = g_txBloom.Sample(sample, input.t);
+    
+    float weights[5] =
+    {
+        0.227027f, 0.1945946f, 0.1216216f, 0.0540541f, 0.0162162f
+    };
+
+    float4 blur = g_txBlur.Sample(sample, uv) * weights[0];
+    
+    for (int i = 1; i < 5; ++i)
+    {
+        float2 offset = float2(g_vTexelSize.x * i * g_fBlurScale , 0); // 가로 방향
+        blur += g_txBlur.Sample(sample, uv + offset) * weights[i];
+        blur += g_txBlur.Sample(sample, uv - offset) * weights[i];
+    }
+    
+    psOut.c = (blur + original)/2;
+    psOut.c.a = 1.0f;
+//    input.c.a;
     return psOut;
 }

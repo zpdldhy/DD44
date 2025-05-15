@@ -46,6 +46,8 @@ float4 PS(BLUR_PS_IN input) : SV_Target
         color += g_txInput.Sample(g_samp, uv - offset) * weights[i];
     }
 
-   // return color;
+   //return color;
     return float4(1.f, 0.f, 0.f, 1.0f);
+   // return float4(color.rgb, 1.0f);
+    
 }
