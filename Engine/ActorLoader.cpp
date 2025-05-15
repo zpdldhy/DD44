@@ -130,6 +130,7 @@ vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
 		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 		{
 			animInstance->CreateConstantBuffer();
+			animInstance->SetName(m_vFbxList[iFbx].name);
 			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
 			{
 				AnimList animTrack;

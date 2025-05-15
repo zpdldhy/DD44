@@ -38,7 +38,7 @@ public:
 	void PlayOnce(int _index);
 	Matrix GetBoneAnim(int _boneIndex);
 	void SetName(wstring _name) { m_modelName = _name; }
-
+	wstring GetName() { return m_modelName; }
 public:
 	const std::vector<AnimList>& GetAnimTrackList() const { return animTrackList; }
 	float m_fAnimPlayRate = 25.0f;
