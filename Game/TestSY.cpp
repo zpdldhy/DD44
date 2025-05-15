@@ -43,33 +43,33 @@ void TestSY::Init()
 		CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 	}
 
-	//LoadAllPrefabs(".map.json");
+	LoadAllPrefabs(".map.json");
 
 	{
-		m_pActor = make_shared<APawn>();
-		m_pActor->SetActorName(L"kkongchi");
+		//m_pActor = make_shared<APawn>();
+		//m_pActor->SetActorName(L"kkongchi");
 
-		m_pStaticMesh = UStaticMeshComponent::CreateCube();
-		m_pActor->SetMeshComponent(m_pStaticMesh);
-		m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
-		m_pActor->SetPosition({ 0.0f, 0.0f, 0.0f });
-		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
+		//m_pStaticMesh = UStaticMeshComponent::CreateCube();
+		//m_pActor->SetMeshComponent(m_pStaticMesh);
+		//m_pActor->SetScale({ 5.0f, 5.0f, 5.0f });
+		//m_pActor->SetPosition({ 0.0f, 0.0f, 0.0f });
+		//m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
-		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
-		m_pStaticMesh->SetMaterial(material);
+		//shared_ptr<UMaterial> material = make_shared<UMaterial>();
+		//material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+		//m_pStaticMesh->SetMaterial(material);
 
-		auto pCameraComponent = make_shared<UCameraComponent>();
-		pCameraComponent->SetLocalPosition(Vec3(20.f, 0.f, -0.f));
-		pCameraComponent->SetNear(10.f);
-		pCameraComponent->SetFar(100.f);
-		m_pActor->SetCameraComponent(pCameraComponent);
+		//auto pCameraComponent = make_shared<UCameraComponent>();
+		//pCameraComponent->SetLocalPosition(Vec3(20.f, 0.f, -0.f));
+		//pCameraComponent->SetNear(10.f);
+		//pCameraComponent->SetFar(100.f);
+		//m_pActor->SetCameraComponent(pCameraComponent);
 
-		auto pBoxComponent = make_shared<UBoxComponent>();
-		pBoxComponent->SetLocalScale({ 6.f, 6.f, 6.f });
-		m_pActor->SetShapeComponent(pBoxComponent);
+		//auto pBoxComponent = make_shared<UBoxComponent>();
+		//pBoxComponent->SetLocalScale({ 6.f, 6.f, 6.f });
+		//m_pActor->SetShapeComponent(pBoxComponent);
 
-		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
+		//m_pActor->AddScript(make_shared<kkongchiMoveScript>());
 	}
 
 	{
@@ -217,47 +217,118 @@ void TestSY::Init()
 	});
 
 	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+	{
+		AssimpLoader loader;
+		vector<MeshData> meshList = loader.Load(objPath);
+		if (meshList.empty())
+			return;
+
+		auto meshComp = make_shared<UStaticMeshComponent>();
+		meshComp->SetMeshPath(to_mw(objPath));
+
+		auto meshRes = make_shared<UStaticMeshResources>();
+		meshRes->SetVertexList(meshList[0].m_vVertexList);
+		meshRes->SetIndexList(meshList[0].m_vIndexList);
+		meshRes->Create();
+
+		meshComp->SetMesh(meshRes);
+
+		auto mat = make_shared<UMaterial>();
+		mat->Load(
+			std::wstring(texPath, texPath + strlen(texPath)),
+			std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+		);
+		meshComp->SetMaterial(mat);
+
+		// Snap 적용 여부 확인
+		if (GUI->GetObjectEditorUI()->IsSnapEnabled())
 		{
-			AssimpLoader loader;
-			vector<MeshData> meshList = loader.Load(objPath);
-			if (meshList.empty())
-				return;
+			pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
+		}
 
-			auto meshComp = make_shared<UStaticMeshComponent>();
-			meshComp->SetMeshPath(to_mw(objPath));
+		auto actor = make_shared<APawn>();
+		actor->SetActorName(L"Object");
 
-			auto meshRes = make_shared<UStaticMeshResources>();
-			meshRes->SetVertexList(meshList[0].m_vVertexList);
-			meshRes->SetIndexList(meshList[0].m_vIndexList);
-			meshRes->Create();
+		actor->SetMeshComponent(meshComp);
+		actor->SetPosition(pos);
+		actor->SetRotation(rot);
+		actor->SetScale(scale);
 
-			meshComp->SetMesh(meshRes);
+		OBJECTMANAGER->AddActor(actor);
+	});
 
-			auto mat = make_shared<UMaterial>();
-			mat->Load(
-				std::wstring(texPath, texPath + strlen(texPath)),
-				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-			);
-			meshComp->SetMaterial(mat);
+	{
+		Vec3 positions[] = {
+			// 랜덤 배치 (대략적으로 수동으로 예시 좌표 생성)
+			Vec3(-4500, 0, -4500),
+			Vec3(-3000, 0, -3200),
+			Vec3(-1500, 0, -1500),
+			Vec3(0, 0, -4500),
+			Vec3(1200, 0, -3700),
+			Vec3(3000, 0, -3000),
+			Vec3(4200, 0, -4200),
+			Vec3(-4800, 0, -1000),
+			Vec3(-3600, 0, -500),
+			Vec3(-1800, 0, -300), //10
+			Vec3(600, 0, -600),
+			Vec3(2400, 0, -900),
+			Vec3(4500, 0, -1500),
+			Vec3(-4200, 0, 600),
+			Vec3(-3000, 0, 900),
+			Vec3(-1200, 0, 1200),
+			Vec3(0, 0, 1500), //17
+			Vec3(1500, 0, 1800),
+			Vec3(3000, 0, 3000),
+			Vec3(4200, 0, 4200), //20
+			Vec3(-4500, 0, 4500),
+			Vec3(-3000, 0, 3600),
+			Vec3(-1500, 0, 3300),
+			Vec3(0, 0, 3000),
+			Vec3(1500, 0, 4200),
+			Vec3(3000, 0, 4500),
+			Vec3(4500, 0, 4800),
+			Vec3(-4800, 0, -4800),
+			Vec3(4800, 0, -4800),
+			Vec3(4800, 0, 4800),
 
-			// Snap 적용 여부 확인
-			if (GUI->GetObjectEditorUI()->IsSnapEnabled())
-			{
-				pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
-			}
+			// 경계선 테스트
+			Vec3(-4800, 0, -4800),  // 왼쪽 아래 끝
+			Vec3(0, 0, 0),          // 중앙
+			Vec3(4800, 0, 4800),    // 오른쪽 위 끝
+			Vec3(-4800, 0, 0),      // 좌측 중앙
+			Vec3(0, 0, 4800),       // 상단 중앙
+		};
 
+		for (int i = 0; i < 35; ++i)
+		{
 			auto actor = make_shared<APawn>();
-			actor->SetActorName(L"Object");
+			actor->SetActorName(L"TestActor_" + to_wstring(i));
 
-			actor->SetMeshComponent(meshComp);
-			actor->SetPosition(pos);
-			actor->SetRotation(rot);
-			actor->SetScale(scale);
+			auto mesh = UStaticMeshComponent::CreateCube();
+			actor->SetMeshComponent(mesh);
+			actor->SetScale({ 5.0f, 5.0f, 5.0f });
+
+			actor->SetPosition(positions[i]);
+			actor->SetRotation({ 0.0f, 0.0f, 0.0f });
+
+			auto material = make_shared<UMaterial>();
+			material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+			mesh->SetMaterial(material);
+
+			auto box = make_shared<UBoxComponent>();
+			box->SetLocalScale({ 6.0f, 6.0f, 6.0f });
+			actor->SetShapeComponent(box);
+
+			actor->m_bUpdateQuadTree = false;
 
 			OBJECTMANAGER->AddActor(actor);
-		});
+		}
+	}
 
-	OBJECTMANAGER->AddActor(m_pActor);
+	InitializeQuadTree();
+	InsertAllActorsIntoQuadTree();
+
+	//OBJECTMANAGER->AddActor(m_pActor);
 	OBJECTMANAGER->AddActor(m_pCameraActor);
 	OBJECTMANAGER->AddActor(m_pSky);	
 }
@@ -272,6 +343,8 @@ void TestSY::Update()
 	{
 		m_pActor->SetDelete(true);
 	}
+
+	UpdateQuadTreeActors();
 
 	// Mouse Picking
 	//if (INPUT->GetButton(LCLICK))
@@ -326,6 +399,7 @@ void TestSY::SetClickPos()
 
 	OBJECTMANAGER->AddActor(pActor);
 }
+
 void TestSY::LoadAllPrefabs(const std::string& extension)
 {
 	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
@@ -338,6 +412,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadMapTile(file, mapData))
 			{
 				auto tile = std::make_shared<ATerrainTileActor>();
+				tile->SetActorName(L"Terrain");
 				tile->m_iNumCols = mapData.Cols;
 				tile->m_iNumRows = mapData.Rows;
 				tile->m_fCellSize = mapData.CellSize;
@@ -354,6 +429,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadCharacter(file, characterData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
+				actor->SetActorName(L"Character");
 				actor->SetPosition(characterData.Translation);
 				actor->SetRotation(characterData.Rotation);
 				actor->SetScale(characterData.Scale);
@@ -366,11 +442,69 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->Load(file, objData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 오브젝트 타입으로 변경
+				actor->SetActorName(L"Object");
 				actor->SetPosition(objData.Translation);
 				actor->SetRotation(objData.Rotation);
 				actor->SetScale(objData.Scale);
 				OBJECTMANAGER->AddActor(actor);
 			}
 		}
+	}
+}
+
+void TestSY::InitializeQuadTree()
+{
+	auto tile = OBJECTMANAGER->FindTileActor();
+	if (!tile)
+	{
+		return;
+	}
+
+	int numCols = tile->m_iNumCols;
+	int numRows = tile->m_iNumRows;
+	float cellSize = tile->m_fCellSize;
+
+	m_pQuadTree = std::make_shared<QuadTree>();
+	m_pQuadTree->Create(numCols, numRows, cellSize);
+}
+
+
+void TestSY::InsertAllActorsIntoQuadTree()
+{
+	if (!m_pQuadTree)
+	{
+		return;
+	}
+
+	auto tile = OBJECTMANAGER->FindTileActor();
+	if (!tile)
+	{
+		return;
+	}
+
+	for (const auto& pair : OBJECTMANAGER->GetActorList())
+	{
+		auto actor = pair.second;
+		if (!actor || actor->GetActorName() == L"Terrain")
+			continue;
+
+		m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), actor);
+	}
+}
+
+void TestSY::UpdateQuadTreeActors()
+{
+	if (!m_pQuadTree)
+		return;
+
+	const auto& actorMap = OBJECTMANAGER->GetActorList();
+
+	for (const auto& pair : actorMap)
+	{
+		auto actor = pair.second;
+		if (!actor)
+			continue;
+
+		m_pQuadTree->UpdateActor(actor);
 	}
 }

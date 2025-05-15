@@ -37,6 +37,10 @@ protected:
 	bool m_bDelete = false;	
 
 public:
+	// *이거 움직일 수 있는 애들은 true로 따로 빼줘야함
+	bool m_bUpdateQuadTree = false;
+
+public:
 	void SetActorName(wstring _szName) { m_szName = _szName; }
 	const std::wstring& GetActorName() const { return m_szName; }
 

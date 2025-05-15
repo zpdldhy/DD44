@@ -200,7 +200,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Resources\Prefab\MyTile.prefab.json" />
+    <None Include="..\Resources\Prefab\MyTile.map.json" />
     <None Include="..\Resources\Shader\Header.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
