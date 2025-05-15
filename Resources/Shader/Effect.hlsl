@@ -32,23 +32,23 @@ float4 PS(VS_OUT_RIM input) : SV_Target
     float4 texColor = g_txDiffuseA.Sample(sample, distortedUV);
     float3 baseColor = texColor.rgb;
 
-    // 4. 조명 계산
-    float3 ambient = ApplyAmbient();
-    float3 diffuse = ApplyLambertLighting(input.n, input.wPos);
-    float3 specular = ApplySpecular(input.n, input.wPos);
-    float3 emissive = g_vEmissiveColor * g_fEmissivePower;
+    //// 4. 조명 계산
+    //float3 ambient = ApplyAmbient();
+    //float3 diffuse = ApplyLambertLighting(input.n, input.wPos);
+    //float3 specular = ApplySpecular(input.n, input.wPos);
+    //float3 emissive = g_vEmissiveColor * g_fEmissivePower;
 
-    // 5. 조명 적용
-    float3 litColor = baseColor * (ambient + diffuse) + specular;
+    //// 5. 조명 적용
+    //float3 litColor = baseColor * (ambient + diffuse) + specular;
 
-    // 6. Emissive 직접 더함
-    litColor += emissive;
+    //// 6. Emissive 직접 더함
+    //litColor += baseColor;
 
     // 7. Glow, HitFlash 등 후처리 효과
-    litColor = ApplyGlow(litColor);
-    litColor = ApplyHitFlash(litColor);
+    baseColor = ApplyGlow(baseColor);
+    baseColor = ApplyHitFlash(baseColor );
 
     // 8. 출력
-    return float4(litColor, texColor.a);
+    return float4(baseColor, texColor.a);
     
 }

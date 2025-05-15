@@ -58,7 +58,7 @@ void TestSY::Init()
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
 		m_pStaticMesh->SetMaterial(material);
 
 		auto pCameraComponent = make_shared<UCameraComponent>();
@@ -89,6 +89,7 @@ void TestSY::Init()
 
 	{
 		m_pSky = make_shared<ASky>();
+		m_pSky->SetActorName(L"Sky");
 
 		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pSky->SetMeshComponent(m_pSkyMesh);
@@ -191,6 +192,9 @@ void TestSY::Init()
 			}
 
 			auto actor = std::make_shared<AActor>();
+			//actor->SetActorName(rootComponent->GetName());
+			actor->SetActorName(L"Character");
+
 			actor->SetMeshComponent(rootComponent);
 
 			actor->SetPosition(position);
@@ -213,6 +217,7 @@ void TestSY::Init()
 		if (!editor) return;
 
 		auto tile = std::make_shared<ATerrainTileActor>();
+		tile->SetActorName(L"Terrain");
 
 		tile->m_iNumCols = editor->GetNumCols();
 		tile->m_iNumRows = editor->GetNumRows();
@@ -234,6 +239,7 @@ void TestSY::Init()
 				return;
 
 			auto meshComp = make_shared<UStaticMeshComponent>();
+			meshComp->SetMeshPath(to_mw(objPath));
 
 			auto meshRes = make_shared<UStaticMeshResources>();
 			meshRes->SetVertexList(meshList[0].m_vVertexList);
@@ -256,6 +262,8 @@ void TestSY::Init()
 			}
 
 			auto actor = make_shared<APawn>();
+			actor->SetActorName(L"Object");
+
 			actor->SetMeshComponent(meshComp);
 			actor->SetPosition(pos);
 			actor->SetRotation(rot);

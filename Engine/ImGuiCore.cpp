@@ -30,6 +30,7 @@ void ImGuiCore::Init()
 	m_pMapEditorUI = make_unique<MapEditorUI>();
 	m_pObjectEditorUI = make_unique<ObjectEditorUI>();
 	m_pEffectEditorUI = make_unique<EffectEditorUI>();
+	m_pActorListUI = std::make_unique<ActorListUI>();
 }
 
 void ImGuiCore::Update()
@@ -86,6 +87,23 @@ void ImGuiCore::Update()
 		}
 
 		ImGui::End();
+
+		ImGui::SetNextWindowPos(ImVec2(10, io.DisplaySize.y - 50), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(140, 40), ImGuiCond_Always);
+
+		ImGui::Begin("ActorListButton", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+		if (ImGui::Button("Actor List", ImVec2(-1, -1)))
+		{
+			m_pActorListUI->Toggle();
+		}
+
+		ImGui::End();
+
+		if (m_pActorListUI)
+		{
+			m_pActorListUI->DrawUI();
+		}
 	}
 }
  

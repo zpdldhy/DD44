@@ -2,6 +2,7 @@
 #include "FbxLoader.h"
 #include "ActorLoader.h"
 #include "PrefabLoader.h"
+#include "UMeshComponent.h"
 
 class CharacterEditorUI
 {
@@ -21,10 +22,14 @@ public:
     }
 
 private:
-    char m_szTextureName[256] = "../Resources/Texture/kkongchi.jpg";
-    char m_szShaderName[256] = "../Resources/Shader/Default.hlsl";
     char m_szAssetPath[256] = "../Resources/Asset/crow_final.asset";
 
+    char m_szTextureName[256] = "../Resources/Texture/Crow_DIFF.png";
+    char m_szShaderName[256] = "../Resources/Shader/skinningShader.hlsl";
+
+    char m_szChildTextureName[256] = "../Resources/Texture/sword.png";
+    char m_szChildShaderName[256] = "../Resources/Shader/Default.hlsl";
+    
     int m_iSelectedMeshIndex = 0;
     int m_iSelectedChildMeshIndex = 0;
     int m_iSelectedAnimIndex = 0;
@@ -54,4 +59,6 @@ public:
     static bool m_bRootSet;
     static bool m_bChildAttached;
     static int m_iChildIndex;
+
+    vector<shared_ptr<UAnimInstance>> m_vAnimList;
 };

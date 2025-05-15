@@ -293,6 +293,9 @@
     <ClInclude Include="PrefabData.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
+    <ClInclude Include="ActorListUI.h">
+      <Filter>Utils\Editor</Filter>
+    </ClInclude>
     <ClInclude Include="MouseRay.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
@@ -512,6 +515,9 @@
     </ClCompile>
     <ClCompile Include="UIManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorListUI.cpp">
+      <Filter>Utils\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -68,6 +68,17 @@ TFbxResource FbxLoader::Load(string _loadFile)
 
 void FbxLoader::PreProcess(FbxNode* _node)
 {
+	// crow_final 저장
+	if (!strcmp(_node->GetName(),"crow_final"))
+	{
+		int a = 0;
+		FbxVector4 rootP = _node->EvaluateGlobalTransform(0).GetT();
+
+		m_vStaticRootPos.x = -rootP[0];
+		m_vStaticRootPos.y = -rootP[1];
+		m_vStaticRootPos.z = -rootP[2];
+	}
+	
 	// skeleton인지 확인
 	if (_node->GetNodeAttribute() && _node->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eSkeleton)
 	{
@@ -90,8 +101,19 @@ void FbxLoader::PreProcess(FbxNode* _node)
 	// mesh인지 확인
 	if (_node->GetMesh())
 	{
-
 		m_vMeshes.emplace_back(_node);
+
+		// TEMP
+		wstring name = to_mw(_node->GetName());
+		wstring parentName = L"None";
+		if (auto parent = _node->GetParent())
+		{
+			parentName = to_mw(parent->GetName());
+		}
+		TempNode temp;
+		temp.m_node = _node;
+		temp.m_szPatrentName = parentName;
+		m_FbxBones.insert(make_pair(name, temp));
 	}
 
 	int iNumChild = _node->GetChildCount();
@@ -114,17 +136,24 @@ void FbxLoader::ParseMesh(FbxNode* _node)
 
 	// 기하행렬 ( 초기 정점 위치를 변환할 떄 사용 ) 
 	FbxNode* pNode = mesh->GetNode();
+	FbxAMatrix globalTransform = pNode->EvaluateGlobalTransform(0);
+
 	FbxAMatrix geom;
 	FbxVector4 trans = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
-	FbxVector4 rot = pNode->GetGeometricRotation(FbxNode::eSourcePivot); // 사원수 아니라고 ? 
+	FbxVector4 rot = pNode->GetGeometricRotation(FbxNode::eSourcePivot); 
 	FbxVector4 scale = pNode->GetGeometricScaling(FbxNode::eSourcePivot);
 	geom.SetT(trans);
 	geom.SetR(rot);
 	geom.SetS(scale);
+
 	FbxAMatrix normalMatrix = geom;
 	normalMatrix = normalMatrix.Inverse();
 	normalMatrix = normalMatrix.Transpose();
 
+	if (!retMesh.m_bSkeleton)
+	{
+		geom = globalTransform * geom;
+	}
 	// 레이어
 	vector<FbxLayerElementUV*> VertexUVSet;
 	vector<FbxLayerElementVertexColor*> VertexColorSet;
@@ -391,26 +420,19 @@ void FbxLoader::ParseAnimation()
 	int animTrackCount = m_pScene->GetSrcObjectCount<FbxAnimStack>();
 	m_result.m_iAnimTrackCount = animTrackCount;
 
-	// TEMP FOR 까마귀 ( 애니메이션 개많음. 추려서 파싱) 
+	// TEMP FOR crow_final ( 애니메이션 개많음. 추려서 파싱 ) 
 	{
+		//vector<int> targetAnimList = { 50, 29, 5, 44, 45, 46, 47, 0, 15, 23, 25};
+		//int size = targetAnimList.size();
 		//if (m_result.m_iAnimTrackCount > 50)
 		//{
-		//	m_result.m_iAnimTrackCount = 11;
+		//	m_result.m_iAnimTrackCount = size;
 		//}
 
-		//// TEMP ( FOR CROW_FINAL )
-		//GetAnimationTrack(50, animBoneCount);
-		//GetAnimationTrack(29, animBoneCount);
-		//GetAnimationTrack(5, animBoneCount);
-		//GetAnimationTrack(44, animBoneCount);
-		//GetAnimationTrack(45, animBoneCount);
-		//GetAnimationTrack(46, animBoneCount);
-		//GetAnimationTrack(47, animBoneCount);
-		//GetAnimationTrack(0, animBoneCount);
-		//GetAnimationTrack(15, animBoneCount);
-		//GetAnimationTrack(23, animBoneCount);
-		//GetAnimationTrack(25, animBoneCount);
-
+		//for (int i = 0; i < size; i++)
+		//{
+		//	GetAnimationTrack(targetAnimList[i], animBoneCount);
+		//}
 	}
 
 	for (int iTrack = 0; iTrack < m_result.m_iAnimTrackCount; iTrack++)

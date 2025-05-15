@@ -102,20 +102,19 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 	}
 }
 
+void ObjectManager::RemoveActor(std::shared_ptr<class AActor> _pActor)
+{
+	_pActor->SetDelete(true);
+}
+
 shared_ptr<class AActor> ObjectManager::GetActor(UINT _iIndex)
 {
 	return m_vActorList.find(_iIndex)->second;
 }
 
-// 임시 사용
-vector<shared_ptr<class AActor>>& ObjectManager::GetActorList()
+const map<UINT, shared_ptr<AActor>>& ObjectManager::GetActorList() const
 {
-	vector<shared_ptr<class AActor>> vList;
-
-	for (auto pActor : m_vActorList)
-		vList.emplace_back(pActor.second);
-
-	return vList;
+	return m_vActorList;
 }
 
 void ObjectManager::CheckStencilList()
