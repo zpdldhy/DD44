@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
 
-class UMeshComponent;
+class UMeshResources;
 class UAnimInstance;
 class APawn;
 
@@ -35,21 +35,24 @@ public:
         m_OnMoveChild = std::move(callback);
     }
 public:
-    void SetMeshList(vector<shared_ptr<UMeshComponent>> _meshList);
+    void SetMeshList(vector<shared_ptr<UMeshResources>> _meshList);
     void SetAnimList(vector<shared_ptr<UAnimInstance>> _animList);
     void SetTexList(vector<wstring> _texureList);
     void SetBoneList(int _meshIndex);
 
 private:
-    vector<shared_ptr<UMeshComponent>> m_vMeshList;
+    vector<shared_ptr<UMeshResources>> m_vMeshResList;
     vector<string> m_vMeshNameList;
     vector<const char*> m_vMeshPtrList;
+    vector<const char*> m_vChildMeshPtrList;
+
 
     vector<string> m_vAnimList;
     vector<const char*> m_vAnimPtrList;
     
     vector<string> m_vTexList;
     vector<const char*> m_vTexPtrList;
+    char texPath[250];
 
     vector<string> m_vBoneList;
     vector<const char*> m_vBonePtrList;
@@ -61,7 +64,10 @@ private:
     int m_rootBoneIndex = -1;
 
     bool m_childMeshSelected = false;
-
+    
+    bool m_moveChildMesh = false;
+    int m_childIndex;
+    Vec3 m_pos;
     ChildMeshData m_childData;
 
     shared_ptr<APawn> m_pActor;

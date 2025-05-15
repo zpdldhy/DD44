@@ -61,14 +61,15 @@ void TestYR2::Init()
 	}
 #pragma endregion
 	loader = make_shared<ActorLoader>();
-	loader->LoadOne("../Resources/Asset/crow_final.asset");
-	meshList = loader->LoadMesh();
+	//loader->ConvertFbxToAsset();
+	loader->LoadOne("../Resources/Asset/_E_BAT_Black Variant.asset");
+	meshResList = loader->LoadMeshResources();
 	animList = loader->LoadAnim();
 	texList = loader->LoadTexPath();
 
 
 	auto meshEditor = GUI->GetMeshEditorUI();
-	meshEditor->SetMeshList(meshList);
+	meshEditor->SetMeshList(meshResList);
 	meshEditor->SetAnimList(animList);
 	meshEditor->SetTexList(texList);
 
@@ -76,12 +77,14 @@ void TestYR2::Init()
 		{
 			_pActor = make_shared<APawn>();
 			// MESH
-			_pActor->SetMeshComponent(meshList[_mesh]);
+			shared_ptr<USkinnedMeshComponent> rootMesh = make_shared<USkinnedMeshComponent>();
+			rootMesh->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshResList[_mesh]));
+			_pActor->SetMeshComponent(rootMesh);
 			// ANIM
-			dynamic_cast<USkinnedMeshComponent*>(meshList[_mesh].get())->SetBaseAnim(animList[_anim]);
+			rootMesh->SetBaseAnim(animList[_anim]);
 			shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
 			animTrack->SetBase(animList[_anim]);
-			dynamic_cast<USkinnedMeshComponent*>(meshList[_mesh].get())->SetMeshAnim(animTrack);
+			rootMesh->SetMeshAnim(animTrack);
 			// MATERIAL
 			shared_ptr<UMaterial> mat = make_shared<UMaterial>();
 			wstring texPath = L"../Resources/Texture/";
@@ -91,48 +94,65 @@ void TestYR2::Init()
 			shader = SHADER->Get(L"../Resources/Shader/skinningShader.hlsl");
 			INPUTLAYOUT->CreateIW(shader->m_pCode);
 			mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
-			meshList[_mesh]->SetMaterial(mat);
+			rootMesh->SetMaterial(mat);
 
 			m_vActorList.emplace_back(_pActor);
 			OBJECTMANAGER->AddActor(_pActor);
 		});
 	GUI->SetChildMeshEditorCallback([this](ChildMeshData data)
 		{
-			auto mesh = meshList[data.meshIndex];
+			shared_ptr<UMeshComponent> child;
 			auto rootMesh = data.rootMesh->GetMeshComponent<USkinnedMeshComponent>();
 			auto animInstance = rootMesh->GetAnimInstance();
 			if (data.bSkeletal)
 			{
+				child = make_shared<USkinnedMeshComponent>();
+				dynamic_pointer_cast<USkinnedMeshComponent>(child)->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshResList[data.meshIndex]));
+				// ANIM
 				shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
 				animTrack->SetBase(animInstance);
-				dynamic_pointer_cast<USkinnedMeshComponent>(mesh)->SetMeshAnim(animTrack);
-				rootMesh->AddChild(mesh);
-				mesh->SetOwner(data.rootMesh);
-				mesh->Init();
+				dynamic_pointer_cast<USkinnedMeshComponent>(child)->SetMeshAnim(animTrack);
+				// MATERIAL
+				shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+				mat->Load(to_mw(data.texPath), L"../Resources/Shader/skinningShader.hlsl");
+				mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+				child->SetMaterial(mat);
+				// ROOT
+				rootMesh->AddChild(child);
+				child->SetOwner(data.rootMesh);
+				child->Init();
 			}
 			else
-			{
-				auto sChild = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
+			{	
+				child = make_shared<UStaticMeshComponent>();
+				auto sChild = dynamic_pointer_cast<UStaticMeshComponent>(child);
+				sChild->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(meshResList[data.meshIndex]));
+				// ANIM
 				sChild->SetAnimInstance(animInstance);
 				int parentBone = rootMesh->GetMesh()->GetBoneIndex(to_mw(data.parentBoneName));
 				Matrix matBone = animInstance->GetBoneAnim(parentBone);
 				sChild->SetMatBone(matBone);
-
+				// MATERIAL
+				shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+				mat->Load(to_mw(data.texPath), L"../Resources/Shader/Default.hlsl");
+				child->SetMaterial(mat);
 				sChild->SetAnimInstance(animInstance);
 				sChild->SetTargetBoneIndex(parentBone);
-				//weapon->SetLocalPosition(Vec3(-1.15f, 0.2f, -0.8f));
-				//weapon->SetLocalRotation(Vec3(0.0f, 0.0f, 10.0f));
-				rootMesh->AddChild(mesh);
+
+				rootMesh->AddChild(sChild);
 
 				sChild->SetOwner(data.rootMesh);
 				sChild->Init();
 
 			}
 		});
-	//meshEditor->MoveMesh([this](int meshIndex, Vec3 position)
-	//{
-	//	auto mesh = m_vActorList[0]->GetMeshComponent();
-	//});
+	
+	meshEditor->MoveMesh([this](int meshIndex, Vec3 position)
+	{
+		auto mesh = m_vActorList[0]->GetMeshComponent();
+		auto child = mesh->GetChild(meshIndex);
+		child->SetLocalPosition(position);
+	});
 }
 
 void TestYR2::Update()

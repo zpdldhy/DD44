@@ -108,6 +108,45 @@ vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 	return m_vMeshList;
 }
 
+vector<shared_ptr<UMeshResources>> ActorLoader::LoadMeshResources()
+{
+	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	{
+		for (int iMesh = 0; iMesh < m_vFbxList[iFbx].m_vMeshList.size(); iMesh++)
+		{
+			auto& data = m_vFbxList[iFbx].m_vMeshList[iMesh];
+			shared_ptr<UMeshResources> meshResource;
+			if (data.m_bSkeleton)
+			{
+				meshResource = make_shared<USkeletalMeshResources>();
+				meshResource->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
+				auto skeletalMesh = dynamic_pointer_cast<USkeletalMeshResources>(meshResource);
+				meshResource->SetVertexList(data.m_vVertexList);
+				skeletalMesh->SetInverseBindPose(m_vFbxList[iFbx].m_vInverseBindPose[iMesh]);
+				skeletalMesh->SetIwList(data.m_vIwList);
+				meshResource->Create();
+				// BONE
+				map<wstring, BoneNode> bones;
+				for (auto& data : m_vFbxList[iFbx].m_mSkeletonList)
+				{
+					bones.insert(make_pair(data.second.m_szName, data.second));
+				}
+				skeletalMesh->AddSkeleton(bones);
+			}
+			else
+			{
+				meshResource = make_shared<UStaticMeshResources>();
+				meshResource->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
+				auto staticMesh = dynamic_pointer_cast<UStaticMeshResources>(meshResource);
+				staticMesh->SetVertexList(data.m_vVertexList);
+				staticMesh->Create();
+			}
+			m_vMeshResList.emplace_back(meshResource);
+		}
+	}
+	return m_vMeshResList;
+}
+
 vector<wstring> ActorLoader::LoadTexPath()
 {
 	vector<wstring> texPathList;

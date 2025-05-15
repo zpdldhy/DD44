@@ -12,7 +12,6 @@ void MeshEditorUI::DrawUI()
 	{
 		ImGui::Text("Set Root Mesh");
 
-		// ROOT MESH
 		ImGui::Combo("Mesh List", &m_meshIndex, m_vMeshPtrList.data(), (int)m_vMeshPtrList.size());
 		ImGui::Combo("Anim List", &m_animIndex, m_vAnimPtrList.data(), (int)m_vAnimPtrList.size());
 		ImGui::Combo("Texture List", &m_texIndex, m_vTexPtrList.data(), (int)m_vTexPtrList.size());
@@ -33,14 +32,16 @@ void MeshEditorUI::DrawUI()
 	{
 		bool bMesh = ImGui::Combo("Mesh List", &m_meshIndex, m_vMeshPtrList.data(), (int)m_vMeshPtrList.size());
 		bool bTex = ImGui::Combo("Texture List", &m_texIndex, m_vTexPtrList.data(), (int)m_vTexPtrList.size());
-		
+		ImGui::InputText("Texture path", texPath, IM_ARRAYSIZE(texPath));
+
 		m_childData.rootMesh = m_pActor;
 
-		if (bMesh || m_childMeshSelected) 
+		if (m_meshIndex >= 0)
 		{ 
 			m_childData.meshIndex = m_meshIndex;
+			m_childData.texPath = texPath;
 			m_childMeshSelected = true;
-			bool skinned = (dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[m_meshIndex]) != nullptr);
+			bool skinned = (dynamic_pointer_cast<USkeletalMeshResources>(m_vMeshResList[m_meshIndex]) != nullptr);
 			m_childData.bSkeletal = skinned;
 			if (!skinned)
 			{
@@ -66,17 +67,32 @@ void MeshEditorUI::DrawUI()
 			}
 
 			m_OnCreateChild(m_childData);
+			m_vChildMeshPtrList.emplace_back(m_vMeshNameList[m_meshIndex].c_str());
+			m_meshIndex = m_animIndex = m_parentBoneIndex = m_rootBoneIndex = -1;
+			m_moveChildMesh = true;
 		}
-		
 	}
 
+	if (m_moveChildMesh)
+	{
+		ImGui::Combo("Child List", &m_childIndex, m_vChildMeshPtrList.data(), (int)m_vChildMeshPtrList.size());
+
+		bool changeX = ImGui::DragFloat("x", &m_pos.x, -0.5f, +0.5f);
+		bool changeY = ImGui::DragFloat("y", &m_pos.y, -0.5f, +0.5f);
+		bool changeZ = ImGui::DragFloat("z", &m_pos.z, -0.5f, +0.5f);
+
+		if (changeX || changeY || changeZ)
+		{
+			m_OnMoveChild(m_childIndex, m_pos);
+		}
+	}
 
 
 }
 
-void MeshEditorUI::SetMeshList(vector<shared_ptr<UMeshComponent>> _meshList)
+void MeshEditorUI::SetMeshList(vector<shared_ptr<UMeshResources>> _meshList)
 {
-	m_vMeshList = _meshList;
+	m_vMeshResList = _meshList;
 	m_vMeshNameList.reserve(_meshList.size());
 	m_vMeshPtrList.reserve(_meshList.size());
 
@@ -116,7 +132,7 @@ void MeshEditorUI::SetTexList(vector<wstring> _texureList)
 }
 void MeshEditorUI::SetBoneList(int _meshIndex)
 {
-	const auto& boneMap = dynamic_pointer_cast<USkinnedMeshComponent>(m_vMeshList[_meshIndex])->GetMesh()->GetSkeletonList();
+	const auto& boneMap = dynamic_pointer_cast<USkeletalMeshResources>(m_vMeshResList[_meshIndex])->GetSkeletonList();
 	m_vBoneList.reserve(boneMap.size());
 	m_vBonePtrList.reserve(boneMap.size());
 	for (auto data : boneMap)
