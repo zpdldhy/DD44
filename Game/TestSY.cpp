@@ -39,7 +39,7 @@ void TestSY::Init()
 	{
 		m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
-		m_pCameraActor->SetActorName(L"EnginCamera");
+		m_pCameraActor->m_szName = L"EnginCamera";
 
 		CAMERA->Set3DCameraActor(m_pCameraActor);
 	}
@@ -48,7 +48,7 @@ void TestSY::Init()
 
 	{
 		m_pActor = make_shared<APawn>();
-		m_pActor->SetActorName(L"kkongchi");
+		m_pActor->m_szName = L"kkongchi";
 
 		m_pStaticMesh = UStaticMeshComponent::CreateCube();
 		m_pActor->SetMeshComponent(m_pStaticMesh);
@@ -68,13 +68,16 @@ void TestSY::Init()
 
 		auto pBoxComponent = make_shared<UBoxComponent>();
 		pBoxComponent->SetLocalScale({ 6.f, 6.f, 6.f });
+		pBoxComponent->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 		m_pActor->SetShapeComponent(pBoxComponent);
 
 		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
+		m_pActor->m_bCollision = true;
 	}
 
 	{
 		auto pActor = make_shared<APawn>();
+		pActor->SetPosition({ 20.f, 0.f, 0.f });
 
 		auto pMesh = UStaticMeshComponent::CreateTriangle();
 		pActor->SetMeshComponent(pMesh);
@@ -83,12 +86,19 @@ void TestSY::Init()
 		pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
 		pMesh->SetMaterial(pMaterial);
 
+		auto pBoxComponent = make_shared<UBoxComponent>();
+		pBoxComponent->SetLocalScale({ 6.f, 6.f, 6.f });
+		pBoxComponent->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		pActor->SetShapeComponent(pBoxComponent);
+
+		pActor->m_bCollision = true;
+
 		OBJECT->AddActor(pActor);
 	}
 
 	{
 		m_pSky = make_shared<ASky>();
-		m_pSky->SetActorName(L"Sky");
+		m_pSky->m_szName = L"Sky";
 
 		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pSky->SetMeshComponent(m_pSkyMesh);
@@ -192,7 +202,7 @@ void TestSY::Init()
 
 			auto actor = std::make_shared<AActor>();
 			//actor->SetActorName(rootComponent->GetName());
-			actor->SetActorName(L"Character");
+			actor->m_szName = L"Character";
 
 			actor->SetMeshComponent(rootComponent);
 
@@ -216,7 +226,7 @@ void TestSY::Init()
 		if (!editor) return;
 
 		auto tile = std::make_shared<ATerrainTileActor>();
-		tile->SetActorName(L"Terrain");
+		tile->m_szName = L"Terrain";
 
 		tile->m_iNumCols = editor->GetNumCols();
 		tile->m_iNumRows = editor->GetNumRows();
@@ -261,7 +271,7 @@ void TestSY::Init()
 			}
 
 			auto actor = make_shared<APawn>();
-			actor->SetActorName(L"Object");
+			actor->m_szName = L"Object";
 
 			actor->SetMeshComponent(meshComp);
 			actor->SetPosition(pos);
@@ -284,7 +294,7 @@ void TestSY::Update()
 
 	if (INPUT->GetButton(I))
 	{
-		m_pActor->SetDelete(true);
+		m_pActor->m_bDelete = true;
 	}
 
 	// Mouse Picking
@@ -307,19 +317,19 @@ void TestSY::SetClickPos()
 
 	m_vRay.Click();
 
-	// Ray 가시화
-	auto pActor = make_shared<APawn>();
-	
-	auto pMesh = UStaticMeshComponent::CreateRay(m_vRay.position, m_vRay.EndPos);
-	pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	
-	pActor->SetMeshComponent(pMesh);
-	
-	auto pMaterial = make_shared<UMaterial>();
-	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");	
-	pMesh->SetMaterial(pMaterial);
-	
-	OBJECT->AddActor(pActor);
+	//// Ray 가시화
+	//auto pActor = make_shared<APawn>();
+	//
+	//auto pMesh = UStaticMeshComponent::CreateRay(m_vRay.position, m_vRay.EndPos);
+	//pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	//
+	//pActor->SetMeshComponent(pMesh);
+	//
+	//auto pMaterial = make_shared<UMaterial>();
+	//pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");	
+	//pMesh->SetMaterial(pMaterial);
+	//
+	//OBJECT->AddActor(pActor);
 
 	//// Check GetInterSection, PointInPolygon
 	//Vec3 v0 = Vec3(-0.5f, -0.5f, 0.f);
@@ -340,10 +350,31 @@ void TestSY::SetClickPos()
 	for (auto& iter : vList)
 	{
 		auto pActor = iter.second;
-		auto shapeComponent = pActor->GetShapeComponent<UBoxComponent>();
+		if (pActor->m_bCollision == false)continue;
+		auto shapeComponent = pActor->GetShapeComponent();
 		if (shapeComponent == nullptr) continue;
-		if (Collision::CheckAABBToRay(m_vRay, shapeComponent->GetBounds(), inter))
+
+		if (shapeComponent->GetShapeType() == ShapeType::ST_BOX)
+		{
+			auto boxComponent = static_cast<UBoxComponent*>(shapeComponent.get());
+
+			if (Collision::CheckAABBToRay(m_vRay, boxComponent->GetBounds(), inter))
+			{
+				int i = 0;
+			}
+		}
+		else if (shapeComponent->GetShapeType() == ShapeType::ST_SPHERE)
+		{
 			int i = 0;
+		}
+		else if (shapeComponent->GetShapeType() == ShapeType::ST_CAPSULE)
+		{
+			int i = 0;
+		}
+		else
+		{
+			int i = 0;
+		}
 	}
 }
 

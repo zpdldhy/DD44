@@ -1,15 +1,25 @@
 #pragma once
 #include "Singleton.h"
+#include "UBoxComponent.h"
 
-enum class CollisionFlag
-{
-
+struct pair_hash {
+	template<typename T1, typename T2>
+	size_t operator()(const pair<T1, T2>& p) const {
+		return hash<T1>()(p.first) ^ hash<T2>()(p.second);
+	}
 };
 
-class Collision : Singleton<Collision>
+class Collision : public Singleton<Collision>
 {
+	using CollisionFunc = function<void(shared_ptr<class AActor>, shared_ptr<class AActor>)>;
+	unordered_map<pair<ShapeType,ShapeType>, CollisionFunc, pair_hash> collisionMap;
+
 public:
-	static void CheckCollision(vector<UINT> _vActorIndex);
+	void Init();
+
+public:
+	void CheckCollision(vector<UINT> _vActorIndex);
+	bool CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex);
 
 public:
 	// Ray

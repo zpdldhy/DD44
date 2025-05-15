@@ -15,7 +15,7 @@ protected:
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
 
 public:
-	UBoxComponent() = default;
+	UBoxComponent() { m_ShapeType = ShapeType::ST_BOX; }
 	virtual ~UBoxComponent() = default;
 
 public:

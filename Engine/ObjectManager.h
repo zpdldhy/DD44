@@ -6,6 +6,7 @@ class ObjectManager : public Singleton<ObjectManager>
 	static UINT ActorCount;
 	map<UINT, shared_ptr<class AActor>> m_vActorList;
 	vector<shared_ptr<class AActor>> m_vRenderActorList;	// Render 이후 Clear
+	vector<UINT> m_vActorIndexList;		// 임시 사용
 
 	// Stencil Check용
 	vector<shared_ptr<class AActor>> m_vPreRenderActorList;		// stencil 미사용
@@ -25,6 +26,7 @@ public:
 	shared_ptr<class AActor> GetActor(UINT _iIndex);
 	const map<UINT, shared_ptr<class AActor>>& GetActorList() const;
 
+	vector<UINT> GetActorIndexList() { return m_vActorIndexList; }	// 임시 사용
 private:
 	void CheckStencilList();
 	void ClearRenderList();

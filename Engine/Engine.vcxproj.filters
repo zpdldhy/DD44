@@ -311,6 +311,7 @@
     <ClInclude Include="ShapeData.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -519,6 +520,7 @@
     <ClCompile Include="ShapeData.cpp">
       <Filter>Headers\Data</Filter>
     </ClCompile>
+    <ClCompile Include="CollisionScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

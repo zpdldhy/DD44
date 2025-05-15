@@ -3,6 +3,55 @@
 #include "ObjectManager.h"
 #include "AActor.h"
 
+void Collision::Init()
+{
+	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_BOX}] = [](auto a, auto b) {
+		auto boxA = static_pointer_cast<UBoxComponent>(a->GetShapeComponent());
+		auto boxB = static_pointer_cast<UBoxComponent>(b->GetShapeComponent());
+
+		// 충돌 검사 로직
+		//if (Collision::CheckAABBToAABB(boxA->GetBounds(), boxB->GetBounds())) {
+		//	// 충돌 처리
+		//}
+		boxA->CollisionAction();	// 여기서 어떤 정보를 넘겨줘야 할까?
+		boxB->CollisionAction();
+		};
+
+	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_SPHERE}] = [](auto a, auto b) {
+		auto boxA = static_pointer_cast<UBoxComponent>(a->GetShapeComponent());
+		// ...
+		};
+
+	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_CAPSULE}] = [](auto a, auto b) {
+		auto boxA = static_pointer_cast<UBoxComponent>(a->GetShapeComponent());
+		// ...
+		};
+
+	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_BOX}] = [](auto a, auto b) {
+		// ...
+		};
+
+	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_SPHERE}] = [](auto a, auto b) {
+		// ...
+		};
+
+	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_CAPSULE}] = [](auto a, auto b) {
+		// ...
+		};
+
+	collisionMap[{ShapeType::ST_CAPSULE, ShapeType::ST_BOX}] = [](auto a, auto b) {
+		// ...
+		};
+
+	collisionMap[{ShapeType::ST_CAPSULE, ShapeType::ST_SPHERE}] = [](auto a, auto b) {
+		// ...
+		};
+
+	collisionMap[{ShapeType::ST_CAPSULE, ShapeType::ST_CAPSULE}] = [](auto a, auto b) {
+		// ...
+		};
+}
+
 void Collision::CheckCollision(vector<UINT> _vActorIndex)
 {
 	// Collision이 있는 Actor의 List를 가져온다.
@@ -13,14 +62,52 @@ void Collision::CheckCollision(vector<UINT> _vActorIndex)
 
 	for(auto& pObj : vActorList)
 	{
+		if (pObj->m_bCollision == false) continue;
+
+		auto objShape = pObj->GetShapeComponent();
+		if (objShape == nullptr ||
+			objShape->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) continue;
+
 		for (auto& pSub : vActorList)
 		{
+			if (pSub->m_bCollision == false) continue;
 			if (pObj == pSub) continue;
+			auto subShape = pSub->GetShapeComponent();
+			if (subShape == nullptr ||
+				subShape->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) continue;
 
-			// Actor의 어떤거랑 비교를 해야하나?
+			auto objType = objShape->GetShapeType();
+			auto subType = subShape->GetShapeType();
 
+			auto key = make_pair(objType, subType);
+			auto iter = collisionMap.find(key);
 
+			if (iter != collisionMap.end())
+			{
+				iter->second(pObj, pSub);
+			}
 		}
+	}
+
+	vActorList.clear();
+}
+
+bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex)
+{
+	// Collision이 있는 Actor의 List를 가져온다.
+	vector<shared_ptr<AActor>> vActorList;
+
+	for (auto index : _vActorIndex)
+		vActorList.emplace_back(OBJECT->GetActor(index));
+
+	float dis;
+	UINT iActorIndex;
+
+	for (auto& pObj : vActorList)
+	{
+		Vec3 inter;
+
+
 	}
 
 	vActorList.clear();

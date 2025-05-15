@@ -31,20 +31,11 @@ public:
 	//--------------------------------------------------------------------------------------
 	// Actor 상태
 	//--------------------------------------------------------------------------------------
-protected:
-	wstring m_szName;
-	UINT m_ActorIndex = 0;	// 고유 번호. 해당 Actor를 빠르게 찾는 로직에서 필요하다.
-	bool m_bDelete = false;	
-
 public:
-	void SetActorName(wstring _szName) { m_szName = _szName; }
-	const std::wstring& GetActorName() const { return m_szName; }
-
-	void SetActorIndex(UINT _iIndex) { m_ActorIndex = _iIndex; }
-	UINT GetActorIndex() { return m_ActorIndex; }
-
-	bool IsDelete() { return m_bDelete; }
-	void SetDelete(bool _bDelete) { m_bDelete = _bDelete; }	
+	wstring m_szName;
+	UINT m_Index = 0;	// 고유 번호. 해당 Actor를 빠르게 찾는 로직에서 필요하다.
+	bool m_bCollision = false;	// 해당 Actor가 이번 Frame에 충돌을 하는지 확인하는 용도.
+	bool m_bDelete = false;	
 
 	//--------------------------------------------------------------------------------------
 	// Component
@@ -60,10 +51,8 @@ public:
 	template<typename T>
 	shared_ptr<T> GetMeshComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
 	shared_ptr<UCameraComponent> GetCameraComponent() { return static_pointer_cast<UCameraComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)]); }
-	template<typename T>
-	shared_ptr<T> GetShapeComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_SHAPE)]); }
-	template<typename T>
-	shared_ptr<T> GetLightComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_LIGHT)]); }
+	shared_ptr<UShapeComponent> GetShapeComponent() { return static_pointer_cast<UShapeComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_SHAPE)]); }
+	shared_ptr<ULightComponent> GetLightComponent() { return static_pointer_cast<ULightComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_LIGHT)]); }
 
 	void SetMeshComponent(shared_ptr<UMeshComponent> _mesh) { m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)] = static_pointer_cast<USceneComponent>(_mesh); }
 	void SetCameraComponent(shared_ptr<UCameraComponent> _camera) { m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)] = static_pointer_cast<USceneComponent>(_camera); }
