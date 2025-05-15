@@ -4,7 +4,7 @@
 class Collision : Singleton<Collision>
 {
 public:
-	static void CheckCollision(vector<shared_ptr<class AActor>> _vActorList);
+	static void CheckCollision(map<UINT, shared_ptr<class AActor>>& _vActorList);
 
 public:
 	static bool RayToPlane(const Ray& _ray, const Plane& _plane);

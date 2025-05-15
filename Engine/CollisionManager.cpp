@@ -1,14 +1,15 @@
 #include "pch.h"
 #include "CollisionManager.h"
 #include "ObjectManager.h"
+#include "AActor.h"
 
-void Collision::CheckCollision(vector<shared_ptr<class AActor>> _vActorList)
+void Collision::CheckCollision(map<UINT, shared_ptr<AActor>>& _vActorList)
 {
-	_vActorList = OBJECT->GetActorList();	// 임시 코드, Quad 구현 후 제거
+	auto vActorList = OBJECT->GetActorList();	// 임시 코드, Quad 구현 후 제거
 
-	for(auto& pObj : _vActorList)
+	for(auto& pObj : vActorList)
 	{
-		for (auto& pSub : _vActorList)
+		for (auto& pSub : vActorList)
 		{
 			if (pObj == pSub) continue;
 
@@ -18,7 +19,7 @@ void Collision::CheckCollision(vector<shared_ptr<class AActor>> _vActorList)
 		}
 	}
 
-	_vActorList.clear();
+	vActorList.clear();
 }
 
 bool Collision::RayToPlane(const Ray& _ray, const Plane& _plane)
