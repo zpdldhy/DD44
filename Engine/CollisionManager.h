@@ -1,15 +1,15 @@
 #pragma once
 #include "Singleton.h"
 
-class CollisionManager : public Singleton<CollisionManager>
+class Collision : Singleton<Collision>
 {
-	vector<shared_ptr<class AActor>> m_vCollisionActor;
+public:
+	static void CheckCollision(map<UINT, shared_ptr<class AActor>>& _vActorList);
 
 public:
-	void Tick();
-	void Destroy();
-
-public:
-	void AddCollisionActor(shared_ptr<class AActor> _pActor) { m_vCollisionActor.push_back(_pActor); }
+	static bool RayToPlane(const Ray& _ray, const Plane& _plane);
+	static bool GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& _inter);
+	static bool PointInPolygon(const Vec3& _inter, const Vec3& _faceNormal, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2);
+	static bool CheckMousePicking(const Ray& _ray, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2, const Vec3& _normal, Vec3& _inter);
 };
 

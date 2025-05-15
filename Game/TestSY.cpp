@@ -31,6 +31,8 @@
 #include "PrefabLoader.h"
 #include "Timer.h"
 #include "Functions.h"
+#include "CollisionManager.h"
+#include "MouseRay.h"
 
 void TestSY::Init()
 {
@@ -40,7 +42,7 @@ void TestSY::Init()
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 		m_pCameraActor->SetActorName(L"EnginCamera");
 
-		CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
+		CAMERA->Set3DCameraActor(m_pCameraActor);
 	}
 
 	//LoadAllPrefabs(".map.json");
@@ -73,6 +75,19 @@ void TestSY::Init()
 	}
 
 	{
+		auto pActor = make_shared<APawn>();
+
+		auto pMesh = UStaticMeshComponent::CreateTriangle();
+		pActor->SetMeshComponent(pMesh);
+
+		auto pMaterial = make_shared<UMaterial>();
+		pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
+		pMesh->SetMaterial(pMaterial);
+
+		OBJECT->AddActor(pActor);
+	}
+
+	{
 		m_pSky = make_shared<ASky>();
 		m_pSky->SetActorName(L"Sky");
 
@@ -101,7 +116,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			UIMANAGER->AddUI(pUIArrowBack);
+			UI->AddUI(pUIArrowBack);
 
 			auto pUIArrowFrame = make_shared<AUIActor>();
 			pUIArrowFrame->SetScale(Vec3(182.f, 181.f, 0.f) * 0.6f);
@@ -116,7 +131,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			UIMANAGER->AddUI(pUIArrowFrame);
+			UI->AddUI(pUIArrowFrame);
 
 			auto pUIArrow = make_shared<AUIActor>();
 			pUIArrow->SetScale(Vec3(107.f, 108.f, 0.f) * 0.4f);
@@ -131,7 +146,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			UIMANAGER->AddUI(pUIArrow);
+			UI->AddUI(pUIArrow);
 		}
 
 		// Energe
@@ -149,7 +164,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			UIMANAGER->AddUI(pUIEnergyBack);
+			UI->AddUI(pUIEnergyBack);
 
 			auto pUIEnergy = make_shared<AUIActor>();
 			pUIEnergy->SetScale(Vec3(64.f, 64.f, 0.f) * 0.5f);
@@ -164,7 +179,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			UIMANAGER->AddUI(pUIEnergy);
+			UI->AddUI(pUIEnergy);
 		}
 	}
 
@@ -193,7 +208,7 @@ void TestSY::Init()
 			cam->SetLocalPosition(Vec3(10, 10, -10));
 			actor->SetCameraComponent(cam);
 
-			OBJECTMANAGER->AddActor(actor);
+			OBJECT->AddActor(actor);
 		});
 
 	GUI->SetMapEditorCallback([this]()
@@ -213,7 +228,7 @@ void TestSY::Init()
 		tile->SetRotation(editor->GetRotation());
 		tile->SetScale(editor->GetScale());
 
-		OBJECTMANAGER->AddActor(tile);
+		OBJECT->AddActor(tile);
 	});
 
 	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
@@ -254,19 +269,19 @@ void TestSY::Init()
 			actor->SetRotation(rot);
 			actor->SetScale(scale);
 
-			OBJECTMANAGER->AddActor(actor);
+			OBJECT->AddActor(actor);
 		});
 
-	OBJECTMANAGER->AddActor(m_pActor);
-	OBJECTMANAGER->AddActor(m_pCameraActor);
-	OBJECTMANAGER->AddActor(m_pSky);	
+	OBJECT->AddActor(m_pActor);
+	OBJECT->AddActor(m_pCameraActor);
+	OBJECT->AddActor(m_pSky);	
 }
 
 void TestSY::Update()
 {
-	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
+	CAMERA->Set3DCameraActor(m_pCameraActor);
 	if (INPUT->GetButtonDown(O))
-		CAMERAMANAGER->Set3DCameraActor(m_pActor);
+		CAMERA->Set3DCameraActor(m_pActor);
 
 	if (INPUT->GetButton(I))
 	{
@@ -274,8 +289,8 @@ void TestSY::Update()
 	}
 
 	// Mouse Picking
-	//if (INPUT->GetButton(LCLICK))
-	//	SetClickPos();
+	if (INPUT->GetButtonDown(LCLICK))
+		SetClickPos();
 }
 
 void TestSY::Render()
@@ -289,43 +304,49 @@ void TestSY::Destroy()
 
 void TestSY::SetClickPos()
 {
-	POINT mousePos = INPUT->GetMousePos();
-	float deltaTime = TIMER->GetDeltaTime() * 10.f;
+	MouseRay m_vRay;
 
-	float fWinSizeX = static_cast<float>(g_windowSize.x);
-	float fWinSizeY = static_cast<float>(g_windowSize.y);
+	m_vRay.Click();
 
-	// To NDC
-	Vec3 vMouseEnd(0.f, 0.f, 1.f);
-	vMouseEnd.x = (2.f * static_cast<float>(mousePos.x) / fWinSizeX) - 1.f;
-	vMouseEnd.y = 1.f - (2.f * static_cast<float>(mousePos.y) / fWinSizeY);
-
-	Matrix mProjViewInvert = Matrix::Identity;
-	(CAMERAMANAGER->Get3DView() * CAMERAMANAGER->Get3DProjection()).Invert(mProjViewInvert);
-
-	vMouseEnd = Vec3::Transform(vMouseEnd, mProjViewInvert);
-
-	m_vMouseRay.position = CAMERAMANAGER->Get3DCameraComponent()->GetCameraPos();
-	m_vMouseRay.direction = vMouseEnd - m_vMouseRay.position;
-
-	Vec3 vMouseMiddle = (vMouseEnd + m_vMouseRay.position) / 2.f;
-
+	// Ray ∞°Ω√»≠
 	auto pActor = make_shared<APawn>();
 
-	auto pMesh = UStaticMeshComponent::CreateRay();
+	auto pMesh = UStaticMeshComponent::CreateRay(m_vRay.position, m_vRay.m_vMouseEndPos);
 	pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	
 	pActor->SetMeshComponent(pMesh);
-	pActor->SetPosition(vMouseMiddle);
-	//pActor->SetRotation(Vec3(0.f, DD_PI / 2.f, 0.f));
-	pActor->SetScale(Vec3(100.f, 100.f, 100.f));
 
 	auto pMaterial = make_shared<UMaterial>();
 	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");	
 	pMesh->SetMaterial(pMaterial);
 
-	OBJECTMANAGER->AddActor(pActor);
+	OBJECT->AddActor(pActor);
+
+	// Check RayToPlane
+	//Plane p1(Vec3(100.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
+	//Plane p2(Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
+
+	//float d = p1.DotNormal(Vec3(0.f, 0.f, 2.f));
+	//float dot = p1.Normal().Dot(Vec3(0.f, 0.f, 1.f));
+
+	//bool col = CollisionManager::RayToPlane(m_vMouseRay, p1);
+
+	//if (col == true)
+	//	int k = 0;
+
+	// Check GetInterSection, PointInPolygon
+	Vec3 v0 = Vec3(-0.5f, -0.5f, 0.f);
+	Vec3 v1 = Vec3(-0.5f, +0.5f, 0.f);
+	Vec3 v2 = Vec3(+0.5f, -0.5f, 0.f);
+	Vec3 normal = Vec3(0.f, 0.f, -1.f);
+	Vec3 inter;
+
+	bool col = Collision::CheckMousePicking(m_vRay, v0, v1, v2, normal, inter);
+
+	if (col)
+		int i = 0;
 }
+
 void TestSY::LoadAllPrefabs(const std::string& extension)
 {
 	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
@@ -345,7 +366,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 				tile->SetPosition(mapData.Position);
 				tile->SetRotation(mapData.Rotation);
 				tile->SetScale(mapData.Scale);
-				OBJECTMANAGER->AddActor(tile);
+				OBJECT->AddActor(tile);
 			}
 		}
 		else if (extension == ".character.json")
@@ -357,7 +378,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 				actor->SetPosition(characterData.Translation);
 				actor->SetRotation(characterData.Rotation);
 				actor->SetScale(characterData.Scale);
-				OBJECTMANAGER->AddActor(actor);
+				OBJECT->AddActor(actor);
 			}
 		}
 		else if (extension == ".object.json")
@@ -369,7 +390,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 				actor->SetPosition(objData.Translation);
 				actor->SetRotation(objData.Rotation);
 				actor->SetScale(objData.Scale);
-				OBJECTMANAGER->AddActor(actor);
+				OBJECT->AddActor(actor);
 			}
 		}
 	}

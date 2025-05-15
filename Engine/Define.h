@@ -14,9 +14,9 @@
 #define TIMER		GET_SINGLE(Timer)
 #define GUI			GET_SINGLE(ImGuiCore)
 #define SOUNDMANAGER	GET_SINGLE(SoundManager)
-#define CAMERAMANAGER	GET_SINGLE(CameraManager)
-#define UIMANAGER		GET_SINGLE(UIManager)
-#define OBJECTMANAGER	GET_SINGLE(ObjectManager)
+#define CAMERA		GET_SINGLE(CameraManager)
+#define UI			GET_SINGLE(UIManager)
+#define OBJECT		GET_SINGLE(ObjectManager)
 #define PREFAB      GET_SINGLE(PrefabLoader)
 #define LIGHTMANAGER GET_SINGLE(LightManager)
 

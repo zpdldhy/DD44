@@ -240,9 +240,6 @@
     <ClInclude Include="FbxLoader.h">
       <Filter>Utils\ModelLoader</Filter>
     </ClInclude>
-    <ClInclude Include="CameraManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
     <ClInclude Include="AssimpLoader.h">
       <Filter>Utils\ModelLoader</Filter>
     </ClInclude>
@@ -284,12 +281,6 @@
     <ClInclude Include="AUIActor.h">
       <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="UIManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
     <ClInclude Include="PrefabLoader.h">
       <Filter>Utils\ModelLoader</Filter>
     </ClInclude>
@@ -299,12 +290,26 @@
     <ClInclude Include="LightManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="LightData.h" />
     <ClInclude Include="PrefabData.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
     <ClInclude Include="ActorListUI.h">
       <Filter>Utils\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseRay.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="LightData.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="UIManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -446,9 +451,6 @@
     <ClCompile Include="FbxLoader.cpp">
       <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
-    <ClCompile Include="CameraManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="AssimpLoader.cpp">
       <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
@@ -490,12 +492,6 @@
     <ClCompile Include="AUIActor.cpp">
       <Filter>Object</Filter>
     </ClCompile>
-    <ClCompile Include="UIManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="PrefabLoader.cpp">
       <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
@@ -507,6 +503,18 @@
     </ClCompile>
     <ClCompile Include="PrefabData.cpp">
       <Filter>Headers\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseRay.cpp">
+      <Filter>Headers\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="UIManager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
     <ClCompile Include="ActorListUI.cpp">
       <Filter>Utils\Editor</Filter>

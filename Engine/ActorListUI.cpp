@@ -14,7 +14,7 @@ void ActorListUI::DrawUI()
 
     ImGui::Begin("Actor List", &m_bVisible, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-    for (auto it = OBJECTMANAGER->GetActorList().begin(); it != OBJECTMANAGER->GetActorList().end(); ++it)
+    for (auto it = OBJECT->GetActorList().begin(); it != OBJECT->GetActorList().end(); ++it)
     {
         UINT id = it->first;
         auto actor = it->second;
@@ -36,7 +36,7 @@ void ActorListUI::DrawUI()
 
     if (m_iSelectedActorID >= 0)
     {
-        auto& actorMap = OBJECTMANAGER->GetActorList();
+        auto& actorMap = OBJECT->GetActorList();
         auto it = actorMap.find(m_iSelectedActorID);
         if (it != actorMap.end())
         {
@@ -144,7 +144,7 @@ void ActorListUI::DrawUI()
 
             if (ImGui::Button("Delete Actor"))
             {
-                OBJECTMANAGER->RemoveActor(actor);
+                OBJECT->RemoveActor(actor);
                 m_iSelectedActorID = -1;
             }
         }
