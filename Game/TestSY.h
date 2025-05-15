@@ -4,6 +4,7 @@
 #include "ObjectEditorUI.h"
 #include "ActorLoader.h"
 #include "PrefabLoader.h"
+#include "QuadTree.h"
 
 class TestSY : public IExecute
 {
@@ -16,6 +17,8 @@ public:
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;	
 
+	std::shared_ptr<QuadTree> m_pQuadTree;
+
 public:
 	void Init() override;
 	void Update() override;
@@ -25,5 +28,8 @@ public:
 private:
 	void SetClickPos();
 	void LoadAllPrefabs(const std::string& extension);
+	void InitializeQuadTree();
+	void InsertAllActorsIntoQuadTree();
+	void UpdateQuadTreeActors();
 };
 

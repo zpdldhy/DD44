@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="kkongchiMoveScript.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="pch.h" />
@@ -155,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="kkongchiMoveScript.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp">
@@ -200,7 +202,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Resources\Prefab\MyTile.prefab.json" />
+    <None Include="..\Resources\Prefab\MyTile.map.json" />
     <None Include="..\Resources\Shader\Header.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
