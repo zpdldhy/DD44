@@ -46,7 +46,7 @@ void TestYR::Init()
 		gizmo.emplace_back(object2);
 		gizmo.emplace_back(object3);
 
-		OBJECTMANAGER->AddActorList(gizmo);
+		OBJECT->AddActorList(gizmo);
 	}
 #pragma endregion
 
@@ -56,8 +56,8 @@ void TestYR::Init()
 		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	}
-	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
-	OBJECTMANAGER->AddActor(m_pCameraActor);
+	CAMERA->Set3DCameraActor(m_pCameraActor);
+	OBJECT->AddActor(m_pCameraActor);
 #pragma endregion
 
 	//loader.ConvertFbxToAsset();
@@ -66,7 +66,7 @@ void TestYR::Init()
 	for (int i = 0; i < m_vActorList.size(); i++)
 	{
 		m_vActorList[i]->SetPosition(Vec3(10.0f * i , 0, 0));
-		OBJECTMANAGER->AddActor(m_vActorList[i]);
+		OBJECT->AddActor(m_vActorList[i]);
 	}
 
 #pragma region ActorTest

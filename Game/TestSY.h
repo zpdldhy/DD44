@@ -15,10 +15,7 @@ public:
 	shared_ptr<class ACameraActor> m_pCameraActor;
 
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
-	shared_ptr<class ASky> m_pSky;
-
-	// Mouse Picking
-	Ray m_vMouseRay;
+	shared_ptr<class ASky> m_pSky;	
 
 	std::shared_ptr<QuadTree> m_pQuadTree;
 

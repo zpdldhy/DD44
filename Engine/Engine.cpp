@@ -16,6 +16,7 @@
 #include "ViewPortTexture.h"
 #include "UIManager.h"
 #include "ObjectManager.h"
+#include "CollisionManager.h"
 
 void Engine::Init()
 {
@@ -38,7 +39,7 @@ void Engine::Init()
 
 	// Manager 초기화
 	{
-		CAMERAMANAGER->Init();
+		CAMERA->Init();
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
@@ -49,8 +50,8 @@ void Engine::Frame()
 {
 	// Object Tick
 	{
-		OBJECTMANAGER->Tick();
-		UIMANAGER->Tick();
+		OBJECT->Tick();
+		UI->Tick();
 	}
 
 	GET_SINGLE(Device)->Frame();
@@ -66,7 +67,7 @@ void Engine::Frame()
 	
 	// Manager Tick
 	{
-		CAMERAMANAGER->Tick();
+		CAMERA->Tick();
 	}
 
 	m_p3DWorld->Tick();
@@ -80,14 +81,14 @@ void Engine::Render()
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
 	DXWRITE->Draw(rt, TIMER->m_szTime);
 
-	CAMERAMANAGER->Render(CameraViewType::CVT_ACTOR);
+	CAMERA->Render(CameraViewType::CVT_ACTOR);
 
 	_app->Render();
 	// 3D World -> Texture Render
 	{
 		m_p3DWorldTexture->BeginViewPort();
 		// ObjectList Render
-		OBJECTMANAGER->Render();
+		OBJECT->Render();
 		m_p3DWorldTexture->EndViewPort();
 
 		// 3DWorld를 보여주는 평면은 Rasterizer = SolidNone으로 고정
@@ -98,7 +99,7 @@ void Engine::Render()
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
 		{
-			CAMERAMANAGER->Render(CameraViewType::CVT_UI);
+			CAMERA->Render(CameraViewType::CVT_UI);
 			m_p3DWorld->Render();
 		}
 
@@ -106,7 +107,7 @@ void Engine::Render()
 		m_pCurrentRasterizer.Reset();
 	}	
 
-	UIMANAGER->Render();
+	UI->Render();
 
 	GUI->Render(); // *Fix Location* after _app->Render() 
 
@@ -116,8 +117,7 @@ void Engine::Render()
 
 void Engine::Release()
 {
-	OBJECTMANAGER->Destroy();
-	UIMANAGER->Destroy();
+	UI->Destroy();	
 
 	{
 		ImGui_ImplDX11_Shutdown();  // DX11 관련 리소스 해제

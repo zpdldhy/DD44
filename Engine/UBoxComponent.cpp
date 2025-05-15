@@ -63,6 +63,9 @@ void UBoxComponent::CreateCollisionBox()
 	m_pCollisionRange->SetPosition(m_vCenter);
 
 	m_pCollisionRange->Init();
+
+	m_vVertexList = pMesh->GetMesh()->GetVertexList();
+	m_vIndexList = pMesh->GetMesh()->GetIndexList();
 }
 
 void UBoxComponent::UpdateBounds()
