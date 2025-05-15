@@ -43,7 +43,7 @@ void TestSY::Init()
 		CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
 	}
 
-	LoadAllPrefabs(".map.json");
+	//LoadAllPrefabs(".map.json");
 
 	{
 		//m_pActor = make_shared<APawn>();
@@ -197,24 +197,49 @@ void TestSY::Init()
 		});
 
 	GUI->SetMapEditorCallback([this]()
-	{
-		MapEditorUI* editor = GUI->GetMapEditorUI();
-		if (!editor) return;
+		{
+			MapEditorUI* editor = GUI->GetMapEditorUI();
+			if (!editor) return;
 
-		auto tile = std::make_shared<ATerrainTileActor>();
-		tile->SetActorName(L"Terrain");
+			auto tile = std::make_shared<ATerrainTileActor>();
+			tile->SetActorName(L"Terrain");
 
-		tile->m_iNumCols = editor->GetNumCols();
-		tile->m_iNumRows = editor->GetNumRows();
-		tile->m_fCellSize = editor->GetCellSize();
+			tile->m_iNumCols = editor->GetNumCols();
+			tile->m_iNumRows = editor->GetNumRows();
+			tile->m_fCellSize = editor->GetCellSize();
 
-		tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
-		tile->SetPosition(editor->GetPosition());
-		tile->SetRotation(editor->GetRotation());
-		tile->SetScale(editor->GetScale());
+			tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
+			tile->SetPosition(editor->GetPosition());
+			tile->SetRotation(editor->GetRotation());
+			tile->SetScale(editor->GetScale());
 
-		OBJECTMANAGER->AddActor(tile);
-	});
+			auto mesh = tile->m_pTerrainMeshComponent->GetMesh();
+			auto newVertexList = mesh->GetVertexList();
+
+			int vertexCountX = tile->m_iNumCols + 1;
+			int row = editor->GetSelectedRow();
+			int col = editor->GetSelectedCol();
+			float centerHeight = editor->GetTargetHeight();
+
+			int topLeft = row * vertexCountX + col;
+			int topRight = topLeft + 1;
+			int bottomLeft = (row + 1) * vertexCountX + col;
+			int bottomRight = bottomLeft + 1;
+
+			if (bottomRight < newVertexList.size())
+			{
+				newVertexList[topLeft].pos.y = centerHeight;
+				newVertexList[topRight].pos.y = centerHeight;
+				newVertexList[bottomLeft].pos.y = centerHeight;
+				newVertexList[bottomRight].pos.y = centerHeight;
+			}
+
+			mesh->SetVertexList(newVertexList);
+			mesh->Create();
+
+			OBJECTMANAGER->AddActor(tile);
+		});
+
 
 	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
 	{

@@ -181,6 +181,9 @@ bool PrefabLoader::SaveMapTile(const PrefabMapData& data, const std::string& fil
     j["Position"] = { data.Position.x, data.Position.y, data.Position.z };
     j["Rotation"] = { data.Rotation.x, data.Rotation.y, data.Rotation.z };
     j["Scale"] = { data.Scale.x, data.Scale.y, data.Scale.z };
+    j["SelectedRow"] = data.SelectedRow;
+    j["SelectedCol"] = data.SelectedCol;
+    j["TargetHeight"] = data.TargetHeight;
     j["TexturePath"] = data.TexturePath;
     j["ShaderPath"] = data.ShaderPath;
 
@@ -207,11 +210,15 @@ bool PrefabLoader::LoadMapTile(const std::string& filePath, PrefabMapData& data)
     data.Position = Vec3(pos[0], pos[1], pos[2]);
     data.Rotation = Vec3(rot[0], rot[1], rot[2]);
     data.Scale = Vec3(scale[0], scale[1], scale[2]);
+    data.SelectedRow = j.value("SelectedRow", -1);
+    data.SelectedCol = j.value("SelectedCol", -1);
+    data.TargetHeight = j.value("TargetHeight", 0.0f);
     data.TexturePath = j["TexturePath"];
     data.ShaderPath = j["ShaderPath"];
 
     return true;
 }
+
 
 bool PrefabLoader::SaveObject(const PrefabObjectData& _prefab, const std::string& _filePath)
 {
