@@ -41,8 +41,8 @@ void Game::SetupEngineCamera()
 	m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	m_pCameraActor->SetActorName(L"EnginCamera");
 
-	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
-	OBJECTMANAGER->AddActor(m_pCameraActor);
+	CAMERA->Set3DCameraActor(m_pCameraActor);
+	OBJECT->AddActor(m_pCameraActor);
 }
 
 void Game::SetupSkybox()
@@ -56,7 +56,7 @@ void Game::SetupSkybox()
 	material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
 	m_pSkyMesh->SetMaterial(material);
 
-	OBJECTMANAGER->AddActor(m_pSky);
+	OBJECT->AddActor(m_pSky);
 }
 
 void Game::SetupEditorCallbacks()
@@ -93,7 +93,7 @@ void Game::SetupCharacterEditorCallback()
 			cam->SetLocalPosition(Vec3(10, 10, -10));
 			actor->SetCameraComponent(cam);
 
-			OBJECTMANAGER->AddActor(actor);
+			OBJECT->AddActor(actor);
 		});
 }
 
@@ -140,7 +140,7 @@ void Game::SetupMapEditorCallback()
 			mesh->SetVertexList(newVertexList);
 			mesh->Create();
 
-			OBJECTMANAGER->AddActor(tile);
+			OBJECT->AddActor(tile);
 		});
 }
 
@@ -184,7 +184,7 @@ void Game::SetupObjectEditorCallback()
 			actor->SetRotation(rot);
 			actor->SetScale(scale);
 
-			OBJECTMANAGER->AddActor(actor);
+			OBJECT->AddActor(actor);
 		});
 }
 
@@ -208,7 +208,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				tile->SetPosition(mapData.Position);
 				tile->SetRotation(mapData.Rotation);
 				tile->SetScale(mapData.Scale);
-				OBJECTMANAGER->AddActor(tile);
+				OBJECT->AddActor(tile);
 			}
 		}
 		else if (extension == ".character.json")
@@ -221,7 +221,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				actor->SetPosition(characterData.Translation);
 				actor->SetRotation(characterData.Rotation);
 				actor->SetScale(characterData.Scale);
-				OBJECTMANAGER->AddActor(actor);
+				OBJECT->AddActor(actor);
 			}
 		}
 		else if (extension == ".object.json")
@@ -234,7 +234,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				actor->SetPosition(objData.Translation);
 				actor->SetRotation(objData.Rotation);
 				actor->SetScale(objData.Scale);
-				OBJECTMANAGER->AddActor(actor);
+				OBJECT->AddActor(actor);
 			}
 		}
 	}

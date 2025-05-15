@@ -361,7 +361,7 @@ void TestSY::Init()
 
 			actor->m_bUpdateQuadTree = false;
 
-			OBJECTMANAGER->AddActor(actor);
+			OBJECT->AddActor(actor);
 		}
 	}
 
@@ -499,7 +499,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 
 void TestSY::InitializeQuadTree()
 {
-	auto tile = OBJECTMANAGER->FindTileActor();
+	auto tile = OBJECT->FindTileActor();
 	if (!tile)
 	{
 		return;
@@ -521,13 +521,13 @@ void TestSY::InsertAllActorsIntoQuadTree()
 		return;
 	}
 
-	auto tile = OBJECTMANAGER->FindTileActor();
+	auto tile = OBJECT->FindTileActor();
 	if (!tile)
 	{
 		return;
 	}
 
-	for (const auto& pair : OBJECTMANAGER->GetActorList())
+	for (const auto& pair : OBJECT->GetActorList())
 	{
 		auto actor = pair.second;
 		if (!actor || actor->GetActorName() == L"Terrain")
@@ -542,7 +542,7 @@ void TestSY::UpdateQuadTreeActors()
 	if (!m_pQuadTree)
 		return;
 
-	const auto& actorMap = OBJECTMANAGER->GetActorList();
+	const auto& actorMap = OBJECT->GetActorList();
 
 	for (const auto& pair : actorMap)
 	{
