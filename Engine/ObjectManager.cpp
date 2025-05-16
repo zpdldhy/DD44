@@ -115,7 +115,7 @@ std::shared_ptr<class ATerrainTileActor> ObjectManager::FindTileActor()
 		if (!actor)
 			continue;
 
-		if (actor->GetActorName() == L"Terrain")
+		if (actor->m_szName == L"Terrain")
 		{
 			return std::dynamic_pointer_cast<ATerrainTileActor>(actor);
 		}

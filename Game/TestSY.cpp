@@ -351,7 +351,7 @@ void TestSY::Init()
 		for (int i = 0; i < 35; ++i)
 		{
 			auto actor = make_shared<APawn>();
-			actor->SetActorName(L"TestActor_" + to_wstring(i));
+			actor->m_szName = L"TestActor_" + to_wstring(i);
 
 			auto mesh = UStaticMeshComponent::CreateCube();
 			actor->SetMeshComponent(mesh);
@@ -450,7 +450,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadMapTile(file, mapData))
 			{
 				auto tile = std::make_shared<ATerrainTileActor>();
-				tile->SetActorName(L"Terrain");
+				tile->m_szName = L"Terrain";
 				tile->m_iNumCols = mapData.Cols;
 				tile->m_iNumRows = mapData.Rows;
 				tile->m_fCellSize = mapData.CellSize;
@@ -467,7 +467,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadCharacter(file, characterData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
-				actor->SetActorName(L"Character");
+				actor->m_szName = L"Character";
 				actor->SetPosition(characterData.Translation);
 				actor->SetRotation(characterData.Rotation);
 				actor->SetScale(characterData.Scale);
@@ -480,7 +480,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->Load(file, objData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 오브젝트 타입으로 변경
-				actor->SetActorName(L"Object");
+				actor->m_szName = L"Object";
 				actor->SetPosition(objData.Translation);
 				actor->SetRotation(objData.Rotation);
 				actor->SetScale(objData.Scale);
@@ -523,7 +523,7 @@ void TestSY::InsertAllActorsIntoQuadTree()
 	for (const auto& pair : OBJECT->GetActorList())
 	{
 		auto actor = pair.second;
-		if (!actor || actor->GetActorName() == L"Terrain")
+		if (!actor || actor->m_szName == L"Terrain")
 			continue;
 
 		m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), actor);

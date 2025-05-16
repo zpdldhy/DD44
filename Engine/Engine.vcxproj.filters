@@ -299,9 +299,6 @@
     <ClInclude Include="ActorListUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="LightData.h">
-      <Filter>Headers\Data</Filter>
-    </ClInclude>
     <ClInclude Include="ObjectManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
@@ -319,7 +316,12 @@
     <ClInclude Include="ShapeData.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionScript.h" />
+    <ClInclude Include="LightData.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionScript.h">
+      <Filter>Component\Collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -532,7 +534,9 @@
     <ClCompile Include="ShapeData.cpp">
       <Filter>Headers\Data</Filter>
     </ClCompile>
-    <ClCompile Include="CollisionScript.cpp" />
+    <ClCompile Include="CollisionScript.cpp">
+      <Filter>Component\Collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

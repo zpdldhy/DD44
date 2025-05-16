@@ -20,7 +20,7 @@ void QuadTree::UpdateActor(std::shared_ptr<AActor> actor)
     if (!actor || !actor->m_bUpdateQuadTree)
         return;
 
-    RemoveActorFromAllNodes(m_pRoot.get(), actor->GetActorIndex());
+    RemoveActorFromAllNodes(m_pRoot.get(), actor->m_Index);
     InsertActor(m_pRoot.get(), actor);
 }
 
@@ -78,7 +78,7 @@ void QuadTree::InsertActor(QuadTreeNode* node, std::shared_ptr<AActor> actor)
     // 리프면 바로 등록
     if (node->pChildren[0] == nullptr)
     {
-        node->vActorIndices.push_back(actor->GetActorIndex());
+        node->vActorIndices.push_back(actor->m_Index);
         return;
     }
 
@@ -89,7 +89,7 @@ void QuadTree::InsertActor(QuadTreeNode* node, std::shared_ptr<AActor> actor)
     }
 
     // 리프가 아니면 현재 노드에도 넣기 (모든 경로 포함)
-    node->vActorIndices.push_back(actor->GetActorIndex());
+    node->vActorIndices.push_back(actor->m_Index);
 }
 
 

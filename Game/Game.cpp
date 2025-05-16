@@ -39,7 +39,7 @@ void Game::SetupEngineCamera()
 	
 	m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 	m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
-	m_pCameraActor->SetActorName(L"EnginCamera");
+	m_pCameraActor->m_szName = L"EnginCamera";
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	OBJECT->AddActor(m_pCameraActor);
@@ -48,7 +48,7 @@ void Game::SetupEngineCamera()
 void Game::SetupSkybox()
 {
 	m_pSky = make_shared<ASky>();
-	m_pSky->SetActorName(L"Sky");
+	m_pSky->m_szName = L"Sky";
 	m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 	m_pSky->SetMeshComponent(m_pSkyMesh);
 
@@ -78,7 +78,7 @@ void Game::SetupCharacterEditorCallback()
 
 			auto actor = std::make_shared<AActor>();
 			//actor->SetActorName(rootComponent->GetName());
-			actor->SetActorName(L"Character");
+			actor->m_szName = L"Character";
 
 			actor->SetMeshComponent(rootComponent);
 
@@ -105,7 +105,7 @@ void Game::SetupMapEditorCallback()
 			if (!editor) return;
 
 			auto tile = std::make_shared<ATerrainTileActor>();
-			tile->SetActorName(L"Terrain");
+			tile->m_szName = L"Terrain";
 
 			tile->m_iNumCols = editor->GetNumCols();
 			tile->m_iNumRows = editor->GetNumRows();
@@ -177,7 +177,7 @@ void Game::SetupObjectEditorCallback()
 			}
 
 			auto actor = make_shared<APawn>();
-			actor->SetActorName(L"Object");
+			actor->m_szName = L"Object";
 
 			actor->SetMeshComponent(meshComp);
 			actor->SetPosition(pos);
@@ -200,7 +200,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadMapTile(file, mapData))
 			{
 				auto tile = std::make_shared<ATerrainTileActor>();
-				tile->SetActorName(L"Terrain");
+				tile->m_szName = L"Terrain";
 				tile->m_iNumCols = mapData.Cols;
 				tile->m_iNumRows = mapData.Rows;
 				tile->m_fCellSize = mapData.CellSize;
@@ -217,7 +217,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadCharacter(file, characterData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
-				actor->SetActorName(L"Character");
+				actor->m_szName = L"Character";
 				actor->SetPosition(characterData.Translation);
 				actor->SetRotation(characterData.Rotation);
 				actor->SetScale(characterData.Scale);
@@ -230,7 +230,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->Load(file, objData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 오브젝트 타입으로 변경
-				actor->SetActorName(L"Object");
+				actor->m_szName = L"Object";
 				actor->SetPosition(objData.Translation);
 				actor->SetRotation(objData.Rotation);
 				actor->SetScale(objData.Scale);
