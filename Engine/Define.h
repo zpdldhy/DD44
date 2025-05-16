@@ -20,5 +20,6 @@
 #define PREFAB      GET_SINGLE(PrefabLoader)
 #define LIGHTMANAGER GET_SINGLE(LightManager)
 #define POSTPROCESS  GET_SINGLE(PostProcessManager)
+#define COLLITION	GET_SINGLE(Collision)
 
 #define DD_PI		3.1415926f

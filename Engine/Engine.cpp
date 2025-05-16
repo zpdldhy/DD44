@@ -39,6 +39,7 @@ void Engine::Init()
 	// Manager 초기화
 	{
 		CAMERA->Init();
+		COLLITION->Init();
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
@@ -53,6 +54,7 @@ void Engine::Frame()
 	{
 		OBJECT->Tick();
 		UI->Tick();
+		COLLITION->CheckCollision(OBJECT->GetActorIndexList());
 	}
 
 	GET_SINGLE(Device)->Frame();

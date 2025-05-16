@@ -4,6 +4,7 @@
 #include "Types.h"
 #include "Define.h"
 #include "Vertex.h"
+#include "ShapeData.h"
 
 // WIN
 #include <windows.h>

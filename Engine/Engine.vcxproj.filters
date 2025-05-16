@@ -299,12 +299,6 @@
     <ClInclude Include="ActorListUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="MouseRay.h">
-      <Filter>Headers\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="LightData.h">
-      <Filter>Headers\Data</Filter>
-    </ClInclude>
     <ClInclude Include="ObjectManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
@@ -318,6 +312,15 @@
     <ClInclude Include="LightData.h" />
     <ClInclude Include="PostProcessManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="ShapeData.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="LightData.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionScript.h">
+      <Filter>Component\Collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -512,9 +515,6 @@
     <ClCompile Include="PrefabData.cpp">
       <Filter>Headers\Data</Filter>
     </ClCompile>
-    <ClCompile Include="MouseRay.cpp">
-      <Filter>Headers\Data</Filter>
-    </ClCompile>
     <ClCompile Include="CameraManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -530,6 +530,12 @@
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="PostProcessManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ShapeData.cpp">
+      <Filter>Headers\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionScript.cpp">
+      <Filter>Component\Collision</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

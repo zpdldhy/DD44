@@ -18,6 +18,7 @@ protected:
 	Matrix m_matProjection;
 
 	Vec3 m_vLook;
+	float m_vLength;
 
 	// Projection
 	// - Orthographic

@@ -19,7 +19,7 @@ void ActorListUI::DrawUI()
         UINT id = it->first;
         auto actor = it->second;
 
-        std::wstring wName = actor->GetActorName();
+        std::wstring wName = actor->m_szName;
         std::string name(wName.begin(), wName.end());
 
         std::string label = "Actor " + std::to_string(id);
@@ -80,7 +80,7 @@ void ActorListUI::DrawUI()
             }
 
             // 기본 정보
-            std::wstring wName = actor->GetActorName();
+            std::wstring wName = actor->m_szName;
             std::string name(wName.begin(), wName.end());
             ImGui::Text("Name: %s", name.c_str());
 
@@ -133,13 +133,13 @@ void ActorListUI::DrawUI()
             ImGui::Text("Scale: %.2f, %.2f, %.2f", scale.x, scale.y, scale.z);
 
             static char nameBuffer[64] = "";
-            std::string currentName(actor->GetActorName().begin(), actor->GetActorName().end());
+            std::string currentName(actor->m_szName.begin(), actor->m_szName.end());
             strcpy_s(nameBuffer, currentName.c_str());
 
             if (ImGui::InputText("Edit Name", nameBuffer, IM_ARRAYSIZE(nameBuffer)))
             {
                 std::wstring newName(nameBuffer, nameBuffer + strlen(nameBuffer));
-                actor->SetActorName(newName);
+                actor->m_szName = newName;
             }
 
             if (ImGui::Button("Delete Actor"))

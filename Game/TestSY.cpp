@@ -32,7 +32,6 @@
 #include "Timer.h"
 #include "Functions.h"
 #include "CollisionManager.h"
-#include "MouseRay.h"
 #include "LightManager.h"
 #include "ALight.h"
 
@@ -44,7 +43,7 @@ void TestSY::Init()
 	{
 		m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
-		m_pCameraActor->SetActorName(L"EnginCamera");
+		m_pCameraActor->m_szName = L"EnginCamera";
 
 		CAMERA->Set3DCameraActor(m_pCameraActor);
 	}
@@ -53,7 +52,7 @@ void TestSY::Init()
 
 	{
 		m_pActor = make_shared<APawn>();
-		m_pActor->SetActorName(L"kkongchi");
+		m_pActor->m_szName = L"kkongchi";
 
 		m_pStaticMesh = UStaticMeshComponent::CreateCube();
 		m_pActor->SetMeshComponent(m_pStaticMesh);
@@ -73,13 +72,16 @@ void TestSY::Init()
 
 		auto pBoxComponent = make_shared<UBoxComponent>();
 		pBoxComponent->SetLocalScale({ 6.f, 6.f, 6.f });
+		pBoxComponent->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 		m_pActor->SetShapeComponent(pBoxComponent);
 
 		m_pActor->AddScript(make_shared<kkongchiMoveScript>());
+		m_pActor->m_bCollision = true;
 	}
 
 	{
 		auto pActor = make_shared<APawn>();
+		pActor->SetPosition({ 20.f, 0.f, 0.f });
 
 		auto pMesh = UStaticMeshComponent::CreateTriangle();
 		pActor->SetMeshComponent(pMesh);
@@ -88,12 +90,19 @@ void TestSY::Init()
 		pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
 		pMesh->SetMaterial(pMaterial);
 
+		auto pBoxComponent = make_shared<UBoxComponent>();
+		pBoxComponent->SetLocalScale({ 6.f, 6.f, 6.f });
+		pBoxComponent->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		pActor->SetShapeComponent(pBoxComponent);
+
+		pActor->m_bCollision = true;
+
 		OBJECT->AddActor(pActor);
 	}
 
 	{
 		m_pSky = make_shared<ASky>();
-		m_pSky->SetActorName(L"Sky");
+		m_pSky->m_szName = L"Sky";
 
 		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pSky->SetMeshComponent(m_pSkyMesh);
@@ -205,7 +214,7 @@ void TestSY::Init()
 
 			auto actor = std::make_shared<AActor>();
 			//actor->SetActorName(rootComponent->GetName());
-			actor->SetActorName(L"Character");
+			actor->m_szName = L"Character";
 
 			actor->SetMeshComponent(rootComponent);
 
@@ -228,8 +237,8 @@ void TestSY::Init()
 			MapEditorUI* editor = GUI->GetMapEditorUI();
 			if (!editor) return;
 
-			auto tile = std::make_shared<ATerrainTileActor>();
-			tile->SetActorName(L"Terrain");
+		auto tile = std::make_shared<ATerrainTileActor>();
+		tile->m_szName = L"Terrain";
 
 			tile->m_iNumCols = editor->GetNumCols();
 			tile->m_iNumRows = editor->GetNumRows();
@@ -298,8 +307,8 @@ void TestSY::Init()
 			pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
 		}
 
-		auto actor = make_shared<APawn>();
-		actor->SetActorName(L"Object");
+			auto actor = make_shared<APawn>();
+			actor->m_szName = L"Object";
 
 		actor->SetMeshComponent(meshComp);
 		actor->SetPosition(pos);
@@ -354,7 +363,7 @@ void TestSY::Init()
 		for (int i = 0; i < 35; ++i)
 		{
 			auto actor = make_shared<APawn>();
-			actor->SetActorName(L"TestActor_" + to_wstring(i));
+			actor->m_szName = L"TestActor_" + to_wstring(i);
 
 			auto mesh = UStaticMeshComponent::CreateCube();
 			actor->SetMeshComponent(mesh);
@@ -397,13 +406,13 @@ void TestSY::Update()
 
 	if (INPUT->GetButton(I))
 	{
-		m_pActor->SetDelete(true);
+		m_pActor->m_bDelete = true;
 	}
 
 	UpdateQuadTreeActors();
 
 	// Mouse Picking
-	if (INPUT->GetButtonDown(LCLICK))
+	if (INPUT->GetButton(LCLICK))
 		SetClickPos();
 }
 
@@ -422,43 +431,27 @@ void TestSY::SetClickPos()
 
 	m_vRay.Click();
 
-	// Ray 가시화
-	auto pActor = make_shared<APawn>();
+	shared_ptr<AActor> pActor = nullptr;
 
-	auto pMesh = UStaticMeshComponent::CreateRay(m_vRay.position, m_vRay.m_vMouseEndPos);
-	pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	
-	pActor->SetMeshComponent(pMesh);
+	Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
 
-	auto pMaterial = make_shared<UMaterial>();
-	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");	
-	pMesh->SetMaterial(pMaterial);
-
-	OBJECT->AddActor(pActor);
-
-	// Check RayToPlane
-	//Plane p1(Vec3(100.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
-	//Plane p2(Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
-
-	//float d = p1.DotNormal(Vec3(0.f, 0.f, 2.f));
-	//float dot = p1.Normal().Dot(Vec3(0.f, 0.f, 1.f));
-
-	//bool col = CollisionManager::RayToPlane(m_vMouseRay, p1);
-
-	//if (col == true)
-	//	int k = 0;
-
-	// Check GetInterSection, PointInPolygon
-	Vec3 v0 = Vec3(-0.5f, -0.5f, 0.f);
-	Vec3 v1 = Vec3(-0.5f, +0.5f, 0.f);
-	Vec3 v2 = Vec3(+0.5f, -0.5f, 0.f);
-	Vec3 normal = Vec3(0.f, 0.f, -1.f);
-	Vec3 inter;
-
-	bool col = Collision::CheckMousePicking(m_vRay, v0, v1, v2, normal, inter);
-
-	if (col)
+	if (pActor)
 		int i = 0;
+
+	//// Ray 가시화
+	//auto pActor = make_shared<APawn>();
+	//
+	//auto pMesh = UStaticMeshComponent::CreateRay(m_vRay.position, m_vRay.EndPos);
+	//pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	//
+	//pActor->SetMeshComponent(pMesh);
+	//
+	//auto pMaterial = make_shared<UMaterial>();
+	//pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");	
+	//pMesh->SetMaterial(pMaterial);
+	//
+	//OBJECT->AddActor(pActor);
+
 }
 
 void TestSY::LoadAllPrefabs(const std::string& extension)
@@ -473,7 +466,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadMapTile(file, mapData))
 			{
 				auto tile = std::make_shared<ATerrainTileActor>();
-				tile->SetActorName(L"Terrain");
+				tile->m_szName = L"Terrain";
 				tile->m_iNumCols = mapData.Cols;
 				tile->m_iNumRows = mapData.Rows;
 				tile->m_fCellSize = mapData.CellSize;
@@ -490,7 +483,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadCharacter(file, characterData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
-				actor->SetActorName(L"Character");
+				actor->m_szName = L"Character";
 				actor->SetPosition(characterData.Translation);
 				actor->SetRotation(characterData.Rotation);
 				actor->SetScale(characterData.Scale);
@@ -503,7 +496,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->Load(file, objData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 오브젝트 타입으로 변경
-				actor->SetActorName(L"Object");
+				actor->m_szName = L"Object";
 				actor->SetPosition(objData.Translation);
 				actor->SetRotation(objData.Rotation);
 				actor->SetScale(objData.Scale);
@@ -546,7 +539,7 @@ void TestSY::InsertAllActorsIntoQuadTree()
 	for (const auto& pair : OBJECT->GetActorList())
 	{
 		auto actor = pair.second;
-		if (!actor || actor->GetActorName() == L"Terrain")
+		if (!actor || actor->m_szName == L"Terrain")
 			continue;
 
 		m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), actor);
