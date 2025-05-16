@@ -19,58 +19,50 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
 {
     PS_OUT output = (PS_OUT) 0;
     
-    // 실루엣 렌더링 모드
     if (g_iRenderMode == 1)
     {
-        output.c = float4(0.2f, 0.2f, 0.2f, 1.0f);
-        output.c1 = float4(0.2f, 0.2f, 0.2f, 1.0f);
-        output.c2 = float4(0.2f, 0.2f, 0.2f, 1.0f);
-        output.c3 = float4(0.2f, 0.2f, 0.2f, 1.0f);
-        output.c4 = float4(0.2f, 0.2f, 0.2f, 1.0f);
+        float4 silhouette = float4(0.2f, 0.2f, 0.2f, 1.0f);
+        output.c = silhouette;
+        output.c1 = silhouette;
+        output.c2 = silhouette;
         return output;
     }
 
-    // 1. UV 왜곡
     float2 distortedUV = GetDistortedUV(input.t);
 
-    // 2. Dissolve 클리핑
     if (ShouldDissolve(distortedUV))
         clip(-1);
 
-    // 3. 텍스처 색상
     float4 texColor = g_txDiffuseA.Sample(sample, distortedUV);
     float3 baseColor = texColor.rgb;
 
-    // 4. 조명 계산
     float3 ambient = ApplyAmbient();
     float3 diffuse = ApplyLambertLighting(input.n, input.wPos);
     float3 specular = ApplySpecular(input.n, input.wPos);
     float3 emissive = g_vEmissiveColor * g_fEmissivePower;
 
-    // 5. 조명 적용
     float3 litColor = baseColor * (ambient + diffuse) + specular;
 
-    // 6. Emissive 직접 더함
-    litColor += emissive;
+    // 최종 출력용은 모든 효과를 포함
+    float3 finalColor = litColor + emissive;
+    finalColor = ApplyGlow(finalColor);
+    finalColor = ApplyHitFlash(finalColor);
 
-    // 7. Glow, HitFlash 등 후처리 효과
-    litColor = ApplyGlow(litColor);
-    litColor = ApplyHitFlash(litColor);
+    // output.c : 최종 결과
+    output.c = float4(finalColor, texColor.a);
 
-    // 8. 출력
-    output.c = float4(litColor, texColor.a);
-    output.c1 = float4(litColor, texColor.a);
-    output.c2 = float4(0.f, 0.f, 0.f, 1.f);
+    // output.c1 : Blur 대상용 (보통 최종 결과와 동일하게 해도 무방)
+    output.c1 = float4(finalColor, texColor.a);
+
+    // output.c2 : Bloom 대상용 (emissive 만 따로 추출)
+    //output.c2 = float4(emissive, 1.0f); // 또는 threshold 기반으로 추출할 수도 있음
+    output.c2 = float4(0.f, 0.f, 1.f, 1.f); //float4(finalColor, texColor.a); // 또는 threshold 기반으로 추출할 수도 있음
     
-    
-    output.c3 = float4(litColor, texColor.a);
-    output.c4 = float4(litColor, texColor.a);
-    output.c5 = float4(litColor, texColor.a);
-    output.c6 = float4(litColor, texColor.a);
-    output.c7 = float4(litColor, texColor.a);
-    
-//  baseColor * (ambient + diffuse) + specular;
-    
+    output.c4.rgb = (ambient + diffuse) + specular;
+    output.c4.a = 1.f;
+    output.c5.rgb = input.n;
+    output.c5.a = 1.f;
+    output.c6 = float4(input.p.z / input.p.w, 0.0f, 0.0f, 1.0f); // R 채널에만 깊이
     
     return output;
-}
+    }

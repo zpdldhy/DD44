@@ -17,6 +17,7 @@
 #include "ActorLoader.h"
 #include "ObjectManager.h"
 #include "LightManager.h"
+#include "PostProcessManager.h"
 
 void TestSJ::Init()
 {
@@ -40,8 +41,9 @@ void TestSJ::Init()
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
 		m_pStaticMesh->SetMaterial(material);
+		
 	}
 
 	{
@@ -56,10 +58,11 @@ void TestSJ::Init()
 		m_pActor2->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
-		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
 		material2->SetUseStencil(true);
 		
-		m_pStaticMesh2->SetMaterial(material2);		
+		m_pStaticMesh2->SetMaterial(material2);
+		
 	}
 
 	{
@@ -78,13 +81,6 @@ void TestSJ::Init()
 		m_pStaticMesh->GetMaterial()->SetNoiseTexture(noiseTex);
 	}
 
-	{
-		m_pLight = make_shared<ALight>();
-		m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
-		m_pLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
-		m_pLight->GetLightComponent()->SetAmbientPower(0.3f);
-
-	}
 	
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
@@ -128,6 +124,7 @@ void TestSJ::Init()
 		m_pLoader = make_shared<ActorLoader>();
 		m_pLoader->LoadOne("../Resources/Asset/crow_final.asset");
 		m_vMeshList = m_pLoader->LoadMesh();
+		m_vMeshList[2]->GetMaterial()->SetEmissiveParams(Vec3(5.0, 0, 0), 1.f);
 		// 2번 인덱스가 검. meshComponent 타고타고 UObject의 이름 확인해보면, "detailSword_weaponTexuture1".
 		m_pSwordActor = make_shared<APawn>();
 		m_pSwordActor->SetMeshComponent(m_vMeshList[2]);
@@ -135,19 +132,29 @@ void TestSJ::Init()
 		m_pSwordActor->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	}
 
+
+
 	{
-		m_pPointLight = make_shared<ALight>();
+		m_pLight = make_shared<ALight>();
+		m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+		m_pLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
+		m_pLight->GetLightComponent()->SetAmbientPower(0.3f);
 
-		m_pPointLight->SetPosition(Vec3(10.0f, 10.0f, 10.0f)); // 눈에 띄도록 위로 띄움
-
-		auto lightComp = m_pPointLight->GetLightComponent();
-		lightComp->SetLightType(ELightType::Point);
-		lightComp->SetColor(Vec3(0.0f, 0.3f, 1.0f));     // 파란빛
-		lightComp->SetIntensity(2.0f);
-		lightComp->SetRange(20.0f);                      // 빛 퍼짐 정도
 	}
 
-	OBJECT->AddActor(m_pPointLight);
+	//{
+	//	m_pPointLight = make_shared<ALight>();
+
+	//	m_pPointLight->SetPosition(Vec3(10.0f, 10.0f, 10.0f)); // 눈에 띄도록 위로 띄움
+
+	//	auto lightComp = m_pPointLight->GetLightComponent();
+	//	lightComp->SetLightType(ELightType::Point);
+	//	lightComp->SetColor(Vec3(0.0f, 0.3f, 1.0f));     // 파란빛
+	//	lightComp->SetIntensity(2.0f);
+	//	lightComp->SetRange(20.0f);                      // 빛 퍼짐 정도
+	//}
+
+	/*OBJECT->AddActor(m_pPointLight);*/
 	OBJECT->AddActor(m_pLight);
 	OBJECT->AddActor(m_pCameraActor);
 	OBJECT->AddActor(m_pActor);
@@ -157,7 +164,7 @@ void TestSJ::Init()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pLight);
-	LIGHTMANAGER->RegisterLight(m_pPointLight);
+	/*LIGHTMANAGER->RegisterLight(m_pPointLight); */
 }
 
 void TestSJ::Update()
@@ -318,20 +325,38 @@ void TestSJ::Update()
 		//{
 		//	targetMat->SetHitFlashTime(flashTimer);
 		//}
-		static float flashTimer = 0.0f;
 
-		if (INPUT->GetButtonDown(R))
-			flashTimer = 1.0f;
+		//static float flashTimer = 0.0f;
 
-		flashTimer -= TIMER->GetDeltaTime() * 3.0f;
-		flashTimer = max(flashTimer, 0.0f);
+		//if (INPUT->GetButtonDown(R))
+		//	flashTimer = 1.0f;
 
-		int selected = GUI->GetEffectEditorUI()->GetSelectedActor(); // 또는 따로 selected 값 가져오기
+		//flashTimer -= TIMER->GetDeltaTime() * 3.0f;
+		//flashTimer = max(flashTimer, 0.0f);
 
-		if (selected == 0 && m_pStaticMesh)
-			m_pStaticMesh->GetMaterial()->SetHitFlashTime(flashTimer);
-		else if (selected == 1 && m_pStaticMesh2)
-			m_pStaticMesh2->GetMaterial()->SetHitFlashTime(flashTimer);
+		//int selected = GUI->GetEffectEditorUI()->GetSelectedActor(); // 또는 따로 selected 값 가져오기
+
+		//if (selected == 0 && m_pStaticMesh)
+		//	m_pStaticMesh->GetMaterial()->SetHitFlashTime(flashTimer);
+		//else if (selected == 1 && m_pStaticMesh2)
+		//	m_pStaticMesh2->GetMaterial()->SetHitFlashTime(flashTimer);
+		//else if (selected == 2)
+		//	m_vMeshList[2]->GetMaterial()->SetHitFlashTime(flashTimer);
+		//
+
+		static float angle = 0.0f;
+		angle += TIMER->GetDeltaTime();
+		angle = fmodf(angle, DD_PI * 2);
+
+
+		float speed = 0.7f;
+		angle += TIMER->GetDeltaTime() * speed * DD_PI * 2.0f; // 속도 * 각속도
+		//angle = fmodf(angle, DD_PI * 2);
+		//float flashTimer = (sin(angle) + 1.0f) * 0.5f;
+		float flashTimer = pow((sin(angle) + 1.0f) * 0.5f, 0.25f);
+
+		// 적용
+		m_vMeshList[2]->GetMaterial()->SetHitFlashTime(flashTimer);
 	}
 	//Sound
 	/*{
@@ -417,18 +442,52 @@ void TestSJ::Update()
 	if (INPUT->GetButton(K)) // Z- (뒤로)
 		m_pPointLight->AddPosition(Vec3(0.f, 0.f, -0.1f));
 
-	if (INPUT->GetButton(Z)) // 위쪽 (+Y)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 1.f, 0.f));
-	if (INPUT->GetButton(X)) // 아래쪽 (-Y)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, -1.f, 0.f));
-	if (INPUT->GetButton(C)) // 왼쪽 (-X)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(-1.f, 0.f, 0.f));
-	if (INPUT->GetButton(B)) // 오른쪽 (+X)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(1.f, 0.f, 0.f));
-	if (INPUT->GetButton(N)) // 앞으로 (-Z)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, -1.f));
-	if (INPUT->GetButton(M)) // 뒤로 (+Z)
-		m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, 1.f));
+	//if (INPUT->GetButton(Z)) // 위쪽 (+Y)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 1.f, 0.f));
+	//if (INPUT->GetButton(X)) // 아래쪽 (-Y)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, -1.f, 0.f));
+	//if (INPUT->GetButton(C)) // 왼쪽 (-X)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(-1.f, 0.f, 0.f));
+	//if (INPUT->GetButton(B)) // 오른쪽 (+X)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(1.f, 0.f, 0.f));
+	//if (INPUT->GetButton(N)) // 앞으로 (-Z)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, -1.f));
+	//if (INPUT->GetButton(M)) // 뒤로 (+Z)
+	//	m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, 1.f));
+
+	//if (INPUT->GetButtonDown(B))
+	//{
+	//	m_fBlurScale += 0.5f;
+	//	m_fBlurScale = min(m_fBlurScale, 5.0f); // 최대 제한
+	//}
+	//if (INPUT->GetButtonDown(N))
+	//{
+	//	m_fBlurScale -= 0.5f;
+	//	m_fBlurScale = max(m_fBlurScale, 0.5f); // 최소 제한
+	//}
+
+	float deltaTime = TIMER->GetDeltaTime(); // 프레임 보정
+
+	if (m_bIncreasingBlur)
+	{
+		m_fBlurScale += m_fBlurSpeed * deltaTime;
+		if (m_fBlurScale >= 5.0f)
+		{
+			m_fBlurScale = 5.0f;
+			m_bIncreasingBlur = false;
+		}
+	}
+	else
+	{
+		m_fBlurScale -= m_fBlurSpeed * deltaTime;
+		if (m_fBlurScale <= 0.5f)
+		{
+			m_fBlurScale = 0.5f;
+			m_bIncreasingBlur = true;
+		}
+	}
+
+	POSTPROCESS->SetBlurScale(m_fBlurScale);
 
 	LIGHTMANAGER->UpdateLightCB();
 }

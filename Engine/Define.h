@@ -19,5 +19,6 @@
 #define OBJECT		GET_SINGLE(ObjectManager)
 #define PREFAB      GET_SINGLE(PrefabLoader)
 #define LIGHTMANAGER GET_SINGLE(LightManager)
+#define POSTPROCESS  GET_SINGLE(PostProcessManager)
 
 #define DD_PI		3.1415926f

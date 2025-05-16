@@ -34,6 +34,7 @@ PS_OUT PS(VS_OUT input)
     
     float4 texColor = g_txDiffuseA.Sample(sample, input.t);
     psOut.c = texColor;
-    
+ 
+   
     return psOut;
 }

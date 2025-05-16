@@ -50,10 +50,10 @@ void UMaterial::Bind()
         DC->PSSetConstantBuffers(3, 1, m_pDissolveCB.GetAddressOf());
     }
 
-    if (m_pNoiseSRV)
-    {
-        DC->PSSetShaderResources(1, 1, m_pNoiseSRV.GetAddressOf()); 
-    }
+    //if (m_pNoiseSRV)
+    //{
+    //    DC->PSSetShaderResources(1, 1, m_pNoiseSRV.GetAddressOf()); 
+    //}
 
     if (m_pUVDistortionCB)
     {
