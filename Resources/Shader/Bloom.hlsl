@@ -54,13 +54,6 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
 
     float3 litColor = baseColor * (ambient + diffuse) + specular;
 
-    // 최종 출력용은 모든 효과를 포함
-    //float3 finalColor = litColor + emissive;
-    //finalColor = ApplyGlow(finalColor);
-    //if (texColor.r > 0.3f)
-    //{
-    //    finalColor = ApplyHitFlash(finalColor,1.0f);        
-    //}
     
     float4 finalColor = float4(litColor + emissive, texColor.a);
     finalColor.rgb = ApplyGlow(finalColor.rgb);
@@ -77,9 +70,7 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     // output.c1 : Blur 대상용 (보통 최종 결과와 동일하게 해도 무방)
     output.c1 = float4(finalColor);
 
-    //output.c2 = float4(emissive, 1.0f); // 또는 threshold 기반으로 추출할 수도 있음
-    //output.c2 = float4(1.f, 1.f, 1.f, 1.f); //float4(finalColor, texColor.a); // 또는 threshold 기반으로 추출할 수도 있음
-    
+ 
     if (texColor.r > 0.3f)
     {
         float hitAmount = saturate(g_fHitFlashTime);

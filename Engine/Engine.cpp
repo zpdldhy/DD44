@@ -31,7 +31,7 @@ void Engine::Init()
 	// 기타 기능 객체 초기화 ( input, )
 	{
 		INPUT->Init();
-		DXWRITE->Create();
+		//DXWRITE->Create();
 		GUI->Init();
 	}
 	_app->Init();
@@ -75,10 +75,10 @@ void Engine::Frame()
 void Engine::Render()
 {
 	GET_SINGLE(Device)->PreRender();
-	DXWRITE->m_pd2dRT->BeginDraw();
+	//DXWRITE->m_pd2dRT->BeginDraw();
 
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
-	DXWRITE->Draw(rt, TIMER->m_szTime);
+	//DXWRITE->Draw(rt, TIMER->m_szTime);
 
 	CAMERA->Render(CameraViewType::CVT_ACTOR);
 
@@ -86,7 +86,7 @@ void Engine::Render()
 	// 3D World -> Texture Render
 	{
 		POSTPROCESS->PreRender();		
-		OBJECTMANAGER->Render();	// ObjectList Render
+		OBJECT->Render();	// ObjectList Render
 		POSTPROCESS->PostRender();
 
 
@@ -97,7 +97,7 @@ void Engine::Render()
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
 		{
-			CAMERAMANAGER->Render(CameraViewType::CVT_UI);
+			CAMERA->Render(CameraViewType::CVT_UI);
 		
 			POSTPROCESS->Present();
 		}
@@ -110,7 +110,7 @@ void Engine::Render()
 
 	GUI->Render(); // *Fix Location* after _app->Render() 
 
-	DXWRITE->m_pd2dRT->EndDraw();
+	//DXWRITE->m_pd2dRT->EndDraw();
 	GET_SINGLE(Device)->PostRender();
 }
 

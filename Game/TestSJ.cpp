@@ -65,7 +65,7 @@ void TestSJ::Init()
 		
 	}
 
-	/*{
+	{
 		m_pSky = make_shared<ASky>();
 
 		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
@@ -74,20 +74,13 @@ void TestSJ::Init()
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
 		m_pSkyMesh->SetMaterial(material);
-	}*/
+	}
 
 	{
 		auto noiseTex = TEXTURE->Load(L"../Resources/Texture/Noise.png");
 		m_pStaticMesh->GetMaterial()->SetNoiseTexture(noiseTex);
 	}
 
-	{
-		m_pLight = make_shared<ALight>();
-		m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
-		m_pLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
-		m_pLight->GetLightComponent()->SetAmbientPower(0.3f);
-
-	}
 	
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
@@ -139,19 +132,29 @@ void TestSJ::Init()
 		m_pSwordActor->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	}
 
+
+
 	{
-		m_pPointLight = make_shared<ALight>();
+		m_pLight = make_shared<ALight>();
+		m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+		m_pLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
+		m_pLight->GetLightComponent()->SetAmbientPower(0.3f);
 
-		m_pPointLight->SetPosition(Vec3(10.0f, 10.0f, 10.0f)); // ´«¿¡ ¶çµµ·Ï À§·Î ¶ç¿ò
-
-		auto lightComp = m_pPointLight->GetLightComponent();
-		lightComp->SetLightType(ELightType::Point);
-		lightComp->SetColor(Vec3(0.0f, 0.3f, 1.0f));     // ÆÄ¶õºû
-		lightComp->SetIntensity(2.0f);
-		lightComp->SetRange(20.0f);                      // ºû ÆÛÁü Á¤µµ
 	}
 
-	OBJECT->AddActor(m_pPointLight);
+	//{
+	//	m_pPointLight = make_shared<ALight>();
+
+	//	m_pPointLight->SetPosition(Vec3(10.0f, 10.0f, 10.0f)); // ´«¿¡ ¶çµµ·Ï À§·Î ¶ç¿ò
+
+	//	auto lightComp = m_pPointLight->GetLightComponent();
+	//	lightComp->SetLightType(ELightType::Point);
+	//	lightComp->SetColor(Vec3(0.0f, 0.3f, 1.0f));     // ÆÄ¶õºû
+	//	lightComp->SetIntensity(2.0f);
+	//	lightComp->SetRange(20.0f);                      // ºû ÆÛÁü Á¤µµ
+	//}
+
+	/*OBJECT->AddActor(m_pPointLight);*/
 	OBJECT->AddActor(m_pLight);
 	OBJECT->AddActor(m_pCameraActor);
 	OBJECT->AddActor(m_pActor);
@@ -161,7 +164,7 @@ void TestSJ::Init()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pLight);
-	LIGHTMANAGER->RegisterLight(m_pPointLight);
+	/*LIGHTMANAGER->RegisterLight(m_pPointLight); */
 }
 
 void TestSJ::Update()
