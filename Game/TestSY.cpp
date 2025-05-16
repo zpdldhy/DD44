@@ -33,9 +33,13 @@
 #include "Functions.h"
 #include "CollisionManager.h"
 #include "MouseRay.h"
+#include "LightManager.h"
+#include "ALight.h"
 
 void TestSY::Init()
 {
+	LIGHTMANAGER->Init();
+
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
 		m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
@@ -97,6 +101,14 @@ void TestSY::Init()
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
 		m_pSkyMesh->SetMaterial(material);
+	}
+
+	// Light
+	{
+		m_pLight = make_shared<ALight>();
+		m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+		m_pLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
+		m_pLight->GetLightComponent()->SetAmbientPower(0.3f);
 	}
 
 	// UIs
@@ -368,9 +380,13 @@ void TestSY::Init()
 	InitializeQuadTree();
 	InsertAllActorsIntoQuadTree();
 
+	OBJECT->AddActor(m_pLight);
 	OBJECT->AddActor(m_pActor);
 	OBJECT->AddActor(m_pCameraActor);
 	OBJECT->AddActor(m_pSky);	
+
+	LIGHTMANAGER->Clear();
+	LIGHTMANAGER->RegisterLight(m_pLight);
 }
 
 void TestSY::Update()
