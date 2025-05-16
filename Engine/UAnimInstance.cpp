@@ -7,6 +7,7 @@
 
 void UAnimInstance::Tick()
 {
+	if(!m_bPlay) { return; }
 	animFrame += TIMER->GetDeltaTime() * m_fAnimPlayRate;
 	
 	if (animFrame >= animTrackList[currentAnimTrackIndex].animList[0].size())
@@ -103,9 +104,17 @@ void UAnimInstance::PlayOnce(int _index)
 
 Matrix UAnimInstance::GetBoneAnim(int _boneIndex)
 {
+	Matrix ret = animTrackList[currentAnimTrackIndex].animList[_boneIndex][animFrame];
 	if (_boneIndex >= animTrackList[currentAnimTrackIndex].animList.size())
 	{
 		return Matrix();
 	}
-	return animTrackList[currentAnimTrackIndex].animList[_boneIndex][animFrame];
+
+	if (m_bInPlace)
+	{
+		Matrix inverse = Matrix::CreateTranslation(-rootPos);
+		ret = ret * inverse;
+	}
+
+	return ret;
 }

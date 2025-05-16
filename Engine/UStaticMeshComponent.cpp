@@ -22,8 +22,6 @@ void UStaticMeshComponent::Tick()
 	{
 		auto mat = m_pAnim->GetBoneAnim(targetBoneIndex);
 		m_matParent = matBone * mat * m_matParent;
-		
-		//SetLocalPosition(Vec3(mat._41, mat._42, mat._43)); // *Rotation¿∫?
 	}
 	USceneComponent::Tick();
 }

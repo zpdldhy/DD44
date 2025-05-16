@@ -46,7 +46,7 @@ public:
 	{
 		m_pEffectEditorUI->SetLightApplyCallback(std::move(callback));
 	}
-	void SetBaseMeshEditorCallback(std::function<void(int, int, int, shared_ptr<APawn>&)> callback)
+	void SetBaseMeshEditorCallback(std::function<void(wstring, int, int, int, shared_ptr<APawn>&)> callback)
 	{
 		m_pMeshEditorUI->CreateActorCallback(std::move(callback));
 	}

@@ -8,7 +8,7 @@
 class UStaticMeshResources : public UMeshResources
 {
 public:
-	UStaticMeshResources() = default;
+	UStaticMeshResources() { m_Type = MeshType::M_STATIC; }
 	virtual ~UStaticMeshResources() = default;
 
 public:

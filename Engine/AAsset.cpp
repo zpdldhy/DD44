@@ -230,3 +230,8 @@ TFbxResource AAsset::Load(const char* fileName)
 	fclose(pFile);
 	return result;
 }
+
+//void AAsset::ExportMesh(shared_ptr<APawn> _actor)
+//{
+//	
+//}

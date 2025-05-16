@@ -66,9 +66,9 @@ vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 	shared_ptr<UMaterial> tempSkinnedMat = make_shared<UMaterial>();
 	tempSkinnedMat->Load(path, L"../Resources/Shader/skinningShader.hlsl");
 
-	//shared_ptr<Shader> shader = SHADER->Get(L"../Resources/Shader/skinningShader.hlsl");
-	//shared_ptr<Inputlayout> inputlayout = make_shared<Inputlayout>();
-	//INPUTLAYOUT->CreateIW(shader->m_pCode);
+	shared_ptr<Shader> shader = SHADER->Get(L"../Resources/Shader/skinningShader.hlsl");
+	shared_ptr<Inputlayout> inputlayout = make_shared<Inputlayout>();
+	INPUTLAYOUT->CreateIW(shader->m_pCode);
 	tempSkinnedMat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
 
 	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
@@ -113,6 +113,45 @@ vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 	return m_vMeshList;
 }
 
+map<wstring, shared_ptr<UMeshResources>> ActorLoader::LoadMeshMap()
+{
+	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	{
+		for (int iMesh = 0; iMesh < m_vFbxList[iFbx].m_vMeshList.size(); iMesh++)
+		{
+			auto& data = m_vFbxList[iFbx].m_vMeshList[iMesh];
+			shared_ptr<UMeshResources> meshResource;
+			if (data.m_bSkeleton)
+			{
+				meshResource = make_shared<USkeletalMeshResources>();
+				meshResource->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
+				auto skeletalMesh = dynamic_pointer_cast<USkeletalMeshResources>(meshResource);
+				meshResource->SetVertexList(data.m_vVertexList);
+				skeletalMesh->SetInverseBindPose(m_vFbxList[iFbx].m_vInverseBindPose[iMesh]);
+				skeletalMesh->SetIwList(data.m_vIwList);
+				meshResource->Create();
+				// BONE
+				map<wstring, BoneNode> bones;
+				for (auto& data : m_vFbxList[iFbx].m_mSkeletonList)
+				{
+					bones.insert(make_pair(data.second.m_szName, data.second));
+				}
+				skeletalMesh->AddSkeleton(bones);
+			}
+			else
+			{
+				meshResource = make_shared<UStaticMeshResources>();
+				meshResource->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
+				auto staticMesh = dynamic_pointer_cast<UStaticMeshResources>(meshResource);
+				staticMesh->SetVertexList(data.m_vVertexList);
+				staticMesh->Create();
+			}
+			wstring name = m_vFbxList[iFbx].name + meshResource->GetName();
+			m_mMeshMap.insert(make_pair(name, meshResource));
+		}
+	}
+	return m_mMeshMap;
+}
 vector<shared_ptr<UMeshResources>> ActorLoader::LoadMeshResources()
 {
 	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)

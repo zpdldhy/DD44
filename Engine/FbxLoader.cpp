@@ -56,8 +56,8 @@ TFbxResource FbxLoader::Load(string _loadFile)
 	m_result.m_iNodeCount = m_result.m_iMeshCount + m_result.m_iBoneCount;
 
 	// 원점에 위치시키기 위해
-	//auto iter = m_FbxBones.find(L"Armature");
-	auto iter = m_FbxBones.find(L"_Root"); // ONLY FOR MAGE
+	auto iter = m_FbxBones.find(L"Armature");
+	//auto iter = m_FbxBones.find(L"_Root"); // ONLY FOR MAGE
 	if (iter != m_FbxBones.end())
 	{
 		FbxVector4 rootP = iter->second.m_node->EvaluateGlobalTransform(0).GetT();
@@ -414,6 +414,7 @@ void FbxLoader::ParseAnimation()
 	int animBoneCount = m_result.m_mSkeletonList.size() + m_result.m_vMeshList.size();
 	int animTrackCount = m_pScene->GetSrcObjectCount<FbxAnimStack>();
 	m_result.m_iAnimTrackCount = animTrackCount;
+	m_result.m_iAnimTrackCount = 1;
 
 	// ONLY FOR crow_final ( 애니메이션 많음. 추려서 파싱 ) 
 	{

@@ -1,5 +1,6 @@
 #pragma once
 #include "IExecute.h"
+#include "ImGuiCore.h"
 
 class ActorLoader;
 class UMeshComponent;
@@ -14,7 +15,7 @@ class TestYR2 : public IExecute
 	shared_ptr<ActorLoader> loader;
 
 	vector<shared_ptr<UMeshComponent>> meshList;
-	vector<shared_ptr<UMeshResources>> meshResList;
+	map<wstring, shared_ptr<UMeshResources>> meshResMap;
 	vector<shared_ptr<UAnimInstance>> animList;
 	vector<wstring> texList;
 
@@ -27,5 +28,7 @@ public:
 	virtual void Init() override;
 	virtual void Update() override;
 	virtual void Render() override;
+public:
+	void AddChild(ChildMeshData data);
 };
 

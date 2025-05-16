@@ -10,7 +10,7 @@
 
 int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCmdLine, int _nCmdShow)
 {
-    shared_ptr<IExecute> app = make_shared<TestYR2>();
+    shared_ptr<IExecute> app = make_shared<TestYR>();
 
     Engine game(_hInstance, app);
     game.Run();

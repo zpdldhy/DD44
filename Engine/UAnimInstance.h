@@ -25,7 +25,7 @@ class UAnimInstance
 public:
 	friend class AnimTrack;
 	bool m_bOnPlayOnce;
-	bool m_bPlay;
+	bool m_bPlay = true;
 
 public:
 	void Tick();

@@ -14,12 +14,14 @@ public:
 	vector<TFbxResource> m_vFbxList;
 	vector<shared_ptr<UMeshComponent>> m_vMeshList;
 	vector<shared_ptr<UMeshResources>> m_vMeshResList;
+	map<wstring, shared_ptr<UMeshResources>> m_mMeshMap;
 	vector<shared_ptr<UAnimInstance>> m_vAnimInstanceList;
 public:
 	void ConvertFbxToAsset(string _path = "../Resources/Fbx/DeathDoor/*.fbx");
 	void LoadAllAsset();
 	void LoadOne(string _path);
 	vector<shared_ptr<UMeshComponent>> LoadMesh();
+	map<wstring, shared_ptr<UMeshResources>> LoadMeshMap();
 	vector<shared_ptr<UMeshResources>> LoadMeshResources();
 	vector<wstring> LoadTexPath();
 	vector<shared_ptr<UAnimInstance>> LoadAnim();
