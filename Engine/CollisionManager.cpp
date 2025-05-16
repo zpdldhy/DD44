@@ -92,7 +92,7 @@ void Collision::CheckCollision(vector<UINT> _vActorIndex)
 	vActorList.clear();
 }
 
-bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex)
+bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor)
 {
 	// Collision이 있는 Actor의 List를 가져온다.
 	vector<shared_ptr<AActor>> vActorList;
@@ -100,17 +100,51 @@ bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex)
 	for (auto index : _vActorIndex)
 		vActorList.emplace_back(OBJECT->GetActor(index));
 
-	float dis;
-	UINT iActorIndex;
+	float dis = 999999.f;
+	shared_ptr<AActor> pActor = nullptr;
 
 	for (auto& pObj : vActorList)
 	{
 		Vec3 inter;
+		auto pShape = pObj->GetShapeComponent();
 
+		if (!pShape|| pShape->GetShapeType() == ShapeType::ST_NONE) continue;
 
+		// Ray를 해당 Actor의 LocalMatrix로 변환
+		Ray colRay = Ray(_ray.position - pShape->GetWorldPosition(), _ray.direction);
+
+		if (pShape->GetShapeType() == ShapeType::ST_BOX)
+		{
+			auto box = static_pointer_cast<UBoxComponent>(pObj->GetShapeComponent());
+			
+			if (CheckAABBToRay(colRay, box->GetBounds(), inter))
+			{
+				float interdis = Vec3::Distance(inter, colRay.position);
+				if (dis < interdis)continue;
+
+				dis = interdis;
+				pActor = pObj;
+			}
+		}
+
+		else if (pShape->GetShapeType() == ShapeType::ST_SPHERE)
+		{
+			int i = 0;
+		}
+		else if (pShape->GetShapeType() == ShapeType::ST_CAPSULE)
+		{
+			int i = 0;
+		}
 	}
 
+	if (pActor == nullptr)
+		return false;
+
+	_pColActor = pActor;
+
 	vActorList.clear();
+
+	return true;
 }
 
 bool Collision::CheckRayToPlane(const Ray& _ray, const Plane& _plane)

@@ -19,7 +19,7 @@ public:
 
 public:
 	void CheckCollision(vector<UINT> _vActorIndex);
-	bool CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex);
+	static bool CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor);
 
 public:
 	// Ray

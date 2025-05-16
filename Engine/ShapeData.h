@@ -11,7 +11,7 @@ struct MouseRay : public Ray
 struct Box
 {
 	Vec3 vCenter = { 0.f, 0.f, 0.f };
-	Vec3 vVertex[8] = { {0.f, 0.f, 0.f}, };
+	//Vec3 vVertex[8] = { {0.f, 0.f, 0.f}, };
 	// AABB
 	Vec3 vMax = { 0.f, 0.f, 0.f };
 	Vec3 vMin = { 0.f, 0.f, 0.f };
@@ -36,19 +36,14 @@ struct Box
 		vAxis[1] = { 0,1,0 };
 		vAxis[2] = { 0,0,1 };
 		vExtent = _max - vCenter;
-	}
 
-	void SetPosition(Vec3 _v)
-	{
-		vCenter = _v;
-		vMin = vCenter - vExtent;
-		vMax = vCenter + vExtent;
-	}
-
-	void AddPosition(Vec3 _v)
-	{
-		vMin += _v;
-		vMax += _v;
-		vCenter += _v;
+		//vVertex[0] = { vMin.x, vMax.y, vMin.z };	// front ÁÂ»ó
+		//vVertex[1] = { vMax.x, vMax.y, vMin.z };	// front ¿ì»ó
+		//vVertex[2] = vMin;	// front ÁÂÇÏ
+		//vVertex[3] = { vMax.x, vMin.y, vMin.z };	// front ¿ìÇÏ
+		//vVertex[4] = { vMin.x, vMax.y, vMax.z };	// back ÁÂ»ó
+		//vVertex[5] = vMax;	// back ¿ì»ó
+		//vVertex[6] = { vMin.x, vMin.y, vMax.z };	// back ÁÂÇÏ
+		//vVertex[7] = { vMax.x, vMin.y, vMax.z };	// back ¿ìÇÏ
 	}
 };

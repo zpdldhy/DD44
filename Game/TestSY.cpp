@@ -317,6 +317,13 @@ void TestSY::SetClickPos()
 
 	m_vRay.Click();
 
+	shared_ptr<AActor> pActor = nullptr;
+
+	Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
+
+	if (pActor)
+		int i = 0;
+
 	//// Ray ∞°Ω√»≠
 	//auto pActor = make_shared<APawn>();
 	//
@@ -331,51 +338,6 @@ void TestSY::SetClickPos()
 	//
 	//OBJECT->AddActor(pActor);
 
-	//// Check GetInterSection, PointInPolygon
-	//Vec3 v0 = Vec3(-0.5f, -0.5f, 0.f);
-	//Vec3 v1 = Vec3(-0.5f, +0.5f, 0.f);
-	//Vec3 v2 = Vec3(+0.5f, -0.5f, 0.f);
-	//Vec3 normal = Vec3(0.f, 0.f, -1.f);
-	//Vec3 inter;
-	//
-	//bool col = Collision::CheckMousePicking(m_vRay, v0, v1, v2, normal, inter);
-	//
-	//if (col)
-	//	int i = 0;
-
-	Vec3 inter;
-
-	auto vList = OBJECT->GetActorList();
-
-	for (auto& iter : vList)
-	{
-		auto pActor = iter.second;
-		if (pActor->m_bCollision == false)continue;
-		auto shapeComponent = pActor->GetShapeComponent();
-		if (shapeComponent == nullptr) continue;
-
-		if (shapeComponent->GetShapeType() == ShapeType::ST_BOX)
-		{
-			auto boxComponent = static_cast<UBoxComponent*>(shapeComponent.get());
-
-			if (Collision::CheckAABBToRay(m_vRay, boxComponent->GetBounds(), inter))
-			{
-				int i = 0;
-			}
-		}
-		else if (shapeComponent->GetShapeType() == ShapeType::ST_SPHERE)
-		{
-			int i = 0;
-		}
-		else if (shapeComponent->GetShapeType() == ShapeType::ST_CAPSULE)
-		{
-			int i = 0;
-		}
-		else
-		{
-			int i = 0;
-		}
-	}
 }
 
 void TestSY::LoadAllPrefabs(const std::string& extension)

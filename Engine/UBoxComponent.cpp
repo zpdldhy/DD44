@@ -8,13 +8,14 @@
 
 void UBoxComponent::Init()
 {
+	USceneComponent::Init();
 	UpdateBounds();
 	CreateCollisionRange();
 }
 
 void UBoxComponent::Tick()
 {
-	UpdateBounds();
+	USceneComponent::Tick();
 	UpdateCollisionRange();
 }
 
@@ -55,7 +56,6 @@ void UBoxComponent::UpdateBounds()
 	vMax *= m_vLocalScale;
 
 	m_Box.Set(vMin, vMax);
-	m_Box.SetPosition(m_vLocalPosition + GetOwner()->GetPosition());
 }
 
 void UBoxComponent::CreateCollisionRange()
@@ -80,6 +80,6 @@ void UBoxComponent::CreateCollisionRange()
 
 void UBoxComponent::UpdateCollisionRange()
 {
-	m_pCollisionRange->SetPosition(m_Box.vCenter);
+	m_pCollisionRange->SetPosition(m_vWorldPosition);
 	m_pCollisionRange->Tick();
 }
