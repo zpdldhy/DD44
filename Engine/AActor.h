@@ -37,7 +37,14 @@ protected:
 	bool m_bDelete = false;	
 
 public:
+	// *이거 움직일 수 있는 애들은 true로 따로 빼줘야함
+	bool m_bUpdateQuadTree = false;
+	bool bRender = true;
+	bool bCollision = true;
+
+public:
 	void SetActorName(wstring _szName) { m_szName = _szName; }
+	const std::wstring& GetActorName() const { return m_szName; }
 
 	void SetActorIndex(UINT _iIndex) { m_ActorIndex = _iIndex; }
 	UINT GetActorIndex() { return m_ActorIndex; }
@@ -71,6 +78,7 @@ public:
 		
 	// Script
 	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }
+	const std::vector<std::shared_ptr<UScriptComponent>>& GetScriptList() const { return m_vScript; }
 
 public:
 	const Vec3& GetPosition() const { return m_pTransform->GetLocalPosition(); }

@@ -90,7 +90,7 @@ void TestSJ::Init()
 	}
 	
 
-	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
+	CAMERA->Set3DCameraActor(m_pCameraActor);
 
 	GUI->SetEffectEditorCallback(
 		[this](int selected, float glowPower, Vec3 glowColor, float dissolveThreshold, Vec3 emissiveColor, float emissivePower) {
@@ -151,13 +151,13 @@ void TestSJ::Init()
 		lightComp->SetRange(20.0f);                      // ºû ÆÛÁü Á¤µµ
 	}
 
-	OBJECTMANAGER->AddActor(m_pPointLight);
-	OBJECTMANAGER->AddActor(m_pLight);
-	OBJECTMANAGER->AddActor(m_pCameraActor);
-	OBJECTMANAGER->AddActor(m_pActor);
-	OBJECTMANAGER->AddActor(m_pActor2);
-//	OBJECTMANAGER->AddActor(m_pSky);
-	OBJECTMANAGER->AddActor(m_pSwordActor);
+	OBJECT->AddActor(m_pPointLight);
+	OBJECT->AddActor(m_pLight);
+	OBJECT->AddActor(m_pCameraActor);
+	OBJECT->AddActor(m_pActor);
+	OBJECT->AddActor(m_pActor2);
+	OBJECT->AddActor(m_pSky);
+	OBJECT->AddActor(m_pSwordActor);
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pLight);
@@ -187,7 +187,7 @@ void TestSJ::Update()
 	//Rim Light
 	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 	{
-		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetCameraPos();
+		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetLocalPosition();
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
 		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
 	}

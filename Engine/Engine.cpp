@@ -16,6 +16,7 @@
 #include "UIManager.h"
 #include "ObjectManager.h"
 #include "PostProcessManager.h"
+#include "CollisionManager.h"
 
 void Engine::Init()
 {
@@ -37,7 +38,7 @@ void Engine::Init()
 
 	// Manager 초기화
 	{
-		CAMERAMANAGER->Init();
+		CAMERA->Init();
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
@@ -50,8 +51,8 @@ void Engine::Frame()
 {
 	// Object Tick
 	{
-		OBJECTMANAGER->Tick();
-		UIMANAGER->Tick();
+		OBJECT->Tick();
+		UI->Tick();
 	}
 
 	GET_SINGLE(Device)->Frame();
@@ -67,7 +68,7 @@ void Engine::Frame()
 	
 	// Manager Tick
 	{
-		CAMERAMANAGER->Tick();
+		CAMERA->Tick();
 	}
 }
 
@@ -79,7 +80,7 @@ void Engine::Render()
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
 	DXWRITE->Draw(rt, TIMER->m_szTime);
 
-	CAMERAMANAGER->Render(CameraViewType::CVT_ACTOR);
+	CAMERA->Render(CameraViewType::CVT_ACTOR);
 
 	_app->Render();
 	// 3D World -> Texture Render
@@ -105,7 +106,7 @@ void Engine::Render()
 		m_pCurrentRasterizer.Reset();
 	}	
 
-	UIMANAGER->Render();
+	UI->Render();
 
 	GUI->Render(); // *Fix Location* after _app->Render() 
 
@@ -115,8 +116,7 @@ void Engine::Render()
 
 void Engine::Release()
 {
-	OBJECTMANAGER->Destroy();
-	UIMANAGER->Destroy();
+	UI->Destroy();	
 
 	{
 		ImGui_ImplDX11_Shutdown();  // DX11 관련 리소스 해제

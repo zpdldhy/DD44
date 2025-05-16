@@ -94,49 +94,70 @@ bool ATerrainTileActor::CreateTerrainFromHeightMap(const std::wstring& heightMap
 
 float ATerrainTileActor::GetHeightAt(float x, float z)
 {
+	auto vertexList = m_pTerrainMeshComponent->GetMesh()->GetVertexList();
+	int numCols = m_iNumCols;
+	int numRows = m_iNumRows;
+	float cellSize = m_fCellSize;
+
+	float halfWidth = numCols * 0.5f * cellSize;
+	float halfHeight = numRows * 0.5f * cellSize;
+
+	float gridX = (x + halfWidth) / cellSize;
+	float gridZ = (z + halfHeight) / cellSize;
+
+	int col = (int)gridX;
+	int row = (int)gridZ;
+
+	if (col < 0 || col >= numCols - 1 || row < 0 || row >= numRows - 1)
 	{
-		auto vertexList = m_pTerrainMeshComponent->GetMesh()->GetVertexList();
-		int numCols = m_iNumCols;
-		int numRows = m_iNumRows;
-		float cellSize = m_fCellSize;
-
-		float halfWidth = (numCols - 1) * 0.5f * cellSize;
-		float halfHeight = (numRows - 1) * 0.5f * cellSize;
-
-		float gridX = (x + halfWidth) / cellSize;
-		float gridZ = (z + halfHeight) / cellSize;
-
-		int col = (int)gridX;
-		int row = (int)gridZ;
-
-		if (col < 0 || col >= numCols - 1 || row < 0 || row >= numRows - 1)
-		{
-			return 0.0f;
-		}
-
-		int idxLT = row * numCols + col;
-		int idxRT = idxLT + 1;
-		int idxLB = (row + 1) * numCols + col;
-		int idxRB = idxLB + 1;
-
-		float yLT = vertexList[idxLT].pos.y;
-		float yRT = vertexList[idxRT].pos.y;
-		float yLB = vertexList[idxLB].pos.y;
-		float yRB = vertexList[idxRB].pos.y;
-
-		float dx = gridX - col;
-		float dz = gridZ - row;
-
-		float height = 0.0f;
-		if (dx + dz < 1.0f)
-		{
-			height = yLT + (yRT - yLT) * dx + (yLB - yLT) * dz;
-		}
-		else
-		{
-			height = yRB + (yLB - yRB) * (1.0f - dx) + (yRT - yRB) * (1.0f - dz);
-		}
-
-		return height;
+		return 0.0f;
 	}
+
+	int idxLT = row * numCols + col;
+	int idxRT = idxLT + 1;
+	int idxLB = (row + 1) * numCols + col;
+	int idxRB = idxLB + 1;
+
+	float yLT = vertexList[idxLT].pos.y;
+	float yRT = vertexList[idxRT].pos.y;
+	float yLB = vertexList[idxLB].pos.y;
+	float yRB = vertexList[idxRB].pos.y;
+
+	float dx = gridX - col;
+	float dz = gridZ - row;
+
+	float height = 0.0f;
+	if (dx + dz < 1.0f)
+	{
+		height = yLT + (yRT - yLT) * dx + (yLB - yLT) * dz;
+	}
+	else
+	{
+		height = yRB + (yLB - yRB) * (1.0f - dx) + (yRT - yRB) * (1.0f - dz);
+	}
+
+	return height;
+}
+
+int ATerrainTileActor::GetCellIndexAt(float x, float z)
+{
+	int numCols = m_iNumCols;
+	int numRows = m_iNumRows;
+	float cellSize = m_fCellSize;
+
+	float halfWidth = numCols * 0.5f * cellSize;
+	float halfHeight = numRows * 0.5f * cellSize;
+
+	float gridX = (x + halfWidth) / cellSize;
+	float gridZ = (z + halfHeight) / cellSize;
+
+	int col = (int)gridX;
+	int row = (int)gridZ;
+
+	if (col < 0 || col >= numCols || row < 0 || row >= numRows)
+	{
+		return -1; // ¹üÀ§ ¹Û
+	}
+
+	return row * numCols + col;
 }

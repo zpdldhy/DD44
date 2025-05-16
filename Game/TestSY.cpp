@@ -31,6 +31,8 @@
 #include "PrefabLoader.h"
 #include "Timer.h"
 #include "Functions.h"
+#include "CollisionManager.h"
+#include "MouseRay.h"
 
 void TestSY::Init()
 {
@@ -40,8 +42,10 @@ void TestSY::Init()
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 		m_pCameraActor->SetActorName(L"EnginCamera");
 
-		CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
+		CAMERA->Set3DCameraActor(m_pCameraActor);
 	}
+
+	//LoadAllPrefabs(".map.json");
 
 	{
 		m_pActor = make_shared<APawn>();
@@ -54,7 +58,7 @@ void TestSY::Init()
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
 		m_pStaticMesh->SetMaterial(material);
 
 		auto pCameraComponent = make_shared<UCameraComponent>();
@@ -71,7 +75,21 @@ void TestSY::Init()
 	}
 
 	{
+		auto pActor = make_shared<APawn>();
+
+		auto pMesh = UStaticMeshComponent::CreateTriangle();
+		pActor->SetMeshComponent(pMesh);
+
+		auto pMaterial = make_shared<UMaterial>();
+		pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
+		pMesh->SetMaterial(pMaterial);
+
+		OBJECT->AddActor(pActor);
+	}
+
+	{
 		m_pSky = make_shared<ASky>();
+		m_pSky->SetActorName(L"Sky");
 
 		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pSky->SetMeshComponent(m_pSkyMesh);
@@ -98,7 +116,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			UIMANAGER->AddUI(pUIArrowBack);
+			UI->AddUI(pUIArrowBack);
 
 			auto pUIArrowFrame = make_shared<AUIActor>();
 			pUIArrowFrame->SetScale(Vec3(182.f, 181.f, 0.f) * 0.6f);
@@ -113,7 +131,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			UIMANAGER->AddUI(pUIArrowFrame);
+			UI->AddUI(pUIArrowFrame);
 
 			auto pUIArrow = make_shared<AUIActor>();
 			pUIArrow->SetScale(Vec3(107.f, 108.f, 0.f) * 0.4f);
@@ -128,7 +146,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			UIMANAGER->AddUI(pUIArrow);
+			UI->AddUI(pUIArrow);
 		}
 
 		// Energe
@@ -146,7 +164,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			UIMANAGER->AddUI(pUIEnergyBack);
+			UI->AddUI(pUIEnergyBack);
 
 			auto pUIEnergy = make_shared<AUIActor>();
 			pUIEnergy->SetScale(Vec3(64.f, 64.f, 0.f) * 0.5f);
@@ -161,7 +179,7 @@ void TestSY::Init()
 				pMesh->SetMaterial(pMaterial);
 			}
 
-			UIMANAGER->AddUI(pUIEnergy);
+			UI->AddUI(pUIEnergy);
 		}
 	}
 
@@ -174,6 +192,9 @@ void TestSY::Init()
 			}
 
 			auto actor = std::make_shared<AActor>();
+			//actor->SetActorName(rootComponent->GetName());
+			actor->SetActorName(L"Character");
+
 			actor->SetMeshComponent(rootComponent);
 
 			actor->SetPosition(position);
@@ -187,62 +208,71 @@ void TestSY::Init()
 			cam->SetLocalPosition(Vec3(10, 10, -10));
 			actor->SetCameraComponent(cam);
 
-			OBJECTMANAGER->AddActor(actor);
+			OBJECT->AddActor(actor);
 		});
 
 	GUI->SetMapEditorCallback([this]()
-	{
-		MapEditorUI* editor = GUI->GetMapEditorUI();
-		if (!editor) return;
+		{
+			MapEditorUI* editor = GUI->GetMapEditorUI();
+			if (!editor) return;
 
-		auto tile = std::make_shared<ATerrainTileActor>();
+			auto tile = std::make_shared<ATerrainTileActor>();
+			tile->SetActorName(L"Terrain");
 
-		tile->m_iNumCols = editor->GetNumCols();
-		tile->m_iNumRows = editor->GetNumRows();
-		tile->m_fCellSize = editor->GetCellSize();
+			tile->m_iNumCols = editor->GetNumCols();
+			tile->m_iNumRows = editor->GetNumRows();
+			tile->m_fCellSize = editor->GetCellSize();
 
-		tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
-		tile->SetPosition(editor->GetPosition());
-		tile->SetRotation(editor->GetRotation());
-		tile->SetScale(editor->GetScale());
+			tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
+			tile->SetPosition(editor->GetPosition());
+			tile->SetRotation(editor->GetRotation());
+			tile->SetScale(editor->GetScale());
 
-		OBJECTMANAGER->AddActor(tile);
-	});
+			auto mesh = tile->m_pTerrainMeshComponent->GetMesh();
+			auto newVertexList = mesh->GetVertexList();
 
-	GUI->SetObjectEditorCallback([this](int actorType, int meshType, const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+			int vertexCountX = tile->m_iNumCols + 1;
+			int row = editor->GetSelectedRow();
+			int col = editor->GetSelectedCol();
+			float centerHeight = editor->GetTargetHeight();
+
+			int topLeft = row * vertexCountX + col;
+			int topRight = topLeft + 1;
+			int bottomLeft = (row + 1) * vertexCountX + col;
+			int bottomRight = bottomLeft + 1;
+
+			if (bottomRight < newVertexList.size())
+			{
+				newVertexList[topLeft].pos.y = centerHeight;
+				newVertexList[topRight].pos.y = centerHeight;
+				newVertexList[bottomLeft].pos.y = centerHeight;
+				newVertexList[bottomRight].pos.y = centerHeight;
+			}
+
+			mesh->SetVertexList(newVertexList);
+			mesh->Create();
+
+			OBJECT->AddActor(tile);
+		});
+
+
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
 	{
 		AssimpLoader loader;
 		vector<MeshData> meshList = loader.Load(objPath);
 		if (meshList.empty())
 			return;
 
-		// Mesh Component 생성
-		shared_ptr<UMeshComponent> meshComp;
-		if (meshType == 0)
-		{
-			// SkinnedMeshComponent 설정 시 향후 확장
-			meshComp = make_shared<UStaticMeshComponent>();
+		auto meshComp = make_shared<UStaticMeshComponent>();
+		meshComp->SetMeshPath(to_mw(objPath));
 
-			auto meshRes = make_shared<UStaticMeshResources>();
-			meshRes->SetVertexList(meshList[0].m_vVertexList);
-			meshRes->SetIndexList(meshList[0].m_vIndexList);
-			meshRes->Create();
+		auto meshRes = make_shared<UStaticMeshResources>();
+		meshRes->SetVertexList(meshList[0].m_vVertexList);
+		meshRes->SetIndexList(meshList[0].m_vIndexList);
+		meshRes->Create();
 
-			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
-		}
-		else if (meshType == 1)
-		{
-			meshComp = make_shared<UStaticMeshComponent>();
+		meshComp->SetMesh(meshRes);
 
-			auto meshRes = make_shared<UStaticMeshResources>();
-			meshRes->SetVertexList(meshList[0].m_vVertexList);
-			meshRes->SetIndexList(meshList[0].m_vIndexList);
-			meshRes->Create();
-
-			dynamic_cast<UStaticMeshComponent*>(meshComp.get())->SetMesh(meshRes);
-		}
-
-		// 머티리얼 설정
 		auto mat = make_shared<UMaterial>();
 		mat->Load(
 			std::wstring(texPath, texPath + strlen(texPath)),
@@ -250,47 +280,114 @@ void TestSY::Init()
 		);
 		meshComp->SetMaterial(mat);
 
-		// Actor 생성
-		shared_ptr<AActor> actor;
-		if (actorType == 0)
+		// Snap 적용 여부 확인
+		if (GUI->GetObjectEditorUI()->IsSnapEnabled())
 		{
-			actor = make_shared<APawn>(); // ACharacter로 교체 가능
+			pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
 		}
-		else if (actorType == 1)
-		{
-			actor = make_shared<APawn>(); // AEnemy로 교체 가능
-		}
-		else if (actorType == 2)
-		{
-			actor = make_shared<APawn>(); // AObject로 교체 가능
-		}
+
+		auto actor = make_shared<APawn>();
+		actor->SetActorName(L"Object");
 
 		actor->SetMeshComponent(meshComp);
 		actor->SetPosition(pos);
 		actor->SetRotation(rot);
 		actor->SetScale(scale);
 
-		OBJECTMANAGER->AddActor(actor);
-	});
+			OBJECT->AddActor(actor);
+		});
 
-	OBJECTMANAGER->AddActor(m_pActor);
-	OBJECTMANAGER->AddActor(m_pCameraActor);
-	OBJECTMANAGER->AddActor(m_pSky);	
+	{
+		Vec3 positions[] = {
+			// 랜덤 배치 (대략적으로 수동으로 예시 좌표 생성)
+			Vec3(-4500, 0, -4500),
+			Vec3(-3000, 0, -3200),
+			Vec3(-1500, 0, -1500),
+			Vec3(0, 0, -4500),
+			Vec3(1200, 0, -3700),
+			Vec3(3000, 0, -3000),
+			Vec3(4200, 0, -4200),
+			Vec3(-4800, 0, -1000),
+			Vec3(-3600, 0, -500),
+			Vec3(-1800, 0, -300), //10
+			Vec3(600, 0, -600),
+			Vec3(2400, 0, -900),
+			Vec3(4500, 0, -1500),
+			Vec3(-4200, 0, 600),
+			Vec3(-3000, 0, 900),
+			Vec3(-1200, 0, 1200),
+			Vec3(0, 0, 1500), //17
+			Vec3(1500, 0, 1800),
+			Vec3(3000, 0, 3000),
+			Vec3(4200, 0, 4200), //20
+			Vec3(-4500, 0, 4500),
+			Vec3(-3000, 0, 3600),
+			Vec3(-1500, 0, 3300),
+			Vec3(0, 0, 3000),
+			Vec3(1500, 0, 4200),
+			Vec3(3000, 0, 4500),
+			Vec3(4500, 0, 4800),
+			Vec3(-4800, 0, -4800),
+			Vec3(4800, 0, -4800),
+			Vec3(4800, 0, 4800),
+
+			// 경계선 테스트
+			Vec3(-4800, 0, -4800),  // 왼쪽 아래 끝
+			Vec3(0, 0, 0),          // 중앙
+			Vec3(4800, 0, 4800),    // 오른쪽 위 끝
+			Vec3(-4800, 0, 0),      // 좌측 중앙
+			Vec3(0, 0, 4800),       // 상단 중앙
+		};
+
+		for (int i = 0; i < 35; ++i)
+		{
+			auto actor = make_shared<APawn>();
+			actor->SetActorName(L"TestActor_" + to_wstring(i));
+
+			auto mesh = UStaticMeshComponent::CreateCube();
+			actor->SetMeshComponent(mesh);
+			actor->SetScale({ 5.0f, 5.0f, 5.0f });
+
+			actor->SetPosition(positions[i]);
+			actor->SetRotation({ 0.0f, 0.0f, 0.0f });
+
+			auto material = make_shared<UMaterial>();
+			material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Effect.hlsl");
+			mesh->SetMaterial(material);
+
+			auto box = make_shared<UBoxComponent>();
+			box->SetLocalScale({ 6.0f, 6.0f, 6.0f });
+			actor->SetShapeComponent(box);
+
+			actor->m_bUpdateQuadTree = false;
+
+			OBJECT->AddActor(actor);
+		}
+	}
+
+	InitializeQuadTree();
+	InsertAllActorsIntoQuadTree();
+
+	OBJECT->AddActor(m_pActor);
+	OBJECT->AddActor(m_pCameraActor);
+	OBJECT->AddActor(m_pSky);	
 }
 
 void TestSY::Update()
 {
-	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
+	CAMERA->Set3DCameraActor(m_pCameraActor);
 	if (INPUT->GetButtonDown(O))
-		CAMERAMANAGER->Set3DCameraActor(m_pActor);
+		CAMERA->Set3DCameraActor(m_pActor);
 
 	if (INPUT->GetButton(I))
 	{
 		m_pActor->SetDelete(true);
 	}
 
+	UpdateQuadTreeActors();
+
 	// Mouse Picking
-	if (INPUT->GetButton(LCLICK))
+	if (INPUT->GetButtonDown(LCLICK))
 		SetClickPos();
 }
 
@@ -305,40 +402,154 @@ void TestSY::Destroy()
 
 void TestSY::SetClickPos()
 {
-	POINT mousePos = INPUT->GetMousePos();
-	float deltaTime = TIMER->GetDeltaTime() * 10.f;
+	MouseRay m_vRay;
 
-	float fWinSizeX = static_cast<float>(g_windowSize.x);
-	float fWinSizeY = static_cast<float>(g_windowSize.y);
+	m_vRay.Click();
 
-	// To NDC
-	Vec3 vMouseEnd(0.f, 0.f, 1.f);
-	vMouseEnd.x = (2.f * static_cast<float>(mousePos.x) / fWinSizeX) - 1.f;
-	vMouseEnd.y = 1.f - (2.f * static_cast<float>(mousePos.y) / fWinSizeY);
-
-	Matrix mProjViewInvert = Matrix::Identity;
-	(CAMERAMANAGER->Get3DView() * CAMERAMANAGER->Get3DProjection()).Invert(mProjViewInvert);
-
-	vMouseEnd = Vec3::Transform(vMouseEnd, mProjViewInvert);
-
-	m_vMouseRay.position = CAMERAMANAGER->Get3DCameraComponent()->GetCameraPos();
-	m_vMouseRay.direction = vMouseEnd - m_vMouseRay.position;
-
-	Vec3 vMouseMiddle = (vMouseEnd + m_vMouseRay.position) / 2.f;
-
+	// Ray 가시화
 	auto pActor = make_shared<APawn>();
 
-	auto pMesh = UStaticMeshComponent::CreateRay();
+	auto pMesh = UStaticMeshComponent::CreateRay(m_vRay.position, m_vRay.m_vMouseEndPos);
 	pMesh->GetMesh()->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	
 	pActor->SetMeshComponent(pMesh);
-	pActor->SetPosition(vMouseMiddle);
-	//pActor->SetRotation(Vec3(0.f, DD_PI / 2.f, 0.f));
-	pActor->SetScale(Vec3(100.f, 100.f, 100.f));
 
 	auto pMaterial = make_shared<UMaterial>();
 	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");	
 	pMesh->SetMaterial(pMaterial);
 
-	OBJECTMANAGER->AddActor(pActor);
+	OBJECT->AddActor(pActor);
+
+	// Check RayToPlane
+	//Plane p1(Vec3(100.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
+	//Plane p2(Vec3(0.f, 0.f, 1.f), Vec3(0.f, 0.f, -1.f));
+
+	//float d = p1.DotNormal(Vec3(0.f, 0.f, 2.f));
+	//float dot = p1.Normal().Dot(Vec3(0.f, 0.f, 1.f));
+
+	//bool col = CollisionManager::RayToPlane(m_vMouseRay, p1);
+
+	//if (col == true)
+	//	int k = 0;
+
+	// Check GetInterSection, PointInPolygon
+	Vec3 v0 = Vec3(-0.5f, -0.5f, 0.f);
+	Vec3 v1 = Vec3(-0.5f, +0.5f, 0.f);
+	Vec3 v2 = Vec3(+0.5f, -0.5f, 0.f);
+	Vec3 normal = Vec3(0.f, 0.f, -1.f);
+	Vec3 inter;
+
+	bool col = Collision::CheckMousePicking(m_vRay, v0, v1, v2, normal, inter);
+
+	if (col)
+		int i = 0;
+}
+
+void TestSY::LoadAllPrefabs(const std::string& extension)
+{
+	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
+
+	for (const auto& file : files)
+	{
+		if (extension == ".map.json")
+		{
+			PrefabMapData mapData;
+			if (PREFAB->LoadMapTile(file, mapData))
+			{
+				auto tile = std::make_shared<ATerrainTileActor>();
+				tile->SetActorName(L"Terrain");
+				tile->m_iNumCols = mapData.Cols;
+				tile->m_iNumRows = mapData.Rows;
+				tile->m_fCellSize = mapData.CellSize;
+				tile->CreateTerrain(to_mw(mapData.TexturePath), to_mw(mapData.ShaderPath));
+				tile->SetPosition(mapData.Position);
+				tile->SetRotation(mapData.Rotation);
+				tile->SetScale(mapData.Scale);
+				OBJECT->AddActor(tile);
+			}
+		}
+		else if (extension == ".character.json")
+		{
+			PrefabCharacterData characterData;
+			if (PREFAB->LoadCharacter(file, characterData))
+			{
+				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
+				actor->SetActorName(L"Character");
+				actor->SetPosition(characterData.Translation);
+				actor->SetRotation(characterData.Rotation);
+				actor->SetScale(characterData.Scale);
+				OBJECT->AddActor(actor);
+			}
+		}
+		else if (extension == ".object.json")
+		{
+			PrefabData objData;
+			if (PREFAB->Load(file, objData))
+			{
+				auto actor = std::make_shared<AActor>(); // 필요에 따라 오브젝트 타입으로 변경
+				actor->SetActorName(L"Object");
+				actor->SetPosition(objData.Translation);
+				actor->SetRotation(objData.Rotation);
+				actor->SetScale(objData.Scale);
+				OBJECT->AddActor(actor);
+			}
+		}
+	}
+}
+
+void TestSY::InitializeQuadTree()
+{
+	auto tile = OBJECT->FindTileActor();
+	if (!tile)
+	{
+		return;
+	}
+
+	int numCols = tile->m_iNumCols;
+	int numRows = tile->m_iNumRows;
+	float cellSize = tile->m_fCellSize;
+
+	m_pQuadTree = std::make_shared<QuadTree>();
+	m_pQuadTree->Create(numCols, numRows, cellSize);
+}
+
+
+void TestSY::InsertAllActorsIntoQuadTree()
+{
+	if (!m_pQuadTree)
+	{
+		return;
+	}
+
+	auto tile = OBJECT->FindTileActor();
+	if (!tile)
+	{
+		return;
+	}
+
+	for (const auto& pair : OBJECT->GetActorList())
+	{
+		auto actor = pair.second;
+		if (!actor || actor->GetActorName() == L"Terrain")
+			continue;
+
+		m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), actor);
+	}
+}
+
+void TestSY::UpdateQuadTreeActors()
+{
+	if (!m_pQuadTree)
+		return;
+
+	const auto& actorMap = OBJECT->GetActorList();
+
+	for (const auto& pair : actorMap)
+	{
+		auto actor = pair.second;
+		if (!actor)
+			continue;
+
+		m_pQuadTree->UpdateActor(actor);
+	}
 }

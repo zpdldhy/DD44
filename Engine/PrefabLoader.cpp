@@ -22,6 +22,7 @@ bool PrefabLoader::Save(const PrefabData& _prefab, const std::string& _filePath)
     file << j.dump(4); // ¿¹»Ú°Ô Ãâ·Â
     return true;
 }
+
 bool PrefabLoader::Load(const std::string& _filePath, PrefabData& _prefab)
 {
     std::ifstream file(_filePath);
@@ -47,6 +48,7 @@ bool PrefabLoader::Load(const std::string& _filePath, PrefabData& _prefab)
 
     return true;
 }
+
 bool PrefabLoader::SaveScene(const std::string& _filepath, const std::vector<PrefabData>& _placedPrefabs)
 {
     json j;
@@ -70,6 +72,7 @@ bool PrefabLoader::SaveScene(const std::string& _filepath, const std::vector<Pre
     file << j.dump(4);
     return true;
 }
+
 bool PrefabLoader::LoadScene(const std::string& _filepath, std::vector<PrefabData>& _placedPrefabs)
 {
     std::ifstream file(_filepath);
@@ -168,3 +171,138 @@ bool PrefabLoader::LoadCharacter(const std::string& filePath, PrefabCharacterDat
 
     return true;
 }
+
+bool PrefabLoader::SaveMapTile(const PrefabMapData& data, const std::string& filePath)
+{
+    json j;
+    j["Cols"] = data.Cols;
+    j["Rows"] = data.Rows;
+    j["CellSize"] = data.CellSize;
+    j["Position"] = { data.Position.x, data.Position.y, data.Position.z };
+    j["Rotation"] = { data.Rotation.x, data.Rotation.y, data.Rotation.z };
+    j["Scale"] = { data.Scale.x, data.Scale.y, data.Scale.z };
+    j["SelectedRow"] = data.SelectedRow;
+    j["SelectedCol"] = data.SelectedCol;
+    j["TargetHeight"] = data.TargetHeight;
+    j["TexturePath"] = data.TexturePath;
+    j["ShaderPath"] = data.ShaderPath;
+
+    std::ofstream out(filePath);
+    if (!out.is_open()) return false;
+    out << j.dump(4);
+    return true;
+}
+
+bool PrefabLoader::LoadMapTile(const std::string& filePath, PrefabMapData& data)
+{
+    std::ifstream in(filePath);
+    if (!in.is_open()) return false;
+
+    json j;
+    in >> j;
+
+    data.Cols = j["Cols"];
+    data.Rows = j["Rows"];
+    data.CellSize = j["CellSize"];
+    auto pos = j["Position"];
+    auto rot = j["Rotation"];
+    auto scale = j["Scale"];
+    data.Position = Vec3(pos[0], pos[1], pos[2]);
+    data.Rotation = Vec3(rot[0], rot[1], rot[2]);
+    data.Scale = Vec3(scale[0], scale[1], scale[2]);
+    data.SelectedRow = j.value("SelectedRow", -1);
+    data.SelectedCol = j.value("SelectedCol", -1);
+    data.TargetHeight = j.value("TargetHeight", 0.0f);
+    data.TexturePath = j["TexturePath"];
+    data.ShaderPath = j["ShaderPath"];
+
+    return true;
+}
+
+
+bool PrefabLoader::SaveObject(const PrefabObjectData& _prefab, const std::string& _filePath)
+{
+    json j;
+    j["Name"] = _prefab.Name;
+    j["MeshPath"] = _prefab.MeshPath;
+    j["ShaderPath"] = _prefab.ShaderPath;
+    j["TexturePath"] = _prefab.TexturePath;
+    j["Scale"] = { _prefab.Scale.x, _prefab.Scale.y, _prefab.Scale.z };
+    j["Rotation"] = { _prefab.Rotation.x, _prefab.Rotation.y, _prefab.Rotation.z };
+    j["Translation"] = { _prefab.Translation.x, _prefab.Translation.y, _prefab.Translation.z };
+
+    std::ofstream file(_filePath);
+    if (!file.is_open()) return false;
+
+    file << j.dump(4);
+    return true;
+}
+
+bool PrefabLoader::LoadObject(const std::string& _filePath, PrefabObjectData& _prefab)
+{
+    std::ifstream file(_filePath);
+    if (!file.is_open()) return false;
+
+    json j;
+    file >> j;
+
+    _prefab.Name = j["Name"];
+    _prefab.MeshPath = j["MeshPath"];
+    _prefab.ShaderPath = j["ShaderPath"];
+    _prefab.TexturePath = j["TexturePath"];
+
+    auto s = j["Scale"];
+    _prefab.Scale = Vec3(s[0], s[1], s[2]);
+
+    auto r = j["Rotation"];
+    _prefab.Rotation = Vec3(r[0], r[1], r[2]);
+
+    auto t = j["Translation"];
+    _prefab.Translation = Vec3(t[0], t[1], t[2]);
+
+    return true;
+}
+
+std::vector<std::string> PrefabLoader::GetPrefabFileList(const std::string& directory, const std::string& extension)
+{
+    std::vector<std::string> files;
+    std::string searchPath = directory + "*" + extension;
+
+    WIN32_FIND_DATAA findData;
+    HANDLE hFind = FindFirstFileA(searchPath.c_str(), &findData);
+
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+            {
+                files.push_back(directory + findData.cFileName);
+            }
+        } while (FindNextFileA(hFind, &findData));
+
+        FindClose(hFind);
+    }
+
+    return files;
+}
+
+std::vector<std::string> PrefabLoader::GetPrefabFileNames(const std::string& directory, const std::string& extension)
+{
+    std::vector<std::string> result;
+    auto files = GetPrefabFileList(directory, extension);
+
+    for (auto& filePath : files)
+    {
+        size_t lastSlash = filePath.find_last_of("/\\");
+        std::string fileName = (lastSlash == std::string::npos) ? filePath : filePath.substr(lastSlash + 1);
+        size_t dotPos = fileName.find_last_of('.');
+        if (dotPos != std::string::npos)
+            fileName = fileName.substr(0, dotPos);
+
+        result.push_back(fileName);
+    }
+
+    return result;
+}
+

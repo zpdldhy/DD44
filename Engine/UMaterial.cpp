@@ -4,6 +4,9 @@
 
 void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
 {
+    m_TexturePath = _textureFileName;
+    m_ShaderPath = _shaderFileName;
+
 	m_pShader = SHADER->Load(_shaderFileName);
     if (_textureFileName != L"")
         m_pTexture = TEXTURE->Load(_textureFileName);

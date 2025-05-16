@@ -154,7 +154,7 @@ void UCameraComponent::CreateFrustumBox()
 	pMesh->SetMaterial(pMaterial);
 
 	m_pFrustumBox->SetMeshComponent(pMesh);
-	m_pFrustumBox->SetPosition(m_vEye);
+	m_pFrustumBox->SetPosition(m_vWorldPosition);
 	m_pFrustumBox->SetScale(m_vLocalScale);
 
 	m_pFrustumBox->Init();	
@@ -162,7 +162,7 @@ void UCameraComponent::CreateFrustumBox()
 
 void UCameraComponent::UpdateFrustumBox()
 {
-	m_pFrustumBox->SetPosition(m_vEye);
+	m_pFrustumBox->SetPosition(m_vWorldPosition);
 	m_pFrustumBox->SetRotation(m_pOwner.lock()->GetRotation());
 
 	m_pFrustumBox->Tick();
@@ -172,8 +172,6 @@ void UCameraComponent::UpdateFrustumBox()
 
 void UCameraComponent::UpdateView()
 {
-	m_vEye = m_vWorldPosition;
-
 	if (Vec3::Distance(Vec3(0.f, 0.f, 0.f), m_vLocalPosition) < 0.1f)
 		m_vLook = m_pOwner.lock()->GetLook();
 	else
@@ -183,23 +181,24 @@ void UCameraComponent::UpdateView()
 
 	m_vLook.Normalize();
 
-	m_matView = DirectX::XMMatrixLookAtLH(m_vEye, m_vEye + m_vLook, vUp);
+	m_matView = DirectX::XMMatrixLookAtLH(m_vWorldPosition, m_vWorldPosition + m_vLook, vUp);
 
-	//// Update Rotate - Look이 바꼈기 때문.
-	//m_vLocalLook = m_matView.Backward();
-	//m_vLocalRight = m_matView.Right();
-	//m_vLocalUp = m_matView.Up();
+	// Update Rotate - Look이 바꼈기 때문.
+	m_vLocalLook = m_matView.Forward();
+	m_vLocalRight = m_matView.Left();
+	m_vLocalUp = m_matView.Up();
 
-	//m_matLocal._31 = m_vLocalLook.x; m_matLocal._32 = m_vLocalLook.y; m_matLocal._33 = m_vLocalLook.z;
-	//m_matLocal._11= m_vLocalRight.x; m_matLocal._12= m_vLocalRight.y; m_matLocal._13= m_vLocalRight.z;
-	//m_matLocal._21 = m_vLocalUp.x;	 m_matLocal._22 = m_vLocalUp.y;	  m_matLocal._23 = m_vLocalUp.z;
+	m_matLocal._31 = m_vLocalLook.x; m_matLocal._32 = m_vLocalLook.y; m_matLocal._33 = m_vLocalLook.z;
+	m_matLocal._11= m_vLocalRight.x; m_matLocal._12= m_vLocalRight.y; m_matLocal._13= m_vLocalRight.z;
+	m_matLocal._21 = m_vLocalUp.x;	 m_matLocal._22 = m_vLocalUp.y;	  m_matLocal._23 = m_vLocalUp.z;
 
-	//Quaternion rotQuat;
-	//m_matLocal.Decompose(m_vLocalScale, rotQuat, m_vLocalPosition);
+	Vec3 Scale, Position;
+	Quaternion rotQuat;
+	m_matLocal.Decompose(Scale, rotQuat, Position);
 
-	//m_vLocalRotation.x = rotQuat.x;
-	//m_vLocalRotation.y = rotQuat.y;
-	//m_vLocalRotation.z = rotQuat.z;
+	m_vLocalRotation.x = rotQuat.x;
+	m_vLocalRotation.y = rotQuat.y;
+	m_vLocalRotation.z = rotQuat.z;
 }
 
 void UCameraComponent::UpdateOrthographicProjection()

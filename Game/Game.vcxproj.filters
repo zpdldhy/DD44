@@ -13,23 +13,16 @@
     <Filter Include="Script">
       <UniqueIdentifier>{565dca02-3e03-4554-8ec9-dfc978045924}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Prefab">
+      <UniqueIdentifier>{4c236e50-0c9b-4856-98ca-b71f6cea1d4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{d4e0bb08-4e67-4ce4-8abd-d7b0b6588aad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Main.h" />
     <ClInclude Include="pch.h">
       <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Sample.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="TestYR.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="TestSJ.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="TestSY.h">
-      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="EngineCameraMoveScript.h">
       <Filter>Script</Filter>
@@ -40,25 +33,34 @@
     <ClInclude Include="Editor.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerMoveScript.h" />
-    <ClInclude Include="TestPlayer.h" />
+    <ClInclude Include="Game.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="TestPlayer.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="TestSJ.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="TestSY.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="TestYR.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerMoveScript.h">
+      <Filter>Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp">
       <Filter>Headers</Filter>
-    </ClCompile>
-    <ClCompile Include="Sample.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="TestSJ.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="TestYR.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="TestSY.cpp">
-      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="EngineCameraMoveScript.cpp">
       <Filter>Script</Filter>
@@ -69,8 +71,30 @@
     <ClCompile Include="Editor.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerMoveScript.cpp" />
-    <ClCompile Include="TestPlayer.cpp" />
+    <ClCompile Include="Game.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="TestPlayer.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="TestSJ.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="TestSY.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="TestYR.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerMoveScript.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
@@ -98,6 +122,9 @@
   <ItemGroup>
     <None Include="..\Resources\Shader\Header.hlsli">
       <Filter>Shader</Filter>
+    </None>
+    <None Include="..\Resources\Prefab\MyTile.map.json">
+      <Filter>Prefab</Filter>
     </None>
   </ItemGroup>
 </Project>
