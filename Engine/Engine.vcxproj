@@ -179,8 +179,10 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="MapEditorUI.h" />
     <ClInclude Include="ObjectEditorUI.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="PostProcessManager.h" />
     <ClInclude Include="PrefabData.h" />
     <ClInclude Include="PrefabLoader.h" />
+    <ClInclude Include="QuadTree.h" />
     <ClInclude Include="ShapeData.h" />
     <ClInclude Include="SkeletalMeshData.h" />
     <ClInclude Include="UAnimInstance.h" />
@@ -258,8 +260,10 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="MapEditorUI.cpp" />
     <ClCompile Include="ObjectEditorUI.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="PostProcessManager.cpp" />
     <ClCompile Include="PrefabData.cpp" />
     <ClCompile Include="PrefabLoader.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="ShapeData.cpp" />
     <ClCompile Include="SkeletalMeshData.cpp" />
     <ClCompile Include="UAnimInstance.cpp" />
@@ -328,6 +332,14 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
+    <None Include="..\Resources\Shader\PRHeader.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Resources\Shader\PRDefault.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

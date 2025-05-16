@@ -22,11 +22,20 @@ void MapEditorUI::DrawUI()
     ImGui::InputText("Texture File", m_szTextureName, IM_ARRAYSIZE(m_szTextureName));
     ImGui::InputText("Shader File", m_szShaderName, IM_ARRAYSIZE(m_szShaderName));
 
-    ImGui::Spacing();
+    ImGui::Separator(); ImGui::Spacing();
+
+    ImGui::InputInt("Row", &m_SelectedRow);
+    ImGui::InputInt("Col", &m_SelectedCol);
+    ImGui::SliderFloat("Height", &m_TargetHeight, -100.0f, 100.0f);
+
+    ImGui::Separator(); ImGui::Spacing();
 
     if (ImGui::Button("Create Terrain Tile", ImVec2(-1, 0)))
     {
-        if (m_OnCreate) m_OnCreate();
+        if (m_OnCreate)
+        {
+            m_OnCreate();
+        }
     }
 
     ImGui::Separator(); ImGui::Spacing();
@@ -49,6 +58,9 @@ void MapEditorUI::DrawUI()
         data.Position = GetPosition();
         data.Rotation = GetRotation();
         data.Scale = GetScale();
+        data.SelectedRow = m_SelectedRow;
+        data.SelectedCol = m_SelectedCol;
+        data.TargetHeight = m_TargetHeight;
         data.TexturePath = textureFullPath;
         data.ShaderPath = shaderFullPath;
 
@@ -78,7 +90,9 @@ void MapEditorUI::DrawUI()
             m_fScale[0] = data.Scale.x;
             m_fScale[1] = data.Scale.y;
             m_fScale[2] = data.Scale.z;
-
+            m_SelectedRow = data.SelectedRow;
+            m_SelectedCol = data.SelectedCol;
+            m_TargetHeight = data.TargetHeight;
             strcpy_s(m_szTextureName, data.TexturePath.c_str());
             strcpy_s(m_szShaderName, data.ShaderPath.c_str());
         }
@@ -99,7 +113,7 @@ void MapEditorUI::DrawUI()
     if (!selectedMapFileName.empty() && ImGui::Button("Load Selected Map"))
     {
         PrefabMapData data;
-        std::string path = "../Resources/Prefab/" + selectedMapFileName + ".map.json";
+        std::string path = "../Resources/Prefab/" + selectedMapFileName + ".json";
         if (PREFAB->LoadMapTile(path, data))
         {
             m_iCols = data.Cols;
@@ -114,7 +128,9 @@ void MapEditorUI::DrawUI()
             m_fScale[0] = data.Scale.x;
             m_fScale[1] = data.Scale.y;
             m_fScale[2] = data.Scale.z;
-
+            m_SelectedRow = data.SelectedRow;
+            m_SelectedCol = data.SelectedCol;
+            m_TargetHeight = data.TargetHeight;
             strcpy_s(m_szTextureName, data.TexturePath.c_str());
             strcpy_s(m_szShaderName, data.ShaderPath.c_str());
         }

@@ -36,6 +36,8 @@ public:
 	UINT m_Index = 0;	// 고유 번호. 해당 Actor를 빠르게 찾는 로직에서 필요하다.
 	bool m_bCollision = false;	// 해당 Actor가 이번 Frame에 충돌을 하는지 확인하는 용도.
 	bool m_bDelete = false;	
+	bool m_bUpdateQuadTree = false;
+	bool bRender = true;
 
 	//--------------------------------------------------------------------------------------
 	// Component

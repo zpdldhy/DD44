@@ -4,6 +4,7 @@
 #include "UMeshComponent.h"
 #include "UMaterial.h"
 #include "DxState.h"
+#include "ATerrainTileActor.h"
 
 UINT ObjectManager::ActorCount = 0;
 
@@ -102,6 +103,25 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 		m_vActorIndexList.emplace_back(ActorCount);	// 임시 사용
 		ActorCount++;
 	}
+}
+
+std::shared_ptr<class ATerrainTileActor> ObjectManager::FindTileActor()
+{
+	const auto& actorMap = GetActorList();
+
+	for (const auto& pair : actorMap)
+	{
+		auto actor = pair.second;
+		if (!actor)
+			continue;
+
+		if (actor->GetActorName() == L"Terrain")
+		{
+			return std::dynamic_pointer_cast<ATerrainTileActor>(actor);
+		}
+	}
+
+	return nullptr;
 }
 
 void ObjectManager::RemoveActor(std::shared_ptr<class AActor> _pActor)

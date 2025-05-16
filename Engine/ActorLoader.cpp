@@ -173,8 +173,8 @@ shared_ptr<APawn> ActorLoader::LoadOneActor(string _path)
 			inputlayout = INPUTLAYOUT->Get(L"IW");
 		}
 		tempSkinnedMat->SetInputlayout(inputlayout);
-
-		tempMat->Load(texPath, L"../Resources/Shader/Default.hlsl");
+		
+		tempMat->Load(L"../Resources/Texture/Sword.png", L"../Resources/Shader/Bloom.hlsl");
 	}
 
 	// Animation

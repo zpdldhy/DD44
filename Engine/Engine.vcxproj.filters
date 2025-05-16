@@ -76,6 +76,9 @@
     <Filter Include="Object\Light">
       <UniqueIdentifier>{bf228db6-d262-40b0-9adf-1d0e57d56b83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{b1a39402-c961-4f46-9178-8b7fa133cfd9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -308,6 +311,11 @@
     <ClInclude Include="UIManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="QuadTree.h" />
+    <ClInclude Include="LightData.h" />
+    <ClInclude Include="PostProcessManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
     <ClInclude Include="ShapeData.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
@@ -517,6 +525,10 @@
     <ClCompile Include="ActorListUI.cpp">
       <Filter>Utils\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="QuadTree.cpp" />
+    <ClCompile Include="PostProcessManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
     <ClCompile Include="ShapeData.cpp">
       <Filter>Headers\Data</Filter>
     </ClCompile>
@@ -524,5 +536,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
+    <None Include="..\Resources\Shader\PRHeader.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Resources\Shader\PRDefault.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

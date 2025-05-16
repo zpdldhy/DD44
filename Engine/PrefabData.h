@@ -52,15 +52,26 @@ struct PrefabCharacterData
     std::vector<ChildMeshData> ChildMeshes;
 };
 
+struct ModifiedCellData
+{
+    int Row;
+    int Col;
+    float Height;
+};
+
 struct PrefabMapData
 {
-    int Cols;
-    int Rows;
-    float CellSize;
+    int Cols = 0;
+    int Rows = 0;
+    float CellSize = 0.0f;
 
     Vec3 Position;
     Vec3 Rotation;
     Vec3 Scale;
+
+    int SelectedRow = -1;
+    int SelectedCol = -1;
+    float TargetHeight = 0.0f;
 
     std::string TexturePath;
     std::string ShaderPath;

@@ -13,9 +13,9 @@
 #include "AActor.h"
 #include "UStaticMeshComponent.h"
 #include "UMaterial.h"
-#include "ViewPortTexture.h"
 #include "UIManager.h"
 #include "ObjectManager.h"
+#include "PostProcessManager.h"
 #include "CollisionManager.h"
 
 void Engine::Init()
@@ -26,13 +26,12 @@ void Engine::Init()
 	{
 		shared_ptr<Shader> shader = SHADER->Get(L"../Resources/Shader/Default.hlsl");
 		INPUTLAYOUT->Init(shader->m_pCode);
-		STATE->Create();
 	}
 
 	// 기타 기능 객체 초기화 ( input, )
 	{
 		INPUT->Init();
-		DXWRITE->Create();
+		//DXWRITE->Create();
 		GUI->Init();
 	}
 	_app->Init();
@@ -44,7 +43,9 @@ void Engine::Init()
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
-	Create3DWorld();
+	POSTPROCESS->Init(8);
+	// 8개의 MRT DxState 초기화
+	STATE->Create();
 }
 
 void Engine::Frame()
@@ -71,29 +72,26 @@ void Engine::Frame()
 	{
 		CAMERA->Tick();
 	}
-
-	m_p3DWorld->Tick();
 }
 
 void Engine::Render()
 {
 	GET_SINGLE(Device)->PreRender();
-	DXWRITE->m_pd2dRT->BeginDraw();
+	//DXWRITE->m_pd2dRT->BeginDraw();
 
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
-	DXWRITE->Draw(rt, TIMER->m_szTime);
+	//DXWRITE->Draw(rt, TIMER->m_szTime);
 
 	CAMERA->Render(CameraViewType::CVT_ACTOR);
 
 	_app->Render();
 	// 3D World -> Texture Render
 	{
-		m_p3DWorldTexture->BeginViewPort();
-		// ObjectList Render
-		OBJECT->Render();
-		m_p3DWorldTexture->EndViewPort();
+		POSTPROCESS->PreRender();		
+		OBJECT->Render();	// ObjectList Render
+		POSTPROCESS->PostRender();
 
-		// 3DWorld를 보여주는 평면은 Rasterizer = SolidNone으로 고정
+
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
 
@@ -102,7 +100,8 @@ void Engine::Render()
 
 		{
 			CAMERA->Render(CameraViewType::CVT_UI);
-			m_p3DWorld->Render();
+		
+			POSTPROCESS->Present();
 		}
 
 		DC->RSSetState(m_pCurrentRasterizer.Get());
@@ -113,7 +112,7 @@ void Engine::Render()
 
 	GUI->Render(); // *Fix Location* after _app->Render() 
 
-	DXWRITE->m_pd2dRT->EndDraw();
+	//DXWRITE->m_pd2dRT->EndDraw();
 	GET_SINGLE(Device)->PostRender();
 }
 
@@ -154,28 +153,4 @@ Engine::Engine(HINSTANCE hInstance, shared_ptr<IExecute> app)
 {
 	_hInstance = hInstance;
 	_app = app;
-}
-
-void Engine::Create3DWorld()
-{
-	float fWinSizeX = static_cast<float>(g_windowSize.x);
-	float fWinSizeY = static_cast<float>(g_windowSize.y);
-
-	m_p3DWorld = make_shared<AActor>();
-
-	auto pMesh = UStaticMeshComponent::CreatePlane();
-
-	auto pMaterial = make_shared<UMaterial>();
-	pMaterial->Load(L"", L"../Resources/Shader/Default.hlsl");
-	pMesh->SetMaterial(pMaterial);
-
-	m_p3DWorld->SetMeshComponent(pMesh);
-	m_p3DWorld->SetPosition(Vec3(0.f, 0.f, 1.f));
-	m_p3DWorld->SetScale(Vec3(fWinSizeX, fWinSizeY, 0.f));
-	m_p3DWorld->Init();
-
-	m_p3DWorldTexture = make_shared<ViewPortTexture>();
-	m_p3DWorldTexture->CreateViewPortTexture(fWinSizeX, fWinSizeY);
-
-	m_p3DWorld->GetMeshComponent<UStaticMeshComponent>()->GetMaterial()->SetTexture(m_p3DWorldTexture);
 }

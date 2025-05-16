@@ -18,6 +18,7 @@ using namespace Microsoft::WRL;
 #include <map>
 #include <list>
 #include <array>
+#include <algorithm>
 using namespace std;
 
 // DX

@@ -61,6 +61,7 @@ class UMaterial
 	shared_ptr<Shader> m_pShader = nullptr;
 	shared_ptr<Texture> m_pTexture = nullptr;
 	shared_ptr<Inputlayout> m_pInputlayout = nullptr;
+	ComPtr<ID3D11ShaderResourceView> m_pTexSRV;
 	ComPtr<ID3D11Buffer> m_pGlowCB;
 	ComPtr<ID3D11Buffer> m_pDissolveCB;
 	ComPtr<ID3D11ShaderResourceView> m_pNoiseSRV;
@@ -102,7 +103,7 @@ public:
 	CB_RMB m_tRenderModeData;
 	ERenderMode m_eRenderMode = ERenderMode::Default;
 	CB_EMISSIVE m_tEmissiveData;
-
+	
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);
 	virtual void Bind();
@@ -110,6 +111,7 @@ public:
 public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
 	virtual void SetTexture(shared_ptr<Texture> _texture) { m_pTexture = _texture; }
+	void SetTexture(ID3D11ShaderResourceView* srv) { m_pTexSRV = srv; }
 	virtual void SetInputlayout(shared_ptr<Inputlayout> _inputlayout) { m_pInputlayout = _inputlayout; }
 
 public:

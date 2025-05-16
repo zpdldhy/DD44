@@ -29,6 +29,7 @@ public:
 	ComPtr<ID3D11DepthStencilState> m_pDSS_StencilWrite;
 	ComPtr<ID3D11DepthStencilState> m_pDSS_StencilMaskEqual;
 
+	UINT m_iMRTNum = 0;
 public:
 	void Create();
 	void CreateBlendStates();
