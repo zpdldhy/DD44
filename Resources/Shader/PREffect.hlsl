@@ -56,8 +56,13 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
 
     // output.c2 : Bloom 대상용 (emissive 만 따로 추출)
     //output.c2 = float4(emissive, 1.0f); // 또는 threshold 기반으로 추출할 수도 있음
-    output.c2 = float4(finalColor, texColor.a); // 또는 threshold 기반으로 추출할 수도 있음
+    output.c2 = float4(0.f, 0.f, 1.f, 1.f); //float4(finalColor, texColor.a); // 또는 threshold 기반으로 추출할 수도 있음
     
+    output.c4.rgb = (ambient + diffuse) + specular;
+    output.c4.a = 1.f;
+    output.c5.rgb = input.n;
+    output.c5.a = 1.f;
+    output.c6 = float4(input.p.z / input.p.w, 0.0f, 0.0f, 1.0f); // R 채널에만 깊이
     
     return output;
-}
+    }

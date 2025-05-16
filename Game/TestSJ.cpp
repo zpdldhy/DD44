@@ -43,6 +43,7 @@ void TestSJ::Init()
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
 		m_pStaticMesh->SetMaterial(material);
+		
 	}
 
 	{
@@ -60,10 +61,11 @@ void TestSJ::Init()
 		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
 		material2->SetUseStencil(true);
 		
-		m_pStaticMesh2->SetMaterial(material2);		
+		m_pStaticMesh2->SetMaterial(material2);
+		
 	}
 
-	{
+	/*{
 		m_pSky = make_shared<ASky>();
 
 		m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
@@ -72,7 +74,7 @@ void TestSJ::Init()
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
 		m_pSkyMesh->SetMaterial(material);
-	}
+	}*/
 
 	{
 		auto noiseTex = TEXTURE->Load(L"../Resources/Texture/Noise.png");
@@ -129,6 +131,7 @@ void TestSJ::Init()
 		m_pLoader = make_shared<ActorLoader>();
 		m_pLoader->LoadOne("../Resources/Asset/crow_final.asset");
 		m_vMeshList = m_pLoader->LoadMesh();
+		m_vMeshList[2]->GetMaterial()->SetEmissiveParams(Vec3(5.0, 0, 0), 1.f);
 		// 2번 인덱스가 검. meshComponent 타고타고 UObject의 이름 확인해보면, "detailSword_weaponTexuture1".
 		m_pSwordActor = make_shared<APawn>();
 		m_pSwordActor->SetMeshComponent(m_vMeshList[2]);
@@ -153,7 +156,7 @@ void TestSJ::Init()
 	OBJECTMANAGER->AddActor(m_pCameraActor);
 	OBJECTMANAGER->AddActor(m_pActor);
 	OBJECTMANAGER->AddActor(m_pActor2);
-	OBJECTMANAGER->AddActor(m_pSky);
+//	OBJECTMANAGER->AddActor(m_pSky);
 	OBJECTMANAGER->AddActor(m_pSwordActor);
 
 	LIGHTMANAGER->Clear();
@@ -319,20 +322,38 @@ void TestSJ::Update()
 		//{
 		//	targetMat->SetHitFlashTime(flashTimer);
 		//}
-		static float flashTimer = 0.0f;
 
-		if (INPUT->GetButtonDown(R))
-			flashTimer = 1.0f;
+		//static float flashTimer = 0.0f;
 
-		flashTimer -= TIMER->GetDeltaTime() * 3.0f;
-		flashTimer = max(flashTimer, 0.0f);
+		//if (INPUT->GetButtonDown(R))
+		//	flashTimer = 1.0f;
 
-		int selected = GUI->GetEffectEditorUI()->GetSelectedActor(); // 또는 따로 selected 값 가져오기
+		//flashTimer -= TIMER->GetDeltaTime() * 3.0f;
+		//flashTimer = max(flashTimer, 0.0f);
 
-		if (selected == 0 && m_pStaticMesh)
-			m_pStaticMesh->GetMaterial()->SetHitFlashTime(flashTimer);
-		else if (selected == 1 && m_pStaticMesh2)
-			m_pStaticMesh2->GetMaterial()->SetHitFlashTime(flashTimer);
+		//int selected = GUI->GetEffectEditorUI()->GetSelectedActor(); // 또는 따로 selected 값 가져오기
+
+		//if (selected == 0 && m_pStaticMesh)
+		//	m_pStaticMesh->GetMaterial()->SetHitFlashTime(flashTimer);
+		//else if (selected == 1 && m_pStaticMesh2)
+		//	m_pStaticMesh2->GetMaterial()->SetHitFlashTime(flashTimer);
+		//else if (selected == 2)
+		//	m_vMeshList[2]->GetMaterial()->SetHitFlashTime(flashTimer);
+		//
+
+		static float angle = 0.0f;
+		angle += TIMER->GetDeltaTime();
+		angle = fmodf(angle, DD_PI * 2);
+
+
+		float speed = 0.7f;
+		angle += TIMER->GetDeltaTime() * speed * DD_PI * 2.0f; // 속도 * 각속도
+		//angle = fmodf(angle, DD_PI * 2);
+		//float flashTimer = (sin(angle) + 1.0f) * 0.5f;
+		float flashTimer = pow((sin(angle) + 1.0f) * 0.5f, 0.25f);
+
+		// 적용
+		m_vMeshList[2]->GetMaterial()->SetHitFlashTime(flashTimer);
 	}
 	//Sound
 	/*{
@@ -431,15 +452,36 @@ void TestSJ::Update()
 	//if (INPUT->GetButton(M)) // 뒤로 (+Z)
 	//	m_pLight->GetLightComponent()->SetDirection(Vec3(0.f, 0.f, 1.f));
 
-	if (INPUT->GetButtonDown(B))
+	//if (INPUT->GetButtonDown(B))
+	//{
+	//	m_fBlurScale += 0.5f;
+	//	m_fBlurScale = min(m_fBlurScale, 5.0f); // 최대 제한
+	//}
+	//if (INPUT->GetButtonDown(N))
+	//{
+	//	m_fBlurScale -= 0.5f;
+	//	m_fBlurScale = max(m_fBlurScale, 0.5f); // 최소 제한
+	//}
+
+	float deltaTime = TIMER->GetDeltaTime(); // 프레임 보정
+
+	if (m_bIncreasingBlur)
 	{
-		m_fBlurScale += 0.5f;
-		m_fBlurScale = min(m_fBlurScale, 10.0f); // 최대 제한
+		m_fBlurScale += m_fBlurSpeed * deltaTime;
+		if (m_fBlurScale >= 5.0f)
+		{
+			m_fBlurScale = 5.0f;
+			m_bIncreasingBlur = false;
+		}
 	}
-	if (INPUT->GetButtonDown(N))
+	else
 	{
-		m_fBlurScale -= 0.5f;
-		m_fBlurScale = max(m_fBlurScale, 0.5f); // 최소 제한
+		m_fBlurScale -= m_fBlurSpeed * deltaTime;
+		if (m_fBlurScale <= 0.5f)
+		{
+			m_fBlurScale = 0.5f;
+			m_bIncreasingBlur = true;
+		}
 	}
 
 	POSTPROCESS->SetBlurScale(m_fBlurScale);

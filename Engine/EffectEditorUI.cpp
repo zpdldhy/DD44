@@ -7,7 +7,7 @@ void EffectEditorUI::DrawUI()
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Effect Settings");
 
     // --- Target Selection ---
-    static const char* cubeNames[] = { "Cube 1", "Cube 2" };
+    static const char* cubeNames[] = { "Cube 1", "Cube 2" ,"Sword"};
     //static int selectedCube = 0;
     ImGui::Text("Target Cube");
     ImGui::Combo("##TargetCube", &m_iSelectedActor, cubeNames, IM_ARRAYSIZE(cubeNames));

@@ -20,6 +20,7 @@ void Timer::Update()
     m_szTime = L"FPS: ";
     m_szTime += std::to_wstring(m_iGameFrame);
     m_szTime += L"\n";
+    m_fTotalTime += m_fDeltaTime;
 }
 
 float Timer::GetDeltaTime() const

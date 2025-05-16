@@ -25,7 +25,6 @@ void Engine::Init()
 	{
 		shared_ptr<Shader> shader = SHADER->Get(L"../Resources/Shader/Default.hlsl");
 		INPUTLAYOUT->Init(shader->m_pCode);
-		STATE->Create();
 	}
 
 	// 기타 기능 객체 초기화 ( input, )
@@ -42,7 +41,9 @@ void Engine::Init()
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
-	POSTPROCESS->Init(3);
+	POSTPROCESS->Init(8);
+	// 8개의 MRT DxState 초기화
+	STATE->Create();
 }
 
 void Engine::Frame()
@@ -87,20 +88,6 @@ void Engine::Render()
 		OBJECTMANAGER->Render();	// ObjectList Render
 		POSTPROCESS->PostRender();
 
-		//POSTPROCESS->BlurPass(
-		//	POSTPROCESS->GetMRT(1)->GetSRV(), // output.c2 → Emissive
-		//	POSTPROCESS->GetTempRTV(),        // 수평 Blur 결과
-		//	Vec2(1, 0));
-
-		//POSTPROCESS->BlurPass(
-		//	POSTPROCESS->GetTempSRV(),        // 수평 결과
-		//	POSTPROCESS->GetFinalRTV(),       // 최종 결과
-		//	Vec2(0, 1));
-
-	
-		//auto srv = POSTPROCESS->GetFinalSRV();
-		//assert(srv != nullptr); // nullptr이면 문제 확정
-		//POSTPROCESS->SetSRVToSlot(1, srv);
 
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
@@ -108,13 +95,9 @@ void Engine::Render()
 		DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
-
-		ID3D11RenderTargetView* rtv = GET_SINGLE(Device)->GetBackBufferRTV();
-		ID3D11DepthStencilView* dsv = GET_SINGLE(Device)->GetDepthStencilView();
-		DC->OMSetRenderTargets(1, &rtv, dsv); // 이거 꼭 다시 설정해줘야 함
-
 		{
 			CAMERAMANAGER->Render(CameraViewType::CVT_UI);
+		
 			POSTPROCESS->Present();
 		}
 

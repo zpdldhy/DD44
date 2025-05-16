@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "DxState.h"
 #include "Device.h"
+#include "PostProcessManager.h"
 
 void DxState::Create()
 {
+	m_iMRTNum = POSTPROCESS->GetMRTNum();
 	CreateBlendStates();
 	CreateSamplerStates();
 	CreateRasterizerStates();
@@ -12,13 +14,14 @@ void DxState::Create()
 
 void DxState::CreateBlendStates()
 {
+	
 	// Alpha Blend
 	{
 		D3D11_BLEND_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
 		bd.AlphaToCoverageEnable = FALSE;
 		bd.IndependentBlendEnable = TRUE;
-		for (int i = 0; i < 3; i++) 
+		for (int i = 0; i < m_iMRTNum; i++)
 		{
 			bd.RenderTarget[i].BlendEnable = TRUE;
 			bd.RenderTarget[i].SrcBlend = D3D11_BLEND_SRC_ALPHA;
@@ -43,7 +46,7 @@ void DxState::CreateBlendStates()
 		ZeroMemory(&bd, sizeof(bd));
 		bd.AlphaToCoverageEnable = FALSE;
 		bd.IndependentBlendEnable = TRUE;
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < m_iMRTNum; i++)
 		{
 			bd.RenderTarget[i].BlendEnable = TRUE;
 			bd.RenderTarget[i].SrcBlend = D3D11_BLEND_ONE;
@@ -68,7 +71,7 @@ void DxState::CreateBlendStates()
 		ZeroMemory(&bd, sizeof(bd));
 		bd.AlphaToCoverageEnable = FALSE;
 		bd.IndependentBlendEnable = TRUE;
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < m_iMRTNum; i++)
 		{
 			bd.RenderTarget[i].BlendEnable = TRUE;
 			bd.RenderTarget[i].SrcBlend = D3D11_BLEND_DEST_COLOR;
@@ -93,7 +96,7 @@ void DxState::CreateBlendStates()
 		ZeroMemory(&bd, sizeof(bd));
 		bd.AlphaToCoverageEnable = FALSE;
 		bd.IndependentBlendEnable = TRUE;
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < m_iMRTNum; i++)
 		{
 			bd.RenderTarget[i].BlendEnable = TRUE;
 			bd.RenderTarget[i].SrcBlend = D3D11_BLEND_ONE;

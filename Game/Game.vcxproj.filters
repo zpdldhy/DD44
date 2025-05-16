@@ -88,13 +88,10 @@
     <FxCompile Include="..\Resources\Shader\Effect.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="..\Resources\Shader\Blur.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Resources\Shader\ComBineShader.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
     <FxCompile Include="..\Resources\Shader\PREffect.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\Bloom.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

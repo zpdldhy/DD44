@@ -25,6 +25,8 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
         output.c = float4(0.2f, 0.2f, 0.2f, 1.0f);
         output.c1 = float4(0.2f, 0.2f, 0.2f, 1.0f);
         output.c2 = float4(0.2f, 0.2f, 0.2f, 1.0f);
+        output.c3 = float4(0.2f, 0.2f, 0.2f, 1.0f);
+        output.c4 = float4(0.2f, 0.2f, 0.2f, 1.0f);
         return output;
     }
 
@@ -59,6 +61,16 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     output.c = float4(litColor, texColor.a);
     output.c1 = float4(litColor, texColor.a);
     output.c2 = float4(0.f, 0.f, 0.f, 1.f);
+    
+    
+    output.c3 = float4(litColor, texColor.a);
+    output.c4 = float4(litColor, texColor.a);
+    output.c5 = float4(litColor, texColor.a);
+    output.c6 = float4(litColor, texColor.a);
+    output.c7 = float4(litColor, texColor.a);
+    
+//  baseColor * (ambient + diffuse) + specular;
+    
     
     return output;
 }

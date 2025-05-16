@@ -130,6 +130,11 @@ struct PS_OUT
     float4 c : SV_Target0;
     float4 c1 : SV_Target1;
     float4 c2 : SV_Target2;
+    float4 c3 : SV_Target3;
+    float4 c4 : SV_Target4;
+    float4 c5 : SV_Target5;
+    float4 c6 : SV_Target6;
+    float4 c7 : SV_Target7;
 };
 
 Texture2D g_txDiffuseA : register(t0);
@@ -179,6 +184,14 @@ float3 ApplyRimLight(float3 normal, float3 worldPos)
 float3 ApplyHitFlash(float3 baseColor)
 {
     return lerp(baseColor, float3(1.0f, 1.0f, 1.0f), saturate(g_fHitFlashTime));
+}
+
+float4 ApplyHitFlash(float4 color)
+{
+    float hitStrength = saturate(g_fHitFlashTime); // 예: 0.0 ~ 1.0
+    float3 flashColor = lerp(color.rgb, float3(1, 1, 1), hitStrength);
+    float alpha = lerp(color.a, 0.8f, hitStrength); // 알파도 줄이기
+    return float4(flashColor, alpha);
 }
 
 float3 UnpackLightColor(int index)

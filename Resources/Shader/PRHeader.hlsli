@@ -35,7 +35,12 @@ struct PS_OUT
 
 Texture2D g_txDefault : register(t0);   // ¿øº»
 Texture2D g_txBlur : register(t1);      // Blur
-Texture2D g_txBloom : register(t2);     // Bloom
+Texture2D g_txMask : register(t2);     // Bloom
+Texture2D g_txBloom : register(t3);    // Bloom
+Texture2D g_txLight : register(t4); 
+Texture2D g_txNormal : register(t5); 
+Texture2D g_txDepth : register(t6); 
+Texture2D g_txTenoc : register(t7); 
 
 SamplerState sample : register(s0);
 

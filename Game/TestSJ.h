@@ -13,8 +13,9 @@ public:
 	virtual void Init() override;
 	virtual void Update() override;
 	virtual void Render() override;
-	float m_fBlurScale = 1.0f;
-
+	float m_fBlurScale = 0.5f;
+	bool m_bIncreasingBlur = true;
+	float m_fBlurSpeed = 5.f; // 초당 변화량
 
 public:
 	shared_ptr<class UStaticMeshComponent> m_pStaticMesh;
