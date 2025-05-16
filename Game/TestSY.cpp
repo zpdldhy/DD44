@@ -48,7 +48,7 @@ void TestSY::Init()
 		CAMERA->Set3DCameraActor(m_pCameraActor);
 	}
 
-	//LoadAllPrefabs(".map.json");
+	LoadAllPrefabs(".map.json");
 
 	{
 		m_pActor = make_shared<APawn>();
