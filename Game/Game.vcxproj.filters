@@ -57,6 +57,9 @@
     <ClInclude Include="PlayerMoveScript.h">
       <Filter>Script</Filter>
     </ClInclude>
+    <ClInclude Include="TestYR2.h">
+      <Filter>Test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -94,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="PlayerMoveScript.cpp">
       <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="TestYR2.cpp">
+      <Filter>Test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

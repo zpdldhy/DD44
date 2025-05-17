@@ -13,8 +13,8 @@ void MeshEditorUI::DrawUI()
 	{
 		ImGui::Text("Set Root Mesh");
 
-		ImGui::Combo("Mesh List", &m_meshIndex, m_vMeshPtrList.data(), (int)m_vMeshPtrList.size());
-		if (m_meshIndex > -1)
+		bool meshSelected = ImGui::Combo("Mesh List", &m_meshIndex, m_vMeshPtrList.data(), (int)m_vMeshPtrList.size());
+		if (m_meshIndex > -1 && meshSelected)
 		{
 			m_baseMeshSelected = true;
 			wstring name = to_mw(m_vMeshPtrList[m_meshIndex]);

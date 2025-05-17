@@ -65,7 +65,7 @@ void TestYR2::Init()
 	//loader->ConvertFbxToAsset();
 	string path = "../Resources/Asset/crow_final.asset";
 	name = to_wm(SplitName(to_mw(path)));
-	loader->LoadAllAsset();
+	loader->LoadOne(path);
 	meshResMap = loader->LoadMeshMap();
 	animList = loader->LoadAnim();
 	texList = loader->LoadTexPath();
