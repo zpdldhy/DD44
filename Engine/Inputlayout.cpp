@@ -22,6 +22,21 @@ bool Inputlayout::Load(ComPtr<ID3DBlob> _pCode, D3D11_INPUT_ELEMENT_DESC _layout
 	return true;
 }
 
+bool InputlayoutManager::CreateInputLayout(wstring layoutName, ComPtr<ID3DBlob> _pCode, D3D11_INPUT_ELEMENT_DESC layout[], UINT numElements)
+{
+	// 이미 존재하는 경우 반환
+	if (Get(layoutName) != nullptr)
+	{
+		return true;
+	}
+
+	shared_ptr<Inputlayout> inputlayout = make_shared<Inputlayout>();
+	inputlayout->Load(_pCode, layout, numElements);
+	m_mList.insert(make_pair(layoutName, inputlayout));
+
+	return true;
+}
+
 bool InputlayoutManager::CreateDefault()
 {
 	if (Get(L"Default") != nullptr)

@@ -43,5 +43,9 @@ public:
     ComPtr<ID3D11Device> GetDevice();
     ComPtr< IDXGISwapChain> GetSwapChain();
     ComPtr<ID3D11DeviceContext> GetDeviceContext();
+public:
+    ID3D11RenderTargetView* GetBackBufferRTV() { return m_pRTV.Get(); }
+    ID3D11DepthStencilView* GetDepthStencilView() { return m_pDSV.Get(); }
+    D3D11_VIEWPORT GetMainViewport() { return m_MainVP; }
 };
 

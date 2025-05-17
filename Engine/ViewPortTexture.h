@@ -12,16 +12,16 @@ protected:
 	ComPtr<ID3D11DepthStencilView> m_pDepthStencilView = nullptr;
 	ComPtr<ID3D11ShaderResourceView> m_pDsvSRV = nullptr;// ±Ì¿Ãπˆ∆€ ∏Æº“Ω∫∫‰
 
-	// Get Prev Viewport
-	D3D11_VIEWPORT m_PrevVP;
-	UINT m_iViewPorts;
-	ID3D11RenderTargetView* m_pPrevRTV = nullptr;
-	ID3D11DepthStencilView* m_pPrevDSV = nullptr;
+public:
+	ID3D11ShaderResourceView* GetSRV() const { return m_pTexSRV.Get(); }
+	ID3D11RenderTargetView* GetRTV() const { return m_pRenderTargetView.Get(); }
+	ID3D11DepthStencilView* GetDSV() const { return m_pDepthStencilView.Get(); }
+	D3D11_VIEWPORT GetVP() const { return m_CurrentVP; }
 
 public:
 	void CreateViewPortTexture(FLOAT _fWidth, FLOAT _fHeight);
-	void BeginViewPort();
-	void EndViewPort();
+	//void BeginViewPort();
+	//void EndViewPort();
 
 private:
 	void SetViewPort(FLOAT _fWidth, FLOAT _fHeight);

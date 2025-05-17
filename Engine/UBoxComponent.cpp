@@ -8,16 +8,15 @@
 
 void UBoxComponent::Init()
 {
-	m_vCenter = m_vLocalPosition + GetOwner()->GetPosition();
-
-	CreateCollisionBox();
+	USceneComponent::Init();
+	UpdateBounds();
+	CreateCollisionRange();
 }
 
 void UBoxComponent::Tick()
 {
-	m_vCenter = m_vLocalPosition + m_pOwner.lock()->GetPosition();
-
-	UpdateBounds();
+	USceneComponent::Tick();
+	UpdateCollisionRange();
 }
 
 void UBoxComponent::PreRender()
@@ -48,7 +47,18 @@ void UBoxComponent::Destroy()
 	m_pCollisionRange->Destroy();
 }
 
-void UBoxComponent::CreateCollisionBox()
+void UBoxComponent::UpdateBounds()
+{
+	Vec3 vMin(-0.5f, -0.5f, -0.5f);
+	Vec3 vMax(+0.5f, +0.5f, +0.5f);
+
+	vMin *= m_vLocalScale;
+	vMax *= m_vLocalScale;
+
+	m_Box.Set(vMin, vMax);
+}
+
+void UBoxComponent::CreateCollisionRange()
 {
 	m_pCollisionRange = make_shared<AActor>();
 
@@ -60,13 +70,16 @@ void UBoxComponent::CreateCollisionBox()
 	pMesh->SetMaterial(pMaterial);
 
 	m_pCollisionRange->SetScale(m_vLocalScale);
-	m_pCollisionRange->SetPosition(m_vCenter);
+	m_pCollisionRange->SetPosition(m_Box.vCenter);
 
 	m_pCollisionRange->Init();
+
+	m_vVertexList = pMesh->GetMesh()->GetVertexList();
+	m_vIndexList = pMesh->GetMesh()->GetIndexList();
 }
 
-void UBoxComponent::UpdateBounds()
+void UBoxComponent::UpdateCollisionRange()
 {
-	m_pCollisionRange->SetPosition(m_vCenter);
+	m_pCollisionRange->SetPosition(m_vWorldPosition);
 	m_pCollisionRange->Tick();
 }

@@ -7,10 +7,10 @@ void EffectEditorUI::DrawUI()
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Effect Settings");
 
     // --- Target Selection ---
-    static const char* cubeNames[] = { "Cube 1", "Cube 2" };
-    static int selectedCube = 0;
+    static const char* cubeNames[] = { "Cube 1", "Cube 2" ,"Sword"};
+    //static int selectedCube = 0;
     ImGui::Text("Target Cube");
-    ImGui::Combo("##TargetCube", &selectedCube, cubeNames, IM_ARRAYSIZE(cubeNames));
+    ImGui::Combo("##TargetCube", &m_iSelectedActor, cubeNames, IM_ARRAYSIZE(cubeNames));
 
     ImGui::Separator(); ImGui::Spacing();
 
@@ -39,7 +39,7 @@ void EffectEditorUI::DrawUI()
     if (ImGui::Button("Apply Effect", ImVec2(-1, 0)) && m_OnEffectApply)
     {
         m_OnEffectApply(
-            selectedCube,
+            m_iSelectedActor,
             glowPower,
             Vec3(glowColor[0], glowColor[1], glowColor[2]),
             dissolveThreshold,
@@ -52,7 +52,7 @@ void EffectEditorUI::DrawUI()
     if (firstRun && m_OnEffectApply)
     {
         m_OnEffectApply(
-            selectedCube,
+            m_iSelectedActor,
             glowPower,
             Vec3(glowColor[0], glowColor[1], glowColor[2]),
             dissolveThreshold,

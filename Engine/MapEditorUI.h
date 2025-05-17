@@ -19,6 +19,10 @@ public:
     Vec3 GetRotation() const { return Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]); }
     Vec3 GetScale() const { return Vec3(m_fScale[0], m_fScale[1], m_fScale[2]); }
 
+    int GetSelectedRow() const { return m_SelectedRow; }
+    int GetSelectedCol() const { return m_SelectedCol; }
+    float GetTargetHeight() const { return m_TargetHeight; }
+
     std::wstring GetTexturePath() const;
     std::wstring GetShaderPath() const;
 
@@ -30,6 +34,10 @@ private:
     float m_fPosition[3] = { 0.0f, 0.0f, 0.0f };
     float m_fRotation[3] = { 0.0f, 0.0f, 0.0f };
     float m_fScale[3] = { 1.0f, 1.0f, 1.0f };
+
+    int m_SelectedRow = 0;
+    int m_SelectedCol = 0;
+    float m_TargetHeight = 0.0f;
 
     char m_szTextureName[256] = "grass.jpg";
     char m_szShaderName[256] = "Default.hlsl";

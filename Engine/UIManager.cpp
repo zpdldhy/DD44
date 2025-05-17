@@ -6,7 +6,7 @@ void UIManager::Tick()
 {
 	for (auto pUI = m_vUIList.begin();pUI!= m_vUIList.end();)
 	{
-		if (pUI->get()->IsDelete() == true)
+		if (pUI->get()->m_bDelete == true)
 			pUI = m_vUIList.erase(pUI);
 		else
 		{

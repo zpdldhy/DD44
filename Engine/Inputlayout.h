@@ -15,6 +15,7 @@ private:
 	map<wstring, shared_ptr<Inputlayout>> m_mList;
 	ComPtr<ID3DBlob> m_pCode;
 public:
+	bool CreateInputLayout(wstring layoutName, ComPtr<ID3DBlob> _pCode, D3D11_INPUT_ELEMENT_DESC layout[], UINT numElements);
 	bool CreateDefault();
 	bool CreateIW(ComPtr<ID3DBlob> _pCode);
 	shared_ptr<Inputlayout> Get(wstring _name = L"Default");

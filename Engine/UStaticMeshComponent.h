@@ -33,7 +33,7 @@ public:
 	Matrix GetMatBone() { return m_matBone; }
 	void SetMatBone(Matrix mat) { m_matBone = mat; }
 public:
-	static shared_ptr<UStaticMeshComponent> CreateRay();
+	static shared_ptr<UStaticMeshComponent> CreateRay(Vec3 _vStart, Vec3 _vEnd);
 	static shared_ptr<UStaticMeshComponent> CreateTriangle();
 	static shared_ptr<UStaticMeshComponent> CreatePlane();
 	static shared_ptr<UStaticMeshComponent> CreateCube();

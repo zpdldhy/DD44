@@ -1,15 +1,33 @@
 #pragma once
 #include "Singleton.h"
+#include "UBoxComponent.h"
 
-class CollisionManager : public Singleton<CollisionManager>
+struct pair_hash {
+	template<typename T1, typename T2>
+	size_t operator()(const pair<T1, T2>& p) const {
+		return hash<T1>()(p.first) ^ hash<T2>()(p.second);
+	}
+};
+
+class Collision : public Singleton<Collision>
 {
-	vector<shared_ptr<class AActor>> m_vCollisionActor;
+	using CollisionFunc = function<void(shared_ptr<class AActor>, shared_ptr<class AActor>)>;
+	unordered_map<pair<ShapeType,ShapeType>, CollisionFunc, pair_hash> collisionMap;
 
 public:
-	void Tick();
-	void Destroy();
+	void Init();
 
 public:
-	void AddCollisionActor(shared_ptr<class AActor> _pActor) { m_vCollisionActor.push_back(_pActor); }
+	void CheckCollision(vector<UINT> _vActorIndex);
+	static bool CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor);
+
+public:
+	// Ray
+	static bool CheckRayToPlane(const Ray& _ray, const Plane& _plane);
+	static bool CheckMousePicking(const Ray& _ray, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2, const Vec3& _normal, Vec3& _inter);
+	static bool CheckAABBToRay(const Ray& _ray, const Box& _box, Vec3& _inter);
+
+	static bool GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& _inter);
+	static bool PointInPolygon(const Vec3& _inter, const Vec3& _faceNormal, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2);
 };
 

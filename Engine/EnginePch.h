@@ -4,6 +4,7 @@
 #include "Types.h"
 #include "Define.h"
 #include "Vertex.h"
+#include "ShapeData.h"
 
 // WIN
 #include <windows.h>
@@ -17,6 +18,7 @@ using namespace Microsoft::WRL;
 #include <map>
 #include <list>
 #include <array>
+#include <algorithm>
 using namespace std;
 
 // DX

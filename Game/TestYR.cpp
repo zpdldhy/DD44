@@ -50,7 +50,7 @@ void TestYR::Init()
 		gizmo.emplace_back(object2);
 		gizmo.emplace_back(object3);
 
-		OBJECTMANAGER->AddActorList(gizmo);
+		OBJECT->AddActorList(gizmo);
 	}
 #pragma endregion
  
@@ -60,8 +60,8 @@ void TestYR::Init()
 		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	}
-	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
-	OBJECTMANAGER->AddActor(m_pCameraActor);
+	CAMERA->Set3DCameraActor(m_pCameraActor);
+	OBJECT->AddActor(m_pCameraActor);
 #pragma endregion
 
 #pragma region ActorTest

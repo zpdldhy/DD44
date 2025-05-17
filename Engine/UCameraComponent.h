@@ -17,8 +17,8 @@ protected:
 	Matrix m_matView;
 	Matrix m_matProjection;
 
-	Vec3 m_vEye;
 	Vec3 m_vLook;
+	float m_vLength;
 
 	// Projection
 	// - Orthographic
@@ -62,7 +62,6 @@ public:
 	Matrix GetView() { return m_matView; }
 	Matrix GetProjection() { return m_matProjection; }
 
-	Vec3 GetCameraPos() { return m_vEye; }
 	Vec3 GetCameraLook() { return m_vLook; }
 
 public:

@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "Engine.h"
 #include "Sample.h"
+#include "Game.h"
+
 #include "TestYR.h"
 #include "TestSY.h"
 #include "TestSJ.h"
