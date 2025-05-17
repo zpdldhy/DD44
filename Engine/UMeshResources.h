@@ -2,6 +2,12 @@
 #include "UObject.h"
 #include "Device.h"
 
+enum class MeshType
+{
+	M_STATIC = 0,
+	M_SKINNED = 1,
+};
+
 class UMeshResources : public UObject
 {
 public:
@@ -9,6 +15,7 @@ public:
 	virtual ~UMeshResources() = default;
 
 protected:
+	MeshType m_Type;
 	ComPtr<ID3D11Buffer> m_pVertexBuffer;
 	ComPtr<ID3D11Buffer> m_pIndexBuffer;
 	vector<PNCT_VERTEX> m_vVertexList;
@@ -39,6 +46,7 @@ public:
 	void SetIndexList(vector<DWORD> _indexList) { m_vIndexList = _indexList; }
 	UINT GetVertexCount() { return static_cast<UINT>(m_vVertexList.size()); }
 	UINT GetIndexCount() { return static_cast<UINT>(m_vIndexList.size()); }
+	int GetType() { return static_cast<int>(m_Type); }
 
 	void SetTopology(D3D11_PRIMITIVE_TOPOLOGY _type = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) { m_Topology = _type; }
 };

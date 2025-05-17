@@ -12,6 +12,7 @@
 
 void TestPlayer::Init()
 {
+	#pragma region PLAYER
 	// 플레이어 세팅
 	shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
 	{
@@ -23,7 +24,6 @@ void TestPlayer::Init()
 		player->SetCameraComponent(cameraComponent);
 		player->AddScript(movement);
 
-		#pragma region ChildMeshes
 		{
 			auto animInstance = player->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 
@@ -55,6 +55,9 @@ void TestPlayer::Init()
 		#pragma endregion
 		OBJECT->AddActor(player);
 	}
+	#pragma endregion
+
+	#pragma region CAMERA
 	// 카메라 세팅
 	{
 		m_pCameraActor = make_shared<ACameraActor>();
@@ -65,6 +68,9 @@ void TestPlayer::Init()
 		CAMERA->Set3DCameraActor(player);
 		OBJECT->AddActor(m_pCameraActor);
 	}
+	#pragma endregion
+
+	#pragma region GIZMO
 
 	//Gizmo 세팅
 	{
@@ -103,6 +109,19 @@ void TestPlayer::Init()
 		gizmo.emplace_back(object2);
 		gizmo.emplace_back(object3);
 	}
+#pragma endregion
+
+	#pragma region TEMP_PROJECTILE
+	projectile = make_shared<APawn>();
+	
+	shared_ptr<UStaticMeshComponent> meshComponent1 = UStaticMeshComponent::CreateCube();
+	shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+	mat->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+	meshComponent1->SetMaterial(mat);
+	meshComponent1->SetLocalScale(Vec3(0.5f, 0.5f, 0.5f));
+	projectile->SetMeshComponent(meshComponent1);
+	OBJECT->AddActor(projectile);
+	#pragma endregion
 }
 
 void TestPlayer::Update()

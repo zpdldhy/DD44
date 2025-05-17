@@ -1,5 +1,26 @@
 #pragma once
 
+struct MeshComponentData
+{
+	wstring m_szRes;
+	int m_type = 0;
+	
+	wstring m_szAnim;
+	int m_targetBone = 0;
+	Matrix m_matBone;
+	bool m_bInPlace = false;
+	int m_rootIndex;
+	
+	wstring m_szTex;
+	wstring m_szShader;
+
+	Vec3 m_pos;
+	Vec3 m_rot;
+	Vec3 m_scale;
+
+	vector<MeshComponentData> m_vChild;
+};
+
 struct MeshData
 {
 	bool m_bSkeleton = false;

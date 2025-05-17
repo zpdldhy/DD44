@@ -78,7 +78,7 @@ void PlayerMoveScript::Tick()
 			Vec3 currentRot = GetOwner()->GetRotation();
 			float currentYaw = currentRot.y;
 
-			// 각도 차이 계산 (-π ~ π 범위로)
+			// 각도 차이 계산
 			float angleDiff = targetYaw - currentYaw;
 			while (angleDiff > DD_PI)  angleDiff -= DD_PI * 2;
 			while (angleDiff < -DD_PI) angleDiff += DD_PI * 2;
