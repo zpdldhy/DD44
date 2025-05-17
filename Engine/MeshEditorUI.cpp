@@ -7,6 +7,7 @@
 
 void MeshEditorUI::DrawUI()
 {
+	if (m_vMeshPtrList.size() <= 0) { return; }
 	// ROOT MESH
 	if(m_pActor == nullptr)
 	{

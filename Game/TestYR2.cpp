@@ -24,8 +24,8 @@ void TestYR2::Init()
 		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
 		m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	}
-	CAMERAMANAGER->Set3DCameraActor(m_pCameraActor);
-	OBJECTMANAGER->AddActor(m_pCameraActor);
+	CAMERA->Set3DCameraActor(m_pCameraActor);
+	OBJECT->AddActor(m_pCameraActor);
 #pragma endregion
 #pragma region Gizmo ¼¼ÆÃ
 	{
@@ -58,7 +58,7 @@ void TestYR2::Init()
 		gizmo.emplace_back(object2);
 		gizmo.emplace_back(object3);
 
-		OBJECTMANAGER->AddActorList(gizmo);
+		OBJECT->AddActorList(gizmo);
 	}
 #pragma endregion
 	loader = make_shared<ActorLoader>();
@@ -118,7 +118,7 @@ void TestYR2::Init()
 			}
 
 			m_vActorList.emplace_back(_pActor);
-			OBJECTMANAGER->AddActor(_pActor);
+			OBJECT->AddActor(_pActor);
 		});
 	GUI->SetChildMeshEditorCallback([this](ChildMeshData data)
 		{

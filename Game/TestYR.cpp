@@ -99,7 +99,7 @@ void TestYR::Init()
 			{
 				root->AddChild(MakeMC(data.m_vChild[i], false, animInstance));
 			}
-			OBJECTMANAGER->AddActor(m_pActor);
+			OBJECT->AddActor(m_pActor);
 
 		}
 

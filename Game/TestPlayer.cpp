@@ -120,7 +120,7 @@ void TestPlayer::Init()
 	meshComponent1->SetMaterial(mat);
 	meshComponent1->SetLocalScale(Vec3(0.5f, 0.5f, 0.5f));
 	projectile->SetMeshComponent(meshComponent1);
-	OBJECTMANAGER->AddActor(projectile);
+	OBJECT->AddActor(projectile);
 	#pragma endregion
 }
 
