@@ -140,7 +140,7 @@ map<wstring, shared_ptr<UMeshResources>> ActorLoader::LoadMeshMap()
 			if (data.m_bSkeleton)
 			{
 				meshResource = make_shared<USkeletalMeshResources>();
-				meshResource->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
+				meshResource->SetName(name);
 				auto skeletalMesh = dynamic_pointer_cast<USkeletalMeshResources>(meshResource);
 				meshResource->SetVertexList(data.m_vVertexList);
 				skeletalMesh->SetInverseBindPose(m_vFbxList[iFbx].m_vInverseBindPose[iMesh]);
@@ -157,7 +157,7 @@ map<wstring, shared_ptr<UMeshResources>> ActorLoader::LoadMeshMap()
 			else
 			{
 				meshResource = make_shared<UStaticMeshResources>();
-				meshResource->SetName(m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName);
+				meshResource->SetName(name);
 				auto staticMesh = dynamic_pointer_cast<UStaticMeshResources>(meshResource);
 				staticMesh->SetVertexList(data.m_vVertexList);
 				staticMesh->Create();
@@ -225,11 +225,11 @@ vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
 	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
 	{
 		// Animation
+		wstring name = m_vFbxList[iFbx].name;
 		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 		{
-			animInstance->SetName(SplitName(m_vFbxList[iFbx].name));
+			animInstance->SetName(name);
 			animInstance->CreateConstantBuffer();
-			animInstance->SetName(m_vFbxList[iFbx].name);
 			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
 			{
 				AnimList animTrack;

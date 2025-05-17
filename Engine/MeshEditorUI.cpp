@@ -17,7 +17,10 @@ void MeshEditorUI::DrawUI()
 		{
 			m_baseMeshSelected = true;
 			wstring name = to_mw(m_vMeshPtrList[m_meshIndex]);
-			SetBoneList(name);
+			if (!m_bBoneSetting)
+			{
+				SetBoneList(name);
+			}
 		}
 		ImGui::Combo("Anim List", &m_animIndex, m_vAnimPtrList.data(), (int)m_vAnimPtrList.size());
 		ImGui::Combo("Texture List", &m_texIndex, m_vTexPtrList.data(), (int)m_vTexPtrList.size());
@@ -37,7 +40,7 @@ void MeshEditorUI::DrawUI()
 	if (m_pActor)
 	{
 		bool bMesh = ImGui::Combo("Mesh List", &m_meshIndex, m_vMeshPtrList.data(), (int)m_vMeshPtrList.size());
-		bool bTex = ImGui::Combo("Texture List", &m_texIndex, m_vTexPtrList.data(), (int)m_vTexPtrList.size());
+		bool bTex = ImGui::Combo("Child Texture List", &m_texIndex, m_vTexPtrList.data(), (int)m_vTexPtrList.size());
 		ImGui::InputText("Texture path", texPath, IM_ARRAYSIZE(texPath));
 
 		m_childData.rootMesh = m_pActor;
@@ -45,6 +48,10 @@ void MeshEditorUI::DrawUI()
 		if (m_meshIndex >= 0)
 		{ 
 			m_childData.meshName = to_mw(m_vMeshPtrList[m_meshIndex]);
+			if (!strcmp(texPath, ""))
+			{
+				strcpy_s(texPath, m_vTexPtrList[m_texIndex]);
+			}
 			m_childData.texPath = texPath;
 			m_childMeshSelected = true;
 			auto iter = m_mMeshResMap.find(m_childData.meshName);
@@ -67,6 +74,11 @@ void MeshEditorUI::DrawUI()
 		if (ImGui::Button("Create Child") && m_OnCreateChild)
 		{
 			m_childData.texIndex = m_texIndex;
+			if (!strcmp(texPath, ""))
+			{
+				strcpy_s(texPath, m_vTexPtrList[m_texIndex]);
+			}
+			m_childData.texPath = texPath;
 			if (m_childData.bAnimatedStatic)
 			{
 				m_childData.parentBoneName = m_vBoneList[m_parentBoneIndex];
@@ -106,9 +118,9 @@ void MeshEditorUI::DrawUI()
 		bool changeBone = ImGui::Combo("Parent Bone", &m_parentBoneIndex, m_vBonePtrList.data(), (int)m_vBonePtrList.size());
 		ImGui::Checkbox("InverseBone", &m_inverseMatBone);
 
-		bool changeX = ImGui::DragFloat("x", &m_pos.x, -0.2f, +0.2f);
-		bool changeY = ImGui::DragFloat("y", &m_pos.y, -0.2f, +0.2f);
-		bool changeZ = ImGui::DragFloat("z", &m_pos.z, -0.2f, +0.2f);
+		bool changeX = ImGui::DragFloat("x", &m_pos.x, -0.05f, +0.05f);
+		bool changeY = ImGui::DragFloat("y", &m_pos.y, -0.05f, +0.05f);
+		bool changeZ = ImGui::DragFloat("z", &m_pos.z, -0.05f, +0.05f);
 
 		if (changeX || changeY || changeZ)
 		{
@@ -119,6 +131,11 @@ void MeshEditorUI::DrawUI()
 		{
 			m_OnParentBoneChange(m_childIndex, m_vBoneList[m_parentBoneIndex], m_inverseMatBone);
 		}
+	}
+
+	if (ImGui::Button("Save mesh") && m_OnMeshSave)
+	{
+		m_OnMeshSave(1, true);
 	}
 
 
@@ -194,4 +211,5 @@ void MeshEditorUI::SetBoneList(wstring meshName)
 		m_vBoneList.push_back(name);
 		m_vBonePtrList.emplace_back(m_vBoneList.back().c_str());
 	}
+	m_bBoneSetting = true;
 }

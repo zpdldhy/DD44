@@ -287,13 +287,18 @@ void AAsset::ExportSkinned(FILE* pFile, shared_ptr<UMeshComponent> _mesh)
 	ExportWstring(pFile, resName);
 
 	// ANIM
-	auto animInstance = mesh->GetAnimInstance();
-	wstring animName = animInstance->GetName();
-	ExportWstring(pFile, animName);
-	bool bInPlace = animInstance->m_bInPlace;
-	int rootIndex = animInstance->GetRootIndex();
-	fwrite(&bInPlace, sizeof(bool), 1, pFile);
-	fwrite(&rootIndex, sizeof(int), 1, pFile);
+	bool bHasBaseAnim = mesh->GetAnimInstance() ? true : false;
+	fwrite(&bHasBaseAnim, sizeof(bool), 1, pFile);
+	if (bHasBaseAnim)
+	{
+		auto animInstance = mesh->GetAnimInstance();
+		wstring animName = animInstance->GetName();
+		ExportWstring(pFile, animName);
+		bool bInPlace = animInstance->m_bInPlace;
+		int rootIndex = animInstance->GetRootIndex();
+		fwrite(&bInPlace, sizeof(bool), 1, pFile);
+		fwrite(&rootIndex, sizeof(int), 1, pFile);
+	}
 	
 	// MATERIAL
 	wstring texPath = mesh->GetMaterial()->GetTexture()->m_pFilePath;
@@ -377,9 +382,14 @@ MeshComponentData AAsset::LoadOneMesh(FILE* pFile)
 
 	if (meshType == (int)MeshType::M_SKINNED)
 	{
-		ret.m_szAnim = LoadWstring(pFile);
-		fread(&ret.m_bInPlace, sizeof(bool), 1, pFile);
-		fread(&ret.m_rootIndex, sizeof(int), 1, pFile);
+		bool bHasBaseAnim;
+		fread(&bHasBaseAnim, sizeof(bool), 1, pFile);
+		if (bHasBaseAnim)
+		{
+			ret.m_szAnim = LoadWstring(pFile);
+			fread(&ret.m_bInPlace, sizeof(bool), 1, pFile);
+			fread(&ret.m_rootIndex, sizeof(int), 1, pFile);
+		}
 		ret.m_szTex = LoadWstring(pFile);
 		ret.m_szShader = LoadWstring(pFile);
 		fread(&ret.m_pos, sizeof(Vec3), 1, pFile);

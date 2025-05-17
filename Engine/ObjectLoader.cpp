@@ -23,17 +23,18 @@ vector<shared_ptr<APawn>> ObjectLoader::Load()
 		shared_ptr<APawn> actor = make_shared<APawn>();
 
 		////MESH
-		// TEMP ( CHILD √≥∏Æ πÃ»Ì ) 
 		shared_ptr<UStaticMeshComponent> rootMesh = make_shared<UStaticMeshComponent>();
 
 		for (int iMesh = 0; iMesh < meshes[iObj].size(); iMesh++)
 		{
 			shared_ptr<UStaticMeshResources> mesh = make_shared<UStaticMeshResources>();
+			mesh->SetName(meshes[iObj][iMesh].m_szName);
 			mesh->SetVertexList(meshes[iObj][iMesh].m_vVertexList);
 			mesh->SetIndexList(meshes[iObj][iMesh].m_vIndexList);
 			mesh->Create();
 			rootMesh->SetMesh(mesh);
 			rootMesh->SetMaterial(material);
+			m_mMeshMap.insert(make_pair(meshes[iObj][iMesh].m_szName, mesh));
 		}
 		m_vMeshList.emplace_back(rootMesh);
 		actor->SetMeshComponent(rootMesh);
@@ -46,4 +47,10 @@ vector<shared_ptr<APawn>> ObjectLoader::Load()
 vector<shared_ptr<UMeshComponent>> ObjectLoader::LoadMesh()
 {
 	return m_vMeshList;
+}
+
+map<wstring, shared_ptr<UMeshResources>> ObjectLoader::LoadMeshMap()
+{
+
+	return m_mMeshMap;
 }

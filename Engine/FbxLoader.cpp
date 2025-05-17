@@ -414,7 +414,6 @@ void FbxLoader::ParseAnimation()
 	int animBoneCount = m_result.m_mSkeletonList.size() + m_result.m_vMeshList.size();
 	int animTrackCount = m_pScene->GetSrcObjectCount<FbxAnimStack>();
 	m_result.m_iAnimTrackCount = animTrackCount;
-	m_result.m_iAnimTrackCount = 1;
 
 	// ONLY FOR crow_final ( 애니메이션 많음. 추려서 파싱 ) 
 	{

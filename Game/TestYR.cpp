@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "TestYR.h"
 #include "ACameraActor.h"
+#include "ObjectLoader.h"
 #include "EngineCameraMoveScript.h"
 #include "CameraManager.h"
 #include "ObjectManager.h"
@@ -63,104 +64,27 @@ void TestYR::Init()
 	OBJECTMANAGER->AddActor(m_pCameraActor);
 #pragma endregion
 
-	//for (int i = 0; i < m_vActorList.size(); i++)
-	//{
-	//	m_vActorList[i]->SetPosition(Vec3(10.0f * i , 0, 0));
-	//	OBJECTMANAGER->AddActor(m_vActorList[i]);
-	//}
-
-
-#pragma region HeadRollerTest
-	{
-		//		//loader.ConvertFbxToAsset();
-		//
-		//		m_pActor = loader.LoadOneActor("../Resources/Asset/_E_HEADROLLER.asset");
-		//		meshList = loader.LoadMesh();
-		//		targetObj = m_pActor;
-		//		auto animInstance = targetObj->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-		//#pragma region Child
-		//		{
-		//			Matrix matBone1 = animInstance->GetBoneAnim(33);
-		//			matBone1 = matBone1.Invert();
-		//			dynamic_cast<UStaticMeshComponent*>(meshList[1].get())->SetMatBone(matBone1);
-		//
-		//			dynamic_cast<UStaticMeshComponent*>(meshList[1].get())->SetAnimInstance(animInstance);
-		//			dynamic_cast<UStaticMeshComponent*>(meshList[1].get())->SetTargetBoneIndex(33);
-		//			meshList[1]->SetLocalPosition(Vec3(-1.15f, 0.2f, -0.5f));
-		//			targetObj->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[1]);
-		//
-		//			Matrix matBone2 = animInstance->GetBoneAnim(34);
-		//			matBone2 = matBone1.Invert();
-		//			dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetMatBone(matBone1);
-		//
-		//			dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetAnimInstance(animInstance);
-		//			dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetTargetBoneIndex(33);
-		//			meshList[2]->SetLocalPosition(Vec3(-1.15f, 0.2f, -0.5f));
-		//			targetObj->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[2]);
-		//
-		//		}
-		//#pragma endregion
-		//
-		//		OBJECTMANAGER->AddActor(m_pActor);
-	}
-#pragma endregion
-
 #pragma region ActorTest
 	{
 		//loader.ConvertFbxToAsset();
-		loader.LoadOne("../Resources/Asset/crow_final.asset");
+		loader.LoadAllAsset();
 		meshMap = loader.LoadMeshMap();
 		tempmeshList = loader.LoadMesh();
 		animInstanceList = loader.LoadAnim();
 		animMap = loader.LoadAnimMap();
 		m_pActor = make_shared<APawn>();
 
-//		auto animInstance = animInstanceList[0];
-//
-//		tempmeshList[0]->GetMaterial()->SetTexture(TEXTURE->Get(L"../Resources/Texture/Crow_DIFF.png"));
-//		dynamic_cast<USkinnedMeshComponent*>(tempmeshList[0].get())->SetBaseAnim(animInstance);
-//		shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
-//		animTrack->SetBase(animInstance);
-//		dynamic_cast<USkinnedMeshComponent*>(tempmeshList[0].get())->SetMeshAnim(animTrack);
-//
-//		m_pActor->SetMeshComponent(tempmeshList[0]);
-//
-//#pragma region Child
-//		{
-//			auto weapon = dynamic_cast<UStaticMeshComponent*>(tempmeshList[2].get());
-//
-//			Matrix matBone = animInstance->GetBoneAnim(43);
-//			//matBone = matBone.Invert();
-//			weapon->SetMatBone(matBone);
-//
-//			weapon->SetAnimInstance(animInstance);
-//			weapon->SetTargetBoneIndex(43);
-//			//weapon->SetLocalPosition(Vec3(-1.15f, 0.2f, -0.5f));
-//			weapon->SetLocalPosition(Vec3(5.0f, 0.0f, 0.0f));
-//			m_pActor->GetMeshComponent<USkinnedMeshComponent>()->AddChild(tempmeshList[2]);
-//		}
-//		{
-//			auto eye = dynamic_cast<UStaticMeshComponent*>(tempmeshList[1].get());
-//
-//			Matrix matBone = animInstance->GetBoneAnim(57);
-//			//matBone = matBone.Invert();
-//			eye->SetMatBone(matBone);
-//
-//			eye->SetAnimInstance(animInstance);
-//			eye->SetTargetBoneIndex(57);
-//			// Idle
-//			eye->SetLocalPosition(Vec3(-0.45f, 0.35f, 0.27f));
-//			m_pActor->GetMeshComponent<USkinnedMeshComponent>()->AddChild(tempmeshList[1]);
-//
-//		}
-//		{
-//			auto tail = dynamic_cast<USkinnedMeshComponent*>(tempmeshList[5].get());
-//			tail->SetMeshAnim(animTrack);
-//		}
-//#pragma endregion
-//
-//		AAsset::ExportMesh(m_pActor, "crow_final");
-		
+		shared_ptr<ObjectLoader>objLoader = make_shared< ObjectLoader>();
+		objLoader->Load();
+		map<wstring, shared_ptr<UMeshResources>> tempMap = objLoader->LoadMeshMap();
+
+		for (auto& data : tempMap)
+		{
+			meshMap.insert(data);
+		}
+	
+		// mesh export 할 시 name 설정 필요
+		//AAsset::ExportMesh(m_pActor, "crow_final");
 		MeshComponentData data = AAsset::LoadMesh("../Resources/Asset/crow_final.mesh");
 		
 		{
@@ -179,58 +103,7 @@ void TestYR::Init()
 
 		}
 
-		{
-			auto originAnim = animMap.find(data.m_szAnim);
-			if (originAnim == animMap.end()) { assert(false); }
-			auto animInstance = originAnim->second->Clone();
-			shared_ptr<UMeshComponent> root = MakeMC(data, true, animInstance);
-			m_pActor2 = make_shared<APawn>();
-			m_pActor2->SetMeshComponent(root);
-
-			for (int i = 0; i < data.m_vChild.size(); i++)
-			{
-				root->AddChild(MakeMC(data.m_vChild[i], false, animInstance));
-			}
-			m_pActor2->SetPosition(Vec3(5.0f, 0.0f, 0.0f));
-			OBJECTMANAGER->AddActor(m_pActor2);
-		}
-
 	}
-#pragma endregion
-
-#pragma region MageTest
-	//		//loader.ConvertFbxToAsset();
-	//
-	//		m_pActor = loader.LoadOneActor("../Resources/Asset/_E_MAGE.asset");
-	//		meshList = loader.LoadMesh();
-	//		targetObj = m_pActor;
-	//		auto animInstance = targetObj->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	//#pragma region Child
-	//		{
-	//			Matrix matBone1 = animInstance->GetBoneAnim(67);
-	//			matBone1 = matBone1.Invert();
-	//			dynamic_cast<UStaticMeshComponent*>(meshList[1].get())->SetMatBone(matBone1);
-	//
-	//			dynamic_cast<UStaticMeshComponent*>(meshList[1].get())->SetAnimInstance(animInstance);
-	//			dynamic_cast<UStaticMeshComponent*>(meshList[1].get())->SetTargetBoneIndex(67);
-	//			meshList[1]->SetLocalRotation(Vec3(0.0f, -90.0f, 0.0f));
-	//			//meshList[1]->SetLocalPosition(Vec3(-1.15f, -2.0f, -0.5f));
-	//			targetObj->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[1]);
-	//
-	//			//Matrix matBone2 = animInstance->GetBoneAnim(34);
-	//			//matBone2 = matBone1.Invert();
-	//			//dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetMatBone(matBone1);
-	//
-	//			//dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetAnimInstance(animInstance);
-	//			//dynamic_cast<UStaticMeshComponent*>(meshList[2].get())->SetTargetBoneIndex(33);
-	//			//meshList[2]->SetLocalPosition(Vec3(-1.15f, 0.2f, -0.5f));
-	//			//targetObj->GetMeshComponent<USkinnedMeshComponent>()->AddChild(meshList[2]);
-	//
-	//		}
-	//#pragma endregion
-	//
-	//		OBJECTMANAGER->AddActor(m_pActor);
-
 #pragma endregion
 
 #pragma region KnightTest
@@ -293,34 +166,10 @@ void TestYR::Init()
 //	OBJECTMANAGER->AddActor(m_pActor);
 
 #pragma endregion
-
-#pragma region Crow_door
-
-	//loader.ConvertFbxToAsset();
-	//loader.LoadOne("../Resources/Asset/CrowDoor.asset");
-	//m_pActor = make_shared<APawn>();
-	//vector<shared_ptr<UMeshComponent>> meshList = loader.LoadMesh();
-	//vector<wstring> texList = loader.LoadTexPath();
-	//wstring texPath = L"../Resources/Texture/";
-	//texPath += texList[0];
-	//shared_ptr<Texture> tex = TEXTURE->Get(texPath);
-	//m_pActor->SetMeshComponent(meshList[0]);
-	//meshList[0]->GetMaterial()->SetTexture(tex);
-	//for (int i = 1; i < meshList.size(); i++)
-	//{
-	//	wstring texPath = L"../Resources/Texture/";
-	//	texPath += texList[i];
-	//	tex = TEXTURE->Get(texPath);
-	//	meshList[i]->GetMaterial()->SetTexture(tex);
-
-	//	meshList[0]->AddChild(meshList[i]);
-	//}
-	//OBJECTMANAGER->AddActor(m_pActor);
-
-#pragma endregion
 }
 void TestYR::Update()
-{
+{	
+	// 애니메이션 확인
 	if (INPUT->GetButton(LCLICK))
 	{
 		//int targetIndex = m_pActor->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance()->GetAnimIndex(L"Slash_Light_R_new");
@@ -330,7 +179,11 @@ void TestYR::Update()
 	if (INPUT->GetButton(C))
 	{
 		auto anim = m_pActor2->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-		anim->SetCurrentAnimTrack(2);
+		if (++targetIndex >= anim->GetAnimTrackList().size())
+		{
+			targetIndex = 0;
+		}
+		anim->SetCurrentAnimTrack(targetIndex);
 	}
 
 }

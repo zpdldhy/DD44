@@ -47,6 +47,10 @@ public:
     {
         m_OnParentBoneChange = std::move(callback);
     }
+    void SaveMesh(std::function<void(int, bool)> callback)
+    {
+        m_OnMeshSave = std::move(callback);
+    }
 public:
     void SetMeshList(map<wstring, shared_ptr<UMeshResources>> _meshList);
     void SetAnimList(vector<shared_ptr<UAnimInstance>> _animList);
@@ -71,6 +75,8 @@ private:
 
     vector<string> m_vBoneList;
     vector<const char*> m_vBonePtrList;
+
+    bool m_bBoneSetting = false;
 
     int m_meshIndex;
     int m_animIndex;
@@ -99,6 +105,7 @@ private:
     function<void(bool)> m_OnAnimStop;
     function<void(int)> m_OnAnimChange;
     function<void(int, string, bool )> m_OnParentBoneChange;
+    function<void(int, bool)> m_OnMeshSave;
 
 };
 
