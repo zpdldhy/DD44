@@ -108,6 +108,7 @@ bool PrefabLoader::SaveCharacter(const PrefabCharacterData& data, const std::str
     json j;
     j["Name"] = data.Name;
     j["RootMeshPath"] = data.RootMeshPath;
+    j["MeshPath"] = data.MeshPath;
     j["ShaderPath"] = data.ShaderPath;
     j["TexturePath"] = data.TexturePath;
     j["ScriptType"] = data.ScriptType;
@@ -118,13 +119,13 @@ bool PrefabLoader::SaveCharacter(const PrefabCharacterData& data, const std::str
     j["Rotation"] = { data.Rotation.x, data.Rotation.y, data.Rotation.z };
     j["Translation"] = { data.Translation.x, data.Translation.y, data.Translation.z };
 
-    for (const auto& child : data.ChildMeshes)
-    {
-        j["ChildMeshes"].push_back({
-            { "MeshPath", child.MeshPath },
-            { "TargetBoneIndex", child.TargetBoneIndex }
-            });
-    }
+    //for (const auto& child : data.ChildMeshes)
+    //{
+    //    j["ChildMeshes"].push_back({
+    //        { "MeshPath", child.MeshPath },
+    //        { "TargetBoneIndex", child.TargetBoneIndex }
+    //        });
+    //}
 
     std::ofstream file(filePath);
     if (!file.is_open()) return false;
@@ -143,6 +144,7 @@ bool PrefabLoader::LoadCharacter(const std::string& filePath, PrefabCharacterDat
 
     data.Name = j["Name"];
     data.RootMeshPath = j["RootMeshPath"];
+    data.MeshPath = j["MeshPath"];
     data.ShaderPath = j["ShaderPath"];
     data.TexturePath = j["TexturePath"];
     data.ScriptType = j["ScriptType"];

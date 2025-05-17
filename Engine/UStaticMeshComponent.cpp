@@ -20,8 +20,8 @@ void UStaticMeshComponent::Tick()
 
 	if (m_pAnim)
 	{
-		auto mat = m_pAnim->GetBoneAnim(targetBoneIndex);
-		m_matParent = matBone * mat * m_matParent;
+		auto mat = m_pAnim->GetBoneAnim(m_targetBoneIndex);
+		m_matParent = m_matBone * mat * m_matParent;
 	}
 	USceneComponent::Tick();
 }

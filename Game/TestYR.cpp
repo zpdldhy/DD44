@@ -12,6 +12,9 @@
 #include "AnimTrack.h"
 #include "ImGuiCore.h"
 #include "UIManager.h"
+#include "AAsset.h"
+#include "SkeletalMeshData.h"
+#include "Inputlayout.h"
 
 void TestYR::Init()
 {
@@ -104,55 +107,94 @@ void TestYR::Init()
 
 #pragma region ActorTest
 	{
-		loader.ConvertFbxToAsset();
-		loader.LoadOne("../Resources/Asset/DD_crow.asset");
+		//loader.ConvertFbxToAsset();
+		loader.LoadOne("../Resources/Asset/crow_final.asset");
+		meshMap = loader.LoadMeshMap();
 		tempmeshList = loader.LoadMesh();
 		animInstanceList = loader.LoadAnim();
+		animMap = loader.LoadAnimMap();
 		m_pActor = make_shared<APawn>();
 
-		auto animInstance = animInstanceList[0];
+//		auto animInstance = animInstanceList[0];
+//
+//		tempmeshList[0]->GetMaterial()->SetTexture(TEXTURE->Get(L"../Resources/Texture/Crow_DIFF.png"));
+//		dynamic_cast<USkinnedMeshComponent*>(tempmeshList[0].get())->SetBaseAnim(animInstance);
+//		shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
+//		animTrack->SetBase(animInstance);
+//		dynamic_cast<USkinnedMeshComponent*>(tempmeshList[0].get())->SetMeshAnim(animTrack);
+//
+//		m_pActor->SetMeshComponent(tempmeshList[0]);
+//
+//#pragma region Child
+//		{
+//			auto weapon = dynamic_cast<UStaticMeshComponent*>(tempmeshList[2].get());
+//
+//			Matrix matBone = animInstance->GetBoneAnim(43);
+//			//matBone = matBone.Invert();
+//			weapon->SetMatBone(matBone);
+//
+//			weapon->SetAnimInstance(animInstance);
+//			weapon->SetTargetBoneIndex(43);
+//			//weapon->SetLocalPosition(Vec3(-1.15f, 0.2f, -0.5f));
+//			weapon->SetLocalPosition(Vec3(5.0f, 0.0f, 0.0f));
+//			m_pActor->GetMeshComponent<USkinnedMeshComponent>()->AddChild(tempmeshList[2]);
+//		}
+//		{
+//			auto eye = dynamic_cast<UStaticMeshComponent*>(tempmeshList[1].get());
+//
+//			Matrix matBone = animInstance->GetBoneAnim(57);
+//			//matBone = matBone.Invert();
+//			eye->SetMatBone(matBone);
+//
+//			eye->SetAnimInstance(animInstance);
+//			eye->SetTargetBoneIndex(57);
+//			// Idle
+//			eye->SetLocalPosition(Vec3(-0.45f, 0.35f, 0.27f));
+//			m_pActor->GetMeshComponent<USkinnedMeshComponent>()->AddChild(tempmeshList[1]);
+//
+//		}
+//		{
+//			auto tail = dynamic_cast<USkinnedMeshComponent*>(tempmeshList[5].get());
+//			tail->SetMeshAnim(animTrack);
+//		}
+//#pragma endregion
+//
+//		AAsset::ExportMesh(m_pActor, "crow_final");
+		
+		MeshComponentData data = AAsset::LoadMesh("../Resources/Asset/crow_final.mesh");
+		
+		{
+			auto originAnim = animMap.find(data.m_szAnim);
+			if (originAnim == animMap.end()) { assert(false); }
+			auto animInstance = originAnim->second->Clone();
+			shared_ptr<UMeshComponent> root = MakeMC(data, true, animInstance);
+			m_pActor = make_shared<APawn>();
+			m_pActor->SetMeshComponent(root);
 
-		dynamic_cast<USkinnedMeshComponent*>(tempmeshList[0].get())->SetBaseAnim(animInstance);
-		shared_ptr<AnimTrack> animTrack = make_shared< AnimTrack>();
-		animTrack->SetBase(animInstance);
-		dynamic_cast<USkinnedMeshComponent*>(tempmeshList[0].get())->SetMeshAnim(animTrack);
+			for (int i = 0; i < data.m_vChild.size(); i++)
+			{
+				root->AddChild(MakeMC(data.m_vChild[i], false, animInstance));
+			}
+			OBJECTMANAGER->AddActor(m_pActor);
 
-		m_pActor->SetMeshComponent(tempmeshList[0]);
+		}
 
-#pragma region Child
-		//{
-		//	auto weapon = dynamic_cast<UStaticMeshComponent*>(tempmeshList[2].get());
+		{
+			auto originAnim = animMap.find(data.m_szAnim);
+			if (originAnim == animMap.end()) { assert(false); }
+			auto animInstance = originAnim->second->Clone();
+			shared_ptr<UMeshComponent> root = MakeMC(data, true, animInstance);
+			m_pActor2 = make_shared<APawn>();
+			m_pActor2->SetMeshComponent(root);
 
-		//	Matrix matBone = animInstance->GetBoneAnim(43);
-		//	//matBone = matBone.Invert();
-		//	weapon->SetMatBone(matBone);
+			for (int i = 0; i < data.m_vChild.size(); i++)
+			{
+				root->AddChild(MakeMC(data.m_vChild[i], false, animInstance));
+			}
+			m_pActor2->SetPosition(Vec3(5.0f, 0.0f, 0.0f));
+			OBJECTMANAGER->AddActor(m_pActor2);
+		}
 
-		//	weapon->SetAnimInstance(animInstance);
-		//	weapon->SetTargetBoneIndex(43);
-		//	weapon->SetLocalPosition(Vec3(-1.15f, 0.2f, -0.5f));
-		//	m_pActor->GetMeshComponent<USkinnedMeshComponent>()->AddChild(tempmeshList[2]);
-		//}
-		//{
-		//	auto eye = dynamic_cast<UStaticMeshComponent*>(tempmeshList[1].get());
-
-		//	Matrix matBone = animInstance->GetBoneAnim(57);
-		//	//matBone = matBone.Invert();
-		//	eye->SetMatBone(matBone);
-
-		//	eye->SetAnimInstance(animInstance);
-		//	eye->SetTargetBoneIndex(57);
-		//	// Idle
-		//	eye->SetLocalPosition(Vec3(-0.45f, 0.35f, 0.27f));
-		//	m_pActor->GetMeshComponent<USkinnedMeshComponent>()->AddChild(tempmeshList[1]);
-
-		//}
-		//{
-		//	auto tail = dynamic_cast<USkinnedMeshComponent*>(tempmeshList[5].get());
-		//	tail->SetMeshAnim(animTrack);
-		//}
-#pragma endregion
-
-		OBJECTMANAGER->AddActor(m_pActor);
 	}
 #pragma endregion
 
@@ -285,9 +327,63 @@ void TestYR::Update()
 		//m_pActor->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance()->PlayOnce(targetIndex);
 	}
 
+	if (INPUT->GetButton(C))
+	{
+		auto anim = m_pActor2->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+		anim->SetCurrentAnimTrack(2);
+	}
+
 }
 void TestYR::Render()
 {
+}
+
+shared_ptr<UMeshComponent> TestYR::MakeMC(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance)
+{
+	shared_ptr<UMeshComponent> mesh;
+	auto meshRes = meshMap.find(data.m_szRes);
+	if (meshRes == meshMap.end()) { assert(false); }
+
+	if (data.m_type == (int)MeshType::M_SKINNED)
+	{
+		mesh = make_shared<USkinnedMeshComponent>();
+		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
+		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
+
+		if (bRoot) { skinnedRoot->SetBaseAnim(animInstance); }
+		shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
+		animTrack->SetBase(animInstance);
+		skinnedRoot->SetMeshAnim(animTrack);
+		if (data.m_bInPlace)
+		{
+			animInstance->m_bInPlace = true;
+			animInstance->SetRootIndex(data.m_rootIndex);
+		} 
+
+		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+		mat->Load(data.m_szTex, data.m_szShader);
+		mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+		skinnedRoot->SetMaterial(mat);
+	}
+	else
+	{
+		mesh = make_shared<UStaticMeshComponent>();
+		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
+		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(meshRes->second));
+
+		staticRoot->SetAnimInstance(animInstance);
+		staticRoot->SetMatBone(data.m_matBone);
+		staticRoot->SetTargetBoneIndex(data.m_targetBone);
+
+		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+		mat->Load(data.m_szTex, data.m_szShader);
+		staticRoot->SetMaterial(mat);
+	}
+	mesh->SetLocalPosition(data.m_pos);
+	mesh->SetLocalRotation(data.m_rot);
+	mesh->SetLocalScale(data.m_scale);
+
+	return mesh;
 }
 
 

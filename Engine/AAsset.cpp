@@ -1,5 +1,10 @@
 #include "pch.h"
 #include "AAsset.h"
+#include "APawn.h"
+#include "USkinnedMeshComponent.h"
+#include "UStaticMeshComponent.h"
+#include "SkeletalMeshData.h"
+#include "UMaterial.h"
 
 void AAsset::Export(TFbxResource _result, string filepath)
 {
@@ -231,7 +236,186 @@ TFbxResource AAsset::Load(const char* fileName)
 	return result;
 }
 
-//void AAsset::ExportMesh(shared_ptr<APawn> _actor)
-//{
-//	
-//}
+void AAsset::ExportMesh(shared_ptr<APawn> _actor, string filepath)
+{
+	FILE* pFile;
+	string path = "../Resources/Asset/";
+	string ext = ".mesh";
+	path = path + filepath + ext;
+	errno_t err = fopen_s(&pFile, path.c_str(), "wb");
+	if (err != 0) { assert(false); }
+
+	// ROOT MESH
+	auto mesh = _actor->GetMeshComponent();
+	bool isSkinned = (dynamic_pointer_cast<USkinnedMeshComponent>(mesh) != nullptr);
+	if (isSkinned)
+	{
+		ExportSkinned(pFile, mesh);
+	}
+	else
+	{
+		ExportStatic(pFile, mesh);
+	}
+
+	int childCount = mesh->GetChildren().size();
+	fwrite(&childCount, sizeof(int), 1, pFile);
+	for (auto& child : mesh->GetChildren())
+	{
+		bool isSkinned = (dynamic_pointer_cast<USkinnedMeshComponent>(child) != nullptr);
+		if (isSkinned)
+		{
+			ExportSkinned(pFile, child);
+		}
+		else
+		{
+			ExportStatic(pFile, child);
+		}
+	}
+
+	fclose(pFile);
+}
+
+void AAsset::ExportSkinned(FILE* pFile, shared_ptr<UMeshComponent> _mesh)
+{
+	auto mesh = dynamic_pointer_cast<USkinnedMeshComponent>(_mesh);
+
+	// BASE
+	int type = mesh->GetMesh()->GetType();
+	fwrite(&type, sizeof(int), 1, pFile);
+
+	wstring resName = mesh->GetMesh()->GetName();
+	ExportWstring(pFile, resName);
+
+	// ANIM
+	auto animInstance = mesh->GetAnimInstance();
+	wstring animName = animInstance->GetName();
+	ExportWstring(pFile, animName);
+	bool bInPlace = animInstance->m_bInPlace;
+	int rootIndex = animInstance->GetRootIndex();
+	fwrite(&bInPlace, sizeof(bool), 1, pFile);
+	fwrite(&rootIndex, sizeof(int), 1, pFile);
+	
+	// MATERIAL
+	wstring texPath = mesh->GetMaterial()->GetTexture()->m_pFilePath;
+	ExportWstring(pFile, texPath);
+
+	wstring shaderPath = mesh->GetMaterial()->GetShaderPath();
+	ExportWstring(pFile, shaderPath);
+
+	// SRT
+	Vec3 pos = mesh->GetLocalPosition();
+	Vec3 rot = mesh->GetLocalRotation();
+	Vec3 scale = mesh->GetLocalScale();
+	fwrite(&pos, sizeof(Vec3), 1, pFile);
+	fwrite(&rot, sizeof(Vec3), 1, pFile);
+	fwrite(&scale, sizeof(Vec3), 1, pFile);
+}
+void AAsset::ExportStatic(FILE* pFile, shared_ptr<UMeshComponent> _mesh)
+{
+	auto mesh = dynamic_pointer_cast<UStaticMeshComponent>(_mesh);
+
+	// BASE
+	int type = mesh->GetMesh()->GetType();
+	fwrite(&type, sizeof(int), 1, pFile);
+
+	wstring resName = mesh->GetMesh()->GetName();
+	ExportWstring(pFile, resName);
+
+	// ANIM
+	wstring animName = mesh->GetAnimInstance()->GetName();
+	ExportWstring(pFile, animName);
+
+	int targetBone = mesh->GetTargetBoneIndex();
+	fwrite(&targetBone, sizeof(int), 1, pFile);
+	
+	Matrix matBone = mesh->GetMatBone();
+	fwrite(&matBone, sizeof(Matrix), 1, pFile);
+
+	// MATERAIL
+	wstring texPath = mesh->GetMaterial()->GetTexture()->m_pFilePath;
+	ExportWstring(pFile, texPath);
+	wstring shaderPath = mesh->GetMaterial()->GetShaderPath();
+	ExportWstring(pFile, shaderPath);
+
+	// SRT
+	Vec3 pos = mesh->GetLocalPosition();
+	Vec3 rot = mesh->GetLocalRotation();
+	Vec3 scale = mesh->GetLocalScale();
+	fwrite(&pos, sizeof(Vec3), 1, pFile);
+	fwrite(&rot, sizeof(Vec3), 1, pFile);
+	fwrite(&scale, sizeof(Vec3), 1, pFile);
+}
+
+MeshComponentData AAsset::LoadMesh(const char* filepath)
+{
+	FILE* pFile;
+	errno_t err = fopen_s(&pFile, filepath, "rb");
+	if (err != 0) { assert(false); }
+
+	MeshComponentData root = LoadOneMesh(pFile);
+
+	int childCount;
+	fread(&childCount, sizeof(int), 1, pFile);
+	for (int i = 0; i < childCount; i++)
+	{
+		MeshComponentData child = LoadOneMesh(pFile);
+		root.m_vChild.emplace_back(child);
+	}
+	
+	fclose(pFile);
+	return root;
+
+}
+
+MeshComponentData AAsset::LoadOneMesh(FILE* pFile)
+{
+	MeshComponentData ret;
+	int meshType;
+	fread(&meshType, sizeof(int), 1, pFile);
+	ret.m_type = meshType;
+	ret.m_szRes = LoadWstring(pFile);
+
+	if (meshType == (int)MeshType::M_SKINNED)
+	{
+		ret.m_szAnim = LoadWstring(pFile);
+		fread(&ret.m_bInPlace, sizeof(bool), 1, pFile);
+		fread(&ret.m_rootIndex, sizeof(int), 1, pFile);
+		ret.m_szTex = LoadWstring(pFile);
+		ret.m_szShader = LoadWstring(pFile);
+		fread(&ret.m_pos, sizeof(Vec3), 1, pFile);
+		fread(&ret.m_rot, sizeof(Vec3), 1, pFile);
+		fread(&ret.m_scale, sizeof(Vec3), 1, pFile);
+	}
+	else
+	{
+		ret.m_szAnim = LoadWstring(pFile);
+		fread(&ret.m_targetBone, sizeof(int), 1, pFile);
+		fread(&ret.m_matBone, sizeof(Matrix), 1, pFile);
+		ret.m_szTex = LoadWstring(pFile);
+		ret.m_szShader = LoadWstring(pFile);
+		fread(&ret.m_pos, sizeof(Vec3), 1, pFile);
+		fread(&ret.m_rot, sizeof(Vec3), 1, pFile);
+		fread(&ret.m_scale, sizeof(Vec3), 1, pFile);
+	}
+	return ret;
+}
+
+void AAsset::ExportWstring(FILE* pFile, wstring _str)
+{
+	UINT strSize = static_cast<UINT>(_str.size());
+	fwrite(&strSize, sizeof(UINT), 1, pFile);
+	fwrite(_str.data(), sizeof(wchar_t), strSize, pFile);
+}
+
+wstring AAsset::LoadWstring(FILE* pFile)
+{
+	UINT strSize;
+	fread(&strSize, sizeof(UINT), 1, pFile);
+	wstring str;
+	str.resize(strSize);
+	fread(&str[0], sizeof(wchar_t), strSize, pFile);
+
+	return str;
+}
+
+

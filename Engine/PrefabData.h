@@ -32,6 +32,7 @@ struct PrefabCharacterData
     std::string Name;
 
     std::string RootMeshPath;
+    std::string MeshPath;
     std::string ShaderPath;
     std::string TexturePath;
 
