@@ -4,6 +4,7 @@
 #include "Sample.h"
 #include "Game.h"
 
+// 삭제 예정
 #include "TestYR.h"
 #include "TestSY.h"
 #include "TestSJ.h"
