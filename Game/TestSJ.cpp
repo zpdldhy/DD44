@@ -517,7 +517,8 @@ void TestSJ::Render()
 
 void TestSJ::SetupObjectEditorCallback()
 {
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale
+		, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
 		{
 			AssimpLoader loader;
 			vector<MeshData> meshList = loader.Load(objPath);
@@ -539,7 +540,10 @@ void TestSJ::SetupObjectEditorCallback()
 				std::wstring(texPath, texPath + strlen(texPath)),
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
 			);
+			mat->SetEmissiveParams(EmissiveColor, Emissivepower);
+			mat->SetSpecularParams(SpecularColor, shininess);
 			meshComp->SetMaterial(mat);
+			
 
 			// Snap 적용 여부 확인
 			if (GUI->GetObjectEditorUI()->IsSnapEnabled())

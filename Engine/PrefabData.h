@@ -25,6 +25,12 @@ struct PrefabObjectData
     Vec3 Scale;
     Vec3 Rotation;
     Vec3 Translation;
+
+    Vec3 EmissiveColor;
+    float EmissivePower;
+
+    Vec3 SpecularColor;
+    float Shininess;
 };
 
 struct PrefabCharacterData

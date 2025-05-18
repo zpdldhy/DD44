@@ -34,7 +34,7 @@ public:
 	{
 		m_pMapEditorUI->SetOnCreateCallback(std::move(callback));
 	}
-	void SetObjectEditorCallback(std::function<void(const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)> callback)
+	void SetObjectEditorCallback(std::function<void(const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float)> callback)
 	{
 		m_pObjectEditorUI->SetOnCreateCallback(std::move(callback));
 	}

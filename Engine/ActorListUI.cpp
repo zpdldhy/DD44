@@ -128,6 +128,7 @@ void ActorListUI::DrawUI()
             Vec3 pos = actor->GetPosition();
             Vec3 rot = actor->GetRotation();
             Vec3 scale = actor->GetScale();
+            
             ImGui::Text("Position: %.2f, %.2f, %.2f", pos.x, pos.y, pos.z);
             ImGui::Text("Rotation: %.2f, %.2f, %.2f", rot.x, rot.y, rot.z);
             ImGui::Text("Scale: %.2f, %.2f, %.2f", scale.x, scale.y, scale.z);

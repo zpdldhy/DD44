@@ -147,7 +147,9 @@ void Game::SetupMapEditorCallback()
 
 void Game::SetupObjectEditorCallback()
 {
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale
+		, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
 		{
 			AssimpLoader loader;
 			vector<MeshData> meshList = loader.Load(objPath);
