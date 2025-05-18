@@ -96,7 +96,7 @@ void ObjectEditorUI::DrawUI()
         if (ImGui::Button("Load Prefab##List"))
         {
             PrefabObjectData data;
-            std::string path = "../Resources/Prefab/" + selectedPrefabName + ".object.json";
+            std::string path = "../Resources/Prefab/" + selectedPrefabName + ".json";
             if (PREFAB->LoadObject(path, data))
             {
                 if (m_OnCreate)

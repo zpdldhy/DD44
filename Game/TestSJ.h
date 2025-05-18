@@ -33,5 +33,7 @@ public:
 	vector<shared_ptr<class UMeshComponent>> m_vMeshList;
 	shared_ptr<class APawn> m_pSwordActor;
 
+	void SetupObjectEditorCallback();
+	void LoadAllPrefabs(const std::string& extension);
 };
 

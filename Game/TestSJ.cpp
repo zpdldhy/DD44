@@ -18,9 +18,14 @@
 #include "ObjectManager.h"
 #include "LightManager.h"
 #include "PostProcessManager.h"
+#include "AssimpLoader.h"
+#include "ATerrainTileActor.h"
 
 void TestSJ::Init()
 {
+	SetupObjectEditorCallback();
+	LoadAllPrefabs(".object.json");
+
 	SOUNDMANAGER->LoadAllSounds();
 
 	LIGHTMANAGER->Init();
@@ -162,10 +167,10 @@ void TestSJ::Init()
 	OBJECT->AddActor(m_pPointLight);
 	OBJECT->AddActor(m_pLight);
 	OBJECT->AddActor(m_pCameraActor);
-	OBJECT->AddActor(m_pActor);
-	OBJECT->AddActor(m_pActor2);
+	//OBJECT->AddActor(m_pActor);
+	//OBJECT->AddActor(m_pActor2);
 	OBJECT->AddActor(m_pSky);
-	OBJECT->AddActor(m_pSwordActor);
+	//OBJECT->AddActor(m_pSwordActor);
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pLight);
@@ -508,4 +513,120 @@ void TestSJ::Render()
 	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
 	//	D2D1::ColorF::White                   // 메인 텍스트 색
 	//);
+}
+
+void TestSJ::SetupObjectEditorCallback()
+{
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+		{
+			AssimpLoader loader;
+			vector<MeshData> meshList = loader.Load(objPath);
+			if (meshList.empty())
+				return;
+
+			auto meshComp = make_shared<UStaticMeshComponent>();
+			meshComp->SetMeshPath(to_mw(objPath));
+
+			auto meshRes = make_shared<UStaticMeshResources>();
+			meshRes->SetVertexList(meshList[0].m_vVertexList);
+			meshRes->SetIndexList(meshList[0].m_vIndexList);
+			meshRes->Create();
+
+			meshComp->SetMesh(meshRes);
+
+			auto mat = make_shared<UMaterial>();
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+			meshComp->SetMaterial(mat);
+
+			// Snap 적용 여부 확인
+			if (GUI->GetObjectEditorUI()->IsSnapEnabled())
+			{
+				pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
+			}
+
+			auto actor = make_shared<APawn>();
+			actor->m_szName = L"Object";
+
+			actor->SetMeshComponent(meshComp);
+			actor->SetPosition(pos);
+			actor->SetRotation(rot);
+			actor->SetScale(scale);
+
+			OBJECT->AddActor(actor);
+		});
+}
+
+void TestSJ::LoadAllPrefabs(const std::string& extension)
+{
+	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
+
+	for (const auto& file : files)
+	{
+		if (extension == ".map.json")
+		{
+			PrefabMapData mapData;
+			if (PREFAB->LoadMapTile(file, mapData))
+			{
+				auto tile = std::make_shared<ATerrainTileActor>();
+				tile->m_szName = L"Terrain";
+				tile->m_iNumCols = mapData.Cols;
+				tile->m_iNumRows = mapData.Rows;
+				tile->m_fCellSize = mapData.CellSize;
+				tile->CreateTerrain(to_mw(mapData.TexturePath), to_mw(mapData.ShaderPath));
+				tile->SetPosition(mapData.Position);
+				tile->SetRotation(mapData.Rotation);
+				tile->SetScale(mapData.Scale);
+				OBJECT->AddActor(tile);
+			}
+		}
+		else if (extension == ".character.json")
+		{
+			PrefabCharacterData characterData;
+			if (PREFAB->LoadCharacter(file, characterData))
+			{
+				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
+				actor->m_szName = L"Character";
+				actor->SetPosition(characterData.Translation);
+				actor->SetRotation(characterData.Rotation);
+				actor->SetScale(characterData.Scale);
+				OBJECT->AddActor(actor);
+			}
+		}
+		else if (extension == ".object.json")
+		{
+			PrefabObjectData objData;
+			if (PREFAB->LoadObject(file, objData))
+			{
+				auto meshComp = make_shared<UStaticMeshComponent>();
+				meshComp->SetMeshPath(to_mw(objData.MeshPath));
+
+				auto meshRes = make_shared<UStaticMeshResources>();
+				AssimpLoader loader;
+				vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
+				if (!meshList.empty())
+				{
+					meshRes->SetVertexList(meshList[0].m_vVertexList);
+					meshRes->SetIndexList(meshList[0].m_vIndexList);
+					meshRes->Create();
+					meshComp->SetMesh(meshRes);
+				}
+
+				auto material = make_shared<UMaterial>();
+				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
+				meshComp->SetMaterial(material);
+
+				auto obj = make_shared<APawn>();
+				obj->SetActorName(L"Object");
+				obj->SetMeshComponent(meshComp);
+				obj->SetPosition(objData.Translation);
+				obj->SetRotation(objData.Rotation);
+				obj->SetScale(objData.Scale);
+
+				OBJECT->AddActor(obj);
+			}
+		}
+	}
 }

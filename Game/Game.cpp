@@ -16,6 +16,7 @@ void Game::Init()
 	SetupEditorCallbacks();
 
 	LoadAllPrefabs(".map.json");
+	LoadAllPrefabs(".object.json");
 
 	SetupEngineCamera();
 	SetupSkybox();
@@ -226,15 +227,35 @@ void Game::LoadAllPrefabs(const std::string& extension)
 		}
 		else if (extension == ".object.json")
 		{
-			PrefabData objData;
-			if (PREFAB->Load(file, objData))
+			PrefabObjectData objData;
+			if (PREFAB->LoadObject(file, objData))
 			{
-				auto actor = std::make_shared<AActor>(); // 필요에 따라 오브젝트 타입으로 변경
-				actor->m_szName = L"Object";
-				actor->SetPosition(objData.Translation);
-				actor->SetRotation(objData.Rotation);
-				actor->SetScale(objData.Scale);
-				OBJECT->AddActor(actor);
+				auto meshComp = make_shared<UStaticMeshComponent>();
+				meshComp->SetMeshPath(to_mw(objData.MeshPath));
+
+				auto meshRes = make_shared<UStaticMeshResources>();
+				AssimpLoader loader;
+				vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
+				if (!meshList.empty())
+				{
+					meshRes->SetVertexList(meshList[0].m_vVertexList);
+					meshRes->SetIndexList(meshList[0].m_vIndexList);
+					meshRes->Create();
+					meshComp->SetMesh(meshRes);
+				}
+
+				auto material = make_shared<UMaterial>();
+				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
+				meshComp->SetMaterial(material);
+
+				auto obj = make_shared<APawn>();
+				obj->SetActorName(L"Object");
+				obj->SetMeshComponent(meshComp);
+				obj->SetPosition(objData.Translation);
+				obj->SetRotation(objData.Rotation);
+				obj->SetScale(objData.Scale);
+
+				OBJECT->AddActor(obj);
 			}
 		}
 	}
