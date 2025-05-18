@@ -39,8 +39,6 @@ public:
 	bool m_bDelete = false;	
 	bool m_bUpdateQuadTree = false;
 
-	void SetActorName(wstring _name) { m_szName = _name; }
-
 	//--------------------------------------------------------------------------------------
 	// Component
 	//--------------------------------------------------------------------------------------

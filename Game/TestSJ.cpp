@@ -622,7 +622,7 @@ void TestSJ::LoadAllPrefabs(const std::string& extension)
 				meshComp->SetMaterial(material);
 
 				auto obj = make_shared<APawn>();
-				obj->SetActorName(L"Object");
+				obj->m_szName = L"Object";
 				obj->SetMeshComponent(meshComp);
 				obj->SetPosition(objData.Translation);
 				obj->SetRotation(objData.Rotation);
