@@ -15,14 +15,16 @@ void ObjectEditorUI::DrawUI()
     DrawVec3Slider("Rotation", m_fRotation, -360.f, 360.f);
     DrawVec3Slider("Scale", m_fScale, 0.01f, 10.f);
 
-    ImGui::Separator(); ImGui::Spacing();
+    ImGui::Spacing();
 
     ImGui::Checkbox("Snap to Grid", &m_bSnapEnabled);
 
-    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Transform 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
+    ImGui::Separator(); ImGui::Spacing();
+
+    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Lighting 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式-
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "SpecularColor");
     DrawVec3Slider("SpecularColor", m_fSpecularColor, 0.f, 1.f);
-    ImGui::InputFloat("Specular", &m_fShininess, 0.0f, 0.0f, "%.2f");
+    ImGui::InputFloat("Shininess", &m_fShininess, 0.0f, 0.0f, "%.2f");
     
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "EmissiveColor");
     DrawVec3Slider("EmissiveColor", m_fEmissiveColor, 0.f, 1.f);

@@ -517,8 +517,7 @@ void TestSJ::Render()
 
 void TestSJ::SetupObjectEditorCallback()
 {
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale
-		, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 specularColor, float shininess, Vec3 emissiveColor, float emissivePower)
 		{
 			AssimpLoader loader;
 			vector<MeshData> meshList = loader.Load(objPath);
@@ -540,8 +539,8 @@ void TestSJ::SetupObjectEditorCallback()
 				std::wstring(texPath, texPath + strlen(texPath)),
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
 			);
-			mat->SetEmissiveParams(EmissiveColor, Emissivepower);
-			mat->SetSpecularParams(SpecularColor, shininess);
+			mat->SetEmissiveParams(emissiveColor, emissivePower);
+			mat->SetSpecularParams(specularColor, shininess);
 			meshComp->SetMaterial(mat);
 			
 
