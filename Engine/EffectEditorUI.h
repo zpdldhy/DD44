@@ -7,7 +7,7 @@ class EffectEditorUI
 public:
     void DrawUI();
 
-    void SetEffectApplyCallback(std::function<void(int, float, Vec3, float, Vec3, float)> callback)
+    void SetEffectApplyCallback(std::function<void(int, float, Vec3, Vec3, float)> callback)
     {
         m_OnEffectApply = std::move(callback);
     }
@@ -16,9 +16,6 @@ public:
     {
         m_OnLightApply = std::move(callback);
     }
-
-
-
 
     // 이펙트 관련 Getter
     float GetGlowPower() const { return m_fGlowPower; }
@@ -43,7 +40,7 @@ private:
     float m_vEmissiveColor[3] = { 1.0f, 1.0f, 1.0f };
     float m_fEmissivePower = 0.0f;
 
-    std::function<void(int, float, Vec3, float, Vec3, float)> m_OnEffectApply;
+    std::function<void(int, float, Vec3, Vec3, float)> m_OnEffectApply;
 
     // 광원 파라미터
     int m_iSelectedLightType = 0;

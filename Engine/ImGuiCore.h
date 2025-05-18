@@ -38,7 +38,7 @@ public:
 	{
 		m_pObjectEditorUI->SetOnCreateCallback(std::move(callback));
 	}
-	void SetEffectEditorCallback(std::function<void(int, float, Vec3, float, Vec3, float)> callback)
+	void SetEffectEditorCallback(std::function<void(int, float, Vec3, Vec3, float)> callback)
 	{
 		m_pEffectEditorUI->SetEffectApplyCallback(std::move(callback));
 	}

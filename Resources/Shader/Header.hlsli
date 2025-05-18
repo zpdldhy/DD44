@@ -3,8 +3,6 @@
 #define MAX_BONE 250
 #define MAX_LIGHTS 4
 
-static const float g_fShininess = 32.0f;
-
 cbuffer cb0 : register(b0)
 {
     row_major matrix g_matWorld;
@@ -14,37 +12,49 @@ cbuffer CameraBuffer : register(b1)
 {
     row_major matrix g_matView;
     row_major matrix g_matProj;
+    float3 g_vCameraPos;
+    float dummy_camera;
 };
 
-cbuffer cbGlowFX : register(b2)
+cbuffer CB_MaterialEffect : register(b2)
 {
-    float g_fGlowPower; // 발광 세기
+    // Glow + HitFlash
+    float g_fGlowPower;
     float3 padding_glow;
-    float3 g_vGlowColor; // 발광 색상
-    float dummy_glow;
+    float3 g_vGlowColor;
     float g_fHitFlashTime;
-}
-cbuffer cbDissolve : register(b3)
-{
-    float g_fDissolveThreshold;
-}
-cbuffer CB_UVDistortion : register(b4)
-{
-    float g_fDistortionStrength; // 왜곡 세기 (예: 0.01 ~ 0.1)
-    float g_fWaveSpeed; // 시간 흐름 속도 (예: 1.0)
-    float g_fWaveFrequency; // 파장 (예: 10.0)
-    float g_fDistortionTime; // 누적 시간 (프레임마다 누적됨)
+
+    // UV Distortion
+    float g_fDistortionStrength;
+    float g_fWaveSpeed;
+    float g_fWaveFrequency;
+    float g_fDistortionTime;
+
+    // Emissive
+    float3 g_vEmissiveColor; // 자발광 색상
+    float g_fEmissivePower;
+    
+    // [Light 반응 계수]
+    float3 g_vAmbientCoeff; // 주변광 반응도
+    float g_fAmbientPower;
+
+    float3 g_vDiffuseCoeff; // 난반사 반응도
+    float g_fDiffusePower;
+
+    float3 g_vSpecularCoeff; // 정반사 색상
+    float g_fShininess;
 };
+
+
+//cbuffer cbDissolve : register(b3)
+//{
+//    float g_fDissolveThreshold;
+//}
 
 cbuffer AnimationBuffer : register(b5)
 {
     matrix obj_matAnim[MAX_BONE];
 }
-cbuffer CB_Camera : register(b6)
-{
-    float3 g_vCameraPos;
-    float dummy_camera;
-};
 
 cbuffer CB_RenderMode : register(b7)
 {
@@ -72,12 +82,6 @@ cbuffer CB_LightArray : register(b8)
 cbuffer InverseBoneBuffer : register(b9)
 {
     matrix obj_matBone[MAX_BONE];
-}
-
-cbuffer CB_Emissive : register(b10)
-{
-    float3 g_vEmissiveColor;
-    float g_fEmissivePower;
 }
 
 cbuffer CB_Blur : register(b11)
@@ -262,10 +266,12 @@ float3 ApplyLambertLighting(float3 normal, float3 worldPos)
         }
 
         float NdotL = saturate(dot(normal, lightDir));
-        result += UnpackLightColor(i) * NdotL * UnpackIntensity(i) * attenuation;
+        result += UnpackLightColor(i) * NdotL * UnpackIntensity(i) * attenuation * g_vDiffuseCoeff * g_fDiffusePower;
     }
     return result;
 }
+
+
 
 float3 ApplySpecular(float3 normal, float3 worldPos)
 {
@@ -298,18 +304,22 @@ float3 ApplySpecular(float3 normal, float3 worldPos)
         }
 
         float3 N = normalize(normal);
-        float3 V = normalize(g_vCameraPos - worldPos);
+        float3 V = normalize(g_vCameraPos - worldPos); // ← 여기 반대 실험도 가능
         float3 R = reflect(-lightDir, N);
 
+        float NdotL = dot(N, lightDir);
+        if (NdotL <= 0.0f)
+            continue; // ← Backface 억제
+
         float spec = pow(saturate(dot(R, V)), g_fShininess);
-        result += UnpackLightColor(i) * spec * UnpackIntensity(i) * attenuation * 10.0f;
+        result += UnpackLightColor(i) * spec * UnpackIntensity(i) * attenuation * g_vSpecularCoeff;
     }
     return result;
 }
 
 float3 ApplyAmbient()
 {
-    return UnpackAmbientColor(0) * UnpackAmbientPower(0);
+    return UnpackAmbientColor(0) * UnpackAmbientPower(0) * g_vAmbientCoeff * g_fAmbientPower;
 }
 
 #endif

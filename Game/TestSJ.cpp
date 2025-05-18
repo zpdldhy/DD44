@@ -40,8 +40,17 @@ void TestSJ::Init()
 		m_pActor->SetPosition({ 0.0f, 0.0f, 0.0f });
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
+		
+
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
+
+		material->SetDiffuseParams(Vec3(1.0f, 1.0f, 1.0f), 1.0f);
+		material->SetAmbientParams(Vec3(0.5f, 0.5f, 0.5f), 1.0f);
+		material->SetSpecularParams(Vec3(1.0f, 1.0f, 1.0f), 64.0f);
+		material->SetEmissiveParams(Vec3(0, 0, 0), 0.0f);
+
+
 		m_pStaticMesh->SetMaterial(material);
 		
 	}
@@ -76,17 +85,14 @@ void TestSJ::Init()
 		m_pSkyMesh->SetMaterial(material);
 	}
 
-	{
-		auto noiseTex = TEXTURE->Load(L"../Resources/Texture/Noise.png");
-		m_pStaticMesh->GetMaterial()->SetNoiseTexture(noiseTex);
-	}
+	
 
 	
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 
 	GUI->SetEffectEditorCallback(
-		[this](int selected, float glowPower, Vec3 glowColor, float dissolveThreshold, Vec3 emissiveColor, float emissivePower) {
+		[this](int selected, float glowPower, Vec3 glowColor, Vec3 emissiveColor, float emissivePower) {
 			if (selected == 0 && m_pStaticMesh)
 			{
 				targetMat = m_pStaticMesh->GetMaterial();
@@ -99,7 +105,6 @@ void TestSJ::Init()
 			if (targetMat)
 			{
 				targetMat->SetGlowParams(glowPower, glowColor);
-				targetMat->SetDissolveParams(dissolveThreshold);
 				targetMat->SetEmissiveParams(emissiveColor, emissivePower);
 			}
 		}
@@ -142,19 +147,19 @@ void TestSJ::Init()
 
 	}
 
-	//{
-	//	m_pPointLight = make_shared<ALight>();
+	{
+		m_pPointLight = make_shared<ALight>();
 
-	//	m_pPointLight->SetPosition(Vec3(10.0f, 10.0f, 10.0f)); // ´«¿¡ ¶çµµ·Ï À§·Î ¶ç¿ò
+		m_pPointLight->SetPosition(Vec3(10.0f, 10.0f, 10.0f)); // ´«¿¡ ¶çµµ·Ï À§·Î ¶ç¿ò
 
-	//	auto lightComp = m_pPointLight->GetLightComponent();
-	//	lightComp->SetLightType(ELightType::Point);
-	//	lightComp->SetColor(Vec3(0.0f, 0.3f, 1.0f));     // ÆÄ¶õºû
-	//	lightComp->SetIntensity(2.0f);
-	//	lightComp->SetRange(20.0f);                      // ºû ÆÛÁü Á¤µµ
-	//}
+		auto lightComp = m_pPointLight->GetLightComponent();
+		lightComp->SetLightType(ELightType::Point);
+		lightComp->SetColor(Vec3(0.0f, 0.3f, 1.0f));     // ÆÄ¶õºû
+		lightComp->SetIntensity(2.0f);
+		lightComp->SetRange(20.0f);                      // ºû ÆÛÁü Á¤µµ
+	}
 
-	/*OBJECT->AddActor(m_pPointLight);*/
+	OBJECT->AddActor(m_pPointLight);
 	OBJECT->AddActor(m_pLight);
 	OBJECT->AddActor(m_pCameraActor);
 	OBJECT->AddActor(m_pActor);
@@ -164,13 +169,13 @@ void TestSJ::Init()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pLight);
-	/*LIGHTMANAGER->RegisterLight(m_pPointLight); */
+	LIGHTMANAGER->RegisterLight(m_pPointLight); 
 }
 
 void TestSJ::Update()
 {
-	/*m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
-	LIGHTMANAGER->UpdateLightCB();*/
+	m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	LIGHTMANAGER->UpdateLightCB();
 	// ¿ÀºêÁ§Æ® È¸Àü
 	{
 		static float angle = 0.0f;
@@ -188,15 +193,15 @@ void TestSJ::Update()
 		m_pActor2->SetPosition(newPos);
 	}
 	//Rim Light
-	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+	/*if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 	{
 		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetLocalPosition();
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
 		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
-	}
+	}*/
 	//Emissive
 	{
-		m_pStaticMesh2->GetMaterial()->SetEmissiveParams(Vec3(0.0f, 1.0f, 0.0f), 0.1f);
+		//m_pStaticMesh2->GetMaterial()->SetEmissiveParams(Vec3(0.0f, 1.0f, 0.0f), 0.1f);
 
 	}
 	//UVDistortion
@@ -490,6 +495,8 @@ void TestSJ::Update()
 	POSTPROCESS->SetBlurScale(m_fBlurScale);
 
 	LIGHTMANAGER->UpdateLightCB();
+
+	
 }
 
 void TestSJ::Render()

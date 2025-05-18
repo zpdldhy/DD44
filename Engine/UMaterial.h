@@ -9,35 +9,46 @@ enum class ERenderMode
 	Silhouette = 1,
 };
 
-struct CB_GLOW
+
+struct CB_MaterialEffect
 {
 	float g_fGlowPower;
-	float padding[3];
+	float padding0[3];
 	Vec3 g_vGlowColor;
-	float dummy = 0.0f;
 	float g_fHitFlashTime;
-	float padding2[3];
-};
 
-struct CB_DISSOLVE
-{
-	float g_fDissolveThreshold;
-	float padding[3];
-};
-
-struct CB_UVDistortion
-{
 	float g_fDistortionStrength;
 	float g_fWaveSpeed;
 	float g_fWaveFrequency;
 	float g_fDistortionTime;
+
+	Vec3   g_vEmissiveColor;
+	float  g_fEmissivePower;
+
+	Vec3   g_vAmbientCoeff = Vec3(1,1,1);    
+	float  g_fAmbientPower = 1.0f;
+
+	Vec3   g_vDiffuseCoeff = Vec3(1, 1, 1);
+	float  g_fDiffusePower = 1.0f;
+
+	Vec3   g_vSpecularCoeff = Vec3(1,1,1);   
+	float  g_fShininess = 32.0f;
 };
 
-struct CB_CAMERA
+struct CB_Material
 {
-	Vec3 g_vCameraPos;
-	float padding;
+	Vec4 vAmbient;
+	Vec4 vDiffuse;
+	Vec4 vSpecular; // a = shininess
+	Vec4 vEmissive;
 };
+
+// 현재 dissolve기능 삭제
+//struct CB_DISSOLVE
+//{
+//	float g_fDissolveThreshold;
+//	float padding[3];
+//};
 
 struct CB_RMB
 {
@@ -45,11 +56,6 @@ struct CB_RMB
 	Vec3 padding;
 };
 
-struct CB_EMISSIVE
-{
-	Vec3 g_vEmissiveColor = Vec3(0, 0, 0);
-	float g_fEmissivePower = 0.0f;
-};
 
 class UMaterial
 {
@@ -62,52 +68,36 @@ class UMaterial
 	shared_ptr<Texture> m_pTexture = nullptr;
 	shared_ptr<Inputlayout> m_pInputlayout = nullptr;
 	ComPtr<ID3D11ShaderResourceView> m_pTexSRV;
-	ComPtr<ID3D11Buffer> m_pGlowCB;
-	ComPtr<ID3D11Buffer> m_pDissolveCB;
-	ComPtr<ID3D11ShaderResourceView> m_pNoiseSRV;
-	ComPtr<ID3D11Buffer> m_pUVDistortionCB;
-	ComPtr<ID3D11Buffer> m_pCameraCB;
+
+	ComPtr<ID3D11Buffer> m_pEffectCB; // 통합 CB
 	ComPtr<ID3D11Buffer> m_pRenderModeBuffer;
-	ComPtr<ID3D11Buffer> m_pEmissiveCB;
-public:
-	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
-	void SetHitFlashTime(float _flashTime);
-	void UpdateGlowBuffer();
-	void UpdateDissolveBuffer();
-	void UpdateUVDistortionBuffer(float _deltaTime);
-	void UpdateCameraBuffer();
-	void UpdateRenderModeBuffer();
-	void UpdateEmissiveBuffer();
-	void CreateGlowCB();
-	void CreateDissolveCB();
-	void CreateUVDistortionCB();
-	void CreateCameraCB();
-	void CreateRenderModeCB();
-	void CreateEmissiveCB();
-	void SetDissolveParams(float _threshold);
-	void SetNoiseTexture(std::shared_ptr<Texture> _tex);
-	void SetUVDistortionParams(float _strength, float _speed, float _frequency);
-	void SetCameraPos(const Vec3& _cameraPos);
-	void SetRenderMode(ERenderMode _eMode);
-	void SetEmissiveParams(const Vec3& _color, float _power);
 
-	void SetUseStencil(bool _bUseStencil) { m_bUseStencil = _bUseStencil; }
-	bool IsUseStencil() { return m_bUseStencil; }
-	
-
-public:
-	CB_GLOW m_tGlowData = { 0.0f, };
-	CB_DISSOLVE m_tDissolveData = { 0.0f };
-	CB_UVDistortion m_tUVDistortion = { };
-	CB_CAMERA m_tCameraData;
+	CB_MaterialEffect m_tEffectData = {};
 	CB_RMB m_tRenderModeData;
 	ERenderMode m_eRenderMode = ERenderMode::Default;
-	CB_EMISSIVE m_tEmissiveData;
-	
+
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);
 	virtual void Bind();
 
+	void CreateEffectCB();
+	void CreateRenderModeCB();
+
+	void UpdateEffectBuffer();
+	void UpdateRenderModeBuffer();
+			
+	void SetRenderMode(ERenderMode _eMode);
+	void SetEmissiveParams(const Vec3& _color, float _power);
+	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
+	void SetHitFlashTime(float _flashTime);
+	void SetUVDistortionParams(float _strength, float _speed, float _frequency);
+	void SetAmbientParams(const Vec3& _coeff, float _power);
+	void SetDiffuseParams(const Vec3& _coeff, float _power);
+	void SetSpecularParams(const Vec3& _coeff, float _shininess);
+
+	void SetUseStencil(bool _bUseStencil) { m_bUseStencil = _bUseStencil; }
+	bool IsUseStencil() { return m_bUseStencil; }
+	
 public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
 	virtual void SetTexture(shared_ptr<Texture> _texture) { m_pTexture = _texture; }
