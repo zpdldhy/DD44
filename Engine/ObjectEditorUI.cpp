@@ -75,10 +75,10 @@ void ObjectEditorUI::DrawUI()
         data.Scale = Vec3(m_fScale[0], m_fScale[1], m_fScale[2]);
         data.Rotation = Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]);
         data.Translation = Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]);
-        data.EmissiveColor = Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]);
         data.SpecularColor = Vec3(m_fSpecularColor[0], m_fSpecularColor[1], m_fSpecularColor[2]);
-        data.EmissivePower = m_fEmissivePower;
         data.Shininess = m_fShininess;
+        data.EmissiveColor = Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]);
+        data.EmissivePower = m_fEmissivePower;
 
         PrefabLoader().SaveObject(data, "../Resources/Prefab/" + data.Name + ".object.json");
     }
@@ -97,16 +97,16 @@ void ObjectEditorUI::DrawUI()
             m_fRotation[0] = data.Rotation.x; m_fRotation[1] = data.Rotation.y; m_fRotation[2] = data.Rotation.z;
             m_fPosition[0] = data.Translation.x; m_fPosition[1] = data.Translation.y; m_fPosition[2] = data.Translation.z;
 
-            m_fEmissiveColor[0] = data.EmissiveColor.x;
-            m_fEmissiveColor[1] = data.EmissiveColor.y;
-            m_fEmissiveColor[2] = data.EmissiveColor.z;
-
             m_fSpecularColor[0] = data.SpecularColor.x;
             m_fSpecularColor[1] = data.SpecularColor.y;
             m_fSpecularColor[2] = data.SpecularColor.z;
-
-            m_fEmissivePower = data.EmissivePower;
             m_fShininess = data.Shininess;
+
+            m_fEmissiveColor[0] = data.EmissiveColor.x;
+            m_fEmissiveColor[1] = data.EmissiveColor.y;
+            m_fEmissiveColor[2] = data.EmissiveColor.z;
+            m_fEmissivePower = data.EmissivePower;
+
         }
     }
 

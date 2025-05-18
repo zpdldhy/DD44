@@ -233,9 +233,9 @@ bool PrefabLoader::SaveObject(const PrefabObjectData& _prefab, const std::string
     j["Rotation"] = { _prefab.Rotation.x, _prefab.Rotation.y, _prefab.Rotation.z };
     j["Translation"] = { _prefab.Translation.x, _prefab.Translation.y, _prefab.Translation.z };
     j["SpecularColor"] = { _prefab.SpecularColor.x,_prefab.SpecularColor.y ,_prefab.SpecularColor.z };
-    j["Shininess"] = { _prefab.Shininess };
+    j["Shininess"] = _prefab.Shininess;
     j["EmissiveColor"] = { _prefab.EmissiveColor.x,_prefab.EmissiveColor.y ,_prefab.EmissiveColor.z };
-    j["EmissivePower"] = { _prefab.EmissivePower };
+    j["EmissivePower"] = _prefab.EmissivePower;
 
     std::ofstream file(_filePath);
     if (!file.is_open()) return false;
