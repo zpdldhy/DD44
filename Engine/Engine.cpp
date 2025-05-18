@@ -17,6 +17,7 @@
 #include "ObjectManager.h"
 #include "PostProcessManager.h"
 #include "CollisionManager.h"
+#include "LightManager.h"
 
 void Engine::Init()
 {
@@ -57,6 +58,8 @@ void Engine::Frame()
 	// Object Tick
 	{
 		OBJECT->Tick();
+		LIGHTMANAGER->UpdateLightCB();
+
 		UI->Tick();
 		COLLITION->CheckCollision(OBJECT->GetActorIndexList());
 	}

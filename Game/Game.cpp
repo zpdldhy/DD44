@@ -10,6 +10,8 @@
 #include "EngineCameraMoveScript.h"
 #include "PlayerMoveScript.h"
 #include "AssimpLoader.h"
+#include "LightManager.h"
+#include "ALight.h"
 
 void Game::Init()
 {
@@ -20,6 +22,7 @@ void Game::Init()
 
 	SetupEngineCamera();
 	SetupSkybox();
+	SetupSunLight();
 }
 
 void Game::Update()
@@ -58,6 +61,22 @@ void Game::SetupSkybox()
 	m_pSkyMesh->SetMaterial(material);
 
 	OBJECT->AddActor(m_pSky);
+}
+
+void Game::SetupSunLight()
+{
+	LIGHTMANAGER->Init();
+	
+	m_pSunLight = make_shared<ALight>();
+	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
+	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
+	m_pSunLight->SetPosition(Vec3(0, 100.0f, 0));
+	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+	OBJECT->AddActor(m_pSunLight);
+	
+	LIGHTMANAGER->Clear();
+	LIGHTMANAGER->RegisterLight(m_pSunLight);
 }
 
 void Game::SetupEditorCallbacks()
