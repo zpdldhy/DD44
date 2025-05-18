@@ -38,6 +38,7 @@ void CameraManager::Render(CameraViewType _ViewType)
 
 	m_CameraData.matView = pCurrentComponent->GetView();
 	m_CameraData.matProjection = pCurrentComponent->GetProjection();
+	m_CameraData.g_vCameraPos = pCurrentComponent->GetOwner()->GetCameraComponent()->GetWorldPosition();
 
 	DC->UpdateSubresource(m_pCameraCB.Get(), 0, nullptr, &m_CameraData, 0, 0);
 	DC->VSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());

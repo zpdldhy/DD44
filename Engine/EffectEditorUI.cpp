@@ -21,10 +21,6 @@ void EffectEditorUI::DrawUI()
     ImGui::SliderFloat("Glow Power", &glowPower, 0.0f, 5.0f);
     ImGui::ColorEdit3("Glow Color", glowColor);
 
-    // --- Dissolve ---
-    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Dissolve");
-    static float dissolveThreshold = 0.0f;
-    ImGui::SliderFloat("Dissolve", &dissolveThreshold, 0.0f, 1.0f);
 
     // --- Emissive ---
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Emissive");
@@ -42,7 +38,6 @@ void EffectEditorUI::DrawUI()
             m_iSelectedActor,
             glowPower,
             Vec3(glowColor[0], glowColor[1], glowColor[2]),
-            dissolveThreshold,
             Vec3(emissiveColor[0], emissiveColor[1], emissiveColor[2]),
             emissivePower
         );
@@ -55,7 +50,6 @@ void EffectEditorUI::DrawUI()
             m_iSelectedActor,
             glowPower,
             Vec3(glowColor[0], glowColor[1], glowColor[2]),
-            dissolveThreshold,
             Vec3(emissiveColor[0], emissiveColor[1], emissiveColor[2]),
             emissivePower
         );
