@@ -54,6 +54,10 @@ void Collision::Init()
 
 void Collision::CheckCollision(vector<UINT> _vActorIndex)
 {
+	// 현재 Quad에 아무 Object가 없을 때 바로 종료
+	if (_vActorIndex.empty())
+		return;
+
 	// Collision이 있는 Actor의 List를 가져온다.
 	vector<shared_ptr<AActor>> vActorList;
 
@@ -62,6 +66,7 @@ void Collision::CheckCollision(vector<UINT> _vActorIndex)
 
 	for(auto& pObj : vActorList)
 	{
+		pObj->m_bCollision = true;		// 임시
 		if (pObj->m_bCollision == false) continue;
 
 		auto objShape = pObj->GetShapeComponent();

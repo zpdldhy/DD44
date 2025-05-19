@@ -18,7 +18,7 @@ class CameraManager : public Singleton<CameraManager>
 	ComPtr<ID3D11Buffer> m_pCameraCB;
 	CameraConstantData m_CameraData;
 
-	shared_ptr<class AActor> m_p3DCameraActor = nullptr;
+	shared_ptr<class AActor> m_p3DCameraActor = nullptr;	// 3D Camera
 	shared_ptr<class AActor> m_pUICameraActor = nullptr;	// Canvers
 	shared_ptr<class UCameraComponent> m_p3DComponent = nullptr;
 	shared_ptr<class UCameraComponent> m_pUIComponent = nullptr;

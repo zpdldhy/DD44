@@ -54,6 +54,9 @@ void QuadTree::Subdivide(QuadTreeNode* node, int depth, int maxDepth)
     for (int i = 0; i < 4; ++i)
     {
         Subdivide(node->pChildren[i].get(), depth + 1, maxDepth);
+
+        if (depth + 1 == maxDepth)
+			m_pLeafs.push_back(node->pChildren[i].get()); // 리프 노드 저장
     }
 }
 
