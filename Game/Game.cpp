@@ -39,44 +39,46 @@ void Game::Destroy()
 
 void Game::SetupEngineCamera()
 {
-	m_pCameraActor = make_shared<ACameraActor>();
+	auto pCameraActor = make_shared<ACameraActor>();
 	
-	m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
-	m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
-	m_pCameraActor->m_szName = L"EnginCamera";
+	pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
+	pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
+	pCameraActor->m_szName = L"EnginCamera";
 
-	CAMERA->Set3DCameraActor(m_pCameraActor);
-	OBJECT->AddActor(m_pCameraActor);
+	CAMERA->Set3DCameraActor(pCameraActor);
+	OBJECT->AddActor(pCameraActor);
 }
 
 void Game::SetupSkybox()
 {
-	m_pSky = make_shared<ASky>();
-	m_pSky->m_szName = L"Sky";
-	m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
-	m_pSky->SetMeshComponent(m_pSkyMesh);
+	auto pSky = make_shared<ASky>();
+	pSky->m_szName = L"Sky";
+
+	auto pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
+	pSky->SetMeshComponent(pSkyMesh);
 
 	shared_ptr<UMaterial> material = make_shared<UMaterial>();
 	material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
-	m_pSkyMesh->SetMaterial(material);
+	pSkyMesh->SetMaterial(material);
 
-	OBJECT->AddActor(m_pSky);
+	OBJECT->AddActor(pSky);
 }
 
 void Game::SetupSunLight()
 {
 	LIGHTMANAGER->Init();
 	
-	m_pSunLight = make_shared<ALight>();
-	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
-	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
-	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
-	m_pSunLight->SetPosition(Vec3(0, 100.0f, 0));
-	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-	OBJECT->AddActor(m_pSunLight);
+	auto pSunLight = make_shared<ALight>();
+	pSunLight->m_szName = L"SunLight";
+	pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
+	pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
+	pSunLight->SetPosition(Vec3(0, 100.0f, 0));
+	pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+	OBJECT->AddActor(pSunLight);
 	
 	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pSunLight);
+	LIGHTMANAGER->RegisterLight(pSunLight);
 }
 
 void Game::SetupEditorCallbacks()
