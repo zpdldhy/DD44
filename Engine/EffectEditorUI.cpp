@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "EffectEditorUI.h"
 #include "imgui.h"
+#include "PostProcessManager.h"
 
 void EffectEditorUI::DrawUI()
 {
@@ -89,4 +90,20 @@ void EffectEditorUI::DrawUI()
             ambientPower
         );
     }
+
+    // --- Debug View Mode ---
+    ImGui::Separator(); ImGui::Spacing();
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Debug View Mode");
+
+    static const char* debugModes[] =
+    {
+        "Final Output", "Original", "Blur", "Blur Mask", "Bloom",
+        "Bloom Mask", "Light", "Normal", "Edge Detection"
+    };
+
+    static int selectedDebugMode = 0;
+    ImGui::Combo("Debug Mode", &selectedDebugMode, debugModes, IM_ARRAYSIZE(debugModes));
+
+    // ¿¬µ¿
+    POSTPROCESS->SetDebugMode(selectedDebugMode);
 }

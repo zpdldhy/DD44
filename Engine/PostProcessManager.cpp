@@ -23,17 +23,8 @@ void PostProcessManager::Init(UINT _count)
 		m_vSRTList.emplace_back(pMRT->GetSRV());	// MRT 결과로 나오는 Texture
 	}
 
-	{
-		D3D11_BUFFER_DESC bd = {};
-		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = sizeof(CB_Blur);
-		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		bd.CPUAccessFlags = 0;
-
-		HRESULT hr = DEVICE->CreateBuffer(&bd, nullptr, m_pBlurCB.GetAddressOf());
-		assert(SUCCEEDED(hr));
-	}
-	
+	CreateBlurCB();
+	CreateDebugCB();
 	CreatePostProcessor();
 }
 
@@ -81,9 +72,8 @@ void PostProcessManager::Present()
 {
 	m_tBlurCB.g_vTexelSize = Vec2(1.0f / g_windowSize.x, 1.0f / g_windowSize.y);
 
-	DC->UpdateSubresource(m_pBlurCB.Get(), 0, nullptr, &m_tBlurCB, 0, 0);
-	DC->PSSetConstantBuffers(11, 1, m_pBlurCB.GetAddressOf());
-
+	ApplyBlurCB();
+	ApplyDebugCB();
 	// PRDefault 연산
 	{
 		DC->PSSetShaderResources(0, m_vSRTList.size(), m_vSRTList.data());
@@ -136,4 +126,47 @@ void PostProcessManager::SetSRVToSlot(int _index, const Microsoft::WRL::ComPtr<I
 		m_vSRTList.resize(_index + 1);
 
 	m_vSRTList[_index] = _srv.Get();
+}
+
+void PostProcessManager::SetDebugMode(int _mode)
+{
+	m_iDebugMode = _mode;
+	m_tDebugData.g_iDebugMode = _mode;
+}
+
+void PostProcessManager::ApplyDebugCB()
+{
+	DC->UpdateSubresource(m_pCBDebug.Get(), 0, nullptr, &m_tDebugData, 0, 0);
+	DC->PSSetConstantBuffers(3, 1, m_pCBDebug.GetAddressOf());
+}
+
+void PostProcessManager::ApplyBlurCB()
+{
+	DC->UpdateSubresource(m_pBlurCB.Get(), 0, nullptr, &m_tBlurCB, 0, 0);
+	DC->PSSetConstantBuffers(11, 1, m_pBlurCB.GetAddressOf());
+}
+
+void PostProcessManager::CreateBlurCB()
+{
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof(CB_Blur);
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bd.CPUAccessFlags = 0;
+
+	HRESULT hr = DEVICE->CreateBuffer(&bd, nullptr, m_pBlurCB.GetAddressOf());
+	assert(SUCCEEDED(hr));
+}
+
+void PostProcessManager::CreateDebugCB()
+{
+	D3D11_BUFFER_DESC desc = {};
+	desc.ByteWidth = sizeof(CB_Debug);
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	HRESULT hr = DEVICE->CreateBuffer(&desc, nullptr, m_pCBDebug.GetAddressOf());
+	assert(SUCCEEDED(hr));
 }
