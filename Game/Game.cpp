@@ -14,6 +14,8 @@
 #include "ALight.h"
 #include "MeshLoader.h"
 #include "Input.h"
+#include "AUIActor.h"
+#include "UIManager.h"
 
 void Game::Init()
 {
@@ -103,6 +105,7 @@ void Game::SetupEditorCallbacks()
 	SetupCharacterEditorCallback();
 	SetupMapEditorCallback();
 	SetupObjectEditorCallback();
+	SetupUIEditorCallback();
 }
 
 void Game::SetupCharacterEditorCallback()
@@ -225,6 +228,30 @@ void Game::SetupObjectEditorCallback()
 			actor->SetScale(scale);
 
 			OBJECT->AddActor(actor);
+		});
+}
+
+void Game::SetupUIEditorCallback()
+{
+	GUI->SetUIEditorCallback([this](const char* texPath, const char* shaderPath, Vec3 pos, Vec3 rot, Vec3 scale)
+		{
+			auto ui = std::make_shared<AUIActor>();
+			ui->m_szName = L"UI";
+			auto meshComp = UStaticMeshComponent::CreatePlane();
+			ui->SetMeshComponent(meshComp);
+
+			auto mat = make_shared<UMaterial>();
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+			meshComp->SetMaterial(mat);
+			ui->SetMeshComponent(meshComp);
+			ui->SetPosition(pos);
+			ui->SetRotation(rot);
+			ui->SetScale(scale);
+
+			UI->AddUI(ui);
 		});
 }
 
