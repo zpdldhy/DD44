@@ -32,5 +32,6 @@ private:
 	void InitializeQuadTree();
 	void InsertAllActorsIntoQuadTree();
 	void UpdateQuadTreeActors();
+	void QuadTreeCollision();
 };
 

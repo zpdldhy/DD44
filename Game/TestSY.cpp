@@ -48,7 +48,7 @@ void TestSY::Init()
 		CAMERA->Set3DCameraActor(m_pCameraActor);
 	}
 
-	//LoadAllPrefabs(".map.json");
+	LoadAllPrefabs(".map.json");
 
 	{
 		m_pActor = make_shared<APawn>();
@@ -413,9 +413,12 @@ void TestSY::Update()
 
 	UpdateQuadTreeActors();
 
+	// Collision
 	// Mouse Picking
 	if (INPUT->GetButton(LCLICK))
 		SetClickPos();
+
+	QuadTreeCollision();
 }
 
 void TestSY::Render()
@@ -562,5 +565,18 @@ void TestSY::UpdateQuadTreeActors()
 			continue;
 
 		m_pQuadTree->UpdateActor(actor);
+	}
+}
+
+void TestSY::QuadTreeCollision()
+{
+	if (!m_pQuadTree)
+		return;
+		
+	auto m_pLeafs = m_pQuadTree->GetLeafs();
+
+	for (const auto& leaf : m_pLeafs)
+	{
+		COLLITION->CheckCollision(leaf->vActorIndices);
 	}
 }
