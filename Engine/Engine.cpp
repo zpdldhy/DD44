@@ -29,8 +29,6 @@ void Engine::Init()
 		INPUTLAYOUT->Init(shader->m_pCode);
 		shared_ptr<Shader> shader2 = SHADER->Get(L"../Resources/Shader/skinningShader.hlsl");
 		INPUTLAYOUT->CreateIW(shader2->m_pCode);
-
-		STATE->Create();
 	}
 
 	// 기타 기능 객체 초기화 ( input, )
