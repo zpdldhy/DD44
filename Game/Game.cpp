@@ -12,6 +12,8 @@
 #include "AssimpLoader.h"
 #include "LightManager.h"
 #include "ALight.h"
+#include "MeshLoader.h"
+#include "Input.h"
 
 void Game::Init()
 {
@@ -19,10 +21,13 @@ void Game::Init()
 
 	LoadAllPrefabs(".map.json");
 	LoadAllPrefabs(".object.json");
+	LoadAllPrefabs(".character.json");
 
-	SetupEngineCamera();
+	//SetupEngineCamera();
+	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
+
 }
 
 void Game::Update()
@@ -47,6 +52,21 @@ void Game::SetupEngineCamera()
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	OBJECT->AddActor(m_pCameraActor);
+}
+
+void Game::SetupGameCamera()
+{
+	if (m_pPlayer == nullptr) { return; }
+
+	m_pGameCamera = make_shared<ACameraActor>();
+	{
+		m_pGameCamera->SetPosition(m_pPlayer->GetPosition());
+		m_pGameCamera->AddScript(make_shared<EngineCameraMoveScript>());
+		m_pGameCamera->m_szName = L"GameCamera";
+
+	}
+	CAMERA->Set3DCameraActor(m_pPlayer);
+	OBJECT->AddActor(m_pGameCamera);
 }
 
 void Game::SetupSkybox()
@@ -238,10 +258,31 @@ void Game::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadCharacter(file, characterData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
+				
+				ActorLoader actorLoader;
+				actorLoader.LoadAllAsset();
+				MeshLoader meshLoader;
+				meshLoader.SetMesh(actorLoader.LoadMeshMap());
+				meshLoader.SetAnim(actorLoader.LoadAnimMap());
+
+				shared_ptr<UMeshComponent> meshComponent = meshLoader.Make(characterData.MeshPath.c_str());
+
+				actor->SetMeshComponent(meshComponent);
+
 				actor->m_szName = L"Character";
 				actor->SetPosition(characterData.Translation);
 				actor->SetRotation(characterData.Rotation);
 				actor->SetScale(characterData.Scale);
+
+				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
+
+				m_pPlayer = actor;
+
+				auto cameraComponent = make_shared<UCameraComponent>();
+				cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
+				m_pPlayer->SetCameraComponent(cameraComponent);
+
+
 				OBJECT->AddActor(actor);
 			}
 		}
