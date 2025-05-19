@@ -5,8 +5,6 @@ struct CameraConstantData
 {
 	Matrix matView;
 	Matrix matProjection;
-	Vec3 g_vCameraPos;
-	float padding_camera = 0.f;
 };
 
 enum class CameraViewType

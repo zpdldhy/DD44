@@ -33,6 +33,9 @@ struct CB_MaterialEffect
 
 	Vec3   g_vSpecularCoeff = Vec3(1,1,1);   
 	float  g_fShininess = 32.0f;
+
+	Vec3 g_vCameraPos;
+	float padding_camera = 0.f;
 };
 
 struct CB_Material
@@ -94,6 +97,7 @@ public:
 	void SetAmbientParams(const Vec3& _coeff, float _power);
 	void SetDiffuseParams(const Vec3& _coeff, float _power);
 	void SetSpecularParams(const Vec3& _coeff, float _shininess);
+	void SetCameraPos(const Vec3& camPos);
 
 	void SetUseStencil(bool _bUseStencil) { m_bUseStencil = _bUseStencil; }
 	bool IsUseStencil() { return m_bUseStencil; }

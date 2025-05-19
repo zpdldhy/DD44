@@ -128,6 +128,12 @@ void UMaterial::SetSpecularParams(const Vec3& _coeff, float _shininess)
     UpdateEffectBuffer();
 }
 
+void UMaterial::SetCameraPos(const Vec3& _camPos)
+{
+    m_tEffectData.g_vCameraPos = _camPos;
+    UpdateEffectBuffer();
+}
+
 
 void UMaterial::SetRenderMode(ERenderMode _eMode)
 {
