@@ -108,6 +108,7 @@ bool PrefabLoader::SaveCharacter(const PrefabCharacterData& data, const std::str
     json j;
     j["Name"] = data.Name;
     j["RootMeshPath"] = data.RootMeshPath;
+    j["MeshPath"] = data.MeshPath;
     j["ShaderPath"] = data.ShaderPath;
     j["TexturePath"] = data.TexturePath;
     j["ScriptType"] = data.ScriptType;
@@ -118,13 +119,13 @@ bool PrefabLoader::SaveCharacter(const PrefabCharacterData& data, const std::str
     j["Rotation"] = { data.Rotation.x, data.Rotation.y, data.Rotation.z };
     j["Translation"] = { data.Translation.x, data.Translation.y, data.Translation.z };
 
-    for (const auto& child : data.ChildMeshes)
-    {
-        j["ChildMeshes"].push_back({
-            { "MeshPath", child.MeshPath },
-            { "TargetBoneIndex", child.TargetBoneIndex }
-            });
-    }
+    //for (const auto& child : data.ChildMeshes)
+    //{
+    //    j["ChildMeshes"].push_back({
+    //        { "MeshPath", child.MeshPath },
+    //        { "TargetBoneIndex", child.TargetBoneIndex }
+    //        });
+    //}
 
     std::ofstream file(filePath);
     if (!file.is_open()) return false;
@@ -143,6 +144,7 @@ bool PrefabLoader::LoadCharacter(const std::string& filePath, PrefabCharacterDat
 
     data.Name = j["Name"];
     data.RootMeshPath = j["RootMeshPath"];
+    data.MeshPath = j["MeshPath"];
     data.ShaderPath = j["ShaderPath"];
     data.TexturePath = j["TexturePath"];
     data.ScriptType = j["ScriptType"];
@@ -230,6 +232,10 @@ bool PrefabLoader::SaveObject(const PrefabObjectData& _prefab, const std::string
     j["Scale"] = { _prefab.Scale.x, _prefab.Scale.y, _prefab.Scale.z };
     j["Rotation"] = { _prefab.Rotation.x, _prefab.Rotation.y, _prefab.Rotation.z };
     j["Translation"] = { _prefab.Translation.x, _prefab.Translation.y, _prefab.Translation.z };
+    j["SpecularColor"] = { _prefab.SpecularColor.x,_prefab.SpecularColor.y ,_prefab.SpecularColor.z };
+    j["Shininess"] = _prefab.Shininess;
+    j["EmissiveColor"] = { _prefab.EmissiveColor.x,_prefab.EmissiveColor.y ,_prefab.EmissiveColor.z };
+    j["EmissivePower"] = _prefab.EmissivePower;
 
     std::ofstream file(_filePath);
     if (!file.is_open()) return false;
@@ -259,6 +265,14 @@ bool PrefabLoader::LoadObject(const std::string& _filePath, PrefabObjectData& _p
 
     auto t = j["Translation"];
     _prefab.Translation = Vec3(t[0], t[1], t[2]);
+
+    auto sc = j["SpecularColor"];
+    _prefab.SpecularColor = Vec3(sc[0], sc[1], sc[2]);
+    _prefab.Shininess = j["Shininess"];
+
+    auto ec = j["EmissiveColor"];
+    _prefab.EmissiveColor = Vec3(ec[0], ec[1], ec[2]);
+    _prefab.EmissivePower = j["EmissivePower"];
 
     return true;
 }

@@ -16,7 +16,7 @@ ALight::ALight()
 
     // 기본 조명 설정 예시 (원하면 제거 가능)
     m_pLightComponent->SetLightType(ELightType::Directional);
-    m_pLightComponent->SetColor(Vec3(1.f, 0.0f, 0.0f));
+    m_pLightComponent->SetColor(Vec3(1.f, 1.0f, 1.0f));
     m_pLightComponent->SetIntensity(0.5f);
 
     auto mesh = UStaticMeshComponent::CreateSphere(10, 10);

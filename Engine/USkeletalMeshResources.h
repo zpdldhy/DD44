@@ -10,7 +10,7 @@ struct CBBindPoseData
 class USkeletalMeshResources : public UMeshResources
 {
 public:
-	USkeletalMeshResources() = default;
+	USkeletalMeshResources() { m_Type = MeshType::M_SKINNED; }
 	virtual ~USkeletalMeshResources() = default;
 
 protected:

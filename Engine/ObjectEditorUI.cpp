@@ -15,9 +15,23 @@ void ObjectEditorUI::DrawUI()
     DrawVec3Slider("Rotation", m_fRotation, -360.f, 360.f);
     DrawVec3Slider("Scale", m_fScale, 0.01f, 10.f);
 
-    ImGui::Separator(); ImGui::Spacing();
+    ImGui::Spacing();
 
     ImGui::Checkbox("Snap to Grid", &m_bSnapEnabled);
+
+    ImGui::Separator(); ImGui::Spacing();
+
+    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Lighting 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式-
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "SpecularColor");
+    DrawVec3Slider("SpecularColor", m_fSpecularColor, 0.f, 1.f);
+    ImGui::InputFloat("Shininess", &m_fShininess, 0.0f, 0.0f, "%.2f");
+    
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "EmissiveColor");
+    DrawVec3Slider("EmissiveColor", m_fEmissiveColor, 0.f, 1.f);
+    ImGui::InputFloat("EmissivePower", &m_fEmissivePower, 0.0f, 0.0f, "%.2f");    
+
+    ImGui::Separator(); ImGui::Spacing();
+     
 
     // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Asset Input 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Asset Paths");
@@ -35,7 +49,11 @@ void ObjectEditorUI::DrawUI()
             m_szObjPath,
             Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]),
             Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]),
-            Vec3(m_fScale[0], m_fScale[1], m_fScale[2])
+            Vec3(m_fScale[0], m_fScale[1], m_fScale[2]),
+            Vec3(m_fSpecularColor[0], m_fSpecularColor[1], m_fSpecularColor[2]),
+            m_fShininess,
+            Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]),
+            m_fEmissivePower
         );
     }
 
@@ -57,6 +75,10 @@ void ObjectEditorUI::DrawUI()
         data.Scale = Vec3(m_fScale[0], m_fScale[1], m_fScale[2]);
         data.Rotation = Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]);
         data.Translation = Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]);
+        data.SpecularColor = Vec3(m_fSpecularColor[0], m_fSpecularColor[1], m_fSpecularColor[2]);
+        data.Shininess = m_fShininess;
+        data.EmissiveColor = Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]);
+        data.EmissivePower = m_fEmissivePower;
 
         PrefabLoader().SaveObject(data, "../Resources/Prefab/" + data.Name + ".object.json");
     }
@@ -74,6 +96,17 @@ void ObjectEditorUI::DrawUI()
             m_fScale[0] = data.Scale.x;    m_fScale[1] = data.Scale.y;    m_fScale[2] = data.Scale.z;
             m_fRotation[0] = data.Rotation.x; m_fRotation[1] = data.Rotation.y; m_fRotation[2] = data.Rotation.z;
             m_fPosition[0] = data.Translation.x; m_fPosition[1] = data.Translation.y; m_fPosition[2] = data.Translation.z;
+
+            m_fSpecularColor[0] = data.SpecularColor.x;
+            m_fSpecularColor[1] = data.SpecularColor.y;
+            m_fSpecularColor[2] = data.SpecularColor.z;
+            m_fShininess = data.Shininess;
+
+            m_fEmissiveColor[0] = data.EmissiveColor.x;
+            m_fEmissiveColor[1] = data.EmissiveColor.y;
+            m_fEmissiveColor[2] = data.EmissiveColor.z;
+            m_fEmissivePower = data.EmissivePower;
+
         }
     }
 
@@ -96,18 +129,22 @@ void ObjectEditorUI::DrawUI()
         if (ImGui::Button("Load Prefab##List"))
         {
             PrefabObjectData data;
-            std::string path = "../Resources/Prefab/" + selectedPrefabName + ".object.json";
+            std::string path = "../Resources/Prefab/" + selectedPrefabName + ".json";
             if (PREFAB->LoadObject(path, data))
             {
                 if (m_OnCreate)
                 {
                     m_OnCreate(
-                        data.TexturePath.c_str(),
-                        data.ShaderPath.c_str(),
-                        data.MeshPath.c_str(),
+                        m_szTexturePath,
+                        m_szShaderPath,
+                        m_szObjPath,
                         Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]),
                         Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]),
-                        Vec3(m_fScale[0], m_fScale[1], m_fScale[2])
+                        Vec3(m_fScale[0], m_fScale[1], m_fScale[2]),
+                        Vec3(m_fSpecularColor[0], m_fSpecularColor[1], m_fSpecularColor[2]),
+                        m_fShininess,
+                        Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]),
+                        m_fEmissivePower                        
                     );
                 }
             }

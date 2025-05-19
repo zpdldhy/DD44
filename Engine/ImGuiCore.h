@@ -5,6 +5,7 @@
 #include "EffectEditorUI.h"
 #include "CharacterEditorUI.h"
 #include "ActorListUI.h"
+#include "MeshEditorUI.h"
 
 class ImGuiCore : public Singleton<ImGuiCore>
 {
@@ -14,6 +15,7 @@ private:
 	std::unique_ptr<class ObjectEditorUI> m_pObjectEditorUI;
 	std::unique_ptr<class EffectEditorUI> m_pEffectEditorUI;
 	std::unique_ptr<class ActorListUI> m_pActorListUI;
+	std::unique_ptr<class MeshEditorUI> m_pMeshEditorUI;
 
 public:
 	bool m_bEditorToolVisible = true;
@@ -22,6 +24,7 @@ public:
 	MapEditorUI* GetMapEditorUI() const { return m_pMapEditorUI.get(); }
 	ObjectEditorUI* GetObjectEditorUI() const { return m_pObjectEditorUI.get(); }
 	EffectEditorUI* GetEffectEditorUI() const { return 	m_pEffectEditorUI.get(); }
+	MeshEditorUI* GetMeshEditorUI() const { return m_pMeshEditorUI.get(); }
 
 	void SetCharacterEditorCallback(std::function<void(std::shared_ptr<UMeshComponent>, const Vec3&, const Vec3&, const Vec3&, int) > callback)
 	{
@@ -31,17 +34,25 @@ public:
 	{
 		m_pMapEditorUI->SetOnCreateCallback(std::move(callback));
 	}
-	void SetObjectEditorCallback(std::function<void(const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)> callback)
+	void SetObjectEditorCallback(std::function<void(const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float)> callback)
 	{
 		m_pObjectEditorUI->SetOnCreateCallback(std::move(callback));
 	}
-	void SetEffectEditorCallback(std::function<void(int, float, Vec3, float, Vec3, float)> callback)
+	void SetEffectEditorCallback(std::function<void(int, float, Vec3, Vec3, float)> callback)
 	{
 		m_pEffectEditorUI->SetEffectApplyCallback(std::move(callback));
 	}
 	void SetLightEditorCallback(std::function<void(ELightType, Vec3, float, Vec3, float)> callback)
 	{
 		m_pEffectEditorUI->SetLightApplyCallback(std::move(callback));
+	}
+	void SetBaseMeshEditorCallback(std::function<void(wstring, int, int, int, shared_ptr<APawn>&)> callback)
+	{
+		m_pMeshEditorUI->CreateActorCallback(std::move(callback));
+	}
+	void SetChildMeshEditorCallback(std::function<void(ChildMeshData)> callback)
+	{
+		m_pMeshEditorUI->CreateChildMeshCallback(std::move(callback));
 	}
 
 public:

@@ -52,6 +52,7 @@ public:
 	shared_ptr<USceneComponent> GetTransform() { return m_pTransform; }
 	template<typename T>
 	shared_ptr<T> GetMeshComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
+	shared_ptr<UMeshComponent> GetMeshComponent() { return static_pointer_cast<UMeshComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
 	shared_ptr<UCameraComponent> GetCameraComponent() { return static_pointer_cast<UCameraComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_CAMERA)]); }
 	shared_ptr<UShapeComponent> GetShapeComponent() { return static_pointer_cast<UShapeComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_SHAPE)]); }
 	shared_ptr<ULightComponent> GetLightComponent() { return static_pointer_cast<ULightComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_LIGHT)]); }

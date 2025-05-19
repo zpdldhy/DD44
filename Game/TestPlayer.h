@@ -10,6 +10,7 @@ class TestPlayer : public IExecute
 {
 	shared_ptr<ActorLoader> loader;
 	shared_ptr<APawn> player;
+	shared_ptr<APawn> projectile;
 	vector<shared_ptr<UMeshComponent>> meshList;
 
 	shared_ptr<class ACameraActor> m_pCameraActor;

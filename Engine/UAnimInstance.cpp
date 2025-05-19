@@ -7,8 +7,9 @@
 
 void UAnimInstance::Tick()
 {
+	if (!m_bPlay) { return; }
 	animFrame += TIMER->GetDeltaTime() * m_fAnimPlayRate;
-	
+
 	if (animFrame >= animTrackList[currentAnimTrackIndex].animList[0].size())
 	{
 		if (m_bOnPlayOnce)
@@ -28,7 +29,7 @@ void UAnimInstance::Tick()
 
 	}
 
-	
+
 	// 애니메이션 파싱 확인 용
 	/*if (INPUT->GetButton(R))
 	{
@@ -41,6 +42,27 @@ void UAnimInstance::Tick()
 	}*/
 }
 
+shared_ptr<UAnimInstance> UAnimInstance::Clone()
+{
+	shared_ptr<UAnimInstance> newAnim = make_shared<UAnimInstance>();
+
+	newAnim->m_modelName = m_modelName;
+	newAnim->animTrackList = animTrackList;
+	newAnim->animFrame = animFrame;
+	newAnim->currentAnimTrackIndex = currentAnimTrackIndex;
+	newAnim->rootPos = rootPos;
+	newAnim->rootIndex = rootIndex;
+	newAnim->prevIndex = prevIndex;
+	newAnim->m_bOnPlayOnce = m_bOnPlayOnce;
+	newAnim->m_bInPlace = m_bInPlace;
+	newAnim->m_bPlay = m_bPlay;
+	newAnim->m_fAnimPlayRate = m_fAnimPlayRate;
+
+	newAnim->CreateConstantBuffer();
+
+	return newAnim;
+}
+
 void UAnimInstance::CreateConstantBuffer()
 {
 	D3D11_BUFFER_DESC pDesc;
@@ -49,9 +71,6 @@ void UAnimInstance::CreateConstantBuffer()
 	pDesc.Usage = D3D11_USAGE_DEFAULT;
 	pDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-	//D3D11_SUBRESOURCE_DATA pInitialData;
-	//ZeroMemory(&pInitialData, sizeof(pInitialData));
-	//pInitialData.pSysMem = &currentAnimList;
 	HRESULT hr = DEVICE->CreateBuffer(&pDesc, NULL, _constantBuffer.GetAddressOf());
 	if (FAILED(hr))
 	{
@@ -79,7 +98,7 @@ int UAnimInstance::GetAnimIndex(wstring _animName)
 
 void UAnimInstance::SetCurrentAnimTrack(int _index)
 {
-	if(m_bOnPlayOnce) { return; }
+	if (m_bOnPlayOnce) { return; }
 	if (_index < 0 || _index >= animTrackList.size())
 	{
 		return;
@@ -90,7 +109,7 @@ void UAnimInstance::SetCurrentAnimTrack(int _index)
 		return;
 	}
 	animFrame = 0;
-	currentAnimTrackIndex  =  _index;
+	currentAnimTrackIndex = _index;
 }
 
 void UAnimInstance::PlayOnce(int _index)
@@ -103,9 +122,17 @@ void UAnimInstance::PlayOnce(int _index)
 
 Matrix UAnimInstance::GetBoneAnim(int _boneIndex)
 {
+	Matrix ret = animTrackList[currentAnimTrackIndex].animList[_boneIndex][animFrame];
 	if (_boneIndex >= animTrackList[currentAnimTrackIndex].animList.size())
 	{
 		return Matrix();
 	}
-	return animTrackList[currentAnimTrackIndex].animList[_boneIndex][animFrame];
+
+	if (m_bInPlace)
+	{
+		Matrix inverse = Matrix::CreateTranslation(-rootPos);
+		ret = ret * inverse;
+	}
+
+	return ret;
 }

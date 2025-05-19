@@ -18,9 +18,14 @@
 #include "ObjectManager.h"
 #include "LightManager.h"
 #include "PostProcessManager.h"
+#include "AssimpLoader.h"
+#include "ATerrainTileActor.h"
 
 void TestSJ::Init()
 {
+	SetupObjectEditorCallback();
+	LoadAllPrefabs(".object.json");
+
 	SOUNDMANAGER->LoadAllSounds();
 
 	LIGHTMANAGER->Init();
@@ -40,8 +45,17 @@ void TestSJ::Init()
 		m_pActor->SetPosition({ 0.0f, 0.0f, 0.0f });
 		m_pActor->SetRotation({ 0.0f, 0.0f, 0.0f });
 
+		
+
 		shared_ptr<UMaterial> material = make_shared<UMaterial>();
 		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
+
+		material->SetDiffuseParams(Vec3(1.0f, 1.0f, 1.0f), 1.0f);
+		material->SetAmbientParams(Vec3(0.5f, 0.5f, 0.5f), 1.0f);
+		material->SetSpecularParams(Vec3(1.0f, 1.0f, 1.0f), 64.0f);
+		material->SetEmissiveParams(Vec3(0, 0, 0), 0.0f);
+
+
 		m_pStaticMesh->SetMaterial(material);
 		
 	}
@@ -76,17 +90,14 @@ void TestSJ::Init()
 		m_pSkyMesh->SetMaterial(material);
 	}
 
-	{
-		auto noiseTex = TEXTURE->Load(L"../Resources/Texture/Noise.png");
-		m_pStaticMesh->GetMaterial()->SetNoiseTexture(noiseTex);
-	}
+	
 
 	
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 
 	GUI->SetEffectEditorCallback(
-		[this](int selected, float glowPower, Vec3 glowColor, float dissolveThreshold, Vec3 emissiveColor, float emissivePower) {
+		[this](int selected, float glowPower, Vec3 glowColor, Vec3 emissiveColor, float emissivePower) {
 			if (selected == 0 && m_pStaticMesh)
 			{
 				targetMat = m_pStaticMesh->GetMaterial();
@@ -99,7 +110,6 @@ void TestSJ::Init()
 			if (targetMat)
 			{
 				targetMat->SetGlowParams(glowPower, glowColor);
-				targetMat->SetDissolveParams(dissolveThreshold);
 				targetMat->SetEmissiveParams(emissiveColor, emissivePower);
 			}
 		}
@@ -142,35 +152,35 @@ void TestSJ::Init()
 
 	}
 
-	//{
-	//	m_pPointLight = make_shared<ALight>();
+	{
+		m_pPointLight = make_shared<ALight>();
 
-	//	m_pPointLight->SetPosition(Vec3(10.0f, 10.0f, 10.0f)); // ´«¿¡ ¶çµµ·Ï À§·Î ¶ç¿ò
+		m_pPointLight->SetPosition(Vec3(10.0f, 10.0f, 10.0f)); // ´«¿¡ ¶çµµ·Ï À§·Î ¶ç¿ò
 
-	//	auto lightComp = m_pPointLight->GetLightComponent();
-	//	lightComp->SetLightType(ELightType::Point);
-	//	lightComp->SetColor(Vec3(0.0f, 0.3f, 1.0f));     // ÆÄ¶õºû
-	//	lightComp->SetIntensity(2.0f);
-	//	lightComp->SetRange(20.0f);                      // ºû ÆÛÁü Á¤µµ
-	//}
+		auto lightComp = m_pPointLight->GetLightComponent();
+		lightComp->SetLightType(ELightType::Point);
+		lightComp->SetColor(Vec3(0.0f, 0.3f, 1.0f));     // ÆÄ¶õºû
+		lightComp->SetIntensity(2.0f);
+		lightComp->SetRange(20.0f);                      // ºû ÆÛÁü Á¤µµ
+	}
 
-	/*OBJECT->AddActor(m_pPointLight);*/
+	OBJECT->AddActor(m_pPointLight);
 	OBJECT->AddActor(m_pLight);
 	OBJECT->AddActor(m_pCameraActor);
 	OBJECT->AddActor(m_pActor);
 	OBJECT->AddActor(m_pActor2);
 	OBJECT->AddActor(m_pSky);
-	OBJECT->AddActor(m_pSwordActor);
+	//OBJECT->AddActor(m_pSwordActor);
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pLight);
-	/*LIGHTMANAGER->RegisterLight(m_pPointLight); */
+	LIGHTMANAGER->RegisterLight(m_pPointLight); 
 }
 
 void TestSJ::Update()
 {
-	/*m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
-	LIGHTMANAGER->UpdateLightCB();*/
+	m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	//LIGHTMANAGER->UpdateLightCB();
 	// ¿ÀºêÁ§Æ® È¸Àü
 	{
 		static float angle = 0.0f;
@@ -190,13 +200,13 @@ void TestSJ::Update()
 	//Rim Light
 	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 	{
-		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetLocalPosition();
+		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetWorldPosition();
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
 		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
 	}
 	//Emissive
 	{
-		m_pStaticMesh2->GetMaterial()->SetEmissiveParams(Vec3(0.0f, 1.0f, 0.0f), 0.1f);
+		//m_pStaticMesh2->GetMaterial()->SetEmissiveParams(Vec3(0.0f, 1.0f, 0.0f), 0.1f);
 
 	}
 	//UVDistortion
@@ -489,7 +499,9 @@ void TestSJ::Update()
 
 	POSTPROCESS->SetBlurScale(m_fBlurScale);
 
-	LIGHTMANAGER->UpdateLightCB();
+	//LIGHTMANAGER->UpdateLightCB();
+
+	
 }
 
 void TestSJ::Render()
@@ -501,4 +513,123 @@ void TestSJ::Render()
 	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (Ã»·Ïºû)
 	//	D2D1::ColorF::White                   // ¸ÞÀÎ ÅØ½ºÆ® »ö
 	//);
+}
+
+void TestSJ::SetupObjectEditorCallback()
+{
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 specularColor, float shininess, Vec3 emissiveColor, float emissivePower)
+		{
+			AssimpLoader loader;
+			vector<MeshData> meshList = loader.Load(objPath);
+			if (meshList.empty())
+				return;
+
+			auto meshComp = make_shared<UStaticMeshComponent>();
+			meshComp->SetMeshPath(to_mw(objPath));
+
+			auto meshRes = make_shared<UStaticMeshResources>();
+			meshRes->SetVertexList(meshList[0].m_vVertexList);
+			meshRes->SetIndexList(meshList[0].m_vIndexList);
+			meshRes->Create();
+
+			meshComp->SetMesh(meshRes);
+
+			auto mat = make_shared<UMaterial>();
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+			mat->SetEmissiveParams(emissiveColor, emissivePower);
+			mat->SetSpecularParams(specularColor, shininess);
+			meshComp->SetMaterial(mat);
+			
+
+			// Snap Àû¿ë ¿©ºÎ È®ÀÎ
+			if (GUI->GetObjectEditorUI()->IsSnapEnabled())
+			{
+				pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
+			}
+
+			auto actor = make_shared<APawn>();
+			actor->m_szName = L"Object";
+
+			actor->SetMeshComponent(meshComp);
+			actor->SetPosition(pos);
+			actor->SetRotation(rot);
+			actor->SetScale(scale);
+
+			OBJECT->AddActor(actor);
+		});
+}
+
+void TestSJ::LoadAllPrefabs(const std::string& extension)
+{
+	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
+
+	for (const auto& file : files)
+	{
+		if (extension == ".map.json")
+		{
+			PrefabMapData mapData;
+			if (PREFAB->LoadMapTile(file, mapData))
+			{
+				auto tile = std::make_shared<ATerrainTileActor>();
+				tile->m_szName = L"Terrain";
+				tile->m_iNumCols = mapData.Cols;
+				tile->m_iNumRows = mapData.Rows;
+				tile->m_fCellSize = mapData.CellSize;
+				tile->CreateTerrain(to_mw(mapData.TexturePath), to_mw(mapData.ShaderPath));
+				tile->SetPosition(mapData.Position);
+				tile->SetRotation(mapData.Rotation);
+				tile->SetScale(mapData.Scale);
+				OBJECT->AddActor(tile);
+			}
+		}
+		else if (extension == ".character.json")
+		{
+			PrefabCharacterData characterData;
+			if (PREFAB->LoadCharacter(file, characterData))
+			{
+				auto actor = std::make_shared<AActor>(); // ÇÊ¿ä¿¡ µû¶ó Ä³¸¯ÅÍ Å¸ÀÔÀ¸·Î º¯°æ
+				actor->m_szName = L"Character";
+				actor->SetPosition(characterData.Translation);
+				actor->SetRotation(characterData.Rotation);
+				actor->SetScale(characterData.Scale);
+				OBJECT->AddActor(actor);
+			}
+		}
+		else if (extension == ".object.json")
+		{
+			PrefabObjectData objData;
+			if (PREFAB->LoadObject(file, objData))
+			{
+				auto meshComp = make_shared<UStaticMeshComponent>();
+				meshComp->SetMeshPath(to_mw(objData.MeshPath));
+
+				auto meshRes = make_shared<UStaticMeshResources>();
+				AssimpLoader loader;
+				vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
+				if (!meshList.empty())
+				{
+					meshRes->SetVertexList(meshList[0].m_vVertexList);
+					meshRes->SetIndexList(meshList[0].m_vIndexList);
+					meshRes->Create();
+					meshComp->SetMesh(meshRes);
+				}
+
+				auto material = make_shared<UMaterial>();
+				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
+				meshComp->SetMaterial(material);
+
+				auto obj = make_shared<APawn>();
+				obj->m_szName = L"Object";
+				obj->SetMeshComponent(meshComp);
+				obj->SetPosition(objData.Translation);
+				obj->SetRotation(objData.Rotation);
+				obj->SetScale(objData.Scale);
+
+				OBJECT->AddActor(obj);
+			}
+		}
+	}
 }

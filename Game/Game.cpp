@@ -10,15 +10,19 @@
 #include "EngineCameraMoveScript.h"
 #include "PlayerMoveScript.h"
 #include "AssimpLoader.h"
+#include "LightManager.h"
+#include "ALight.h"
 
 void Game::Init()
 {
 	SetupEditorCallbacks();
 
 	LoadAllPrefabs(".map.json");
+	LoadAllPrefabs(".object.json");
 
 	SetupEngineCamera();
 	SetupSkybox();
+	SetupSunLight();
 }
 
 void Game::Update()
@@ -57,6 +61,22 @@ void Game::SetupSkybox()
 	m_pSkyMesh->SetMaterial(material);
 
 	OBJECT->AddActor(m_pSky);
+}
+
+void Game::SetupSunLight()
+{
+	LIGHTMANAGER->Init();
+	
+	m_pSunLight = make_shared<ALight>();
+	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
+	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
+	m_pSunLight->SetPosition(Vec3(0, 100.0f, 0));
+	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+	OBJECT->AddActor(m_pSunLight);
+	
+	LIGHTMANAGER->Clear();
+	LIGHTMANAGER->RegisterLight(m_pSunLight);
 }
 
 void Game::SetupEditorCallbacks()
@@ -146,7 +166,8 @@ void Game::SetupMapEditorCallback()
 
 void Game::SetupObjectEditorCallback()
 {
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale)
+
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
 		{
 			AssimpLoader loader;
 			vector<MeshData> meshList = loader.Load(objPath);
@@ -226,15 +247,35 @@ void Game::LoadAllPrefabs(const std::string& extension)
 		}
 		else if (extension == ".object.json")
 		{
-			PrefabData objData;
-			if (PREFAB->Load(file, objData))
+			PrefabObjectData objData;
+			if (PREFAB->LoadObject(file, objData))
 			{
-				auto actor = std::make_shared<AActor>(); // 필요에 따라 오브젝트 타입으로 변경
-				actor->m_szName = L"Object";
-				actor->SetPosition(objData.Translation);
-				actor->SetRotation(objData.Rotation);
-				actor->SetScale(objData.Scale);
-				OBJECT->AddActor(actor);
+				auto meshComp = make_shared<UStaticMeshComponent>();
+				meshComp->SetMeshPath(to_mw(objData.MeshPath));
+
+				auto meshRes = make_shared<UStaticMeshResources>();
+				AssimpLoader loader;
+				vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
+				if (!meshList.empty())
+				{
+					meshRes->SetVertexList(meshList[0].m_vVertexList);
+					meshRes->SetIndexList(meshList[0].m_vIndexList);
+					meshRes->Create();
+					meshComp->SetMesh(meshRes);
+				}
+
+				auto material = make_shared<UMaterial>();
+				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
+				meshComp->SetMaterial(material);
+
+				auto obj = make_shared<APawn>();
+				obj->m_szName = L"Object";
+				obj->SetMeshComponent(meshComp);
+				obj->SetPosition(objData.Translation);
+				obj->SetRotation(objData.Rotation);
+				obj->SetScale(objData.Scale);
+
+				OBJECT->AddActor(obj);
 			}
 		}
 	}

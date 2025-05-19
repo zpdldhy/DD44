@@ -9,6 +9,8 @@ public:
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
 
+	shared_ptr<class ALight> m_pSunLight;
+
 public:
 	void Init() override;
 	void Update() override;
@@ -18,6 +20,7 @@ public:
 protected:
 	void SetupEngineCamera();
 	void SetupSkybox();
+	void SetupSunLight();
 
 	void SetupEditorCallbacks();
 	void SetupCharacterEditorCallback();

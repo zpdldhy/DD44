@@ -4,14 +4,16 @@
 #include "Sample.h"
 #include "Game.h"
 
+// 삭제 예정
 #include "TestYR.h"
 #include "TestSY.h"
 #include "TestSJ.h"
 #include "TestPlayer.h"
+#include "TestYR2.h"
 
 int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCmdLine, int _nCmdShow)
 {
-    shared_ptr<IExecute> app = make_shared<TestSY>();
+    shared_ptr<IExecute> app = make_shared<Game>();
 
     Engine game(_hInstance, app);
     game.Run();

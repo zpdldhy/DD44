@@ -31,6 +31,7 @@ void ImGuiCore::Init()
 	m_pObjectEditorUI = make_unique<ObjectEditorUI>();
 	m_pEffectEditorUI = make_unique<EffectEditorUI>();
 	m_pActorListUI = std::make_unique<ActorListUI>();
+	m_pMeshEditorUI = make_unique<MeshEditorUI>();
 }
 
 void ImGuiCore::Update()
@@ -81,6 +82,11 @@ void ImGuiCore::Update()
 			if (ImGui::BeginTabItem("Effect Editor"))
 			{
 				if (m_pEffectEditorUI) m_pEffectEditorUI->DrawUI();
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Mesh Editor"))
+			{
+				if (m_pMeshEditorUI) m_pMeshEditorUI->DrawUI();
 				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();

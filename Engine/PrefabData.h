@@ -25,6 +25,12 @@ struct PrefabObjectData
     Vec3 Scale;
     Vec3 Rotation;
     Vec3 Translation;
+
+    Vec3 SpecularColor;
+    float Shininess;
+
+    Vec3 EmissiveColor;
+    float EmissivePower;
 };
 
 struct PrefabCharacterData
@@ -32,6 +38,7 @@ struct PrefabCharacterData
     std::string Name;
 
     std::string RootMeshPath;
+    std::string MeshPath;
     std::string ShaderPath;
     std::string TexturePath;
 

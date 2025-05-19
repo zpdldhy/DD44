@@ -20,9 +20,11 @@ public:
     {
         m_OnCreate = std::move(callback);
     }
-
+public:
+    shared_ptr<UMeshComponent> MakeMesh(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance);
 private:
     char m_szAssetPath[256] = "../Resources/Asset/crow_final.asset";
+    char m_szMeshPath[256] = "../Resources/Asset/crow_final.mesh";
 
     char m_szTextureName[256] = "../Resources/Texture/Crow_DIFF.png";
     char m_szShaderName[256] = "../Resources/Shader/skinningShader.hlsl";
@@ -42,6 +44,8 @@ private:
 
     std::shared_ptr<ActorLoader> m_pLoader;
     std::vector<std::shared_ptr<UMeshComponent>> m_vMeshList;
+    std::map<wstring, std::shared_ptr<UMeshResources>> m_mMeshMap;
+    std::vector<MeshComponentData> m_vMeshDataList;
     std::shared_ptr<UMeshComponent> m_pRootComponent;
 
     // Prefab
@@ -61,4 +65,5 @@ public:
     static int m_iChildIndex;
 
     vector<shared_ptr<UAnimInstance>> m_vAnimList;
+    map<wstring, shared_ptr<UAnimInstance>> m_mAnimMap;
 };
