@@ -12,6 +12,8 @@
 #include "AssimpLoader.h"
 #include "LightManager.h"
 #include "ALight.h"
+#include "MeshLoader.h"
+#include "Input.h"
 
 void Game::Init()
 {
@@ -19,14 +21,30 @@ void Game::Init()
 
 	LoadAllPrefabs(".map.json");
 	LoadAllPrefabs(".object.json");
+	LoadAllPrefabs(".character.json");
 
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
+
 }
 
 void Game::Update()
 {
+	if (INPUT->GetButton(O))
+	{
+		if (m_bEnginCamera)
+		{
+			m_bEnginCamera = false;
+			CAMERA->Set3DCameraActor(m_pPlayer);
+		}
+		else
+		{
+			m_bEnginCamera = true;
+			CAMERA->Set3DCameraActor(m_pCameraActor);
+		}
+	}
+
 }
 
 void Game::Render()
@@ -239,10 +257,31 @@ void Game::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadCharacter(file, characterData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
+				
+				ActorLoader actorLoader;
+				actorLoader.LoadAllAsset();
+				MeshLoader meshLoader;
+				meshLoader.SetMesh(actorLoader.LoadMeshMap());
+				meshLoader.SetAnim(actorLoader.LoadAnimMap());
+
+				shared_ptr<UMeshComponent> meshComponent = meshLoader.Make(characterData.MeshPath.c_str());
+
+				actor->SetMeshComponent(meshComponent);
+
 				actor->m_szName = L"Character";
 				actor->SetPosition(characterData.Translation);
 				actor->SetRotation(characterData.Rotation);
 				actor->SetScale(characterData.Scale);
+
+				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
+
+				m_pPlayer = actor;
+
+				auto cameraComponent = make_shared<UCameraComponent>();
+				cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
+				m_pPlayer->SetCameraComponent(cameraComponent);
+
+
 				OBJECT->AddActor(actor);
 			}
 		}

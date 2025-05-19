@@ -176,6 +176,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="ActorListUI.h" />
     <ClInclude Include="MeshEditorUI.h" />
+    <ClInclude Include="MeshLoader.h" />
     <ClInclude Include="ObjectLoader.h" />
     <ClInclude Include="MapEditorUI.h" />
     <ClInclude Include="ObjectEditorUI.h" />
@@ -259,6 +260,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="ActorListUI.cpp" />
     <ClCompile Include="MeshEditorUI.cpp" />
+    <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="ObjectLoader.cpp" />
     <ClCompile Include="MapEditorUI.cpp" />
     <ClCompile Include="ObjectEditorUI.cpp" />
