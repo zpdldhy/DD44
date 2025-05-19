@@ -54,7 +54,6 @@ void Engine::Frame()
 	{
 		OBJECT->Tick();
 		UI->Tick();
-		COLLITION->CheckCollision(OBJECT->GetActorIndexList());
 	}
 
 	GET_SINGLE(Device)->Frame();
@@ -91,6 +90,7 @@ void Engine::Render()
 		OBJECT->Render();	// ObjectList Render
 		POSTPROCESS->PostRender();
 
+		
 
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();

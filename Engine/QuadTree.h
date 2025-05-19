@@ -34,9 +34,10 @@ public:
     void RemoveActorFromAllNodes(QuadTreeNode* node, UINT actorIndex);
     
     QuadTreeNode* GetRoot() const { return m_pRoot.get(); }
+	std::vector<QuadTreeNode*> GetLeafs() const { return m_pLeafs; }
 
 private:
     std::unique_ptr<QuadTreeNode> m_pRoot;
-
+    std::vector<QuadTreeNode*> m_pLeafs;
 };
 
