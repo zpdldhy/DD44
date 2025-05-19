@@ -167,8 +167,8 @@ void TestSJ::Init()
 	OBJECT->AddActor(m_pPointLight);
 	OBJECT->AddActor(m_pLight);
 	OBJECT->AddActor(m_pCameraActor);
-	//OBJECT->AddActor(m_pActor);
-	//OBJECT->AddActor(m_pActor2);
+	OBJECT->AddActor(m_pActor);
+	OBJECT->AddActor(m_pActor2);
 	OBJECT->AddActor(m_pSky);
 	//OBJECT->AddActor(m_pSwordActor);
 
@@ -180,7 +180,7 @@ void TestSJ::Init()
 void TestSJ::Update()
 {
 	m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
-	LIGHTMANAGER->UpdateLightCB();
+	//LIGHTMANAGER->UpdateLightCB();
 	// 오브젝트 회전
 	{
 		static float angle = 0.0f;
@@ -198,12 +198,12 @@ void TestSJ::Update()
 		m_pActor2->SetPosition(newPos);
 	}
 	//Rim Light
-	/*if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 	{
-		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetLocalPosition();
+		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetWorldPosition();
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
 		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
-	}*/
+	}
 	//Emissive
 	{
 		//m_pStaticMesh2->GetMaterial()->SetEmissiveParams(Vec3(0.0f, 1.0f, 0.0f), 0.1f);
@@ -499,7 +499,7 @@ void TestSJ::Update()
 
 	POSTPROCESS->SetBlurScale(m_fBlurScale);
 
-	LIGHTMANAGER->UpdateLightCB();
+	//LIGHTMANAGER->UpdateLightCB();
 
 	
 }

@@ -12,8 +12,6 @@ cbuffer CameraBuffer : register(b1)
 {
     row_major matrix g_matView;
     row_major matrix g_matProj;
-    float3 g_vCameraPos;
-    float dummy_camera;
 };
 
 cbuffer CB_MaterialEffect : register(b2)
@@ -43,6 +41,9 @@ cbuffer CB_MaterialEffect : register(b2)
 
     float3 g_vSpecularCoeff; // 정반사 색상
     float g_fShininess;
+    
+    float3 g_vCameraPos;
+    float dummy_camera;
 };
 
 
@@ -270,7 +271,6 @@ float3 ApplyLambertLighting(float3 normal, float3 worldPos)
     }
     return result;
 }
-
 
 
 float3 ApplySpecular(float3 normal, float3 worldPos)
