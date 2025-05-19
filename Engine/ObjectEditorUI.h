@@ -26,10 +26,10 @@ private:
     float m_fRotation[3] = { 0.0f, 0.0f, 0.0f };
     float m_fScale[3] = { 1.0f, 1.0f, 1.0f };
 
-    char m_szTexturePath[256] = "../Resources/Texture/kkongchi.jpg";
-    char m_szShaderPath[256] = "../Resources/Shader/Default.hlsl";
-    char m_szObjPath[256] = "../Resources/Obj/buggy_floor.obj";
-
+    char m_szObjPath[256] = "../Resources/Obj/column/column.obj";
+    char m_szTexturePath[256] = "../Resources/Obj/column/column_gray.png";
+    char m_szShaderPath[256] = "../Resources/Shader/PREffect.hlsl";
+ 
     float m_fEmissiveColor[3] = { 0.f, 0.f, 0.f };
     float m_fEmissivePower = 0.f;
     float m_fSpecularColor[3] = { 0.f, 0.f, 0.f };
