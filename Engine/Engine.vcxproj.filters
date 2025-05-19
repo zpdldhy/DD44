@@ -322,6 +322,10 @@
     <ClInclude Include="CollisionScript.h">
       <Filter>Component\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="MeshEditorUI.h" />
+    <ClInclude Include="UIEditorUI.h">
+      <Filter>Utils\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -536,6 +540,10 @@
     </ClCompile>
     <ClCompile Include="CollisionScript.cpp">
       <Filter>Component\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshEditorUI.cpp" />
+    <ClCompile Include="UIEditorUI.cpp">
+      <Filter>Utils\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

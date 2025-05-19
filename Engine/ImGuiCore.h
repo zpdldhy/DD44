@@ -6,6 +6,7 @@
 #include "CharacterEditorUI.h"
 #include "ActorListUI.h"
 #include "MeshEditorUI.h"
+#include "UIEditorUI.h"
 
 class ImGuiCore : public Singleton<ImGuiCore>
 {
@@ -16,6 +17,7 @@ private:
 	std::unique_ptr<class EffectEditorUI> m_pEffectEditorUI;
 	std::unique_ptr<class ActorListUI> m_pActorListUI;
 	std::unique_ptr<class MeshEditorUI> m_pMeshEditorUI;
+	std::unique_ptr<class UIEditorUI> m_pUIEditorUI;
 
 public:
 	bool m_bEditorToolVisible = true;
@@ -25,6 +27,7 @@ public:
 	ObjectEditorUI* GetObjectEditorUI() const { return m_pObjectEditorUI.get(); }
 	EffectEditorUI* GetEffectEditorUI() const { return 	m_pEffectEditorUI.get(); }
 	MeshEditorUI* GetMeshEditorUI() const { return m_pMeshEditorUI.get(); }
+	UIEditorUI* GetUIEditorUI() const { return m_pUIEditorUI.get(); }
 
 	void SetCharacterEditorCallback(std::function<void(std::shared_ptr<UMeshComponent>, const Vec3&, const Vec3&, const Vec3&, int) > callback)
 	{
@@ -53,6 +56,10 @@ public:
 	void SetChildMeshEditorCallback(std::function<void(ChildMeshData)> callback)
 	{
 		m_pMeshEditorUI->CreateChildMeshCallback(std::move(callback));
+	}
+	void SetUIEditorCallback(std::function<void()> callback)
+	{
+		m_pUIEditorUI->SetOnCreateCallback(std::move(callback));
 	}
 
 public:

@@ -68,6 +68,7 @@ void Game::SetupSunLight()
 	LIGHTMANAGER->Init();
 	
 	m_pSunLight = make_shared<ALight>();
+	m_pSunLight->m_szName = L"SunLight";
 	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
 	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
