@@ -4,12 +4,13 @@
 
 void ObjectEditorUI::DrawUI()
 {
-    // 式式式式式式式式式式式式式式式式式式式式式式式 Object Configuration 式式式式式式式式式式式式式式式式式式式式式式式
-    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Object Configuration");
+    // 式式式式式式式式式式式式式式式式式式式式式式式式式式 Asset Paths 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Asset Paths");
+    ImGui::InputText("Obj", m_szObjPath, IM_ARRAYSIZE(m_szObjPath));
 
     ImGui::Separator(); ImGui::Spacing();
 
-    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Transform 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
+    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Transform 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Transform");
     DrawVec3Slider("Position", m_fPosition, -100.f, 100.f);
     DrawVec3Slider("Rotation", m_fRotation, -360.f, 360.f);
@@ -32,14 +33,14 @@ void ObjectEditorUI::DrawUI()
 
     ImGui::Separator(); ImGui::Spacing();
      
+    // 式式式式式式式式式式式式式式式式式式式式式式式式式式 Material Input 式式式式式式式式式式式式式式式式式式式式式式式式式式式
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Material Paths");
 
-    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Asset Input 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
-    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Asset Paths");
     ImGui::InputText("Texture", m_szTexturePath, IM_ARRAYSIZE(m_szTexturePath));
     ImGui::InputText("Shader", m_szShaderPath, IM_ARRAYSIZE(m_szShaderPath));
-    ImGui::InputText("Obj", m_szObjPath, IM_ARRAYSIZE(m_szObjPath));
 
-    ImGui::Spacing();
+
+    ImGui::Separator(); ImGui::Spacing();
 
     if (ImGui::Button("Create", ImVec2(-1, 0)) && m_OnCreate)
     {
@@ -177,6 +178,7 @@ std::vector<std::string> ObjectEditorUI::GetPrefabList(const std::string& folder
 
     return result;
 }
+
 void ObjectEditorUI::DrawVec3Slider(const char* label, float* values, float minVal, float maxVal)
 {
     ImGui::PushID(label);
