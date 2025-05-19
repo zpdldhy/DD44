@@ -32,6 +32,8 @@ public:
     
     void InsertActor(QuadTreeNode* node, std::shared_ptr<AActor> actor);
     void RemoveActorFromAllNodes(QuadTreeNode* node, UINT actorIndex);
+
+    std::vector<UINT> FindNearbyActorIndices(const AActor& _actor);
     
     QuadTreeNode* GetRoot() const { return m_pRoot.get(); }
 	std::vector<QuadTreeNode*> GetLeafs() const { return m_pLeafs; }
