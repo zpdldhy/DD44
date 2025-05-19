@@ -23,8 +23,7 @@ void Game::Init()
 	LoadAllPrefabs(".object.json");
 	LoadAllPrefabs(".character.json");
 
-	//SetupEngineCamera();
-	SetupGameCamera();
+	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
 
@@ -32,6 +31,20 @@ void Game::Init()
 
 void Game::Update()
 {
+	if (INPUT->GetButton(O))
+	{
+		if (m_bEnginCamera)
+		{
+			m_bEnginCamera = false;
+			CAMERA->Set3DCameraActor(m_pPlayer);
+		}
+		else
+		{
+			m_bEnginCamera = true;
+			CAMERA->Set3DCameraActor(m_pCameraActor);
+		}
+	}
+
 }
 
 void Game::Render()
@@ -52,21 +65,6 @@ void Game::SetupEngineCamera()
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	OBJECT->AddActor(m_pCameraActor);
-}
-
-void Game::SetupGameCamera()
-{
-	if (m_pPlayer == nullptr) { return; }
-
-	m_pGameCamera = make_shared<ACameraActor>();
-	{
-		m_pGameCamera->SetPosition(m_pPlayer->GetPosition());
-		m_pGameCamera->AddScript(make_shared<EngineCameraMoveScript>());
-		m_pGameCamera->m_szName = L"GameCamera";
-
-	}
-	CAMERA->Set3DCameraActor(m_pPlayer);
-	OBJECT->AddActor(m_pGameCamera);
 }
 
 void Game::SetupSkybox()

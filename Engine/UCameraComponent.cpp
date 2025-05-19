@@ -163,7 +163,6 @@ void UCameraComponent::CreateFrustumBox()
 void UCameraComponent::UpdateFrustumBox()
 {
 	m_pFrustumBox->SetPosition(m_vWorldPosition);
-	m_pFrustumBox->SetRotation(m_pOwner.lock()->GetRotation());
 
 	m_pFrustumBox->Tick();
 

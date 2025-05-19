@@ -5,7 +5,6 @@ class Game : public IExecute
 {
 public:
 	shared_ptr<class ACameraActor> m_pCameraActor;
-	shared_ptr<class ACameraActor> m_pGameCamera;
 	
 	shared_ptr<class AActor> m_pPlayer;
 
@@ -13,6 +12,8 @@ public:
 	shared_ptr<class ASky> m_pSky;
 
 	shared_ptr<class ALight> m_pSunLight;
+
+	bool m_bEnginCamera = false;
 
 public:
 	void Init() override;
@@ -22,7 +23,6 @@ public:
 
 protected:
 	void SetupEngineCamera();
-	void SetupGameCamera();
 	void SetupSkybox();
 	void SetupSunLight();
 

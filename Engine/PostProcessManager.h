@@ -14,6 +14,12 @@ struct CB_Blur
 	Vec3 padding;
 };
 
+struct CB_Debug
+{
+	int g_iDebugMode;
+	Vec3 padding;
+};
+
 class PostProcessManager : public Singleton<PostProcessManager>
 {
 	UINT m_iMRTCount = 0;
@@ -33,6 +39,10 @@ class PostProcessManager : public Singleton<PostProcessManager>
 
 	CB_Blur m_tBlurCB = {};
 
+	int m_iDebugMode = 0;
+	CB_Debug m_tDebugData;       
+	ComPtr<ID3D11Buffer> m_pCBDebug; 
+
 public:
 	// 후처리용 텍스처 및 shader초기화
 	void Init(UINT _count);
@@ -49,6 +59,12 @@ public:
 	UINT GetMRTNum() { return m_vMRTList.size(); }	
 	void SetBlurScale(float _scale) { m_tBlurCB.g_fBlurScale = _scale;}
 	void SetSRVToSlot(int _index, const ComPtr<ID3D11ShaderResourceView>& _srv);
+
+	void CreateBlurCB();
+	void ApplyBlurCB();
+	void CreateDebugCB();
+	void SetDebugMode(int _mode);      
+	void ApplyDebugCB();
 
 private:
 
