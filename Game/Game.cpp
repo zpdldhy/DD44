@@ -20,7 +20,7 @@ void Game::Init()
 	SetupEditorCallbacks();
 
 	LoadAllPrefabs(".map.json");
-	LoadAllPrefabs(".object.json");
+	LoadAllPrefabs(".objects.json");
 	LoadAllPrefabs(".character.json");
 
 	SetupEngineCamera();
@@ -277,7 +277,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				m_pPlayer = actor;
 
 				auto cameraComponent = make_shared<UCameraComponent>();
-				cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
+				cameraComponent->SetLocalPosition(Vec3(20.0f, 35.0f, -20.0f));
 				m_pPlayer->SetCameraComponent(cameraComponent);
 
 
@@ -317,5 +317,42 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				OBJECT->AddActor(obj);
 			}
 		}
+		else if (extension == ".objects.json")
+		{
+			std::vector<PrefabObjectData> objList;
+			if (PREFAB->LoadObjectArray(file, objList))
+			{
+				for (auto& objData : objList)
+				{
+					auto meshComp = make_shared<UStaticMeshComponent>();
+					meshComp->SetMeshPath(to_mw(objData.MeshPath));
+
+					auto meshRes = make_shared<UStaticMeshResources>();
+					AssimpLoader loader;
+					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
+					if (!meshList.empty())
+					{
+						meshRes->SetVertexList(meshList[0].m_vVertexList);
+						meshRes->SetIndexList(meshList[0].m_vIndexList);
+						meshRes->Create();
+						meshComp->SetMesh(meshRes);
+					}
+
+					auto material = make_shared<UMaterial>();
+					material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
+					meshComp->SetMaterial(material);
+
+					auto obj = make_shared<APawn>();
+					obj->m_szName = L"Object";
+					obj->SetMeshComponent(meshComp);
+					obj->SetPosition(objData.Translation);
+					obj->SetRotation(objData.Rotation);
+					obj->SetScale(objData.Scale);
+
+					OBJECT->AddActor(obj);
+				}
+			}
+		}
+
 	}
 }
