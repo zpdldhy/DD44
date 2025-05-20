@@ -3,6 +3,7 @@
 #include "UMaterial.h"
 #include "UStaticMeshComponent.h"
 #include "APawn.h"
+#include "AAsset.h"
 
 vector<shared_ptr<APawn>> ObjectLoader::Load()
 {
@@ -44,6 +45,17 @@ vector<shared_ptr<APawn>> ObjectLoader::Load()
 	return m_vObjList;
 }
 
+void ObjectLoader::ConvertObjToAsset(string _path)
+{
+	vector<string> fileList = GetFileNames(_path);
+
+	for (int iPath = 0; iPath < fileList.size(); iPath++)
+	{
+		LoadAsFR(fileList[iPath]);
+		//AAsset::Export(ret, fileList[iPath]);
+	}
+}
+
 vector<shared_ptr<UMeshComponent>> ObjectLoader::LoadMesh()
 {
 	return m_vMeshList;
@@ -53,4 +65,15 @@ map<wstring, shared_ptr<UMeshResources>> ObjectLoader::LoadMeshMap()
 {
 
 	return m_mMeshMap;
+}
+
+void ObjectLoader::LoadAsFR(string path)
+{
+	TFbxResource ret;
+	ret.Clear();
+	vector<MeshData> dataList = objectLoader.Load(path);
+	ret.m_iMeshCount = 1;
+	ret.m_vMeshList.emplace_back(dataList[0]);
+
+	AAsset::Export(ret, path);
 }

@@ -12,16 +12,20 @@
 #include "AssimpLoader.h"
 #include "LightManager.h"
 #include "ALight.h"
-#include "MeshLoader.h"
+//#include "MeshLoader.h"
 #include "Input.h"
 #include "UBoxComponent.h"
 
 void Game::Init()
 {
-	SetupEditorCallbacks();
+	// Asset 로딩
+	actorLoader.LoadAllAsset();
+	meshLoader.SetMesh(actorLoader.LoadMeshMap());
+	meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
 	LoadAllPrefabs(".map.json");
 	LoadAllPrefabs(".objects.json");
+	LoadAllPrefabs(".object.json");
 	LoadAllPrefabs(".character.json");
 
 	SetupEngineCamera();
@@ -59,7 +63,7 @@ void Game::Destroy()
 void Game::SetupEngineCamera()
 {
 	m_pCameraActor = make_shared<ACameraActor>();
-	
+
 	m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 	m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	m_pCameraActor->m_szName = L"EnginCamera";
@@ -85,7 +89,7 @@ void Game::SetupSkybox()
 void Game::SetupSunLight()
 {
 	LIGHTMANAGER->Init();
-	
+
 	m_pSunLight = make_shared<ALight>();
 	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
@@ -93,169 +97,14 @@ void Game::SetupSunLight()
 	m_pSunLight->SetPosition(Vec3(0, 100.0f, 0));
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	OBJECT->AddActor(m_pSunLight);
-	
+
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
 }
 
-void Game::SetupEditorCallbacks()
-{
-	SetupCharacterEditorCallback();
-	SetupMapEditorCallback();
-	SetupObjectEditorCallback();
-}
-
-void Game::SetupCharacterEditorCallback()
-{
-	GUI->SetCharacterEditorCallback(
-		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position,
-			const Vec3& rotation,
-			const Vec3& scale, 
-			CameraComponentData camera,
-			ShapeComponentData shape,
-			int scriptType)
-		{
-			if (!rootComponent)
-			{
-				return;
-			}
-
-			auto actor = std::make_shared<AActor>();
-			//actor->SetActorName(rootComponent->GetName());
-			actor->m_szName = L"Character";
-
-			actor->SetMeshComponent(rootComponent);
-
-			actor->SetPosition(position);
-			actor->SetRotation(rotation);
-			actor->SetScale(scale);
-
-			if (camera.isUse)
-			{
-				auto cam = std::make_shared<UCameraComponent>();
-				cam->SetLocalPosition(Vec3(camera.Position));
-				cam->SetLocalRotation(Vec3(camera.Rotation));
-				cam->SetPerspective(camera.Fov, camera.Aspect, camera.Near, camera.Far);
-				actor->SetCameraComponent(cam);
-			}
-
-			if (shape.isUse)
-			{
-				shared_ptr<UShapeComponent> shapeComp = nullptr;
-
-				if (shape.eShapeType == ShapeType::ST_BOX)
-					shapeComp = std::make_shared<UBoxComponent>();
-				//else if (shape.eShapeType == ShapeType::ST_SPHERE)
-
-				shapeComp->SetLocalScale(Vec3(shape.Scale));
-				shapeComp->SetLocalPosition(Vec3(shape.Position));
-				shapeComp->SetLocalRotation(Vec3(shape.Rotation));
-				shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-
-				actor->SetShapeComponent(shapeComp);
-			}
-
-			if (scriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
-			//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
-
-			OBJECT->AddActor(actor);
-		});
-}
-
-void Game::SetupMapEditorCallback()
-{
-	GUI->SetMapEditorCallback([this]()
-		{
-			MapEditorUI* editor = GUI->GetMapEditorUI();
-			if (!editor) return;
-
-			auto tile = std::make_shared<ATerrainTileActor>();
-			tile->m_szName = L"Terrain";
-
-			tile->m_iNumCols = editor->GetNumCols();
-			tile->m_iNumRows = editor->GetNumRows();
-			tile->m_fCellSize = editor->GetCellSize();
-
-			tile->CreateTerrain(editor->GetTexturePath(), editor->GetShaderPath());
-			tile->SetPosition(editor->GetPosition());
-			tile->SetRotation(editor->GetRotation());
-			tile->SetScale(editor->GetScale());
-
-			auto mesh = tile->m_pTerrainMeshComponent->GetMesh();
-			auto newVertexList = mesh->GetVertexList();
-
-			int vertexCountX = tile->m_iNumCols + 1;
-			int row = editor->GetSelectedRow();
-			int col = editor->GetSelectedCol();
-			float centerHeight = editor->GetTargetHeight();
-
-			int topLeft = row * vertexCountX + col;
-			int topRight = topLeft + 1;
-			int bottomLeft = (row + 1) * vertexCountX + col;
-			int bottomRight = bottomLeft + 1;
-
-			if (bottomRight < newVertexList.size())
-			{
-				newVertexList[topLeft].pos.y = centerHeight;
-				newVertexList[topRight].pos.y = centerHeight;
-				newVertexList[bottomLeft].pos.y = centerHeight;
-				newVertexList[bottomRight].pos.y = centerHeight;
-			}
-
-			mesh->SetVertexList(newVertexList);
-			mesh->Create();
-
-			OBJECT->AddActor(tile);
-		});
-}
-
-void Game::SetupObjectEditorCallback()
-{
-
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
-		{
-			AssimpLoader loader;
-			vector<MeshData> meshList = loader.Load(objPath);
-			if (meshList.empty())
-				return;
-
-			auto meshComp = make_shared<UStaticMeshComponent>();
-			meshComp->SetMeshPath(to_mw(objPath));
-
-			auto meshRes = make_shared<UStaticMeshResources>();
-			meshRes->SetVertexList(meshList[0].m_vVertexList);
-			meshRes->SetIndexList(meshList[0].m_vIndexList);
-			meshRes->Create();
-
-			meshComp->SetMesh(meshRes);
-
-			auto mat = make_shared<UMaterial>();
-			mat->Load(
-				std::wstring(texPath, texPath + strlen(texPath)),
-				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-			);
-			meshComp->SetMaterial(mat);
-
-			// Snap 적용 여부 확인
-			if (GUI->GetObjectEditorUI()->IsSnapEnabled())
-			{
-				pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
-			}
-
-			auto actor = make_shared<APawn>();
-			actor->m_szName = L"Object";
-
-			actor->SetMeshComponent(meshComp);
-			actor->SetPosition(pos);
-			actor->SetRotation(rot);
-			actor->SetScale(scale);
-
-			OBJECT->AddActor(actor);
-		});
-}
-
 void Game::LoadAllPrefabs(const std::string& extension)
 {
+
 	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
 
 	for (const auto& file : files)
@@ -284,11 +133,11 @@ void Game::LoadAllPrefabs(const std::string& extension)
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
 
-				ActorLoader actorLoader;
-				actorLoader.LoadAllAsset();
-				MeshLoader meshLoader;
-				meshLoader.SetMesh(actorLoader.LoadMeshMap());
-				meshLoader.SetAnim(actorLoader.LoadAnimMap());
+				//ActorLoader actorLoader;
+				//actorLoader.LoadAllAsset();
+				//MeshLoader meshLoader;
+				//meshLoader.SetMesh(actorLoader.LoadMeshMap());
+				//meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
 				shared_ptr<UMeshComponent> meshComponent = meshLoader.Make(characterData.MeshPath.c_str());
 
@@ -335,19 +184,31 @@ void Game::LoadAllPrefabs(const std::string& extension)
 			PrefabObjectData objData;
 			if (PREFAB->LoadObject(file, objData))
 			{
-				auto meshComp = make_shared<UStaticMeshComponent>();
-				meshComp->SetMeshPath(to_mw(objData.MeshPath));
-
-				auto meshRes = make_shared<UStaticMeshResources>();
-				AssimpLoader loader;
-				vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
-				if (!meshList.empty())
+				shared_ptr<UStaticMeshComponent> meshComp = make_shared<UStaticMeshComponent>();
+ 				if (SplitExt(to_mw(objData.MeshPath)) == L".obj")
 				{
-					meshRes->SetVertexList(meshList[0].m_vVertexList);
-					meshRes->SetIndexList(meshList[0].m_vIndexList);
-					meshRes->Create();
-					meshComp->SetMesh(meshRes);
+					AssimpLoader loader;
+					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
+					meshComp->SetMeshPath(to_mw(objData.MeshPath)); // 이거 풀네임으로 들어가야되는건가 ? 나중에 어디서 쓰이나 ? 
+					auto meshRes = make_shared<UStaticMeshResources>();
+					if (!meshList.empty())
+					{
+						meshRes->SetVertexList(meshList[0].m_vVertexList);
+						meshRes->SetIndexList(meshList[0].m_vIndexList);
+						meshRes->Create();
+						meshComp->SetMesh(meshRes);
+					}
+
 				}
+				else
+				{
+					ActorLoader al;
+					al.LoadOne(objData.MeshPath);
+					meshComp->SetMeshPath(to_mw(objData.MeshPath));
+					auto resources = al.LoadMeshResources();
+					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources[0]));
+				}
+
 
 				auto material = make_shared<UMaterial>();
 				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
@@ -401,4 +262,6 @@ void Game::LoadAllPrefabs(const std::string& extension)
 		}
 
 	}
+
+
 }

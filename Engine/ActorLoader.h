@@ -33,6 +33,7 @@ public:
 	// prefab전 바로 사용을 위한 
 	shared_ptr<APawn> LoadOneActor(string _path);
 	vector<shared_ptr<APawn>> LoadAllActor();
+	shared_ptr<APawn> LoadRedeemer(string _path);
 
 };
 

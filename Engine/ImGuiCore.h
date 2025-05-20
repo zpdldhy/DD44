@@ -46,11 +46,11 @@ public:
 	{
 		m_pEffectEditorUI->SetLightApplyCallback(std::move(callback));
 	}
-	void SetBaseMeshEditorCallback(std::function<void(wstring, int, int, int, shared_ptr<APawn>&)> callback)
+	void SetBaseMeshEditorCallback(function<void(PreMeshData, shared_ptr<APawn>&)> callback)
 	{
 		m_pMeshEditorUI->CreateActorCallback(std::move(callback));
 	}
-	void SetChildMeshEditorCallback(std::function<void(ChildMeshData)> callback)
+	void SetChildMeshEditorCallback(std::function<void(PreMeshData, shared_ptr<APawn>&)> callback)
 	{
 		m_pMeshEditorUI->CreateChildMeshCallback(std::move(callback));
 	}

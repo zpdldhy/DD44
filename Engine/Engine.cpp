@@ -19,6 +19,8 @@
 #include "CollisionManager.h"
 #include "LightManager.h"
 
+bool Engine::bRunGame;
+
 void Engine::Init()
 {
 	GET_SINGLE(Device)->Init();
@@ -35,7 +37,12 @@ void Engine::Init()
 	{
 		INPUT->Init();
 		//DXWRITE->Create();
-		GUI->Init();
+#ifndef RUN_GAME
+		if (!bRunGame)
+		{
+			GUI->Init();
+		}
+#endif
 	}
 	_app->Init();
 
@@ -65,12 +72,16 @@ void Engine::Frame()
 
 	GET_SINGLE(Device)->Frame();
 
-	GUI->Update();
-	
+	if (!bRunGame)
+	{
+		GUI->Update();
+	}
+
+
 	_app->Update();
 
 	TIMER->Update();
-	
+
 	// Manager Tick
 	{
 		CAMERA->Tick();
@@ -90,11 +101,11 @@ void Engine::Render()
 	_app->Render();
 	// 3D World -> Texture Render
 	{
-		POSTPROCESS->PreRender();		
+		POSTPROCESS->PreRender();
 		OBJECT->Render();	// ObjectList Render
 		POSTPROCESS->PostRender();
 
-		
+
 
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
@@ -104,17 +115,20 @@ void Engine::Render()
 
 		{
 			CAMERA->Render(CameraViewType::CVT_UI);
-		
+
 			POSTPROCESS->Present();
 		}
 
 		DC->RSSetState(m_pCurrentRasterizer.Get());
 		m_pCurrentRasterizer.Reset();
-	}	
+	}
 
 	UI->Render();
+	if (!bRunGame)
+	{
+		GUI->Render(); // *Fix Location* after _app->Render() 
+	}
 
-	GUI->Render(); // *Fix Location* after _app->Render() 
 
 	//DXWRITE->m_pd2dRT->EndDraw();
 	GET_SINGLE(Device)->PostRender();
@@ -122,13 +136,14 @@ void Engine::Render()
 
 void Engine::Release()
 {
-	UI->Destroy();	
-
+	UI->Destroy();
+	if(!bRunGame)
 	{
 		ImGui_ImplDX11_Shutdown();  // DX11 관련 리소스 해제
 		ImGui_ImplWin32_Shutdown(); // Win32 윈도우 관련 연결 해제
 		ImGui::DestroyContext();    // ImGui 컨텍스트 자체 해제
 	}
+
 	GET_SINGLE(Device)->Release();
 }
 
@@ -138,8 +153,8 @@ void Engine::Run()
 	_window.SetWindow();
 	Init();
 
-	Timer timer; 
-	timer.Init(); 
+	Timer timer;
+	timer.Init();
 
 	while (_window.CheckRun())
 	{
