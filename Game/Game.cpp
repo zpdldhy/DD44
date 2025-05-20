@@ -260,12 +260,11 @@ void Game::SetupObjectEditorCallback()
 
 void Game::SetupUIEditorCallback()
 {
-	GUI->SetUIEditorCallback([this](const char* texPath, const char* shaderPath, Vec3 pos, Vec3 rot, Vec3 scale)
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, ActorData actorData)
 		{
-			auto ui = std::make_shared<AUIActor>();
-			ui->m_szName = L"UI";
+			uiActor->m_szName = L"UI";
 			auto meshComp = UStaticMeshComponent::CreatePlane();
-			ui->SetMeshComponent(meshComp);
+			uiActor->SetMeshComponent(meshComp);
 
 			auto mat = make_shared<UMaterial>();
 			mat->Load(
@@ -273,12 +272,12 @@ void Game::SetupUIEditorCallback()
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
 			);
 			meshComp->SetMaterial(mat);
-			ui->SetMeshComponent(meshComp);
-			ui->SetPosition(pos);
-			ui->SetRotation(rot);
-			ui->SetScale(scale);
+			uiActor->SetMeshComponent(meshComp);
+			uiActor->SetPosition(Vec3(actorData.Position));
+			uiActor->SetRotation(Vec3(actorData.Rotation));
+			uiActor->SetScale(Vec3(actorData.Scale));
 
-			UI->AddUI(ui);
+			UI->AddUI(uiActor);
 		});
 }
 

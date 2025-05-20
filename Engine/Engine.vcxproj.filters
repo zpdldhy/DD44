@@ -324,7 +324,7 @@
     </ClInclude>
     <ClInclude Include="MeshEditorUI.h" />
     <ClInclude Include="MeshLoader.h" />
-    <ClInclude Include="EditorData.h">
+    <ClInclude Include="EditorData.h" />
     <ClInclude Include="UIEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>

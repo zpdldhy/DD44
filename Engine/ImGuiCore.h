@@ -57,7 +57,7 @@ public:
 	{
 		m_pMeshEditorUI->CreateChildMeshCallback(std::move(callback));
 	}
-	void SetUIEditorCallback(std::function<void(const char*, const char*, Vec3, Vec3, Vec3)> callback)
+	void SetUIEditorCallback(std::function<void(shared_ptr<class AUIActor>, const char*, const char*, ActorData)> callback)
 	{
 		m_pUIEditorUI->SetOnCreateCallback(std::move(callback));
 	}

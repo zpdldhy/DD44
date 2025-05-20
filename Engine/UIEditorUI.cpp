@@ -1,114 +1,134 @@
 #include "pch.h"
 #include "UIEditorUI.h"
 #include "PrefabLoader.h"
+#include "AUIActor.h"
 
 void UIEditorUI::DrawUI()
 {
-    // ───────────────────────────── Transform ─────────────────────────────
-    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Transform");
-    DrawVec3Slider("Position", m_fPosition, -100.f, 100.f);
-    DrawVec3Slider("Rotation", m_fRotation, -360.f, 360.f);
-    DrawVec3Slider("Scale", m_fScale, 0.01f, 10.f);
+	// ───────────────────────────── Create ─────────────────────────────
+	if (ImGui::Button("Create New UI"))
+	{
+		m_pUIActor = make_shared<AUIActor>();
 
-    ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
-    // ───────────────────────────── Asset Input ─────────────────────────────
-    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Asset Paths");
-    ImGui::InputText("Texture", m_szTexturePath, IM_ARRAYSIZE(m_szTexturePath));
-    ImGui::InputText("Shader", m_szShaderPath, IM_ARRAYSIZE(m_szShaderPath));
+		ResetData();
 
-    ImGui::Spacing();
+		// 초기값 세팅
+		m_OnCreate(
+			m_pUIActor,
+			m_szTexturePath,
+			m_szShaderPath,
+			m_UIData
+		);
+	}
 
-    if (ImGui::Button("Create", ImVec2(-1, 0)) && m_OnCreate)
-    {
-        m_OnCreate(
-            m_szTexturePath,
-            m_szShaderPath,
-            Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]),
-            Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]),
-            Vec3(m_fScale[0], m_fScale[1], m_fScale[2])
-        );
-    }
+	if (m_pUIActor == nullptr)
+		return;
 
-    // ───────────────────────────── Prefab Save/Load ─────────────────────────────
-    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Prefab Tools");
+	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+	// ───────────────────────────── Transform ─────────────────────────────
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Transform");
+	DrawVec3("Position", m_UIData.Position);
+	DrawVec3("Rotation", m_UIData.Rotation);
+	DrawVec3("Scale", m_UIData.Scale);
 
-    static char prefabName[64] = "MyUI";
-    ImGui::InputText("Prefab Name", prefabName, IM_ARRAYSIZE(prefabName));
+	// ───────────────────────────── Actor Update ─────────────────────────────
+	UpdateUIActor();
 
-    if (ImGui::Button("Save as Prefab", ImVec2(-1, 0)))
-    {
-        PrefabObjectData data;
-        data.Name = prefabName;
-        data.ShaderPath = m_szShaderPath;
-        data.TexturePath = m_szTexturePath;
-        data.Scale = Vec3(m_fScale[0], m_fScale[1], m_fScale[2]);
-        data.Rotation = Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]);
-        data.Translation = Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]);
+	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+	// ───────────────────────────── Asset Input ─────────────────────────────
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Asset Paths");
+	ImGui::InputText("Texture", m_szTexturePath, IM_ARRAYSIZE(m_szTexturePath));
+	ImGui::InputText("Shader", m_szShaderPath, IM_ARRAYSIZE(m_szShaderPath));
 
-        PrefabLoader().SaveObject(data, "../Resources/Prefab/" + data.Name + ".ui.json");
-    }
+	ImGui::Spacing();
+	// ───────────────────────────── Prefab Save/Load ─────────────────────────────
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Prefab Tools");
 
-    if (ImGui::Button("Load Prefab##File", ImVec2(-1, 0)))
-    {
-        PrefabObjectData data;
-        std::string path = "../Resources/Prefab/" + std::string(prefabName) + ".ui.json";
-        if (PREFAB->LoadObject(path, data))
-        {
-            strcpy_s(m_szShaderPath, data.ShaderPath.c_str());
-            strcpy_s(m_szTexturePath, data.TexturePath.c_str());
+	static char prefabName[64] = "MyUI";
+	ImGui::InputText("Prefab Name", prefabName, IM_ARRAYSIZE(prefabName));
 
-            m_fScale[0] = data.Scale.x;    m_fScale[1] = data.Scale.y;    m_fScale[2] = data.Scale.z;
-            m_fRotation[0] = data.Rotation.x; m_fRotation[1] = data.Rotation.y; m_fRotation[2] = data.Rotation.z;
-            m_fPosition[0] = data.Translation.x; m_fPosition[1] = data.Translation.y; m_fPosition[2] = data.Translation.z;
-        }
-    }
+	if (ImGui::Button("Save as Prefab", ImVec2(-1, 0)))
+	{
+		PrefabObjectData data;
+		data.Name = prefabName;
+		data.ShaderPath = m_szShaderPath;
+		data.TexturePath = m_szTexturePath;
+		data.Scale = Vec3(m_UIData.Scale);
+		data.Rotation = Vec3(m_UIData.Rotation);
+		data.Translation = Vec3(m_UIData.Position);
 
-    ImGui::Separator(); ImGui::Spacing();
+		PrefabLoader().SaveObject(data, "../Resources/Prefab/" + data.Name + ".ui.json");
+	}
+
+	if (ImGui::Button("Load Prefab##File", ImVec2(-1, 0)))
+	{
+		PrefabObjectData data;
+		std::string path = "../Resources/Prefab/" + std::string(prefabName) + ".ui.json";
+		if (PREFAB->LoadObject(path, data))
+		{
+			strcpy_s(m_szShaderPath, data.ShaderPath.c_str());
+			strcpy_s(m_szTexturePath, data.TexturePath.c_str());
+
+			
+		}
+	}
+
+	ImGui::Separator(); ImGui::Spacing();
 }
 
-void UIEditorUI::DrawVec3Slider(const char* label, float* values, float minVal, float maxVal)
+void UIEditorUI::DrawVec3(const char* label, float* values)
 {
-    ImGui::PushID(label);
-    ImGui::Text("%s", label);
-    ImGui::Indent(10.0f);
+	ImGui::PushID(label);
+	ImGui::Text("%s", label);
+	ImGui::Indent(10.0f);
 
-    static const char* axes[] = { "X", "Y", "Z" };
-    const float buttonSize = 20.0f;
-    const float inputWidth = 60.0f;
-    const float sliderWidth = 150.0f;
-    const float spacing = 4.0f;
+	static const char* axes[] = { "X", "Y", "Z" };
+	const float buttonSize = 20.0f;
+	const float inputWidth = 60.0f;
+	const float sliderWidth = 150.0f;
+	const float spacing = 4.0f;
 
-    for (int i = 0; i < 3; ++i)
-    {
-        ImGui::PushID(i);
+	for (int i = 0; i < 3; ++i)
+	{
+		ImGui::PushID(i);
 
-        ImGui::Text("%s", axes[i]); ImGui::SameLine();
+		ImGui::Text("%s", axes[i]); ImGui::SameLine();
 
-        if (ImGui::Button("-", ImVec2(buttonSize, 0)))
-            values[i] -= 0.1f;
-        ImGui::SameLine(0, spacing);
+		if (ImGui::Button("-", ImVec2(buttonSize, 0)))
+			values[i] -= 0.1f;
+		ImGui::SameLine(0, spacing);
 
-        ImGui::PushItemWidth(sliderWidth);
-        if (ImGui::SliderFloat("##Slider", &values[i], minVal, maxVal))
-        {
-            // 값이 바뀐 경우 추가 작업 가능
-        }
-        ImGui::PopItemWidth();
+		ImGui::PushItemWidth(inputWidth);
+		ImGui::InputFloat("##Value", &values[i], 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
 
-        ImGui::SameLine(0, spacing);
+		ImGui::SameLine(0, spacing);
 
-        if (ImGui::Button("+", ImVec2(buttonSize, 0)))
-            values[i] += 0.1f;
+		if (ImGui::Button("+", ImVec2(buttonSize, 0)))
+			values[i] += 0.1f;
 
-        ImGui::SameLine(0, spacing);
+		ImGui::PopID();
+	}
 
-        ImGui::PushItemWidth(inputWidth);
-        ImGui::InputFloat("##Value", &values[i], 0.0f, 0.0f, "%.2f");
-        ImGui::PopItemWidth();
+	ImGui::Unindent(10.0f);
+	ImGui::PopID();
+}
 
-        ImGui::PopID();
-    }
+void UIEditorUI::UpdateUIActor()
+{
+	if(m_pUIActor==nullptr)
+		return;
 
-    ImGui::Unindent(10.0f);
-    ImGui::PopID();
+	m_pUIActor->SetPosition(Vec3(m_UIData.Position));
+	m_pUIActor->SetRotation(Vec3(m_UIData.Rotation));
+	m_pUIActor->SetScale(Vec3(m_UIData.Scale));
+}
+
+void UIEditorUI::ResetData()
+{
+	for (int i = 0; i < 3; i++) m_UIData.Position[i] = 0.0f;
+	for (int i = 0; i < 3; i++) m_UIData.Rotation[i] = 0.0f;
+	for (int i = 0; i < 3; i++) m_UIData.Scale[i] = 100.0f;
+	strcpy_s(m_szTexturePath, "../Resources/Texture/white.png");
+	strcpy_s(m_szShaderPath, "../Resources/Shader/Default.hlsl");
 }

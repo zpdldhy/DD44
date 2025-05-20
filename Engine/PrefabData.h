@@ -63,6 +63,22 @@ struct PrefabCharacterData
 
 };
 
+struct PrefabUIData
+{
+    std::string Name;
+
+    std::string ShaderPath;
+    std::string TexturePath;
+
+    int ScriptType;
+
+    ActorData actor;
+
+    // Component
+    CameraComponentData camera;
+    ShapeComponentData shape;
+};
+
 struct ModifiedCellData
 {
     int Row;
