@@ -2,6 +2,9 @@
 #include "IExecute.h"
 #include "Sound.h"
 
+#include "ActorLoader.h"
+#include "MeshLoader.h"
+
 class UMaterial;
 
 class TestSJ : public IExecute
@@ -32,6 +35,10 @@ public:
 	shared_ptr<class ActorLoader> m_pLoader;
 	vector<shared_ptr<class UMeshComponent>> m_vMeshList;
 	shared_ptr<class APawn> m_pSwordActor;
+
+	// Asset loading
+	ActorLoader actorLoader;
+	MeshLoader meshLoader;
 
 	void SetupObjectEditorCallback();
 	void LoadAllPrefabs(const std::string& extension);
