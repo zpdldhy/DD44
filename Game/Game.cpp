@@ -14,6 +14,7 @@
 #include "ALight.h"
 //#include "MeshLoader.h"
 #include "Input.h"
+#include "UBoxComponent.h"
 
 void Game::Init()
 {
@@ -25,7 +26,7 @@ void Game::Init()
 	SetupEditorCallbacks();
 
 	LoadAllPrefabs(".map.json");
-	LoadAllPrefabs(".object.json");
+	LoadAllPrefabs(".objects.json");
 	LoadAllPrefabs(".character.json");
 
 	SetupEngineCamera();
@@ -112,7 +113,12 @@ void Game::SetupEditorCallbacks()
 void Game::SetupCharacterEditorCallback()
 {
 	GUI->SetCharacterEditorCallback(
-		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position, const Vec3& rotation, const Vec3& scale, int scriptType)
+		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale, 
+			CameraComponentData camera,
+			ShapeComponentData shape,
+			int scriptType)
 		{
 			if (!rootComponent)
 			{
@@ -129,12 +135,33 @@ void Game::SetupCharacterEditorCallback()
 			actor->SetRotation(rotation);
 			actor->SetScale(scale);
 
+			if (camera.isUse)
+			{
+				auto cam = std::make_shared<UCameraComponent>();
+				cam->SetLocalPosition(Vec3(camera.Position));
+				cam->SetLocalRotation(Vec3(camera.Rotation));
+				cam->SetPerspective(camera.Fov, camera.Aspect, camera.Near, camera.Far);
+				actor->SetCameraComponent(cam);
+			}
+
+			if (shape.isUse)
+			{
+				shared_ptr<UShapeComponent> shapeComp = nullptr;
+
+				if (shape.eShapeType == ShapeType::ST_BOX)
+					shapeComp = std::make_shared<UBoxComponent>();
+				//else if (shape.eShapeType == ShapeType::ST_SPHERE)
+
+				shapeComp->SetLocalScale(Vec3(shape.Scale));
+				shapeComp->SetLocalPosition(Vec3(shape.Position));
+				shapeComp->SetLocalRotation(Vec3(shape.Rotation));
+				shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+				actor->SetShapeComponent(shapeComp);
+			}
+
 			if (scriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 			//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
-
-			auto cam = std::make_shared<UCameraComponent>();
-			cam->SetLocalPosition(Vec3(10, 10, -10));
-			actor->SetCameraComponent(cam);
 
 			OBJECT->AddActor(actor);
 		});
@@ -274,17 +301,36 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				actor->SetMeshComponent(meshComponent);
 
 				actor->m_szName = L"Character";
-				actor->SetPosition(characterData.Translation);
-				actor->SetRotation(characterData.Rotation);
-				actor->SetScale(characterData.Scale);
+				actor->SetPosition(Vec3(characterData.actor.Position));
+				actor->SetRotation(Vec3(characterData.actor.Rotation));
+				actor->SetScale(Vec3(characterData.actor.Scale));
 
 				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 
 				m_pPlayer = actor;
 
-				auto cameraComponent = make_shared<UCameraComponent>();
-				cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
-				m_pPlayer->SetCameraComponent(cameraComponent);
+				if (characterData.camera.isUse)
+				{
+					auto cameraComponent = make_shared<UCameraComponent>();
+					cameraComponent->SetLocalPosition(Vec3(characterData.camera.Position));
+					cameraComponent->SetLocalRotation(Vec3(characterData.camera.Rotation));
+					cameraComponent->SetPerspective(characterData.camera.Fov, characterData.camera.Aspect, characterData.camera.Near, characterData.camera.Far);
+					actor->SetCameraComponent(cameraComponent);
+				}
+
+				if (characterData.shape.isUse)
+				{
+					shared_ptr<UShapeComponent> shapeComponent = nullptr;
+					if(static_cast<ShapeType>(characterData.shape.eShapeType)== ShapeType::ST_BOX)
+						shapeComponent = make_shared<UBoxComponent>();
+					//else if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_SPHERE)
+
+					shapeComponent->SetLocalScale(Vec3(characterData.shape.Scale));
+					shapeComponent->SetLocalPosition(Vec3(characterData.shape.Position));
+					shapeComponent->SetLocalRotation(Vec3(characterData.shape.Rotation));
+					shapeComponent->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+					actor->SetShapeComponent(shapeComponent);
+				}
 
 
 				OBJECT->AddActor(actor);
@@ -335,6 +381,43 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				OBJECT->AddActor(obj);
 			}
 		}
+		else if (extension == ".objects.json")
+		{
+			std::vector<PrefabObjectData> objList;
+			if (PREFAB->LoadObjectArray(file, objList))
+			{
+				for (auto& objData : objList)
+				{
+					auto meshComp = make_shared<UStaticMeshComponent>();
+					meshComp->SetMeshPath(to_mw(objData.MeshPath));
+
+					auto meshRes = make_shared<UStaticMeshResources>();
+					AssimpLoader loader;
+					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
+					if (!meshList.empty())
+					{
+						meshRes->SetVertexList(meshList[0].m_vVertexList);
+						meshRes->SetIndexList(meshList[0].m_vIndexList);
+						meshRes->Create();
+						meshComp->SetMesh(meshRes);
+					}
+
+					auto material = make_shared<UMaterial>();
+					material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
+					meshComp->SetMaterial(material);
+
+					auto obj = make_shared<APawn>();
+					obj->m_szName = L"Object";
+					obj->SetMeshComponent(meshComp);
+					obj->SetPosition(objData.Translation);
+					obj->SetRotation(objData.Rotation);
+					obj->SetScale(objData.Scale);
+
+					OBJECT->AddActor(obj);
+				}
+			}
+		}
+
 	}
 
 

@@ -115,9 +115,29 @@ bool PrefabLoader::SaveCharacter(const PrefabCharacterData& data, const std::str
     j["AnimIndex"] = data.AnimIndex;
     j["AnimSpeed"] = data.AnimSpeed;
 
-    j["Scale"] = { data.Scale.x, data.Scale.y, data.Scale.z };
-    j["Rotation"] = { data.Rotation.x, data.Rotation.y, data.Rotation.z };
-    j["Translation"] = { data.Translation.x, data.Translation.y, data.Translation.z };
+    j["Actor"] = {
+        { "Scale" , { data.actor.Scale[0], data.actor.Scale[1], data.actor.Scale[2] }},
+		{ "Rotation" , { data.actor.Rotation[0], data.actor.Rotation[1], data.actor.Rotation[2] }},
+		{ "Translation" , { data.actor.Position[0], data.actor.Position[1], data.actor.Position[2] }}
+    };
+
+	j["CameraComponent"] = {
+		{ "isUse", data.camera.isUse },
+		{ "Position", { data.camera.Position[0], data.camera.Position[1], data.camera.Position[2] } },
+		{ "Rotation", { data.camera.Rotation[0], data.camera.Rotation[1], data.camera.Rotation[2] } },
+		{ "Fov", data.camera.Fov },
+		{ "Aspect", data.camera.Aspect },
+		{ "Near", data.camera.Near },
+		{ "Far", data.camera.Far }
+	};
+
+	j["ShapeComponent"] = {
+		{ "isUse", data.shape.isUse },
+		{ "ShapeType", static_cast<UINT>(data.shape.eShapeType) },
+		{ "Position", { data.shape.Position[0], data.shape.Position[1], data.shape.Position[2] } },
+		{ "Rotation", { data.shape.Rotation[0], data.shape.Rotation[1], data.shape.Rotation[2] } },
+		{ "Scale", { data.shape.Scale[0], data.shape.Scale[1], data.shape.Scale[2] } }
+	};
 
     //for (const auto& child : data.ChildMeshes)
     //{
@@ -151,14 +171,11 @@ bool PrefabLoader::LoadCharacter(const std::string& filePath, PrefabCharacterDat
     data.AnimIndex = j["AnimIndex"];
     data.AnimSpeed = j["AnimSpeed"];
 
-    auto s = j["Scale"];
-    data.Scale = Vec3(s[0], s[1], s[2]);
+    LoadActor(j, data);
 
-    auto r = j["Rotation"];
-    data.Rotation = Vec3(r[0], r[1], r[2]);
-
-    auto t = j["Translation"];
-    data.Translation = Vec3(t[0], t[1], t[2]);
+    // Component
+	LoadCameraComponent(j, data.camera);
+	LoadShapeComponent(j, data.shape);
 
     if (j.contains("ChildMeshes"))
     {
@@ -275,6 +292,85 @@ bool PrefabLoader::LoadObject(const std::string& _filePath, PrefabObjectData& _p
     _prefab.EmissivePower = j["EmissivePower"];
 
     return true;
+}
+
+bool PrefabLoader::LoadObjectArray(const std::string& _filePath, std::vector<PrefabObjectData>& _outPrefabs)
+{
+    std::ifstream file(_filePath);
+    if (!file.is_open()) return false;
+
+    json j;
+    file >> j;
+
+    if (!j.is_array()) return false;
+
+    for (auto& item : j)
+    {
+        PrefabObjectData prefab;
+        prefab.Name = item["Name"];
+        prefab.MeshPath = item["MeshPath"];
+        prefab.ShaderPath = item["ShaderPath"];
+        prefab.TexturePath = item["TexturePath"];
+
+        auto s = item["Scale"];
+        prefab.Scale = Vec3(s[0], s[1], s[2]);
+
+        auto r = item["Rotation"];
+        prefab.Rotation = Vec3(r[0], r[1], r[2]);
+
+        auto t = item["Translation"];
+        prefab.Translation = Vec3(t[0], t[1], t[2]);
+
+        auto sc = item["SpecularColor"];
+        prefab.SpecularColor = Vec3(sc[0], sc[1], sc[2]);
+        prefab.Shininess = item["Shininess"];
+
+        auto ec = item["EmissiveColor"];
+        prefab.EmissiveColor = Vec3(ec[0], ec[1], ec[2]);
+        prefab.EmissivePower = item["EmissivePower"];
+
+        _outPrefabs.push_back(prefab);
+    }
+
+    return true;
+}
+
+
+void PrefabLoader::LoadActor(json& j, PrefabCharacterData& data)
+{
+    auto s = j["Actor"]["Scale"];
+    for (int i = 0; i < 3; i++) data.actor.Scale[i] = s[i];
+
+    auto r = j["Actor"]["Rotation"];
+    for (int i = 0; i < 3; i++) data.actor.Rotation[i] = r[i];
+
+    auto t = j["Actor"]["Translation"];
+    for (int i = 0; i < 3; i++) data.actor.Position[i] = t[i];
+}
+
+void PrefabLoader::LoadCameraComponent(json& j, CameraComponentData& data)
+{
+	data.isUse = j["CameraComponent"]["isUse"];
+	auto pos = j["CameraComponent"]["Position"];
+	auto rot = j["CameraComponent"]["Rotation"];
+	data.Fov = j["CameraComponent"]["Fov"];
+	data.Aspect = j["CameraComponent"]["Aspect"];
+	data.Near = j["CameraComponent"]["Near"];
+	data.Far = j["CameraComponent"]["Far"];
+	for (int i = 0; i < 3; i++) data.Position[i] = pos[i];
+	for (int i = 0; i < 3; i++) data.Rotation[i] = rot[i];
+}
+
+void PrefabLoader::LoadShapeComponent(json& j, ShapeComponentData& data)
+{
+	data.isUse = j["ShapeComponent"]["isUse"];
+	data.eShapeType = static_cast<ShapeType>(j["ShapeComponent"]["ShapeType"]);
+	auto pos = j["ShapeComponent"]["Position"];
+	auto rot = j["ShapeComponent"]["Rotation"];
+	auto scale = j["ShapeComponent"]["Scale"];
+	for (int i = 0; i < 3; i++) data.Position[i] = pos[i];
+	for (int i = 0; i < 3; i++) data.Rotation[i] = rot[i];
+	for (int i = 0; i < 3; i++) data.Scale[i] = scale[i];
 }
 
 std::vector<std::string> PrefabLoader::GetPrefabFileList(const std::string& directory, const std::string& extension)

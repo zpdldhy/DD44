@@ -1,4 +1,5 @@
 #pragma once
+#include "EditorData.h"
 
 struct PrefabData
 {
@@ -47,16 +48,19 @@ struct PrefabCharacterData
     int AnimIndex;
     float AnimSpeed;
 
-    Vec3 Scale;
-    Vec3 Rotation;
-    Vec3 Translation;
+    ActorData actor;
 
-    struct PreMeshData
+    // Component
+	CameraComponentData camera;
+	ShapeComponentData shape;
+
+    struct ChildMeshData
     {
         std::string MeshPath;
         int TargetBoneIndex;
     };
-    std::vector<PreMeshData> ChildMeshes;
+    std::vector<ChildMeshData> ChildMeshes;
+
 };
 
 struct ModifiedCellData

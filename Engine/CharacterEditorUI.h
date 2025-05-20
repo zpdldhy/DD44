@@ -11,11 +11,25 @@ public:
     void DrawUI();
     void DrawVec3Slider(const char* label, float* values, float minVal, float maxVal);
 
+private:
+    // Draw UI
+    void SetActor();
+    void SetComponent();
+    void SetCameraComponent();
+    void SetShapeComponent();
+	void SaveCharacterPrefab();
+	void LoadCharacterPrefab();
+    void BrowserSection();
+    void ResetButton();
+
+public:
     void SetOnCreateCallback(std::function<void(
         std::shared_ptr<UMeshComponent> rootComponent,
         Vec3 position,
         Vec3 rotation,
         Vec3 scale,
+        CameraComponentData cameraData,
+        ShapeComponentData shapeData,
         int scriptType
         )> callback)
     {
@@ -37,11 +51,16 @@ private:
     int m_iSelectedChildMeshIndex = 0;
     int m_iSelectedAnimIndex = 0;
     int m_iSelectedBoneIndex = 0;
+	int m_iSelectedComoponentIndex = 0;
     int m_iSelectedScriptIndex = 0;
 
     float m_fPosition[3] = { 0.0f, 0.0f, 0.0f };
     float m_fRotation[3] = { 0.0f, 0.0f, 0.0f };
     float m_fScale[3] = { 1.0f, 1.0f, 1.0f };
+
+    // Component
+	CameraComponentData m_CameraData;
+	ShapeComponentData m_ShapeData;
 
     std::shared_ptr<ActorLoader> m_pLoader;
     std::vector<std::shared_ptr<UMeshComponent>> m_vMeshList;
@@ -57,6 +76,8 @@ private:
         Vec3 position,
         Vec3 rotation,
         Vec3 scale,
+        CameraComponentData,
+        ShapeComponentData,
         int scriptType
     )> m_OnCreate;
 
