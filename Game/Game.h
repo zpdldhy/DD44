@@ -1,4 +1,5 @@
 #pragma once
+#define RUN_GAME
 #include "IExecute.h"
 #include "ActorLoader.h"
 #include "MeshLoader.h"
@@ -33,11 +34,6 @@ protected:
 	void SetupEngineCamera();
 	void SetupSkybox();
 	void SetupSunLight();
-
-	void SetupEditorCallbacks();
-	void SetupCharacterEditorCallback();
-	void SetupMapEditorCallback();
-	void SetupObjectEditorCallback();
 
 	void LoadAllPrefabs(const std::string& extension);
 

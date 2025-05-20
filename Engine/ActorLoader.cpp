@@ -57,11 +57,11 @@ void ActorLoader::LoadOne(string _path)
 
 vector<MeshComponentData> ActorLoader::LoadMeshData()
 {
-	vector<string> fileNames = GetFileNames("../Resources/Asset/*.mesh");
+	vector<string> fileNames = GetFileNames("../Resources/Asset/*.json");
 
 	for (int iPath = 0; iPath < fileNames.size(); iPath++)
 	{
-		MeshComponentData data = AAsset::LoadMesh(fileNames[iPath].c_str());
+		MeshComponentData data = AAsset::LoadJsonMesh(fileNames[iPath].c_str());
 		m_vMeshDataList.emplace_back(data);
 	}
 	return m_vMeshDataList;

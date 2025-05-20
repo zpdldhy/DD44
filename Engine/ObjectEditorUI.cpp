@@ -6,7 +6,7 @@ void ObjectEditorUI::DrawUI()
 {
     // 式式式式式式式式式式式式式式式式式式式式式式式式式式 Asset Paths 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Asset Paths");
-    ImGui::InputText("Obj", m_szObjPath, IM_ARRAYSIZE(m_szObjPath));
+    ImGui::InputText("Asset", m_szObjPath, IM_ARRAYSIZE(m_szObjPath));
 
     ImGui::Separator(); ImGui::Spacing();
 

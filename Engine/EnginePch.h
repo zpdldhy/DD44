@@ -66,3 +66,4 @@ using json = nlohmann::json;
 // Window º¯¼ö
 extern POINT g_windowSize;
 extern HWND g_hWnd;
+extern bool bRunGame;

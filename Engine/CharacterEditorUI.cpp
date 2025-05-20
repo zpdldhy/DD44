@@ -27,9 +27,9 @@ void CharacterEditorUI::DrawUI()
 		if (!m_pLoader)
 			m_pLoader = std::make_shared<ActorLoader>();
 
+		// 다른 obj 파일의 mesh도 사용이 될 수 있어서 LoadAll로 해둠
 		m_pLoader->LoadAllAsset();
-		//m_vMeshList = m_pLoader->LoadMesh();
-		//m_vAnimList = m_pLoader->LoadAnim();
+
 		m_mMeshMap = m_pLoader->LoadMeshMap();
 		m_mAnimMap = m_pLoader->LoadAnimMap();
 		m_vMeshDataList = m_pLoader->LoadMeshData();
@@ -41,7 +41,7 @@ void CharacterEditorUI::DrawUI()
 		string name = to_wm(SplitName(to_mw(m_szAssetPath)));
 		string meshPath = "../Resources/Asset/";
 		meshPath += name;
-		meshPath += ".mesh";
+		meshPath += ".mesh.json";
 		strcpy_s(m_szMeshPath, meshPath.c_str());
 	}
 
@@ -122,9 +122,7 @@ void CharacterEditorUI::DrawUI()
 			//	if (originAnim == m_mAnimMap.end()) { assert(false); }
 			//	auto animInstance = originAnim->second->Clone();
 			//}
-
 			//m_pRootComponent = MakeMesh(m_vMeshDataList[m_iSelectedMeshIndex], true, animInstance);
-
 			//auto& data = m_vMeshDataList[m_iSelectedMeshIndex];
 			//for (int i = 0; i < data.m_vChild.size(); i++)
 			//{
