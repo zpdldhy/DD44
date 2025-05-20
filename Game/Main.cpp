@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "Sample.h"
 #include "Game.h"
+#include "Editor.h"
 
 // 삭제 예정
 #include "TestYR.h"
@@ -16,6 +17,7 @@ int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCm
     shared_ptr<IExecute> app = make_shared<Game>();
 
     Engine game(_hInstance, app);
+    Engine::bRunGame=true;
     game.Run();
 
     return 0;
