@@ -25,12 +25,16 @@ void CharacterEditorUI::DrawUI()
 		if (!m_pLoader)
 			m_pLoader = std::make_shared<ActorLoader>();
 
-		m_pLoader->LoadOne(m_szAssetPath);
+		m_pLoader->LoadAllAsset();
 		//m_vMeshList = m_pLoader->LoadMesh();
 		//m_vAnimList = m_pLoader->LoadAnim();
 		m_mMeshMap = m_pLoader->LoadMeshMap();
 		m_mAnimMap = m_pLoader->LoadAnimMap();
 		m_vMeshDataList = m_pLoader->LoadMeshData();
+
+		meshLoader.SetMesh(m_mMeshMap);
+		meshLoader.SetAnim(m_mAnimMap);
+
 
 		string name = to_wm(SplitName(to_mw(m_szAssetPath)));
 		string meshPath = "../Resources/Asset/";
@@ -108,17 +112,22 @@ void CharacterEditorUI::DrawUI()
 				 }
 				 m_bRootSet = true;
 			 }*/
-			auto originAnim = m_mAnimMap.find(m_vMeshDataList[m_iSelectedMeshIndex].m_szAnim);
-			if (originAnim == m_mAnimMap.end()) { assert(false); }
-			auto animInstance = originAnim->second->Clone();
 
-			m_pRootComponent = MakeMesh(m_vMeshDataList[m_iSelectedMeshIndex], true, animInstance);
+			m_pRootComponent = meshLoader.Make(m_vMeshDataList[m_iSelectedMeshIndex]);
+			//if (m_mAnimMap.size() > 0)
+			//{
+			//	auto originAnim = m_mAnimMap.find(m_vMeshDataList[m_iSelectedMeshIndex].m_szAnim);
+			//	if (originAnim == m_mAnimMap.end()) { assert(false); }
+			//	auto animInstance = originAnim->second->Clone();
+			//}
 
-			auto& data = m_vMeshDataList[m_iSelectedMeshIndex];
-			for (int i = 0; i < data.m_vChild.size(); i++)
-			{
-				m_pRootComponent->AddChild(MakeMesh(data.m_vChild[i], false, animInstance));
-			}
+			//m_pRootComponent = MakeMesh(m_vMeshDataList[m_iSelectedMeshIndex], true, animInstance);
+
+			//auto& data = m_vMeshDataList[m_iSelectedMeshIndex];
+			//for (int i = 0; i < data.m_vChild.size(); i++)
+			//{
+			//	m_pRootComponent->AddChild(MakeMesh(data.m_vChild[i], false, animInstance));
+			//}
 		}
 	}
 
@@ -391,20 +400,23 @@ void CharacterEditorUI::DrawUI()
 				m_mMeshMap = m_pLoader->LoadMeshMap();
 				m_mAnimMap = m_pLoader->LoadAnimMap();
 				m_iSelectedMeshIndex = 0;
+				meshLoader.SetMesh(m_mMeshMap);
+				meshLoader.SetAnim(m_mAnimMap);
 
-				auto meshData = AAsset::LoadMesh(m_szMeshPath);
+				m_pRootComponent = meshLoader.Make(m_szMeshPath);
+				//auto meshData = AAsset::LoadMesh(m_szMeshPath);
 
-				auto originAnim = m_mAnimMap.find(meshData.m_szAnim);
-				if (originAnim == m_mAnimMap.end()) { assert(false); }
-				auto animInstance = originAnim->second->Clone();
+				//auto originAnim = m_mAnimMap.find(meshData.m_szAnim);
+				//if (originAnim == m_mAnimMap.end()) { assert(false); }
+				//auto animInstance = originAnim->second->Clone();
 
-				m_pRootComponent = MakeMesh(meshData, true, animInstance);
+				//m_pRootComponent = meshLoader.MakeMesh(meshData, true, animInstance);
 
-				auto& data = meshData;
-				for (int i = 0; i < data.m_vChild.size(); i++)
-				{
-					m_pRootComponent->AddChild(MakeMesh(data.m_vChild[i], false, animInstance));
-				}
+				//auto& data = meshData;
+				//for (int i = 0; i < data.m_vChild.size(); i++)
+				//{
+				//	m_pRootComponent->AddChild(MakeMesh(data.m_vChild[i], false, animInstance));
+				//}
 				
 				m_OnCreate(m_pRootComponent, position, rotation, scale, m_iSelectedScriptIndex);
 			}
@@ -522,52 +534,52 @@ void CharacterEditorUI::DrawVec3Slider(const char* label, float* values, float m
 	ImGui::PopID();
 }
 
-shared_ptr<UMeshComponent> CharacterEditorUI::MakeMesh(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance)
-{
-	shared_ptr<UMeshComponent> mesh;
-	auto meshRes = m_mMeshMap.find(data.m_szRes);
-	if (meshRes == m_mMeshMap.end()) { assert(false); }
-
-
-	if (data.m_type == (int)MeshType::M_SKINNED)
-	{
-		mesh = make_shared<USkinnedMeshComponent>();
-		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
-		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
-
-		if (bRoot) { skinnedRoot->SetBaseAnim(animInstance); }
-		shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
-		animTrack->SetBase(animInstance);
-		skinnedRoot->SetMeshAnim(animTrack);
-		if (data.m_bInPlace)
-		{
-			animInstance->m_bInPlace = true;
-			animInstance->SetRootIndex(data.m_rootIndex);
-		}
-
-		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
-		mat->Load(data.m_szTex, data.m_szShader);
-		mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
-		skinnedRoot->SetMaterial(mat);
-	}
-	else
-	{
-		mesh = make_shared<UStaticMeshComponent>();
-		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
-		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(meshRes->second));
-
-		staticRoot->SetAnimInstance(animInstance);
-		staticRoot->SetMatBone(data.m_matBone);
-		staticRoot->SetTargetBoneIndex(data.m_targetBone);
-
-		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
-		mat->Load(data.m_szTex, data.m_szShader);
-		staticRoot->SetMaterial(mat);
-	}
-	mesh->SetLocalPosition(data.m_pos);
-	mesh->SetLocalRotation(data.m_rot);
-	mesh->SetLocalScale(data.m_scale);
-
-	return mesh;
-}
-
+//shared_ptr<UMeshComponent> CharacterEditorUI::MakeMesh(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance)
+//{
+//	shared_ptr<UMeshComponent> mesh;
+//	auto meshRes = m_mMeshMap.find(data.m_szRes);
+//	if (meshRes == m_mMeshMap.end()) { assert(false); }
+//
+//
+//	if (data.m_type == (int)MeshType::M_SKINNED)
+//	{
+//		mesh = make_shared<USkinnedMeshComponent>();
+//		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
+//		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
+//
+//		if (bRoot) { skinnedRoot->SetBaseAnim(animInstance); }
+//		shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
+//		animTrack->SetBase(animInstance);
+//		skinnedRoot->SetMeshAnim(animTrack);
+//		if (data.m_bInPlace)
+//		{
+//			animInstance->m_bInPlace = true;
+//			animInstance->SetRootIndex(data.m_rootIndex);
+//		}
+//
+//		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+//		mat->Load(data.m_szTex, data.m_szShader);
+//		mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+//		skinnedRoot->SetMaterial(mat);
+//	}
+//	else
+//	{
+//		mesh = make_shared<UStaticMeshComponent>();
+//		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
+//		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(meshRes->second));
+//
+//		staticRoot->SetAnimInstance(animInstance);
+//		staticRoot->SetMatBone(data.m_matBone);
+//		staticRoot->SetTargetBoneIndex(data.m_targetBone);
+//
+//		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+//		mat->Load(data.m_szTex, data.m_szShader);
+//		staticRoot->SetMaterial(mat);
+//	}
+//	mesh->SetLocalPosition(data.m_pos);
+//	mesh->SetLocalRotation(data.m_rot);
+//	mesh->SetLocalScale(data.m_scale);
+//
+//	return mesh;
+//}
+//

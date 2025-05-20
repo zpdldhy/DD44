@@ -198,9 +198,11 @@ void FbxLoader::ParseMesh(FbxNode* _node)
 		if (pSurface)
 		{
 			string texPath = ParseMaterial(pSurface);
+			int texNum = m_result.m_mTexPathList.size() + i;
+			m_result.m_mTexPathList.insert(make_pair(texNum, (to_mw(texPath))));
 			if (!texPath.empty())
 			{
-				m_result.m_mTexPathList.insert(make_pair(i, (to_mw(texPath))));
+				
 			}
 		}
 	}

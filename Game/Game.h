@@ -1,5 +1,7 @@
 #pragma once
 #include "IExecute.h"
+#include "ActorLoader.h"
+#include "MeshLoader.h"
 
 class Game : public IExecute
 {
@@ -14,6 +16,12 @@ public:
 	shared_ptr<class ALight> m_pSunLight;
 
 	bool m_bEnginCamera = false;
+
+	// Asset loading
+	ActorLoader actorLoader;
+	MeshLoader meshLoader;
+
+	float time;
 
 public:
 	void Init() override;

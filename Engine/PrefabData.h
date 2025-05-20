@@ -51,12 +51,12 @@ struct PrefabCharacterData
     Vec3 Rotation;
     Vec3 Translation;
 
-    struct ChildMeshData
+    struct PreMeshData
     {
         std::string MeshPath;
         int TargetBoneIndex;
     };
-    std::vector<ChildMeshData> ChildMeshes;
+    std::vector<PreMeshData> ChildMeshes;
 };
 
 struct ModifiedCellData

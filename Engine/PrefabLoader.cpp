@@ -164,7 +164,7 @@ bool PrefabLoader::LoadCharacter(const std::string& filePath, PrefabCharacterDat
     {
         for (const auto& child : j["ChildMeshes"])
         {
-            PrefabCharacterData::ChildMeshData childData;
+            PrefabCharacterData::PreMeshData childData;
             childData.MeshPath = child["MeshPath"];
             childData.TargetBoneIndex = child["TargetBoneIndex"];
             data.ChildMeshes.push_back(childData);
