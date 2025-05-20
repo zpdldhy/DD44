@@ -238,7 +238,6 @@ bool PrefabLoader::LoadMapTile(const std::string& filePath, PrefabMapData& data)
     return true;
 }
 
-
 bool PrefabLoader::SaveObject(const PrefabObjectData& _prefab, const std::string& _filePath)
 {
     json j;
@@ -253,6 +252,11 @@ bool PrefabLoader::SaveObject(const PrefabObjectData& _prefab, const std::string
     j["Shininess"] = _prefab.Shininess;
     j["EmissiveColor"] = { _prefab.EmissiveColor.x,_prefab.EmissiveColor.y ,_prefab.EmissiveColor.z };
     j["EmissivePower"] = _prefab.EmissivePower;
+    j["ShapeData"]["isUse"] = _prefab.ShapeData.isUse;
+    j["ShapeData"]["eShapeType"] = static_cast<int>(_prefab.ShapeData.eShapeType);
+    j["ShapeData"]["Position"] = { _prefab.ShapeData.Position[0], _prefab.ShapeData.Position[1], _prefab.ShapeData.Position[2] };
+    j["ShapeData"]["Rotation"] = { _prefab.ShapeData.Rotation[0], _prefab.ShapeData.Rotation[1], _prefab.ShapeData.Rotation[2] };
+    j["ShapeData"]["Scale"] = { _prefab.ShapeData.Scale[0], _prefab.ShapeData.Scale[1], _prefab.ShapeData.Scale[2] };
 
     std::ofstream file(_filePath);
     if (!file.is_open()) return false;
@@ -260,6 +264,7 @@ bool PrefabLoader::SaveObject(const PrefabObjectData& _prefab, const std::string
     file << j.dump(4);
     return true;
 }
+
 
 bool PrefabLoader::LoadObject(const std::string& _filePath, PrefabObjectData& _prefab)
 {
@@ -290,6 +295,23 @@ bool PrefabLoader::LoadObject(const std::string& _filePath, PrefabObjectData& _p
     auto ec = j["EmissiveColor"];
     _prefab.EmissiveColor = Vec3(ec[0], ec[1], ec[2]);
     _prefab.EmissivePower = j["EmissivePower"];
+
+    if (j.contains("ShapeData"))
+    {
+        auto& shape = j["ShapeData"];
+        _prefab.ShapeData.isUse = shape.value("isUse", false);
+        _prefab.ShapeData.eShapeType = static_cast<ShapeType>(shape.value("eShapeType", 0));
+
+        auto pos = shape["Position"];
+        auto rot = shape["Rotation"];
+        auto scale = shape["Scale"];
+        for (int i = 0; i < 3; ++i)
+        {
+            _prefab.ShapeData.Position[i] = pos[i];
+            _prefab.ShapeData.Rotation[i] = rot[i];
+            _prefab.ShapeData.Scale[i] = scale[i];
+        }
+    }
 
     return true;
 }
