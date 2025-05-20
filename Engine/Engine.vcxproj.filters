@@ -322,6 +322,11 @@
     <ClInclude Include="CollisionScript.h">
       <Filter>Component\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="MeshEditorUI.h" />
+    <ClInclude Include="MeshLoader.h" />
+    <ClInclude Include="EditorData.h">
+      <Filter>Utils\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -537,6 +542,8 @@
     <ClCompile Include="CollisionScript.cpp">
       <Filter>Component\Collision</Filter>
     </ClCompile>
+    <ClCompile Include="MeshEditorUI.cpp" />
+    <ClCompile Include="MeshLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

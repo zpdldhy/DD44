@@ -9,14 +9,6 @@ enum class CollisionEnabled
 	CE_QUERYANDPHYSICS,
 };
 
-enum class ShapeType
-{
-	ST_NONE,
-	ST_BOX,
-	ST_SPHERE,
-	ST_CAPSULE,
-};
-
 class UShapeComponent : public UPrimitiveComponent
 {
 protected:

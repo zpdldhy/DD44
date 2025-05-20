@@ -6,11 +6,21 @@
 #include "AActor.h"
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
+#include "UBoxComponent.h"
 
 void PlayerMoveScript::Init()
 {
 	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetLocalPosition();
 	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+
+	//auto shape = make_shared<UBoxComponent>();
+	//shape->SetLocalScale({ 1.f, 2.0f, 1.f });
+	//shape->SetLocalRotation({ 0.0f, 0.0f, 0.0f });
+	//shape->SetLocalPosition({ 0.0f, 1.0f, 0.0f });
+	//shape->SetOwner(GetOwner());
+	//shape->Init();
+	//GetOwner()->SetShapeComponent(shape);
+
 }
 
 void PlayerMoveScript::Tick()
