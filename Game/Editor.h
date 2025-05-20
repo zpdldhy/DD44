@@ -39,6 +39,7 @@ protected:
 	void SetupMapEditorCallback();
 	void SetupObjectEditorCallback();
 
+	void SetClickPos();
 	void LoadAllPrefabs(const std::string& extension);
 
 };

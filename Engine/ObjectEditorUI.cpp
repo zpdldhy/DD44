@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "ObjectEditorUI.h"
 #include "PrefabLoader.h"
-#include "EditorData.h"
 
 void ObjectEditorUI::DrawUI()
 {

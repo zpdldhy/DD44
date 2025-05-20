@@ -1,4 +1,5 @@
 #pragma once
+#include "EditorData.h"
 
 class ObjectEditorUI
 {
@@ -10,7 +11,7 @@ public:
 
     bool IsSnapEnabled() const { return m_bSnapEnabled; }
     std::vector<std::string> GetPrefabList(const std::string& folderPath);
-    void SetOnCreateCallback(std::function<void(const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float)> callback)
+    void SetOnCreateCallback(std::function<void(const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float, ShapeComponentData)> callback)
     {
         m_OnCreate = std::move(callback);
     }
@@ -38,5 +39,5 @@ private:
     ShapeComponentData m_ShapeData;
 
     std::vector<std::string> m_vObjectPrefabList;
-    std::function<void(const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float, const ShapeComponentData&)> m_OnCreate;
+    std::function<void(const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float, ShapeComponentData)> m_OnCreate;
 };

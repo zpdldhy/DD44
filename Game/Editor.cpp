@@ -3,6 +3,7 @@
 #include "ImGuiCore.h"
 #include "ObjectManager.h"
 #include "CameraManager.h"
+#include "CollisionManager.h"
 #include "ACameraActor.h"
 #include "ASky.h"
 #include "ATerrainTileActor.h"
@@ -56,7 +57,10 @@ void Editor::Update()
 			CAMERA->Set3DCameraActor(m_pCameraActor);
 		}
 	}
-
+	if (INPUT->GetButton(LCLICK))
+	{
+		SetClickPos();
+	}
 }
 
 void Editor::Render()
@@ -223,7 +227,7 @@ void Editor::SetupMapEditorCallback()
 void Editor::SetupObjectEditorCallback()
 {
 
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 emissiveColor, float emissivepower, ShapeComponentData shapeData)
 		{
 			ActorLoader al;
 			al.LoadOne(objPath);
@@ -253,8 +257,38 @@ void Editor::SetupObjectEditorCallback()
 			actor->SetRotation(rot);
 			actor->SetScale(scale);
 
+			if (shapeData.isUse)
+			{
+				shared_ptr<UShapeComponent> shapeComp = nullptr;
+
+				if (shapeData.eShapeType == ShapeType::ST_BOX)
+					shapeComp = std::make_shared<UBoxComponent>();
+				//else if (shapeData.eShapeType == ShapeType::ST_SPHERE)
+
+				shapeComp->SetLocalScale(Vec3(shapeData.Scale));
+				shapeComp->SetLocalPosition(Vec3(shapeData.Position));
+				shapeComp->SetLocalRotation(Vec3(shapeData.Rotation));
+				shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+				actor->SetShapeComponent(shapeComp);
+			}
+
 			OBJECT->AddActor(actor);
 		});
+}
+
+void Editor::SetClickPos()
+{
+	MouseRay m_vRay;
+
+	m_vRay.Click();
+
+	shared_ptr<AActor> pActor = nullptr;
+
+	Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
+
+	if (pActor)
+		int i = 0;
 }
 
 void Editor::LoadAllPrefabs(const std::string& extension)
