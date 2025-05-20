@@ -25,6 +25,7 @@ protected:
 	void SetupEngineCamera();
 	void SetupSkybox();
 	void SetupSunLight();
+	void SetupCollisionObject();
 
 	void SetupEditorCallbacks();
 	void SetupCharacterEditorCallback();

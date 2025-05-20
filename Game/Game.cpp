@@ -27,7 +27,7 @@ void Game::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
-
+	SetupCollisionObject();
 }
 
 void Game::Update()
@@ -96,6 +96,32 @@ void Game::SetupSunLight()
 	
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
+}
+
+void Game::SetupCollisionObject()
+{
+	auto actor = make_shared<AActor>();
+	actor->m_szName = L"CollisionObject";
+
+	string objPath = "../Resources/Obj/wall/stone_wall.obj";
+
+	AssimpLoader loader;
+	vector<MeshData> meshList = loader.Load(objPath);
+	if (meshList.empty())
+		return;
+
+	auto meshComp = make_shared<UStaticMeshComponent>();
+	meshComp->SetMeshPath(to_mw(objPath));
+
+	auto meshRes = make_shared<UStaticMeshResources>();
+	meshRes->SetVertexList(meshList[0].m_vVertexList);
+	meshRes->SetIndexList(meshList[0].m_vIndexList);
+	meshRes->Create();
+
+	meshComp->SetMesh(meshRes);
+
+	auto mat = make_shared<UMaterial>();
+	mat->Load(L"../Resources/Obj/wall/stone_wall.png", L"../Resources/Shader/Default.hlsl");
 }
 
 void Game::SetupEditorCallbacks()
