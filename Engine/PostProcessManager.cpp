@@ -8,6 +8,7 @@
 #include "AActor.h"
 #include "UMaterial.h"
 #include "Dxstate.h"
+#include "Timer.h"
 
 void PostProcessManager::Init(UINT _count)
 {
@@ -25,12 +26,14 @@ void PostProcessManager::Init(UINT _count)
 
 	CreateBlurCB();
 	CreateDebugCB();
+	CreateTimeCB();
 	CreatePostProcessor();
 }
 
 
 void PostProcessManager::PreRender()
 {
+	void ApplytimeCB();
 	m_p3DWorld->Tick();
 
 	m_iPrevViewPorts = 1;
@@ -138,6 +141,29 @@ void PostProcessManager::ApplyDebugCB()
 {
 	DC->UpdateSubresource(m_pCBDebug.Get(), 0, nullptr, &m_tDebugData, 0, 0);
 	DC->PSSetConstantBuffers(3, 1, m_pCBDebug.GetAddressOf());
+}
+
+void PostProcessManager::CreateTimeCB()
+{
+	D3D11_BUFFER_DESC desc = {};
+	desc.ByteWidth = sizeof(CB_GlobalTime);
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	DEVICE->CreateBuffer(&desc, nullptr, m_pCBGlobalTime.GetAddressOf());
+}
+
+void PostProcessManager::ApplytimeCB()
+{
+	CB_GlobalTime cb = {};
+	cb.g_fGlobalTime = TIMER->GetGameTime();   // È¤Àº TOTAL_TIME
+	cb.g_fDeltaTime = TIMER->GetDeltaTime();   // DELTA
+
+	DC->UpdateSubresource(m_pCBGlobalTime.Get(), 0, nullptr, &cb, 0, 0);
+	DC->VSSetConstantBuffers(6, 1, m_pCBGlobalTime.GetAddressOf());
+	DC->PSSetConstantBuffers(6, 1, m_pCBGlobalTime.GetAddressOf());
 }
 
 void PostProcessManager::ApplyBlurCB()

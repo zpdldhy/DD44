@@ -7,7 +7,6 @@ VS_OUT_RIM VS(VS_IN input)
     float4 worldPos = mul(float4(input.p, 1.0f), g_matWorld);
     output.p = mul(mul(worldPos, g_matView), g_matProj);
     output.wPos = worldPos.xyz;
-    //output.n = normalize(mul(input.n, (float3x3) g_matWorld));
     output.n = normalize(mul(float4(input.n, 0.0f), g_matWorld).xyz);
     output.c = input.c;
     output.t = input.t;
@@ -28,11 +27,10 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
         return output;
     }
 
-    
     float4 texColor = g_txDiffuseA.Sample(sample, input.t);
     float3 emissive;
     float3 specular = ApplySpecular(input.n, input.wPos);
-    float3 ambient =ApplyAmbient();
+    float3 ambient = ApplyAmbient();
     float3 flash;
 
     if (texColor.r < 0.6f)
@@ -40,11 +38,11 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
         emissive = float3(0, 0, 0);
         ambient = float3(1, 1, 1);
         specular = float3(0, 0, 0);
-        output.c2 = float4(1.f, 0.f, 1.f, 1.f); 
+        output.c2 = float4(0.f, 0.f, 1.f, 1.f); 
     }
     else
     {
-        emissive = g_vEmissiveColor * g_fEmissivePower * 3.0f;
+        emissive = g_vEmissiveColor * g_fEmissivePower * 5.0f;
         output.c2 = float4(1.f, 1.f, 1.f, 1.f); 
     }
     
@@ -57,12 +55,6 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     
     float4 finalColor = float4(litColor + emissive, texColor.a);
     finalColor.rgb = ApplyGlow(finalColor.rgb);
-
-    //if (texColor.r > 0.3f)
-    //{
-    //    finalColor = ApplyHitFlash(finalColor); // 여기서 alpha도 같이 바뀜
-    //}
-    
 
     // output.c : 최종 결과
     output.c = float4(finalColor);
@@ -89,7 +81,11 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
         output.c3 = float4(0.114, 0.129, 0.125, 0); // 사용하지 않음
     }
     
-    output.c4.rgb = diffuse;
+    output.c4.rgb = (ambient + diffuse) + specular;
+    output.c4.a = 1.f;
+    output.c5.rgb = input.n;
+    output.c5.a = 1.f;
+    output.c6 = float4(input.p.z / input.p.w, 0.0f, 0.0f, 1.0f); // R 채널에만 깊이
     
 
     return output;

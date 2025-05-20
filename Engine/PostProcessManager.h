@@ -20,6 +20,13 @@ struct CB_Debug
 	Vec3 padding;
 };
 
+struct CB_GlobalTime
+{
+	float g_fGlobalTime;
+	float g_fDeltaTime;
+	Vec2 padding;
+};
+
 class PostProcessManager : public Singleton<PostProcessManager>
 {
 	UINT m_iMRTCount = 0;
@@ -42,6 +49,7 @@ class PostProcessManager : public Singleton<PostProcessManager>
 	int m_iDebugMode = 0;
 	CB_Debug m_tDebugData;       
 	ComPtr<ID3D11Buffer> m_pCBDebug; 
+	ComPtr<ID3D11Buffer> m_pCBGlobalTime;
 
 public:
 	// 후처리용 텍스처 및 shader초기화
@@ -66,6 +74,8 @@ public:
 	void SetDebugMode(int _mode);      
 	void ApplyDebugCB();
 
+	void CreateTimeCB();
+	void ApplytimeCB();
 private:
 
 	// Blur Shader 및 CBuffer

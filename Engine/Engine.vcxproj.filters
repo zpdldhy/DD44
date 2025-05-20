@@ -79,6 +79,9 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{b1a39402-c961-4f46-9178-8b7fa133cfd9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Effect">
+      <UniqueIdentifier>{8d00e682-b2d0-425d-a375-625af6fde94e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -322,6 +325,8 @@
     <ClInclude Include="CollisionScript.h">
       <Filter>Component\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="MeshEditorUI.h" />
+    <ClInclude Include="MeshLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -537,6 +542,8 @@
     <ClCompile Include="CollisionScript.cpp">
       <Filter>Component\Collision</Filter>
     </ClCompile>
+    <ClCompile Include="MeshEditorUI.cpp" />
+    <ClCompile Include="MeshLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

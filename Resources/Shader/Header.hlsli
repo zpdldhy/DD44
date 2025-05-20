@@ -52,10 +52,18 @@ cbuffer CB_MaterialEffect : register(b2)
 //    float g_fDissolveThreshold;
 //}
 
+
 cbuffer AnimationBuffer : register(b5)
 {
     matrix obj_matAnim[MAX_BONE];
 }
+
+cbuffer CB_GlobalTime : register(b6)
+{
+    float g_fGlobalTime;
+    float g_fGlobalDelta;
+    float2 padding_Gtime;
+};
 
 cbuffer CB_RenderMode : register(b7)
 {

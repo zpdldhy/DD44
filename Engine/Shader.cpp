@@ -87,9 +87,44 @@ bool Shader::CreatePixelShader(std::wstring _filename)
 	if (errorCode) errorCode->Release();
 	return true;
 }
+
+bool Shader::CreateGeometryShader(std::wstring _filename)
+{
+	ComPtr<ID3DBlob> gsCode;
+	ComPtr<ID3DBlob> errorCode;
+
+	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+#if _DEBUG
+	flags |= D3DCOMPILE_DEBUG;
+	flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+
+	// entry point는 "GS"로 고정
+	HRESULT hr = D3DCompileFromFile(_filename.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		"GS", "gs_5_0", flags, 0, gsCode.GetAddressOf(), errorCode.GetAddressOf());
+
+	if (FAILED(hr))
+	{
+		DX_CHECK(hr, _T(__FUNCTION__));
+		return false;
+	}
+
+	hr = DEVICE->CreateGeometryShader(gsCode->GetBufferPointer(), gsCode->GetBufferSize(),
+		nullptr, m_pGeometryShader.GetAddressOf());
+
+	if (FAILED(hr))
+	{
+		DX_CHECK(hr, _T(__FUNCTION__));
+		return false;
+	}
+
+	return true;
+}
+
 void Shader::Release()
 {
 }
+
 
 shared_ptr<Shader> ShaderManager::Get(wstring _filename)
 {
