@@ -323,6 +323,8 @@
       <Filter>Component\Collision</Filter>
     </ClInclude>
     <ClInclude Include="MeshEditorUI.h" />
+    <ClInclude Include="MeshLoader.h" />
+    <ClInclude Include="EditorData.h">
     <ClInclude Include="UIEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
@@ -542,6 +544,7 @@
       <Filter>Component\Collision</Filter>
     </ClCompile>
     <ClCompile Include="MeshEditorUI.cpp" />
+    <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="UIEditorUI.cpp">
       <Filter>Utils\Editor</Filter>
     </ClCompile>

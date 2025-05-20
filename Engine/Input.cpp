@@ -33,17 +33,22 @@ DWORD Input::CheckKey(DWORD _dwKey)
 
 bool Input::GetButton(GameKey _key)
 {
-	return CheckKey(_key) == KEY_PUSH;
+	return _dwKeyState[_key] == KEY_PUSH;
 }
 
 bool Input::GetButtonDown(GameKey _key)
 {
-	return CheckKey(_key) == KEY_HOLD;
+	return _dwKeyState[_key] == KEY_HOLD;
 }
 
 bool Input::GetButtonUp(GameKey _key)
 {
-	return CheckKey(_key) == KEY_UP;
+	return _dwKeyState[_key] == KEY_UP;
+}
+
+bool Input::GetButtonFree(GameKey _key)
+{
+	return _dwKeyState[_key] == KEY_FREE;
 }
 
 POINT Input::GetMousePos()
@@ -56,4 +61,12 @@ POINT Input::GetMousePos()
 void Input::Init()
 {
 	ZeroMemory(_dwKeyState, sizeof(DWORD) * 256);
+}
+
+void Input::Tick()
+{
+	for (int i = 0; i < 256; ++i)
+	{
+		CheckKey(i);
+	}
 }

@@ -109,3 +109,45 @@ void QuadTree::RemoveActorFromAllNodes(QuadTreeNode* node, UINT actorIndex)
         RemoveActorFromAllNodes(node->pChildren[i].get(), actorIndex);
     }
 }
+
+std::vector<UINT> QuadTree::FindNearbyActorIndices(const AActor& _actor)
+{
+    std::vector<UINT> result;
+
+    // 1. 액터가 포함된 리프 노드 찾기
+    QuadTreeNode* pCenterNode = nullptr;
+    Vec3 actorPos = _actor.GetPosition();
+
+    for (QuadTreeNode* pLeaf : m_pLeafs)
+    {
+        if (pLeaf->bounds.Contains(actorPos))
+        {
+            pCenterNode = pLeaf;
+            break;
+        }
+    }
+
+    if (pCenterNode == nullptr)
+        return result; // 없으면
+
+    // 2. 주변 3x3 노드 탐색
+    for (QuadTreeNode* pLeaf : m_pLeafs)
+    {
+        const Vec3& min = pLeaf->bounds.vMin;
+        const Vec3& max = pLeaf->bounds.vMax;
+
+        // 중심 노드 경계 확장 (한 칸 여유)
+        const Vec3& cMin = pCenterNode->bounds.vMin;
+        const Vec3& cMax = pCenterNode->bounds.vMax;
+
+        if (max.x >= cMin.x - (cMax.x - cMin.x) &&
+            min.x <= cMax.x + (cMax.x - cMin.x) &&
+            max.z >= cMin.z - (cMax.z - cMin.z) &&
+            min.z <= cMax.z + (cMax.z - cMin.z))
+        {
+            result.insert(result.end(), pLeaf->vActorIndices.begin(), pLeaf->vActorIndices.end());
+        }
+    }
+
+    return result;
+}

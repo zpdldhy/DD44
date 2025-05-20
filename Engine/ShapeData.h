@@ -1,5 +1,13 @@
 #pragma once
 
+enum class ShapeType
+{
+	ST_NONE,
+	ST_BOX,
+	ST_SPHERE,
+	ST_CAPSULE,
+};
+
 struct MouseRay : public Ray
 {
 	POINT WinPos = { 0, 0 };

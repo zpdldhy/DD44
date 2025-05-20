@@ -9,9 +9,6 @@ protected:
 
 	// 범위 표기
 	shared_ptr<class AActor> m_pCollisionRange = nullptr;
-	vector<PNCT_VERTEX> m_vVertexList;
-	vector<DWORD> m_vIndexList;
-
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
 
 public:

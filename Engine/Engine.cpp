@@ -53,6 +53,8 @@ void Engine::Init()
 
 void Engine::Frame()
 {
+	INPUT->Tick();
+
 	// Object Tick
 	{
 		OBJECT->Tick();
@@ -66,10 +68,7 @@ void Engine::Frame()
 	GUI->Update();
 	
 	_app->Update();
-	if (INPUT->GetButtonDown(A))
-	{
-		INPUT->GetMousePos();
-	}
+
 	TIMER->Update();
 	
 	// Manager Tick

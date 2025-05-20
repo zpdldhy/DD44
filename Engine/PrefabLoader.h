@@ -19,6 +19,12 @@ public:
 
 	bool SaveObject(const PrefabObjectData& _prefab, const std::string& _filePath);
 	bool LoadObject(const std::string& _filePath, PrefabObjectData& _prefab);
+	bool LoadObjectArray(const std::string& _filePath, std::vector<PrefabObjectData>& _outPrefabs);
+
+private:
+	void LoadActor(json& j, PrefabCharacterData& data);
+	void LoadCameraComponent(json& j, CameraComponentData& data);
+	void LoadShapeComponent(json& j, ShapeComponentData& data);
 
 public:
 	std::vector<std::string> GetPrefabFileList(const std::string& directory, const std::string& extension);

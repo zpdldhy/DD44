@@ -205,7 +205,7 @@ void TestSY::Init()
 	}
 
 	GUI->SetCharacterEditorCallback(
-		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position, const Vec3& rotation, const Vec3& scale, int scriptType)
+		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position, const Vec3& rotation, const Vec3& scale, CameraComponentData camera, ShapeComponentData shape, int scriptType)
 		{
 			if (!rootComponent)
 			{
@@ -225,9 +225,30 @@ void TestSY::Init()
 			if (scriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 			//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
 
-			auto cam = std::make_shared<UCameraComponent>();
-			cam->SetLocalPosition(Vec3(10, 10, -10));
-			actor->SetCameraComponent(cam);
+			if (camera.isUse) 
+			{
+				auto cam = std::make_shared<UCameraComponent>();
+				cam->SetLocalPosition(Vec3(camera.Position));
+				cam->SetLocalRotation(Vec3(camera.Rotation));
+				cam->SetPerspective(camera.Fov, camera.Aspect, camera.Near, camera.Far);
+				actor->SetCameraComponent(cam); 
+			}
+
+			if (shape.isUse)
+			{
+				shared_ptr<UShapeComponent> shapeComp;
+
+				if(shape.eShapeType==ShapeType::ST_BOX)
+					shapeComp = std::make_shared<UBoxComponent>();
+				//else if (shape.eShapeType == ShapeType::ST_SPHERE)
+
+				shapeComp->SetLocalScale(Vec3(shape.Scale));
+				shapeComp->SetLocalPosition(Vec3(shape.Position));
+				shapeComp->SetLocalRotation(Vec3(shape.Rotation));
+				shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+				actor->SetShapeComponent(shapeComp);
+			}
 
 			OBJECT->AddActor(actor);
 		});
@@ -489,9 +510,9 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
 				actor->m_szName = L"Character";
-				actor->SetPosition(characterData.Translation);
-				actor->SetRotation(characterData.Rotation);
-				actor->SetScale(characterData.Scale);
+				actor->SetPosition(Vec3(characterData.actor.Position));
+				actor->SetRotation(Vec3(characterData.actor.Rotation));
+				actor->SetScale(Vec3(characterData.actor.Scale));
 				OBJECT->AddActor(actor);
 			}
 		}
