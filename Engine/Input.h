@@ -87,11 +87,12 @@ public:
 	bool GetButton(GameKey _key);
 	bool GetButtonDown(GameKey _key);
 	bool GetButtonUp(GameKey _key);
+    bool GetButtonFree(GameKey _key);
 	POINT GetMousePos();
 
 public:
 	void Init();
-	void Frame() {};
+    void Tick();
 	void Render() {};
-	void Release() {};
+	void Destroy() {};
 };

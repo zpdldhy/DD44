@@ -26,7 +26,7 @@ public:
 	EffectEditorUI* GetEffectEditorUI() const { return 	m_pEffectEditorUI.get(); }
 	MeshEditorUI* GetMeshEditorUI() const { return m_pMeshEditorUI.get(); }
 
-	void SetCharacterEditorCallback(std::function<void(std::shared_ptr<UMeshComponent>, const Vec3&, const Vec3&, const Vec3&, int) > callback)
+	void SetCharacterEditorCallback(std::function<void(std::shared_ptr<UMeshComponent>, const Vec3&, const Vec3&, const Vec3&, CameraComponentData, ShapeComponentData, int) > callback)
 	{
 		m_pCharacterEditorUI->SetOnCreateCallback(std::move(callback));
 	}

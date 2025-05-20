@@ -15,7 +15,9 @@ void CharacterEditorUI::DrawUI()
 	static std::vector<std::string> meshDisplayNames;
 	static std::vector<const char*> meshDisplayNamePtrs;
 
-	ImGui::InputText("Asset Path", m_szAssetPath, IM_ARRAYSIZE(m_szAssetPath));
+	// ────────────────────────── Asset Paths ─────────────────────────────
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Asset Paths");
+	ImGui::InputText(" ", m_szAssetPath, IM_ARRAYSIZE(m_szAssetPath));
 
 	if (ImGui::Button("Load Asset"))
 	{
@@ -270,27 +272,19 @@ void CharacterEditorUI::DrawUI()
 	//}
 #pragma endregion
 
-	// 스크립트 설정
 	ImGui::Separator();
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Script Configuration");
-
-	// *여기에 스크립트 리스트 넣어야함(이름 정확히)
-	static std::vector<std::string> scriptNames = { "None", "PlayerMoveScript", "EnemyAIScript" };
-	static std::vector<const char*> scriptNamePtrs;
-	if (scriptNamePtrs.empty())
-	{
-		for (auto& name : scriptNames)
-			scriptNamePtrs.push_back(name.c_str());
-	}
-
-	ImGui::Combo("Script", &m_iSelectedScriptIndex, scriptNamePtrs.data(), (int)scriptNamePtrs.size());
 
 	// SRT 적용 -> Callback 처리
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Transform");
-	DrawVec3Slider("Position", m_fPosition, -100.f, 100.f);
-	DrawVec3Slider("Rotation", m_fRotation, -360.f, 360.f);
-	DrawVec3Slider("Scale", m_fScale, 0.01f, 10.f);
+	SetActor();
 
+	ImGui::Separator();
+
+	// Component 추가
+	// Camera, Shape, Script ...
+	SetComponent();
+
+	// Actor 생성
+	ImGui::Separator();
 	if (ImGui::Button("Finalize Actor Creation"))
 	{
 		if (m_pRootComponent && m_OnCreate)
@@ -299,7 +293,7 @@ void CharacterEditorUI::DrawUI()
 			Vec3 rotation(m_fRotation[0], m_fRotation[1], m_fRotation[2]);
 			Vec3 scale(m_fScale[0], m_fScale[1], m_fScale[2]);
 
-			m_OnCreate(m_pRootComponent, position, rotation, scale, m_iSelectedScriptIndex);
+			m_OnCreate(m_pRootComponent, position, rotation, scale, m_CameraData, m_ShapeData, m_iSelectedScriptIndex);
 		}
 
 		m_bRootSet = false;
@@ -309,170 +303,21 @@ void CharacterEditorUI::DrawUI()
 	ImGui::Separator(); ImGui::Spacing();
 
 	// Prefab Save/Load
-	ImGui::BeginChild("SaveCharacterSection", ImVec2(0, 100), true);
-	{
-		ImGui::Text("Save Character Prefab");
-		static char characterSavePath[256] = "../Resources/Prefab/MyCharacter.character.json";
-		ImGui::InputText("Save Path", characterSavePath, IM_ARRAYSIZE(characterSavePath));
-
-		if (ImGui::Button("Save Character", ImVec2(-1, 0)))
-		{
-			PrefabCharacterData data;
-			data.Name = "MyCharacter";
-			data.RootMeshPath = m_szAssetPath;
-			data.MeshPath = m_szMeshPath;
-			data.ShaderPath = m_szShaderName;
-			data.TexturePath = m_szTextureName;
-			data.ScriptType = m_iSelectedScriptIndex;
-			data.AnimIndex = m_iSelectedAnimIndex;
-
-			auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
-			data.AnimSpeed = animInstance ? animInstance->m_fAnimPlayRate : 1.0f;
-
-			data.Scale = Vec3(m_fScale[0], m_fScale[1], m_fScale[2]);
-			data.Rotation = Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]);
-			data.Translation = Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]);
-
-			//for (int i = 0; i < m_iChildIndex; ++i)
-			//{
-			//    auto child = m_pRootComponent->GetChild(i);
-			//    if (child)
-			//    {
-			//        PrefabCharacterData::ChildMeshData childData;
-			//        childData.MeshPath = "Unknown";
-			//        childData.TargetBoneIndex = m_iSelectedBoneIndex;
-			//        data.ChildMeshes.push_back(childData);
-			//    }
-			//}
-
-			PREFAB->SaveCharacter(data, characterSavePath);
-		}
-	}
-	ImGui::EndChild();
+	SaveCharacterPrefab();
 
 	ImGui::Spacing();
 
-	ImGui::BeginChild("LoadCharacterSection", ImVec2(0, 100), true);
-	{
-		ImGui::Text("Load Character Prefab");
-		static char characterLoadPath[256] = "../Resources/Prefab/MyCharacter.character.json";
-		ImGui::InputText("Load Path", characterLoadPath, IM_ARRAYSIZE(characterLoadPath));
-
-		if (ImGui::Button("Load Character", ImVec2(-1, 0)))
-		{
-			PrefabCharacterData data;
-			if (PREFAB->LoadCharacter(characterLoadPath, data))
-			{
-				strcpy_s(m_szAssetPath, data.RootMeshPath.c_str());
-				strcpy_s(m_szMeshPath, data.MeshPath.c_str());
-				strcpy_s(m_szShaderName, data.ShaderPath.c_str());
-				strcpy_s(m_szTextureName, data.TexturePath.c_str());
-
-				m_iSelectedScriptIndex = data.ScriptType;
-				m_iSelectedAnimIndex = data.AnimIndex;
-
-				//auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
-				//if (animInstance)
-				//{
-				//    // *애니메이션 속도는 로더에서 따로 적용 필요
-				//    animInstance->m_fAnimPlayRate = data.AnimSpeed;
-				//}
-
-				m_fScale[0] = data.Scale.x; m_fScale[1] = data.Scale.y; m_fScale[2] = data.Scale.z;
-				m_fRotation[0] = data.Rotation.x; m_fRotation[1] = data.Rotation.y; m_fRotation[2] = data.Rotation.z;
-				m_fPosition[0] = data.Translation.x; m_fPosition[1] = data.Translation.y; m_fPosition[2] = data.Translation.z;
-
-				Vec3 position(m_fPosition[0], m_fPosition[1], m_fPosition[2]);
-				Vec3 rotation(m_fRotation[0], m_fRotation[1], m_fRotation[2]);
-				Vec3 scale(m_fScale[0], m_fScale[1], m_fScale[2]);
-
-				if (!m_pLoader) m_pLoader = std::make_shared<ActorLoader>();
-				m_pLoader->LoadOne(m_szAssetPath);
-				m_mMeshMap = m_pLoader->LoadMeshMap();
-				m_mAnimMap = m_pLoader->LoadAnimMap();
-				m_iSelectedMeshIndex = 0;
-
-				auto meshData = AAsset::LoadMesh(m_szMeshPath);
-
-				auto originAnim = m_mAnimMap.find(meshData.m_szAnim);
-				if (originAnim == m_mAnimMap.end()) { assert(false); }
-				auto animInstance = originAnim->second->Clone();
-
-				m_pRootComponent = MakeMesh(meshData, true, animInstance);
-
-				auto& data = meshData;
-				for (int i = 0; i < data.m_vChild.size(); i++)
-				{
-					m_pRootComponent->AddChild(MakeMesh(data.m_vChild[i], false, animInstance));
-				}
-				
-				m_OnCreate(m_pRootComponent, position, rotation, scale, m_iSelectedScriptIndex);
-			}
-		}
-	}
-	ImGui::EndChild();
+	LoadCharacterPrefab();
 
 	ImGui::Spacing();
 
 	// 프리팹 브라우저 : 현재 미구현
-	// *프리팹 구조 확정되면 추가 기능 구현
-	ImGui::BeginChild("PrefabBrowserSection", ImVec2(0, 150), true);
-	{
-		ImGui::Text("Prefab Browser");
-
-		m_vCharacterPrefabList = PREFAB->GetPrefabFileNames("../Resources/Prefab/", ".character.json");
-		static std::string selectedCharacterPrefab = "";
-
-		for (const auto& name : m_vCharacterPrefabList)
-		{
-			if (ImGui::Selectable(name.c_str(), selectedCharacterPrefab == name))
-				selectedCharacterPrefab = name;
-		}
-
-		if (!selectedCharacterPrefab.empty() && ImGui::Button("Load Selected Prefab", ImVec2(-1, 0)))
-		{
-			PrefabCharacterData data;
-			std::string fullPath = "../Resources/Prefab/" + selectedCharacterPrefab + ".character.json";
-			if (PREFAB->LoadCharacter(fullPath, data))
-			{
-				strcpy_s(m_szAssetPath, data.RootMeshPath.c_str());
-				strcpy_s(m_szShaderName, data.ShaderPath.c_str());
-				strcpy_s(m_szTextureName, data.TexturePath.c_str());
-
-				m_iSelectedScriptIndex = data.ScriptType;
-				m_iSelectedAnimIndex = data.AnimIndex;
-
-				auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
-				if (animInstance)
-					animInstance->m_fAnimPlayRate = data.AnimSpeed;
-
-				m_fScale[0] = data.Scale.x; m_fScale[1] = data.Scale.y; m_fScale[2] = data.Scale.z;
-				m_fRotation[0] = data.Rotation.x; m_fRotation[1] = data.Rotation.y; m_fRotation[2] = data.Rotation.z;
-				m_fPosition[0] = data.Translation.x; m_fPosition[1] = data.Translation.y; m_fPosition[2] = data.Translation.z;
-
-				if (!m_pLoader) m_pLoader = std::make_shared<ActorLoader>();
-				m_pLoader->LoadOne(m_szAssetPath);
-				m_vMeshList = m_pLoader->LoadMesh();
-				m_iSelectedMeshIndex = 0;
-			}
-		}
-	}
-	ImGui::EndChild();
+	BrowserSection();
 
 	ImGui::Separator(); ImGui::Spacing();
 
 	// 새로운 캐릭터 생성 시 초기화
-	if (ImGui::Button("Reset"))
-	{
-		m_pRootComponent = nullptr;
-
-		m_iSelectedMeshIndex = 0;
-		m_iSelectedChildMeshIndex = 0;
-		m_iSelectedAnimIndex = 0;
-		m_iSelectedScriptIndex = 0;
-
-		m_iChildIndex = 0;
-	}
+	ResetButton();
 }
 
 void CharacterEditorUI::DrawVec3Slider(const char* label, float* values, float minVal, float maxVal)
@@ -520,6 +365,316 @@ void CharacterEditorUI::DrawVec3Slider(const char* label, float* values, float m
 
 	ImGui::Unindent(10.0f);
 	ImGui::PopID();
+}
+
+void CharacterEditorUI::SetActor()
+{
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Transform");
+	DrawVec3Slider("Position", m_fPosition, -100.f, 100.f);
+	DrawVec3Slider("Rotation", m_fRotation, -360.f, 360.f);
+	DrawVec3Slider("Scale", m_fScale, 0.01f, 10.f);
+}
+
+void CharacterEditorUI::SetComponent()
+{
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Set Component");
+
+	static std::vector<std::string> componentNames 
+		= { "None", "CameraComponent", "ShapeComponent" };
+	static std::vector<const char*> componentNamePtrs;
+	if (componentNamePtrs.empty())
+	{
+		for (auto& name : componentNames)
+			componentNamePtrs.push_back(name.c_str());
+	}
+
+	ImGui::Combo("Component", &m_iSelectedComoponentIndex, componentNamePtrs.data(), (int)componentNamePtrs.size());
+	ImGui::Separator();
+
+	if (m_iSelectedComoponentIndex == 1)
+	{
+		m_CameraData.isUse = true;
+	}
+	else if (m_iSelectedComoponentIndex == 2)
+	{
+		m_ShapeData.isUse = true;
+	}
+
+	if (m_CameraData.isUse)
+	{
+		SetCameraComponent();
+		ImGui::Separator();
+	}
+
+	if (m_ShapeData.isUse)
+	{
+		SetShapeComponent();
+		ImGui::Separator();
+	}
+
+	// 스크립트 설정
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Script Configuration");
+
+	// *여기에 스크립트 리스트 넣어야함(이름 정확히)
+	static std::vector<std::string> scriptNames = { "None", "PlayerMoveScript", "EnemyAIScript" };
+	static std::vector<const char*> scriptNamePtrs;
+	if (scriptNamePtrs.empty())
+	{
+		for (auto& name : scriptNames)
+			scriptNamePtrs.push_back(name.c_str());
+	}
+
+	ImGui::Combo("Script", &m_iSelectedScriptIndex, scriptNamePtrs.data(), (int)scriptNamePtrs.size());
+
+}
+
+void CharacterEditorUI::SetCameraComponent()
+{
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Camera Configuration");
+	ImGui::Checkbox("Use Camera", &m_ShapeData.isUse);
+
+	DrawVec3Slider("Camera Position", m_CameraData.Position, -100.f, 100.f);
+	DrawVec3Slider("Camera Rotation", m_CameraData.Rotation, -360.f, 360.f);
+
+	ImGui::PushID("CameraFov");
+	ImGui::Text("%s", "Fov"); ImGui::SameLine();
+	ImGui::PushItemWidth(60.f);
+	ImGui::InputFloat("##Value", &m_CameraData.Fov);
+	ImGui::PopItemWidth(); ImGui::SameLine();
+	ImGui::PopID();
+
+	ImGui::PushID("CameraAspect");
+	ImGui::Text("%s", "Aspect"); ImGui::SameLine();
+	ImGui::PushItemWidth(60.f);
+	ImGui::InputFloat("##Value", &m_CameraData.Aspect);
+	ImGui::PopItemWidth();
+	ImGui::PopID();
+
+	ImGui::PushID("CameraNear");
+	ImGui::Text("%s", "Near"); ImGui::SameLine();
+	ImGui::PushItemWidth(60.f);
+	ImGui::InputFloat("##Value", &m_CameraData.Near);
+	ImGui::PopItemWidth(); ImGui::SameLine();
+	ImGui::PopID();
+
+	ImGui::PushID("CameraFar");
+	ImGui::Text("%s", "Far"); ImGui::SameLine();
+	ImGui::PushItemWidth(60.f);
+	ImGui::InputFloat("##Value", &m_CameraData.Far);
+	ImGui::PopItemWidth();
+	ImGui::PopID();
+}
+
+void CharacterEditorUI::SetShapeComponent()
+{
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Shape Configuration");
+	ImGui::Checkbox("Use Shape", &m_ShapeData.isUse);
+
+	static std::vector<std::string> shapeNames
+		= { "Box", "Sphere" };
+	static std::vector<const char*> shapeNamePtrs;
+	if (shapeNamePtrs.empty())
+	{
+		for (auto& name : shapeNames)
+			shapeNamePtrs.push_back(name.c_str());
+	}
+
+	static int iSelectedShapeIndex = 0;
+
+	ImGui::Combo("ShapeType", &iSelectedShapeIndex, shapeNamePtrs.data(), (int)shapeNamePtrs.size());
+
+	if (iSelectedShapeIndex == 0)
+	{
+		m_ShapeData.eShapeType = ShapeType::ST_BOX;
+	}
+	else if (iSelectedShapeIndex == 1)
+	{
+		m_ShapeData.eShapeType = ShapeType::ST_SPHERE;
+	}
+
+	DrawVec3Slider("Shape Position", m_ShapeData.Position, -100.f, 100.f);
+	DrawVec3Slider("Shape Rotation", m_ShapeData.Rotation, -360.f, 360.f);
+	DrawVec3Slider("Shape Scale", m_ShapeData.Scale, 0.01f, 10.f);
+}
+
+void CharacterEditorUI::SaveCharacterPrefab()
+{
+	ImGui::BeginChild("SaveCharacterSection", ImVec2(0, 100), true);
+	{
+		ImGui::Text("Save Character Prefab");
+		static char characterSavePath[256] = "../Resources/Prefab/MyCharacter.character.json";
+		ImGui::InputText("Save Path", characterSavePath, IM_ARRAYSIZE(characterSavePath));
+
+		if (ImGui::Button("Save Character", ImVec2(-1, 0)))
+		{
+			PrefabCharacterData data;
+			data.Name = "MyCharacter";
+			data.RootMeshPath = m_szAssetPath;
+			data.MeshPath = m_szMeshPath;
+			data.ShaderPath = m_szShaderName;
+			data.TexturePath = m_szTextureName;
+			data.ScriptType = m_iSelectedScriptIndex;
+			data.AnimIndex = m_iSelectedAnimIndex;
+
+			auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
+			data.AnimSpeed = animInstance ? animInstance->m_fAnimPlayRate : 1.0f;
+
+			for (int i = 0; i < 3; i++)	data.actor.Scale[i] = m_fScale[i];
+			for (int i = 0; i < 3; i++)	data.actor.Rotation[i] = m_fRotation[i];
+			for (int i = 0; i < 3; i++)	data.actor.Position[i] = m_fPosition[i];
+
+			//for (int i = 0; i < m_iChildIndex; ++i)
+			//{
+			//    auto child = m_pRootComponent->GetChild(i);
+			//    if (child)
+			//    {
+			//        PrefabCharacterData::ChildMeshData childData;
+			//        childData.MeshPath = "Unknown";
+			//        childData.TargetBoneIndex = m_iSelectedBoneIndex;
+			//        data.ChildMeshes.push_back(childData);
+			//    }
+			//}		
+				
+			// Component
+			data.camera = m_CameraData;
+			data.shape = m_ShapeData;
+
+			PREFAB->SaveCharacter(data, characterSavePath);
+		}
+	}
+	ImGui::EndChild();
+}
+
+void CharacterEditorUI::LoadCharacterPrefab()
+{
+	ImGui::BeginChild("LoadCharacterSection", ImVec2(0, 100), true);
+	{
+		ImGui::Text("Load Character Prefab");
+		static char characterLoadPath[256] = "../Resources/Prefab/MyCharacter.character.json";
+		ImGui::InputText("Load Path", characterLoadPath, IM_ARRAYSIZE(characterLoadPath));
+
+		if (ImGui::Button("Load Character", ImVec2(-1, 0)))
+		{
+			PrefabCharacterData data;
+			if (PREFAB->LoadCharacter(characterLoadPath, data))
+			{
+				strcpy_s(m_szAssetPath, data.RootMeshPath.c_str());
+				strcpy_s(m_szMeshPath, data.MeshPath.c_str());
+				strcpy_s(m_szShaderName, data.ShaderPath.c_str());
+				strcpy_s(m_szTextureName, data.TexturePath.c_str());
+
+				m_iSelectedScriptIndex = data.ScriptType;
+				m_iSelectedAnimIndex = data.AnimIndex;
+
+				//auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
+				//if (animInstance)
+				//{
+				//    // *애니메이션 속도는 로더에서 따로 적용 필요
+				//    animInstance->m_fAnimPlayRate = data.AnimSpeed;
+				//}
+
+				for (int i = 0; i < 3; i++) m_fScale[i] = data.actor.Scale[i];
+				for (int i = 0; i < 3; i++) m_fRotation[i] = data.actor.Rotation[i];
+				for (int i = 0; i < 3; i++) m_fPosition[i] = data.actor.Position[i];
+
+				m_CameraData = data.camera;
+				m_ShapeData = data.shape;
+
+				Vec3 position(m_fPosition[0], m_fPosition[1], m_fPosition[2]);
+				Vec3 rotation(m_fRotation[0], m_fRotation[1], m_fRotation[2]);
+				Vec3 scale(m_fScale[0], m_fScale[1], m_fScale[2]);
+
+				if (!m_pLoader) m_pLoader = std::make_shared<ActorLoader>();
+				m_pLoader->LoadOne(m_szAssetPath);
+				m_mMeshMap = m_pLoader->LoadMeshMap();
+				m_mAnimMap = m_pLoader->LoadAnimMap();
+				m_iSelectedMeshIndex = 0;
+
+				auto meshData = AAsset::LoadMesh(m_szMeshPath);
+
+				auto originAnim = m_mAnimMap.find(meshData.m_szAnim);
+				if (originAnim == m_mAnimMap.end()) { assert(false); }
+				auto animInstance = originAnim->second->Clone();
+
+				m_pRootComponent = MakeMesh(meshData, true, animInstance);
+
+				auto& data = meshData;
+				for (int i = 0; i < data.m_vChild.size(); i++)
+				{
+					m_pRootComponent->AddChild(MakeMesh(data.m_vChild[i], false, animInstance));
+				}
+
+				m_OnCreate(m_pRootComponent, position, rotation, scale, m_CameraData, m_ShapeData, m_iSelectedScriptIndex);
+			}
+		}
+	}
+	ImGui::EndChild();
+}
+
+void CharacterEditorUI::BrowserSection()
+{
+	// *프리팹 구조 확정되면 추가 기능 구현
+	ImGui::BeginChild("PrefabBrowserSection", ImVec2(0, 150), true);
+	{
+		ImGui::Text("Prefab Browser");
+
+		m_vCharacterPrefabList = PREFAB->GetPrefabFileNames("../Resources/Prefab/", ".character.json");
+		static std::string selectedCharacterPrefab = "";
+
+		for (const auto& name : m_vCharacterPrefabList)
+		{
+			if (ImGui::Selectable(name.c_str(), selectedCharacterPrefab == name))
+				selectedCharacterPrefab = name;
+		}
+
+		if (!selectedCharacterPrefab.empty() && ImGui::Button("Load Selected Prefab", ImVec2(-1, 0)))
+		{
+			PrefabCharacterData data;
+			std::string fullPath = "../Resources/Prefab/" + selectedCharacterPrefab + ".character.json";
+			if (PREFAB->LoadCharacter(fullPath, data))
+			{
+				strcpy_s(m_szAssetPath, data.RootMeshPath.c_str());
+				strcpy_s(m_szShaderName, data.ShaderPath.c_str());
+				strcpy_s(m_szTextureName, data.TexturePath.c_str());
+
+				m_iSelectedScriptIndex = data.ScriptType;
+				m_iSelectedAnimIndex = data.AnimIndex;
+
+				auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
+				if (animInstance)
+					animInstance->m_fAnimPlayRate = data.AnimSpeed;
+
+				for (int i = 0; i < 3; i++) m_fScale[i] = data.actor.Scale[i];
+				for (int i = 0; i < 3; i++) m_fRotation[i] = data.actor.Rotation[i];
+				for (int i = 0; i < 3; i++) m_fPosition[i] = data.actor.Position[i];
+
+				if (!m_pLoader) m_pLoader = std::make_shared<ActorLoader>();
+				m_pLoader->LoadOne(m_szAssetPath);
+				m_vMeshList = m_pLoader->LoadMesh();
+				m_iSelectedMeshIndex = 0;
+			}
+		}
+	}
+	ImGui::EndChild();
+}
+
+void CharacterEditorUI::ResetButton()
+{
+	if (ImGui::Button("Reset"))
+	{
+		m_pRootComponent = nullptr;
+
+		m_iSelectedMeshIndex = 0;
+		m_iSelectedChildMeshIndex = 0;
+		m_iSelectedAnimIndex = 0;
+		m_iSelectedComoponentIndex = 0;
+		m_iSelectedScriptIndex = 0;
+
+		m_iChildIndex = 0;
+
+		m_CameraData.isUse = false;
+		m_ShapeData.isUse = false;
+	}
 }
 
 shared_ptr<UMeshComponent> CharacterEditorUI::MakeMesh(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance)
