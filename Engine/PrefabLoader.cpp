@@ -294,6 +294,48 @@ bool PrefabLoader::LoadObject(const std::string& _filePath, PrefabObjectData& _p
     return true;
 }
 
+bool PrefabLoader::LoadObjectArray(const std::string& _filePath, std::vector<PrefabObjectData>& _outPrefabs)
+{
+    std::ifstream file(_filePath);
+    if (!file.is_open()) return false;
+
+    json j;
+    file >> j;
+
+    if (!j.is_array()) return false;
+
+    for (auto& item : j)
+    {
+        PrefabObjectData prefab;
+        prefab.Name = item["Name"];
+        prefab.MeshPath = item["MeshPath"];
+        prefab.ShaderPath = item["ShaderPath"];
+        prefab.TexturePath = item["TexturePath"];
+
+        auto s = item["Scale"];
+        prefab.Scale = Vec3(s[0], s[1], s[2]);
+
+        auto r = item["Rotation"];
+        prefab.Rotation = Vec3(r[0], r[1], r[2]);
+
+        auto t = item["Translation"];
+        prefab.Translation = Vec3(t[0], t[1], t[2]);
+
+        auto sc = item["SpecularColor"];
+        prefab.SpecularColor = Vec3(sc[0], sc[1], sc[2]);
+        prefab.Shininess = item["Shininess"];
+
+        auto ec = item["EmissiveColor"];
+        prefab.EmissiveColor = Vec3(ec[0], ec[1], ec[2]);
+        prefab.EmissivePower = item["EmissivePower"];
+
+        _outPrefabs.push_back(prefab);
+    }
+
+    return true;
+}
+
+
 void PrefabLoader::LoadActor(json& j, PrefabCharacterData& data)
 {
     auto s = j["Actor"]["Scale"];
