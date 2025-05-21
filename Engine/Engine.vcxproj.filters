@@ -327,6 +327,9 @@
     </ClInclude>
     <ClInclude Include="MeshEditorUI.h" />
     <ClInclude Include="MeshLoader.h" />
+    <ClInclude Include="UParticleComponent.h">
+      <Filter>Component\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -544,6 +547,9 @@
     </ClCompile>
     <ClCompile Include="MeshEditorUI.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
+    <ClCompile Include="UParticleComponent.cpp">
+      <Filter>Component\Effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

@@ -52,7 +52,6 @@ cbuffer CB_MaterialEffect : register(b2)
 //    float g_fDissolveThreshold;
 //}
 
-
 cbuffer AnimationBuffer : register(b5)
 {
     matrix obj_matAnim[MAX_BONE];
