@@ -34,10 +34,3 @@ struct ShapeComponentData
 	float Scale[3] = { 1.0f, 1.0f, 1.0f };
 };
 
-enum class GizmoAxis
-{
-	NONE,
-	X,
-	Y,
-	Z
-};

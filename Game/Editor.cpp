@@ -6,6 +6,7 @@
 #include "CollisionManager.h"
 #include "ACameraActor.h"
 #include "ASky.h"
+#include "AGizmo.h"
 #include "ATerrainTileActor.h"
 #include "UStaticMeshComponent.h"
 #include "EngineCameraMoveScript.h"
@@ -23,7 +24,6 @@ bool bRunGame = true;
 //#undef RUN_GAME
 void Editor::Init()
 {
-	
 	// Asset ·Îµù
 	actorLoader.LoadAllAsset();
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
@@ -39,7 +39,7 @@ void Editor::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
-
+	SetupGizmo();
 }
 
 void Editor::Update()
@@ -111,6 +111,46 @@ void Editor::SetupSunLight()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
+}
+
+void Editor::SetupGizmo()
+{
+	m_pGizmo = make_shared<AActor>();
+	m_pGizmo->m_szName = L"Gizmo";
+	shared_ptr<UMeshComponent> meshComponent =
+		meshLoader.Make("../Resources/Asset/gizmo.mesh.json");
+	m_pGizmo->SetMeshComponent(meshComponent);
+
+	shared_ptr<UShapeComponent> _pRootShape = std::make_shared<UShapeComponent>();
+	_pRootShape->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	_pRootShape->SetLocalScale(Vec3(1.0f, 1.0f, 1.0f));
+	
+	shared_ptr<UBoxComponent> _pXBox = nullptr;
+	_pXBox = std::make_shared<UBoxComponent>();
+	_pXBox->SetLocalScale(Vec3(1.0f, 0.1f, 0.1f));
+	_pXBox->SetLocalPosition(Vec3(1.2f, 0.0f, 0.0f));
+	_pXBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	_pRootShape->AddChild(_pXBox);
+
+	shared_ptr<UBoxComponent> _YBox = nullptr;
+	_YBox = std::make_shared<UBoxComponent>();
+	_YBox->SetLocalScale(Vec3(0.1f, 1.0f, 0.1f));
+	_YBox->SetLocalPosition(Vec3(0.0f, 1.2f, 0.0f));
+	_YBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	_pRootShape->AddChild(_YBox);
+
+	shared_ptr<UBoxComponent> _ZBox = nullptr;
+	_ZBox = std::make_shared<UBoxComponent>();
+	_ZBox->SetLocalScale(Vec3(0.1f, 0.1f, 1.0f));
+	_ZBox->SetLocalPosition(Vec3(0.0f, 0.0f, 1.2f));
+	_ZBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	_pRootShape->AddChild(_ZBox);
+
+	m_pGizmo->SetShapeComponent(_pRootShape);
+
+	m_pGizmo->SetScale(Vec3(0.01f, 0.01f, 0.01f));
+	m_pGizmo->SetPosition(Vec3(0, 10.0f, 0));
+	OBJECT->AddActor(m_pGizmo);
 }
 
 void Editor::SetupEditorCallbacks()
@@ -283,11 +323,21 @@ void Editor::SetClickPos()
 	m_vRay.Click();
 
 	shared_ptr<AActor> pActor = nullptr;
-	if (Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor))
+	shared_ptr<UShapeComponent> pHitShape = nullptr;
+
+	if (Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor, pHitShape))
 	{
 		if (pActor)
 		{
-			GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			if (pActor->m_szName == L"Gizmo" && pHitShape)
+			{
+				Vec3 local = pHitShape->GetLocalPosition();
+	
+			}
+			else
+			{
+				GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			}
 		}
 	}
 

@@ -9,6 +9,7 @@
 void UBoxComponent::Init()
 {
 	USceneComponent::Init();
+
 	UpdateBounds();
 	CreateCollisionRange();
 }

@@ -24,7 +24,7 @@ public:
 	void Destroy() override;
 
 public:
-	virtual void UpdateBounds() override;
+	virtual void UpdateBounds(); //override;
 	const Box& const GetBounds() { return m_Box; }
 
 public:

@@ -456,7 +456,7 @@ void TestSY::SetClickPos()
 
 	shared_ptr<AActor> pActor = nullptr;
 
-	Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
+	//Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
 
 	if (pActor)
 		int i = 0;

@@ -19,7 +19,8 @@ public:
 
 public:
 	void CheckCollision(vector<UINT> _vActorIndex);
-	static bool CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor);
+	static bool CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor, shared_ptr<UShapeComponent>& _pColShape);
+	static bool CheckRayHit(const std::shared_ptr<UShapeComponent>& _shape, const Ray& _ray, Vec3& _outInter, std::shared_ptr<UShapeComponent>& _outHitShape);
 
 public:
 	// Ray

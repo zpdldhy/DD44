@@ -64,7 +64,7 @@ void Collision::CheckCollision(vector<UINT> _vActorIndex)
 	for (auto index : _vActorIndex)
 		vActorList.emplace_back(OBJECT->GetActor(index));
 
-	for(auto& pObj : vActorList)
+	for (auto& pObj : vActorList)
 	{
 		pObj->m_bCollision = true;		// 임시
 		if (pObj->m_bCollision == false) continue;
@@ -97,9 +97,8 @@ void Collision::CheckCollision(vector<UINT> _vActorIndex)
 	vActorList.clear();
 }
 
-bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor)
+bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor, shared_ptr<UShapeComponent>& _pColShape)
 {
-	// Collision이 있는 Actor의 List를 가져온다.
 	vector<shared_ptr<AActor>> vActorList;
 
 	for (auto index : _vActorIndex)
@@ -107,56 +106,125 @@ bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, sh
 
 	float dis = 999999.f;
 	shared_ptr<AActor> pActor = nullptr;
+	shared_ptr<UShapeComponent> hitShape = nullptr;
 
 	for (auto& pObj : vActorList)
 	{
 		Vec3 inter;
+		std::shared_ptr<UShapeComponent> tmpShape;
+
 		auto pShape = pObj->GetShapeComponent();
+		if (!pShape) continue;
 
-		if (!pShape|| pShape->GetShapeType() == ShapeType::ST_NONE) continue;
-
-		// Ray를 해당 Actor의 LocalMatrix로 변환
-		Ray colRay = Ray(_ray.position - pShape->GetWorldPosition(), _ray.direction);
-
-		if (pShape->GetShapeType() == ShapeType::ST_BOX)
+		// Child가 없을 시
+		if (pShape->GetChildren().empty())
 		{
-			auto box = static_pointer_cast<UBoxComponent>(pObj->GetShapeComponent());
-			
-			if (CheckAABBToRay(colRay, box->GetBounds(), inter))
-			{
-				float interdis = Vec3::Distance(inter, colRay.position);
-				if (dis < interdis)continue;
+			if (!pShape || pShape->GetShapeType() == ShapeType::ST_NONE) continue;
 
-				dis = interdis;
-				pActor = pObj;
+			Ray colRay = Ray(_ray.position - pShape->GetWorldPosition(), _ray.direction);
+
+			if (pShape->GetShapeType() == ShapeType::ST_BOX)
+			{
+				auto box = static_pointer_cast<UBoxComponent>(pObj->GetShapeComponent());
+
+				if (CheckAABBToRay(colRay, box->GetBounds(), inter))
+				{
+					float interdis = Vec3::Distance(inter, colRay.position);
+					if (dis < interdis)continue;
+
+					dis = interdis;
+					pActor = pObj;
+					hitShape = pShape;
+				}
 			}
 		}
 
-		else if (pShape->GetShapeType() == ShapeType::ST_SPHERE)
-		{
-			int i = 0;
-		}
-		else if (pShape->GetShapeType() == ShapeType::ST_CAPSULE)
-		{
-			int i = 0;
-		}
+		// Child가 있을 시
+		else
+			for (auto& child : pShape->GetChildren())
+			{
+				auto& temp = child->GetWorldPosition();
+
+				Ray colRay = Ray(_ray.position - child->GetWorldPosition(), _ray.direction);
+
+				if (child->GetShapeType() == ShapeType::ST_BOX)
+				{
+					auto box = static_pointer_cast<UBoxComponent>(pObj->GetShapeComponent());
+
+					if (CheckAABBToRay(colRay, box->GetBounds(), inter))
+					{
+						float interdis = Vec3::Distance(inter, colRay.position);
+						if (dis < interdis)continue;
+
+						dis = interdis;
+						pActor = pObj;
+						hitShape = child;
+					}
+				}
+			}
 	}
 
-	if (pActor == nullptr)
+	if (!pActor)
 		return false;
 
 	_pColActor = pActor;
+	_pColShape = hitShape;
 
 	vActorList.clear();
 
 	return true;
 }
 
+bool Collision::CheckRayHit(const std::shared_ptr<UShapeComponent>& _shape, const Ray& _ray, Vec3& _outInter, std::shared_ptr<UShapeComponent>& _outHitShape)
+{
+	bool bHit = false;
+	Vec3 inter;
+
+	if (_shape->GetShapeType() == ShapeType::ST_BOX)
+	{
+		auto box = std::static_pointer_cast<UBoxComponent>(_shape);
+		if (CheckAABBToRay(_ray, box->GetBounds(), inter))
+		{
+			_outInter = inter;
+			_outHitShape = _shape;
+			bHit = true;
+		}
+	}
+
+	for (auto& child : _shape->GetChildren())
+	{
+		if (!child) continue;
+
+		if (_shape->GetShapeType() == ShapeType::ST_BOX)
+		{
+			auto box = std::static_pointer_cast<UBoxComponent>(_shape);
+			if (CheckAABBToRay(_ray, box->GetBounds(), inter))
+			{
+				_outInter = inter;
+				_outHitShape = _shape;
+				bHit = true;
+			}
+		}
+
+		Vec3 tmp;
+		std::shared_ptr<UShapeComponent> hitChild;
+
+		if (CheckRayHit(child, _ray, tmp, hitChild))
+		{
+			_outInter = tmp;
+			_outHitShape = hitChild;
+			bHit = true;
+		}
+	}
+
+	return bHit;
+}
+
 bool Collision::CheckRayToPlane(const Ray& _ray, const Plane& _plane)
 {
 	// Ray의 Start Point와 Plane의 거리, normal 방향쪽에 있으면 양수
 	float d = _plane.DotNormal(_ray.position);
-	
+
 	Vec3 dir = _ray.direction;
 	Vec3 normal = _plane.Normal();
 	dir.Normalize();
