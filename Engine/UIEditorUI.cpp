@@ -5,10 +5,12 @@
 #include "UMaterial.h"
 #include "Texture.h"
 #include "Functions.h"
+#include "Input.h"
+#include "UIManager.h"
 
 void UIEditorUI::DrawUI()
 {
-	// ───────────────────────────── Init ─────────────────────────────
+	// ───────────────────────────── Init ─────────────────────────────	
 
 	if (m_vTextureList.empty() && m_vTextureNameList.empty())
 	{
@@ -22,6 +24,8 @@ void UIEditorUI::DrawUI()
 		SearchFile(searchPath, ".jpg");
 		SearchFile(searchPath, ".bmp");
 	}
+
+	SelectActor();
 
 	// ───────────────────────────── Create ─────────────────────────────
 
@@ -69,8 +73,9 @@ void UIEditorUI::DrawUI()
 
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
-	// ───────────────────────────── Actor Update ─────────────────────────────
+	// ───────────────────────────── Update ─────────────────────────────
 	
+	UpdatePrefabData();
 	UpdateUIActor();
 
 	// ───────────────────────────── Prefab Save/Load ─────────────────────────────
@@ -111,6 +116,23 @@ void UIEditorUI::DrawVec3(const char* label, float* values)
 	ImGui::PopID();
 }
 
+void UIEditorUI::UpdatePrefabData()
+{
+	m_CurrentPrefab.Name = to_wm(m_pUIActor->m_szName);
+
+	memcpy(m_CurrentPrefab.transform.Scale, m_Trans.Scale, sizeof(float) * 3);
+	memcpy(m_CurrentPrefab.transform.Rotation, m_Trans.Rotation, sizeof(float) * 3);
+	memcpy(m_CurrentPrefab.transform.Position, m_Trans.Position, sizeof(float) * 3);
+
+	// Texture
+	m_CurrentPrefab.IdleTexturePath = m_vTextureList[m_iIdleIndex];
+	m_CurrentPrefab.HoverTexturePath = m_vTextureList[m_iHoverIndex];
+	m_CurrentPrefab.ActiveTexturePath = m_vTextureList[m_iActiveIndex];
+	m_CurrentPrefab.SelectedTexturePath = m_vTextureList[m_iSelectedIndex];
+
+	m_CurrentPrefab.ShaderPath = m_szShaderPath;
+}
+
 void UIEditorUI::UpdateUIActor()
 {
 	if(m_pUIActor==nullptr)
@@ -118,7 +140,9 @@ void UIEditorUI::UpdateUIActor()
 
 	m_pUIActor->SetPosition(Vec3(m_Trans.Position));
 	m_pUIActor->SetRotation(Vec3(m_Trans.Rotation));
-	m_pUIActor->SetScale(Vec3(m_Trans.Scale));
+	m_pUIActor->SetScale(Vec3(m_Trans.Scale));	
+
+	m_pUIActor->SetPrefabData(m_CurrentPrefab);
 }
 
 void UIEditorUI::ResetData()
@@ -186,23 +210,7 @@ void UIEditorUI::SavePrefab()
 
 	if (ImGui::Button("Save Prefab", ImVec2(-1, 0)))
 	{
-		PrefabUIData data;
-				
-		data.Name = m_szPrefabName;
-
-		memcpy(data.transform.Scale, m_Trans.Scale, sizeof(float) * 3);
-		memcpy(data.transform.Rotation, m_Trans.Rotation, sizeof(float) * 3);
-		memcpy(data.transform.Position, m_Trans.Position, sizeof(float) * 3);
-
-		// Texture
-		data.IdleTexturePath = m_vTextureNameList[m_iIdleIndex];
-		data.HoverTexturePath = m_vTextureNameList[m_iHoverIndex];
-		data.ActiveTexturePath = m_vTextureNameList[m_iActiveIndex];
-		data.SelectedTexturePath = m_vTextureNameList[m_iSelectedIndex];
-
-		data.ShaderPath = m_szShaderPath;
-
-		PrefabLoader().SaveUI(data, "../Resources/Prefab/" + data.Name + ".ui.json");
+		PrefabLoader().SaveUI(m_CurrentPrefab, "../Resources/Prefab/" + m_CurrentPrefab.Name + ".ui.json");
 	}
 }
 
@@ -215,24 +223,7 @@ void UIEditorUI::LoadPrefab()
 
 		if (PREFAB->LoadUI(path, data))
 		{
-			memcpy(m_Trans.Scale, data.transform.Scale, sizeof(float) * 3);
-			memcpy(m_Trans.Rotation, data.transform.Rotation, sizeof(float) * 3);
-			memcpy(m_Trans.Position, data.transform.Position, sizeof(float) * 3);
-
-			// Texture
-			for (size_t i = 0; i < m_vTextureNameList.size(); ++i)
-			{
-				if (!strcmp(m_vTextureNameList[i].c_str(), data.IdleTexturePath.c_str()))
-					m_iIdleIndex = i;
-				if (!strcmp(m_vTextureNameList[i].c_str(), data.HoverTexturePath.c_str()))
-					m_iHoverIndex = i;
-				if (!strcmp(m_vTextureNameList[i].c_str(), data.ActiveTexturePath.c_str()))
-					m_iActiveIndex = i;
-				if (!strcmp(m_vTextureNameList[i].c_str(), data.SelectedTexturePath.c_str()))
-					m_iSelectedIndex = i;
-			}
-
-			strcpy_s(m_szShaderPath, data.ShaderPath.c_str());
+			ResolvePrefabData(data);
 		}
 	}
 }
@@ -261,4 +252,42 @@ void UIEditorUI::SearchFile(const string& _directory, const string& _extension)
 
 		FindClose(hFind);
 	}
+}
+
+void UIEditorUI::SelectActor()
+{
+	// UI를 순회하며 Select를 찾아 Main Actor 변경
+	for (auto pUI : UI->GetUIList())
+	{
+		if (pUI->GetStateType() == UIStateType::ST_SELECT)
+		{
+			m_pUIActor = pUI;
+			m_CurrentPrefab = pUI->GetPrefabData();
+
+			ResolvePrefabData(m_CurrentPrefab);
+			break;
+		}
+	}	
+}
+
+void UIEditorUI::ResolvePrefabData(const PrefabUIData& data)
+{
+	memcpy(m_Trans.Scale, data.transform.Scale, sizeof(float) * 3);
+	memcpy(m_Trans.Rotation, data.transform.Rotation, sizeof(float) * 3);
+	memcpy(m_Trans.Position, data.transform.Position, sizeof(float) * 3);
+
+	// Texture
+	for (size_t i = 0; i < m_vTextureList.size(); ++i)
+	{
+		if (!strcmp(m_vTextureList[i].c_str(), data.IdleTexturePath.c_str()))
+			m_iIdleIndex = i;
+		if (!strcmp(m_vTextureList[i].c_str(), data.HoverTexturePath.c_str()))
+			m_iHoverIndex = i;
+		if (!strcmp(m_vTextureList[i].c_str(), data.ActiveTexturePath.c_str()))
+			m_iActiveIndex = i;
+		if (!strcmp(m_vTextureList[i].c_str(), data.SelectedTexturePath.c_str()))
+			m_iSelectedIndex = i;
+	}
+
+	strcpy_s(m_szShaderPath, data.ShaderPath.c_str());
 }

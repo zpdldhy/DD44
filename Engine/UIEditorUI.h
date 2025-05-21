@@ -14,6 +14,7 @@ public:
 
 private:
 	void UpdateUIActor();
+	void UpdatePrefabData();
 	void ResetData();
 	void SetTexture();
 	void SavePrefab();
@@ -22,7 +23,12 @@ private:
 	void SearchFile(const string& directory, const string& extension);
 
 private:
+	void SelectActor();
+	void ResolvePrefabData(const PrefabUIData& data);
+
+private:
 	shared_ptr<class AUIActor> m_pUIActor = nullptr;
+	PrefabUIData m_CurrentPrefab;
 
 	TransformData m_Trans = { { 0.0f, 0.0f, 0.0f },
 								{ 0.0f, 0.0f, 0.0f },
@@ -35,10 +41,15 @@ private:
 
 	vector<string> m_vTextureList;
 	vector<string> m_vTextureNameList;
+
 	char m_szShaderPath[256] = "../Resources/Shader/Default.hlsl";
 
 	// Prefab
 	char m_szPrefabName[64] = "MyUI";
 
 	std::function<void(shared_ptr<AUIActor>, const char*, const char*, TransformData)> m_OnCreate;
+
+private:
+	// Tool
+	POINT m_ptMousePos = { 0, 0 };
 };

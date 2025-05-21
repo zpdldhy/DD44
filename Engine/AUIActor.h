@@ -1,6 +1,7 @@
 #pragma once
 #include "AActor.h"
 #include "UIState.h"
+#include "PrefabData.h"
 
 class Texture;
 
@@ -23,6 +24,10 @@ public:
 	void SetActiveTexture(shared_ptr<Texture> _pTexture) { m_pActiveTexture = _pTexture; }
 	void SetSelectTexture(shared_ptr<Texture> _pTexture) { m_pSelectTexture = _pTexture; }
 
+	// Prefab
+	void SetPrefabData(const PrefabUIData& _data) { m_PrefabData = _data; }
+	PrefabUIData GetPrefabData() { return m_PrefabData; }
+
 private:
 	// State
 	shared_ptr<UIState> m_pState = nullptr;
@@ -33,5 +38,8 @@ private:
 	shared_ptr<Texture> m_pHoverTexture = nullptr;
 	shared_ptr<Texture> m_pActiveTexture = nullptr;
 	shared_ptr<Texture> m_pSelectTexture = nullptr;	
+
+	// Prefab
+	PrefabUIData m_PrefabData;
 };
 
