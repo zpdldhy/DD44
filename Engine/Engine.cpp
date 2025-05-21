@@ -19,7 +19,6 @@
 #include "CollisionManager.h"
 #include "LightManager.h"
 
-bool Engine::bRunGame;
 
 void Engine::Init()
 {
@@ -37,12 +36,8 @@ void Engine::Init()
 	{
 		INPUT->Init();
 		//DXWRITE->Create();
-#ifndef RUN_GAME
-		if (!bRunGame)
-		{
-			GUI->Init();
-		}
-#endif
+
+		if (_app->m_type != SCENE_TYPE::GAME) { GUI->Init(); }
 	}
 	_app->Init();
 
@@ -65,19 +60,14 @@ void Engine::Frame()
 	// Object Tick
 	{
 		OBJECT->Tick();
-		LIGHTMANAGER->UpdateLightCB();
+		//LIGHTMANAGER->UpdateLightCB();
 
 		UI->Tick();
 	}
 
 	GET_SINGLE(Device)->Frame();
 
-	if (!bRunGame)
-	{
-		GUI->Update();
-	}
-
-
+	if (_app->m_type != SCENE_TYPE::GAME) { GUI->Update(); }
 	_app->Update();
 
 	TIMER->Update();
@@ -124,11 +114,10 @@ void Engine::Render()
 	}
 
 	UI->Render();
-	if (!bRunGame)
-	{
-		GUI->Render(); // *Fix Location* after _app->Render() 
-	}
 
+	if (_app->m_type != SCENE_TYPE::GAME) {
+		GUI->Render(); // *Fix Location* after _app->Render() }
+	}
 
 	//DXWRITE->m_pd2dRT->EndDraw();
 	GET_SINGLE(Device)->PostRender();
@@ -137,13 +126,13 @@ void Engine::Render()
 void Engine::Release()
 {
 	UI->Destroy();
-	if(!bRunGame)
+
+	if (_app->m_type != SCENE_TYPE::GAME)
 	{
 		ImGui_ImplDX11_Shutdown();  // DX11 관련 리소스 해제
 		ImGui_ImplWin32_Shutdown(); // Win32 윈도우 관련 연결 해제
 		ImGui::DestroyContext();    // ImGui 컨텍스트 자체 해제
 	}
-
 	GET_SINGLE(Device)->Release();
 }
 

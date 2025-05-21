@@ -36,6 +36,7 @@ protected:
 	void SetupSunLight();
 
 	void LoadAllPrefabs(const std::string& extension);
-
+public:
+	Game() { m_type = SCENE_TYPE::GAME; }
 };
 
