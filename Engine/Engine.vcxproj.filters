@@ -327,6 +327,7 @@
     <ClInclude Include="EditorData.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="Profiler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -544,6 +545,7 @@
     </ClCompile>
     <ClCompile Include="MeshEditorUI.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
+    <ClCompile Include="Profiler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

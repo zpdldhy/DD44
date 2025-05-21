@@ -116,13 +116,15 @@ void AAsset::Export(TFbxResource _result, string filepath)
 
 TFbxResource AAsset::Load(const char* fileName)
 {
+	string file = fileName;
+	Profiler p("Asset::Load" + file);
 	FILE* pFile;
 
 	errno_t err = fopen_s(&pFile, fileName, "rb");
 	if (err != 0) { assert(false); }
 	TFbxResource result;
 	result.name = SplitName(to_mw(fileName));
-
+	result.m_ResPathName = to_mw(fileName);
 	// HEADER
 	fread(&result.m_iBoneCount, sizeof(UINT), 1, pFile);
 	fread(&result.m_iMeshCount, sizeof(UINT), 1, pFile);
@@ -491,6 +493,7 @@ void AAsset::ExportStatic(int num, nlohmann::ordered_json& j, shared_ptr<UMeshCo
 
 MeshComponentData AAsset::LoadJsonMesh(const char* filepath)
 {
+	//Profiler p("AAsset::LoadJsonMesh");
 	std::ifstream file(filepath);
 	if (!file.is_open()) { assert(false); }
 

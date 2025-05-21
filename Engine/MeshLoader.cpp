@@ -20,13 +20,14 @@ void MeshLoader::SetAnim(map<wstring, shared_ptr<UAnimInstance>> _anim)
 	m_mAnimMap = _anim;
 }
 
-shared_ptr<UMeshComponent> MeshLoader::Make(const char*_path)
+shared_ptr<UMeshComponent> MeshLoader::Make(const char* _path)
 {
+	//Profiler p("MeshLoader::Make");
 	auto meshData = AAsset::LoadJsonMesh(_path);
 	shared_ptr<UMeshComponent> m_pRootComponent;
 	auto originAnim = m_mAnimMap.find(meshData.m_szAnim);
-	if (originAnim == m_mAnimMap.end()) 
-	{ 
+	if (originAnim == m_mAnimMap.end())
+	{
 		m_pRootComponent = MakeMesh(meshData, true);
 		auto& data = meshData;
 		for (int i = 0; i < data.m_vChild.size(); i++)
@@ -76,30 +77,52 @@ shared_ptr<UMeshComponent> MeshLoader::Make(MeshComponentData data)
 shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance)
 {
 	shared_ptr<UMeshComponent> mesh;
+
 	auto meshRes = m_mMeshMap.find(data.m_szRes);
 	if (meshRes == m_mMeshMap.end()) { assert(false); }
 
-
 	if (data.m_type == (int)MeshType::M_SKINNED)
 	{
+		//Profiler p("MeshLoader::MakeMeshSkinned");
 		mesh = make_shared<USkinnedMeshComponent>();
 		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
 		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
 
-		if (bRoot) { skinnedRoot->SetBaseAnim(animInstance); }
-		shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
-		animTrack->SetBase(animInstance);
-		skinnedRoot->SetMeshAnim(animTrack);
-		if (data.m_bInPlace)
 		{
-			animInstance->m_bInPlace = true;
-			animInstance->SetRootIndex(data.m_rootIndex);
+			//Profiler p("Set Anim");
+
+			if (bRoot) { skinnedRoot->SetBaseAnim(animInstance); }
+			shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
+			animTrack->SetBase(animInstance);
+			skinnedRoot->SetMeshAnim(animTrack);
+			if (data.m_bInPlace)
+			{
+				animInstance->m_bInPlace = true;
+				animInstance->SetRootIndex(data.m_rootIndex);
+			}
+
 		}
 
-		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
-		mat->Load(data.m_szTex, data.m_szShader);
-		mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
-		skinnedRoot->SetMaterial(mat);
+		{
+			//Profiler p("Skinned : SetMat");
+			shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+			{
+				//Profiler p("MatLoad");
+
+				mat->Load(data.m_szTex, data.m_szShader);
+
+			}
+			{
+				//Profiler p("Inputlayout");
+
+				mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+
+			}
+			skinnedRoot->SetMaterial(mat);
+
+		}
+		int a = 0;
+
 	}
 	else
 	{
@@ -111,9 +134,17 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 		staticRoot->SetMatBone(data.m_matBone);
 		staticRoot->SetTargetBoneIndex(data.m_targetBone);
 
-		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
-		mat->Load(data.m_szTex, data.m_szShader);
-		staticRoot->SetMaterial(mat);
+		{
+			//Profiler p("StaticMesh : SetMat");
+			shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+			{
+				//Profiler p("MatLoad");
+
+				mat->Load(data.m_szTex, data.m_szShader);
+
+			}
+			staticRoot->SetMaterial(mat);
+		}
 	}
 	mesh->SetLocalPosition(data.m_pos);
 	mesh->SetLocalRotation(data.m_rot);
@@ -124,7 +155,6 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 
 shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool _bRoot)
 {
-	
 	shared_ptr<UMeshComponent> mesh;
 	auto meshRes = m_mMeshMap.find(data.m_szRes);
 	if (meshRes == m_mMeshMap.end()) { assert(false); }
@@ -165,8 +195,8 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(wstring _resName)
 	auto iter = m_mMeshMap.find(_resName);
 	if (iter == m_mMeshMap.end()) { assert(false); }
 
-	
-	bool skinned = dynamic_pointer_cast<USkeletalMeshResources>(mesh) ? true: false;
+
+	bool skinned = dynamic_pointer_cast<USkeletalMeshResources>(mesh) ? true : false;
 	if (skinned)
 	{
 		mesh = make_shared<USkinnedMeshComponent>();

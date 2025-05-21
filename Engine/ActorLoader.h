@@ -18,10 +18,12 @@ public:
 	map<wstring, shared_ptr<UMeshResources>> m_mMeshMap;
 	vector<shared_ptr<UAnimInstance>> m_vAnimInstanceList;
 	map<wstring, shared_ptr<UAnimInstance>> m_vAnimInstanceMap;
+	map<wstring, shared_ptr<UMeshResources>> m_mResPathMap;
 public:
 	void ConvertFbxToAsset(string _path = "../Resources/Fbx/DeathDoor/*.fbx");
 	void LoadAllAsset();
 	void LoadOne(string _path);
+	shared_ptr<UMeshResources> LoadOneRes(string _path);
 	vector<MeshComponentData> LoadMeshData();
 	vector<shared_ptr<UMeshComponent>> LoadMesh();
 	map<wstring, shared_ptr<UMeshResources>> LoadMeshMap();

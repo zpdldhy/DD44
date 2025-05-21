@@ -18,6 +18,7 @@
 
 void Game::Init()
 {
+	Profiler p("Init");
 	// Asset 로딩
 	actorLoader.LoadAllAsset();
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
@@ -104,7 +105,7 @@ void Game::SetupSunLight()
 
 void Game::LoadAllPrefabs(const std::string& extension)
 {
-
+	//Profiler p("LoadAllPrefabs" + extension);
 	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
 
 	for (const auto& file : files)
@@ -139,15 +140,18 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				//meshLoader.SetMesh(actorLoader.LoadMeshMap());
 				//meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
-				shared_ptr<UMeshComponent> meshComponent = meshLoader.Make(characterData.MeshPath.c_str());
+				{
 
-				actor->SetMeshComponent(meshComponent);
+					shared_ptr<UMeshComponent> meshComponent = meshLoader.Make(characterData.MeshPath.c_str());
 
-				actor->m_szName = L"Character";
-				actor->SetPosition(Vec3(characterData.actor.Position));
-				actor->SetRotation(Vec3(characterData.actor.Rotation));
-				actor->SetScale(Vec3(characterData.actor.Scale));
+					actor->SetMeshComponent(meshComponent);
 
+					actor->m_szName = L"Character";
+					actor->SetPosition(Vec3(characterData.actor.Position));
+					actor->SetRotation(Vec3(characterData.actor.Rotation));
+					actor->SetScale(Vec3(characterData.actor.Scale));
+
+				}
 				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 
 				m_pPlayer = actor;
@@ -164,7 +168,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				if (characterData.shape.isUse)
 				{
 					shared_ptr<UShapeComponent> shapeComponent = nullptr;
-					if(static_cast<ShapeType>(characterData.shape.eShapeType)== ShapeType::ST_BOX)
+					if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_BOX)
 						shapeComponent = make_shared<UBoxComponent>();
 					//else if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_SPHERE)
 
@@ -181,12 +185,14 @@ void Game::LoadAllPrefabs(const std::string& extension)
 		}
 		else if (extension == ".object.json")
 		{
+			//Profiler p("MakeObject");
 			PrefabObjectData objData;
 			if (PREFAB->LoadObject(file, objData))
 			{
 				shared_ptr<UStaticMeshComponent> meshComp = make_shared<UStaticMeshComponent>();
- 				if (SplitExt(to_mw(objData.MeshPath)) == L".obj")
+				if (SplitExt(to_mw(objData.MeshPath)) == L".obj")
 				{
+					//Profiler p("Mesh From Obj");
 					AssimpLoader loader;
 					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
 					meshComp->SetMeshPath(to_mw(objData.MeshPath)); // 이거 풀네임으로 들어가야되는건가 ? 나중에 어디서 쓰이나 ? 
@@ -202,11 +208,9 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				}
 				else
 				{
-					ActorLoader al;
-					al.LoadOne(objData.MeshPath);
-					meshComp->SetMeshPath(to_mw(objData.MeshPath));
-					auto resources = al.LoadMeshResources();
-					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources[0]));
+					//Profiler p("Mesh From Asset");
+					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
+					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 				}
 
 
@@ -232,18 +236,10 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				for (auto& objData : objList)
 				{
 					auto meshComp = make_shared<UStaticMeshComponent>();
-					meshComp->SetMeshPath(to_mw(objData.MeshPath));
-
-					auto meshRes = make_shared<UStaticMeshResources>();
-					AssimpLoader loader;
-					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
-					if (!meshList.empty())
-					{
-						meshRes->SetVertexList(meshList[0].m_vVertexList);
-						meshRes->SetIndexList(meshList[0].m_vIndexList);
-						meshRes->Create();
-						meshComp->SetMesh(meshRes);
-					}
+					meshComp->SetMeshPath(to_mw(objData.MeshPath)); 
+					
+					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
+					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 
 					auto material = make_shared<UMaterial>();
 					material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
