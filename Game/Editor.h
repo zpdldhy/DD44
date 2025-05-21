@@ -15,6 +15,8 @@ public:
 
 	shared_ptr<class ALight> m_pSunLight;
 
+	shared_ptr<class AActor> m_pGizmo;
+
 	bool m_bEnginCamera = false;
 
 	// Asset loading
@@ -33,12 +35,14 @@ protected:
 	void SetupEngineCamera();
 	void SetupSkybox();
 	void SetupSunLight();
+	void SetupGizmo();
 
 	void SetupEditorCallbacks();
 	void SetupCharacterEditorCallback();
 	void SetupMapEditorCallback();
 	void SetupObjectEditorCallback();
 
+	void SetClickPos();
 	void LoadAllPrefabs(const std::string& extension);
 
 };

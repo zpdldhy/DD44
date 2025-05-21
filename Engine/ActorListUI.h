@@ -5,9 +5,11 @@ class ActorListUI
 public:
 	void DrawUI();
 	void Toggle();
+	void SetSelectedActorID(UINT id);
 
 private:
 	bool m_bVisible = false;
+	bool m_bDragMode = false;
 	float m_fSlideOffset = 0.0f;
 
 	Vec3 m_vPosition;

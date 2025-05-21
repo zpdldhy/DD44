@@ -525,7 +525,7 @@ void TestSJ::Render()
 
 void TestSJ::SetupObjectEditorCallback()
 {
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 specularColor, float shininess, Vec3 emissiveColor, float emissivePower)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 specularColor, float shininess, Vec3 emissiveColor, float emissivePower, ShapeComponentData shapeData)
 		{
 			AssimpLoader loader;
 			vector<MeshData> meshList = loader.Load(objPath);
