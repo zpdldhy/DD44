@@ -13,7 +13,6 @@ class Engine
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
 
 public:
-	static bool bRunGame;
 	Engine(HINSTANCE _hInstance, shared_ptr<IExecute> _app);
 
 public:

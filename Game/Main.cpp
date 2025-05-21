@@ -17,7 +17,6 @@ int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCm
     shared_ptr<IExecute> app = make_shared<Editor>();
 
     Engine game(_hInstance, app);
-    Engine::bRunGame = false;
     game.Run();
 
     return 0;
