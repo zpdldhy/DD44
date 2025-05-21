@@ -272,6 +272,12 @@ void Game::SetupUIEditorCallback()
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
 			);
 			meshComp->SetMaterial(mat);
+
+			uiActor->SetIdleTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetHoverTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetActiveTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetSelectTexture(TEXTURE->Get(to_mw(texPath)));
+
 			uiActor->SetMeshComponent(meshComp);
 			uiActor->SetPosition(Vec3(actorData.Position));
 			uiActor->SetRotation(Vec3(actorData.Rotation));

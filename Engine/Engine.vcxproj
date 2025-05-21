@@ -192,6 +192,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="UBoxComponent.h" />
     <ClInclude Include="UIEditorUI.h" />
     <ClInclude Include="UIManager.h" />
+    <ClInclude Include="UIState.h" />
     <ClInclude Include="ULightComponent.h" />
     <ClInclude Include="UShapeComponent.h" />
     <ClInclude Include="Sound.h" />
@@ -276,6 +277,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="UBoxComponent.cpp" />
     <ClCompile Include="UIEditorUI.cpp" />
     <ClCompile Include="UIManager.cpp" />
+    <ClCompile Include="UIState.cpp" />
     <ClCompile Include="ULightComponent.cpp" />
     <ClCompile Include="UShapeComponent.cpp" />
     <ClCompile Include="Sound.cpp" />

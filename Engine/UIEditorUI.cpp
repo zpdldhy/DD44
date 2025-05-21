@@ -130,7 +130,10 @@ void UIEditorUI::ResetData()
 	m_UIData.Scale[2] = 1.0f;
 
 	// Texture
-	m_iSelectedTextureIndex = 0;
+	m_iIdleIndex = 0;
+	m_iHoverIndex = 0;
+	m_iActiveIndex = 0;
+	m_iSelectedIndex = 0;
 	m_vTextureList.emplace_back("../Resources/Texture/white.png");
 	m_vTextureNameList.emplace_back("white.png");
 
@@ -155,16 +158,37 @@ void UIEditorUI::SetTexture()
 			NamePtrs.push_back(name.c_str());
 	}
 
-	static int iPreSelectedIndex = 0;
-
-	ImGui::Combo("Texture", &m_iSelectedTextureIndex, NamePtrs.data(), (int)NamePtrs.size());
-
-	if (m_iSelectedTextureIndex != iPreSelectedIndex)
+	static int iPreIdleIndex = 0;
+	ImGui::Combo("Idle Texture", &m_iIdleIndex, NamePtrs.data(), (int)NamePtrs.size());
+	if (m_iIdleIndex != iPreIdleIndex)
 	{
-		iPreSelectedIndex = m_iSelectedTextureIndex;
-		m_pUIActor->GetMeshComponent()->GetMaterial()->SetTexture(TEXTURE->Get(to_mw(m_vTextureList[iPreSelectedIndex])));
+		iPreIdleIndex = m_iIdleIndex;
+		m_pUIActor->SetIdleTexture(TEXTURE->Get(to_mw(m_vTextureList[iPreIdleIndex])));
 	}
 
+	static int iPreHoverIndex = 0;
+	ImGui::Combo("Hover Texture", &m_iHoverIndex, NamePtrs.data(), (int)NamePtrs.size());
+	if (m_iHoverIndex != iPreHoverIndex)
+	{
+		iPreHoverIndex = m_iHoverIndex;
+		m_pUIActor->SetHoverTexture(TEXTURE->Get(to_mw(m_vTextureList[iPreHoverIndex])));
+	}
+
+	static int iPreActiveIndex = 0;
+	ImGui::Combo("Active Texture", &m_iActiveIndex, NamePtrs.data(), (int)NamePtrs.size());
+	if (m_iActiveIndex != iPreActiveIndex)
+	{
+		iPreActiveIndex = m_iActiveIndex;
+		m_pUIActor->SetActiveTexture(TEXTURE->Get(to_mw(m_vTextureList[iPreActiveIndex])));
+	}
+
+	static int iPreSelectedIndex = 0;
+	ImGui::Combo("Selected Texture", &m_iSelectedIndex, NamePtrs.data(), (int)NamePtrs.size());
+	if (m_iSelectedIndex != iPreSelectedIndex)
+	{
+		iPreSelectedIndex = m_iSelectedIndex;
+		m_pUIActor->SetSelectTexture(TEXTURE->Get(to_mw(m_vTextureList[iPreSelectedIndex])));
+	}
 }
 
 void UIEditorUI::SearchFile(const string& _directory, const string& _extension)

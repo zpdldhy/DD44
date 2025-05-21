@@ -17,7 +17,6 @@ private:
 	void ResetData();
 	void SetTexture();
 
-	vector<string> GetTextureList(const std::string& directory);
 	void SearchFile(const string& directory, const string& extension);
 
 private:
@@ -27,7 +26,11 @@ private:
 								{ 0.0f, 0.0f, 0.0f },
 								{ 100.0f, 100.0f, 1.0f } };
 
-	int m_iSelectedTextureIndex = 0;
+	int m_iIdleIndex = 0;
+	int m_iHoverIndex = 0;
+	int m_iActiveIndex = 0;
+	int m_iSelectedIndex = 0;
+
 	vector<string> m_vTextureList;
 	vector<string> m_vTextureNameList;
 	char m_szShaderPath[256] = "../Resources/Shader/Default.hlsl";

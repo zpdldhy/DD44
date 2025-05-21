@@ -290,3 +290,18 @@ bool Collision::PointInPolygon(const Vec3& _inter, const Vec3& _faceNormal, cons
 
 	return true;
 }
+
+// 화면좌표계 충돌
+bool Collision2D::CheckRectToPoint(const POINT& _point, const Vec2& _rectMin, const Vec2& _rectMax)
+{
+	if (_point.x < _rectMin.x)
+		return false;
+	if (_point.x > _rectMax.x)
+		return false;
+	if (_point.y < _rectMin.y)
+		return false;
+	if (_point.y > _rectMax.y)
+		return false;
+
+	return true;
+}

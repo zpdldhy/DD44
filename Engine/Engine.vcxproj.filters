@@ -328,6 +328,9 @@
     <ClInclude Include="UIEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="UIState.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -547,6 +550,9 @@
     <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="UIEditorUI.cpp">
       <Filter>Utils\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="UIState.cpp">
+      <Filter>FSM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

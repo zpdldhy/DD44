@@ -31,3 +31,8 @@ public:
 	static bool PointInPolygon(const Vec3& _inter, const Vec3& _faceNormal, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2);
 };
 
+class Collision2D
+{
+public:
+	static bool CheckRectToPoint(const POINT& _point, const Vec2& _rectMin, const Vec2& _rectMax);
+};
