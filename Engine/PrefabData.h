@@ -48,7 +48,7 @@ struct PrefabCharacterData
     int AnimIndex;
     float AnimSpeed;
 
-    ActorData actor;
+    TransformData transform;
 
     // Component
 	CameraComponentData camera;
@@ -67,16 +67,15 @@ struct PrefabUIData
 {
     std::string Name;
 
+    TransformData transform;
+
+    std::string IdleTexturePath;
+    std::string HoverTexturePath;
+    std::string ActiveTexturePath;
+    std::string SelectedTexturePath;
     std::string ShaderPath;
-    std::string TexturePath;
 
     int ScriptType;
-
-    ActorData actor;
-
-    // Component
-    CameraComponentData camera;
-    ShapeComponentData shape;
 };
 
 struct ModifiedCellData

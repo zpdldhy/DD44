@@ -8,7 +8,23 @@
 
 void UIEditorUI::DrawUI()
 {
+	// ───────────────────────────── Init ─────────────────────────────
+
+	if (m_vTextureList.empty() && m_vTextureNameList.empty())
+	{
+		m_vTextureList.emplace_back("../Resources/Texture/white.png");
+		m_vTextureNameList.emplace_back("white.png");
+
+		string searchPath = "../Resources/Texture/";
+
+		// 만약 다른 형식의 파일도 필요하다면 여기에 추가
+		SearchFile(searchPath, ".png");
+		SearchFile(searchPath, ".jpg");
+		SearchFile(searchPath, ".bmp");
+	}
+
 	// ───────────────────────────── Create ─────────────────────────────
+
 	if (ImGui::Button("Create New UI"))
 	{
 		m_pUIActor = make_shared<AUIActor>();
@@ -20,7 +36,7 @@ void UIEditorUI::DrawUI()
 			m_pUIActor,
 			m_vTextureList[0].c_str(),	// white.png
 			m_szShaderPath,
-			m_UIData
+			m_Trans
 		);
 	}
 
@@ -28,58 +44,42 @@ void UIEditorUI::DrawUI()
 		return;
 
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+
 	// ───────────────────────────── Transform ─────────────────────────────
+	
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Transform");
 
 	ImGui::SameLine(0, 37.5f); ImGui::Text("%s", "X");
 	ImGui::SameLine(0, 72.5f); ImGui::Text("%s", "Y");
 	ImGui::SameLine(0, 72.5f); ImGui::Text("%s", "Z");
 
-	DrawVec3("Position", m_UIData.Position);
-	DrawVec3("Rotation", m_UIData.Rotation);
-	DrawVec3("Scale   ", m_UIData.Scale);
+	DrawVec3("Position", m_Trans.Position);
+	DrawVec3("Rotation", m_Trans.Rotation);
+	DrawVec3("Scale   ", m_Trans.Scale);
 
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
-	// ───────────────────────────── Asset Input ─────────────────────────────
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Asset Paths");
+
+	// ───────────────────────────── Materials ─────────────────────────────
+	
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Materials");
+
 	SetTexture();
+
 	ImGui::InputText("Shader", m_szShaderPath, IM_ARRAYSIZE(m_szShaderPath));
 
+	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+
 	// ───────────────────────────── Actor Update ─────────────────────────────
+	
 	UpdateUIActor();
 
-	ImGui::Spacing();
 	// ───────────────────────────── Prefab Save/Load ─────────────────────────────
+	
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Prefab Tools");
 
-	static char prefabName[64] = "MyUI";
-	ImGui::InputText("Prefab Name", prefabName, IM_ARRAYSIZE(prefabName));
+	SavePrefab();
 
-	if (ImGui::Button("Save as Prefab", ImVec2(-1, 0)))
-	{
-		PrefabObjectData data;
-		data.Name = prefabName;
-		data.ShaderPath = m_szShaderPath;
-		//data.TexturePath = m_szTexturePath;
-		data.Scale = Vec3(m_UIData.Scale);
-		data.Rotation = Vec3(m_UIData.Rotation);
-		data.Translation = Vec3(m_UIData.Position);
-
-		PrefabLoader().SaveObject(data, "../Resources/Prefab/" + data.Name + ".ui.json");
-	}
-
-	if (ImGui::Button("Load Prefab##File", ImVec2(-1, 0)))
-	{
-		PrefabObjectData data;
-		std::string path = "../Resources/Prefab/" + std::string(prefabName) + ".ui.json";
-		if (PREFAB->LoadObject(path, data))
-		{
-			strcpy_s(m_szShaderPath, data.ShaderPath.c_str());
-			//strcpy_s(m_szTexturePath, data.TexturePath.c_str());
-
-			
-		}
-	}
+	LoadPrefab();
 
 	ImGui::Separator(); ImGui::Spacing();
 }
@@ -116,41 +116,30 @@ void UIEditorUI::UpdateUIActor()
 	if(m_pUIActor==nullptr)
 		return;
 
-	m_pUIActor->SetPosition(Vec3(m_UIData.Position));
-	m_pUIActor->SetRotation(Vec3(m_UIData.Rotation));
-	m_pUIActor->SetScale(Vec3(m_UIData.Scale));
+	m_pUIActor->SetPosition(Vec3(m_Trans.Position));
+	m_pUIActor->SetRotation(Vec3(m_Trans.Rotation));
+	m_pUIActor->SetScale(Vec3(m_Trans.Scale));
 }
 
 void UIEditorUI::ResetData()
 {
 	// Transform
-	for (int i = 0; i < 3; i++) m_UIData.Position[i] = 0.0f;
-	for (int i = 0; i < 3; i++) m_UIData.Rotation[i] = 0.0f;
-	for (int i = 0; i < 2; i++) m_UIData.Scale[i] = 100.0f;
-	m_UIData.Scale[2] = 1.0f;
+	for (int i = 0; i < 3; i++) m_Trans.Position[i] = 0.0f;
+	for (int i = 0; i < 3; i++) m_Trans.Rotation[i] = 0.0f;
+	for (int i = 0; i < 2; i++) m_Trans.Scale[i] = 100.0f;
+	m_Trans.Scale[2] = 1.0f;
 
 	// Texture
 	m_iIdleIndex = 0;
 	m_iHoverIndex = 0;
 	m_iActiveIndex = 0;
 	m_iSelectedIndex = 0;
-	m_vTextureList.emplace_back("../Resources/Texture/white.png");
-	m_vTextureNameList.emplace_back("white.png");
 
 	strcpy_s(m_szShaderPath, "../Resources/Shader/Default.hlsl");
 }
 
 void UIEditorUI::SetTexture()
 {
-	if (m_vTextureList.size() == 1)
-	{
-		string searchPath = "../Resources/Texture/";
-
-		// 만약 다른 형식의 파일도 필요하다면 여기에 추가
-		SearchFile(searchPath, ".png");
-		SearchFile(searchPath, ".jpg");
-	}
-
 	static std::vector<const char*> NamePtrs;
 	if (NamePtrs.empty())
 	{
@@ -188,6 +177,63 @@ void UIEditorUI::SetTexture()
 	{
 		iPreSelectedIndex = m_iSelectedIndex;
 		m_pUIActor->SetSelectTexture(TEXTURE->Get(to_mw(m_vTextureList[iPreSelectedIndex])));
+	}
+}
+
+void UIEditorUI::SavePrefab()
+{
+	ImGui::InputText("Prefab Name", m_szPrefabName, IM_ARRAYSIZE(m_szPrefabName));
+
+	if (ImGui::Button("Save Prefab", ImVec2(-1, 0)))
+	{
+		PrefabUIData data;
+				
+		data.Name = m_szPrefabName;
+
+		memcpy(data.transform.Scale, m_Trans.Scale, sizeof(float) * 3);
+		memcpy(data.transform.Rotation, m_Trans.Rotation, sizeof(float) * 3);
+		memcpy(data.transform.Position, m_Trans.Position, sizeof(float) * 3);
+
+		// Texture
+		data.IdleTexturePath = m_vTextureNameList[m_iIdleIndex];
+		data.HoverTexturePath = m_vTextureNameList[m_iHoverIndex];
+		data.ActiveTexturePath = m_vTextureNameList[m_iActiveIndex];
+		data.SelectedTexturePath = m_vTextureNameList[m_iSelectedIndex];
+
+		data.ShaderPath = m_szShaderPath;
+
+		PrefabLoader().SaveUI(data, "../Resources/Prefab/" + data.Name + ".ui.json");
+	}
+}
+
+void UIEditorUI::LoadPrefab()
+{
+	if (ImGui::Button("Load Prefab##File", ImVec2(-1, 0)))
+	{
+		PrefabUIData data;
+		std::string path = "../Resources/Prefab/" + std::string(m_szPrefabName) + ".ui.json";
+
+		if (PREFAB->LoadUI(path, data))
+		{
+			memcpy(m_Trans.Scale, data.transform.Scale, sizeof(float) * 3);
+			memcpy(m_Trans.Rotation, data.transform.Rotation, sizeof(float) * 3);
+			memcpy(m_Trans.Position, data.transform.Position, sizeof(float) * 3);
+
+			// Texture
+			for (size_t i = 0; i < m_vTextureNameList.size(); ++i)
+			{
+				if (!strcmp(m_vTextureNameList[i].c_str(), data.IdleTexturePath.c_str()))
+					m_iIdleIndex = i;
+				if (!strcmp(m_vTextureNameList[i].c_str(), data.HoverTexturePath.c_str()))
+					m_iHoverIndex = i;
+				if (!strcmp(m_vTextureNameList[i].c_str(), data.ActiveTexturePath.c_str()))
+					m_iActiveIndex = i;
+				if (!strcmp(m_vTextureNameList[i].c_str(), data.SelectedTexturePath.c_str()))
+					m_iSelectedIndex = i;
+			}
+
+			strcpy_s(m_szShaderPath, data.ShaderPath.c_str());
+		}
 	}
 }
 
