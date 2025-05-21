@@ -55,6 +55,15 @@ void ActorLoader::LoadOne(string _path)
 	m_vFbxList.emplace_back(resource);
 }
 
+shared_ptr<UMeshResources> ActorLoader::LoadOneRes(string _path)
+{
+	//Profiler p("ActorLoader::LoadOneRes");
+	auto iter = m_mResPathMap.find(to_mw(_path));
+	if(iter == m_mResPathMap.end()) { assert(false); }
+
+	return iter->second;
+}
+
 vector<MeshComponentData> ActorLoader::LoadMeshData()
 {
 	vector<string> fileNames = GetFileNames("../Resources/Asset/*.json");
@@ -129,6 +138,7 @@ vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 
 map<wstring, shared_ptr<UMeshResources>> ActorLoader::LoadMeshMap()
 {
+	Profiler p("ActorLoader::LoadMeshMap");
 	m_mMeshMap.clear();
 	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
 	{
@@ -167,6 +177,7 @@ map<wstring, shared_ptr<UMeshResources>> ActorLoader::LoadMeshMap()
 				staticMesh->Create();
 			}
 			m_mMeshMap.insert(make_pair(name, meshResource));
+			m_mResPathMap.insert(make_pair(m_vFbxList[iFbx].m_ResPathName, meshResource));
 		}
 	}
 	return m_mMeshMap;

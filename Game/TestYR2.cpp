@@ -73,22 +73,22 @@ void TestYR2::Init()
 	//OBJECT->AddActor(m_pActor);
 
 
-	//loader = make_shared<ActorLoader>();
-	////name = "temp";
-	//loader->LoadAllAsset();
-	//meshResMap = loader->LoadMeshMap();
-	//animList = loader->LoadAnim();
-	//texList = loader->LoadTexPath();
-
-	objLoader = make_shared< ObjectLoader>();
-	objLoader->ConvertObjToAsset("../Resources/Obj/wall/*.obj");
-	//objLoader->Load();
-	//objLoader->LoadAsFR("../Resources/Obj/AltarSmallStone3.obj");
-	//map<wstring, shared_ptr<UMeshResources>> tempMap = objLoader->LoadMeshMap();
 	loader = make_shared<ActorLoader>();
 	name = "temp";
 	loader->LoadAllAsset();
 	meshResMap = loader->LoadMeshMap();
+	animList = loader->LoadAnim();
+	texList = loader->LoadTexPath();
+
+	//objLoader = make_shared< ObjectLoader>();
+	//objLoader->ConvertObjToAsset("../Resources/Obj/wall/*.obj");
+	////objLoader->Load();
+	////objLoader->LoadAsFR("../Resources/Obj/AltarSmallStone3.obj");
+	////map<wstring, shared_ptr<UMeshResources>> tempMap = objLoader->LoadMeshMap();
+	//loader = make_shared<ActorLoader>();
+	//name = "temp";
+	//loader->LoadAllAsset();
+	//meshResMap = loader->LoadMeshMap();
 	
 	/*for (auto& data : tempMap)
 	{

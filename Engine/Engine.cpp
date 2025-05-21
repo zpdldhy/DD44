@@ -60,7 +60,7 @@ void Engine::Frame()
 	// Object Tick
 	{
 		OBJECT->Tick();
-		//LIGHTMANAGER->UpdateLightCB();
+		LIGHTMANAGER->UpdateLightCB();
 
 		UI->Tick();
 	}
