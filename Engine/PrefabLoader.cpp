@@ -335,6 +335,73 @@ bool PrefabLoader::LoadObjectArray(const std::string& _filePath, std::vector<Pre
     return true;
 }
 
+bool PrefabLoader::SaveParticle(const PrefabParticleData& data, const std::string& filePath)
+{
+    json j;
+
+    j["Name"] = data.Name;
+    j["ShaderPath"] = data.ShaderPath;
+    j["TexturePath"] = data.TexturePath;
+
+    j["Scale"] = { data.Scale.x, data.Scale.y, data.Scale.z };
+    j["Rotation"] = { data.Rotation.x, data.Rotation.y, data.Rotation.z };
+    j["Translation"] = { data.Translation.x, data.Translation.y, data.Translation.z };
+
+    j["Divisions"] = data.Divisions;
+    j["Row"] = data.Row;
+    j["Col"] = data.Col;
+
+    j["UVStart"] = { data.UVStart.x, data.UVStart.y };
+    j["UVEnd"] = { data.UVEnd.x, data.UVEnd.y };
+
+    j["BillboardSizeX"] = data.BillboardSizeX;
+    j["BillboardSizeY"] = data.BillboardSizeY;
+
+    std::ofstream file(filePath);
+    if (!file.is_open())
+        return false;
+
+    file << std::setw(4) << j;
+    return true;
+}
+
+bool PrefabLoader::LoadParticle(const std::string& filePath, PrefabParticleData& outData)
+{
+    std::ifstream file(filePath);
+    if (!file.is_open())
+        return false;
+
+    json j;
+    file >> j;
+
+    outData.Name = j["Name"];
+    outData.ShaderPath = j["ShaderPath"];
+    outData.TexturePath = j["TexturePath"];
+
+    auto s = j["Scale"];
+    outData.Scale = Vec3(s[0], s[1], s[2]);
+
+    auto r = j["Rotation"];
+    outData.Rotation = Vec3(r[0], r[1], r[2]);
+
+    auto t = j["Translation"];
+    outData.Translation = Vec3(t[0], t[1], t[2]);
+
+    outData.Divisions = j["Divisions"];
+    outData.Row = j["Row"];
+    outData.Col = j["Col"];
+
+    auto uv0 = j["UVStart"];
+    auto uv1 = j["UVEnd"];
+    outData.UVStart = Vec2(uv0[0], uv0[1]);
+    outData.UVEnd = Vec2(uv1[0], uv1[1]);
+
+    outData.BillboardSizeX = j["BillboardSizeX"];
+    outData.BillboardSizeY = j["BillboardSizeY"];
+
+    return true;
+}
+
 
 void PrefabLoader::LoadActor(json& j, PrefabCharacterData& data)
 {

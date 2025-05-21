@@ -17,9 +17,11 @@
 #define CAMERA		GET_SINGLE(CameraManager)
 #define UI			GET_SINGLE(UIManager)
 #define OBJECT		GET_SINGLE(ObjectManager)
+#define PARTICLE    GET_SINGLE(ParticleManager)
 #define PREFAB      GET_SINGLE(PrefabLoader)
 #define LIGHTMANAGER GET_SINGLE(LightManager)
 #define POSTPROCESS  GET_SINGLE(PostProcessManager)
 #define COLLITION	GET_SINGLE(Collision)
+
 
 #define DD_PI		3.1415926f

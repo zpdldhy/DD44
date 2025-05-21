@@ -2,6 +2,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Inputlayout.h"
+#include "ConstantBuffer.h"
 
 enum class ERenderMode
 {
@@ -59,6 +60,11 @@ struct CB_RMB
 	Vec3 padding;
 };
 
+struct CB_SpriteUV
+{
+	Vec2 uvStart = { 0.0f, 0.0f };
+	Vec2 uvEnd = { 1.0f, 1.0f };
+};
 
 class UMaterial
 {
@@ -71,9 +77,10 @@ class UMaterial
 	shared_ptr<Texture> m_pTexture = nullptr;
 	shared_ptr<Inputlayout> m_pInputlayout = nullptr;
 	ComPtr<ID3D11ShaderResourceView> m_pTexSRV;
-
+	
 	ComPtr<ID3D11Buffer> m_pEffectCB; // ХыЧе CB
 	ComPtr<ID3D11Buffer> m_pRenderModeBuffer;
+	shared_ptr<class ConstantBuffer<CB_SpriteUV>> m_CB_SpriteUV;
 
 	CB_MaterialEffect m_tEffectData = {};
 	CB_RMB m_tRenderModeData;
@@ -101,7 +108,7 @@ public:
 
 	void SetUseStencil(bool _bUseStencil) { m_bUseStencil = _bUseStencil; }
 	bool IsUseStencil() { return m_bUseStencil; }
-	
+	void SetUVRange(Vec2 start, Vec2 end);
 public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
 	virtual void SetTexture(shared_ptr<Texture> _texture) { m_pTexture = _texture; }

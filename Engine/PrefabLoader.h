@@ -21,6 +21,9 @@ public:
 	bool LoadObject(const std::string& _filePath, PrefabObjectData& _prefab);
 	bool LoadObjectArray(const std::string& _filePath, std::vector<PrefabObjectData>& _outPrefabs);
 
+	bool SaveParticle(const PrefabParticleData& data, const std::string& filePath);
+	bool LoadParticle(const std::string& filePath, PrefabParticleData& outData);
+
 private:
 	void LoadActor(json& j, PrefabCharacterData& data);
 	void LoadCameraComponent(json& j, CameraComponentData& data);

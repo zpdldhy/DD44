@@ -4,6 +4,7 @@
 #include "UCameraComponent.h"
 #include "UShapeComponent.h"
 #include "ULightComponent.h"
+#include "ConstantBuffer.h"
 
 enum class ComponentType
 {
@@ -15,6 +16,8 @@ enum class ComponentType
 	CT_LIGHT,
 	CT_COUNT,
 };
+
+
 
 class AActor : public enable_shared_from_this<AActor>
 {
@@ -78,6 +81,10 @@ public:
 	void SetPosition(const Vec3& _pos) { m_pTransform->SetLocalPosition(_pos); }
 	void SetRotation(const Vec3& _rot) { m_pTransform->SetLocalRotation(_rot); }
 	void SetScale(const Vec3& _scale) { m_pTransform->SetLocalScale(_scale); }
+	void SetWolrdMatrix(const Matrix& _mat) { m_pTransform->SetWorldMatrix(_mat); }
 	void AddPosition(const Vec3& _pos) { m_pTransform->AddLocalPosition(_pos); }
 	void AddRotation(const Vec3& _rot) { m_pTransform->AddLocalRotation(_rot); }
+
+
+
 };

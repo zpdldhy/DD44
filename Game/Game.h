@@ -31,6 +31,7 @@ protected:
 	void SetupMapEditorCallback();
 	void SetupObjectEditorCallback();
 	void SetupUIEditorCallback();
+	void SetupParticleEditorCallback();
 
 	void LoadAllPrefabs(const std::string& extension);
 

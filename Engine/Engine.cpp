@@ -18,6 +18,7 @@
 #include "PostProcessManager.h"
 #include "CollisionManager.h"
 #include "LightManager.h"
+#include "ParticleManager.h"
 
 void Engine::Init()
 {
@@ -61,6 +62,7 @@ void Engine::Frame()
 		LIGHTMANAGER->UpdateLightCB();
 
 		UI->Tick();
+		PARTICLE->Tick();
 	}
 
 	GET_SINGLE(Device)->Frame();
@@ -92,6 +94,7 @@ void Engine::Render()
 	{
 		POSTPROCESS->PreRender();		
 		OBJECT->Render();	// ObjectList Render
+		PARTICLE->Render();
 		POSTPROCESS->PostRender();
 		
 		if (m_pCurrentRasterizer)
@@ -120,6 +123,7 @@ void Engine::Render()
 void Engine::Release()
 {
 	UI->Destroy();	
+	PARTICLE->Destroy();
 
 	{
 		ImGui_ImplDX11_Shutdown();  // DX11 包访 府家胶 秦力
