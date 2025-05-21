@@ -79,6 +79,9 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{b1a39402-c961-4f46-9178-8b7fa133cfd9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Gizmo">
+      <UniqueIdentifier>{1ef2feb8-a91e-4dbd-ab2a-070c1359b4ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -327,6 +330,9 @@
     <ClInclude Include="EditorData.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="AGizmo.h">
+      <Filter>Object\Gizmo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -544,6 +550,9 @@
     </ClCompile>
     <ClCompile Include="MeshEditorUI.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
+    <ClCompile Include="AGizmo.cpp">
+      <Filter>Object\Gizmo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

@@ -280,15 +280,17 @@ void Editor::SetupObjectEditorCallback()
 void Editor::SetClickPos()
 {
 	MouseRay m_vRay;
-
 	m_vRay.Click();
 
 	shared_ptr<AActor> pActor = nullptr;
+	if (Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor))
+	{
+		if (pActor)
+		{
+			GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+		}
+	}
 
-	Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
-
-	if (pActor)
-		int i = 0;
 }
 
 void Editor::LoadAllPrefabs(const std::string& extension)

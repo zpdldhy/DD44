@@ -124,6 +124,9 @@ void ActorListUI::DrawUI()
                 }
             }
 
+            // DragMode
+            ImGui::Checkbox("Drag Mode", &m_bDragMode);
+
             // Transform Á¤º¸
             Vec3 pos = actor->GetPosition();
             Vec3 rot = actor->GetRotation();
@@ -157,4 +160,9 @@ void ActorListUI::DrawUI()
 void ActorListUI::Toggle()
 {
 	m_bVisible = !m_bVisible;
+}
+
+void ActorListUI::SetSelectedActorID(UINT id)
+{
+    m_iSelectedActorID = id;
 }
