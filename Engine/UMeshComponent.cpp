@@ -3,6 +3,8 @@
 
 void UMeshComponent::Render()
 {
+	if(!bRender) { return; }
+
 	PreRender();
 	PostRender();
 

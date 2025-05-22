@@ -16,10 +16,12 @@
 #include "APawn.h"
 #include "AAsset.h"
 #include "Input.h"
+#include "ALight.h"
+#include "LightManager.h"
 
 void TestYR2::Init()
 {
-#pragma region Camera
+#pragma region 纠 技泼
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
 		m_pCameraActor->SetPosition({ 0.0f, 0.0f, 0.0f });
@@ -27,42 +29,11 @@ void TestYR2::Init()
 	}
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	OBJECT->AddActor(m_pCameraActor);
+
+	SetupLight();
+	SetupGizmo();
+
 #pragma endregion
-#pragma region Gizmo 技泼
-	{
-		shared_ptr<APawn> object1 = make_shared<APawn>();
-		shared_ptr<APawn> object2 = make_shared<APawn>();
-		shared_ptr<APawn> object3 = make_shared<APawn>();
-
-		// Material 积己
-		shared_ptr<UMaterial> material = make_shared<UMaterial>();
-		material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-
-		// mesh 积己
-		shared_ptr<UStaticMeshComponent> meshComponent1 = UStaticMeshComponent::CreateCube();
-		shared_ptr<UStaticMeshComponent> meshComponent2 = UStaticMeshComponent::CreateCube();
-		shared_ptr<UStaticMeshComponent> meshComponent3 = UStaticMeshComponent::CreateCube();
-		meshComponent1->SetMaterial(material);
-		meshComponent2->SetMaterial(material);
-		meshComponent3->SetMaterial(material);
-
-		// Object 汲沥
-		object1->SetMeshComponent(meshComponent1);
-		object2->SetMeshComponent(meshComponent2);
-		object3->SetMeshComponent(meshComponent3);
-
-		object1->SetScale(Vec3(10000.0f, 0.03f, 0.03f));
-		object2->SetScale(Vec3(0.03f, 10000.0f, 0.03f));
-		object3->SetScale(Vec3(0.03f, 0.03f, 10000.0f));
-
-		gizmo.emplace_back(object1);
-		gizmo.emplace_back(object2);
-		gizmo.emplace_back(object3);
-
-		OBJECT->AddActorList(gizmo);
-	}
-#pragma endregion
-
 
 	loader = make_shared<ActorLoader>();
 	//loader->ConvertFbxToAsset();
@@ -188,6 +159,12 @@ void TestYR2::Init()
 			auto child = mesh->GetChild(meshIndex);
 			child->SetLocalPosition(position);
 		});
+	meshEditor->ScaleMesh([this](int meshIndex, Vec3 scale)
+		{
+			auto mesh = m_vActorList[0]->GetMeshComponent();
+			auto child = mesh->GetChild(meshIndex);
+			child->SetLocalScale(scale);
+		});
 	meshEditor->StopAnim([this](bool stop)
 		{
 			auto animInstance = m_vActorList[0]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
@@ -304,4 +281,54 @@ void TestYR2::AddChild(PreMeshData data)
 		sChild->SetOwner(data.actor);
 		sChild->Init();
 	}
+}
+
+void TestYR2::SetupLight()
+{
+	LIGHTMANAGER->Init();
+
+	auto m_pSunLight = make_shared<ALight>();
+	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
+	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
+	m_pSunLight->SetPosition(Vec3(0, 100.0f, 0));
+	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+	OBJECT->AddActor(m_pSunLight);
+
+	LIGHTMANAGER->Clear();
+	LIGHTMANAGER->RegisterLight(m_pSunLight);
+}
+
+void TestYR2::SetupGizmo()
+{
+	shared_ptr<APawn> object1 = make_shared<APawn>();
+	shared_ptr<APawn> object2 = make_shared<APawn>();
+	shared_ptr<APawn> object3 = make_shared<APawn>();
+
+	// Material 积己
+	shared_ptr<UMaterial> material = make_shared<UMaterial>();
+	material->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+
+	// mesh 积己
+	shared_ptr<UStaticMeshComponent> meshComponent1 = UStaticMeshComponent::CreateCube();
+	shared_ptr<UStaticMeshComponent> meshComponent2 = UStaticMeshComponent::CreateCube();
+	shared_ptr<UStaticMeshComponent> meshComponent3 = UStaticMeshComponent::CreateCube();
+	meshComponent1->SetMaterial(material);
+	meshComponent2->SetMaterial(material);
+	meshComponent3->SetMaterial(material);
+
+	// Object 汲沥
+	object1->SetMeshComponent(meshComponent1);
+	object2->SetMeshComponent(meshComponent2);
+	object3->SetMeshComponent(meshComponent3);
+
+	object1->SetScale(Vec3(10000.0f, 0.03f, 0.03f));
+	object2->SetScale(Vec3(0.03f, 10000.0f, 0.03f));
+	object3->SetScale(Vec3(0.03f, 0.03f, 10000.0f));
+
+	gizmo.emplace_back(object1);
+	gizmo.emplace_back(object2);
+	gizmo.emplace_back(object3);
+
+	OBJECT->AddActorList(gizmo);
 }

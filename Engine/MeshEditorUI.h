@@ -49,6 +49,10 @@ public:
     {
         m_OnMoveChild = std::move(callback);
     }
+    void ScaleMesh(std::function<void(int, Vec3)> callback)
+    {
+        m_OnScaleChild = std::move(callback);
+    }
 
     // animation ฐüทร
     void StopAnim(std::function<void(bool)> callback)
@@ -114,6 +118,7 @@ private:
     bool m_moveChildMesh = false;
     int m_childIndex;
     Vec3 m_pos;
+    Vec3 m_scale;
     PreMeshData m_childData;
 
     bool m_animStop;
@@ -135,6 +140,7 @@ private:
     function<void(PreMeshData, shared_ptr<APawn>&)> m_OnCreateActor;
     function<void(PreMeshData, shared_ptr<APawn>&)> m_OnCreateChild;
     function<void(int, Vec3)> m_OnMoveChild;
+    function<void(int, Vec3)> m_OnScaleChild;
     function<void(bool)> m_OnAnimStop;
     function<void(int)> m_OnAnimChange;
     function<void(int, string, bool )> m_OnParentBoneChange;

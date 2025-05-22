@@ -69,7 +69,7 @@ void TestPlayer::Init()
 	// 플레이어 세팅
 	shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
 	player = make_shared<APawn>();
-	auto meshComponent = meshLoader->Make("../Resources/Asset/crow_final5.mesh.json");
+	auto meshComponent = meshLoader->Make("../Resources/Asset/crow_final6.mesh.json");
 	player->SetMeshComponent(meshComponent);
 
 	auto cameraComponent = make_shared<UCameraComponent>();
@@ -78,7 +78,7 @@ void TestPlayer::Init()
 	player->AddScript(movement);
 	OBJECT->AddActor(player);
 
-	sword = player->GetMeshComponent()->GetChild(1);
+	sword = player->GetMeshComponent()->GetChild(3);
 #pragma endregion
 #pragma region CAMERA
 	// 카메라 세팅
@@ -98,7 +98,7 @@ void TestPlayer::Init()
 		player->GetMeshComponent()->AddChild(socket);
 		socket->SetOwner(player);
 		socket->Init();
-
+		//socket->SetVisible(false);
 	}
 	
 }

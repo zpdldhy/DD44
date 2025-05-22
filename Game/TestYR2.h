@@ -35,5 +35,7 @@ public:
 	virtual void Render() override;
 public:
 	void AddChild(PreMeshData data);
+	void SetupLight();
+	void SetupGizmo();
 };
 

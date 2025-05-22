@@ -4,6 +4,7 @@
 class APawn;
 class AActor;
 class UAnimInstance;
+class UMeshComponent;
 
 class PlayerMoveScript : public UScriptComponent
 {
@@ -19,6 +20,14 @@ public:
 	// ANIMATION
 	shared_ptr<UAnimInstance> m_pAnimInstance;
 	bool m_bAttack = false;
+
+	// Player's Child Mesh Components
+	shared_ptr<UMeshComponent> sword;
+	shared_ptr<UMeshComponent> effect;
+	shared_ptr<UMeshComponent> sword_socket1;
+	shared_ptr<UMeshComponent> sword_socket2;
+	shared_ptr<UMeshComponent> back_socket;
+
 public:
 	void Init() override;
 	void Tick() override;

@@ -20,11 +20,27 @@ void PlayerMoveScript::Init()
 	//shape->SetOwner(GetOwner());
 	//shape->Init();
 	//GetOwner()->SetShapeComponent(shape);
+	
+	// Set Socket
+	// [주의] crow_final6.mesh.json 파일 시에만 가능
+	sword = GetOwner()->GetMeshComponent()->GetChild(2);
+	effect = GetOwner()->GetMeshComponent()->GetChild(6);
+	sword_socket1 = GetOwner()->GetMeshComponent()->GetChild(3);
+	sword_socket2 = GetOwner()->GetMeshComponent()->GetChild(4);
+	back_socket = GetOwner()->GetMeshComponent()->GetChild(5);
+	
+	effect->SetVisible(false);
+	sword_socket1->SetVisible(false);
+	sword_socket2->SetVisible(false);
+	back_socket->SetVisible(false);
+
+	sword->SetLocalPosition(back_socket->GetAnimWorld());
 
 }
 
 void PlayerMoveScript::Tick()
 {
+	sword->SetLocalPosition(back_socket->GetAnimWorld());
 	float deltaTime = TIMER->GetDeltaTime();
 
 	Vec3 up = { 0, 1, 0 };

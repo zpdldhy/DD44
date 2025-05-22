@@ -178,13 +178,23 @@ void MeshEditorUI::DrawUI()
 		bool changeBone = ImGui::Combo("Parent Bone", &m_parentBoneIndex, m_vBonePtrList.data(), (int)m_vBonePtrList.size());
 		ImGui::Checkbox("InverseBone", &m_inverseMatBone);
 
-		bool changeX = ImGui::DragFloat("x", &m_pos.x, -0.01f, +0.01f);
-		bool changeY = ImGui::DragFloat("y", &m_pos.y, -0.01f, +0.01f);
-		bool changeZ = ImGui::DragFloat("z", &m_pos.z, -0.01f, +0.01f);
+		bool changeX = ImGui::DragFloat("pos x", &m_pos.x, -0.01f, +0.01f);
+		bool changeY = ImGui::DragFloat("pos y", &m_pos.y, -0.01f, +0.01f);
+		bool changeZ = ImGui::DragFloat("pos z", &m_pos.z, -0.01f, +0.01f);
+
+		bool scaleX = ImGui::DragFloat("scale x", &m_scale.x, -0.01f, +0.01f);
+		bool scaleY = ImGui::DragFloat("scale y", &m_scale.y, -0.01f, +0.01f);
+		bool scaleZ = ImGui::DragFloat("scale z", &m_scale.z, -0.01f, +0.01f);
+		bool scale = scaleX || scaleY || scaleZ;
 
 		if (changeX || changeY || changeZ)
 		{
 			m_OnMoveChild(m_childIndex, m_pos);
+		}
+
+		if (scale)
+		{
+			m_OnScaleChild(m_childIndex, m_scale);
 		}
 
 		if (changeBone)

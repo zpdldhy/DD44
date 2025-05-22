@@ -10,6 +10,7 @@ public:
 protected:
 	std::wstring m_MeshPath;
 	vector<shared_ptr<UMeshComponent>>	m_vChild;
+	bool bRender = true;
 
 public:	
 	void Render() override;
@@ -22,5 +23,7 @@ public:
 	shared_ptr<UMeshComponent> GetChild(int _index) { return m_vChild[_index]; }
 
 	vector<shared_ptr<UMeshComponent>> GetChildren() { return m_vChild; }
+public:
+	void SetVisible(bool _visible) { bRender = _visible; }
 };
 
