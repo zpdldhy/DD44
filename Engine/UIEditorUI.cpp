@@ -7,6 +7,7 @@
 #include "Functions.h"
 #include "Input.h"
 #include "UIManager.h"
+#include "CollisionManager.h"
 
 void UIEditorUI::DrawUI()
 {
@@ -62,6 +63,68 @@ void UIEditorUI::DrawUI()
 	DrawVec3("Scale   ", m_Trans.Scale);
 
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+
+	m_ptCurrentMousePos = INPUT->GetMousePos();
+
+	// 화면 좌표계로 변환
+	m_ptCurrentMousePos.x = m_ptCurrentMousePos.x - g_windowSize.x / 2;
+	m_ptCurrentMousePos.y = -(m_ptCurrentMousePos.y - g_windowSize.y / 2);
+
+	// 마우스 위치로 이동
+	if (m_pUIActor->GetStateType() == UIStateType::ST_ACTIVE)
+	{
+
+		auto scale = m_pUIActor->GetScale();
+		auto pos = m_pUIActor->GetPosition();
+
+		Vec2 vMin = { -0.4f, -0.4f };
+		Vec2 vMax = { +0.4f, +0.4f };
+
+		vMin = vMin * Vec2(scale) + Vec2(pos);
+		vMax = vMax * Vec2(scale) + Vec2(pos);
+
+		// Position 조정		
+		if (Collision2D::CheckRectToPoint(m_ptCurrentMousePos, vMin, vMax))
+		{
+			m_Trans.Position[0] = static_cast<float>(m_ptCurrentMousePos.x);
+			m_Trans.Position[1] = static_cast<float>(m_ptCurrentMousePos.y);
+		}
+		// Scale 조정
+		else 
+		{
+			POINT ptDiff = { m_ptCurrentMousePos.x - m_ptPrevMousePos.x, m_ptCurrentMousePos.y - m_ptPrevMousePos.y };
+
+			// 아래 Scale 조정
+			if (m_ptCurrentMousePos.y < vMin.y)
+			{
+				m_Trans.Scale[1] -= static_cast<float>(ptDiff.y);
+				m_Trans.Position[1] += static_cast<float>(ptDiff.y) / 2;
+			}
+
+			// 위 Scale 조정
+			if (m_ptCurrentMousePos.y > vMax.y)
+			{
+				m_Trans.Scale[1] += static_cast<float>(ptDiff.y);
+				m_Trans.Position[1] += static_cast<float>(ptDiff.y) / 2;
+			}
+
+			// 왼쪽 Scale 조정
+			if (m_ptCurrentMousePos.x < vMin.x)
+			{
+				m_Trans.Scale[0] -= static_cast<float>(ptDiff.x);
+				m_Trans.Position[0] += static_cast<float>(ptDiff.x) / 2;
+			}
+
+			// 오른쪽 Scale 조정
+			if (m_ptCurrentMousePos.x > vMax.x)
+			{
+				m_Trans.Scale[0] += static_cast<float>(ptDiff.x);
+				m_Trans.Position[0] += static_cast<float>(ptDiff.x) / 2;
+			}
+		}
+	}
+
+	m_ptPrevMousePos = m_ptCurrentMousePos;
 
 	// ───────────────────────────── Materials ─────────────────────────────
 	

@@ -50,6 +50,6 @@ private:
 	std::function<void(shared_ptr<AUIActor>, const char*, const char*, TransformData)> m_OnCreate;
 
 private:
-	// Tool
-	POINT m_ptMousePos = { 0, 0 };
+	POINT m_ptCurrentMousePos = { 0, 0 };
+	POINT m_ptPrevMousePos = { 0, 0 };
 };
