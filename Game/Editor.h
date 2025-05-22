@@ -44,7 +44,6 @@ protected:
 	void SetupSkybox();
 	void SetupSunLight();
 	void SetupGizmo();
-	void SetGizmoPosition(Vec3 _pos);
 
 	void SetupEditorCallbacks();
 	void SetupCharacterEditorCallback();
@@ -52,6 +51,8 @@ protected:
 	void SetupObjectEditorCallback();
 
 	void SetClickPos();
+	void SetGizmoPosition(Vec3 _pos);
+	void SetActorPositionByDragging();
 	void LoadAllPrefabs(const std::string& extension);
 
 };

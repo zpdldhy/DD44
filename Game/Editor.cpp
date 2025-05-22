@@ -23,7 +23,6 @@ bool bRunGame = true;
 //#undef RUN_GAME
 void Editor::Init()
 {
-	
 	// Asset 로딩
 	actorLoader.LoadAllAsset();
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
@@ -57,56 +56,7 @@ void Editor::Update()
 		}
 	}
 
-	if (INPUT->GetButtonDown(LCLICK))
-	{
-		SetClickPos();
-
-		UINT selectedID = GUI->GetActorListUI()->GetSelectedActorID();
-		if (selectedID > 0 && OBJECT->GetActorList().count(selectedID) > 0)
-		{
-			if (!m_pGizmoCore)
-			{
-				SetupGizmo();
-			}
-
-			auto& actorMap = OBJECT->GetActorList();
-			auto _actor = actorMap.find(GUI->GetActorListUI()->GetSelectedActorID());
-			if (_actor != actorMap.end())
-			{
-				auto actor = _actor->second;
-				SetGizmoPosition(actor->GetPosition());
-			}
-
-			auto _axis = actorMap.find(GUI->GetActorListUI()->GetSelectedGizmoAxis());
-			if (_axis != actorMap.end())
-			{
-				auto actor = _actor->second;
-				auto axis = _axis->second;
-				if (!actor || !axis) return;
-
-				// 드래그 처리
-				POINT curMouse = INPUT->GetMousePos();
-				float deltaX = static_cast<float>(curMouse.x - m_vPrevMouse.x);
-				float deltaY = static_cast<float>(curMouse.y - m_vPrevMouse.y);
-				Vec3 newPos = m_vDragStartPos;
-
-				if (axis == m_pGizmoX)
-					newPos.x += deltaX * 0.07f;
-				else if (axis == m_pGizmoY)
-					newPos.y -= deltaY * 0.07f;
-				else if (axis == m_pGizmoZ)
-					newPos.z += deltaX * 0.07f;
-
-				actor->SetPosition(newPos);
-				SetGizmoPosition(actor->GetPosition());
-			}
-		}
-	}
-	else if (INPUT->GetButtonUp(LCLICK))
-	{
-		m_bDragging = false;
-		GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
-	}
+	SetActorPositionByDragging();
 }
 
 void Editor::Render()
@@ -213,45 +163,6 @@ void Editor::SetupGizmo()
 	m_pGizmoZ->SetScale(m_pGizmoCore->GetScale());
 	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
 	OBJECT->AddActor(m_pGizmoZ);
-
-	//shared_ptr<UShapeComponent> _pRootShape = std::make_shared<UShapeComponent>();
-	//_pRootShape->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	//_pRootShape->SetLocalScale(Vec3(1.0f, 1.0f, 1.0f));
-
-	//shared_ptr<UBoxComponent> _pXBox = nullptr;
-	//_pXBox = std::make_shared<UBoxComponent>();
-	//_pXBox->SetLocalScale(Vec3(1.0f, 0.1f, 0.1f));
-	//_pXBox->SetLocalPosition(Vec3(1.2f, 0.0f, 0.0f));
-	//_pXBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	//_pRootShape->AddChild(_pXBox);
-
-	//shared_ptr<UBoxComponent> _YBox = nullptr;
-	//_YBox = std::make_shared<UBoxComponent>();
-	//_YBox->SetLocalScale(Vec3(0.1f, 1.0f, 0.1f));
-	//_YBox->SetLocalPosition(Vec3(0.0f, 1.2f, 0.0f));
-	//_YBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	//_pRootShape->AddChild(_YBox);
-
-	//shared_ptr<UBoxComponent> _ZBox = nullptr;
-	//_ZBox = std::make_shared<UBoxComponent>();
-	//_ZBox->SetLocalScale(Vec3(0.1f, 0.1f, 1.0f));
-	//_ZBox->SetLocalPosition(Vec3(0.0f, 0.0f, 1.2f));
-	//_ZBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	//_pRootShape->AddChild(_ZBox);
-
-	//m_pGizmo->SetShapeComponent(_pRootShape);
-
-	//m_pGizmo->SetScale(Vec3(0.01f, 0.01f, 0.01f));
-	//m_pGizmo->SetPosition(Vec3(0, 10.0f, 0));
-	//OBJECT->AddActor(m_pGizmo);
-}
-
-void Editor::SetGizmoPosition(Vec3 _pos)
-{
-	m_pGizmoCore->SetPosition(Vec3(_pos.x, _pos.y + 1.0f, _pos.z));
-	m_pGizmoX->SetPosition(m_pGizmoCore->GetPosition());
-	m_pGizmoY->SetPosition(m_pGizmoCore->GetPosition());
-	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
 }
 
 void Editor::SetupEditorCallbacks()
@@ -452,6 +363,68 @@ void Editor::SetClickPos()
 				m_vDragStartPos = actor->GetPosition();
 			}
 		}
+	}
+}
+
+void Editor::SetGizmoPosition(Vec3 _pos)
+{
+	m_pGizmoCore->SetPosition(Vec3(_pos.x, _pos.y + 1.0f, _pos.z));
+	m_pGizmoX->SetPosition(m_pGizmoCore->GetPosition());
+	m_pGizmoY->SetPosition(m_pGizmoCore->GetPosition());
+	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
+}
+
+void Editor::SetActorPositionByDragging()
+{
+	if (INPUT->GetButtonDown(LCLICK))
+	{
+		SetClickPos();
+
+		UINT selectedID = GUI->GetActorListUI()->GetSelectedActorID();
+		if (selectedID > 0 && OBJECT->GetActorList().count(selectedID) > 0)
+		{
+			if (!m_pGizmoCore)
+			{
+				SetupGizmo();
+			}
+
+			auto& actorMap = OBJECT->GetActorList();
+			auto _actor = actorMap.find(GUI->GetActorListUI()->GetSelectedActorID());
+			if (_actor != actorMap.end())
+			{
+				auto actor = _actor->second;
+				SetGizmoPosition(actor->GetPosition());
+			}
+
+			auto _axis = actorMap.find(GUI->GetActorListUI()->GetSelectedGizmoAxis());
+			if (_axis != actorMap.end())
+			{
+				auto actor = _actor->second;
+				auto axis = _axis->second;
+				if (!actor || !axis) return;
+
+				// 드래그 처리
+				POINT curMouse = INPUT->GetMousePos();
+				float deltaX = static_cast<float>(curMouse.x - m_vPrevMouse.x);
+				float deltaY = static_cast<float>(curMouse.y - m_vPrevMouse.y);
+				Vec3 newPos = m_vDragStartPos;
+
+				if (axis == m_pGizmoX)
+					newPos.x += deltaX * 0.07f;
+				else if (axis == m_pGizmoY)
+					newPos.y -= deltaY * 0.07f;
+				else if (axis == m_pGizmoZ)
+					newPos.z += deltaX * 0.07f;
+
+				actor->SetPosition(newPos);
+				SetGizmoPosition(actor->GetPosition());
+			}
+		}
+	}
+	else if (INPUT->GetButtonUp(LCLICK))
+	{
+		m_bDragging = false;
+		GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
 	}
 }
 
