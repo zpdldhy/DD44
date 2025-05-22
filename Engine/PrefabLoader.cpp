@@ -365,37 +365,38 @@ bool PrefabLoader::SaveParticle(const PrefabParticleData& data, const std::strin
     return true;
 }
 
-bool PrefabLoader::LoadParticle(const std::string& filePath, PrefabParticleData& outData)
+bool PrefabLoader::LoadParticle( PrefabParticleData& outData, const std::string& filePath )
 {
     std::ifstream file(filePath);
     if (!file.is_open())
         return false;
 
-    json j;
+    nlohmann::json j;
     file >> j;
 
     outData.Name = j["Name"];
     outData.ShaderPath = j["ShaderPath"];
     outData.TexturePath = j["TexturePath"];
 
-    auto s = j["Scale"];
-    outData.Scale = Vec3(s[0], s[1], s[2]);
+    // 배열 파싱
+    auto t = j["Translation"];
+    outData.Translation = Vec3(t[0], t[1], t[2]);
 
     auto r = j["Rotation"];
     outData.Rotation = Vec3(r[0], r[1], r[2]);
 
-    auto t = j["Translation"];
-    outData.Translation = Vec3(t[0], t[1], t[2]);
+    auto s = j["Scale"];
+    outData.Scale = Vec3(s[0], s[1], s[2]);
 
+    auto uvStart = j["UVStart"];
+    auto uvEnd = j["UVEnd"];
+    outData.UVStart = Vec2(uvStart[0], uvStart[1]);
+    outData.UVEnd = Vec2(uvEnd[0], uvEnd[1]);
+
+    // 숫자
     outData.Divisions = j["Divisions"];
     outData.Row = j["Row"];
     outData.Col = j["Col"];
-
-    auto uv0 = j["UVStart"];
-    auto uv1 = j["UVEnd"];
-    outData.UVStart = Vec2(uv0[0], uv0[1]);
-    outData.UVEnd = Vec2(uv1[0], uv1[1]);
-
     outData.BillboardSizeX = j["BillboardSizeX"];
     outData.BillboardSizeY = j["BillboardSizeY"];
 

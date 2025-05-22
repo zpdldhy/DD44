@@ -37,6 +37,78 @@ void ParticleEditorUI::DrawUI()
 		);
 	}
 
+	//ImGui::SameLine();
+	ImGui::Text("Load Prefab:");
+	ImGui::SameLine();
+
+	static char loadName[64] = "MyParticle";
+	ImGui::PushItemWidth(150);
+	ImGui::InputText("##LoadName", loadName, IM_ARRAYSIZE(loadName));
+	ImGui::PopItemWidth();
+
+	ImGui::SameLine(); // 옆에 Load 버튼 붙이기
+	if (ImGui::Button("Load"))
+	{
+		std::string path = "../Resources/Prefab/" + std::string(loadName) + ".particle.json";
+		PrefabParticleData data;
+		if (PREFAB->LoadParticle(data, path))
+		{
+			// 기존 로드 처리 (m_OnCreate 호출 포함)
+			auto newParticle = make_shared<AParticleActor>();
+			m_pParticleActor = newParticle;
+			m_vCreatedParticles.push_back(newParticle);
+			m_iSelectedParticleIndex = static_cast<int>(m_vCreatedParticles.size()) - 1;
+			m_iLastSelectedParticleIndex = -1;
+
+			m_Data.Position[0] = data.Translation.x;
+			m_Data.Position[1] = data.Translation.y;
+			m_Data.Position[2] = data.Translation.z;
+			m_Data.Rotation[0] = data.Rotation.x;
+			m_Data.Rotation[1] = data.Rotation.y;
+			m_Data.Rotation[2] = data.Rotation.z;
+			m_Data.Scale[0] = data.Scale.x;
+			m_Data.Scale[1] = data.Scale.y;
+			m_Data.Scale[2] = data.Scale.z;
+
+			m_UVStart = data.UVStart;
+			m_UVEnd = data.UVEnd;
+			m_iDivisions = data.Divisions;
+			m_iSelectedRow = data.Row;
+			m_iSelectedCol = data.Col;
+			strcpy_s(m_szShaderPath, data.ShaderPath.c_str());
+
+			auto it = std::find(m_vTextureList.begin(), m_vTextureList.end(), data.TexturePath);
+			if (it != m_vTextureList.end())
+			{
+				m_iSelectedTextureIndex = static_cast<int>(std::distance(m_vTextureList.begin(), it));
+			}
+			else
+			{
+				m_vTextureList.push_back(data.TexturePath);
+				std::string texName = data.TexturePath.substr(data.TexturePath.find_last_of("/\\") + 1);
+				m_vTextureNameList.push_back(texName);
+				m_iSelectedTextureIndex = (int)m_vTextureList.size() - 1;
+			}
+
+			if (m_OnCreate)
+			{
+				m_OnCreate(
+					newParticle,
+					m_vTextureList[m_iSelectedTextureIndex].c_str(),
+					m_szShaderPath,
+					m_Data,
+					m_UVStart,
+					m_UVEnd
+				);
+			}
+		}
+		else
+		{
+			ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to load prefab!");
+		}
+	}
+
+
 	if (!m_pParticleActor)
 		return;
 

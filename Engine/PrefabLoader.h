@@ -22,7 +22,7 @@ public:
 	bool LoadObjectArray(const std::string& _filePath, std::vector<PrefabObjectData>& _outPrefabs);
 
 	bool SaveParticle(const PrefabParticleData& data, const std::string& filePath);
-	bool LoadParticle(const std::string& filePath, PrefabParticleData& outData);
+	bool LoadParticle(PrefabParticleData& outData, const std::string& filePath );
 
 private:
 	void LoadActor(json& j, PrefabCharacterData& data);
