@@ -97,7 +97,7 @@ void ObjectEditorUI::DrawUI()
         data.TexturePath = m_szTexturePath;
         data.Scale = Vec3(m_fScale[0], m_fScale[1], m_fScale[2]);
         data.Rotation = Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]);
-        data.Translation = Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]);
+        data.Position = Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]);
         data.SpecularColor = Vec3(m_fSpecularColor[0], m_fSpecularColor[1], m_fSpecularColor[2]);
         data.Shininess = m_fShininess;
         data.EmissiveColor = Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]);
@@ -119,7 +119,7 @@ void ObjectEditorUI::DrawUI()
 
             m_fScale[0] = data.Scale.x;    m_fScale[1] = data.Scale.y;    m_fScale[2] = data.Scale.z;
             m_fRotation[0] = data.Rotation.x; m_fRotation[1] = data.Rotation.y; m_fRotation[2] = data.Rotation.z;
-            m_fPosition[0] = data.Translation.x; m_fPosition[1] = data.Translation.y; m_fPosition[2] = data.Translation.z;
+            m_fPosition[0] = data.Position.x; m_fPosition[1] = data.Position.y; m_fPosition[2] = data.Position.z;
 
             m_fSpecularColor[0] = data.SpecularColor.x;
             m_fSpecularColor[1] = data.SpecularColor.y;

@@ -92,6 +92,8 @@ void UBoxComponent::CreateCollisionRange()
 
 void UBoxComponent::UpdateCollisionRange()
 {
+	m_pCollisionRange->SetScale(m_vWorldScale);
+	m_pCollisionRange->SetRotation(m_vWorldRotation);
 	m_pCollisionRange->SetPosition(m_vWorldPosition);
 	m_pCollisionRange->Tick();
 }

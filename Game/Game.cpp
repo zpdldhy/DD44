@@ -213,7 +213,6 @@ void Game::LoadAllPrefabs(const std::string& extension)
 					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 				}
 
-
 				auto material = make_shared<UMaterial>();
 				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
 				meshComp->SetMaterial(material);
@@ -221,7 +220,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				auto obj = make_shared<APawn>();
 				obj->m_szName = L"Object";
 				obj->SetMeshComponent(meshComp);
-				obj->SetPosition(objData.Translation);
+				obj->SetPosition(objData.Position);
 				obj->SetRotation(objData.Rotation);
 				obj->SetScale(objData.Scale);
 
@@ -248,7 +247,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 					auto obj = make_shared<APawn>();
 					obj->m_szName = L"Object";
 					obj->SetMeshComponent(meshComp);
-					obj->SetPosition(objData.Translation);
+					obj->SetPosition(objData.Position);
 					obj->SetRotation(objData.Rotation);
 					obj->SetScale(objData.Scale);
 

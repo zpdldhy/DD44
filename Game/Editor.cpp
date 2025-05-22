@@ -38,6 +38,7 @@ void Editor::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
+	SetupGizmo();
 }
 
 void Editor::Update()
@@ -281,33 +282,15 @@ void Editor::SetupObjectEditorCallback()
 
 	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 emissiveColor, float emissivepower, ShapeComponentData shapeData)
 		{
+			auto actor = make_shared<APawn>();
+			actor->m_szName = L"Object";
+
 			ActorLoader al;
 			al.LoadOne(objPath);
 			auto meshComp = make_shared<UStaticMeshComponent>();
 			meshComp->SetMeshPath(to_mw(objPath));
 			auto resources = al.LoadMeshResources();
 			meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources[0]));
-
-			auto mat = make_shared<UMaterial>();
-			mat->Load(
-				std::wstring(texPath, texPath + strlen(texPath)),
-				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-			);
-			meshComp->SetMaterial(mat);
-
-			// Snap 적용 여부 확인
-			if (GUI->GetObjectEditorUI()->IsSnapEnabled())
-			{
-				pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
-			}
-
-			auto actor = make_shared<APawn>();
-			actor->m_szName = L"Object";
-
-			actor->SetMeshComponent(meshComp);
-			actor->SetPosition(pos);
-			actor->SetRotation(rot);
-			actor->SetScale(scale);
 
 			if (shapeData.isUse)
 			{
@@ -324,6 +307,24 @@ void Editor::SetupObjectEditorCallback()
 
 				actor->SetShapeComponent(shapeComp);
 			}
+
+			auto mat = make_shared<UMaterial>();
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+			meshComp->SetMaterial(mat);
+
+			// Snap 적용 여부 확인
+			if (GUI->GetObjectEditorUI()->IsSnapEnabled())
+			{
+				pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
+			}
+
+			actor->SetMeshComponent(meshComp);
+			actor->SetPosition(pos);
+			actor->SetRotation(rot);
+			actor->SetScale(scale);
 
 			OBJECT->AddActor(actor);
 		});
@@ -393,7 +394,14 @@ void Editor::SetActorPositionByDragging()
 			if (_actor != actorMap.end())
 			{
 				auto actor = _actor->second;
-				SetGizmoPosition(actor->GetPosition());
+				if (actor)
+				{
+					SetGizmoPosition(actor->GetPosition());
+				}
+				else
+				{
+					SetGizmoPosition(Vec3(0.f, 0.f, 0.f));
+				}
 			}
 
 			auto _axis = actorMap.find(GUI->GetActorListUI()->GetSelectedGizmoAxis());
@@ -441,6 +449,7 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadMapTile(file, mapData))
 			{
 				auto tile = std::make_shared<ATerrainTileActor>();
+				tile->SetPrefabPath(file);
 				tile->m_szName = L"Terrain";
 				tile->m_iNumCols = mapData.Cols;
 				tile->m_iNumRows = mapData.Rows;
@@ -458,6 +467,7 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadCharacter(file, characterData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
+				actor->SetPrefabPath(file);
 
 				shared_ptr<UMeshComponent> meshComponent = meshLoader.Make(characterData.MeshPath.c_str());
 
@@ -507,6 +517,7 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 				shared_ptr<UStaticMeshComponent> meshComp = make_shared<UStaticMeshComponent>();
 				if (SplitExt(to_mw(objData.MeshPath)) == L".obj")
 				{
+					//Profiler p("Mesh From Obj");
 					AssimpLoader loader;
 					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
 					meshComp->SetMeshPath(to_mw(objData.MeshPath)); // 이거 풀네임으로 들어가야되는건가 ? 나중에 어디서 쓰이나 ? 
@@ -522,24 +533,38 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 				}
 				else
 				{
-					ActorLoader al;
-					al.LoadOne(objData.MeshPath);
-					meshComp->SetMeshPath(to_mw(objData.MeshPath));
-					auto resources = al.LoadMeshResources();
-					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources[0]));
+					//Profiler p("Mesh From Asset");
+					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
+					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 				}
-
 
 				auto material = make_shared<UMaterial>();
 				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
 				meshComp->SetMaterial(material);
 
 				auto obj = make_shared<APawn>();
+				obj->SetPrefabPath(file);
 				obj->m_szName = L"Object";
 				obj->SetMeshComponent(meshComp);
-				obj->SetPosition(objData.Translation);
+				obj->SetPosition(objData.Position);
 				obj->SetRotation(objData.Rotation);
 				obj->SetScale(objData.Scale);
+
+				if (objData.ShapeData.isUse)
+				{
+					shared_ptr<UShapeComponent> shapeComp = nullptr;
+
+					if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
+						shapeComp = std::make_shared<UBoxComponent>();
+					// else if (...) // 다른 타입 추가 가능
+
+					shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));
+					shapeComp->SetLocalPosition(Vec3(objData.ShapeData.Position));
+					shapeComp->SetLocalRotation(Vec3(objData.ShapeData.Rotation));
+					shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+					obj->SetShapeComponent(shapeComp);
+				}
 
 				OBJECT->AddActor(obj);
 			}
@@ -554,34 +579,39 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 					auto meshComp = make_shared<UStaticMeshComponent>();
 					meshComp->SetMeshPath(to_mw(objData.MeshPath));
 
-					auto meshRes = make_shared<UStaticMeshResources>();
-					AssimpLoader loader;
-					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
-					if (!meshList.empty())
-					{
-						meshRes->SetVertexList(meshList[0].m_vVertexList);
-						meshRes->SetIndexList(meshList[0].m_vIndexList);
-						meshRes->Create();
-						meshComp->SetMesh(meshRes);
-					}
+					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
+					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 
 					auto material = make_shared<UMaterial>();
 					material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
 					meshComp->SetMaterial(material);
 
 					auto obj = make_shared<APawn>();
+					obj->SetPrefabPath(file);
 					obj->m_szName = L"Object";
 					obj->SetMeshComponent(meshComp);
-					obj->SetPosition(objData.Translation);
+					obj->SetPosition(objData.Position);
 					obj->SetRotation(objData.Rotation);
 					obj->SetScale(objData.Scale);
+
+					if (objData.ShapeData.isUse)
+					{
+						shared_ptr<UShapeComponent> shapeComp = nullptr;
+
+						if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
+							shapeComp = std::make_shared<UBoxComponent>();
+
+						shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));
+						shapeComp->SetLocalPosition(Vec3(objData.ShapeData.Position));
+						shapeComp->SetLocalRotation(Vec3(objData.ShapeData.Rotation));
+						shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+						obj->SetShapeComponent(shapeComp);
+					}
 
 					OBJECT->AddActor(obj);
 				}
 			}
 		}
-
 	}
-
-
 }

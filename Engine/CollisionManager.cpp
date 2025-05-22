@@ -103,7 +103,13 @@ bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, sh
 	vector<shared_ptr<AActor>> vActorList;
 
 	for (auto index : _vActorIndex)
-		vActorList.emplace_back(OBJECT->GetActor(index));
+	{
+		auto it = OBJECT->GetActorList().find(index);
+		if (it != OBJECT->GetActorList().end() && it->second)
+		{
+			vActorList.emplace_back(it->second);
+		}
+	}
 
 	float dis = 999999.f;
 	shared_ptr<AActor> pActor = nullptr;

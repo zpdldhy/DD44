@@ -47,6 +47,7 @@ protected:
 	shared_ptr<USceneComponent> m_pTransform = nullptr;
 	array<shared_ptr<USceneComponent>, static_cast<size_t>(ComponentType::CT_COUNT)> m_arrComponent;
 	vector<shared_ptr<class UScriptComponent>> m_vScript;
+	std::string m_sPrefabPath = {  };
 
 public:
 	shared_ptr<USceneComponent> GetTransform() { return m_pTransform; }
@@ -65,6 +66,10 @@ public:
 	// Script
 	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }
 	const std::vector<std::shared_ptr<UScriptComponent>>& GetScriptList() const { return m_vScript; }
+
+	// PrefabData
+	const std::string& GetPrefabPath() const { return m_sPrefabPath; }
+	void SetPrefabPath(const std::string& path) { m_sPrefabPath = path; }
 
 public:
 	const Vec3& GetPosition() const { return m_pTransform->GetLocalPosition(); }

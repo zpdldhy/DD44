@@ -520,7 +520,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 오브젝트 타입으로 변경
 				actor->m_szName = L"Object";
-				actor->SetPosition(objData.Translation);
+				actor->SetPosition(objData.Position);
 				actor->SetRotation(objData.Rotation);
 				actor->SetScale(objData.Scale);
 				OBJECT->AddActor(actor);
