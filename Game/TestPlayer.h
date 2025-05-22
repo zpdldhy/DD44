@@ -17,7 +17,7 @@ class TestPlayer : public IExecute
 	vector<shared_ptr<APawn>> gizmo;
 
 	shared_ptr<UMeshComponent> sword;
-	shared_ptr<UMeshComponent> effect;
+	shared_ptr<UMeshComponent> socket;
 public:
 	virtual void Init() override;
 	virtual void Update() override;

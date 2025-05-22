@@ -43,6 +43,10 @@ protected:
 	Matrix m_matTrans = Matrix::Identity;
 	Matrix m_matParent = Matrix::Identity;
 
+	// TEMP
+	Vec3 m_vAnimWorld;
+	Matrix m_matAnim;
+
 public:
 	USceneComponent() = default;
 	virtual ~USceneComponent() = default;
@@ -85,5 +89,8 @@ public:
 	// Matrix
 	const Matrix& GetWorld() const { return m_matWorld; }
 	void SetParentTransform(shared_ptr<USceneComponent> _pTransform) { if (_pTransform.get() != this) m_pParentTransform = _pTransform; }
+
+	const Vec3& GetAnimWorld();
+
 };
 

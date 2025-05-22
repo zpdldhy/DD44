@@ -105,9 +105,22 @@ void USceneComponent::UpdateWorldMatrix()
 		m_vWorldScale = m_vLocalScale * m_pParentTransform->GetLocalScale();
 		m_vWorldRotation = m_vLocalRotation + m_pParentTransform->GetLocalRotation();
 		m_vWorldPosition = m_vLocalPosition + m_pParentTransform->GetLocalPosition();
+
+		m_matParent = m_pParentTransform->GetWorld();
 	}
 
 	// Set Matrix
 	m_matLocal = m_matScale * m_matRotation * m_matTrans;
-	m_matWorld = m_matLocal * m_matParent;
+	m_matWorld = m_matLocal * m_matAnim * m_matParent;
+}
+
+const Vec3& USceneComponent::GetAnimWorld()
+{
+	auto mat = m_matLocal * m_matAnim;
+
+	m_vAnimWorld.x = mat._41;
+	m_vAnimWorld.y = mat._42;
+	m_vAnimWorld.z = mat._43;
+
+	return m_vAnimWorld;
 }
