@@ -20,9 +20,17 @@
 #include "PostProcessManager.h"
 #include "AssimpLoader.h"
 #include "ATerrainTileActor.h"
+#include "UBoxComponent.h"
+#include "PlayerMoveScript.h"
 
 void TestSJ::Init()
 {
+	// Asset 로딩 ( 변경하면서 콜백/LoadPrefab이 많이 바껴서 실행할 때 오류나더라고. 그래서 main꺼에서 좀 복사해뒀습니다 )
+	actorLoader.LoadAllAsset();
+	meshLoader.SetMesh(actorLoader.LoadMeshMap());
+	meshLoader.SetAnim(actorLoader.LoadAnimMap());
+
+
 	SetupObjectEditorCallback();
 	LoadAllPrefabs(".object.json");
 
@@ -517,7 +525,7 @@ void TestSJ::Render()
 
 void TestSJ::SetupObjectEditorCallback()
 {
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 specularColor, float shininess, Vec3 emissiveColor, float emissivePower)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 specularColor, float shininess, Vec3 emissiveColor, float emissivePower, ShapeComponentData shapeData)
 		{
 			AssimpLoader loader;
 			vector<MeshData> meshList = loader.Load(objPath);
@@ -591,10 +599,42 @@ void TestSJ::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadCharacter(file, characterData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
+
+				shared_ptr<UMeshComponent> meshComponent = meshLoader.Make(characterData.MeshPath.c_str());
+
+				actor->SetMeshComponent(meshComponent);
+
 				actor->m_szName = L"Character";
-				actor->SetPosition(Vec3(characterData.transform.Position));
-				actor->SetRotation(Vec3(characterData.transform.Rotation));
-				actor->SetScale(Vec3(characterData.transform.Scale));
+				actor->SetPosition(Vec3(characterData.actor.Position));
+				actor->SetRotation(Vec3(characterData.actor.Rotation));
+				actor->SetScale(Vec3(characterData.actor.Scale));
+
+				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
+
+				if (characterData.camera.isUse)
+				{
+					auto cameraComponent = make_shared<UCameraComponent>();
+					cameraComponent->SetLocalPosition(Vec3(characterData.camera.Position));
+					cameraComponent->SetLocalRotation(Vec3(characterData.camera.Rotation));
+					cameraComponent->SetPerspective(characterData.camera.Fov, characterData.camera.Aspect, characterData.camera.Near, characterData.camera.Far);
+					actor->SetCameraComponent(cameraComponent);
+				}
+
+				if (characterData.shape.isUse)
+				{
+					shared_ptr<UShapeComponent> shapeComponent = nullptr;
+					if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_BOX)
+						shapeComponent = make_shared<UBoxComponent>();
+					//else if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_SPHERE)
+
+					shapeComponent->SetLocalScale(Vec3(characterData.shape.Scale));
+					shapeComponent->SetLocalPosition(Vec3(characterData.shape.Position));
+					shapeComponent->SetLocalRotation(Vec3(characterData.shape.Rotation));
+					shapeComponent->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+					actor->SetShapeComponent(shapeComponent);
+				}
+
+
 				OBJECT->AddActor(actor);
 			}
 		}
@@ -603,19 +643,31 @@ void TestSJ::LoadAllPrefabs(const std::string& extension)
 			PrefabObjectData objData;
 			if (PREFAB->LoadObject(file, objData))
 			{
-				auto meshComp = make_shared<UStaticMeshComponent>();
-				meshComp->SetMeshPath(to_mw(objData.MeshPath));
-
-				auto meshRes = make_shared<UStaticMeshResources>();
-				AssimpLoader loader;
-				vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
-				if (!meshList.empty())
+				shared_ptr<UStaticMeshComponent> meshComp = make_shared<UStaticMeshComponent>();
+				if (SplitExt(to_mw(objData.MeshPath)) == L".obj")
 				{
-					meshRes->SetVertexList(meshList[0].m_vVertexList);
-					meshRes->SetIndexList(meshList[0].m_vIndexList);
-					meshRes->Create();
-					meshComp->SetMesh(meshRes);
+					AssimpLoader loader;
+					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
+					meshComp->SetMeshPath(to_mw(objData.MeshPath));
+					auto meshRes = make_shared<UStaticMeshResources>();
+					if (!meshList.empty())
+					{
+						meshRes->SetVertexList(meshList[0].m_vVertexList);
+						meshRes->SetIndexList(meshList[0].m_vIndexList);
+						meshRes->Create();
+						meshComp->SetMesh(meshRes);
+					}
+
 				}
+				else
+				{
+					ActorLoader al;
+					al.LoadOne(objData.MeshPath);
+					meshComp->SetMeshPath(to_mw(objData.MeshPath));
+					auto resources = al.LoadMeshResources();
+					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources[0]));
+				}
+
 
 				auto material = make_shared<UMaterial>();
 				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));

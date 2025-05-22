@@ -32,6 +32,8 @@ struct PrefabObjectData
 
     Vec3 EmissiveColor;
     float EmissivePower;
+
+    ShapeComponentData ShapeData;
 };
 
 struct PrefabCharacterData

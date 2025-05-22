@@ -163,5 +163,5 @@ void ObjectManager::ClearRenderList()
 	m_vRenderActorList.clear();
 	m_vPreRenderActorList.clear();
 	m_vPostRenderActorList.clear();
-	m_vActorIndexList.clear();	// 임시 사용
+	//m_vActorIndexList.clear();	// 임시 사용
 }

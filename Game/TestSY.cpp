@@ -34,6 +34,7 @@
 #include "CollisionManager.h"
 #include "LightManager.h"
 #include "ALight.h"
+#include "EditorData.h"
 
 void TestSY::Init()
 {
@@ -205,7 +206,12 @@ void TestSY::Init()
 	}
 
 	GUI->SetCharacterEditorCallback(
-		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position, const Vec3& rotation, const Vec3& scale, CameraComponentData camera, ShapeComponentData shape, int scriptType)
+		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale,
+			CameraComponentData camera,
+			ShapeComponentData shape,
+			int scriptType)
 		{
 			if (!rootComponent)
 			{
@@ -222,23 +228,20 @@ void TestSY::Init()
 			actor->SetRotation(rotation);
 			actor->SetScale(scale);
 
-			if (scriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
-			//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
-
-			if (camera.isUse) 
+			if (camera.isUse)
 			{
 				auto cam = std::make_shared<UCameraComponent>();
 				cam->SetLocalPosition(Vec3(camera.Position));
 				cam->SetLocalRotation(Vec3(camera.Rotation));
 				cam->SetPerspective(camera.Fov, camera.Aspect, camera.Near, camera.Far);
-				actor->SetCameraComponent(cam); 
+				actor->SetCameraComponent(cam);
 			}
 
 			if (shape.isUse)
 			{
-				shared_ptr<UShapeComponent> shapeComp;
+				shared_ptr<UShapeComponent> shapeComp = nullptr;
 
-				if(shape.eShapeType==ShapeType::ST_BOX)
+				if (shape.eShapeType == ShapeType::ST_BOX)
 					shapeComp = std::make_shared<UBoxComponent>();
 				//else if (shape.eShapeType == ShapeType::ST_SPHERE)
 
@@ -249,6 +252,9 @@ void TestSY::Init()
 
 				actor->SetShapeComponent(shapeComp);
 			}
+
+			if (scriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
+			//if (scriptType == 2) actor->AddScript(std::make_shared<EnemyAIScript>());
 
 			OBJECT->AddActor(actor);
 		});
@@ -299,44 +305,35 @@ void TestSY::Init()
 
 
 
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale
-		, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
-	{
-		AssimpLoader loader;
-		vector<MeshData> meshList = loader.Load(objPath);
-		if (meshList.empty())
-			return;
-
-		auto meshComp = make_shared<UStaticMeshComponent>();
-		meshComp->SetMeshPath(to_mw(objPath));
-
-		auto meshRes = make_shared<UStaticMeshResources>();
-		meshRes->SetVertexList(meshList[0].m_vVertexList);
-		meshRes->SetIndexList(meshList[0].m_vIndexList);
-		meshRes->Create();
-
-		meshComp->SetMesh(meshRes);
-
-		auto mat = make_shared<UMaterial>();
-		mat->Load(
-			std::wstring(texPath, texPath + strlen(texPath)),
-			std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-		);
-		meshComp->SetMaterial(mat);
-
-		// Snap 적용 여부 확인
-		if (GUI->GetObjectEditorUI()->IsSnapEnabled())
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower, ShapeComponentData ShapeData)
 		{
-			pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
-		}
+			ActorLoader al;
+			al.LoadOne(objPath);
+			auto meshComp = make_shared<UStaticMeshComponent>();
+			meshComp->SetMeshPath(to_mw(objPath));
+			auto resources = al.LoadMeshResources();
+			meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources[0]));
+
+			auto mat = make_shared<UMaterial>();
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+			meshComp->SetMaterial(mat);
+
+			// Snap 적용 여부 확인
+			if (GUI->GetObjectEditorUI()->IsSnapEnabled())
+			{
+				pos = GUI->GetObjectEditorUI()->SnapToGrid(pos, 10.0f);
+			}
 
 			auto actor = make_shared<APawn>();
 			actor->m_szName = L"Object";
 
-		actor->SetMeshComponent(meshComp);
-		actor->SetPosition(pos);
-		actor->SetRotation(rot);
-		actor->SetScale(scale);
+			actor->SetMeshComponent(meshComp);
+			actor->SetPosition(pos);
+			actor->SetRotation(rot);
+			actor->SetScale(scale);
 
 			OBJECT->AddActor(actor);
 		});
@@ -459,7 +456,7 @@ void TestSY::SetClickPos()
 
 	shared_ptr<AActor> pActor = nullptr;
 
-	Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
+	//Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
 
 	if (pActor)
 		int i = 0;

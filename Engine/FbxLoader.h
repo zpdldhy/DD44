@@ -20,6 +20,7 @@ struct TIwData
 struct TFbxResource
 {
 	wstring name;
+	wstring m_ResPathName;
 	// Material
 	map<int, wstring> m_mTexPathList;
 

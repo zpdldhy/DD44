@@ -5,6 +5,7 @@
 #include "UStaticMeshComponent.h"
 #include "SkeletalMeshData.h"
 #include "UMaterial.h"
+#include "fstream"
 
 void AAsset::Export(TFbxResource _result, string filepath)
 {
@@ -75,6 +76,7 @@ void AAsset::Export(TFbxResource _result, string filepath)
 	// INVERSE MAT BONE
 	for (int iMat = 0; iMat < _result.m_iMeshCount; iMat++)
 	{
+		if (_result.m_iBoneCount <= 0) continue; // ????..??
 		fwrite(&_result.m_vInverseBindPose[iMat].at(0), sizeof(Matrix), _result.m_iNodeCount, pFile);
 	}
 
@@ -114,13 +116,15 @@ void AAsset::Export(TFbxResource _result, string filepath)
 
 TFbxResource AAsset::Load(const char* fileName)
 {
+	string file = fileName;
+	Profiler p("Asset::Load" + file);
 	FILE* pFile;
 
 	errno_t err = fopen_s(&pFile, fileName, "rb");
 	if (err != 0) { assert(false); }
 	TFbxResource result;
 	result.name = SplitName(to_mw(fileName));
-
+	result.m_ResPathName = to_mw(fileName);
 	// HEADER
 	fread(&result.m_iBoneCount, sizeof(UINT), 1, pFile);
 	fread(&result.m_iMeshCount, sizeof(UINT), 1, pFile);
@@ -193,6 +197,7 @@ TFbxResource AAsset::Load(const char* fileName)
 	result.m_vInverseBindPose.resize(result.m_iMeshCount);
 	for (int iMat = 0; iMat < result.m_iMeshCount; iMat++)
 	{
+		if(result.m_iBoneCount <= 0) { continue; }
 		result.m_vInverseBindPose[iMat].resize(result.m_iNodeCount);
 		fread(&result.m_vInverseBindPose[iMat].at(0), sizeof(Matrix), result.m_iNodeCount, pFile);
 	}
@@ -327,14 +332,20 @@ void AAsset::ExportStatic(FILE* pFile, shared_ptr<UMeshComponent> _mesh)
 	ExportWstring(pFile, resName);
 
 	// ANIM
-	wstring animName = mesh->GetAnimInstance()->GetName();
-	ExportWstring(pFile, animName);
+	bool bHasBaseAnim = mesh->GetAnimInstance() ? true : false;
+	fwrite(&bHasBaseAnim, sizeof(bool), 1, pFile);
+	if (bHasBaseAnim)
+	{
+		auto animInstance = mesh->GetAnimInstance();
+		wstring animName = animInstance->GetName();
+		ExportWstring(pFile, animName);
+		int targetBone = mesh->GetTargetBoneIndex();
+		fwrite(&targetBone, sizeof(int), 1, pFile);
+		Matrix matBone = mesh->GetMatBone();
+		fwrite(&matBone, sizeof(Matrix), 1, pFile);
+	}
 
-	int targetBone = mesh->GetTargetBoneIndex();
-	fwrite(&targetBone, sizeof(int), 1, pFile);
 	
-	Matrix matBone = mesh->GetMatBone();
-	fwrite(&matBone, sizeof(Matrix), 1, pFile);
 
 	// MATERAIL
 	wstring texPath = mesh->GetMaterial()->GetTexture()->m_pFilePath;
@@ -349,6 +360,198 @@ void AAsset::ExportStatic(FILE* pFile, shared_ptr<UMeshComponent> _mesh)
 	fwrite(&pos, sizeof(Vec3), 1, pFile);
 	fwrite(&rot, sizeof(Vec3), 1, pFile);
 	fwrite(&scale, sizeof(Vec3), 1, pFile);
+}
+
+void AAsset::ExportJsonMesh(shared_ptr<APawn> _actor, string fileName)
+{
+	string path = "../Resources/Asset/";
+	fileName += ".mesh.json";
+	fileName = path + fileName;
+
+	std::ofstream file(fileName);
+	if (!file.is_open()) { assert(false); }
+
+	nlohmann::ordered_json j;
+	int i = 0;
+
+	// ROOT MESH
+	auto mesh = _actor->GetMeshComponent();
+	bool isSkinned = (dynamic_pointer_cast<USkinnedMeshComponent>(mesh) != nullptr);
+	if (isSkinned)
+	{
+		ExportSkinned(i++, j, mesh);
+	}
+	else
+	{
+		ExportStatic(i++, j, mesh);
+	}
+
+	int childCount = mesh->GetChildren().size();
+	j["childCount"] = childCount;
+	for (auto& child : mesh->GetChildren())
+	{
+		bool isSkinned = (dynamic_pointer_cast<USkinnedMeshComponent>(child) != nullptr);
+		if (isSkinned)
+		{
+			ExportSkinned(i++, j, child);
+		}
+		else
+		{
+			ExportStatic(i++, j, child);
+		}
+	}
+
+	file << j.dump(4); // 예쁘게 출력
+}
+
+void AAsset::ExportSkinned(int num, nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh)
+{
+	auto mesh = dynamic_pointer_cast<USkinnedMeshComponent>(_mesh);
+
+	// BASE
+	j["Mesh" + to_string(num)];
+	int type = mesh->GetMesh()->GetType();
+	j["MeshType" + to_string(num)] = type;
+	string resName = to_wm(mesh->GetMesh()->GetName());
+	j["MeshResName" + to_string(num)] = resName;
+
+	// ANIM
+	bool bHasBaseAnim = mesh->GetAnimInstance() ? true : false;
+	j["HasBaseAnim" + to_string(num)] = bHasBaseAnim;
+	
+	if (bHasBaseAnim)
+	{
+		auto animInstance = mesh->GetAnimInstance();
+		string animName = to_wm(animInstance->GetName());
+		j["animName" + to_string(num)] = animName;
+		bool bInPlace = animInstance->m_bInPlace;
+		int rootIndex = animInstance->GetRootIndex();
+		j["bInPlace" + to_string(num)] = bInPlace;
+		j["rootIndex" + to_string(num)] = rootIndex;
+	}
+
+	// MATERIAL
+	string texPath = to_wm(mesh->GetMaterial()->GetTexture()->m_pFilePath);
+	j["texPath" + to_string(num)] = texPath;
+
+	string shaderPath = to_wm(mesh->GetMaterial()->GetShaderPath());
+	j["shaderPath" + to_string(num)] = shaderPath;
+
+	// SRT
+	Vec3 pos = mesh->GetLocalPosition();
+	Vec3 rot = mesh->GetLocalRotation();
+	Vec3 scale = mesh->GetLocalScale();
+
+	j["Scale" + to_string(num)] = { scale.x, scale.y, scale.z };
+	j["Rotation" + to_string(num)] = { rot.x, rot.y, rot.z };
+	j["Translation" + to_string(num)] = { pos.x, pos.y, pos.z };
+}
+
+void AAsset::ExportStatic(int num, nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh)
+{
+	auto mesh = dynamic_pointer_cast<UStaticMeshComponent>(_mesh);
+
+	// BASE
+	int type = mesh->GetMesh()->GetType();
+	j["MeshType" + to_string(num)] = type;
+
+	string resName = to_wm(mesh->GetMesh()->GetName());
+	j["MeshResName" + to_string(num)] = resName;
+
+	// ANIM
+	bool bHasBaseAnim = mesh->GetAnimInstance() ? true : false;
+	j["HasBaseAnim" + to_string(num)] = bHasBaseAnim;
+
+	if (bHasBaseAnim)
+	{
+		auto animInstance = mesh->GetAnimInstance();
+		string animName = to_wm(animInstance->GetName());
+		j["animName" + to_string(num)] = animName;
+		int targetBone = mesh->GetTargetBoneIndex();
+		j["targetBone" + to_string(num)] = targetBone;
+		Matrix matBone = mesh->GetMatBone();
+		j["matBone" + to_string(num)] = MatrixToJson(matBone);
+	}
+
+	// MATERAIL
+	string texPath = to_wm(mesh->GetMaterial()->GetTexture()->m_pFilePath);
+	j["texPath" + to_string(num)] = texPath;
+	
+	string shaderPath = to_wm(mesh->GetMaterial()->GetShaderPath());
+	j["shaderPath" + to_string(num)] = shaderPath;
+
+	// SRT
+	Vec3 pos = mesh->GetLocalPosition();
+	Vec3 rot = mesh->GetLocalRotation();
+	Vec3 scale = mesh->GetLocalScale();
+
+	j["Scale" + to_string(num)] = { scale.x, scale.y, scale.z };
+	j["Rotation" + to_string(num)] = { rot.x, rot.y, rot.z };
+	j["Translation" + to_string(num)] = { pos.x, pos.y, pos.z };
+
+}
+
+MeshComponentData AAsset::LoadJsonMesh(const char* filepath)
+{
+	//Profiler p("AAsset::LoadJsonMesh");
+	std::ifstream file(filepath);
+	if (!file.is_open()) { assert(false); }
+
+	nlohmann::ordered_json j;
+	file >> j;
+
+	int num = 0;
+	MeshComponentData root = LoadOneJsonMesh(num++, j);
+
+	int childCount = j["childCount"];
+
+	for (int i = 0; i < childCount; i++)
+	{
+		MeshComponentData child = LoadOneJsonMesh(num++, j);
+		root.m_vChild.emplace_back(child);
+	}
+
+	return root;
+}
+
+MeshComponentData AAsset::LoadOneJsonMesh(int num, const nlohmann::ordered_json& j)
+{
+	MeshComponentData ret;
+
+	// BASE
+	ret.m_type = j["MeshType" + to_string(num)];
+	ret.m_szRes = to_mw(j["MeshResName" + to_string(num)]);
+	bool bHasBaseAnim = (j["HasBaseAnim" + to_string(num)]);
+
+	if (bHasBaseAnim)
+	{
+		if (ret.m_type == (int)MeshType::M_SKINNED)
+		{
+			ret.m_szAnim = to_mw(j["animName" + to_string(num)]);
+			ret.m_bInPlace = j["bInPlace" + to_string(num)];
+			ret.m_rootIndex = j["rootIndex" + to_string(num)];
+		}
+		else
+		{
+			ret.m_szAnim = to_mw(j["animName" + to_string(num)]);
+			ret.m_targetBone = j["targetBone" + to_string(num)];
+			ret.m_matBone = LoadMatrixFromJson(j["matBone" + to_string(num)]);
+		}
+	}
+
+	// MATERIAL
+	ret.m_szTex = to_mw(j["texPath" + to_string(num)]);
+	ret.m_szShader = to_mw(j["shaderPath" + to_string(num)]);
+
+	// SRT
+	auto s = j["Scale" + to_string(num)];
+	auto r = j["Rotation" + to_string(num)];
+	auto t = j["Translation" + to_string(num)];
+	ret.m_scale = Vec3(s[0], s[1], s[2]);
+	ret.m_rot = Vec3(r[0], r[1], r[2]);
+	ret.m_pos = Vec3(t[0], t[1], t[2]);
+
+	return ret;
 }
 
 MeshComponentData AAsset::LoadMesh(const char* filepath)
@@ -398,9 +601,14 @@ MeshComponentData AAsset::LoadOneMesh(FILE* pFile)
 	}
 	else
 	{
-		ret.m_szAnim = LoadWstring(pFile);
-		fread(&ret.m_targetBone, sizeof(int), 1, pFile);
-		fread(&ret.m_matBone, sizeof(Matrix), 1, pFile);
+		bool bHasBaseAnim;
+		fread(&bHasBaseAnim, sizeof(bool), 1, pFile);
+		if (bHasBaseAnim)
+		{
+			ret.m_szAnim = LoadWstring(pFile);
+			fread(&ret.m_targetBone, sizeof(int), 1, pFile);
+			fread(&ret.m_matBone, sizeof(Matrix), 1, pFile);
+		}
 		ret.m_szTex = LoadWstring(pFile);
 		ret.m_szShader = LoadWstring(pFile);
 		fread(&ret.m_pos, sizeof(Vec3), 1, pFile);
@@ -426,6 +634,36 @@ wstring AAsset::LoadWstring(FILE* pFile)
 	fread(&str[0], sizeof(wchar_t), strSize, pFile);
 
 	return str;
+}
+
+json AAsset::MatrixToJson(const Matrix& mat)
+{
+	json j = json::array();
+	for (int col = 0; col < 4; ++col) {
+		for (int row = 0; row < 4; ++row) {
+			j.push_back(mat(row, col)); // 열 우선
+		}
+	}
+	return j;
+}
+
+Matrix AAsset::LoadMatrixFromJson(const nlohmann::ordered_json& j)
+{
+	Matrix mat;
+
+	if (!j.is_array() || j.size() != 16) {
+		throw std::runtime_error("Invalid matrix JSON format.");
+	}
+
+	// column-major: fill mat(row, col) using column-major index
+	int index = 0;
+	for (int col = 0; col < 4; ++col) {
+		for (int row = 0; row < 4; ++row) {
+			mat(row, col) = j.at(index++).get<float>();
+		}
+	}
+
+	return mat;
 }
 
 
