@@ -17,6 +17,8 @@
 //#include "MeshLoader.h"
 #include "Input.h"
 #include "UBoxComponent.h"
+#include "AUIActor.h"
+#include "UIManager.h"
 
 bool bRunGame = true;
 
@@ -35,6 +37,7 @@ void Editor::Init()
 	LoadAllPrefabs(".objects.json");
 	LoadAllPrefabs(".object.json");
 	LoadAllPrefabs(".character.json");
+	LoadAllPrefabs(".ui.json");
 
 	SetupEngineCamera();
 	SetupSkybox();
@@ -259,6 +262,7 @@ void Editor::SetupEditorCallbacks()
 	SetupCharacterEditorCallback();
 	SetupMapEditorCallback();
 	SetupObjectEditorCallback();
+	SetupUIEditorCallback();
 }
 
 void Editor::SetupCharacterEditorCallback()
@@ -415,6 +419,37 @@ void Editor::SetupObjectEditorCallback()
 			}
 
 			OBJECT->AddActor(actor);
+		});
+}
+
+void Editor::SetupUIEditorCallback()
+{
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Vec4 sliceUV)
+		{
+			uiActor->m_szName = L"UI";
+			auto meshComp = UStaticMeshComponent::CreatePlane();
+			uiActor->SetMeshComponent(meshComp);
+
+			auto mat = make_shared<UMaterial>();
+			mat->SetUseEffect(false);
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+			meshComp->SetMaterial(mat);
+
+			uiActor->SetIdleTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetHoverTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetActiveTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetSelectTexture(TEXTURE->Get(to_mw(texPath)));
+
+			uiActor->SetMeshComponent(meshComp);
+			uiActor->SetPosition(Vec3(actorData.Position));
+			uiActor->SetRotation(Vec3(actorData.Rotation));
+			uiActor->SetScale(Vec3(actorData.Scale));
+			uiActor->SetSliceData(sliceUV);
+
+			UI->AddUI(uiActor);
 		});
 }
 
@@ -599,8 +634,37 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 				}
 			}
 		}
+		else if (extension == ".ui.json")
+		{
+			PrefabUIData uiData;
+			if (PREFAB->LoadUI(file, uiData))
+			{
+				auto uiActor = make_shared<AUIActor>();
+				uiActor->m_szName = to_mw(uiData.Name);
 
+				auto meshComp = UStaticMeshComponent::CreatePlane();
+				uiActor->SetMeshComponent(meshComp);
+
+				auto mat = make_shared<UMaterial>();
+				mat->SetUseEffect(false);
+				mat->Load(L"", to_mw(uiData.ShaderPath));
+				meshComp->SetMaterial(mat);
+
+				uiActor->SetIdleTexture(TEXTURE->Get(to_mw(uiData.IdleTexturePath)));
+				uiActor->SetHoverTexture(TEXTURE->Get(to_mw(uiData.HoverTexturePath)));
+				uiActor->SetActiveTexture(TEXTURE->Get(to_mw(uiData.ActiveTexturePath)));
+				uiActor->SetSelectTexture(TEXTURE->Get(to_mw(uiData.SelectedTexturePath)));
+
+				uiActor->SetMeshComponent(meshComp);
+				uiActor->SetPosition(Vec3(uiData.transform.Position));
+				uiActor->SetRotation(Vec3(uiData.transform.Rotation));
+				uiActor->SetScale(Vec3(uiData.transform.Scale));
+				uiActor->SetSliceData(Vec4(uiData.SliceUV));
+
+				uiActor->SetPrefabData(uiData);
+
+				UI->AddUI(uiActor);
+			}
+		}
 	}
-
-
 }

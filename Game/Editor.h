@@ -50,6 +50,7 @@ protected:
 	void SetupCharacterEditorCallback();
 	void SetupMapEditorCallback();
 	void SetupObjectEditorCallback();
+	void SetupUIEditorCallback();
 
 	void SetClickPos();
 	void LoadAllPrefabs(const std::string& extension);

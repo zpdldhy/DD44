@@ -30,6 +30,7 @@ void Game::Init()
 	LoadAllPrefabs(".objects.json");
 	LoadAllPrefabs(".object.json");
 	LoadAllPrefabs(".character.json");
+	LoadAllPrefabs(".ui.json");
 
 	SetupEngineCamera();
 	SetupSkybox();
@@ -259,6 +260,37 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				}
 			}
 		}
+		else if (extension == ".ui.json")
+		{
+			PrefabUIData uiData;
+			if (PREFAB->LoadUI(file, uiData))
+			{
+				auto uiActor = make_shared<AUIActor>();
+				uiActor->m_szName = to_mw(uiData.Name);
 
+				auto meshComp = UStaticMeshComponent::CreatePlane();
+				uiActor->SetMeshComponent(meshComp);
+
+				auto mat = make_shared<UMaterial>();
+				mat->SetUseEffect(false);
+				mat->Load(L"", to_mw(uiData.ShaderPath));
+				meshComp->SetMaterial(mat);
+
+				uiActor->SetIdleTexture(TEXTURE->Get(to_mw(uiData.IdleTexturePath)));
+				uiActor->SetHoverTexture(TEXTURE->Get(to_mw(uiData.HoverTexturePath)));
+				uiActor->SetActiveTexture(TEXTURE->Get(to_mw(uiData.ActiveTexturePath)));
+				uiActor->SetSelectTexture(TEXTURE->Get(to_mw(uiData.SelectedTexturePath)));
+
+				uiActor->SetMeshComponent(meshComp);
+				uiActor->SetPosition(Vec3(uiData.transform.Position));
+				uiActor->SetRotation(Vec3(uiData.transform.Rotation));
+				uiActor->SetScale(Vec3(uiData.transform.Scale));
+				uiActor->SetSliceData(Vec4(uiData.SliceUV));
+
+				uiActor->SetPrefabData(uiData);
+
+				UI->AddUI(uiActor);
+			}
+		}
 	}
 }
