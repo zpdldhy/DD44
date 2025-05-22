@@ -491,9 +491,9 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 				actor->SetMeshComponent(meshComponent);
 
 				actor->m_szName = L"Character";
-				actor->SetPosition(Vec3(characterData.actor.Position));
-				actor->SetRotation(Vec3(characterData.actor.Rotation));
-				actor->SetScale(Vec3(characterData.actor.Scale));
+				actor->SetPosition(Vec3(characterData.transform.Position));
+				actor->SetRotation(Vec3(characterData.transform.Rotation));
+				actor->SetScale(Vec3(characterData.transform.Scale));
 
 				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 
@@ -581,16 +581,8 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 					auto meshComp = make_shared<UStaticMeshComponent>();
 					meshComp->SetMeshPath(to_mw(objData.MeshPath));
 
-					auto meshRes = make_shared<UStaticMeshResources>();
-					AssimpLoader loader;
-					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
-					if (!meshList.empty())
-					{
-						meshRes->SetVertexList(meshList[0].m_vVertexList);
-						meshRes->SetIndexList(meshList[0].m_vIndexList);
-						meshRes->Create();
-						meshComp->SetMesh(meshRes);
-					}
+					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
+					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 
 					auto material = make_shared<UMaterial>();
 					material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
