@@ -5,6 +5,8 @@
 #include <tchar.h> 
 #include <locale>
 #include <codecvt>
+#include <random>
+
 
 static void DX_CHECK(HRESULT _hr, const TCHAR* _function)
 {
@@ -98,4 +100,15 @@ static std::vector<std::string> GetFileNames(std::string _path)
 		FindClose(hFind);
 	}
 	return fileList;
+}
+
+// 두값 사이에 랜덤한 숫자 반환
+static float RandomRange(float min, float max)
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+
+	std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+	float t = dist(gen); // [0,1]
+	return min + (max - min) * t;
 }

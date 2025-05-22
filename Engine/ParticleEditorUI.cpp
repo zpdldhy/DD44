@@ -8,6 +8,13 @@
 
 void ParticleEditorUI::DrawUI()
 {
+	static bool bInit = false;
+	if (!bInit)
+	{
+		bInit = true;
+		ResetData();
+	}
+
 	if (ImGui::Button("Create New Particle"))
 	{
 		if (!m_OnCreate)
@@ -18,7 +25,8 @@ void ParticleEditorUI::DrawUI()
 
 		// 새 파티클 생성
 		auto newParticle = make_shared<AParticleActor>();
-		m_pParticleActor = newParticle;
+
+		//m_pParticleActor = newParticle;
 
 		ResetData();
 
@@ -33,8 +41,17 @@ void ParticleEditorUI::DrawUI()
 			m_szShaderPath,
 			m_Data,
 			m_UVStart,
-			m_UVEnd
+			m_UVEnd,
+			m_iDivisions,
+			m_AnimData.DurationSeconds,
+			m_AnimData.bLoop,
+			m_AnimData.bAutoDestroy
 		);
+
+		newParticle->InitSpriteAnimation(m_iDivisions, m_AnimData.DurationSeconds);
+		newParticle->SetLoop(m_AnimData.bLoop);
+		newParticle->SetAutoDestroy(m_AnimData.bAutoDestroy);
+		newParticle->SetUV(m_UVStart, m_UVEnd);
 	}
 
 	//ImGui::SameLine();
@@ -53,12 +70,11 @@ void ParticleEditorUI::DrawUI()
 		PrefabParticleData data;
 		if (PREFAB->LoadParticle(data, path))
 		{
-			// 기존 로드 처리 (m_OnCreate 호출 포함)
 			auto newParticle = make_shared<AParticleActor>();
-			m_pParticleActor = newParticle;
 			m_vCreatedParticles.push_back(newParticle);
 			m_iSelectedParticleIndex = static_cast<int>(m_vCreatedParticles.size()) - 1;
 			m_iLastSelectedParticleIndex = -1;
+
 
 			m_Data.Position[0] = data.Translation.x;
 			m_Data.Position[1] = data.Translation.y;
@@ -94,11 +110,15 @@ void ParticleEditorUI::DrawUI()
 			{
 				m_OnCreate(
 					newParticle,
-					m_vTextureList[m_iSelectedTextureIndex].c_str(),
+					m_vTextureList[0].c_str(),
 					m_szShaderPath,
 					m_Data,
 					m_UVStart,
-					m_UVEnd
+					m_UVEnd,
+					m_iDivisions,
+					m_AnimData.DurationSeconds,
+					m_AnimData.bLoop,
+					m_AnimData.bAutoDestroy
 				);
 			}
 		}
@@ -109,8 +129,8 @@ void ParticleEditorUI::DrawUI()
 	}
 
 
-	if (!m_pParticleActor)
-		return;
+	//if (!m_pParticleActor)
+	//	return;
 
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
@@ -136,13 +156,80 @@ void ParticleEditorUI::DrawUI()
 		m_UVStart.y = m_iSelectedRow * cellSize;
 		m_UVEnd.x = (m_iSelectedCol + 1) * cellSize;
 		m_UVEnd.y = (m_iSelectedRow + 1) * cellSize;
-		if (m_pParticleActor)
+		if (auto actor = GetSelectedActor())
 		{
-			m_pParticleActor->SetUV(m_UVStart, m_UVEnd);
+			actor->SetUV(m_UVStart, m_UVEnd);
 		}
 	}
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+	ImGui::Text("Animation Settings");
+	static float prevDuration = m_AnimData.DurationSeconds;
 
+	if (ImGui::InputFloat("Duration (sec)", &m_AnimData.DurationSeconds))
+	{
+		if (auto actor = GetSelectedActor())
+			actor->SetDuration(m_AnimData.DurationSeconds);
+	}
+	if (ImGui::Checkbox("Loop", &m_AnimData.bLoop))
+	{
+		if (auto actor = GetSelectedActor())
+			actor->SetLoop(m_AnimData.bLoop);
+	}
 
+	if (ImGui::Checkbox("Auto Destroy", &m_AnimData.bAutoDestroy))
+	{
+		if (auto actor = GetSelectedActor())
+			actor->SetAutoDestroy(m_AnimData.bAutoDestroy);
+	}
+	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+	ImGui::Text("Batch Particle Spawn");
+
+	DrawVec3("Box Min (XYZ)", m_vBoxMin);
+	DrawVec3("Box Max (XYZ)", m_vBoxMax);
+	ImGui::InputInt("Count", &m_iNumParticles);
+
+	if (ImGui::Button("Spawn Particles in Box"))
+	{
+		for (int i = 0; i < m_iNumParticles; ++i)
+		{
+			Vec3 randPos = RandomVec3InBox(m_vBoxMin, m_vBoxMax);
+
+			ActorData copy = m_Data;
+			copy.Position[0] = randPos.x;
+			copy.Position[1] = randPos.y;
+			copy.Position[2] = randPos.z;
+
+			auto newParticle = make_shared<AParticleActor>();
+			m_vCreatedParticles.push_back(newParticle);
+			m_vParticleData.push_back(copy);
+
+			if (m_OnCreate)
+			{
+				m_OnCreate(
+					newParticle,
+					m_vTextureList[m_iSelectedTextureIndex].c_str(),
+					m_szShaderPath,
+					copy,
+					m_UVStart,
+					m_UVEnd,
+					m_iDivisions,
+					m_AnimData.DurationSeconds,
+					m_AnimData.bLoop,
+					m_AnimData.bAutoDestroy
+				);
+			}
+
+			newParticle->InitSpriteAnimation(m_iDivisions, m_AnimData.DurationSeconds);
+			newParticle->SetLoop(m_AnimData.bLoop);
+			newParticle->SetAutoDestroy(m_AnimData.bAutoDestroy);
+			newParticle->SetUV(m_UVStart, m_UVEnd);
+			newParticle->SetPosition(randPos);
+			newParticle->SetRotation(Vec3(copy.Rotation));
+			newParticle->SetScale(Vec3(copy.Scale));
+		}
+	}
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 	ImGui::Text("Assets");
 	SetTexture();
@@ -166,30 +253,13 @@ void ParticleEditorUI::DrawUI()
 
 		ImGui::ListBox("##ParticleList", &m_iSelectedParticleIndex, particleNames.data(), (int)particleNames.size(), 5);
 
-		if (m_iSelectedParticleIndex >= 0)
+		if (m_iSelectedParticleIndex >= 0 && m_iSelectedParticleIndex < m_vParticleData.size())
 		{
-			m_pParticleActor = m_vCreatedParticles[m_iSelectedParticleIndex];
-
 			if (m_iSelectedParticleIndex != m_iLastSelectedParticleIndex)
 			{
-				// 선택이 바뀐 "그 프레임에만" 값을 복사
-				Vec3 pos = m_pParticleActor->GetPosition();
-				Vec3 rot = m_pParticleActor->GetRotation();
-				Vec3 scale = m_pParticleActor->GetScale();
-
-				m_Data.Position[0] = pos.x;
-				m_Data.Position[1] = pos.y;
-				m_Data.Position[2] = pos.z;
-
-				m_Data.Rotation[0] = rot.x;
-				m_Data.Rotation[1] = rot.y;
-				m_Data.Rotation[2] = rot.z;
-
-				m_Data.Scale[0] = scale.x;
-				m_Data.Scale[1] = scale.y;
-				m_Data.Scale[2] = scale.z;
-
-				m_iLastSelectedParticleIndex = m_iSelectedParticleIndex; // 업데이트!
+				// 선택된 인덱스가 바뀌었을 때만 동기화
+				m_Data = m_vParticleData[m_iSelectedParticleIndex];
+				m_iLastSelectedParticleIndex = m_iSelectedParticleIndex;
 			}
 		}
 	}
@@ -215,6 +285,9 @@ void ParticleEditorUI::DrawUI()
 		data.UVEnd = m_UVEnd;
 		data.BillboardSizeX = m_Data.Scale[0]; // 또는 따로 관리하는 값
 		data.BillboardSizeY = m_Data.Scale[1];
+		data.Duration = m_AnimData.DurationSeconds;
+		data.bLoop = m_AnimData.bLoop;
+		data.bAutoDestroy = m_AnimData.bAutoDestroy;
 
 		std::string path = "../Resources/Prefab/" + data.Name + ".particle.json";
 		PREFAB->SaveParticle(data, path);
@@ -246,6 +319,11 @@ void ParticleEditorUI::DrawVec3(const char* label, float* values)
 	ImGui::PopID();
 }
 
+void ParticleEditorUI::DrawVec3(const char* label, Vec3& vec)
+{
+	DrawVec3(label, &vec.x);
+}
+
 void ParticleEditorUI::DrawVec2(const char* label, float* values)
 {
 	ImGui::PushID(label);
@@ -272,12 +350,15 @@ void ParticleEditorUI::DrawVec2(const char* label, float* values)
 
 void ParticleEditorUI::UpdateUIActor()
 {
-	if (!m_pParticleActor)
-		return;
+	auto actor = GetSelectedActor();
+	auto data = GetSelectedActorData();
+	if (!actor || !data) return;
 
-	m_pParticleActor->SetPosition(Vec3(m_Data.Position));
-	m_pParticleActor->SetRotation(Vec3(m_Data.Rotation));
-	m_pParticleActor->SetScale(Vec3(m_Data.Scale));
+	actor->SetPosition(Vec3(m_Data.Position));
+	actor->SetRotation(Vec3(m_Data.Rotation));
+	actor->SetScale(Vec3(m_Data.Scale));
+
+	*data = m_Data;
 }
 
 void ParticleEditorUI::ResetData()
@@ -295,9 +376,11 @@ void ParticleEditorUI::ResetData()
 	m_UVStart = { 0.0f, 0.0f };
 	m_UVEnd = { 1.0f, 1.0f };
 
-	m_iSelectedTextureIndex = 0;
-	m_vTextureList.emplace_back("../Resources/Texture/white.png");
-	m_vTextureNameList.emplace_back("white.png");
+	if (m_vTextureList.empty())
+	{
+		m_vTextureList.emplace_back("../Resources/Texture/white.png");
+		m_vTextureNameList.emplace_back("white.png");
+	}
 
 	m_iDivisions = 4;
 	m_iSelectedRow = 0;
@@ -317,6 +400,8 @@ void ParticleEditorUI::SetTexture()
 
 	static std::vector<const char*> namePtrs;
 	namePtrs.clear();
+	for (auto& name : m_vTextureNameList)
+		namePtrs.push_back(name.c_str());
 	if (namePtrs.empty())
 	{
 		for (auto& name : m_vTextureNameList)
@@ -329,9 +414,13 @@ void ParticleEditorUI::SetTexture()
 	if (m_iSelectedTextureIndex != preSelectedIndex)
 	{
 		preSelectedIndex = m_iSelectedTextureIndex;
-		m_pParticleActor->GetMeshComponent()->GetMaterial()->SetTexture(
-			TEXTURE->Get(to_mw(m_vTextureList[m_iSelectedTextureIndex]))
-		);
+		auto selectedActor = GetSelectedActor();
+		if (selectedActor)
+		{
+			selectedActor->GetMeshComponent()->GetMaterial()->SetTexture(
+				TEXTURE->Get(to_mw(m_vTextureList[m_iSelectedTextureIndex]))
+			);
+		}
 	}
 }
 
@@ -368,4 +457,28 @@ void ParticleEditorUI::SearchFile(const string& directory, const string& extensi
 
 		FindClose(hFind);
 	}
+}
+
+Vec3 ParticleEditorUI::RandomVec3InBox(const Vec3& min, const Vec3& max)
+{
+	return Vec3(
+		RandomRange(min.x, max.x),
+		RandomRange(min.y, max.y),
+		RandomRange(min.z, max.z)
+	);
+}
+
+
+shared_ptr<AParticleActor> ParticleEditorUI::GetSelectedActor()
+{
+	if (m_iSelectedParticleIndex < 0 || m_iSelectedParticleIndex >= m_vCreatedParticles.size())
+		return nullptr;
+	return m_vCreatedParticles[m_iSelectedParticleIndex];
+}
+
+ActorData* ParticleEditorUI::GetSelectedActorData()
+{
+	if (m_iSelectedParticleIndex < 0 || m_iSelectedParticleIndex >= m_vParticleData.size())
+		return nullptr;
+	return &m_vParticleData[m_iSelectedParticleIndex];
 }

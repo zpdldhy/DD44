@@ -292,7 +292,11 @@ void Game::SetupParticleEditorCallback()
 		const char* shaderPath,
 		ActorData actorData,
 		Vec2 uvStart,
-		Vec2 uvEnd)
+		Vec2 uvEnd,
+		int divisions,
+		float duration,
+		bool loop,
+		bool autoDestroy)
 		{
 			particleActor->m_szName = L"Particle";
 
@@ -316,10 +320,13 @@ void Game::SetupParticleEditorCallback()
 			particleActor->SetPosition(Vec3(actorData.Position));
 			particleActor->SetRotation(Vec3(actorData.Rotation));
 			particleActor->SetScale(Vec3(actorData.Scale));
+			particleActor->InitSpriteAnimation(divisions, duration);
+			particleActor->SetLoop(loop);
+			particleActor->SetAutoDestroy(autoDestroy);
 
 			// 5. 화면에 등록
 			PARTICLE->AddUI(particleActor);
-			particleActor->InitSpriteAnimation(4, 10.0f); // 4는 divisions, 10은 frameRate
+			//particleActor->InitSpriteAnimation(4, 1.f); // 4는 divisions, 10은 frameRate
 		});
 }
 

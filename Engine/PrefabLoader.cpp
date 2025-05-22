@@ -357,6 +357,10 @@ bool PrefabLoader::SaveParticle(const PrefabParticleData& data, const std::strin
     j["BillboardSizeX"] = data.BillboardSizeX;
     j["BillboardSizeY"] = data.BillboardSizeY;
 
+    j["Duration"] = data.Duration;
+    j["bLoop"] = data.bLoop;
+    j["bAutoDestroy"] = data.bAutoDestroy;
+
     std::ofstream file(filePath);
     if (!file.is_open())
         return false;
@@ -399,6 +403,11 @@ bool PrefabLoader::LoadParticle( PrefabParticleData& outData, const std::string&
     outData.Col = j["Col"];
     outData.BillboardSizeX = j["BillboardSizeX"];
     outData.BillboardSizeY = j["BillboardSizeY"];
+    outData.Duration = j.value("Duration", 1.0f);
+    outData.bLoop = j.value("bLoop", true);
+    outData.bAutoDestroy = j.value("bAutoDestroy", false);
+
+
 
     return true;
 }

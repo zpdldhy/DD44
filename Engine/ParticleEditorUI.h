@@ -1,15 +1,17 @@
 #pragma once
 #include "PrefabLoader.h"
+#include "EditorData.h"
 
 class ParticleEditorUI
 {
 public:
 	void DrawUI();
 	void DrawVec3(const char* label, float* values);
+	void DrawVec3(const char* label, Vec3& vec);
 	void DrawVec2(const char* label, float* values);
 
 
-	void SetOnCreateCallback(std::function<void(shared_ptr<class AParticleActor>, const char*, const char*, ActorData, Vec2, Vec2)> callback)
+	void SetOnCreateCallback(std::function<void(shared_ptr<class AParticleActor>, const char*, const char*, ActorData, Vec2, Vec2, int, float, bool, bool)> callback)
 	{
 		m_OnCreate = std::move(callback);
 	}
@@ -20,12 +22,18 @@ private:
 	void SetTexture();
 	vector<string> GetTextureList(const std::string& directory);
 	void SearchFile(const string& directory, const string& extension);
+	Vec3 RandomVec3InBox(const Vec3& min, const Vec3& max);
+	ActorData* GetSelectedActorData();
+	shared_ptr<AParticleActor> GetSelectedActor();
 
 	int m_iDivisions = 4; // 기본 3x3 분할
 	int m_iSelectedRow = 0;
 	int m_iSelectedCol = 0;
+
+	ParticleAnimationData m_AnimData;
 private:
-	shared_ptr<class AParticleActor> m_pParticleActor = nullptr;
+	std::vector<ActorData> m_vParticleData;
+	//shared_ptr<class AParticleActor> m_pParticleActor = nullptr;
 
 	ActorData m_Data = {
 		{ 0.0f, 0.0f, 50.0f }, // Position
@@ -46,6 +54,10 @@ private:
 	int m_iSelectedParticleIndex = -1;
 	int m_iLastSelectedParticleIndex = -1;
 
-	std::function<void(shared_ptr<AParticleActor>, const char*, const char*, ActorData, Vec2, Vec2)> m_OnCreate;
+	Vec3 m_vBoxMin = { -100.0f, -100.0f, 0.0f };
+	Vec3 m_vBoxMax = { 100.0f, 100.0f, 0.0f };
+	int m_iNumParticles = 10;
+
+	std::function<void(shared_ptr<AParticleActor>, const char*, const char*, ActorData, Vec2, Vec2, int divisions, float duration, bool loop, bool autoDestroy)> m_OnCreate;
 };
 

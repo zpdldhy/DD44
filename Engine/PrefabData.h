@@ -100,6 +100,10 @@ struct PrefabParticleData
 
     float BillboardSizeX = 100.0f;
     float BillboardSizeY = 100.0f;
+
+    float Duration = 1.0f;
+    bool bLoop = true;
+    bool bAutoDestroy = false;
 };
 
 struct ModifiedCellData
