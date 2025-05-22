@@ -15,6 +15,7 @@ public:
 
 	shared_ptr<UMeshComponent> Make(const char* _path);
 	shared_ptr<UMeshComponent> Make(MeshComponentData data);
+
 	shared_ptr<UMeshComponent> MakeMesh(MeshComponentData _data, bool _bRoot, shared_ptr<UAnimInstance> _animInstance);
 	shared_ptr<UMeshComponent> MakeMesh(MeshComponentData _data, bool _bRoot);
 	shared_ptr<UMeshComponent> MakeMesh(wstring _resName);

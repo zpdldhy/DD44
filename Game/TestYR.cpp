@@ -16,6 +16,7 @@
 #include "AAsset.h"
 #include "SkeletalMeshData.h"
 #include "Inputlayout.h"
+#include "APawn.h"
 
 void TestYR::Init()
 {

@@ -21,5 +21,6 @@
 #define LIGHTMANAGER GET_SINGLE(LightManager)
 #define POSTPROCESS  GET_SINGLE(PostProcessManager)
 #define COLLITION	GET_SINGLE(Collision)
+#define ACTORLOADER GET_SINGLE(ActorLoader)
 
 #define DD_PI		3.1415926f

@@ -3,6 +3,7 @@
 #include "ActorLoader.h"
 #include "ObjectLoader.h"
 
+class AActor;
 class APawn;
 class UAnimInstance;
 class UMeshResources;

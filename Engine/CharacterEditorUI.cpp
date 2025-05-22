@@ -523,6 +523,8 @@ void CharacterEditorUI::SaveCharacterPrefab()
 			data.ScriptType = m_iSelectedScriptIndex;
 			data.AnimIndex = m_iSelectedAnimIndex;
 
+			// 변경 요망
+			// m_vAnimInstanceList를 더이상 쓰지 않음
 			auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
 			data.AnimSpeed = animInstance ? animInstance->m_fAnimPlayRate : 1.0f;
 
@@ -650,6 +652,8 @@ void CharacterEditorUI::BrowserSection()
 				m_iSelectedScriptIndex = data.ScriptType;
 				m_iSelectedAnimIndex = data.AnimIndex;
 
+				// 변경 요망
+				// m_vAnimInstanceList를 더이상 쓰지 않음
 				auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
 				if (animInstance)
 					animInstance->m_fAnimPlayRate = data.AnimSpeed;

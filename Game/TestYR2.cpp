@@ -64,40 +64,15 @@ void TestYR2::Init()
 #pragma endregion
 
 
-	//loader = make_shared<ActorLoader>();
-	//loader->ConvertFbxToAsset();
-	//string path = "../Resources/Asset/_E_KNIGHT.asset";
-	//name = to_wm(SplitName(to_mw(path)));
-	//m_pActor = loader->LoadRedeemer(path);
-
-	//OBJECT->AddActor(m_pActor);
-
-
 	loader = make_shared<ActorLoader>();
-	name = "temp";
+	//loader->ConvertFbxToAsset();
+	//loader->ConvertObjToAsset("../Resources/Obj/Test/*.obj");
+
 	loader->LoadAllAsset();
 	meshResMap = loader->LoadMeshMap();
 	animList = loader->LoadAnim();
 	texList = loader->LoadTexPath();
 
-	//objLoader = make_shared< ObjectLoader>();
-	//objLoader->ConvertObjToAsset("../Resources/Obj/wall/*.obj");
-	////objLoader->Load();
-	////objLoader->LoadAsFR("../Resources/Obj/AltarSmallStone3.obj");
-	////map<wstring, shared_ptr<UMeshResources>> tempMap = objLoader->LoadMeshMap();
-	//loader = make_shared<ActorLoader>();
-	//name = "temp";
-	//loader->LoadAllAsset();
-	//meshResMap = loader->LoadMeshMap();
-	
-	/*for (auto& data : tempMap)
-	{
-		meshResMap.insert(data);
-	}*/
-
-	{
-
-	}
 
 	auto meshEditor = GUI->GetMeshEditorUI();
 	//meshEditor->SetActor(m_pActor);
@@ -241,9 +216,6 @@ void TestYR2::Init()
 			bSaveMesh = true;
 			name = _name;
 		});
-
-
-
 }
 
 void TestYR2::Update()
@@ -252,16 +224,6 @@ void TestYR2::Update()
 	{
 		AAsset::ExportJsonMesh(m_pActor, name);
 		bSaveMesh = false;
-	}
-
-	if (INPUT->GetButton(C))
-	{
-		//auto anim = m_pActor->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-		//if (++animIndex >= anim->GetAnimTrackList().size())
-		//{
-		//	animIndex = 0;
-		//}
-		//anim->SetCurrentAnimTrack(animIndex);
 	}
 }
 
