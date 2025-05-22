@@ -526,9 +526,9 @@ void CharacterEditorUI::SaveCharacterPrefab()
 			auto animInstance = m_pLoader->m_vAnimInstanceList.empty() ? nullptr : m_pLoader->m_vAnimInstanceList[0];
 			data.AnimSpeed = animInstance ? animInstance->m_fAnimPlayRate : 1.0f;
 
-			for (int i = 0; i < 3; i++)	data.actor.Scale[i] = m_fScale[i];
-			for (int i = 0; i < 3; i++)	data.actor.Rotation[i] = m_fRotation[i];
-			for (int i = 0; i < 3; i++)	data.actor.Position[i] = m_fPosition[i];
+			for (int i = 0; i < 3; i++)	data.transform.Scale[i] = m_fScale[i];
+			for (int i = 0; i < 3; i++)	data.transform.Rotation[i] = m_fRotation[i];
+			for (int i = 0; i < 3; i++)	data.transform.Position[i] = m_fPosition[i];
 
 			//for (int i = 0; i < m_iChildIndex; ++i)
 			//{
@@ -580,9 +580,9 @@ void CharacterEditorUI::LoadCharacterPrefab()
 				//    animInstance->m_fAnimPlayRate = data.AnimSpeed;
 				//}
 
-				for (int i = 0; i < 3; i++) m_fScale[i] = data.actor.Scale[i];
-				for (int i = 0; i < 3; i++) m_fRotation[i] = data.actor.Rotation[i];
-				for (int i = 0; i < 3; i++) m_fPosition[i] = data.actor.Position[i];
+				for (int i = 0; i < 3; i++) m_fScale[i] = data.transform.Scale[i];
+				for (int i = 0; i < 3; i++) m_fRotation[i] = data.transform.Rotation[i];
+				for (int i = 0; i < 3; i++) m_fPosition[i] = data.transform.Position[i];
 
 				m_CameraData = data.camera;
 				m_ShapeData = data.shape;
@@ -654,9 +654,9 @@ void CharacterEditorUI::BrowserSection()
 				if (animInstance)
 					animInstance->m_fAnimPlayRate = data.AnimSpeed;
 
-				for (int i = 0; i < 3; i++) m_fScale[i] = data.actor.Scale[i];
-				for (int i = 0; i < 3; i++) m_fRotation[i] = data.actor.Rotation[i];
-				for (int i = 0; i < 3; i++) m_fPosition[i] = data.actor.Position[i];
+				for (int i = 0; i < 3; i++) m_fScale[i] = data.transform.Scale[i];
+				for (int i = 0; i < 3; i++) m_fRotation[i] = data.transform.Rotation[i];
+				for (int i = 0; i < 3; i++) m_fPosition[i] = data.transform.Position[i];
 
 				if (!m_pLoader) m_pLoader = std::make_shared<ActorLoader>();
 				m_pLoader->LoadOne(m_szAssetPath);

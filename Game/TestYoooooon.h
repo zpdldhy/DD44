@@ -3,7 +3,7 @@
 #include "ActorLoader.h"
 #include "MeshLoader.h"
 
-class Editor : public IExecute
+class TestYoooooon : public IExecute
 {
 public:
 	shared_ptr<class ACameraActor> m_pCameraActor;
@@ -15,23 +15,11 @@ public:
 
 	shared_ptr<class ALight> m_pSunLight;
 
-	shared_ptr<class AActor> m_pGizmoCore;
-	shared_ptr<class AActor> m_pGizmoX;
-	shared_ptr<class AActor> m_pGizmoY;
-	shared_ptr<class AActor> m_pGizmoZ;
-	shared_ptr<class AActor> m_pSelectedGizmo;
-
-	POINT m_vPrevMouse = {};
-	Vec3 m_vDragStartPos = {};
-	bool m_bDragging = false;
-
 	bool m_bEnginCamera = false;
 
 	// Asset loading
 	ActorLoader actorLoader;
 	MeshLoader meshLoader;
-
-	float time;
 
 public:
 	void Init() override;
@@ -43,8 +31,6 @@ protected:
 	void SetupEngineCamera();
 	void SetupSkybox();
 	void SetupSunLight();
-	void SetupGizmo();
-	void SetGizmoPosition(Vec3 _pos);
 
 	void SetupEditorCallbacks();
 	void SetupCharacterEditorCallback();
@@ -52,7 +38,6 @@ protected:
 	void SetupObjectEditorCallback();
 	void SetupUIEditorCallback();
 
-	void SetClickPos();
 	void LoadAllPrefabs(const std::string& extension);
 
 };

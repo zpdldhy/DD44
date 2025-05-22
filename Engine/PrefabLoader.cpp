@@ -115,11 +115,7 @@ bool PrefabLoader::SaveCharacter(const PrefabCharacterData& data, const std::str
     j["AnimIndex"] = data.AnimIndex;
     j["AnimSpeed"] = data.AnimSpeed;
 
-    j["Actor"] = {
-        { "Scale" , { data.actor.Scale[0], data.actor.Scale[1], data.actor.Scale[2] }},
-		{ "Rotation" , { data.actor.Rotation[0], data.actor.Rotation[1], data.actor.Rotation[2] }},
-		{ "Translation" , { data.actor.Position[0], data.actor.Position[1], data.actor.Position[2] }}
-    };
+	SaveTransform(j, data.transform);
 
 	j["CameraComponent"] = {
 		{ "isUse", data.camera.isUse },
@@ -171,7 +167,7 @@ bool PrefabLoader::LoadCharacter(const std::string& filePath, PrefabCharacterDat
     data.AnimIndex = j["AnimIndex"];
     data.AnimSpeed = j["AnimSpeed"];
 
-    LoadActor(j, data);
+    LoadTransform(j, data.transform);
 
     // Component
 	LoadCameraComponent(j, data.camera);
@@ -335,17 +331,86 @@ bool PrefabLoader::LoadObjectArray(const std::string& _filePath, std::vector<Pre
     return true;
 }
 
-
-void PrefabLoader::LoadActor(json& j, PrefabCharacterData& data)
+bool PrefabLoader::SaveUI(const PrefabUIData& _prefab, const std::string& _filePath)
 {
-    auto s = j["Actor"]["Scale"];
-    for (int i = 0; i < 3; i++) data.actor.Scale[i] = s[i];
+    json j;
+    j["Name"] = _prefab.Name;
 
-    auto r = j["Actor"]["Rotation"];
-    for (int i = 0; i < 3; i++) data.actor.Rotation[i] = r[i];
+	SaveTransform(j, _prefab.transform);
 
-    auto t = j["Actor"]["Translation"];
-    for (int i = 0; i < 3; i++) data.actor.Position[i] = t[i];
+    j["SliceUV"] = { _prefab.SliceUV[0], _prefab.SliceUV[1], _prefab.SliceUV[2], _prefab.SliceUV[3]};
+
+	j["TexturePath"] = {
+		{ "Idle", _prefab.IdleTexturePath },
+		{ "Hover", _prefab.HoverTexturePath },
+		{ "Active", _prefab.ActiveTexturePath },
+		{ "Selected", _prefab.SelectedTexturePath }
+	};
+
+	j["ShaderPath"] = _prefab.ShaderPath;
+
+    std::ofstream file(_filePath);
+    if (!file.is_open()) return false;
+
+    file << j.dump(4);
+    return true;
+}
+
+bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
+{
+	std::ifstream file(_filePath);
+	if (!file.is_open()) return false;
+
+	json j;
+	file >> j;
+
+	_prefab.Name = j["Name"];
+
+	LoadTransform(j, _prefab.transform);
+
+	auto s = j["SliceUV"];
+    for (int i = 0; i < 4; i++)	_prefab.SliceUV[i] = s[i];
+
+	_prefab.IdleTexturePath = j["TexturePath"]["Idle"];
+	_prefab.HoverTexturePath = j["TexturePath"]["Hover"];
+	_prefab.ActiveTexturePath = j["TexturePath"]["Active"];
+	_prefab.SelectedTexturePath = j["TexturePath"]["Selected"];
+	_prefab.ShaderPath = j["ShaderPath"];
+
+	return true;
+}
+
+bool PrefabLoader::DeletePrefab(const std::string& _filePath)
+{
+    if (std::remove(_filePath.c_str()) == 0) {
+        return true; // 성공적으로 삭제됨
+    }
+    else {
+        perror("파일 삭제 실패");
+        return false;
+    }
+}
+
+
+void PrefabLoader::SaveTransform(json& j, const TransformData& data)
+{
+    j["Transform"] = {
+    { "Scale" , { data.Scale[0], data.Scale[1], data.Scale[2] }},
+    { "Rotation" , { data.Rotation[0], data.Rotation[1], data.Rotation[2] }},
+    { "Translation" , { data.Position[0], data.Position[1], data.Position[2] }}
+    };
+}
+
+void PrefabLoader::LoadTransform(json& j, TransformData& data)
+{
+    auto s = j["Transform"]["Scale"];
+    for (int i = 0; i < 3; i++) data.Scale[i] = s[i];
+
+    auto r = j["Transform"]["Rotation"];
+    for (int i = 0; i < 3; i++) data.Rotation[i] = r[i];
+
+    auto t = j["Transform"]["Translation"];
+    for (int i = 0; i < 3; i++) data.Position[i] = t[i];
 }
 
 void PrefabLoader::LoadCameraComponent(json& j, CameraComponentData& data)

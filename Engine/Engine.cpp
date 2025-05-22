@@ -19,7 +19,6 @@
 #include "CollisionManager.h"
 #include "LightManager.h"
 
-
 void Engine::Init()
 {
 	GET_SINGLE(Device)->Init();
@@ -94,9 +93,7 @@ void Engine::Render()
 		POSTPROCESS->PreRender();
 		OBJECT->Render();	// ObjectList Render
 		POSTPROCESS->PostRender();
-
-
-
+		
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
 
@@ -104,16 +101,15 @@ void Engine::Render()
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
 		{
-			CAMERA->Render(CameraViewType::CVT_UI);
-
+			CAMERA->Render(CameraViewType::CVT_UI);		
 			POSTPROCESS->Present();
 		}
+
+		UI->Render();
 
 		DC->RSSetState(m_pCurrentRasterizer.Get());
 		m_pCurrentRasterizer.Reset();
 	}
-
-	UI->Render();
 
 	if (_app->m_type != SCENE_TYPE::GAME) {
 		GUI->Render(); // *Fix Location* after _app->Render() }

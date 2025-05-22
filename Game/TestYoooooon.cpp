@@ -1,9 +1,8 @@
 #include "pch.h"
-#include "Editor.h"
+#include "TestYoooooon.h"
 #include "ImGuiCore.h"
 #include "ObjectManager.h"
 #include "CameraManager.h"
-#include "CollisionManager.h"
 #include "ACameraActor.h"
 #include "ASky.h"
 #include "ATerrainTileActor.h"
@@ -13,20 +12,14 @@
 #include "AssimpLoader.h"
 #include "LightManager.h"
 #include "ALight.h"
-#include "UMeshComponent.h"
-//#include "MeshLoader.h"
+#include "MeshLoader.h"
 #include "Input.h"
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
 
-bool bRunGame = true;
-
-//#undef RUN_GAME
-void Editor::Init()
+void TestYoooooon::Init()
 {
-	
-	// Asset 로딩
 	actorLoader.LoadAllAsset();
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
 	meshLoader.SetAnim(actorLoader.LoadAnimMap());
@@ -35,16 +28,16 @@ void Editor::Init()
 
 	LoadAllPrefabs(".map.json");
 	LoadAllPrefabs(".objects.json");
-	LoadAllPrefabs(".object.json");
 	LoadAllPrefabs(".character.json");
 	LoadAllPrefabs(".ui.json");
 
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
+
 }
 
-void Editor::Update()
+void TestYoooooon::Update()
 {
 	if (INPUT->GetButton(O))
 	{
@@ -60,67 +53,17 @@ void Editor::Update()
 		}
 	}
 
-	if (INPUT->GetButtonDown(LCLICK))
-	{
-		SetClickPos();
-
-		UINT selectedID = GUI->GetActorListUI()->GetSelectedActorID();
-		if (selectedID > 0 && OBJECT->GetActorList().count(selectedID) > 0)
-		{
-			if (!m_pGizmoCore)
-			{
-				SetupGizmo();
-			}
-
-			auto& actorMap = OBJECT->GetActorList();
-			auto _actor = actorMap.find(GUI->GetActorListUI()->GetSelectedActorID());
-			if (_actor != actorMap.end())
-			{
-				auto actor = _actor->second;
-				SetGizmoPosition(actor->GetPosition());
-			}
-
-			auto _axis = actorMap.find(GUI->GetActorListUI()->GetSelectedGizmoAxis());
-			if (_axis != actorMap.end())
-			{
-				auto actor = _actor->second;
-				auto axis = _axis->second;
-				if (!actor || !axis) return;
-
-				// 드래그 처리
-				POINT curMouse = INPUT->GetMousePos();
-				float deltaX = static_cast<float>(curMouse.x - m_vPrevMouse.x);
-				float deltaY = static_cast<float>(curMouse.y - m_vPrevMouse.y);
-				Vec3 newPos = m_vDragStartPos;
-
-				if (axis == m_pGizmoX)
-					newPos.x += deltaX * 0.07f;
-				else if (axis == m_pGizmoY)
-					newPos.y -= deltaY * 0.07f;
-				else if (axis == m_pGizmoZ)
-					newPos.z += deltaX * 0.07f;
-
-				actor->SetPosition(newPos);
-				SetGizmoPosition(actor->GetPosition());
-			}
-		}
-	}
-	else if (INPUT->GetButtonUp(LCLICK))
-	{
-		m_bDragging = false;
-		GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
-	}
 }
 
-void Editor::Render()
+void TestYoooooon::Render()
 {
 }
 
-void Editor::Destroy()
+void TestYoooooon::Destroy()
 {
 }
 
-void Editor::SetupEngineCamera()
+void TestYoooooon::SetupEngineCamera()
 {
 	m_pCameraActor = make_shared<ACameraActor>();
 
@@ -132,7 +75,7 @@ void Editor::SetupEngineCamera()
 	OBJECT->AddActor(m_pCameraActor);
 }
 
-void Editor::SetupSkybox()
+void TestYoooooon::SetupSkybox()
 {
 	m_pSky = make_shared<ASky>();
 	m_pSky->m_szName = L"Sky";
@@ -146,11 +89,12 @@ void Editor::SetupSkybox()
 	OBJECT->AddActor(m_pSky);
 }
 
-void Editor::SetupSunLight()
+void TestYoooooon::SetupSunLight()
 {
 	LIGHTMANAGER->Init();
 
 	m_pSunLight = make_shared<ALight>();
+	m_pSunLight->m_szName = L"SunLight";
 	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
 	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
@@ -162,102 +106,7 @@ void Editor::SetupSunLight()
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
 }
 
-void Editor::SetupGizmo()
-{
-	m_pGizmoCore = make_shared<AActor>();
-	m_pGizmoCore->m_szName = L"Gizmo";
-	shared_ptr<UMeshComponent> meshComponent =
-		meshLoader.Make("../Resources/Asset/gizmo.mesh.json");
-	m_pGizmoCore->SetMeshComponent(meshComponent);
-	m_pGizmoCore->SetScale(Vec3(0.04f, 0.04f, 0.04f));
-	OBJECT->AddActor(m_pGizmoCore);
-
-	float _boxScale = 5.0f;
-	float _boxPosition = 4.0f;
-
-	m_pGizmoX = make_shared<AActor>();
-	m_pGizmoX->m_szName = L"Gizmo";
-	m_pGizmoX->SetMeshComponent(meshComponent->GetChild(0));
-	shared_ptr<UBoxComponent> _pXBox = std::make_shared<UBoxComponent>();
-	_pXBox->m_bVisible = false;
-	_pXBox->SetShapeColor(Vec4(1.0f, 0.f, 0.f, 0.f));
-	_pXBox->SetLocalScale(Vec3(_boxScale, 0.4f, 0.4f));
-	_pXBox->SetLocalPosition(Vec3(_boxPosition, 0.0f, 0.0f));
-	_pXBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	m_pGizmoX->SetShapeComponent(_pXBox);
-	m_pGizmoX->SetScale(m_pGizmoCore->GetScale());
-	m_pGizmoX->SetPosition(m_pGizmoCore->GetPosition());
-	OBJECT->AddActor(m_pGizmoX);
-
-	m_pGizmoY = make_shared<AActor>();
-	m_pGizmoY->m_szName = L"Gizmo";
-	m_pGizmoY->SetMeshComponent(meshComponent->GetChild(1));
-	shared_ptr<UBoxComponent> _pYBox = std::make_shared<UBoxComponent>();
-	_pYBox->m_bVisible = false;
-	_pYBox->SetShapeColor(Vec4(0.f, 1.0f, 0.f, 0.f));
-	_pYBox->SetLocalScale(Vec3(0.4f, _boxScale, 0.4f));
-	_pYBox->SetLocalPosition(Vec3(0.0f, _boxPosition, 0.0f));
-	_pYBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	m_pGizmoY->SetShapeComponent(_pYBox);
-	m_pGizmoY->SetScale(m_pGizmoCore->GetScale());
-	m_pGizmoY->SetPosition(m_pGizmoCore->GetPosition());
-	OBJECT->AddActor(m_pGizmoY);
-
-	m_pGizmoZ = make_shared<AActor>();
-	m_pGizmoZ->m_szName = L"Gizmo";
-	m_pGizmoZ->SetMeshComponent(meshComponent->GetChild(2));
-	shared_ptr<UBoxComponent> _pZBox = std::make_shared<UBoxComponent>();
-	_pZBox->m_bVisible = false;
-	_pZBox->SetShapeColor(Vec4(0.f, 0.f, 1.0f, 0.f));
-	_pZBox->SetLocalScale(Vec3(0.4f, 0.4f, _boxScale));
-	_pZBox->SetLocalPosition(Vec3(0.0f, 0.0f, _boxPosition));
-	_pZBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	m_pGizmoZ->SetShapeComponent(_pZBox);
-	m_pGizmoZ->SetScale(m_pGizmoCore->GetScale());
-	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
-	OBJECT->AddActor(m_pGizmoZ);
-
-	//shared_ptr<UShapeComponent> _pRootShape = std::make_shared<UShapeComponent>();
-	//_pRootShape->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	//_pRootShape->SetLocalScale(Vec3(1.0f, 1.0f, 1.0f));
-
-	//shared_ptr<UBoxComponent> _pXBox = nullptr;
-	//_pXBox = std::make_shared<UBoxComponent>();
-	//_pXBox->SetLocalScale(Vec3(1.0f, 0.1f, 0.1f));
-	//_pXBox->SetLocalPosition(Vec3(1.2f, 0.0f, 0.0f));
-	//_pXBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	//_pRootShape->AddChild(_pXBox);
-
-	//shared_ptr<UBoxComponent> _YBox = nullptr;
-	//_YBox = std::make_shared<UBoxComponent>();
-	//_YBox->SetLocalScale(Vec3(0.1f, 1.0f, 0.1f));
-	//_YBox->SetLocalPosition(Vec3(0.0f, 1.2f, 0.0f));
-	//_YBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	//_pRootShape->AddChild(_YBox);
-
-	//shared_ptr<UBoxComponent> _ZBox = nullptr;
-	//_ZBox = std::make_shared<UBoxComponent>();
-	//_ZBox->SetLocalScale(Vec3(0.1f, 0.1f, 1.0f));
-	//_ZBox->SetLocalPosition(Vec3(0.0f, 0.0f, 1.2f));
-	//_ZBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	//_pRootShape->AddChild(_ZBox);
-
-	//m_pGizmo->SetShapeComponent(_pRootShape);
-
-	//m_pGizmo->SetScale(Vec3(0.01f, 0.01f, 0.01f));
-	//m_pGizmo->SetPosition(Vec3(0, 10.0f, 0));
-	//OBJECT->AddActor(m_pGizmo);
-}
-
-void Editor::SetGizmoPosition(Vec3 _pos)
-{
-	m_pGizmoCore->SetPosition(Vec3(_pos.x, _pos.y + 1.0f, _pos.z));
-	m_pGizmoX->SetPosition(m_pGizmoCore->GetPosition());
-	m_pGizmoY->SetPosition(m_pGizmoCore->GetPosition());
-	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
-}
-
-void Editor::SetupEditorCallbacks()
+void TestYoooooon::SetupEditorCallbacks()
 {
 	SetupCharacterEditorCallback();
 	SetupMapEditorCallback();
@@ -265,7 +114,7 @@ void Editor::SetupEditorCallbacks()
 	SetupUIEditorCallback();
 }
 
-void Editor::SetupCharacterEditorCallback()
+void TestYoooooon::SetupCharacterEditorCallback()
 {
 	GUI->SetCharacterEditorCallback(
 		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position,
@@ -322,7 +171,7 @@ void Editor::SetupCharacterEditorCallback()
 		});
 }
 
-void Editor::SetupMapEditorCallback()
+void TestYoooooon::SetupMapEditorCallback()
 {
 	GUI->SetMapEditorCallback([this]()
 		{
@@ -369,9 +218,8 @@ void Editor::SetupMapEditorCallback()
 		});
 }
 
-void Editor::SetupObjectEditorCallback()
+void TestYoooooon::SetupObjectEditorCallback()
 {
-
 	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 emissiveColor, float emissivepower, ShapeComponentData shapeData)
 		{
 			ActorLoader al;
@@ -422,7 +270,7 @@ void Editor::SetupObjectEditorCallback()
 		});
 }
 
-void Editor::SetupUIEditorCallback()
+void TestYoooooon::SetupUIEditorCallback()
 {
 	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Vec4 sliceUV)
 		{
@@ -453,46 +301,8 @@ void Editor::SetupUIEditorCallback()
 		});
 }
 
-void Editor::SetClickPos()
+void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 {
-	MouseRay m_vRay;
-	m_vRay.Click();
-
-	shared_ptr<AActor> pActor = nullptr;
-	if (Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor))
-	{
-		if (!pActor) return;
-
-		if (pActor->m_szName != L"Gizmo")
-		{
-			GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
-			GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
-		}
-		else
-		{
-			if (pActor == m_pGizmoX)
-				GUI->GetActorListUI()->SetSelectedGizmoAxis(pActor->m_Index);
-			else if (pActor == m_pGizmoY)
-				GUI->GetActorListUI()->SetSelectedGizmoAxis(pActor->m_Index);
-			else if (pActor == m_pGizmoZ)
-				GUI->GetActorListUI()->SetSelectedGizmoAxis(pActor->m_Index);
-
-			m_pSelectedGizmo = pActor;
-			m_bDragging = true;
-			m_vPrevMouse = INPUT->GetMousePos();
-
-			auto actor = OBJECT->GetActor(GUI->GetActorListUI()->GetSelectedActorID());
-			if (actor)
-			{
-				m_vDragStartPos = actor->GetPosition();
-			}
-		}
-	}
-}
-
-void Editor::LoadAllPrefabs(const std::string& extension)
-{
-
 	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
 
 	for (const auto& file : files)
@@ -520,6 +330,12 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadCharacter(file, characterData))
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
+
+				ActorLoader actorLoader;
+				actorLoader.LoadAllAsset();
+				MeshLoader meshLoader;
+				meshLoader.SetMesh(actorLoader.LoadMeshMap());
+				meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
 				shared_ptr<UMeshComponent> meshComponent = meshLoader.Make(characterData.MeshPath.c_str());
 
@@ -566,31 +382,19 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 			PrefabObjectData objData;
 			if (PREFAB->LoadObject(file, objData))
 			{
-				shared_ptr<UStaticMeshComponent> meshComp = make_shared<UStaticMeshComponent>();
-				if (SplitExt(to_mw(objData.MeshPath)) == L".obj")
-				{
-					AssimpLoader loader;
-					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
-					meshComp->SetMeshPath(to_mw(objData.MeshPath)); // 이거 풀네임으로 들어가야되는건가 ? 나중에 어디서 쓰이나 ? 
-					auto meshRes = make_shared<UStaticMeshResources>();
-					if (!meshList.empty())
-					{
-						meshRes->SetVertexList(meshList[0].m_vVertexList);
-						meshRes->SetIndexList(meshList[0].m_vIndexList);
-						meshRes->Create();
-						meshComp->SetMesh(meshRes);
-					}
+				auto meshComp = make_shared<UStaticMeshComponent>();
+				meshComp->SetMeshPath(to_mw(objData.MeshPath));
 
-				}
-				else
+				auto meshRes = make_shared<UStaticMeshResources>();
+				AssimpLoader loader;
+				vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
+				if (!meshList.empty())
 				{
-					ActorLoader al;
-					al.LoadOne(objData.MeshPath);
-					meshComp->SetMeshPath(to_mw(objData.MeshPath));
-					auto resources = al.LoadMeshResources();
-					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources[0]));
+					meshRes->SetVertexList(meshList[0].m_vVertexList);
+					meshRes->SetIndexList(meshList[0].m_vIndexList);
+					meshRes->Create();
+					meshComp->SetMesh(meshRes);
 				}
-
 
 				auto material = make_shared<UMaterial>();
 				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
@@ -666,5 +470,6 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 				UI->AddUI(uiActor);
 			}
 		}
+
 	}
 }

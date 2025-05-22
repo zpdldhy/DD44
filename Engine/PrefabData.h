@@ -50,7 +50,7 @@ struct PrefabCharacterData
     int AnimIndex;
     float AnimSpeed;
 
-    ActorData actor;
+    TransformData transform;
 
     // Component
 	CameraComponentData camera;
@@ -63,6 +63,23 @@ struct PrefabCharacterData
     };
     std::vector<ChildMeshData> ChildMeshes;
 
+};
+
+struct PrefabUIData
+{
+    std::string Name;
+
+    TransformData transform;
+
+	float SliceUV[4];
+
+    std::string IdleTexturePath;
+    std::string HoverTexturePath;
+    std::string ActiveTexturePath;
+    std::string SelectedTexturePath;
+    std::string ShaderPath;
+
+    int ScriptType;
 };
 
 struct ModifiedCellData

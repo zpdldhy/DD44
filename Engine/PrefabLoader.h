@@ -21,8 +21,15 @@ public:
 	bool LoadObject(const std::string& _filePath, PrefabObjectData& _prefab);
 	bool LoadObjectArray(const std::string& _filePath, std::vector<PrefabObjectData>& _outPrefabs);
 
+	bool SaveUI(const PrefabUIData& _prefab, const std::string& _filePath);
+	bool LoadUI(const std::string& _filePath, PrefabUIData& _prefab);
+
+	bool DeletePrefab(const std::string& _filePath);
+
 private:
-	void LoadActor(json& j, PrefabCharacterData& data);
+	void SaveTransform(json& j, const TransformData& data);
+
+	void LoadTransform(json& j, TransformData& data);
 	void LoadCameraComponent(json& j, CameraComponentData& data);
 	void LoadShapeComponent(json& j, ShapeComponentData& data);
 
