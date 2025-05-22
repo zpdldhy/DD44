@@ -3,6 +3,12 @@
 #include "UIState.h"
 #include "PrefabData.h"
 
+struct UISliceData
+{
+	// x는 left, y는 right, z는 top, w는 bottom
+	Vec4 vSlice;
+};
+
 class Texture;
 
 class AUIActor : public AActor
@@ -12,7 +18,12 @@ public:
 	virtual ~AUIActor() = default;
 
 public:
+	void Init() override;
 	void Tick() override;
+	void Render() override;
+
+public:
+	void CreateUISlice();
 
 public:
 	void SetState(shared_ptr<UIState> _pState) { m_pState = _pState; }
@@ -24,11 +35,18 @@ public:
 	void SetActiveTexture(shared_ptr<Texture> _pTexture) { m_pActiveTexture = _pTexture; }
 	void SetSelectTexture(shared_ptr<Texture> _pTexture) { m_pSelectTexture = _pTexture; }
 
+	// 9-slice
+	void SetSliceData(const Vec4& _vSlice) { m_tUISliceData.vSlice = _vSlice; }
+
 	// Prefab
 	void SetPrefabData(const PrefabUIData& _data) { m_PrefabData = _data; }
 	PrefabUIData GetPrefabData() { return m_PrefabData; }
 
 private:
+	// Constants
+	UISliceData m_tUISliceData = { {0.5f, 0.5f, 0.5f, 0.5f}, };
+	static ComPtr<ID3D11Buffer> m_pUISliceCB;
+
 	// State
 	shared_ptr<UIState> m_pState = nullptr;
 	UIStateType m_eStateType = UIStateType::ST_IDLE;

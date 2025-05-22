@@ -13,20 +13,18 @@ void UIEditorUI::DrawUI()
 {
 	// ───────────────────────────── Init ─────────────────────────────	
 
+	m_vTextureList.emplace_back("../Resources/Texture/UI/white.png");
+	m_vTextureNameList.emplace_back("white.png");
+
+	string searchPath = "../Resources/Texture/UI/";
+
+	// 만약 다른 형식의 파일도 필요하다면 여기에 추가
+	SearchFile(searchPath, ".png", m_vTextureList, m_vTextureNameList);
+	SearchFile(searchPath, ".jpg", m_vTextureList, m_vTextureNameList);
+	SearchFile(searchPath, ".bmp", m_vTextureList, m_vTextureNameList);
+
+
 	SelectActor();
-
-	if (m_pUIActor)
-	{
-		m_vTextureList.emplace_back("../Resources/Texture/UI/white.png");
-		m_vTextureNameList.emplace_back("white.png");
-
-		string searchPath = "../Resources/Texture/UI/";
-
-		// 만약 다른 형식의 파일도 필요하다면 여기에 추가
-		SearchFile(searchPath, ".png", m_vTextureList, m_vTextureNameList);
-		SearchFile(searchPath, ".jpg", m_vTextureList, m_vTextureNameList);
-		SearchFile(searchPath, ".bmp", m_vTextureList, m_vTextureNameList);
-	}
 
 	// ───────────────────────────── Create ─────────────────────────────
 
@@ -41,12 +39,19 @@ void UIEditorUI::DrawUI()
 			m_pUIActor,
 			m_vTextureList[0].c_str(),	// white.png
 			m_szShaderPath,
-			m_Trans
+			m_Trans,
+			Vec4(m_vSliceUV)
 		);
 	}
 
 	if (m_pUIActor == nullptr)
+	{
+		m_vPrefabList.clear();
+		m_vPrefabNameList.clear();
+		m_vTextureList.clear();
+		m_vTextureNameList.clear();
 		return;
+	}
 
 	// ───────────────────────────── Delete ─────────────────────────────
 	ImGui::SameLine(0, 212.5f);
@@ -68,6 +73,140 @@ void UIEditorUI::DrawUI()
 
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Transform");
 
+	SetTransform();
+
+	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+
+	// ───────────────────────────── SliceUV ─────────────────────────────
+
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "SliceUV");
+
+	SetSliceUV();
+
+	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+
+	// ───────────────────────────── Materials ─────────────────────────────
+
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Materials");
+
+	SetTexture();
+
+	ImGui::InputText("Shader", m_szShaderPath, IM_ARRAYSIZE(m_szShaderPath));
+
+	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+
+	// ───────────────────────────── Update ─────────────────────────────
+
+	UpdatePrefabData();
+	UpdateUIActor();
+
+	// ───────────────────────────── Prefab Save/Load/Delete ─────────────────────────────
+
+	searchPath = "../Resources/Prefab/";
+
+	// 만약 다른 형식의 파일도 필요하다면 여기에 추가
+	SearchFile(searchPath, ".ui.json", m_vPrefabList, m_vPrefabNameList);
+
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Prefab Tools");
+
+	SavePrefab();
+
+	ImGui::Separator(); ImGui::Spacing();
+
+	LoadPrefab();
+
+	ImGui::Separator(); ImGui::Spacing();
+
+	DeletePrefab();
+
+	m_vPrefabList.clear();
+	m_vPrefabNameList.clear();
+	m_vTextureList.clear();
+	m_vTextureNameList.clear();
+}
+
+void UIEditorUI::DrawVec3(const char* label, float* values)
+{
+	ImGui::PushID(label);
+	ImGui::Text("%s", label);
+	ImGui::Indent(10.0f);
+
+	const float inputWidth = 60.0f;
+	const float spacing = 20.0f;
+
+
+	for (int i = 0; i < 3; ++i)
+	{
+		ImGui::SameLine(0, spacing);
+
+		ImGui::PushID(i);
+
+		ImGui::PushItemWidth(inputWidth);
+		ImGui::InputFloat("##Value", &values[i], 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+
+		ImGui::PopID();
+	}
+
+	ImGui::Unindent(10.0f);
+	ImGui::PopID();
+}
+
+void UIEditorUI::UpdatePrefabData()
+{
+	m_CurrentPrefab.Name = to_wm(m_pUIActor->m_szName);
+
+	memcpy(m_CurrentPrefab.transform.Scale, m_Trans.Scale, sizeof(float) * 3);
+	memcpy(m_CurrentPrefab.transform.Rotation, m_Trans.Rotation, sizeof(float) * 3);
+	memcpy(m_CurrentPrefab.transform.Position, m_Trans.Position, sizeof(float) * 3);
+
+	memcpy(m_CurrentPrefab.SliceUV, m_vSliceUV, sizeof(float) * 4);
+
+	// Texture
+	m_CurrentPrefab.IdleTexturePath = m_vTextureList[m_iIdleIndex];
+	m_CurrentPrefab.HoverTexturePath = m_vTextureList[m_iHoverIndex];
+	m_CurrentPrefab.ActiveTexturePath = m_vTextureList[m_iActiveIndex];
+	m_CurrentPrefab.SelectedTexturePath = m_vTextureList[m_iSelectedIndex];
+
+	m_CurrentPrefab.ShaderPath = m_szShaderPath;
+}
+
+void UIEditorUI::UpdateUIActor()
+{
+	if (m_pUIActor == nullptr)
+		return;
+
+	m_pUIActor->SetPosition(Vec3(m_Trans.Position));
+	m_pUIActor->SetRotation(Vec3(m_Trans.Rotation));
+	m_pUIActor->SetScale(Vec3(m_Trans.Scale));
+
+	m_pUIActor->SetSliceData(Vec4(m_vSliceUV[0], m_vSliceUV[1], m_vSliceUV[2], m_vSliceUV[3]));
+
+	m_pUIActor->SetPrefabData(m_CurrentPrefab);
+}
+
+void UIEditorUI::ResetData()
+{
+	// Transform
+	for (int i = 0; i < 3; i++) m_Trans.Position[i] = 0.0f;
+	for (int i = 0; i < 3; i++) m_Trans.Rotation[i] = 0.0f;
+	for (int i = 0; i < 2; i++) m_Trans.Scale[i] = 100.0f;
+	// Slice
+	for (int i = 0; i < 4; i++) m_vSliceUV[i] = 0.5f;
+
+	m_Trans.Scale[2] = 1.0f;
+
+	// Texture
+	m_iIdleIndex = 0;
+	m_iHoverIndex = 0;
+	m_iActiveIndex = 0;
+	m_iSelectedIndex = 0;
+
+	strcpy_s(m_szShaderPath, "../Resources/Shader/UVSlice.hlsl");
+}
+
+void UIEditorUI::SetTransform()
+{
 	ImGui::SameLine(0, 37.5f); ImGui::Text("%s", "X");
 	ImGui::SameLine(0, 72.5f); ImGui::Text("%s", "Y");
 	ImGui::SameLine(0, 72.5f); ImGui::Text("%s", "Z");
@@ -75,8 +214,6 @@ void UIEditorUI::DrawUI()
 	DrawVec3("Position", m_Trans.Position);
 	DrawVec3("Rotation", m_Trans.Rotation);
 	DrawVec3("Scale   ", m_Trans.Scale);
-
-	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
 	m_ptCurrentMousePos = INPUT->GetMousePos();
 
@@ -139,118 +276,35 @@ void UIEditorUI::DrawUI()
 	}
 
 	m_ptPrevMousePos = m_ptCurrentMousePos;
-
-	// ───────────────────────────── Materials ─────────────────────────────
-
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Materials");
-
-	SetTexture();
-
-	ImGui::InputText("Shader", m_szShaderPath, IM_ARRAYSIZE(m_szShaderPath));
-
-	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
-
-	// ───────────────────────────── Update ─────────────────────────────
-
-	UpdatePrefabData();
-	UpdateUIActor();
-
-	// ───────────────────────────── Prefab Save/Load/Delete ─────────────────────────────
-
-	string searchPath = "../Resources/Prefab/";
-
-	// 만약 다른 형식의 파일도 필요하다면 여기에 추가
-	SearchFile(searchPath, ".ui.json", m_vPrefabList, m_vPrefabNameList);
-
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Prefab Tools");
-
-	SavePrefab();
-
-	ImGui::Separator(); ImGui::Spacing();
-
-	LoadPrefab();
-
-	ImGui::Separator(); ImGui::Spacing();
-
-	DeletePrefab();
-
-	m_vPrefabList.clear();
-	m_vPrefabNameList.clear();
-	m_vTextureList.clear();
-	m_vTextureNameList.clear();
 }
 
-void UIEditorUI::DrawVec3(const char* label, float* values)
+void UIEditorUI::SetSliceUV()
 {
-	ImGui::PushID(label);
-	ImGui::Text("%s", label);
-	ImGui::Indent(10.0f);
+	ImGui::SameLine(0, 25.f); ImGui::Text("%s", "Left");
+	ImGui::SameLine(0, 50.f); ImGui::Text("%s", "Right");
+	ImGui::SameLine(0, 50.f); ImGui::Text("%s", "Top");
+	ImGui::SameLine(0, 50.f); ImGui::Text("%s", "Bottom");
+
+	ImGui::PushID("SliceUV");
+	ImGui::Indent(60.f);
 
 	const float inputWidth = 60.0f;
-	const float spacing = 20.0f;
+	const float spacing = 20.f;
 
-
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
-		ImGui::SameLine(0, spacing);
-
 		ImGui::PushID(i);
 
 		ImGui::PushItemWidth(inputWidth);
-		ImGui::InputFloat("##Value", &values[i], 0.0f, 0.0f, "%.2f");
+		ImGui::InputFloat("##Value", &m_vSliceUV[i], 0.0f, 0.0f, "%.2f");
 		ImGui::PopItemWidth();
 
 		ImGui::PopID();
+		ImGui::SameLine(0, spacing);
 	}
 
-	ImGui::Unindent(10.0f);
+	ImGui::Unindent(60.f);
 	ImGui::PopID();
-}
-
-void UIEditorUI::UpdatePrefabData()
-{
-	m_CurrentPrefab.Name = to_wm(m_pUIActor->m_szName);
-
-	memcpy(m_CurrentPrefab.transform.Scale, m_Trans.Scale, sizeof(float) * 3);
-	memcpy(m_CurrentPrefab.transform.Rotation, m_Trans.Rotation, sizeof(float) * 3);
-	memcpy(m_CurrentPrefab.transform.Position, m_Trans.Position, sizeof(float) * 3);
-
-	// Texture
-	m_CurrentPrefab.IdleTexturePath = m_vTextureList[m_iIdleIndex];
-	m_CurrentPrefab.HoverTexturePath = m_vTextureList[m_iHoverIndex];
-	m_CurrentPrefab.ActiveTexturePath = m_vTextureList[m_iActiveIndex];
-	m_CurrentPrefab.SelectedTexturePath = m_vTextureList[m_iSelectedIndex];
-
-	m_CurrentPrefab.ShaderPath = m_szShaderPath;
-}
-
-void UIEditorUI::UpdateUIActor()
-{
-	if (m_pUIActor == nullptr)
-		return;
-
-	m_pUIActor->SetPosition(Vec3(m_Trans.Position));
-	m_pUIActor->SetRotation(Vec3(m_Trans.Rotation));
-	m_pUIActor->SetScale(Vec3(m_Trans.Scale));
-
-	m_pUIActor->SetPrefabData(m_CurrentPrefab);
-}
-
-void UIEditorUI::ResetData()
-{
-	// Transform
-	for (int i = 0; i < 3; i++) m_Trans.Position[i] = 0.0f;
-	for (int i = 0; i < 3; i++) m_Trans.Rotation[i] = 0.0f;
-	for (int i = 0; i < 2; i++) m_Trans.Scale[i] = 100.0f;
-	m_Trans.Scale[2] = 1.0f;
-
-	// Texture
-	m_iIdleIndex = 0;
-	m_iHoverIndex = 0;
-	m_iActiveIndex = 0;
-	m_iSelectedIndex = 0;
-
-	strcpy_s(m_szShaderPath, "../Resources/Shader/Default.hlsl");
 }
 
 void UIEditorUI::SetTexture()
@@ -390,6 +444,8 @@ void UIEditorUI::ResolvePrefabData(const PrefabUIData& data)
 	memcpy(m_Trans.Scale, data.transform.Scale, sizeof(float) * 3);
 	memcpy(m_Trans.Rotation, data.transform.Rotation, sizeof(float) * 3);
 	memcpy(m_Trans.Position, data.transform.Position, sizeof(float) * 3);
+
+	memcpy(m_vSliceUV, data.SliceUV, sizeof(float) * 4);
 
 	// Texture
 	for (size_t i = 0; i < m_vTextureList.size(); ++i)

@@ -136,6 +136,9 @@
     <FxCompile Include="..\Resources\Shader\Sword.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\Resources\Shader\UVSlice.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources\Shader\Header.hlsli">
@@ -143,6 +146,9 @@
     </None>
     <None Include="..\Resources\Prefab\MyTile.map.json">
       <Filter>Prefab</Filter>
+    </None>
+    <None Include="..\Resources\Shader\MainHeader.hlsli">
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -338,6 +338,8 @@ bool PrefabLoader::SaveUI(const PrefabUIData& _prefab, const std::string& _fileP
 
 	SaveTransform(j, _prefab.transform);
 
+    j["SliceUV"] = { _prefab.SliceUV[0], _prefab.SliceUV[1], _prefab.SliceUV[2], _prefab.SliceUV[3]};
+
 	j["TexturePath"] = {
 		{ "Idle", _prefab.IdleTexturePath },
 		{ "Hover", _prefab.HoverTexturePath },
@@ -365,6 +367,9 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
 	_prefab.Name = j["Name"];
 
 	LoadTransform(j, _prefab.transform);
+
+	auto s = j["SliceUV"];
+    for (int i = 0; i < 4; i++)	_prefab.SliceUV[i] = s[i];
 
 	_prefab.IdleTexturePath = j["TexturePath"]["Idle"];
 	_prefab.HoverTexturePath = j["TexturePath"]["Hover"];

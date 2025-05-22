@@ -260,7 +260,7 @@ void Game::SetupObjectEditorCallback()
 
 void Game::SetupUIEditorCallback()
 {
-	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData)
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Vec4 sliceUV)
 		{
 			uiActor->m_szName = L"UI";
 			auto meshComp = UStaticMeshComponent::CreatePlane();
@@ -282,6 +282,7 @@ void Game::SetupUIEditorCallback()
 			uiActor->SetPosition(Vec3(actorData.Position));
 			uiActor->SetRotation(Vec3(actorData.Rotation));
 			uiActor->SetScale(Vec3(actorData.Scale));
+			uiActor->SetSliceData(sliceUV);
 
 			UI->AddUI(uiActor);
 		});

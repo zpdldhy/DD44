@@ -261,13 +261,14 @@ void TestYoooooon::SetupObjectEditorCallback()
 
 void TestYoooooon::SetupUIEditorCallback()
 {
-	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData)
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Vec4 sliceUV)
 		{
 			uiActor->m_szName = L"UI";
 			auto meshComp = UStaticMeshComponent::CreatePlane();
 			uiActor->SetMeshComponent(meshComp);
 
 			auto mat = make_shared<UMaterial>();
+			mat->SetUseEffect(false);
 			mat->Load(
 				std::wstring(texPath, texPath + strlen(texPath)),
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
@@ -283,6 +284,7 @@ void TestYoooooon::SetupUIEditorCallback()
 			uiActor->SetPosition(Vec3(actorData.Position));
 			uiActor->SetRotation(Vec3(actorData.Rotation));
 			uiActor->SetScale(Vec3(actorData.Scale));
+			uiActor->SetSliceData(sliceUV);
 
 			UI->AddUI(uiActor);
 		});
@@ -445,6 +447,7 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 				uiActor->SetMeshComponent(meshComp);
 
 				auto mat = make_shared<UMaterial>();
+				mat->SetUseEffect(false);
 				mat->Load(L"", to_mw(uiData.ShaderPath));
 				meshComp->SetMaterial(mat);
 
@@ -457,6 +460,7 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 				uiActor->SetPosition(Vec3(uiData.transform.Position));
 				uiActor->SetRotation(Vec3(uiData.transform.Rotation));
 				uiActor->SetScale(Vec3(uiData.transform.Scale));
+				uiActor->SetSliceData(Vec4(uiData.SliceUV));
 
 				uiActor->SetPrefabData(uiData);
 

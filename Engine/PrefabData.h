@@ -69,6 +69,8 @@ struct PrefabUIData
 
     TransformData transform;
 
+	float SliceUV[4];
+
     std::string IdleTexturePath;
     std::string HoverTexturePath;
     std::string ActiveTexturePath;

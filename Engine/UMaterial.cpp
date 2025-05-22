@@ -37,7 +37,7 @@ void UMaterial::Bind()
         DC->IASetInputLayout(m_pInputlayout->m_pInputLayout.Get());
 	}
 
-	if (m_pEffectCB)
+	if (m_pEffectCB && m_bUseEffect)
 	{
         DC->VSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
         DC->PSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
