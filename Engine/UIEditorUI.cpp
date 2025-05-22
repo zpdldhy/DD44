@@ -13,7 +13,9 @@ void UIEditorUI::DrawUI()
 {
 	// ───────────────────────────── Init ─────────────────────────────	
 
-	if (m_vTextureList.empty() && m_vTextureNameList.empty())
+	SelectActor();
+
+	if (m_pUIActor)
 	{
 		m_vTextureList.emplace_back("../Resources/Texture/UI/white.png");
 		m_vTextureNameList.emplace_back("white.png");
@@ -23,10 +25,8 @@ void UIEditorUI::DrawUI()
 		// 만약 다른 형식의 파일도 필요하다면 여기에 추가
 		SearchFile(searchPath, ".png", m_vTextureList, m_vTextureNameList);
 		SearchFile(searchPath, ".jpg", m_vTextureList, m_vTextureNameList);
-		SearchFile(searchPath, ".bmp", m_vTextureList, m_vTextureNameList);		
+		SearchFile(searchPath, ".bmp", m_vTextureList, m_vTextureNameList);
 	}
-
-	SelectActor();
 
 	// ───────────────────────────── Create ─────────────────────────────
 
@@ -65,7 +65,7 @@ void UIEditorUI::DrawUI()
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
 	// ───────────────────────────── Transform ─────────────────────────────
-	
+
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Transform");
 
 	ImGui::SameLine(0, 37.5f); ImGui::Text("%s", "X");
@@ -104,7 +104,7 @@ void UIEditorUI::DrawUI()
 			m_Trans.Position[1] = static_cast<float>(m_ptCurrentMousePos.y);
 		}
 		// Scale 조정
-		else 
+		else
 		{
 			POINT ptDiff = { m_ptCurrentMousePos.x - m_ptPrevMousePos.x, m_ptCurrentMousePos.y - m_ptPrevMousePos.y };
 
@@ -141,7 +141,7 @@ void UIEditorUI::DrawUI()
 	m_ptPrevMousePos = m_ptCurrentMousePos;
 
 	// ───────────────────────────── Materials ─────────────────────────────
-	
+
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Materials");
 
 	SetTexture();
@@ -151,12 +151,12 @@ void UIEditorUI::DrawUI()
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
 	// ───────────────────────────── Update ─────────────────────────────
-	
+
 	UpdatePrefabData();
 	UpdateUIActor();
 
 	// ───────────────────────────── Prefab Save/Load/Delete ─────────────────────────────
-	
+
 	string searchPath = "../Resources/Prefab/";
 
 	// 만약 다른 형식의 파일도 필요하다면 여기에 추가
@@ -176,6 +176,8 @@ void UIEditorUI::DrawUI()
 
 	m_vPrefabList.clear();
 	m_vPrefabNameList.clear();
+	m_vTextureList.clear();
+	m_vTextureNameList.clear();
 }
 
 void UIEditorUI::DrawVec3(const char* label, float* values)
@@ -196,7 +198,7 @@ void UIEditorUI::DrawVec3(const char* label, float* values)
 
 		ImGui::PushItemWidth(inputWidth);
 		ImGui::InputFloat("##Value", &values[i], 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();		
+		ImGui::PopItemWidth();
 
 		ImGui::PopID();
 	}
@@ -224,12 +226,12 @@ void UIEditorUI::UpdatePrefabData()
 
 void UIEditorUI::UpdateUIActor()
 {
-	if(m_pUIActor==nullptr)
+	if (m_pUIActor == nullptr)
 		return;
 
 	m_pUIActor->SetPosition(Vec3(m_Trans.Position));
 	m_pUIActor->SetRotation(Vec3(m_Trans.Rotation));
-	m_pUIActor->SetScale(Vec3(m_Trans.Scale));	
+	m_pUIActor->SetScale(Vec3(m_Trans.Scale));
 
 	m_pUIActor->SetPrefabData(m_CurrentPrefab);
 }
@@ -291,6 +293,8 @@ void UIEditorUI::SetTexture()
 		iPreSelectedIndex = m_iSelectedIndex;
 		m_pUIActor->SetSelectTexture(TEXTURE->Get(to_mw(m_vTextureList[iPreSelectedIndex])));
 	}
+
+	NamePtrs.clear();
 }
 
 void UIEditorUI::SavePrefab()
@@ -324,6 +328,8 @@ void UIEditorUI::LoadPrefab()
 			ResolvePrefabData(data);
 		}
 	}
+
+	NamePtrs.clear();
 }
 
 void UIEditorUI::DeletePrefab()
@@ -351,7 +357,7 @@ void UIEditorUI::SearchFile(const string& _directory, const string& _extension, 
 			if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
 				// white가 최상단이 되도록
-				if(!strcmp(findData.cFileName, "white.png"))
+				if (!strcmp(findData.cFileName, "white.png"))
 					continue;
 
 				_vPaths.push_back(_directory + findData.cFileName);
@@ -376,7 +382,7 @@ void UIEditorUI::SelectActor()
 			ResolvePrefabData(m_CurrentPrefab);
 			break;
 		}
-	}	
+	}
 }
 
 void UIEditorUI::ResolvePrefabData(const PrefabUIData& data)
