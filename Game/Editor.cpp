@@ -91,16 +91,21 @@ void Editor::Update()
 				Vec3 newPos = m_vDragStartPos;
 
 				if (axis == m_pGizmoX)
-					newPos.x += deltaX * 0.1f;
+					newPos.x += deltaX * 0.07f;
 				else if (axis == m_pGizmoY)
-					newPos.y -= deltaY * 0.1f;
+					newPos.y -= deltaY * 0.07f;
 				else if (axis == m_pGizmoZ)
-					newPos.z += deltaX * 0.1f;
+					newPos.z += deltaX * 0.07f;
 
 				actor->SetPosition(newPos);
 				SetGizmoPosition(actor->GetPosition());
 			}
 		}
+	}
+	else if (INPUT->GetButtonUp(LCLICK))
+	{
+		m_bDragging = false;
+		GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
 	}
 }
 
