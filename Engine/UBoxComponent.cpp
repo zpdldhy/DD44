@@ -10,13 +10,22 @@ void UBoxComponent::Init()
 {
 	USceneComponent::Init();
 	UpdateBounds();
-	CreateCollisionRange();
+
+	if (m_bVisible)
+	{
+		CreateCollisionRange();
+	}
+
 }
 
 void UBoxComponent::Tick()
 {
 	USceneComponent::Tick();
-	UpdateCollisionRange();
+
+	if (m_bVisible)
+	{
+		UpdateCollisionRange();
+	}
 }
 
 void UBoxComponent::PreRender()
@@ -25,17 +34,20 @@ void UBoxComponent::PreRender()
 
 void UBoxComponent::Render()
 {
-	if (m_pCurrentRasterizer)
+	if (m_bVisible)
+	{
+		if (m_pCurrentRasterizer)
+			m_pCurrentRasterizer.Reset();
+
+		DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
+		DC->RSSetState(STATE->m_pRSWireFrame.Get());
+
+		m_pCollisionRange->Render();
+
+		DC->RSSetState(m_pCurrentRasterizer.Get());
+
 		m_pCurrentRasterizer.Reset();
-
-	DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
-	DC->RSSetState(STATE->m_pRSWireFrame.Get());
-
-	m_pCollisionRange->Render();
-
-	DC->RSSetState(m_pCurrentRasterizer.Get());
-
-	m_pCurrentRasterizer.Reset();
+	}
 }
 
 void UBoxComponent::PostRender()
@@ -44,7 +56,10 @@ void UBoxComponent::PostRender()
 
 void UBoxComponent::Destroy()
 {
-	m_pCollisionRange->Destroy();
+	if (m_pCollisionRange)
+	{
+		m_pCollisionRange->Destroy();
+	}
 }
 
 void UBoxComponent::UpdateBounds()
@@ -65,9 +80,9 @@ void UBoxComponent::CreateCollisionRange()
 	auto pMesh = UStaticMeshComponent::CreateCube();
 	m_pCollisionRange->SetMeshComponent(pMesh);
 
-	auto pMaterial = make_shared<UMaterial>();
-	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
-	pMesh->SetMaterial(pMaterial);
+	//auto pMaterial = make_shared<UMaterial>();
+	//pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
+	//pMesh->SetMaterial(pMaterial);
 
 	m_pCollisionRange->SetScale(m_vLocalScale);
 	m_pCollisionRange->SetPosition(m_Box.vCenter);
