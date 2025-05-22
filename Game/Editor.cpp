@@ -3,6 +3,7 @@
 #include "ImGuiCore.h"
 #include "ObjectManager.h"
 #include "CameraManager.h"
+#include "CollisionManager.h"
 #include "ACameraActor.h"
 #include "ASky.h"
 #include "ATerrainTileActor.h"
@@ -38,7 +39,6 @@ void Editor::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
-
 }
 
 void Editor::Update()
@@ -57,6 +57,51 @@ void Editor::Update()
 		}
 	}
 
+	if (INPUT->GetButtonDown(LCLICK))
+	{
+		SetClickPos();
+
+		UINT selectedID = GUI->GetActorListUI()->GetSelectedActorID();
+		if (selectedID > 0 && OBJECT->GetActorList().count(selectedID) > 0)
+		{
+			if (!m_pGizmoCore)
+			{
+				SetupGizmo();
+			}
+
+			auto& actorMap = OBJECT->GetActorList();
+			auto _actor = actorMap.find(GUI->GetActorListUI()->GetSelectedActorID());
+			if (_actor != actorMap.end())
+			{
+				auto actor = _actor->second;
+				SetGizmoPosition(actor->GetPosition());
+			}
+
+			auto _axis = actorMap.find(GUI->GetActorListUI()->GetSelectedGizmoAxis());
+			if (_axis != actorMap.end())
+			{
+				auto actor = _actor->second;
+				auto axis = _axis->second;
+				if (!actor || !axis) return;
+
+				// 드래그 처리
+				POINT curMouse = INPUT->GetMousePos();
+				float deltaX = static_cast<float>(curMouse.x - m_vPrevMouse.x);
+				float deltaY = static_cast<float>(curMouse.y - m_vPrevMouse.y);
+				Vec3 newPos = m_vDragStartPos;
+
+				if (axis == m_pGizmoX)
+					newPos.x += deltaX * 0.1f;
+				else if (axis == m_pGizmoY)
+					newPos.y -= deltaY * 0.1f;
+				else if (axis == m_pGizmoZ)
+					newPos.z += deltaX * 0.1f;
+
+				actor->SetPosition(newPos);
+				SetGizmoPosition(actor->GetPosition());
+			}
+		}
+	}
 }
 
 void Editor::Render()
@@ -107,6 +152,101 @@ void Editor::SetupSunLight()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
+}
+
+void Editor::SetupGizmo()
+{
+	m_pGizmoCore = make_shared<AActor>();
+	m_pGizmoCore->m_szName = L"Gizmo";
+	shared_ptr<UMeshComponent> meshComponent =
+		meshLoader.Make("../Resources/Asset/gizmo.mesh.json");
+	m_pGizmoCore->SetMeshComponent(meshComponent);
+	m_pGizmoCore->SetScale(Vec3(0.04f, 0.04f, 0.04f));
+	OBJECT->AddActor(m_pGizmoCore);
+
+	float _boxScale = 5.0f;
+	float _boxPosition = 4.0f;
+
+	m_pGizmoX = make_shared<AActor>();
+	m_pGizmoX->m_szName = L"Gizmo";
+	m_pGizmoX->SetMeshComponent(meshComponent->GetChild(0));
+	shared_ptr<UBoxComponent> _pXBox = std::make_shared<UBoxComponent>();
+	_pXBox->m_bVisible = false;
+	_pXBox->SetShapeColor(Vec4(1.0f, 0.f, 0.f, 0.f));
+	_pXBox->SetLocalScale(Vec3(_boxScale, 0.4f, 0.4f));
+	_pXBox->SetLocalPosition(Vec3(_boxPosition, 0.0f, 0.0f));
+	_pXBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	m_pGizmoX->SetShapeComponent(_pXBox);
+	m_pGizmoX->SetScale(m_pGizmoCore->GetScale());
+	m_pGizmoX->SetPosition(m_pGizmoCore->GetPosition());
+	OBJECT->AddActor(m_pGizmoX);
+
+	m_pGizmoY = make_shared<AActor>();
+	m_pGizmoY->m_szName = L"Gizmo";
+	m_pGizmoY->SetMeshComponent(meshComponent->GetChild(1));
+	shared_ptr<UBoxComponent> _pYBox = std::make_shared<UBoxComponent>();
+	_pYBox->m_bVisible = false;
+	_pYBox->SetShapeColor(Vec4(0.f, 1.0f, 0.f, 0.f));
+	_pYBox->SetLocalScale(Vec3(0.4f, _boxScale, 0.4f));
+	_pYBox->SetLocalPosition(Vec3(0.0f, _boxPosition, 0.0f));
+	_pYBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	m_pGizmoY->SetShapeComponent(_pYBox);
+	m_pGizmoY->SetScale(m_pGizmoCore->GetScale());
+	m_pGizmoY->SetPosition(m_pGizmoCore->GetPosition());
+	OBJECT->AddActor(m_pGizmoY);
+
+	m_pGizmoZ = make_shared<AActor>();
+	m_pGizmoZ->m_szName = L"Gizmo";
+	m_pGizmoZ->SetMeshComponent(meshComponent->GetChild(2));
+	shared_ptr<UBoxComponent> _pZBox = std::make_shared<UBoxComponent>();
+	_pZBox->m_bVisible = false;
+	_pZBox->SetShapeColor(Vec4(0.f, 0.f, 1.0f, 0.f));
+	_pZBox->SetLocalScale(Vec3(0.4f, 0.4f, _boxScale));
+	_pZBox->SetLocalPosition(Vec3(0.0f, 0.0f, _boxPosition));
+	_pZBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	m_pGizmoZ->SetShapeComponent(_pZBox);
+	m_pGizmoZ->SetScale(m_pGizmoCore->GetScale());
+	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
+	OBJECT->AddActor(m_pGizmoZ);
+
+	//shared_ptr<UShapeComponent> _pRootShape = std::make_shared<UShapeComponent>();
+	//_pRootShape->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	//_pRootShape->SetLocalScale(Vec3(1.0f, 1.0f, 1.0f));
+
+	//shared_ptr<UBoxComponent> _pXBox = nullptr;
+	//_pXBox = std::make_shared<UBoxComponent>();
+	//_pXBox->SetLocalScale(Vec3(1.0f, 0.1f, 0.1f));
+	//_pXBox->SetLocalPosition(Vec3(1.2f, 0.0f, 0.0f));
+	//_pXBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	//_pRootShape->AddChild(_pXBox);
+
+	//shared_ptr<UBoxComponent> _YBox = nullptr;
+	//_YBox = std::make_shared<UBoxComponent>();
+	//_YBox->SetLocalScale(Vec3(0.1f, 1.0f, 0.1f));
+	//_YBox->SetLocalPosition(Vec3(0.0f, 1.2f, 0.0f));
+	//_YBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	//_pRootShape->AddChild(_YBox);
+
+	//shared_ptr<UBoxComponent> _ZBox = nullptr;
+	//_ZBox = std::make_shared<UBoxComponent>();
+	//_ZBox->SetLocalScale(Vec3(0.1f, 0.1f, 1.0f));
+	//_ZBox->SetLocalPosition(Vec3(0.0f, 0.0f, 1.2f));
+	//_ZBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	//_pRootShape->AddChild(_ZBox);
+
+	//m_pGizmo->SetShapeComponent(_pRootShape);
+
+	//m_pGizmo->SetScale(Vec3(0.01f, 0.01f, 0.01f));
+	//m_pGizmo->SetPosition(Vec3(0, 10.0f, 0));
+	//OBJECT->AddActor(m_pGizmo);
+}
+
+void Editor::SetGizmoPosition(Vec3 _pos)
+{
+	m_pGizmoCore->SetPosition(Vec3(_pos.x, _pos.y + 1.0f, _pos.z));
+	m_pGizmoX->SetPosition(m_pGizmoCore->GetPosition());
+	m_pGizmoY->SetPosition(m_pGizmoCore->GetPosition());
+	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
 }
 
 void Editor::SetupEditorCallbacks()
@@ -223,7 +363,7 @@ void Editor::SetupMapEditorCallback()
 void Editor::SetupObjectEditorCallback()
 {
 
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 emissiveColor, float emissivepower, ShapeComponentData shapeData)
 		{
 			ActorLoader al;
 			al.LoadOne(objPath);
@@ -253,8 +393,61 @@ void Editor::SetupObjectEditorCallback()
 			actor->SetRotation(rot);
 			actor->SetScale(scale);
 
+			if (shapeData.isUse)
+			{
+				shared_ptr<UShapeComponent> shapeComp = nullptr;
+
+				if (shapeData.eShapeType == ShapeType::ST_BOX)
+					shapeComp = std::make_shared<UBoxComponent>();
+				//else if (shapeData.eShapeType == ShapeType::ST_SPHERE)
+
+				shapeComp->SetLocalScale(Vec3(shapeData.Scale));
+				shapeComp->SetLocalPosition(Vec3(shapeData.Position));
+				shapeComp->SetLocalRotation(Vec3(shapeData.Rotation));
+				shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+				actor->SetShapeComponent(shapeComp);
+			}
+
 			OBJECT->AddActor(actor);
 		});
+}
+
+void Editor::SetClickPos()
+{
+	MouseRay m_vRay;
+	m_vRay.Click();
+
+	shared_ptr<AActor> pActor = nullptr;
+	if (Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor))
+	{
+		if (!pActor) return;
+
+		if (pActor->m_szName != L"Gizmo")
+		{
+			GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
+		}
+		else
+		{
+			if (pActor == m_pGizmoX)
+				GUI->GetActorListUI()->SetSelectedGizmoAxis(pActor->m_Index);
+			else if (pActor == m_pGizmoY)
+				GUI->GetActorListUI()->SetSelectedGizmoAxis(pActor->m_Index);
+			else if (pActor == m_pGizmoZ)
+				GUI->GetActorListUI()->SetSelectedGizmoAxis(pActor->m_Index);
+
+			m_pSelectedGizmo = pActor;
+			m_bDragging = true;
+			m_vPrevMouse = INPUT->GetMousePos();
+
+			auto actor = OBJECT->GetActor(GUI->GetActorListUI()->GetSelectedActorID());
+			if (actor)
+			{
+				m_vDragStartPos = actor->GetPosition();
+			}
+		}
+	}
 }
 
 void Editor::LoadAllPrefabs(const std::string& extension)

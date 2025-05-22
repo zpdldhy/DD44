@@ -34,6 +34,7 @@
 #include "CollisionManager.h"
 #include "LightManager.h"
 #include "ALight.h"
+#include "EditorData.h"
 
 void TestSY::Init()
 {
@@ -304,7 +305,7 @@ void TestSY::Init()
 
 
 
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower, ShapeComponentData ShapeData)
 		{
 			ActorLoader al;
 			al.LoadOne(objPath);
@@ -455,7 +456,7 @@ void TestSY::SetClickPos()
 
 	shared_ptr<AActor> pActor = nullptr;
 
-	Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
+	//Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
 
 	if (pActor)
 		int i = 0;

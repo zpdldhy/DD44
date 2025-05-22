@@ -39,6 +39,27 @@ void ObjectEditorUI::DrawUI()
     ImGui::InputText("Texture", m_szTexturePath, IM_ARRAYSIZE(m_szTexturePath));
     ImGui::InputText("Shader", m_szShaderPath, IM_ARRAYSIZE(m_szShaderPath));
 
+    ImGui::Separator(); ImGui::Spacing();
+
+    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Shape Info 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Shape Configuration");
+    ImGui::Checkbox("Use Shape##Obj", &m_ShapeData.isUse);
+
+    static std::vector<std::string> shapeNames = { "Box", "Sphere" };
+    static std::vector<const char*> shapeNamePtrs;
+    if (shapeNamePtrs.empty())
+    {
+        for (auto& name : shapeNames)
+            shapeNamePtrs.push_back(name.c_str());
+    }
+
+    static int iSelectedShapeIndex = 0;
+    ImGui::Combo("Shape Type##Obj", &iSelectedShapeIndex, shapeNamePtrs.data(), (int)shapeNamePtrs.size());
+    m_ShapeData.eShapeType = (iSelectedShapeIndex == 0) ? ShapeType::ST_BOX : ShapeType::ST_SPHERE;
+
+    DrawVec3Slider("Shape Position##Obj", m_ShapeData.Position, -100.f, 100.f);
+    DrawVec3Slider("Shape Rotation##Obj", m_ShapeData.Rotation, -360.f, 360.f);
+    DrawVec3Slider("Shape Scale##Obj", m_ShapeData.Scale, 0.01f, 10.f);
 
     ImGui::Separator(); ImGui::Spacing();
 
@@ -54,7 +75,8 @@ void ObjectEditorUI::DrawUI()
             Vec3(m_fSpecularColor[0], m_fSpecularColor[1], m_fSpecularColor[2]),
             m_fShininess,
             Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]),
-            m_fEmissivePower
+            m_fEmissivePower,
+            m_ShapeData
         );
     }
 
@@ -80,6 +102,7 @@ void ObjectEditorUI::DrawUI()
         data.Shininess = m_fShininess;
         data.EmissiveColor = Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]);
         data.EmissivePower = m_fEmissivePower;
+        data.ShapeData = m_ShapeData;
 
         PrefabLoader().SaveObject(data, "../Resources/Prefab/" + data.Name + ".object.json");
     }
@@ -108,6 +131,7 @@ void ObjectEditorUI::DrawUI()
             m_fEmissiveColor[2] = data.EmissiveColor.z;
             m_fEmissivePower = data.EmissivePower;
 
+            m_ShapeData = data.ShapeData;
         }
     }
 
@@ -145,7 +169,8 @@ void ObjectEditorUI::DrawUI()
                         Vec3(m_fSpecularColor[0], m_fSpecularColor[1], m_fSpecularColor[2]),
                         m_fShininess,
                         Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]),
-                        m_fEmissivePower                        
+                        m_fEmissivePower,
+                        m_ShapeData
                     );
                 }
             }
