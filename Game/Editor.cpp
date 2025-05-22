@@ -39,7 +39,6 @@ void Editor::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
-	//SetupGizmo();
 }
 
 void Editor::Update()
@@ -58,9 +57,49 @@ void Editor::Update()
 		}
 	}
 
-	if (INPUT->GetButton(LCLICK))
+	if (INPUT->GetButtonDown(LCLICK))
 	{
 		SetClickPos();
+
+		UINT selectedID = GUI->GetActorListUI()->GetSelectedActorID();
+		if (selectedID > 0 && OBJECT->GetActorList().count(selectedID) > 0)
+		{
+			if (!m_pGizmoCore)
+			{
+				SetupGizmo();
+			}
+
+			auto& actorMap = OBJECT->GetActorList();
+			auto _actor = actorMap.find(GUI->GetActorListUI()->GetSelectedActorID());
+			if (_actor != actorMap.end())
+			{
+				auto actor = _actor->second;
+				SetGizmoPosition(actor->GetPosition());
+			}
+
+			auto _axis = actorMap.find(GUI->GetActorListUI()->GetSelectedGizmoAxis());
+			if (_axis != actorMap.end())
+			{
+				auto actor = _actor->second;
+				auto axis = _axis->second;
+				if (!actor || !axis) return;
+
+				// 드래그 처리
+				POINT curMouse = INPUT->GetMousePos();
+				float delta = static_cast<float>(curMouse.x - m_vPrevMouse.x);
+				Vec3 newPos = m_vDragStartPos;
+
+				if (axis == m_pGizmoX)
+					newPos.x += delta * 0.1f;
+				else if (axis == m_pGizmoY)
+					newPos.y += delta * 0.1f;
+				else if (axis == m_pGizmoZ)
+					newPos.z += delta * 0.1f;
+
+				actor->SetPosition(newPos);
+				SetGizmoPosition(actor->GetPosition());
+			}
+		}
 	}
 }
 
@@ -116,11 +155,55 @@ void Editor::SetupSunLight()
 
 void Editor::SetupGizmo()
 {
-	//m_pGizmo = make_shared<AActor>();
-	//m_pGizmo->m_szName = L"Gizmo";
-	//shared_ptr<UMeshComponent> meshComponent =
-	//	meshLoader.Make("../Resources/Asset/gizmo.mesh.json");
-	//m_pGizmo->SetMeshComponent(meshComponent);
+	m_pGizmoCore = make_shared<AActor>();
+	m_pGizmoCore->m_szName = L"Gizmo";
+	shared_ptr<UMeshComponent> meshComponent =
+		meshLoader.Make("../Resources/Asset/gizmo.mesh.json");
+	m_pGizmoCore->SetMeshComponent(meshComponent);
+	m_pGizmoCore->SetScale(Vec3(0.025f, 0.025f, 0.025f));
+	OBJECT->AddActor(m_pGizmoCore);
+
+	float _boxScale = 3.2f;
+	float _boxPosition = 2.5f;
+
+	m_pGizmoX = make_shared<AActor>();
+	m_pGizmoX->m_szName = L"Gizmo";
+	m_pGizmoX->SetMeshComponent(meshComponent->GetChild(0));
+	shared_ptr<UBoxComponent> _pXBox = std::make_shared<UBoxComponent>();
+	_pXBox->SetShapeColor(Vec4(1.0f, 0.f, 0.f, 0.f));
+	_pXBox->SetLocalScale(Vec3(_boxScale, 0.2f, 0.2f));
+	_pXBox->SetLocalPosition(Vec3(_boxPosition, 0.0f, 0.0f));
+	_pXBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	m_pGizmoX->SetShapeComponent(_pXBox);
+	m_pGizmoX->SetScale(m_pGizmoCore->GetScale());
+	m_pGizmoX->SetPosition(m_pGizmoCore->GetPosition());
+	OBJECT->AddActor(m_pGizmoX);
+
+	m_pGizmoY = make_shared<AActor>();
+	m_pGizmoY->m_szName = L"Gizmo";
+	m_pGizmoY->SetMeshComponent(meshComponent->GetChild(1));
+	shared_ptr<UBoxComponent> _pYBox = std::make_shared<UBoxComponent>();
+	_pXBox->SetShapeColor(Vec4(0.f, 1.0f, 0.f, 0.f));
+	_pYBox->SetLocalScale(Vec3(0.2f, _boxScale, 0.2f));
+	_pYBox->SetLocalPosition(Vec3(0.0f, _boxPosition, 0.0f));
+	_pYBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	m_pGizmoY->SetShapeComponent(_pYBox);
+	m_pGizmoY->SetScale(m_pGizmoCore->GetScale());
+	m_pGizmoY->SetPosition(m_pGizmoCore->GetPosition());
+	OBJECT->AddActor(m_pGizmoY);
+
+	m_pGizmoZ = make_shared<AActor>();
+	m_pGizmoZ->m_szName = L"Gizmo";
+	m_pGizmoZ->SetMeshComponent(meshComponent->GetChild(2));
+	shared_ptr<UBoxComponent> _pZBox = std::make_shared<UBoxComponent>();
+	_pXBox->SetShapeColor(Vec4(0.f, 0.f, 1.0f, 0.f));
+	_pZBox->SetLocalScale(Vec3(0.2f, 0.2f, _boxScale));
+	_pZBox->SetLocalPosition(Vec3(0.0f, 0.0f, _boxPosition));
+	_pZBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	m_pGizmoZ->SetShapeComponent(_pZBox);
+	m_pGizmoZ->SetScale(m_pGizmoCore->GetScale());
+	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
+	OBJECT->AddActor(m_pGizmoZ);
 
 	//shared_ptr<UShapeComponent> _pRootShape = std::make_shared<UShapeComponent>();
 	//_pRootShape->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
@@ -152,6 +235,14 @@ void Editor::SetupGizmo()
 	//m_pGizmo->SetScale(Vec3(0.01f, 0.01f, 0.01f));
 	//m_pGizmo->SetPosition(Vec3(0, 10.0f, 0));
 	//OBJECT->AddActor(m_pGizmo);
+}
+
+void Editor::SetGizmoPosition(Vec3 _pos)
+{
+	m_pGizmoCore->SetPosition(Vec3(_pos.x, _pos.y + 1.0f, _pos.z));
+	m_pGizmoX->SetPosition(m_pGizmoCore->GetPosition());
+	m_pGizmoY->SetPosition(m_pGizmoCore->GetPosition());
+	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
 }
 
 void Editor::SetupEditorCallbacks()
@@ -324,12 +415,33 @@ void Editor::SetClickPos()
 	m_vRay.Click();
 
 	shared_ptr<AActor> pActor = nullptr;
-
 	if (Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor))
 	{
-		if (pActor)
+		if (!pActor) return;
+
+		if (pActor->m_szName != L"Gizmo")
 		{
 			GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
+		}
+		else
+		{
+			if (pActor == m_pGizmoX)
+				GUI->GetActorListUI()->SetSelectedGizmoAxis(pActor->m_Index);
+			else if (pActor == m_pGizmoY)
+				GUI->GetActorListUI()->SetSelectedGizmoAxis(pActor->m_Index);
+			else if (pActor == m_pGizmoZ)
+				GUI->GetActorListUI()->SetSelectedGizmoAxis(pActor->m_Index);
+
+			m_pSelectedGizmo = pActor;
+			m_bDragging = true;
+			m_vPrevMouse = INPUT->GetMousePos();
+
+			auto actor = OBJECT->GetActor(GUI->GetActorListUI()->GetSelectedActorID());
+			if (actor)
+			{
+				m_vDragStartPos = actor->GetPosition();
+			}
 		}
 	}
 }

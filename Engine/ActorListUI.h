@@ -5,7 +5,12 @@ class ActorListUI
 public:
 	void DrawUI();
 	void Toggle();
+
+	UINT GetSelectedActorID();
+	UINT GetSelectedGizmoAxis();
+
 	void SetSelectedActorID(UINT id);
+	void SetSelectedGizmoAxis(UINT id);
 
 private:
 	bool m_bVisible = false;
@@ -17,6 +22,6 @@ private:
 	Vec3 m_vScale;
 	int m_iLastActorID = -1;
 	int m_iSelectedActorID = -1;
-
+	int m_iSelectedGizmoAxis = -1;
 };
 

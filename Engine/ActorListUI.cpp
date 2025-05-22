@@ -162,7 +162,22 @@ void ActorListUI::Toggle()
 	m_bVisible = !m_bVisible;
 }
 
+UINT ActorListUI::GetSelectedActorID()
+{
+    return m_iSelectedActorID;
+}
+
+UINT ActorListUI::GetSelectedGizmoAxis()
+{
+    return m_iSelectedGizmoAxis;
+}
+
 void ActorListUI::SetSelectedActorID(UINT id)
 {
     m_iSelectedActorID = id;
+}
+
+void ActorListUI::SetSelectedGizmoAxis(UINT id)
+{
+    m_iSelectedGizmoAxis = id;
 }
