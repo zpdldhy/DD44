@@ -21,8 +21,12 @@ public:
 	bool LoadObject(const std::string& _filePath, PrefabObjectData& _prefab);
 	bool LoadObjectArray(const std::string& _filePath, std::vector<PrefabObjectData>& _outPrefabs);
 
+	//particle 개별
 	bool SaveParticle(const PrefabParticleData& data, const std::string& filePath);
 	bool LoadParticle(PrefabParticleData& outData, const std::string& filePath );
+	//particle 그룹
+	bool SaveParticleGroup(const PrefabParticleGroupData& data, const std::string& path);
+	bool LoadParticleGroup(PrefabParticleGroupData& out, const std::string& path);
 
 private:
 	void LoadActor(json& j, PrefabCharacterData& data);

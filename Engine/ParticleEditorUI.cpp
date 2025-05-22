@@ -6,6 +6,7 @@
 #include "Texture.h"
 #include "Functions.h"
 
+
 void ParticleEditorUI::DrawUI()
 {
 	static bool bInit = false;
@@ -26,14 +27,19 @@ void ParticleEditorUI::DrawUI()
 		// 새 파티클 생성
 		auto newParticle = make_shared<AParticleActor>();
 
-		//m_pParticleActor = newParticle;
-
-		ResetData();
 
 		// 리스트에 추가
 		m_vCreatedParticles.push_back(newParticle);
+		m_vParticleData.push_back(m_Data);
 		m_iSelectedParticleIndex = static_cast<int>(m_vCreatedParticles.size()) - 1;
-
+		
+		ActorData copy;
+		for (int j = 0; j < 3; ++j)
+		{
+			copy.Position[j] = m_Data.Position[j];
+			copy.Rotation[j] = m_Data.Rotation[j];
+			copy.Scale[j] = m_Data.Scale[j];
+		}
 		// 콜백
 		m_OnCreate(
 			newParticle,
@@ -72,6 +78,8 @@ void ParticleEditorUI::DrawUI()
 		{
 			auto newParticle = make_shared<AParticleActor>();
 			m_vCreatedParticles.push_back(newParticle);
+			m_vParticleData.push_back(m_Data);
+
 			m_iSelectedParticleIndex = static_cast<int>(m_vCreatedParticles.size()) - 1;
 			m_iLastSelectedParticleIndex = -1;
 
@@ -128,9 +136,65 @@ void ParticleEditorUI::DrawUI()
 		}
 	}
 
+	ImGui::Text("Load Group:");
+	ImGui::SameLine();
+	static char loadGroupName[64] = "MyParticleGroup";
+	ImGui::PushItemWidth(150);
+	ImGui::InputText("##LoadGroupName", loadGroupName, IM_ARRAYSIZE(loadGroupName));
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+	if (ImGui::Button("Load Group"))
+	{
+		std::string path = "../Resources/Prefab/" + std::string(loadGroupName) + ".particlegroup.json";
 
-	//if (!m_pParticleActor)
-	//	return;
+		PrefabParticleGroupData group;
+		if (!PREFAB->LoadParticleGroup(group, path))
+		{
+			ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to load group!");
+		}
+		else
+		{
+			for (auto& p : group.Particles)
+			{
+				auto newParticle = make_shared<AParticleActor>();
+				m_vCreatedParticles.push_back(newParticle);
+				ActorData tempData;
+				tempData.Position[0] = p.Translation.x;
+				tempData.Position[1] = p.Translation.y;
+				tempData.Position[2] = p.Translation.z;
+
+				tempData.Rotation[0] = p.Rotation.x;
+				tempData.Rotation[1] = p.Rotation.y;
+				tempData.Rotation[2] = p.Rotation.z;
+
+				tempData.Scale[0] = p.Scale.x;
+				tempData.Scale[1] = p.Scale.y;
+				tempData.Scale[2] = p.Scale.z;
+
+				
+				m_vParticleData.push_back(tempData);
+
+				if (m_OnCreate)
+				{
+					m_OnCreate(
+						newParticle,
+						p.TexturePath.c_str(),
+						p.ShaderPath.c_str(),
+						tempData,
+						p.UVStart,
+						p.UVEnd,
+						p.Divisions,
+						p.Duration,
+						p.bLoop,
+						p.bAutoDestroy
+					);
+				}		
+			}
+
+			ImGui::TextColored(ImVec4(0, 1, 0, 1), "Group loaded!");
+		}
+
+	}
 
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
@@ -255,12 +319,7 @@ void ParticleEditorUI::DrawUI()
 
 		if (m_iSelectedParticleIndex >= 0 && m_iSelectedParticleIndex < m_vParticleData.size())
 		{
-			if (m_iSelectedParticleIndex != m_iLastSelectedParticleIndex)
-			{
-				// 선택된 인덱스가 바뀌었을 때만 동기화
-				m_Data = m_vParticleData[m_iSelectedParticleIndex];
-				m_iLastSelectedParticleIndex = m_iSelectedParticleIndex;
-			}
+			m_Data = m_vParticleData[m_iSelectedParticleIndex];
 		}
 	}
 
@@ -294,6 +353,49 @@ void ParticleEditorUI::DrawUI()
 	}
 
 	ImGui::Separator();
+	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+	ImGui::Text("Prefab Group");
+
+	ImGui::InputText("Group Name", m_szGroupName, IM_ARRAYSIZE(m_szGroupName));
+
+	if (ImGui::Button("Save All as Group"))
+	{
+		PrefabParticleGroupData group;
+		group.GroupName = m_szGroupName;
+
+		for (int i = 0; i < m_vParticleData.size(); ++i)
+		{
+			PrefabParticleData data;
+			data.Name = "Particle" + std::to_string(i); // 이름 부여
+
+			data.ShaderPath = m_szShaderPath;
+			data.TexturePath = m_vTextureList[m_iSelectedTextureIndex];
+
+			data.Scale = Vec3(m_vParticleData[i].Scale);
+			data.Rotation = Vec3(m_vParticleData[i].Rotation);
+			data.Translation = Vec3(m_vParticleData[i].Position);
+
+			data.Divisions = m_iDivisions;
+			data.Row = m_iSelectedRow;
+			data.Col = m_iSelectedCol;
+			data.UVStart = m_UVStart;
+			data.UVEnd = m_UVEnd;
+
+			data.Duration = m_AnimData.DurationSeconds;
+			data.bLoop = m_AnimData.bLoop;
+			data.bAutoDestroy = m_AnimData.bAutoDestroy;
+
+			group.Particles.push_back(data);
+		}
+
+		std::string path = "../Resources/Prefab/";
+		path += std::string(m_szGroupName) + ".particlegroup.json";
+
+		if (!PREFAB->SaveParticleGroup(group, path))
+			ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to save group!");
+		else
+			ImGui::TextColored(ImVec4(0, 1, 0, 1), "Group saved!");
+	}
 }
 
 void ParticleEditorUI::DrawVec3(const char* label, float* values)
@@ -350,15 +452,18 @@ void ParticleEditorUI::DrawVec2(const char* label, float* values)
 
 void ParticleEditorUI::UpdateUIActor()
 {
-	auto actor = GetSelectedActor();
-	auto data = GetSelectedActorData();
-	if (!actor || !data) return;
+	if (m_iSelectedParticleIndex >= m_vParticleData.size()) 
+		return;
+
+	auto actor = m_vCreatedParticles[m_iSelectedParticleIndex];
+	auto& data = m_vParticleData[m_iSelectedParticleIndex];
+
 
 	actor->SetPosition(Vec3(m_Data.Position));
 	actor->SetRotation(Vec3(m_Data.Rotation));
 	actor->SetScale(Vec3(m_Data.Scale));
 
-	*data = m_Data;
+	data = m_Data;
 }
 
 void ParticleEditorUI::ResetData()
@@ -481,4 +586,13 @@ ActorData* ParticleEditorUI::GetSelectedActorData()
 	if (m_iSelectedParticleIndex < 0 || m_iSelectedParticleIndex >= m_vParticleData.size())
 		return nullptr;
 	return &m_vParticleData[m_iSelectedParticleIndex];
+}
+
+void ParticleEditorUI::ForceSyncTransformFromSelected()
+{
+	if (m_iSelectedParticleIndex >= 0 && m_iSelectedParticleIndex < m_vParticleData.size())
+	{
+		m_Data = m_vParticleData[m_iSelectedParticleIndex];
+		m_iLastSelectedParticleIndex = m_iSelectedParticleIndex;
+	}
 }

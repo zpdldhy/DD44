@@ -25,10 +25,9 @@ private:
 	Vec3 RandomVec3InBox(const Vec3& min, const Vec3& max);
 	ActorData* GetSelectedActorData();
 	shared_ptr<AParticleActor> GetSelectedActor();
+	void ForceSyncTransformFromSelected();
 
-	int m_iDivisions = 4; // 기본 3x3 분할
-	int m_iSelectedRow = 0;
-	int m_iSelectedCol = 0;
+
 
 	ParticleAnimationData m_AnimData;
 private:
@@ -58,6 +57,11 @@ private:
 	Vec3 m_vBoxMax = { 100.0f, 100.0f, 0.0f };
 	int m_iNumParticles = 10;
 
+	int m_iDivisions = 4;
+	int m_iSelectedRow = 0;
+	int m_iSelectedCol = 0;
+
+	char m_szGroupName[64] = "MyParticleGroup";
 	std::function<void(shared_ptr<AParticleActor>, const char*, const char*, ActorData, Vec2, Vec2, int divisions, float duration, bool loop, bool autoDestroy)> m_OnCreate;
 };
 

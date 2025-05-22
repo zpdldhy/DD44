@@ -412,6 +412,95 @@ bool PrefabLoader::LoadParticle( PrefabParticleData& outData, const std::string&
     return true;
 }
 
+bool PrefabLoader::SaveParticleGroup(const PrefabParticleGroupData& data, const std::string& path)
+{
+    nlohmann::json j;
+    j["GroupName"] = data.GroupName;
+
+    for (const auto& particle : data.Particles)
+    {
+        nlohmann::json p;
+        p["Name"] = particle.Name;
+        p["ShaderPath"] = particle.ShaderPath;
+        p["TexturePath"] = particle.TexturePath;
+
+        p["Scale"] = { particle.Scale.x, particle.Scale.y, particle.Scale.z };
+        p["Rotation"] = { particle.Rotation.x, particle.Rotation.y, particle.Rotation.z };
+        p["Translation"] = { particle.Translation.x, particle.Translation.y, particle.Translation.z };
+
+        p["Divisions"] = particle.Divisions;
+        p["Row"] = particle.Row;
+        p["Col"] = particle.Col;
+
+        p["UVStart"] = { particle.UVStart.x, particle.UVStart.y };
+        p["UVEnd"] = { particle.UVEnd.x, particle.UVEnd.y };
+
+        p["BillboardSizeX"] = particle.BillboardSizeX;
+        p["BillboardSizeY"] = particle.BillboardSizeY;
+
+        p["Duration"] = particle.Duration;
+        p["bLoop"] = particle.bLoop;
+        p["bAutoDestroy"] = particle.bAutoDestroy;
+
+        j["Particles"].push_back(p);
+    }
+
+    std::ofstream file(path);
+    if (!file.is_open()) return false;
+
+    file << j.dump(4); // ¿¹»Ú°Ô ÀúÀå
+    return true;
+}
+
+bool PrefabLoader::LoadParticleGroup(PrefabParticleGroupData& out, const std::string& path)
+{
+    std::ifstream file(path);
+    if (!file.is_open()) return false;
+
+    nlohmann::json j;
+    file >> j;
+
+    out.GroupName = j.value("GroupName", "");
+
+    const auto& jParticles = j["Particles"];
+    for (const auto& p : jParticles)
+    {
+        PrefabParticleData particle;
+
+        particle.Name = p.value("Name", "");
+        particle.ShaderPath = p.value("ShaderPath", "");
+        particle.TexturePath = p.value("TexturePath", "");
+
+        auto s = p["Scale"];
+        particle.Scale = Vec3(s[0], s[1], s[2]);
+
+        auto r = p["Rotation"];
+        particle.Rotation = Vec3(r[0], r[1], r[2]);
+
+        auto t = p["Translation"];
+        particle.Translation = Vec3(t[0], t[1], t[2]);
+
+        particle.Divisions = p.value("Divisions", 4);
+        particle.Row = p.value("Row", 0);
+        particle.Col = p.value("Col", 0);
+
+        auto uv0 = p["UVStart"];
+        auto uv1 = p["UVEnd"];
+        particle.UVStart = Vec2(uv0[0], uv0[1]);
+        particle.UVEnd = Vec2(uv1[0], uv1[1]);
+
+        particle.BillboardSizeX = p.value("BillboardSizeX", 100.0f);
+        particle.BillboardSizeY = p.value("BillboardSizeY", 100.0f);
+
+        particle.Duration = p.value("Duration", 1.0f);
+        particle.bLoop = p.value("bLoop", true);
+        particle.bAutoDestroy = p.value("bAutoDestroy", false);
+
+        out.Particles.push_back(particle);
+    }
+
+    return true;
+}
 
 void PrefabLoader::LoadActor(json& j, PrefabCharacterData& data)
 {

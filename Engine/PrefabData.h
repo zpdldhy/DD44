@@ -91,6 +91,8 @@ struct PrefabParticleData
     Vec3 Rotation;
     Vec3 Translation;
 
+    ActorData actor;
+
     int Divisions = 4;     // NxN
     int Row = 0;
     int Col = 0;
@@ -104,6 +106,12 @@ struct PrefabParticleData
     float Duration = 1.0f;
     bool bLoop = true;
     bool bAutoDestroy = false;
+};
+
+struct PrefabParticleGroupData
+{
+    std::string GroupName; 
+    std::vector<PrefabParticleData> Particles;
 };
 
 struct ModifiedCellData

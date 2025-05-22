@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Game.h"
+#include "TestYoooooon.h"
 #include "ImGuiCore.h"
 #include "ObjectManager.h"
 #include "CameraManager.h"
@@ -17,16 +17,15 @@
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
-#include "AParticleActor.h"
-#include "ParticleManager.h"
 
-void Game::Init()
+void TestYoooooon::Init()
 {
 	SetupEditorCallbacks();
 
 	LoadAllPrefabs(".map.json");
 	LoadAllPrefabs(".objects.json");
 	LoadAllPrefabs(".character.json");
+	LoadAllPrefabs(".ui.json");
 
 	SetupEngineCamera();
 	SetupSkybox();
@@ -34,7 +33,7 @@ void Game::Init()
 
 }
 
-void Game::Update()
+void TestYoooooon::Update()
 {
 	if (INPUT->GetButton(O))
 	{
@@ -52,18 +51,18 @@ void Game::Update()
 
 }
 
-void Game::Render()
+void TestYoooooon::Render()
 {
 }
 
-void Game::Destroy()
+void TestYoooooon::Destroy()
 {
 }
 
-void Game::SetupEngineCamera()
+void TestYoooooon::SetupEngineCamera()
 {
 	m_pCameraActor = make_shared<ACameraActor>();
-	
+
 	m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 	m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	m_pCameraActor->m_szName = L"EnginCamera";
@@ -72,7 +71,7 @@ void Game::SetupEngineCamera()
 	OBJECT->AddActor(m_pCameraActor);
 }
 
-void Game::SetupSkybox()
+void TestYoooooon::SetupSkybox()
 {
 	m_pSky = make_shared<ASky>();
 	m_pSky->m_szName = L"Sky";
@@ -86,10 +85,10 @@ void Game::SetupSkybox()
 	OBJECT->AddActor(m_pSky);
 }
 
-void Game::SetupSunLight()
+void TestYoooooon::SetupSunLight()
 {
 	LIGHTMANAGER->Init();
-	
+
 	m_pSunLight = make_shared<ALight>();
 	m_pSunLight->m_szName = L"SunLight";
 	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
@@ -98,26 +97,25 @@ void Game::SetupSunLight()
 	m_pSunLight->SetPosition(Vec3(0, 100.0f, 0));
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	OBJECT->AddActor(m_pSunLight);
-	
+
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
 }
 
-void Game::SetupEditorCallbacks()
+void TestYoooooon::SetupEditorCallbacks()
 {
 	SetupCharacterEditorCallback();
 	SetupMapEditorCallback();
 	SetupObjectEditorCallback();
 	SetupUIEditorCallback();
-	SetupParticleEditorCallback();
 }
 
-void Game::SetupCharacterEditorCallback()
+void TestYoooooon::SetupCharacterEditorCallback()
 {
 	GUI->SetCharacterEditorCallback(
 		[](std::shared_ptr<UMeshComponent> rootComponent, const Vec3& position,
 			const Vec3& rotation,
-			const Vec3& scale, 
+			const Vec3& scale,
 			CameraComponentData camera,
 			ShapeComponentData shape,
 			int scriptType)
@@ -169,7 +167,7 @@ void Game::SetupCharacterEditorCallback()
 		});
 }
 
-void Game::SetupMapEditorCallback()
+void TestYoooooon::SetupMapEditorCallback()
 {
 	GUI->SetMapEditorCallback([this]()
 		{
@@ -216,7 +214,7 @@ void Game::SetupMapEditorCallback()
 		});
 }
 
-void Game::SetupObjectEditorCallback()
+void TestYoooooon::SetupObjectEditorCallback()
 {
 
 	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
@@ -261,9 +259,9 @@ void Game::SetupObjectEditorCallback()
 		});
 }
 
-void Game::SetupUIEditorCallback()
+void TestYoooooon::SetupUIEditorCallback()
 {
-	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, ActorData actorData)
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData)
 		{
 			uiActor->m_szName = L"UI";
 			auto meshComp = UStaticMeshComponent::CreatePlane();
@@ -275,6 +273,12 @@ void Game::SetupUIEditorCallback()
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
 			);
 			meshComp->SetMaterial(mat);
+
+			uiActor->SetIdleTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetHoverTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetActiveTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetSelectTexture(TEXTURE->Get(to_mw(texPath)));
+
 			uiActor->SetMeshComponent(meshComp);
 			uiActor->SetPosition(Vec3(actorData.Position));
 			uiActor->SetRotation(Vec3(actorData.Rotation));
@@ -284,57 +288,7 @@ void Game::SetupUIEditorCallback()
 		});
 }
 
-void Game::SetupParticleEditorCallback()
-{
-	GUI->SetParticleEditorCallbck([this](
-		shared_ptr<AParticleActor> particleActor,
-		const char* texPath,
-		const char* shaderPath,
-		ActorData actorData,
-		Vec2 uvStart,
-		Vec2 uvEnd,
-		int divisions,
-		float duration,
-		bool loop,
-		bool autoDestroy)
-		{
-			particleActor->m_szName = L"Particle";
-
-			// 1. 메시 (Quad)
-			auto meshComp = UStaticMeshComponent::CreatePlane(); // 또는 CreateQuad()
-			particleActor->SetMeshComponent(meshComp);
-
-			// 2. 머티리얼 로드
-			auto mat = make_shared<UMaterial>();
-			mat->Load(
-				std::wstring(texPath, texPath + strlen(texPath)),
-				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-			);
-
-			// 3. UV 설정 (셰이더에 넘기기 위함)
-			mat->SetUVRange(uvStart, uvEnd); // → SetUVRange() 함수 내부에서 CB 업데이트
-
-			// 4. 머티리얼, 트랜스폼 적용
-			meshComp->SetMaterial(mat);
-
-			particleActor->SetMeshComponent(meshComp);
-			particleActor->SetPosition(Vec3(actorData.Position));
-			particleActor->SetRotation(Vec3(actorData.Rotation));
-			particleActor->SetScale(Vec3(actorData.Scale));
-			particleActor->InitSpriteAnimation(divisions, duration);
-			particleActor->SetLoop(loop);
-			particleActor->SetAutoDestroy(autoDestroy);
-
-			// 5. 화면에 등록
-			PARTICLE->AddUI(particleActor);
-			//particleActor->InitSpriteAnimation(4, 1.f); // 4는 divisions, 10은 frameRate
-		});
-}
-
-
-
-
-void Game::LoadAllPrefabs(const std::string& extension)
+void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 {
 	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
 
@@ -375,9 +329,9 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				actor->SetMeshComponent(meshComponent);
 
 				actor->m_szName = L"Character";
-				actor->SetPosition(Vec3(characterData.actor.Position));
-				actor->SetRotation(Vec3(characterData.actor.Rotation));
-				actor->SetScale(Vec3(characterData.actor.Scale));
+				actor->SetPosition(Vec3(characterData.transform.Position));
+				actor->SetRotation(Vec3(characterData.transform.Rotation));
+				actor->SetScale(Vec3(characterData.transform.Scale));
 
 				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 
@@ -395,7 +349,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				if (characterData.shape.isUse)
 				{
 					shared_ptr<UShapeComponent> shapeComponent = nullptr;
-					if(static_cast<ShapeType>(characterData.shape.eShapeType)== ShapeType::ST_BOX)
+					if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_BOX)
 						shapeComponent = make_shared<UBoxComponent>();
 					//else if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_SPHERE)
 
@@ -477,6 +431,36 @@ void Game::LoadAllPrefabs(const std::string& extension)
 
 					OBJECT->AddActor(obj);
 				}
+			}
+		}
+		else if (extension == ".ui.json")
+		{
+			PrefabUIData uiData;
+			if (PREFAB->LoadUI(file, uiData))
+			{
+				auto uiActor = make_shared<AUIActor>();
+				uiActor->m_szName = to_mw(uiData.Name);
+
+				auto meshComp = UStaticMeshComponent::CreatePlane();
+				uiActor->SetMeshComponent(meshComp);
+
+				auto mat = make_shared<UMaterial>();
+				mat->Load(L"", to_mw(uiData.ShaderPath));
+				meshComp->SetMaterial(mat);
+
+				uiActor->SetIdleTexture(TEXTURE->Get(to_mw(uiData.IdleTexturePath)));
+				uiActor->SetHoverTexture(TEXTURE->Get(to_mw(uiData.HoverTexturePath)));
+				uiActor->SetActiveTexture(TEXTURE->Get(to_mw(uiData.ActiveTexturePath)));
+				uiActor->SetSelectTexture(TEXTURE->Get(to_mw(uiData.SelectedTexturePath)));
+
+				uiActor->SetMeshComponent(meshComp);
+				uiActor->SetPosition(Vec3(uiData.transform.Position));
+				uiActor->SetRotation(Vec3(uiData.transform.Rotation));
+				uiActor->SetScale(Vec3(uiData.transform.Scale));
+
+				uiActor->SetPrefabData(uiData);
+
+				UI->AddUI(uiActor);
 			}
 		}
 

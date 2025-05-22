@@ -17,6 +17,7 @@ public:
 	virtual ~AParticleActor() = default;
 
 	virtual void Tick() override; // AActor에서 상속한 Tick()
+	void Render() override;
 
 	void SetUV(Vec2 start, Vec2 end);
 	void InitSpriteAnimation(int divisions, float duration);

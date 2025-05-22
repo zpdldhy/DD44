@@ -14,15 +14,6 @@ AParticleActor::AParticleActor()
 
 void AParticleActor::Tick()
 {
-	if (m_CB_Billboard)
-	{
-		Vec3 scale = GetScale();
-		m_CB_Billboard->data.center = GetPosition();
-		m_CB_Billboard->data.size = Vec2(scale.x, scale.y); // uniform scale
-		m_CB_Billboard->Update();
-		m_CB_Billboard->Push();
-	}
-
 	AActor::Tick();
 
 
@@ -68,6 +59,19 @@ void AParticleActor::Tick()
 			SetUV(uvStart, uvEnd);
 		}
 	}
+}
+
+void AParticleActor::Render()
+{
+	if (m_CB_Billboard)
+	{
+		Vec3 scale = GetScale();
+		m_CB_Billboard->data.center = GetPosition();
+		m_CB_Billboard->data.size = Vec2(scale.x, scale.y); // uniform scale
+		m_CB_Billboard->Update();
+		m_CB_Billboard->Push();
+	}
+	AActor::Render();
 }
 
 void AParticleActor::SetUV(Vec2 start, Vec2 end)
