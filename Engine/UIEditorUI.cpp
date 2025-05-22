@@ -15,15 +15,15 @@ void UIEditorUI::DrawUI()
 
 	if (m_vTextureList.empty() && m_vTextureNameList.empty())
 	{
-		m_vTextureList.emplace_back("../Resources/Texture/white.png");
+		m_vTextureList.emplace_back("../Resources/Texture/UI/white.png");
 		m_vTextureNameList.emplace_back("white.png");
 
-		string searchPath = "../Resources/Texture/";
+		string searchPath = "../Resources/Texture/UI/";
 
 		// 만약 다른 형식의 파일도 필요하다면 여기에 추가
-		SearchFile(searchPath, ".png");
-		SearchFile(searchPath, ".jpg");
-		SearchFile(searchPath, ".bmp");
+		SearchFile(searchPath, ".png", m_vTextureList, m_vTextureNameList);
+		SearchFile(searchPath, ".jpg", m_vTextureList, m_vTextureNameList);
+		SearchFile(searchPath, ".bmp", m_vTextureList, m_vTextureNameList);		
 	}
 
 	SelectActor();
@@ -47,6 +47,20 @@ void UIEditorUI::DrawUI()
 
 	if (m_pUIActor == nullptr)
 		return;
+
+	// ───────────────────────────── Delete ─────────────────────────────
+	ImGui::SameLine(0, 212.5f);
+
+	if (ImGui::Button("Delete UI"))
+	{
+		m_pUIActor->SetState(make_shared<IdleUIState>());
+		m_pUIActor->SetStateType(UIStateType::ST_IDLE);
+		UI->DeleteUI(m_pUIActor->m_Index);
+		m_pUIActor = nullptr;
+		ResetData();
+
+		return;
+	}
 
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
@@ -141,15 +155,27 @@ void UIEditorUI::DrawUI()
 	UpdatePrefabData();
 	UpdateUIActor();
 
-	// ───────────────────────────── Prefab Save/Load ─────────────────────────────
+	// ───────────────────────────── Prefab Save/Load/Delete ─────────────────────────────
 	
+	string searchPath = "../Resources/Prefab/";
+
+	// 만약 다른 형식의 파일도 필요하다면 여기에 추가
+	SearchFile(searchPath, ".ui.json", m_vPrefabList, m_vPrefabNameList);
+
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Prefab Tools");
 
 	SavePrefab();
 
+	ImGui::Separator(); ImGui::Spacing();
+
 	LoadPrefab();
 
 	ImGui::Separator(); ImGui::Spacing();
+
+	DeletePrefab();
+
+	m_vPrefabList.clear();
+	m_vPrefabNameList.clear();
 }
 
 void UIEditorUI::DrawVec3(const char* label, float* values)
@@ -273,16 +299,25 @@ void UIEditorUI::SavePrefab()
 
 	if (ImGui::Button("Save Prefab", ImVec2(-1, 0)))
 	{
-		PrefabLoader().SaveUI(m_CurrentPrefab, "../Resources/Prefab/" + m_CurrentPrefab.Name + ".ui.json");
+		PrefabLoader().SaveUI(m_CurrentPrefab, "../Resources/Prefab/" + std::string(m_szPrefabName) + ".ui.json");
 	}
 }
 
 void UIEditorUI::LoadPrefab()
 {
+	static std::vector<const char*> NamePtrs;
+	if (NamePtrs.empty())
+	{
+		for (auto& name : m_vPrefabNameList)
+			NamePtrs.push_back(name.c_str());
+	}
+
+	ImGui::Combo("PrefabList", &m_iPrefabdIndex, NamePtrs.data(), (int)NamePtrs.size());
+
 	if (ImGui::Button("Load Prefab##File", ImVec2(-1, 0)))
 	{
 		PrefabUIData data;
-		std::string path = "../Resources/Prefab/" + std::string(m_szPrefabName) + ".ui.json";
+		std::string path = m_vPrefabList[m_iPrefabdIndex];
 
 		if (PREFAB->LoadUI(path, data))
 		{
@@ -291,7 +326,18 @@ void UIEditorUI::LoadPrefab()
 	}
 }
 
-void UIEditorUI::SearchFile(const string& _directory, const string& _extension)
+void UIEditorUI::DeletePrefab()
+{
+	if (ImGui::Button("Delete Prefab##File", ImVec2(-1, 0)))
+	{
+		if (PREFAB->DeletePrefab(m_vPrefabList[m_iPrefabdIndex]))
+		{
+			m_iPrefabdIndex = 0;
+		}
+	}
+}
+
+void UIEditorUI::SearchFile(const string& _directory, const string& _extension, vector<string>& _vPaths, vector<string>& _vNames)
 {
 	string searchPath = _directory + "*" + _extension;
 
@@ -308,8 +354,8 @@ void UIEditorUI::SearchFile(const string& _directory, const string& _extension)
 				if(!strcmp(findData.cFileName, "white.png"))
 					continue;
 
-				m_vTextureList.push_back(_directory + findData.cFileName);
-				m_vTextureNameList.push_back(findData.cFileName);
+				_vPaths.push_back(_directory + findData.cFileName);
+				_vNames.push_back(findData.cFileName);
 			}
 		} while (FindNextFileA(hFind, &findData));
 

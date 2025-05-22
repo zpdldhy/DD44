@@ -375,6 +375,17 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
 	return true;
 }
 
+bool PrefabLoader::DeletePrefab(const std::string& _filePath)
+{
+    if (std::remove(_filePath.c_str()) == 0) {
+        return true; // 성공적으로 삭제됨
+    }
+    else {
+        perror("파일 삭제 실패");
+        return false;
+    }
+}
+
 
 void PrefabLoader::SaveTransform(json& j, const TransformData& data)
 {

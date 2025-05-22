@@ -19,8 +19,9 @@ private:
 	void SetTexture();
 	void SavePrefab();
 	void LoadPrefab();
+	void DeletePrefab();
 
-	void SearchFile(const string& directory, const string& extension);
+	void SearchFile(const string& _directory, const string& _extension, vector<string>& _vPaths, vector<string>& _vNames);
 
 private:
 	void SelectActor();
@@ -46,6 +47,9 @@ private:
 
 	// Prefab
 	char m_szPrefabName[64] = "MyUI";
+	vector<string> m_vPrefabList;
+	vector<string> m_vPrefabNameList;
+	int m_iPrefabdIndex = 0;
 
 	std::function<void(shared_ptr<AUIActor>, const char*, const char*, TransformData)> m_OnCreate;
 

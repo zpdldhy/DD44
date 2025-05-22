@@ -24,6 +24,8 @@ public:
 	bool SaveUI(const PrefabUIData& _prefab, const std::string& _filePath);
 	bool LoadUI(const std::string& _filePath, PrefabUIData& _prefab);
 
+	bool DeletePrefab(const std::string& _filePath);
+
 private:
 	void SaveTransform(json& j, const TransformData& data);
 

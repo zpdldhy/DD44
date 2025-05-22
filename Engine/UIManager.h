@@ -3,8 +3,9 @@
 
 class UIManager : public Singleton<UIManager>
 {
-	vector<shared_ptr<class AUIActor>> m_vUIList;
+	map<UINT, shared_ptr<class AUIActor>> m_vUIList;
 	vector<shared_ptr<class AUIActor>> m_vRenderUIList;
+	static UINT m_iUIID;
 
 public:
 	void Tick();
@@ -12,9 +13,13 @@ public:
 	void Destroy();
 
 public:
-	void SetUIList(vector<shared_ptr<class AUIActor>> _vUIList);
 	void AddUIList(vector<shared_ptr<class AUIActor>> _vUIList);
 	void AddUI(shared_ptr<class AUIActor> _pUIActor);
-	vector<shared_ptr<class AUIActor>> GetUIList() { return m_vUIList; }
+
+	shared_ptr<class AUIActor> GetUI(UINT _iID);
+	vector<shared_ptr<class AUIActor>> GetUIList();
+
+	void DeleteUI(shared_ptr<class AUIActor> _pUIActor);
+	void DeleteUI(UINT _iID);
 };
 
