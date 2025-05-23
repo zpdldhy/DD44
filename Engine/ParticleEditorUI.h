@@ -23,9 +23,7 @@ private:
 	vector<string> GetTextureList(const std::string& directory);
 	void SearchFile(const string& directory, const string& extension);
 	Vec3 RandomVec3InBox(const Vec3& min, const Vec3& max);
-	ActorData* GetSelectedActorData();
 	shared_ptr<AParticleActor> GetSelectedActor();
-	void ForceSyncTransformFromSelected();
 
 
 
@@ -53,8 +51,8 @@ private:
 	int m_iSelectedParticleIndex = -1;
 	int m_iLastSelectedParticleIndex = -1;
 
-	Vec3 m_vBoxMin = { -100.0f, -100.0f, 0.0f };
-	Vec3 m_vBoxMax = { 100.0f, 100.0f, 0.0f };
+	Vec3 m_vBoxMin = { -20.0f, -20.0f, 20.0f };
+	Vec3 m_vBoxMax = { 20.0f, 20.0f, 50.0f };
 	int m_iNumParticles = 10;
 
 	int m_iDivisions = 4;

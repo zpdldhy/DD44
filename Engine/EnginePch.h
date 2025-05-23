@@ -5,6 +5,7 @@
 #include "Define.h"
 #include "Vertex.h"
 #include "ShapeData.h"
+#include "stack"
 
 // WIN
 #include <windows.h>

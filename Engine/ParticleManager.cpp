@@ -3,6 +3,7 @@
 #include "AParticleActor.h"
 #include "CameraManager.h"
 
+
 void ParticleManager::Tick()
 {
 	for (auto pP = m_vParticleList.begin(); pP != m_vParticleList.end();)
@@ -21,10 +22,29 @@ void ParticleManager::Tick()
 
 void ParticleManager::Render()
 {
+	PreRender();
 	for (auto& pParticleActor : m_vRenderParticleList)
 		pParticleActor->Render();
 
 	m_vRenderParticleList.clear();
+	PostRender();
+}
+
+void ParticleManager::PreRender()
+{
+	m_sharedOption.blend = BlendType::Additive;
+	m_sharedOption.depth = DepthType::ZTestOn_ZWriteOff;
+	m_sharedOption.cull = CullType::None;
+	m_sharedOption.sampler = SamplerType::Linear;
+	m_sharedOption.bWireframe = false;
+	m_sharedOption.bStencil = false;
+
+	STATEMANAGER->Apply(m_sharedOption);
+}
+
+void ParticleManager::PostRender()
+{
+	STATEMANAGER->Restore();
 }
 
 void ParticleManager::Destroy()

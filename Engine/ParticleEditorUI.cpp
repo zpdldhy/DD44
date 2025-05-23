@@ -23,12 +23,8 @@ void ParticleEditorUI::DrawUI()
 			ImGui::TextColored(ImVec4(1, 0, 0, 1), "Error: OnCreate callback is not set!");
 			return;
 		}
-
-		// 새 파티클 생성
 		auto newParticle = make_shared<AParticleActor>();
 
-
-		// 리스트에 추가
 		m_vCreatedParticles.push_back(newParticle);
 		m_vParticleData.push_back(m_Data);
 		m_iSelectedParticleIndex = static_cast<int>(m_vCreatedParticles.size()) - 1;
@@ -60,7 +56,6 @@ void ParticleEditorUI::DrawUI()
 		newParticle->SetUV(m_UVStart, m_UVEnd);
 	}
 
-	//ImGui::SameLine();
 	ImGui::Text("Load Prefab:");
 	ImGui::SameLine();
 
@@ -198,21 +193,15 @@ void ParticleEditorUI::DrawUI()
 
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
+
 	ImGui::Text("Transform");
 	DrawVec3("Position", m_Data.Position);
 	DrawVec3("Rotation", m_Data.Rotation);
 	DrawVec3("Scale", m_Data.Scale);
 
-	ImGui::Spacing();
-	ImGui::Text("UV");
-	DrawVec2("UV Start", &m_UVStart.x);
-	DrawVec2("UV End", &m_UVEnd.x);
-
-	ImGui::Spacing();
+	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 	ImGui::Text("Sprite Grid");
 	ImGui::InputInt("Divisions (NxN)", &m_iDivisions);
-	ImGui::InputInt("Row", &m_iSelectedRow);
-	ImGui::InputInt("Col", &m_iSelectedCol);
 	if (ImGui::Button("Apply UV Grid"))
 	{
 		float cellSize = 1.0f / (float)m_iDivisions;
@@ -223,6 +212,9 @@ void ParticleEditorUI::DrawUI()
 		if (auto actor = GetSelectedActor())
 		{
 			actor->SetUV(m_UVStart, m_UVEnd);
+
+			float duration = actor->GetDuration();
+			actor->InitSpriteAnimation(m_iDivisions, duration);
 		}
 	}
 	ImGui::Spacing();
@@ -468,7 +460,6 @@ void ParticleEditorUI::UpdateUIActor()
 
 void ParticleEditorUI::ResetData()
 {
-
 	for (int i = 0; i < 3; ++i)
 	{
 		m_Data.Position[i] = m_Data.Position[i];
@@ -581,18 +572,4 @@ shared_ptr<AParticleActor> ParticleEditorUI::GetSelectedActor()
 	return m_vCreatedParticles[m_iSelectedParticleIndex];
 }
 
-ActorData* ParticleEditorUI::GetSelectedActorData()
-{
-	if (m_iSelectedParticleIndex < 0 || m_iSelectedParticleIndex >= m_vParticleData.size())
-		return nullptr;
-	return &m_vParticleData[m_iSelectedParticleIndex];
-}
 
-void ParticleEditorUI::ForceSyncTransformFromSelected()
-{
-	if (m_iSelectedParticleIndex >= 0 && m_iSelectedParticleIndex < m_vParticleData.size())
-	{
-		m_Data = m_vParticleData[m_iSelectedParticleIndex];
-		m_iLastSelectedParticleIndex = m_iSelectedParticleIndex;
-	}
-}

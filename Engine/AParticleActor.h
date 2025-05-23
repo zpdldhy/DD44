@@ -25,6 +25,7 @@ public:
 	void SetDuration(float seconds);
 	void SetLoop(bool b) { m_bLoop = b; }
 	void SetAutoDestroy(bool b) { m_bAutoDestroy = b; }
+	float GetDuration() const { return m_fDuration; }
 private:
 	int m_iDivisions = 4;        // 분할 수 (N x N)
 	float m_fFrameRate = 10.0f;  // 초당 프레임 수

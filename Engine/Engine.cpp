@@ -19,6 +19,7 @@
 #include "CollisionManager.h"
 #include "LightManager.h"
 #include "ParticleManager.h"
+#include "RenderStateManager.h"
 
 void Engine::Init()
 {
@@ -50,6 +51,7 @@ void Engine::Init()
 	POSTPROCESS->Init(8);
 	// 8개의 MRT DxState 초기화
 	STATE->Create();
+	//STATEMANAGER->InitState();
 }
 
 void Engine::Frame()
