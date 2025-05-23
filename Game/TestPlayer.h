@@ -14,16 +14,21 @@ class TestPlayer : public IExecute
 	vector<shared_ptr<UMeshComponent>> meshList;
 
 	shared_ptr<class ACameraActor> m_pCameraActor;
+	shared_ptr<class ACameraActor> m_pCameraEngine;
+
 	vector<shared_ptr<APawn>> gizmo;
 
 	shared_ptr<UMeshComponent> sword;
 	shared_ptr<UMeshComponent> socket;
+
+	bool m_bEnginCamera = true;
 public:
 	virtual void Init() override;
 	virtual void Update() override;
 	virtual void Render() override;
 public:
 	void SetupSunLight();
+	void SetupEngineCamera();
 
 };
 

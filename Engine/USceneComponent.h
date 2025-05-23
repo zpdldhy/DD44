@@ -70,9 +70,9 @@ public:
 	const Vec3& GetLocalRight() const { return m_vLocalRight; }
 	const Vec3& GetLocalUp() const { return m_vLocalUp; }
 
-	void SetLocalPosition(const Vec3& _pos) { m_vLocalPosition = _pos; }
-	void SetLocalRotation(const Vec3& _rot) { m_vLocalRotation = _rot; }
-	void SetLocalScale(const Vec3& _scale) { m_vLocalScale = _scale; }
+	virtual void SetLocalPosition(const Vec3& _pos) { m_vLocalPosition = _pos; }
+	virtual void SetLocalRotation(const Vec3& _rot) { m_vLocalRotation = _rot; }
+	virtual void SetLocalScale(const Vec3& _scale) { m_vLocalScale = _scale; }
 
 	void AddLocalPosition(const Vec3& _pos) { m_vLocalPosition += _pos; }
 	void AddLocalRotation(const Vec3& _rot) { m_vLocalRotation += _rot; }

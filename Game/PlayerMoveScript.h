@@ -21,12 +21,13 @@ public:
 	shared_ptr<UAnimInstance> m_pAnimInstance;
 	bool m_bAttack = false;
 
-	// Player's Child Mesh Components
-	shared_ptr<UMeshComponent> sword;
-	shared_ptr<UMeshComponent> effect;
-	shared_ptr<UMeshComponent> sword_socket1;
-	shared_ptr<UMeshComponent> sword_socket2;
-	shared_ptr<UMeshComponent> back_socket;
+	// Child Mesh Components
+	// 어떻게 관리해야 좋을지 모르겟음
+	weak_ptr<UMeshComponent> sword;
+	weak_ptr<UMeshComponent> effect;
+	weak_ptr<UMeshComponent> sword_socket1;
+	weak_ptr<UMeshComponent> sword_socket2;
+	weak_ptr<UMeshComponent> back_socket;
 
 public:
 	void Init() override;

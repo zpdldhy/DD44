@@ -328,6 +328,7 @@
       <Filter>Utils\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Profiler.h" />
+    <ClInclude Include="MeshTransform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -546,6 +547,7 @@
     <ClCompile Include="MeshEditorUI.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="Profiler.cpp" />
+    <ClCompile Include="MeshTransform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

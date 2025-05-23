@@ -84,7 +84,7 @@ map<wstring, shared_ptr<UMeshResources>> ActorLoader::LoadMeshMap()
 			if (data.m_bSkeleton)
 			{
 				meshResource = make_shared<USkeletalMeshResources>();
-				meshResource->SetName(name);
+				meshResource->SetName(name); 
 				auto skeletalMesh = dynamic_pointer_cast<USkeletalMeshResources>(meshResource);
 				meshResource->SetVertexList(data.m_vVertexList);
 				skeletalMesh->SetInverseBindPose(m_vFbxList[iFbx].m_vInverseBindPose[iMesh]);

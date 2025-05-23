@@ -14,6 +14,8 @@
 #include "ALight.h"
 #include "APawn.h"
 #include "UMaterial.h"
+#include "MeshTransform.h"
+#include "Input.h"
 
 void TestPlayer::Init()
 {
@@ -72,6 +74,8 @@ void TestPlayer::Init()
 	auto meshComponent = meshLoader->Make("../Resources/Asset/crow_final6.mesh.json");
 	player->SetMeshComponent(meshComponent);
 
+	player->SetPosition(Vec3(10, 10, 10));
+	
 	auto cameraComponent = make_shared<UCameraComponent>();
 	cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
 	player->SetCameraComponent(cameraComponent);
@@ -95,7 +99,9 @@ void TestPlayer::Init()
 	
 	{
 		socket = UStaticMeshComponent::CreateCube();
-		player->GetMeshComponent()->AddChild(socket);
+		shared_ptr<MeshTransform> mt = make_shared<MeshTransform>();
+		socket->SetMeshTransform(mt);
+		sword->AddChild(socket);
 		socket->SetOwner(player);
 		socket->Init();
 		//socket->SetVisible(false);
@@ -106,6 +112,20 @@ void TestPlayer::Init()
 void TestPlayer::Update()
 {
 	socket->SetLocalPosition(sword->GetAnimWorld());
+
+	if (INPUT->GetButton(O))
+	{
+		if (m_bEnginCamera)
+		{
+			m_bEnginCamera = false;
+			CAMERA->Set3DCameraActor(player);
+		}
+		else
+		{
+			m_bEnginCamera = true;
+			CAMERA->Set3DCameraActor(m_pCameraActor);
+		}
+	}
 }
 
 void TestPlayer::Render()
@@ -126,4 +146,16 @@ void TestPlayer::SetupSunLight()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
+}
+
+void TestPlayer::SetupEngineCamera()
+{
+	m_pCameraEngine = make_shared<ACameraActor>();
+
+	m_pCameraEngine->SetPosition({ 0.0f, 10.0f, 0.0f });
+	m_pCameraEngine->AddScript(make_shared<EngineCameraMoveScript>());
+	m_pCameraEngine->m_szName = L"EnginCamera";
+
+	CAMERA->Set3DCameraActor(m_pCameraEngine);
+	OBJECT->AddActor(m_pCameraEngine);
 }

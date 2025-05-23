@@ -7,6 +7,7 @@
 #include "UAnimInstance.h"
 #include "UMaterial.h"
 #include "AAsset.h"
+#include "MeshTransform.h"
 
 void MeshLoader::SetMesh(map<wstring, shared_ptr<UMeshResources>> _mesh)
 {
@@ -87,7 +88,8 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 		mesh = make_shared<USkinnedMeshComponent>();
 		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
 		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
-
+		shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		mesh->SetMeshTransform(transform);
 		{
 			//Profiler p("Set Anim");
 
@@ -130,6 +132,10 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
 		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(meshRes->second));
 
+		shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		mesh->SetMeshTransform(transform);
+		
+
 		staticRoot->SetAnimInstance(animInstance);
 		staticRoot->SetMatBone(data.m_matBone);
 		staticRoot->SetTargetBoneIndex(data.m_targetBone);
@@ -166,6 +172,8 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool _bR
 		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
 		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
 
+		shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		mesh->SetMeshTransform(transform);
 
 		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
 		mat->Load(data.m_szTex, data.m_szShader);
@@ -177,6 +185,10 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool _bR
 		mesh = make_shared<UStaticMeshComponent>();
 		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
 		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(meshRes->second));
+
+		shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		staticRoot->SetMatBone(data.m_matBone);
+		mesh->SetMeshTransform(transform);
 
 		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
 		mat->Load(data.m_szTex, data.m_szShader);
@@ -202,13 +214,46 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(wstring _resName)
 		mesh = make_shared<USkinnedMeshComponent>();
 		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
 		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(iter->second));
+
+		shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		mesh->SetMeshTransform(transform);
 	}
 	else
 	{
 		mesh = make_shared<UStaticMeshComponent>();
 		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
 		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(iter->second));
-
+		
+		shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		mesh->SetMeshTransform(transform);
 	}
 	return mesh;
+}
+
+shared_ptr<UMeshResources> MeshLoader::GetMeshRes(wstring _name)
+{
+	auto res = m_mMeshMap.find(_name);
+	if (res != m_mMeshMap.end())
+	{
+		return res->second;
+	}
+	else
+	{
+		assert(false);
+		//return shared_ptr<UMeshResources>();
+	}
+}
+
+shared_ptr<UAnimInstance> MeshLoader::GetAnimInstance(wstring _name)
+{
+	auto res = m_mAnimMap.find(_name);
+	if (res != m_mAnimMap.end())
+	{
+		return res->second;
+	}
+	else
+	{
+		assert(false);
+		//return shared_ptr<UMeshResources>();
+	}
 }

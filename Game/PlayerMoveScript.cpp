@@ -4,9 +4,11 @@
 #include "Timer.h"
 #include "APawn.h"
 #include "AActor.h"
+#include "UStaticMeshComponent.h"
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
 #include "UBoxComponent.h"
+#include "MeshTransform.h"
 
 void PlayerMoveScript::Init()
 {
@@ -23,24 +25,33 @@ void PlayerMoveScript::Init()
 	
 	// Set Socket
 	// [주의] crow_final6.mesh.json 파일 시에만 가능
-	sword = GetOwner()->GetMeshComponent()->GetChild(2);
-	effect = GetOwner()->GetMeshComponent()->GetChild(6);
-	sword_socket1 = GetOwner()->GetMeshComponent()->GetChild(3);
-	sword_socket2 = GetOwner()->GetMeshComponent()->GetChild(4);
-	back_socket = GetOwner()->GetMeshComponent()->GetChild(5);
+	//sword = GetOwner()->GetMeshComponent()->GetChild(2);
+	//effect = GetOwner()->GetMeshComponent()->GetChild(6);
+	//sword_socket1 = GetOwner()->GetMeshComponent()->GetChild(3);
+	//sword_socket2 = GetOwner()->GetMeshComponent()->GetChild(4);
+	//back_socket = GetOwner()->GetMeshComponent()->GetChild(5);
 	
-	effect->SetVisible(false);
-	sword_socket1->SetVisible(false);
-	sword_socket2->SetVisible(false);
-	back_socket->SetVisible(false);
+	//effect.lock()->SetVisible(false);
+	//sword_socket1.lock()->SetVisible(false);
+	//sword_socket2.lock()->SetVisible(false);
+	//back_socket.lock()->SetVisible(false);
+	
+	//sword.lock()->AddChild(sword_socket1.lock());
+	//sword.lock()->AddChild(sword_socket2.lock());
 
-	sword->SetLocalPosition(back_socket->GetAnimWorld());
+
+	//auto socketTemp = UStaticMeshComponent::CreateCube();
+	//auto transform = make_shared<MeshTransform>();
+	////socketTemp->SetMeshTransform(transform);
+	//back_socket.lock()->AddChild(sword.lock());
+
+	//sword.lock()->SetLocalPosition(back_socket.lock()->GetAnimWorld());
 
 }
 
 void PlayerMoveScript::Tick()
 {
-	sword->SetLocalPosition(back_socket->GetAnimWorld());
+	//sword.lock()->SetLocalPosition(back_socket.lock()->GetAnimWorld());
 	float deltaTime = TIMER->GetDeltaTime();
 
 	Vec3 up = { 0, 1, 0 };

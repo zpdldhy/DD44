@@ -37,7 +37,7 @@ void TestYR2::Init()
 
 	loader = make_shared<ActorLoader>();
 	//loader->ConvertFbxToAsset();
-	//loader->ConvertObjToAsset("../Resources/Obj/Test/*.obj");
+	//loader->ConvertObjToAsset("../Resources/Obj/*.obj");
 
 	loader->LoadAllAsset();
 	meshResMap = loader->LoadMeshMap();
@@ -193,6 +193,8 @@ void TestYR2::Init()
 			bSaveMesh = true;
 			name = _name;
 		});
+
+
 }
 
 void TestYR2::Update()

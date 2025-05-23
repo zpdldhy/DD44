@@ -15,10 +15,10 @@
 //#include "MeshLoader.h"
 #include "Input.h"
 #include "UBoxComponent.h"
+#include "Timer.h"
 
 void Game::Init()
 {
-	Profiler p("Init");
 	// Asset ·Îµù
 	actorLoader.LoadAllAsset();
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
@@ -32,6 +32,8 @@ void Game::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
+
+
 
 }
 
@@ -49,6 +51,11 @@ void Game::Update()
 			m_bEnginCamera = true;
 			CAMERA->Set3DCameraActor(m_pCameraActor);
 		}
+
+		char buffer[256];
+		float fps = TIMER->GetFPS();
+		sprintf_s(buffer, "Fps : %.6f\n", fps);
+		OutputDebugStringA(buffer);
 	}
 
 }
