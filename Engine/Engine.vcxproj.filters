@@ -329,8 +329,6 @@
       <Filter>Utils\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Profiler.h" />
-    <ClInclude Include="UIState.h">
-      <Filter>FSM</Filter>
     <ClInclude Include="ParticleEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
@@ -343,6 +341,9 @@
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="RenderStateManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="UIState.h">
+      <Filter>FSM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -577,6 +578,9 @@
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="RenderStateManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="UIState.cpp">
+      <Filter>FSM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

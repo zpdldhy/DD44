@@ -29,7 +29,7 @@ void ParticleEditorUI::DrawUI()
 		m_vParticleData.push_back(m_Data);
 		m_iSelectedParticleIndex = static_cast<int>(m_vCreatedParticles.size()) - 1;
 		
-		ActorData copy;
+		TransformData copy;
 		for (int j = 0; j < 3; ++j)
 		{
 			copy.Position[j] = m_Data.Position[j];
@@ -153,7 +153,7 @@ void ParticleEditorUI::DrawUI()
 			{
 				auto newParticle = make_shared<AParticleActor>();
 				m_vCreatedParticles.push_back(newParticle);
-				ActorData tempData;
+				TransformData tempData;
 				tempData.Position[0] = p.Translation.x;
 				tempData.Position[1] = p.Translation.y;
 				tempData.Position[2] = p.Translation.z;
@@ -252,7 +252,7 @@ void ParticleEditorUI::DrawUI()
 		{
 			Vec3 randPos = RandomVec3InBox(m_vBoxMin, m_vBoxMax);
 
-			ActorData copy = m_Data;
+			TransformData copy = m_Data;
 			copy.Position[0] = randPos.x;
 			copy.Position[1] = randPos.y;
 			copy.Position[2] = randPos.z;

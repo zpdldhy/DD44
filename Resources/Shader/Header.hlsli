@@ -43,14 +43,14 @@ cbuffer CB_SpriteUV : register(b4)
     float2 g_uvEnd;
 }
 
-float2 remapUV(float2 uv)
-{
-    return lerp(g_uvStart, g_uvEnd, uv);
-}
-
 cbuffer AnimationBuffer : register(b5)
 {
     matrix obj_matAnim[MAX_BONE];
+}
+
+float2 remapUV(float2 uv)
+{
+    return lerp(g_uvStart, g_uvEnd, uv);
 }
 
 cbuffer CB_Billboard : register(b6)

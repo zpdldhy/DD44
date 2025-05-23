@@ -2,7 +2,7 @@
 #include "ShapeData.h"
 #include "UShapeComponent.h"
 
-struct ActorData
+struct TransformData
 {
 	// Transform
 	float Position[3] = { 0.0f, 0.0f, 0.0f };

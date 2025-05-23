@@ -11,7 +11,7 @@ public:
 	void DrawVec2(const char* label, float* values);
 
 
-	void SetOnCreateCallback(std::function<void(shared_ptr<class AParticleActor>, const char*, const char*, ActorData, Vec2, Vec2, int, float, bool, bool)> callback)
+	void SetOnCreateCallback(std::function<void(shared_ptr<class AParticleActor>, const char*, const char*, TransformData, Vec2, Vec2, int, float, bool, bool)> callback)
 	{
 		m_OnCreate = std::move(callback);
 	}
@@ -29,10 +29,10 @@ private:
 
 	ParticleAnimationData m_AnimData;
 private:
-	std::vector<ActorData> m_vParticleData;
+	std::vector<TransformData> m_vParticleData;
 	//shared_ptr<class AParticleActor> m_pParticleActor = nullptr;
 
-	ActorData m_Data = {
+	TransformData m_Data = {
 		{ 0.0f, 0.0f, 50.0f }, // Position
 		{ 0.0f, 0.0f, 0.0f }, // Rotation
 		{ 20.0f, 20.0f, 20.0f }  // Scale
@@ -60,6 +60,6 @@ private:
 	int m_iSelectedCol = 0;
 
 	char m_szGroupName[64] = "MyParticleGroup";
-	std::function<void(shared_ptr<AParticleActor>, const char*, const char*, ActorData, Vec2, Vec2, int divisions, float duration, bool loop, bool autoDestroy)> m_OnCreate;
+	std::function<void(shared_ptr<AParticleActor>, const char*, const char*, TransformData, Vec2, Vec2, int divisions, float duration, bool loop, bool autoDestroy)> m_OnCreate;
 };
 

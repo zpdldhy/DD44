@@ -17,8 +17,6 @@
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
-#include "AParticleActor.h"
-#include "ParticleManager.h"
 
 void Game::Init()
 {
@@ -152,10 +150,10 @@ void Game::LoadAllPrefabs(const std::string& extension)
 
 					actor->SetMeshComponent(meshComponent);
 
-				actor->m_szName = L"Character";
-				actor->SetPosition(Vec3(characterData.transform.Position));
-				actor->SetRotation(Vec3(characterData.transform.Rotation));
-				actor->SetScale(Vec3(characterData.transform.Scale));
+					actor->m_szName = L"Character";
+					actor->SetPosition(Vec3(characterData.transform.Position));
+					actor->SetRotation(Vec3(characterData.transform.Rotation));
+					actor->SetScale(Vec3(characterData.transform.Scale));
 
 				}
 				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
@@ -242,8 +240,8 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				for (auto& objData : objList)
 				{
 					auto meshComp = make_shared<UStaticMeshComponent>();
-					meshComp->SetMeshPath(to_mw(objData.MeshPath)); 
-					
+					meshComp->SetMeshPath(to_mw(objData.MeshPath));
+
 					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
 					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 

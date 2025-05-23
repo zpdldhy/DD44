@@ -65,7 +65,7 @@ public:
 	{
 		m_pUIEditorUI->SetOnCreateCallback(std::move(callback));
 	}
-	void SetParticleEditorCallbck(std::function<void(shared_ptr<class AParticleActor>, const char*, const char*, ActorData, Vec2, Vec2, int, float, bool,bool)> callback)
+	void SetParticleEditorCallbck(std::function<void(shared_ptr<class AParticleActor>, const char*, const char*, TransformData, Vec2, Vec2, int, float, bool,bool)> callback)
 	{
 		if (m_pParticleEditorUI)
 		m_pParticleEditorUI->SetOnCreateCallback(std::move(callback));

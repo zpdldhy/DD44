@@ -55,9 +55,8 @@ private:
 	shared_ptr<Texture> m_pIdleTexture = nullptr;
 	shared_ptr<Texture> m_pHoverTexture = nullptr;
 	shared_ptr<Texture> m_pActiveTexture = nullptr;
-	shared_ptr<Texture> m_pSelectTexture = nullptr;	
+	shared_ptr<Texture> m_pSelectTexture = nullptr;
 
 	// Prefab
 	PrefabUIData m_PrefabData;
 };
-

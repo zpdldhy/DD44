@@ -93,7 +93,7 @@ struct PrefabParticleData
     Vec3 Rotation;
     Vec3 Translation;
 
-    ActorData actor;
+    TransformData actor;
 
     int Divisions = 4;     // NxN
     int Row = 0;
