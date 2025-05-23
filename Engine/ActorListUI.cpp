@@ -11,8 +11,8 @@ void ActorListUI::DrawUI()
 {
 	if (!m_bVisible) return;
 
-	ImGui::SetNextWindowPos(ImVec2(10.0f, ImGui::GetIO().DisplaySize.y - 360.0f), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_Always);
+	ImGui::SetNextWindowPos(ImVec2(10.0f, ImGui::GetIO().DisplaySize.y - 260.0f), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_Always);
 
 	ImGui::Begin("Actor List", &m_bVisible, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
@@ -39,7 +39,7 @@ void ActorListUI::DrawUI()
 	if (m_iSelectedActorID >= 0)
 	{
 		ImGui::SetNextWindowPos(ImVec2(10.0f, ImGui::GetIO().DisplaySize.y - 870.0f), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2(300, 500), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(300, 600), ImGuiCond_Always);
 
 		ImGui::Begin("Selected Actor Details", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
@@ -71,24 +71,8 @@ void ActorListUI::DrawUI()
 				m_iLastActorID = m_iSelectedActorID;
 			}
 
-			m_vPosition = actor->GetPosition();
-			m_vRotation = actor->GetRotation();
-			m_vScale = actor->GetScale();
-
-			// SRT 조절 UI
-			ImGui::InputFloat3("Position", &m_vPosition.x);
-			ImGui::InputFloat3("Rotation", &m_vRotation.x);
-			ImGui::InputFloat3("Scale", &m_vScale.x);
-
-			static char nameBuffer[64] = "";
-			std::string currentName(actor->m_szName.begin(), actor->m_szName.end());
-			strcpy_s(nameBuffer, currentName.c_str());
-
-			if (ImGui::InputText("Edit Name", nameBuffer, IM_ARRAYSIZE(nameBuffer)))
-			{
-				std::wstring newName(nameBuffer, nameBuffer + strlen(nameBuffer));
-				m_szNewName = newName;
-			}
+			EditActorName(actor);
+			EditActorTransform(actor);
 
 			if (ImGui::Button("Apply"))
 			{
@@ -143,8 +127,8 @@ void ActorListUI::DrawUI()
 				ImGui::Separator(); ImGui::Spacing();
 
 				// ---------------- Shape Info ----------------
-				ViewShapeComponentData(tileActor);
-				ImGui::Separator(); ImGui::Spacing();
+				//ViewShapeComponentData(tileActor);
+				//ImGui::Separator(); ImGui::Spacing();
 
 				// ---------------- Save Prefab ----------------
 				if (ImGui::Button("Save Map Prefab"))
@@ -167,7 +151,8 @@ void ActorListUI::DrawUI()
 				ImGui::Separator(); ImGui::Spacing();
 
 				// ---------------- Mesh Info ----------------
-				ViewMeshComponentData(actor);
+				//ViewMeshComponentData(actor);
+				EditShapeTransformData(actor);
 				ImGui::Separator(); ImGui::Spacing();
 
 				// ---------------- Shape Info ----------------
@@ -195,7 +180,8 @@ void ActorListUI::DrawUI()
 				ImGui::Separator(); ImGui::Spacing();
 
 				// ---------------- Shape Info ----------------
-				ViewShapeComponentData(actor);
+				//ViewShapeComponentData(actor);
+				EditShapeTransformData(actor);
 				ImGui::Separator(); ImGui::Spacing();
 
 				// ---------------- Save Prefab ----------------
@@ -253,7 +239,7 @@ void ActorListUI::ViewMeshComponentData(const std::shared_ptr<AActor>& _actor)
 	bool isSkinned = std::dynamic_pointer_cast<USkinnedMeshComponent>(meshComp) != nullptr;
 
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Mesh Info");
-	ImGui::Text("Mesh Type: %s", isSkinned ? "Skinned" : "Static");
+	ImGui::Text("Mesh Type : %s", isSkinned ? "Skinned" : "Static");
 
 	if (meshComp)
 	{
@@ -263,8 +249,14 @@ void ActorListUI::ViewMeshComponentData(const std::shared_ptr<AActor>& _actor)
 		if (!meshPath.empty())
 		{
 			std::string extension = meshPath.substr(meshPath.find_last_of('.') + 1);
-			std::string typeLabel = (extension == "asset") ? "Asset" : (extension == "obj") ? "Obj" : "Unknown";
-			ImGui::Text("Mesh Path (%s): %s", typeLabel.c_str(), meshPath.c_str());
+
+			std::string displayPath = meshPath;
+			std::string baseFolder = "../Resources/";
+			size_t pos = meshPath.find(baseFolder);
+			if (pos != std::string::npos)
+				displayPath = meshPath.substr(pos + baseFolder.length());
+
+			ImGui::Text("Mesh Path : %s", displayPath.c_str());
 		}
 		else
 		{
@@ -279,20 +271,32 @@ void ActorListUI::ViewMeshComponentData(const std::shared_ptr<AActor>& _actor)
 			std::string texPath(wTex.begin(), wTex.end());
 			std::string shaderPath(wShader.begin(), wShader.end());
 
+			std::string displayTexPath = texPath;
+			std::string displayShaderPath = shaderPath;
+
+			const std::string basePath = "../Resources/";
+			size_t texPos = texPath.find(basePath);
+			if (texPos != std::string::npos)
+				displayTexPath = texPath.substr(texPos + basePath.length());
+
+			size_t shaderPos = shaderPath.find(basePath);
+			if (shaderPos != std::string::npos)
+				displayShaderPath = shaderPath.substr(shaderPos + basePath.length());
+
 			ImGui::Separator(); ImGui::Spacing();
 			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Material Info");
-			ImGui::Text("Texture: %s", texPath.c_str());
-			ImGui::Text("Shader: %s", shaderPath.c_str());
+			ImGui::Text("Texture : %s", displayTexPath.c_str());
+			ImGui::Text("Shader : %s", displayShaderPath.c_str());
 
 			Vec3 spec = { 0.f,0.f,0.f };
 			Vec3 emissive = { 0.f,0.f,0.f };
 			float shininess = 0.f;
 			float emissivePower = 0.f;
 
-			ImGui::Text("SpecularColor: %.2f, %.2f, %.2f", spec.x, spec.y, spec.z);
-			ImGui::Text("Shininess: %.2f", shininess);
-			ImGui::Text("EmissiveColor: %.2f, %.2f, %.2f", emissive.x, emissive.y, emissive.z);
-			ImGui::Text("EmissivePower: %.2f", emissivePower);
+			ImGui::Text("SpecularColor : %.2f, %.2f, %.2f", spec.x, spec.y, spec.z);
+			ImGui::Text("Shininess : %.2f", shininess);
+			ImGui::Text("EmissiveColor : %.2f, %.2f, %.2f", emissive.x, emissive.y, emissive.z);
+			ImGui::Text("EmissivePower : %.2f", emissivePower);
 		}
 	}
 }
@@ -349,6 +353,72 @@ void ActorListUI::ViewMapData(const std::shared_ptr<ATerrainTileActor>& _tileact
 
 void ActorListUI::ViewCharacterData(const std::shared_ptr<AActor>& _actor)
 {
+}
+
+void ActorListUI::EditActorTransform(std::shared_ptr<class AActor>& _actor)
+{
+	m_vPosition = _actor->GetPosition();
+	m_vRotation = _actor->GetRotation();
+	m_vScale = _actor->GetScale();
+
+	// SRT 조절 UI
+	ImGui::InputFloat3("Position", &m_vPosition.x);
+	ImGui::InputFloat3("Rotation", &m_vRotation.x);
+	ImGui::InputFloat3("Scale", &m_vScale.x);
+}
+
+void ActorListUI::EditActorName(std::shared_ptr<class AActor>& _actor)
+{
+	static char nameBuffer[64] = "";
+	std::string currentName(_actor->m_szName.begin(), _actor->m_szName.end());
+	strcpy_s(nameBuffer, currentName.c_str());
+
+	if (ImGui::InputText("Edit Name", nameBuffer, IM_ARRAYSIZE(nameBuffer)))
+	{
+		std::wstring newName(nameBuffer, nameBuffer + strlen(nameBuffer));
+		m_szNewName = newName;
+	}
+}
+
+void ActorListUI::EditShapeTransformData(std::shared_ptr<AActor>& _actor)
+{
+	auto shapeComp = _actor->GetShapeComponent();
+	if (!shapeComp)
+	{
+		ImGui::Separator(); ImGui::Spacing();
+		ImGui::TextColored(ImVec4(1, 1, 0, 1), "Shape Info");
+		ImGui::Text("isUse: false");
+		return;
+	}
+
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Shape Info");
+	ImGui::Text("isUse: true");
+
+	const char* shapeTypeStr = "Unknown";
+	switch (shapeComp->GetShapeType())
+	{
+	case ShapeType::ST_NONE:    shapeTypeStr = "None";    break;
+	case ShapeType::ST_BOX:     shapeTypeStr = "Box";     break;
+	case ShapeType::ST_SPHERE:  shapeTypeStr = "Sphere";  break;
+	case ShapeType::ST_CAPSULE: shapeTypeStr = "Capsule"; break;
+	}
+	ImGui::Text("ShapeType: %s", shapeTypeStr);
+
+	Vec3 shapePos = shapeComp->GetLocalPosition();
+	Vec3 shapeRot = shapeComp->GetLocalRotation();
+	Vec3 shapeScl = shapeComp->GetLocalScale();
+
+	bool updated = false;
+	updated |= ImGui::InputFloat3("Shape Pos", &shapePos.x);
+	updated |= ImGui::InputFloat3("Shape Rot", &shapeRot.x);
+	updated |= ImGui::InputFloat3("Shape Scl", &shapeScl.x);
+
+	if (updated)
+	{
+		shapeComp->SetLocalPosition(shapePos);
+		shapeComp->SetLocalRotation(shapeRot);
+		shapeComp->SetLocalScale(shapeScl);
+	}
 }
 
 void ActorListUI::SaveMapPrefab(const std::shared_ptr<class ATerrainTileActor>& _tileactor)

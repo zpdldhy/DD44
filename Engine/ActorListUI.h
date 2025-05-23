@@ -16,6 +16,11 @@ public:
 	void ViewMapData(const std::shared_ptr<class ATerrainTileActor>& _tileactor);
 	void ViewCharacterData(const std::shared_ptr<class AActor>& _actor);
 
+	// 데이터 수정
+	void EditActorTransform(std::shared_ptr<class AActor>& _actor);
+	void EditActorName(std::shared_ptr<class AActor>& _actor);
+	void EditShapeTransformData(std::shared_ptr<AActor>& _actor);
+
 	// 타입별 저장
 	void SaveMapPrefab(const std::shared_ptr<class ATerrainTileActor>& _tileactor);
 	void SaveCharacterPrefab(const std::shared_ptr<class AActor>& _actor);
