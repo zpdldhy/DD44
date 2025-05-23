@@ -5,6 +5,7 @@ class APawn;
 class ACameraActor;
 class UMeshComponent;
 class MeshLoader;
+class UStaticMeshComponent;
 
 class TestYR : public IExecute
 {
@@ -19,10 +20,20 @@ class TestYR : public IExecute
 	vector<shared_ptr<APawn>> gizmo;
 
 	shared_ptr<UMeshComponent> sword;
-	shared_ptr<UMeshComponent> socket;
+	shared_ptr<UStaticMeshComponent> backSocketComp;
+	shared_ptr<UStaticMeshComponent> handSocketComp;
+
 
 	bool m_bEnginCamera = true;
 	int animIndex;
+	Vec3 rot;
+
+	Vec3 backSwordPos;
+	Vec3 backSwordRot;
+
+	Vec3 handSwordPos;
+	Vec3 handSwordRot;
+
 public:
 	virtual void Init() override;
 	virtual void Update() override;

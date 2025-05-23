@@ -108,27 +108,49 @@ void TestYR::Init()
 	player->SetMeshComponent(bodyComp);
 
 #pragma endregion
-#pragma region Socket
-	auto socketComp = UStaticMeshComponent::CreateCube();
-	socketComp->SetName(L"Socket");
+#pragma region BackSocket
+	backSocketComp = UStaticMeshComponent::CreateCube();
+	backSocketComp->SetName(L"BackSocket");
 
 	// ANIM
 	// 없이 우선 가
-	socketComp->SetAnimInstance(animInstance);
-	socketComp->SetTargetBoneIndex(53);
+	backSocketComp->SetAnimInstance(animInstance);
+	backSocketComp->SetTargetBoneIndex(53);
 
 	// MATERIAL
-	socketComp->SetMaterial(tMat);
+	backSocketComp->SetMaterial(tMat);
 
 	// TRANSFORM
-	shared_ptr<MeshTransform> socketT = make_shared<MeshTransform>();
-	socketComp->SetMeshTransform(socketT);
-	socketComp->GetMeshTransform()->SetLocalPosition(Vec3(-0.5f, -0.5f, -0.0f));
+	shared_ptr<MeshTransform> backSocketT = make_shared<MeshTransform>();
+	backSocketComp->SetMeshTransform(backSocketT);
+	backSocketComp->GetMeshTransform()->SetLocalPosition(Vec3(-0.5f, -0.5f, -0.0f));
 	//socketComp->GetMeshTransform()->SetLocalScale(Vec3(0.1f, 0.1f, 0.1f));
-	socketComp->SetVisible(false);
-	bodyComp->AddChild(socketComp);
+	backSocketComp->SetVisible(false);
+	bodyComp->AddChild(backSocketComp);
+
 #pragma endregion
 
+#pragma region HandSocket
+	handSocketComp = UStaticMeshComponent::CreateCube();
+	handSocketComp->SetName(L"HandSocket");
+
+	// ANIM
+	// 없이 우선 가
+	handSocketComp->SetAnimInstance(animInstance);
+	handSocketComp->SetTargetBoneIndex(43);
+
+	// MATERIAL
+	handSocketComp->SetMaterial(tMat);
+
+	// TRANSFORM
+	shared_ptr<MeshTransform> handSocketT = make_shared<MeshTransform>();
+	handSocketComp->SetMeshTransform(handSocketT);
+	handSocketComp->GetMeshTransform()->SetLocalPosition(Vec3(-0.1f, 0.0f, 0.0f));
+	//handSocketComp->GetMeshTransform()->SetLocalScale(Vec3(0.1f, 0.1f, 0.1f));
+	handSocketComp->SetVisible(false);
+	bodyComp->AddChild(handSocketComp);
+
+#pragma endregion
 #pragma region Sword
 	auto swordComp = make_shared<UStaticMeshComponent>();
 	auto swordRes = meshLoader->GetMeshRes(L"SworddetailSword_weaponTexture1_0");
@@ -144,18 +166,69 @@ void TestYR::Init()
 	// TRANSFORM
 	shared_ptr<MeshTransform> swordT = make_shared<MeshTransform>();
 	swordComp->SetMeshTransform(swordT);
+	
 	swordT->SetLocalScale(Vec3(120.0f, 120.0f, 120.0f));
-	swordT->SetLocalRotation(Vec3(0.1f, 0.0f, -DD_PI / 2));
-	swordT->SetLocalPosition(Vec3(-0.5f, 0.0f, 0.0f));
-	socketComp->AddChild(swordComp);
+
+	//backSwordRot = Vec3(0.1f, 0.0f, -DD_PI / 2);
+	//backSwordPos = Vec3(-0.5f, 0.0f, 0.0f);
+	//swordT->SetLocalRotation(backSwordRot);
+	//swordT->SetLocalPosition(backSwordPos);
+
+	handSwordRot = Vec3(0.0f, 0.0f, DD_PI / 2);
+	backSwordPos = Vec3(1.0f, 0.0f, 0.0f);
+	swordT->SetLocalRotation(handSwordRot);
+	swordT->SetLocalPosition(backSwordPos);
+
+
+	handSocketComp->AddChild(swordComp);
 
 #pragma endregion
 
+#pragma region WallTest
+	//auto wallComp1 = make_shared<UStaticMeshComponent>();
+	//auto wallComp2 = make_shared<UStaticMeshComponent>();
+	//auto wallComp3 = make_shared<UStaticMeshComponent>();
+
+	//auto wallRes = meshLoader->GetMeshRes(L"stone_wallStoneWallVer2_0");
+	//wallComp1->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(wallRes));
+	//wallComp2->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(wallRes));
+	//wallComp3->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(wallRes));
+
+	//wallComp1->SetName(L"Wall1");
+	//wallComp2->SetName(L"Wall2");
+	//wallComp3->SetName(L"Wall3");
+
+	//// ANIM
+	//// socket의 anim 따라감.
+
+	//// MATERIAL
+	//wallComp1->SetMaterial(tMat);
+	//wallComp2->SetMaterial(tMat);
+	//wallComp3->SetMaterial(tMat);
+
+	//// TRANSFORM
+	//shared_ptr<MeshTransform> wall1T = make_shared<MeshTransform>();
+	//shared_ptr<MeshTransform> wall2T = make_shared<MeshTransform>();
+	//shared_ptr<MeshTransform> wall3T = make_shared<MeshTransform>();
+	//wallComp1->SetMeshTransform(wall1T);
+	//wallComp2->SetMeshTransform(wall2T);
+	//wallComp3->SetMeshTransform(wall3T);
+
+	//wall2T->SetLocalPosition(Vec3(0.0f, 5.0f, 0.0f));
+	//wall3T->SetLocalPosition(Vec3(0.0f, 10.0f, 0.0f));
+	//
+	//socketComp->AddChild(wallComp1);
+	//socketComp->AddChild(wallComp2);
+	//socketComp->AddChild(wallComp3);
+
+#pragma endregion
 	auto cameraComponent = make_shared<UCameraComponent>();
 	cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
 	player->SetCameraComponent(cameraComponent);
-	//player->AddScript(movement);
+	player->AddScript(movement);
 	OBJECT->AddActor(player);
+
+
 #pragma region CAMERA
 	// 카메라 세팅
 	{
