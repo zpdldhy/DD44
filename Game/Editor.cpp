@@ -369,7 +369,9 @@ void Editor::SetClickPos()
 
 void Editor::SetGizmoPosition(Vec3 _pos)
 {
-	m_pGizmoCore->SetPosition(Vec3(_pos.x, _pos.y + 1.0f, _pos.z));
+	float offset = 10.0f;
+
+	m_pGizmoCore->SetPosition(Vec3(_pos.x + offset, _pos.y + 1.0f, _pos.z - offset));
 	m_pGizmoX->SetPosition(m_pGizmoCore->GetPosition());
 	m_pGizmoY->SetPosition(m_pGizmoCore->GetPosition());
 	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
@@ -536,6 +538,7 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 					//Profiler p("Mesh From Asset");
 					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
 					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
+					meshComp->SetMeshPath(to_mw(objData.MeshPath));
 				}
 
 				auto material = make_shared<UMaterial>();

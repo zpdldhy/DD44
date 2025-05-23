@@ -69,10 +69,11 @@ void ActorListUI::DrawUI()
 					meshComp->GetMaterial()->SetGlowParams(0.7f, Vec3(1.0f, 0.0f, 0.0f));
 
 				m_iLastActorID = m_iSelectedActorID;
-				m_vPosition = actor->GetPosition();
-				m_vRotation = actor->GetRotation();
-				m_vScale = actor->GetScale();
 			}
+
+			m_vPosition = actor->GetPosition();
+			m_vRotation = actor->GetRotation();
+			m_vScale = actor->GetScale();
 
 			// SRT 조절 UI
 			ImGui::InputFloat3("Position", &m_vPosition.x);
@@ -126,8 +127,8 @@ void ActorListUI::DrawUI()
 				auto tileActor = std::dynamic_pointer_cast<ATerrainTileActor>(actor);
 
 				// ---------------- Transform ----------------
-				ViewTransformData(tileActor);
-				ImGui::Separator(); ImGui::Spacing();
+				//ViewTransformData(tileActor);
+				//ImGui::Separator(); ImGui::Spacing();
 
 				// ----------------- Map Data -----------------
 				ViewMapData(tileActor);
@@ -144,12 +145,18 @@ void ActorListUI::DrawUI()
 				// ---------------- Shape Info ----------------
 				ViewShapeComponentData(tileActor);
 				ImGui::Separator(); ImGui::Spacing();
+
+				// ---------------- Save Prefab ----------------
+				if (ImGui::Button("Save Map Prefab"))
+				{
+					SaveMapPrefab(tileActor);
+				}
 			}
 			else if (extension == ".character.json")
 			{
 				// ---------------- Transform ----------------
-				ViewTransformData(actor);
-				ImGui::Separator(); ImGui::Spacing();
+				//ViewTransformData(actor);
+				//ImGui::Separator(); ImGui::Spacing();
 
 				// -------------- Character Data --------------
 				ViewCharacterData(actor);
@@ -166,12 +173,18 @@ void ActorListUI::DrawUI()
 				// ---------------- Shape Info ----------------
 				ViewShapeComponentData(actor);
 				ImGui::Separator(); ImGui::Spacing();
+
+				// ---------------- Save Prefab ----------------
+				if (ImGui::Button("Save Character Prefab"))
+				{
+					SaveCharacterPrefab(actor);
+				}
 			}
 			else if (extension == ".object.json" || extension == ".objects.json")
 			{
 				// ---------------- Transform ----------------
-				ViewTransformData(actor);
-				ImGui::Separator(); ImGui::Spacing();
+				//ViewTransformData(actor);
+				//ImGui::Separator(); ImGui::Spacing();
 
 				// ---------------- Actor Info ----------------
 				ViewActorInformation(actor);
@@ -184,6 +197,19 @@ void ActorListUI::DrawUI()
 				// ---------------- Shape Info ----------------
 				ViewShapeComponentData(actor);
 				ImGui::Separator(); ImGui::Spacing();
+
+				// ---------------- Save Prefab ----------------
+				if (extension == ".object.json")
+				{
+					if (ImGui::Button("Save Object Prefab"))
+					{
+						SaveObjectPrefab(actor);
+					}
+				}
+				else
+				{
+					// 다중 선택 및 다중 프리팹 저장
+				}
 			}
 		}
 
@@ -323,6 +349,123 @@ void ActorListUI::ViewMapData(const std::shared_ptr<ATerrainTileActor>& _tileact
 
 void ActorListUI::ViewCharacterData(const std::shared_ptr<AActor>& _actor)
 {
+}
+
+void ActorListUI::SaveMapPrefab(const std::shared_ptr<class ATerrainTileActor>& _tileactor)
+{
+	PrefabMapData data;
+	data.Position = m_vPosition;
+	data.Rotation = m_vRotation;
+	data.Scale = m_vScale;
+	data.Cols = _tileactor->GetNumCols();
+	data.Rows = _tileactor->GetNumRows();
+	data.CellSize = _tileactor->GetCellSize();
+	data.SelectedRow = 0;
+	data.SelectedCol = 0;
+	data.TargetHeight = 0.0f;
+	data.TexturePath = to_wm(_tileactor->GetMeshComponent()->GetMaterial()->GetTexturePath());
+	data.ShaderPath = to_wm(_tileactor->GetMeshComponent()->GetMaterial()->GetShaderPath());
+
+	PREFAB->SaveMapTile(data, _tileactor->GetPrefabPath());
+}
+
+void ActorListUI::SaveCharacterPrefab(const std::shared_ptr<class AActor>& _actor)
+{
+	PrefabCharacterData data;
+	data.Name = to_wm(_actor->m_szName);
+	data.MeshPath = "";
+	data.RootMeshPath = "";
+	data.TexturePath = "";
+	data.ShaderPath = "";
+	data.ScriptType = 0;
+	data.AnimIndex = 0;
+	data.AnimSpeed = 1.0f;
+
+	data.actor.Position[0] = m_vPosition.x;
+	data.actor.Position[1] = m_vPosition.y;
+	data.actor.Position[2] = m_vPosition.z;
+	data.actor.Rotation[0] = m_vRotation.x;
+	data.actor.Rotation[1] = m_vRotation.y;
+	data.actor.Rotation[2] = m_vRotation.z;
+	data.actor.Scale[0] = m_vScale.x;
+	data.actor.Scale[1] = m_vScale.y;
+	data.actor.Scale[2] = m_vScale.z;
+
+	auto shape = _actor->GetShapeComponent();
+	if (shape)
+	{
+		data.shape.isUse = true;
+		data.shape.eShapeType = shape->GetShapeType();
+
+		Vec3 sp = shape->GetLocalPosition();
+		Vec3 sr = shape->GetLocalRotation();
+		Vec3 ss = shape->GetLocalScale();
+
+		data.shape.Position[0] = sp.x;
+		data.shape.Position[1] = sp.y;
+		data.shape.Position[2] = sp.z;
+
+		data.shape.Rotation[0] = sr.x;
+		data.shape.Rotation[1] = sr.y;
+		data.shape.Rotation[2] = sr.z;
+
+		data.shape.Scale[0] = ss.x;
+		data.shape.Scale[1] = ss.y;
+		data.shape.Scale[2] = ss.z;
+	}
+
+	PREFAB->SaveCharacter(data, _actor->GetPrefabPath());
+}
+
+void ActorListUI::SaveObjectPrefab(const std::shared_ptr<class AActor>& _actor)
+{
+	PrefabObjectData data;
+	data.Name = to_wm(_actor->m_szName);
+	data.Position = m_vPosition;
+	data.Rotation = m_vRotation;
+	data.Scale = m_vScale;
+
+	auto meshComp = _actor->GetMeshComponent<UMeshComponent>();
+	if (meshComp)
+	{
+		data.MeshPath = to_wm(meshComp->GetMeshPath());
+
+		auto mat = meshComp->GetMaterial();
+		if (mat)
+		{
+			data.TexturePath = to_wm(mat->GetTexturePath());
+			data.ShaderPath = to_wm(mat->GetShaderPath());
+			data.SpecularColor = { 0.f,0.f,0.f };
+			data.Shininess = 0.0f;
+			data.EmissiveColor = { 0.f,0.f,0.f };
+			data.EmissivePower = 0.0f;
+		}
+	}
+
+	auto shape = _actor->GetShapeComponent();
+	if (shape)
+	{
+		data.ShapeData.isUse = true;
+		data.ShapeData.eShapeType = shape->GetShapeType();
+
+		Vec3 sp = shape->GetLocalPosition();
+		Vec3 sr = shape->GetLocalRotation();
+		Vec3 ss = shape->GetLocalScale();
+
+		data.ShapeData.Position[0] = sp.x;
+		data.ShapeData.Position[1] = sp.y;
+		data.ShapeData.Position[2] = sp.z;
+
+		data.ShapeData.Rotation[0] = sr.x;
+		data.ShapeData.Rotation[1] = sr.y;
+		data.ShapeData.Rotation[2] = sr.z;
+
+		data.ShapeData.Scale[0] = ss.x;
+		data.ShapeData.Scale[1] = ss.y;
+		data.ShapeData.Scale[2] = ss.z;
+	}
+
+	PREFAB->SaveObject(data, _actor->GetPrefabPath());
 }
 
 UINT ActorListUI::GetLastActorID()

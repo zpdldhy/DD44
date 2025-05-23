@@ -5,13 +5,21 @@ class ActorListUI
 public:
 	void DrawUI();
 	void Toggle();
+
+	// 공통 데이터 정보
 	void ViewTransformData(const std::shared_ptr<class AActor>& _actor);
 	void ViewActorInformation(const std::shared_ptr<class AActor>& _actor);
 	void ViewMeshComponentData(const std::shared_ptr<class AActor>& _actor);
 	void ViewShapeComponentData(const std::shared_ptr<class AActor>& _actor);
-	
+
+	// 타입별 데이터 정보
 	void ViewMapData(const std::shared_ptr<class ATerrainTileActor>& _tileactor);
 	void ViewCharacterData(const std::shared_ptr<class AActor>& _actor);
+
+	// 타입별 저장
+	void SaveMapPrefab(const std::shared_ptr<class ATerrainTileActor>& _tileactor);
+	void SaveCharacterPrefab(const std::shared_ptr<class AActor>& _actor);
+	void SaveObjectPrefab(const std::shared_ptr<class AActor>& _actor);
 
 	UINT GetLastActorID();
 	UINT GetSelectedActorID();
