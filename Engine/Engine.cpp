@@ -37,7 +37,8 @@ void Engine::Init()
 	{
 		INPUT->Init();
 		//DXWRITE->Create();
-		GUI->Init();
+
+		if (_app->m_type != SCENE_TYPE::GAME) { GUI->Init(); }
 	}
 	_app->Init();
 
@@ -69,12 +70,11 @@ void Engine::Frame()
 
 	GET_SINGLE(Device)->Frame();
 
-	GUI->Update();
-	
+	if (_app->m_type != SCENE_TYPE::GAME) { GUI->Update(); }
 	_app->Update();
 
 	TIMER->Update();
-	
+
 	// Manager Tick
 	{
 		CAMERA->Tick();
@@ -94,7 +94,7 @@ void Engine::Render()
 	_app->Render();
 	// 3D World -> Texture Render
 	{
-		POSTPROCESS->PreRender();		
+		POSTPROCESS->PreRender();
 		OBJECT->Render();	// ObjectList Render
 		PARTICLE->Render();
 		POSTPROCESS->PostRender();
@@ -114,9 +114,11 @@ void Engine::Render()
 
 		DC->RSSetState(m_pCurrentRasterizer.Get());
 		m_pCurrentRasterizer.Reset();
-	}	
+	}
 
-	GUI->Render(); // *Fix Location* after _app->Render() 
+	if (_app->m_type != SCENE_TYPE::GAME) {
+		GUI->Render(); // *Fix Location* after _app->Render() }
+	}
 
 	//DXWRITE->m_pd2dRT->EndDraw();
 	GET_SINGLE(Device)->PostRender();
@@ -127,6 +129,7 @@ void Engine::Release()
 	UI->Destroy();	
 	PARTICLE->Destroy();
 
+	if (_app->m_type != SCENE_TYPE::GAME)
 	{
 		ImGui_ImplDX11_Shutdown();  // DX11 관련 리소스 해제
 		ImGui_ImplWin32_Shutdown(); // Win32 윈도우 관련 연결 해제
@@ -141,8 +144,8 @@ void Engine::Run()
 	_window.SetWindow();
 	Init();
 
-	Timer timer; 
-	timer.Init(); 
+	Timer timer;
+	timer.Init();
 
 	while (_window.CheckRun())
 	{

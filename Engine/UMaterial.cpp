@@ -7,9 +7,9 @@ void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
     m_TexturePath = _textureFileName;
     m_ShaderPath = _shaderFileName;
 
-	m_pShader = SHADER->Load(_shaderFileName);
+	m_pShader = SHADER->Get(_shaderFileName);
     if (_textureFileName != L"")
-        m_pTexture = TEXTURE->Load(_textureFileName);
+        m_pTexture = TEXTURE->Get(_textureFileName);
 	m_pInputlayout = INPUTLAYOUT->Get();
     
     CreateEffectCB();
@@ -39,7 +39,7 @@ void UMaterial::Bind()
         DC->IASetInputLayout(m_pInputlayout->m_pInputLayout.Get());
 	}
 
-	if (m_pEffectCB)
+	if (m_pEffectCB && m_bUseEffect)
 	{
         DC->VSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
         DC->PSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());

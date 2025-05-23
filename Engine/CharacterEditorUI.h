@@ -3,6 +3,7 @@
 #include "ActorLoader.h"
 #include "PrefabLoader.h"
 #include "UMeshComponent.h"
+#include "MeshLoader.h"
 
 class CharacterEditorUI
 {
@@ -34,8 +35,8 @@ public:
     {
         m_OnCreate = std::move(callback);
     }
-    shared_ptr<UMeshComponent> MakeMesh(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance);
-
+//public:
+//    shared_ptr<UMeshComponent> MakeMesh(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance);
 private:
     char m_szAssetPath[256] = "../Resources/Asset/crow_final.asset";
     char m_szMeshPath[256] = "../Resources/Asset/crow_final.mesh";
@@ -87,4 +88,6 @@ public:
 
     vector<shared_ptr<UAnimInstance>> m_vAnimList;
     map<wstring, shared_ptr<UAnimInstance>> m_mAnimMap;
+
+    MeshLoader meshLoader;
 };

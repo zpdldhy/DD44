@@ -51,6 +51,9 @@ using namespace std;
 #include "JSON/json.hpp"
 using json = nlohmann::json;
 
+// TEMP 
+#include "Profiler.h"
+
 // LIBS
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -67,3 +70,4 @@ using json = nlohmann::json;
 // Window º¯¼ö
 extern POINT g_windowSize;
 extern HWND g_hWnd;
+extern bool bRunGame;

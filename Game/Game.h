@@ -1,5 +1,8 @@
 #pragma once
+#define RUN_GAME
 #include "IExecute.h"
+#include "ActorLoader.h"
+#include "MeshLoader.h"
 
 class Game : public IExecute
 {
@@ -15,6 +18,12 @@ public:
 
 	bool m_bEnginCamera = false;
 
+	// Asset loading
+	ActorLoader actorLoader;
+	MeshLoader meshLoader;
+
+	float time;
+
 public:
 	void Init() override;
 	void Update() override;
@@ -26,14 +35,8 @@ protected:
 	void SetupSkybox();
 	void SetupSunLight();
 
-	void SetupEditorCallbacks();
-	void SetupCharacterEditorCallback();
-	void SetupMapEditorCallback();
-	void SetupObjectEditorCallback();
-	void SetupUIEditorCallback();
-	void SetupParticleEditorCallback();
-
 	void LoadAllPrefabs(const std::string& extension);
-
+public:
+	Game() { m_type = SCENE_TYPE::GAME; }
 };
 

@@ -33,6 +33,7 @@ struct PrefabObjectData
     Vec3 EmissiveColor;
     float EmissivePower;
 
+    ShapeComponentData ShapeData;
 };
 
 struct PrefabCharacterData
@@ -49,7 +50,7 @@ struct PrefabCharacterData
     int AnimIndex;
     float AnimSpeed;
 
-    ActorData actor;
+    TransformData transform;
 
     // Component
 	CameraComponentData camera;
@@ -68,16 +69,17 @@ struct PrefabUIData
 {
     std::string Name;
 
+    TransformData transform;
+
+	float SliceUV[4];
+
+    std::string IdleTexturePath;
+    std::string HoverTexturePath;
+    std::string ActiveTexturePath;
+    std::string SelectedTexturePath;
     std::string ShaderPath;
-    std::string TexturePath;
 
     int ScriptType;
-
-    ActorData actor;
-
-    // Component
-    CameraComponentData camera;
-    ShapeComponentData shape;
 };
 
 struct PrefabParticleData

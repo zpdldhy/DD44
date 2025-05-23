@@ -27,12 +27,13 @@ class TestYR2 : public IExecute
 	bool bSaveMesh;
 	shared_ptr<APawn> m_pActor;
 	string name;
+	int animIndex = 0;
 
 public:
 	virtual void Init() override;
 	virtual void Update() override;
 	virtual void Render() override;
 public:
-	void AddChild(ChildMeshData data);
+	void AddChild(PreMeshData data);
 };
 

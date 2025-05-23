@@ -69,6 +69,7 @@ struct CB_SpriteUV
 class UMaterial
 {
 	bool m_bUseStencil = false;
+	bool m_bUseEffect = true;
 
 	std::wstring m_TexturePath;
 	std::wstring m_ShaderPath;
@@ -107,7 +108,9 @@ public:
 	void SetCameraPos(const Vec3& camPos);
 
 	void SetUseStencil(bool _bUseStencil) { m_bUseStencil = _bUseStencil; }
-	bool IsUseStencil() { return m_bUseStencil; }
+	bool IsUseStencil() { return m_bUseStencil; }	
+	void SetUseEffect(bool _bUseEffect) { m_bUseEffect = _bUseEffect; }
+	bool IsUseEffect() { return m_bUseEffect; }
 	void SetUVRange(Vec2 start, Vec2 end);
 public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }

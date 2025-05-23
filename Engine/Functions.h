@@ -61,6 +61,17 @@ static std::wstring SplitName(std::wstring filename)
 	return key;
 }
 
+static std::wstring SplitExt(std::wstring filename)
+{
+	TCHAR szFileName[256];
+	TCHAR Drive[MAX_PATH];
+	TCHAR Dir[MAX_PATH];
+	TCHAR FName[MAX_PATH];
+	TCHAR Ext[MAX_PATH];
+	_tsplitpath_s(filename.c_str(), Drive, Dir, FName, Ext);
+
+	return Ext;
+}
 static std::wstring to_mw(const std::string& _src)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;

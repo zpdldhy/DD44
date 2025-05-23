@@ -19,7 +19,18 @@ public:
 	static MeshComponentData LoadMesh(const char* filepath);
 	static MeshComponentData LoadOneMesh(FILE* pFile);
 
+	static void ExportJsonMesh(shared_ptr<APawn> _actor, string filepath); 
+	static void ExportSkinned(int num ,nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh);
+	static void ExportStatic(int num, nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh);
+
+	static MeshComponentData LoadJsonMesh(const char* filepath);
+	static MeshComponentData LoadOneJsonMesh(int num, const nlohmann::ordered_json& j);
+
+
 	static void ExportWstring(FILE* pFile, wstring _str);
 	static wstring LoadWstring(FILE* pFile);
+
+	static json  MatrixToJson(const Matrix& mat);
+	static Matrix LoadMatrixFromJson(const nlohmann::ordered_json& j);
 };
 

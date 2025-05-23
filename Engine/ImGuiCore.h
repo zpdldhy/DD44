@@ -29,6 +29,7 @@ public:
 	MapEditorUI* GetMapEditorUI() const { return m_pMapEditorUI.get(); }
 	ObjectEditorUI* GetObjectEditorUI() const { return m_pObjectEditorUI.get(); }
 	EffectEditorUI* GetEffectEditorUI() const { return 	m_pEffectEditorUI.get(); }
+	ActorListUI* GetActorListUI() const { return m_pActorListUI.get(); }
 	MeshEditorUI* GetMeshEditorUI() const { return m_pMeshEditorUI.get(); }
 	UIEditorUI* GetUIEditorUI() const { return m_pUIEditorUI.get(); }
 
@@ -40,7 +41,7 @@ public:
 	{
 		m_pMapEditorUI->SetOnCreateCallback(std::move(callback));
 	}
-	void SetObjectEditorCallback(std::function<void(const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float)> callback)
+	void SetObjectEditorCallback(std::function<void(const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float, ShapeComponentData)> callback)
 	{
 		m_pObjectEditorUI->SetOnCreateCallback(std::move(callback));
 	}
@@ -52,15 +53,15 @@ public:
 	{
 		m_pEffectEditorUI->SetLightApplyCallback(std::move(callback));
 	}
-	void SetBaseMeshEditorCallback(std::function<void(wstring, int, int, int, shared_ptr<APawn>&)> callback)
+	void SetBaseMeshEditorCallback(function<void(PreMeshData, shared_ptr<APawn>&)> callback)
 	{
 		m_pMeshEditorUI->CreateActorCallback(std::move(callback));
 	}
-	void SetChildMeshEditorCallback(std::function<void(ChildMeshData)> callback)
+	void SetChildMeshEditorCallback(std::function<void(PreMeshData, shared_ptr<APawn>&)> callback)
 	{
 		m_pMeshEditorUI->CreateChildMeshCallback(std::move(callback));
 	}
-	void SetUIEditorCallback(std::function<void(shared_ptr<class AUIActor>, const char*, const char*, ActorData)> callback)
+	void SetUIEditorCallback(std::function<void(shared_ptr<class AUIActor>, const char*, const char*, TransformData, Vec4)> callback)
 	{
 		m_pUIEditorUI->SetOnCreateCallback(std::move(callback));
 	}

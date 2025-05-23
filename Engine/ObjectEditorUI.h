@@ -1,4 +1,5 @@
 #pragma once
+#include "EditorData.h"
 
 class ObjectEditorUI
 {
@@ -10,7 +11,8 @@ public:
 
     bool IsSnapEnabled() const { return m_bSnapEnabled; }
     std::vector<std::string> GetPrefabList(const std::string& folderPath);
-    void SetOnCreateCallback(std::function<void(const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float)> callback)
+    void SetOnCreateCallback(std::function<void(
+        const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float, ShapeComponentData)> callback)
     {
         m_OnCreate = std::move(callback);
     }
@@ -26,7 +28,7 @@ private:
     float m_fRotation[3] = { 0.0f, 0.0f, 0.0f };
     float m_fScale[3] = { 1.0f, 1.0f, 1.0f };
 
-    char m_szObjPath[256] = "../Resources/Obj/wall/stone_wall.obj";
+    char m_szObjPath[256] = "../Resources/Asset/stone_wall.asset";
     char m_szTexturePath[256] = "../Resources/Obj/wall/stone_wall.png";
     char m_szShaderPath[256] = "../Resources/Shader/Wall.hlsl";
  
@@ -35,9 +37,11 @@ private:
     float m_fSpecularColor[3] = { 0.f, 0.f, 0.f };
     float m_fShininess = 0.f;  
     
+    ShapeComponentData m_ShapeData;
 
     std::vector<std::string> m_vObjectPrefabList;
 
-    std::function<void(const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float)> m_OnCreate;
+    std::function<void(
+        const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float, ShapeComponentData)> m_OnCreate;
 
 };

@@ -20,6 +20,10 @@
 
 void TestYoooooon::Init()
 {
+	actorLoader.LoadAllAsset();
+	meshLoader.SetMesh(actorLoader.LoadMeshMap());
+	meshLoader.SetAnim(actorLoader.LoadAnimMap());
+
 	SetupEditorCallbacks();
 
 	LoadAllPrefabs(".map.json");
@@ -216,23 +220,14 @@ void TestYoooooon::SetupMapEditorCallback()
 
 void TestYoooooon::SetupObjectEditorCallback()
 {
-
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 emissiveColor, float emissivepower, ShapeComponentData shapeData)
 		{
-			AssimpLoader loader;
-			vector<MeshData> meshList = loader.Load(objPath);
-			if (meshList.empty())
-				return;
-
+			ActorLoader al;
+			al.LoadOne(objPath);
 			auto meshComp = make_shared<UStaticMeshComponent>();
 			meshComp->SetMeshPath(to_mw(objPath));
-
-			auto meshRes = make_shared<UStaticMeshResources>();
-			meshRes->SetVertexList(meshList[0].m_vVertexList);
-			meshRes->SetIndexList(meshList[0].m_vIndexList);
-			meshRes->Create();
-
-			meshComp->SetMesh(meshRes);
+			auto resources = al.LoadMeshResources();
+			meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources[0]));
 
 			auto mat = make_shared<UMaterial>();
 			mat->Load(
@@ -255,19 +250,36 @@ void TestYoooooon::SetupObjectEditorCallback()
 			actor->SetRotation(rot);
 			actor->SetScale(scale);
 
+			if (shapeData.isUse)
+			{
+				shared_ptr<UShapeComponent> shapeComp = nullptr;
+
+				if (shapeData.eShapeType == ShapeType::ST_BOX)
+					shapeComp = std::make_shared<UBoxComponent>();
+				//else if (shapeData.eShapeType == ShapeType::ST_SPHERE)
+
+				shapeComp->SetLocalScale(Vec3(shapeData.Scale));
+				shapeComp->SetLocalPosition(Vec3(shapeData.Position));
+				shapeComp->SetLocalRotation(Vec3(shapeData.Rotation));
+				shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+				actor->SetShapeComponent(shapeComp);
+			}
+
 			OBJECT->AddActor(actor);
 		});
 }
 
 void TestYoooooon::SetupUIEditorCallback()
 {
-	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData)
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Vec4 sliceUV)
 		{
 			uiActor->m_szName = L"UI";
 			auto meshComp = UStaticMeshComponent::CreatePlane();
 			uiActor->SetMeshComponent(meshComp);
 
 			auto mat = make_shared<UMaterial>();
+			mat->SetUseEffect(false);
 			mat->Load(
 				std::wstring(texPath, texPath + strlen(texPath)),
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
@@ -283,6 +295,7 @@ void TestYoooooon::SetupUIEditorCallback()
 			uiActor->SetPosition(Vec3(actorData.Position));
 			uiActor->SetRotation(Vec3(actorData.Rotation));
 			uiActor->SetScale(Vec3(actorData.Scale));
+			uiActor->SetSliceData(sliceUV);
 
 			UI->AddUI(uiActor);
 		});
@@ -407,16 +420,8 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 					auto meshComp = make_shared<UStaticMeshComponent>();
 					meshComp->SetMeshPath(to_mw(objData.MeshPath));
 
-					auto meshRes = make_shared<UStaticMeshResources>();
-					AssimpLoader loader;
-					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
-					if (!meshList.empty())
-					{
-						meshRes->SetVertexList(meshList[0].m_vVertexList);
-						meshRes->SetIndexList(meshList[0].m_vIndexList);
-						meshRes->Create();
-						meshComp->SetMesh(meshRes);
-					}
+					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
+					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 
 					auto material = make_shared<UMaterial>();
 					material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
@@ -445,6 +450,7 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 				uiActor->SetMeshComponent(meshComp);
 
 				auto mat = make_shared<UMaterial>();
+				mat->SetUseEffect(false);
 				mat->Load(L"", to_mw(uiData.ShaderPath));
 				meshComp->SetMaterial(mat);
 
@@ -457,6 +463,7 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 				uiActor->SetPosition(Vec3(uiData.transform.Position));
 				uiActor->SetRotation(Vec3(uiData.transform.Rotation));
 				uiActor->SetScale(Vec3(uiData.transform.Scale));
+				uiActor->SetSliceData(Vec4(uiData.SliceUV));
 
 				uiActor->SetPrefabData(uiData);
 
