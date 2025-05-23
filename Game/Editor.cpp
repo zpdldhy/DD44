@@ -38,7 +38,7 @@ void Editor::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
-	SetupGizmo();
+	//SetupGizmo();
 }
 
 void Editor::Update()

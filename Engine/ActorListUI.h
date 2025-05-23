@@ -5,6 +5,13 @@ class ActorListUI
 public:
 	void DrawUI();
 	void Toggle();
+	void ViewTransformData(const std::shared_ptr<class AActor>& _actor);
+	void ViewActorInformation(const std::shared_ptr<class AActor>& _actor);
+	void ViewMeshComponentData(const std::shared_ptr<class AActor>& _actor);
+	void ViewShapeComponentData(const std::shared_ptr<class AActor>& _actor);
+	
+	void ViewMapData(const std::shared_ptr<class ATerrainTileActor>& _tileactor);
+	void ViewCharacterData(const std::shared_ptr<class AActor>& _actor);
 
 	UINT GetLastActorID();
 	UINT GetSelectedActorID();
