@@ -10,7 +10,11 @@ public:
     Vec3 SnapToGrid(const Vec3& position, float gridSize);
 
     bool IsSnapEnabled() const { return m_bSnapEnabled; }
+
+    void SetFileBrower(const std::string& root, const std::string& relative);
+    std::vector<std::string> GetMeshFileList(const std::string& folderPath);
     std::vector<std::string> GetPrefabList(const std::string& folderPath);
+
     void SetOnCreateCallback(std::function<void(
         const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float, ShapeComponentData)> callback)
     {
@@ -39,6 +43,7 @@ private:
     
     ShapeComponentData m_ShapeData;
 
+    std::vector<std::string> m_vObjectMeshList;
     std::vector<std::string> m_vObjectPrefabList;
 
     std::function<void(

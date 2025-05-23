@@ -34,7 +34,7 @@ public:
 	void SetSelectedGizmoAxis(UINT id);
 
 private:
-	bool m_bVisible = false;
+	bool m_bVisible = true;
 	float m_fSlideOffset = 0.0f;
 
 	Vec3 m_vPosition;

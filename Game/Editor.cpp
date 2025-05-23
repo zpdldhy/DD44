@@ -285,12 +285,30 @@ void Editor::SetupObjectEditorCallback()
 			auto actor = make_shared<APawn>();
 			actor->m_szName = L"Object";
 
-			ActorLoader al;
-			al.LoadOne(objPath);
-			auto meshComp = make_shared<UStaticMeshComponent>();
-			meshComp->SetMeshPath(to_mw(objPath));
-			auto resources = al.LoadMeshResources();
-			meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources[0]));
+			shared_ptr<UStaticMeshComponent> meshComp = make_shared<UStaticMeshComponent>();
+			if (SplitExt(to_mw(objPath)) == L".obj")
+			{
+				//Profiler p("Mesh From Obj");
+				AssimpLoader loader;
+				vector<MeshData> meshList = loader.Load(objPath);
+				meshComp->SetMeshPath(to_mw(objPath)); // 이거 풀네임으로 들어가야되는건가 ? 나중에 어디서 쓰이나 ? 
+				auto meshRes = make_shared<UStaticMeshResources>();
+				if (!meshList.empty())
+				{
+					meshRes->SetVertexList(meshList[0].m_vVertexList);
+					meshRes->SetIndexList(meshList[0].m_vIndexList);
+					meshRes->Create();
+					meshComp->SetMesh(meshRes);
+				}
+
+			}
+			else
+			{
+				//Profiler p("Mesh From Asset");
+				auto resources = actorLoader.LoadOneRes(objPath);
+				meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
+				meshComp->SetMeshPath(to_mw(objPath));
+			}
 
 			if (shapeData.isUse)
 			{
@@ -309,10 +327,7 @@ void Editor::SetupObjectEditorCallback()
 			}
 
 			auto mat = make_shared<UMaterial>();
-			mat->Load(
-				std::wstring(texPath, texPath + strlen(texPath)),
-				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
-			);
+			mat->Load(to_mw(texPath), to_mw(shaderPath));
 			meshComp->SetMaterial(mat);
 
 			// Snap 적용 여부 확인

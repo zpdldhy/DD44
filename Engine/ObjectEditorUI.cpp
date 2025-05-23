@@ -4,6 +4,28 @@
 
 void ObjectEditorUI::DrawUI()
 {
+    // 式式式式式式式式式式式式式式式式式式式式式式式式式式 Mesh Browser  式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Browse Mesh Files");
+
+    ImGui::BeginChild("FileExplorer", ImVec2(0, 200), true);
+    SetFileBrower("../Resources/Obj/", "");
+    ImGui::EndChild();
+
+    //static std::string selectedMeshFile = "";
+    //std::vector<std::string> meshFiles = GetMeshFileList("../Resources/Obj/");
+
+    //for (const auto& file : meshFiles)
+    //{
+    //    if (ImGui::Selectable(file.c_str(), selectedMeshFile == file))
+    //    {
+    //        selectedMeshFile = file;
+    //        std::string fullPath = "../Resources/Obj/" + file;
+    //        strcpy_s(m_szObjPath, fullPath.c_str());
+    //    }
+    //}
+
+    ImGui::Separator(); ImGui::Spacing();
+
     // 式式式式式式式式式式式式式式式式式式式式式式式式式式 Asset Paths 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Asset Paths");
     ImGui::InputText("Asset", m_szObjPath, IM_ARRAYSIZE(m_szObjPath));
@@ -177,6 +199,104 @@ void ObjectEditorUI::DrawUI()
         }
     }
     ImGui::Separator(); ImGui::Spacing();
+}
+
+void ObjectEditorUI::SetFileBrower(const std::string& root, const std::string& relative)
+{
+    std::string fullPath = root + relative;
+    std::string searchPath = fullPath + "\\*";
+
+    WIN32_FIND_DATAA findData;
+    HANDLE hFind = FindFirstFileA(searchPath.c_str(), &findData);
+    if (hFind == INVALID_HANDLE_VALUE)
+        return;
+
+    std::vector<std::string> folders;
+    std::vector<std::string> files;
+
+    do
+    {
+        const char* name = findData.cFileName;
+        if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
+            continue;
+
+        if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+        {
+            folders.push_back(name);
+        }
+        else
+        {
+            std::string ext = name;
+            size_t dot = ext.find_last_of('.');
+            if (dot != std::string::npos)
+                ext = ext.substr(dot + 1);
+
+            if (ext == "obj")
+                files.push_back(name);
+        }
+
+    } while (FindNextFileA(hFind, &findData));
+    FindClose(hFind);
+
+    std::sort(folders.begin(), folders.end());
+    std::sort(files.begin(), files.end());
+
+    for (const auto& folder : folders)
+    {
+        std::string path = relative.empty() ? folder : (relative + "/" + folder);
+        std::string label = "[DIR] " + folder;
+
+        if (ImGui::TreeNode(label.c_str()))
+        {
+            SetFileBrower(root, path);
+            ImGui::TreePop();
+        }
+    }
+
+    for (const auto& file : files)
+    {
+        std::string path = relative.empty() ? file : (relative + "/" + file);
+        std::string label = "- " + file;
+
+        ImGui::Indent(20.0f);
+        if (ImGui::Selectable(label.c_str()))
+        {
+            std::string selectedFullPath = root + path;
+            strcpy_s(m_szObjPath, selectedFullPath.c_str());
+        }
+
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::BeginTooltip();
+            ImGui::Text("%s", (root + path).c_str());
+            ImGui::EndTooltip();
+        }
+        ImGui::Unindent(20.0f);
+    }
+}
+
+std::vector<std::string> ObjectEditorUI::GetMeshFileList(const std::string& folderPath)
+{
+    std::vector<std::string> result;
+
+    std::string searchPath = folderPath + "*.*";
+    WIN32_FIND_DATAA findData;
+    HANDLE hFind = FindFirstFileA(searchPath.c_str(), &findData);
+
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            std::string file = findData.cFileName;
+            if (file.find(".asset") != std::string::npos || file.find(".obj") != std::string::npos)
+            {
+                result.push_back(file);
+            }
+        } while (FindNextFileA(hFind, &findData));
+        FindClose(hFind);
+    }
+
+    return result;
 }
 
 std::vector<std::string> ObjectEditorUI::GetPrefabList(const std::string& folderPath)
