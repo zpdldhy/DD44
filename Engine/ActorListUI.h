@@ -1,5 +1,13 @@
 #pragma once
 
+enum class GizmoMode
+{
+	Translate = 0,
+	Rotate,
+	Scale,
+	None
+};
+
 class ActorListUI
 {
 public:
@@ -29,9 +37,11 @@ public:
 	UINT GetLastActorID();
 	UINT GetSelectedActorID();
 	UINT GetSelectedGizmoAxis();
+	GizmoMode GetMode() { return m_eGizmoMode; }
 
 	void SetSelectedActorID(UINT id);
 	void SetSelectedGizmoAxis(UINT id);
+	void SetGizmoMode(GizmoMode _mode) { m_eGizmoMode = _mode; }
 
 private:
 	bool m_bVisible = true;
@@ -45,5 +55,7 @@ private:
 	int m_iLastActorID = -1;
 	int m_iSelectedActorID = -1;
 	int m_iSelectedGizmoAxis = -1;
+
+	GizmoMode m_eGizmoMode = GizmoMode::None;
 };
 

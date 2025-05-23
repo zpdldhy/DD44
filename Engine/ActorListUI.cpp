@@ -365,6 +365,23 @@ void ActorListUI::EditActorTransform(std::shared_ptr<class AActor>& _actor)
 	ImGui::InputFloat3("Position", &m_vPosition.x);
 	ImGui::InputFloat3("Rotation", &m_vRotation.x);
 	ImGui::InputFloat3("Scale", &m_vScale.x);
+
+	// Gizmo Mode 선택 UI
+	int srtMode = static_cast<int>(m_eGizmoMode);
+	const char* srtLabels[] = { "Translate", "Rotate", "Scale" };
+
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Gizmo Mode (SRT)");
+
+	if (ImGui::Combo("SRT Mode", &srtMode, srtLabels, IM_ARRAYSIZE(srtLabels)))
+	{
+		m_eGizmoMode = static_cast<GizmoMode>(srtMode);
+	}
+
+	// 단축키 입력 처리 (UI 갱신도 함께)
+	bool ctrl = ImGui::GetIO().KeyCtrl;
+	if (ctrl && ImGui::IsKeyPressed(ImGuiKey_W)) { m_eGizmoMode = GizmoMode::Translate; srtMode = 0; }
+	if (ctrl && ImGui::IsKeyPressed(ImGuiKey_E)) { m_eGizmoMode = GizmoMode::Rotate;    srtMode = 1; }
+	if (ctrl && ImGui::IsKeyPressed(ImGuiKey_R)) { m_eGizmoMode = GizmoMode::Scale;     srtMode = 2; }
 }
 
 void ActorListUI::EditActorName(std::shared_ptr<class AActor>& _actor)
