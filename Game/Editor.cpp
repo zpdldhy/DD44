@@ -57,6 +57,11 @@ void Editor::Update()
 		}
 	}
 
+	if (GUI->GetObjectEditorUI()->IsPlacementMode() && INPUT->GetButton(LCLICK))
+	{
+		CreateObjectAtMousePick();
+	}
+
 	SetActorPositionByDragging();
 }
 
@@ -353,7 +358,7 @@ void Editor::SetClickPos()
 	shared_ptr<AActor> pActor = nullptr;
 	if (Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor))
 	{
-		if (!pActor) return;
+		if (!pActor || pActor->m_szName == L"Terrain") return;
 
 		if (pActor->m_szName != L"Gizmo")
 		{
@@ -394,6 +399,8 @@ void Editor::SetGizmoPosition(Vec3 _pos)
 
 void Editor::SetActorPositionByDragging()
 {
+	if (GUI->GetObjectEditorUI()->IsPlacementMode()) return;
+
 	if (INPUT->GetButtonDown(LCLICK))
 	{
 		SetClickPos();
@@ -452,6 +459,42 @@ void Editor::SetActorPositionByDragging()
 		GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
 	}
 }
+
+void Editor::CreateObjectAtMousePick()
+{
+	MouseRay ray;
+	ray.Click();
+
+	shared_ptr<AActor> tileActor;
+	if (!Collision::CheckRayCollision(ray, OBJECT->GetActorIndexList(), tileActor))
+		return;
+
+	// 진짜 Terrain이랑 충돌한 경우에만 처리
+	if (!tileActor || tileActor->m_szName != L"Terrain")
+		return;
+
+	auto terrain = std::dynamic_pointer_cast<ATerrainTileActor>(tileActor);
+	if (!terrain || !terrain->GetShapeComponent())
+		return;
+
+	Box box = static_pointer_cast<UBoxComponent>(terrain->GetShapeComponent())->GetBounds();
+	Vec3 hitPos;
+	Ray castRay(ray.position, ray.direction);
+
+	if (!Collision::CheckAABBToRay(castRay, box, hitPos))
+		return;
+
+	float x = hitPos.x;
+	float z = hitPos.z;
+	float y = terrain->GetHeightAt(x, z);
+
+	Vec3 placePos(x, y, z);
+	if (GUI->GetObjectEditorUI()->IsSnapEnabled())
+		placePos = GUI->GetObjectEditorUI()->SnapToGrid(placePos, 10.0f);
+
+	GUI->GetObjectEditorUI()->CreateAtPosition(placePos);
+}
+
 
 void Editor::LoadAllPrefabs(const std::string& extension)
 {

@@ -8,12 +8,14 @@ public:
     void DrawVec3Slider(const char* label, float* values, float minVal, float maxVal);
 
     Vec3 SnapToGrid(const Vec3& position, float gridSize);
-
     bool IsSnapEnabled() const { return m_bSnapEnabled; }
+    bool IsPlacementMode() const { return m_bPlacementMode; }
 
-    void SetFileBrower(const std::string& root, const std::string& relative);
-    std::vector<std::string> GetMeshFileList(const std::string& folderPath);
-    std::vector<std::string> GetPrefabList(const std::string& folderPath);
+    std::vector<std::string> LoadMeshFileList(const std::string& folderPath);
+    std::vector<std::string> LoadPrefabList(const std::string& folderPath);
+
+    void StartFileBrowser(const std::string& root, const std::string& relative);
+    void CreateAtPosition(const Vec3& pos);
 
     void SetOnCreateCallback(std::function<void(
         const char*, const char*, const char*, Vec3, Vec3, Vec3, Vec3, float, Vec3, float, ShapeComponentData)> callback)
@@ -21,10 +23,9 @@ public:
         m_OnCreate = std::move(callback);
     }
 
-
 private:
     bool m_bSnapEnabled = false;
-    bool m_bShowObjectList = false;
+    bool m_bPlacementMode = false;
 
     int m_iSelectedPlacedIndex = -1;
 

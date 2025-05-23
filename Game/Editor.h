@@ -53,6 +53,8 @@ protected:
 	void SetClickPos();
 	void SetGizmoPosition(Vec3 _pos);
 	void SetActorPositionByDragging();
+	void CreateObjectAtMousePick();
+
 	void LoadAllPrefabs(const std::string& extension);
 
 };

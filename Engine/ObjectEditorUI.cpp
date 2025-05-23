@@ -8,21 +8,10 @@ void ObjectEditorUI::DrawUI()
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Browse Mesh Files");
 
     ImGui::BeginChild("FileExplorer", ImVec2(0, 200), true);
-    SetFileBrower("../Resources/Obj/", "");
+    StartFileBrowser("../Resources/Obj/", "");
     ImGui::EndChild();
 
-    //static std::string selectedMeshFile = "";
-    //std::vector<std::string> meshFiles = GetMeshFileList("../Resources/Obj/");
-
-    //for (const auto& file : meshFiles)
-    //{
-    //    if (ImGui::Selectable(file.c_str(), selectedMeshFile == file))
-    //    {
-    //        selectedMeshFile = file;
-    //        std::string fullPath = "../Resources/Obj/" + file;
-    //        strcpy_s(m_szObjPath, fullPath.c_str());
-    //    }
-    //}
+    ImGui::Checkbox("Placement Mode", &m_bPlacementMode);
 
     ImGui::Separator(); ImGui::Spacing();
 
@@ -201,7 +190,7 @@ void ObjectEditorUI::DrawUI()
     ImGui::Separator(); ImGui::Spacing();
 }
 
-void ObjectEditorUI::SetFileBrower(const std::string& root, const std::string& relative)
+void ObjectEditorUI::StartFileBrowser(const std::string& root, const std::string& relative)
 {
     std::string fullPath = root + relative;
     std::string searchPath = fullPath + "\\*";
@@ -248,7 +237,7 @@ void ObjectEditorUI::SetFileBrower(const std::string& root, const std::string& r
 
         if (ImGui::TreeNode(label.c_str()))
         {
-            SetFileBrower(root, path);
+            StartFileBrowser(root, path);
             ImGui::TreePop();
         }
     }
@@ -275,7 +264,27 @@ void ObjectEditorUI::SetFileBrower(const std::string& root, const std::string& r
     }
 }
 
-std::vector<std::string> ObjectEditorUI::GetMeshFileList(const std::string& folderPath)
+void ObjectEditorUI::CreateAtPosition(const Vec3& pos)
+{
+    if (!m_OnCreate)
+        return;
+
+    m_OnCreate(
+        m_szTexturePath,
+        m_szShaderPath,
+        m_szObjPath,
+        pos,
+        Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]),
+        Vec3(m_fScale[0], m_fScale[1], m_fScale[2]),
+        Vec3(m_fSpecularColor[0], m_fSpecularColor[1], m_fSpecularColor[2]),
+        m_fShininess,
+        Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]),
+        m_fEmissivePower,
+        m_ShapeData
+    );
+}
+
+std::vector<std::string> ObjectEditorUI::LoadMeshFileList(const std::string& folderPath)
 {
     std::vector<std::string> result;
 
@@ -299,7 +308,7 @@ std::vector<std::string> ObjectEditorUI::GetMeshFileList(const std::string& fold
     return result;
 }
 
-std::vector<std::string> ObjectEditorUI::GetPrefabList(const std::string& folderPath)
+std::vector<std::string> ObjectEditorUI::LoadPrefabList(const std::string& folderPath)
 {
     std::vector<std::string> result;
 
