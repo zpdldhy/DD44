@@ -33,6 +33,7 @@ void ImGuiCore::Init()
 	m_pActorListUI = std::make_unique<ActorListUI>();
 	m_pMeshEditorUI = make_unique<MeshEditorUI>();
 	m_pUIEditorUI = make_unique<UIEditorUI>();
+	m_pParticleEditorUI = make_unique<ParticleEditorUI>();
 }
 
 void ImGuiCore::Update()
@@ -93,6 +94,11 @@ void ImGuiCore::Update()
 			if (ImGui::BeginTabItem("UI Editor"))
 			{
 				if (m_pUIEditorUI) m_pUIEditorUI->DrawUI();
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Particle Editor"))
+			{
+				if (m_pParticleEditorUI) m_pParticleEditorUI->DrawUI();
 				ImGui::EndTabItem();
 			}
 			ImGui::EndTabBar();

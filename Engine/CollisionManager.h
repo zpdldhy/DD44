@@ -3,36 +3,36 @@
 #include "UBoxComponent.h"
 
 struct pair_hash {
-	template<typename T1, typename T2>
-	size_t operator()(const pair<T1, T2>& p) const {
-		return hash<T1>()(p.first) ^ hash<T2>()(p.second);
-	}
+    template<typename T1, typename T2>
+    size_t operator()(const pair<T1, T2>& p) const {
+        return hash<T1>()(p.first) ^ hash<T2>()(p.second);
+    }
 };
 
 class Collision : public Singleton<Collision>
 {
-	using CollisionFunc = function<void(shared_ptr<class AActor>, shared_ptr<class AActor>)>;
-	unordered_map<pair<ShapeType,ShapeType>, CollisionFunc, pair_hash> collisionMap;
+    using CollisionFunc = function<void(shared_ptr<class AActor>, shared_ptr<class AActor>)>;
+    unordered_map<pair<ShapeType, ShapeType>, CollisionFunc, pair_hash> collisionMap;
 
 public:
-	void Init();
+    void Init();
 
 public:
-	void CheckCollision(vector<UINT> _vActorIndex);
-	static bool CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor);
+    void CheckCollision(vector<UINT> _vActorIndex);
+    static bool CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor);
 
 public:
-	// Ray
-	static bool CheckRayToPlane(const Ray& _ray, const Plane& _plane);
-	static bool CheckMousePicking(const Ray& _ray, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2, const Vec3& _normal, Vec3& _inter);
-	static bool CheckAABBToRay(const Ray& _ray, const Box& _box, Vec3& _inter);
+    // Ray
+    static bool CheckRayToPlane(const Ray& _ray, const Plane& _plane);
+    static bool CheckMousePicking(const Ray& _ray, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2, const Vec3& _normal, Vec3& _inter);
+    static bool CheckAABBToRay(const Ray& _ray, const Box& _box, Vec3& _inter);
 
-	static bool GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& _inter);
-	static bool PointInPolygon(const Vec3& _inter, const Vec3& _faceNormal, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2);
+    static bool GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& _inter);
+    static bool PointInPolygon(const Vec3& _inter, const Vec3& _faceNormal, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2);
 };
 
 class Collision2D
 {
 public:
-	static bool CheckRectToPoint(const POINT& _point, const Vec2& _rectMin, const Vec2& _rectMax);
+    static bool CheckRectToPoint(const POINT& _point, const Vec2& _rectMin, const Vec2& _rectMax);
 };

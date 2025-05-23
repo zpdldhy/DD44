@@ -60,9 +60,6 @@
     <ClInclude Include="TestYR2.h">
       <Filter>Test</Filter>
     </ClInclude>
-    <ClInclude Include="TestYoooooon.h">
-      <Filter>Test</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -104,9 +101,6 @@
     <ClCompile Include="TestYR2.cpp">
       <Filter>Test</Filter>
     </ClCompile>
-    <ClCompile Include="TestYoooooon.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
@@ -137,6 +131,9 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\UVSlice.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\SpriteUV.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

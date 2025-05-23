@@ -26,6 +26,8 @@ void AActor::Init()
 		script->SetOwner(shared_from_this());
 		script->Init();
 	}
+
+	
 }
 
 void AActor::Tick()
@@ -43,6 +45,7 @@ void AActor::Tick()
 	{
 		script->Tick();
 	}
+
 }
 
 void AActor::Render()

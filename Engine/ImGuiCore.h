@@ -7,6 +7,7 @@
 #include "ActorListUI.h"
 #include "MeshEditorUI.h"
 #include "UIEditorUI.h"
+#include "ParticleEditorUI.h"
 
 class ImGuiCore : public Singleton<ImGuiCore>
 {
@@ -18,6 +19,8 @@ private:
 	std::unique_ptr<class ActorListUI> m_pActorListUI;
 	std::unique_ptr<class MeshEditorUI> m_pMeshEditorUI;
 	std::unique_ptr<class UIEditorUI> m_pUIEditorUI;
+	std::unique_ptr<class ParticleEditorUI> m_pParticleEditorUI;
+
 
 public:
 	bool m_bEditorToolVisible = true;
@@ -61,6 +64,11 @@ public:
 	void SetUIEditorCallback(std::function<void(shared_ptr<class AUIActor>, const char*, const char*, TransformData, Vec4)> callback)
 	{
 		m_pUIEditorUI->SetOnCreateCallback(std::move(callback));
+	}
+	void SetParticleEditorCallbck(std::function<void(shared_ptr<class AParticleActor>, const char*, const char*, TransformData, Vec2, Vec2, int, float, bool,bool)> callback)
+	{
+		if (m_pParticleEditorUI)
+		m_pParticleEditorUI->SetOnCreateCallback(std::move(callback));
 	}
 
 public:

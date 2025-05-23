@@ -19,6 +19,8 @@
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
+#include "AParticleActor.h"
+#include "ParticleManager.h"
 
 bool bRunGame = true;
 
@@ -263,6 +265,7 @@ void Editor::SetupEditorCallbacks()
 	SetupMapEditorCallback();
 	SetupObjectEditorCallback();
 	SetupUIEditorCallback();
+	SetupParticleEditorCallback();
 }
 
 void Editor::SetupCharacterEditorCallback()
@@ -489,6 +492,54 @@ void Editor::SetClickPos()
 		}
 	}
 }
+
+void Editor::SetupParticleEditorCallback()
+{
+	GUI->SetParticleEditorCallbck([this](
+		shared_ptr<AParticleActor> particleActor,
+		const char* texPath,
+		const char* shaderPath,
+		TransformData actorData,
+		Vec2 uvStart,
+		Vec2 uvEnd,
+		int divisions,
+		float duration,
+		bool loop,
+		bool autoDestroy)
+		{
+			particleActor->m_szName = L"Particle";
+
+			// 1. 메시 (Quad)
+			auto meshComp = UStaticMeshComponent::CreatePlane(); // 또는 CreateQuad()
+			particleActor->SetMeshComponent(meshComp);
+
+			// 2. 머티리얼 로드
+			auto mat = make_shared<UMaterial>();
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+
+			// 3. UV 설정 (셰이더에 넘기기 위함)
+			mat->SetUVRange(uvStart, uvEnd); // → SetUVRange() 함수 내부에서 CB 업데이트
+
+			// 4. 머티리얼, 트랜스폼 적용
+			meshComp->SetMaterial(mat);
+
+			particleActor->SetMeshComponent(meshComp);
+			particleActor->SetPosition(Vec3(actorData.Position));
+			particleActor->SetRotation(Vec3(actorData.Rotation));
+			particleActor->SetScale(Vec3(actorData.Scale));
+			particleActor->InitSpriteAnimation(divisions, duration);
+			particleActor->SetLoop(loop);
+			particleActor->SetAutoDestroy(autoDestroy);
+
+			// 5. 화면에 등록
+			PARTICLE->AddUI(particleActor);
+			//particleActor->InitSpriteAnimation(4, 1.f); // 4는 divisions, 10은 frameRate
+		});
+}
+
 
 void Editor::LoadAllPrefabs(const std::string& extension)
 {

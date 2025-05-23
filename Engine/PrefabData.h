@@ -82,6 +82,40 @@ struct PrefabUIData
     int ScriptType;
 };
 
+struct PrefabParticleData
+{
+    std::string Name;
+
+    std::string ShaderPath;
+    std::string TexturePath;
+
+    Vec3 Scale;
+    Vec3 Rotation;
+    Vec3 Translation;
+
+    TransformData actor;
+
+    int Divisions = 4;     // NxN
+    int Row = 0;
+    int Col = 0;
+
+    Vec2 UVStart = { 0.0f, 0.0f };
+    Vec2 UVEnd = { 1.0f, 1.0f };
+
+    float BillboardSizeX = 100.0f;
+    float BillboardSizeY = 100.0f;
+
+    float Duration = 1.0f;
+    bool bLoop = true;
+    bool bAutoDestroy = false;
+};
+
+struct PrefabParticleGroupData
+{
+    std::string GroupName; 
+    std::vector<PrefabParticleData> Particles;
+};
+
 struct ModifiedCellData
 {
     int Row;

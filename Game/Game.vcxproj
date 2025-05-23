@@ -151,7 +151,6 @@
     <ClInclude Include="TestPlayer.h" />
     <ClInclude Include="TestSJ.h" />
     <ClInclude Include="TestSY.h" />
-    <ClInclude Include="TestYoooooon.h" />
     <ClInclude Include="TestYR.h" />
     <ClInclude Include="TestYR2.h" />
   </ItemGroup>
@@ -169,7 +168,6 @@
     <ClCompile Include="TestPlayer.cpp" />
     <ClCompile Include="TestSJ.cpp" />
     <ClCompile Include="TestSY.cpp" />
-    <ClCompile Include="TestYoooooon.cpp" />
     <ClCompile Include="TestYR.cpp" />
     <ClCompile Include="TestYR2.cpp" />
   </ItemGroup>
@@ -210,6 +208,11 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\Sky.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\SpriteUV.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
