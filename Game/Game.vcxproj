@@ -151,6 +151,7 @@
     <ClInclude Include="TestPlayer.h" />
     <ClInclude Include="TestSJ.h" />
     <ClInclude Include="TestSY.h" />
+    <ClInclude Include="TestYoooooon.h" />
     <ClInclude Include="TestYR.h" />
     <ClInclude Include="TestYR2.h" />
   </ItemGroup>
@@ -168,6 +169,7 @@
     <ClCompile Include="TestPlayer.cpp" />
     <ClCompile Include="TestSJ.cpp" />
     <ClCompile Include="TestSY.cpp" />
+    <ClCompile Include="TestYoooooon.cpp" />
     <ClCompile Include="TestYR.cpp" />
     <ClCompile Include="TestYR2.cpp" />
   </ItemGroup>

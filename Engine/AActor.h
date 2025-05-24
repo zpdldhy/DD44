@@ -11,7 +11,6 @@ enum class ComponentType
 	CT_CAMERA,
 	CT_SHAPE,
 	//CT_EFFECT,
-	CT_TRANSFORM,
 	CT_MESH,
 	CT_LIGHT,
 	CT_COUNT,
@@ -67,7 +66,7 @@ public:
 		
 	// Script
 	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }
-	const std::vector<std::shared_ptr<UScriptComponent>>& GetScriptList() const { return m_vScript; }
+	const std::vector<std::shared_ptr<class UScriptComponent>>& GetScriptList() const { return m_vScript; }
 
 public:
 	const Vec3& GetPosition() const { return m_pTransform->GetLocalPosition(); }

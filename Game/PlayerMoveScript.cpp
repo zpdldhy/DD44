@@ -10,17 +10,11 @@
 
 void PlayerMoveScript::Init()
 {
+	auto camera = GetOwner()->GetCameraComponent();
+	camera->SetLookAt(GetOwner()->GetPosition());
+
 	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetLocalPosition();
 	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-
-	//auto shape = make_shared<UBoxComponent>();
-	//shape->SetLocalScale({ 1.f, 2.0f, 1.f });
-	//shape->SetLocalRotation({ 0.0f, 0.0f, 0.0f });
-	//shape->SetLocalPosition({ 0.0f, 1.0f, 0.0f });
-	//shape->SetOwner(GetOwner());
-	//shape->Init();
-	//GetOwner()->SetShapeComponent(shape);
-
 }
 
 void PlayerMoveScript::Tick()
@@ -106,4 +100,6 @@ void PlayerMoveScript::Tick()
 		m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
 	}
 
+	auto camera = GetOwner()->GetCameraComponent();
+	camera->SetLookAt(GetOwner()->GetPosition());
 }

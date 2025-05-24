@@ -10,11 +10,7 @@ void UCameraComponent::Init()
 	USceneComponent::Init();
 
 	UpdateView();
-
-	if (m_ProjectionType == ProjectionType::PT_ORTHOGRAPHIC)
-		UpdateOrthographicProjection();
-	else if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
-		UpdatePersPectiveProjection();
+	UpdateProjection();
 
 #ifndef DEBUG
 	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
@@ -27,11 +23,7 @@ void UCameraComponent::Tick()
 	USceneComponent::Tick();
 
 	UpdateView();
-
-	if (m_ProjectionType == ProjectionType::PT_ORTHOGRAPHIC)
-		UpdateOrthographicProjection();
-	else if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
-		UpdatePersPectiveProjection();
+	UpdateProjection();
 
 #ifndef DEBUG
 	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
@@ -79,7 +71,7 @@ void UCameraComponent::CreateFrustumBox()
 	Vec3 vMax = Vec3(1.f, 1.f, 1.f);
 
 	Matrix matViewProj;
-	(m_matView * m_matProjection).Invert(matViewProj);
+	matViewProj = (m_matView * m_matProjection).Invert();
 
 	// Front
 	vertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0.f, 0.f, +1.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
@@ -155,7 +147,7 @@ void UCameraComponent::CreateFrustumBox()
 
 	m_pFrustumBox->SetMeshComponent(pMesh);
 	m_pFrustumBox->SetPosition(m_vWorldPosition);
-	m_pFrustumBox->SetScale(m_vLocalScale);
+	m_pFrustumBox->SetRotation(m_vWorldRotation);
 
 	m_pFrustumBox->Init();	
 }
@@ -163,6 +155,7 @@ void UCameraComponent::CreateFrustumBox()
 void UCameraComponent::UpdateFrustumBox()
 {
 	m_pFrustumBox->SetPosition(m_vWorldPosition);
+	m_pFrustumBox->SetRotation(m_vWorldRotation);
 
 	m_pFrustumBox->Tick();
 
@@ -171,45 +164,25 @@ void UCameraComponent::UpdateFrustumBox()
 
 void UCameraComponent::UpdateView()
 {
-	if (Vec3::Distance(Vec3(0.f, 0.f, 0.f), m_vLocalPosition) < 0.1f)
-		m_vLook = m_pOwner.lock()->GetLook();
-	else
-		m_vLook = -m_vLocalPosition;
-
 	Vec3 vUp = Vec3(0.f, 1.f, 0.f);
 
-	m_vLook.Normalize();
-
-	m_matView = DirectX::XMMatrixLookAtLH(m_vWorldPosition, m_vWorldPosition + m_vLook, vUp);
-
-	// Update Rotate - Look이 바꼈기 때문.
-	m_vLocalLook = m_matView.Forward();
-	m_vLocalRight = m_matView.Left();
-	m_vLocalUp = m_matView.Up();
-
-	m_matLocal._31 = m_vLocalLook.x; m_matLocal._32 = m_vLocalLook.y; m_matLocal._33 = m_vLocalLook.z;
-	m_matLocal._11= m_vLocalRight.x; m_matLocal._12= m_vLocalRight.y; m_matLocal._13= m_vLocalRight.z;
-	m_matLocal._21 = m_vLocalUp.x;	 m_matLocal._22 = m_vLocalUp.y;	  m_matLocal._23 = m_vLocalUp.z;
-
-	Vec3 Scale, Position;
-	Quaternion rotQuat;
-	m_matLocal.Decompose(Scale, rotQuat, Position);
-
-	m_vLocalRotation.x = rotQuat.x;
-	m_vLocalRotation.y = rotQuat.y;
-	m_vLocalRotation.z = rotQuat.z;
+	if (m_ViewType == ViewType::VT_LOOKAT)
+	{
+		m_matView = DirectX::XMMatrixLookAtLH(m_vWorldPosition, m_vLookAt, vUp);
+		m_vLookTo = m_vLookAt - m_vWorldPosition;
+		m_vLookTo.Normalize();
+	}
+	else if(m_ViewType == ViewType::VT_LOOKTO)
+		m_matView = DirectX::XMMatrixLookToLH(m_vWorldPosition, m_vLookTo, vUp);
 }
 
-void UCameraComponent::UpdateOrthographicProjection()
-{	
-	m_matProjection = DirectX::XMMatrixOrthographicLH(m_fWidth, m_fHeight, m_fNear, m_fFar);
-}
-
-void UCameraComponent::UpdatePersPectiveProjection()
+void UCameraComponent::UpdateProjection()
 {
-	m_matProjection = DirectX::XMMatrixPerspectiveFovLH(m_fFov, m_fAspect, m_fNear, m_fFar);
+	if (m_ProjectionType == ProjectionType::PT_ORTHOGRAPHIC)
+		m_matProjection = DirectX::XMMatrixOrthographicLH(m_fWidth, m_fHeight, m_fNear, m_fFar);
+	else if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
+		m_matProjection = DirectX::XMMatrixPerspectiveFovLH(m_fFov, m_fAspect, m_fNear, m_fFar);
 }
-
 void UCameraComponent::SetOrthographic(float _fWidth, float _fHeight)
 {
 	m_fWidth = _fWidth;

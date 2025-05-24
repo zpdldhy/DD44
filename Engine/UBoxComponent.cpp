@@ -85,13 +85,16 @@ void UBoxComponent::CreateCollisionRange()
 	//pMesh->SetMaterial(pMaterial);
 
 	m_pCollisionRange->SetScale(m_vLocalScale);
-	m_pCollisionRange->SetPosition(m_Box.vCenter);
+	m_pCollisionRange->SetRotation(m_vWorldRotation);
+	m_pCollisionRange->SetPosition(m_vWorldPosition);
 
 	m_pCollisionRange->Init();
 }
 
 void UBoxComponent::UpdateCollisionRange()
 {
+	m_pCollisionRange->SetScale(m_vLocalScale);
+	m_pCollisionRange->SetRotation(m_vWorldRotation);
 	m_pCollisionRange->SetPosition(m_vWorldPosition);
 	m_pCollisionRange->Tick();
 }
