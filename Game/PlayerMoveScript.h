@@ -1,5 +1,6 @@
 #pragma once
 #include "UScriptComponent.h"
+#include "PlayerStates.h"
 
 class APawn;
 class AActor;
@@ -25,12 +26,18 @@ public:
 	// 어떻게 관리해야 좋을지 모르겟음
 	weak_ptr<UMeshComponent> sword;
 	weak_ptr<UMeshComponent> effect;
-	weak_ptr<UMeshComponent> sword_socket1;
-	weak_ptr<UMeshComponent> sword_socket2;
-	weak_ptr<UMeshComponent> back_socket;
+	weak_ptr<UMeshComponent> handSocket;
+	weak_ptr<UMeshComponent> backSocket;
+
+	shared_ptr<StateBase> idle;
+	shared_ptr<StateBase> walk;
+	shared_ptr<StateBase> attack;
+	shared_ptr<StateBase> currentState;
 
 public:
 	void Init() override;
 	void Tick() override;
+public:
+	void ChangetState(shared_ptr<StateBase> _state);
 };
 

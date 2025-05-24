@@ -23,8 +23,11 @@ public:
 	const std::wstring& GetMeshPath() const { return m_MeshPath; }
 
 	void AddChild(shared_ptr<UMeshComponent> _child);// { m_vChild.push_back(_child); }
+	void RemoveChild(int _index);
+	int GetChildIndex(shared_ptr<UMeshComponent> _child);
 	shared_ptr<UMeshComponent> GetChild(int _index) { return m_vChild[_index]; }
 	vector<shared_ptr<UMeshComponent>> GetChildren() { return m_vChild; }
+	shared_ptr<UMeshComponent> GetChildByName(const wstring& _name);
 	
 	void SetMeshTransform(const shared_ptr<MeshTransform>& _pMeshTrans) { m_pMeshTrans = _pMeshTrans; }
 	const shared_ptr<MeshTransform>& GetMeshTransform() { return m_pMeshTrans; }

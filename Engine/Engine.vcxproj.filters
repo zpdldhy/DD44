@@ -329,6 +329,12 @@
     </ClInclude>
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="MeshTransform.h" />
+    <ClInclude Include="StateBase.h">
+      <Filter>Headers\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachine.h">
+      <Filter>Headers\Template</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">

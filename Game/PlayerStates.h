@@ -1,0 +1,76 @@
+#pragma once
+#include "StateBase.h"
+class AActor;
+class UMeshComponent;
+
+enum PLAYER_STATE
+{
+	PLAYER_S_IDLE = 0,
+	PLAYER_S_WALK,
+	PLAYER_S_ATTACK,
+	PLAYER_S_HIT,
+	PLAYER_S_DEATH,
+	PLAYER_S_COUNT
+};
+
+class PlayerIdleState : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+public:
+	PlayerIdleState(weak_ptr<AActor> _pOwner);
+	~PlayerIdleState() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+
+};
+
+class PlayerWalkState : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+public:
+	PlayerWalkState(weak_ptr<AActor> _pOwner);
+	~PlayerWalkState() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+
+};
+
+class PlayerAttackState : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+
+	shared_ptr<StateBase>* m_pCurrentState = nullptr;
+	shared_ptr<StateBase> m_pPrevState;
+
+	weak_ptr<UMeshComponent> m_pSword;
+	weak_ptr<UMeshComponent> m_pBackSocket;
+	weak_ptr<UMeshComponent> m_pHandSocket;
+
+	Vec3 handSwordRot = Vec3(0.0f, 0.0f, DD_PI / 2);
+	Vec3 handSwordPos = Vec3(1.0f, 0.0f, 0.0f);
+
+	Vec3 backSwordRot = Vec3(0.0f, 0.3f, -DD_PI / 2);
+	Vec3 backSwordPos = Vec3(-0.5f, 0.0f, 0.0f);
+
+public:
+	PlayerAttackState(weak_ptr<AActor> _pOwner);
+	~PlayerAttackState() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+	void SetPrevState(const shared_ptr<StateBase>& _prevState) { m_pPrevState = _prevState; }
+	void SetCurrentState(shared_ptr<StateBase>* _currentState) { m_pCurrentState = _currentState; }
+	// sword, hand, back ¼ø¼­
+	void SetComponent(weak_ptr<UMeshComponent> _sword, weak_ptr<UMeshComponent> _hand, weak_ptr<UMeshComponent> _back);
+};

@@ -81,7 +81,7 @@ void TestYR::Init()
 
 	shared_ptr<UMaterial> tMat = make_shared<UMaterial>();
 	tMat->Load(L"../Resources/Texture/red.png", L"../Resources/Shader/Default.hlsl");
-	
+
 	shared_ptr<UMaterial> tCrowMat = make_shared<UMaterial>();
 	tCrowMat->Load(L"../Resources/Texture/crow_DIFF.png", L"../Resources/Shader/Default.hlsl");
 #pragma region Body
@@ -129,7 +129,6 @@ void TestYR::Init()
 	bodyComp->AddChild(backSocketComp);
 
 #pragma endregion
-
 #pragma region HandSocket
 	handSocketComp = UStaticMeshComponent::CreateCube();
 	handSocketComp->SetName(L"HandSocket");
@@ -152,7 +151,7 @@ void TestYR::Init()
 
 #pragma endregion
 #pragma region Sword
-	auto swordComp = make_shared<UStaticMeshComponent>();
+	swordComp = make_shared<UStaticMeshComponent>();
 	auto swordRes = meshLoader->GetMeshRes(L"SworddetailSword_weaponTexture1_0");
 	swordComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(swordRes));
 	swordComp->SetName(L"Sword");
@@ -166,24 +165,26 @@ void TestYR::Init()
 	// TRANSFORM
 	shared_ptr<MeshTransform> swordT = make_shared<MeshTransform>();
 	swordComp->SetMeshTransform(swordT);
-	
+
 	swordT->SetLocalScale(Vec3(120.0f, 120.0f, 120.0f));
 
-	//backSwordRot = Vec3(0.1f, 0.0f, -DD_PI / 2);
-	//backSwordPos = Vec3(-0.5f, 0.0f, 0.0f);
-	//swordT->SetLocalRotation(backSwordRot);
-	//swordT->SetLocalPosition(backSwordPos);
+	backSwordRot = Vec3(0.0f, 0.3f, -DD_PI / 2);
+	backSwordPos = Vec3(-0.5f, 0.0f, 0.0f);
+	swordT->SetLocalRotation(backSwordRot);
+	swordT->SetLocalPosition(backSwordPos);
+	backSocketComp->AddChild(swordComp);
 
 	handSwordRot = Vec3(0.0f, 0.0f, DD_PI / 2);
-	backSwordPos = Vec3(1.0f, 0.0f, 0.0f);
-	swordT->SetLocalRotation(handSwordRot);
-	swordT->SetLocalPosition(backSwordPos);
+	handSwordPos = Vec3(1.0f, 0.0f, 0.0f);
+	//swordT->SetLocalRotation(handSwordRot);
+	//swordT->SetLocalPosition(handSwordPos);
 
 
-	handSocketComp->AddChild(swordComp);
+	//handSocketComp->AddChild(swordComp);
+
+	currentSwordParent = backSocketComp;
 
 #pragma endregion
-
 #pragma region WallTest
 	//auto wallComp1 = make_shared<UStaticMeshComponent>();
 	//auto wallComp2 = make_shared<UStaticMeshComponent>();
@@ -227,6 +228,17 @@ void TestYR::Init()
 	player->SetCameraComponent(cameraComponent);
 	player->AddScript(movement);
 	OBJECT->AddActor(player);
+#pragma endregion
+
+
+#pragma region HeadRoller
+	enemy1 = make_shared<APawn>();
+	auto meshComponent = meshLoader->Make("../Resources/Asset/E_HEADROLLER.mesh.json");
+	enemy1->SetMeshComponent(meshComponent);
+	enemy1->SetPosition(Vec3(5.0f, 0.0f, 0.0f));
+	OBJECT->AddActor(enemy1);
+#pragma endregion
+
 
 
 #pragma region CAMERA
@@ -263,13 +275,33 @@ void TestYR::Update()
 
 	if (INPUT->GetButton(C))
 	{
-		auto anim = dynamic_pointer_cast<USkinnedMeshComponent>(player->GetMeshComponent())->GetAnimInstance();
-		if (++animIndex >= anim->GetAnimTrackList().size())
-		{
-			animIndex = 0;
-		}
-		anim->SetCurrentAnimTrack(animIndex);
+		//auto anim = dynamic_pointer_cast<USkinnedMeshComponent>(enemy1->GetMeshComponent())->GetAnimInstance();
+		//if (++animIndex >= anim->GetAnimTrackList().size())
+		//{
+		//	animIndex = 0;
+		//}
+		//anim->SetCurrentAnimTrack(animIndex);
 	}
+
+	//if (INPUT->GetButton(LCLICK))
+	//{
+	//	// 부모를 못찾으면 이거는 일회성임 .. 
+	//	// 이 처리를 어떻게 깔끔하게 해줘야할지 모르겠음
+	//	int index = currentSwordParent->GetChildIndex(swordComp);
+	//	if (index < 0)
+	//	{
+	//		assert(false);
+	//	}
+	//	currentSwordParent->RemoveChild(index);
+	//	handSocketComp->AddChild(swordComp);
+
+	//	// 여전히 일회성
+	//	currentSwordParent = handSocketComp;
+
+	//	swordComp->GetMeshTransform()->SetLocalPosition(handSwordPos);
+	//	swordComp->GetMeshTransform()->SetLocalRotation(handSwordRot);
+
+	//}
 }
 
 void TestYR::Render()

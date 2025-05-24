@@ -130,6 +130,35 @@ void MeshTransform::UpdateRotationMatrix()
 	//m_matRotation = mat;
 }
 
+
+void MeshTransform::SetParent(const shared_ptr<MeshTransform>& _parent)
+{
+	if (HasParent())
+	{
+		m_pParent.lock()->RemoveChild(shared_from_this());
+		m_pParent = _parent;
+	}
+	else
+	{
+		m_pParent = _parent;
+	}
+}
+
+void MeshTransform::RemoveChild(const shared_ptr<MeshTransform>& _child)
+{
+	for (auto iter = m_vChild.begin(); iter != m_vChild.end(); )
+	{
+		if (iter->lock() == _child)
+		{
+			iter = m_vChild.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+}
+
 shared_ptr<MeshTransform> MeshTransform::Clone()
 {
 	shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();

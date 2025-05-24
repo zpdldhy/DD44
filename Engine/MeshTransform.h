@@ -3,7 +3,7 @@ class MeshTransform : public enable_shared_from_this<MeshTransform>
 {
 private:
 	Vec3 m_vLocalScale = { 1.0f, 1.0f, 1.0f };
-	Vec3 m_vLocalRotation = { 0.0f, 0.0f, 0.0f} ;
+	Vec3 m_vLocalRotation = { 0.0f, 0.0f, 0.0f };
 	Vec3 m_vLocalPosition = { 0.0f, 0.0f, 0.0f };
 	Vec3 m_vLocalLook;
 	Vec3 m_vLocalRight;
@@ -57,8 +57,9 @@ public:
 	void UpdateRotationMatrix();
 
 public:
-	void SetParent(const shared_ptr<MeshTransform>& _parent) { m_pParent = _parent; }
+	void SetParent(const shared_ptr<MeshTransform>& _parent);
 	void AddChild(const shared_ptr<MeshTransform>& _child) { m_vChild.push_back(_child); }
+	void RemoveChild(const shared_ptr<MeshTransform>& _child);
 	bool HasParent() { return m_pParent.expired() ? false : true; }
 
 	shared_ptr<MeshTransform> Clone();

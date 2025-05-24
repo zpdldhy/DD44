@@ -141,12 +141,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Editor.h" />
+    <ClInclude Include="EnemyState.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="HeadRollerMove.h" />
+    <ClInclude Include="HeadRollerStates.h" />
     <ClInclude Include="kkongchiMoveScript.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayerMoveScript.h" />
+    <ClInclude Include="PlayerStates.h" />
     <ClInclude Include="Sample.h" />
     <ClInclude Include="TestPlayer.h" />
     <ClInclude Include="TestSJ.h" />
@@ -158,12 +162,15 @@
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="HeadRollerMove.cpp" />
+    <ClCompile Include="HeadRollerStates.cpp" />
     <ClCompile Include="kkongchiMoveScript.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PlayerMoveScript.cpp" />
+    <ClCompile Include="PlayerStates.cpp" />
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="TestPlayer.cpp" />
     <ClCompile Include="TestSJ.cpp" />

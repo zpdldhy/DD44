@@ -29,6 +29,46 @@ void UMeshComponent::AddChild(shared_ptr<UMeshComponent> _child)
 
 }
 
+void UMeshComponent::RemoveChild(int _index)
+{
+	auto child = GetChild(_index);
+	// Transform 정리
+	m_vChild.erase(m_vChild.begin() + _index);
+
+}
+
+int UMeshComponent::GetChildIndex(shared_ptr<UMeshComponent> _child)
+{
+	for (int i = 0; i < m_vChild.size(); i++)
+	{
+		if (m_vChild[i] == _child)
+		{
+			return i;
+		}
+	}
+	// 없는 자식을 참조하려함
+	return -1;
+}
+
+shared_ptr<UMeshComponent> UMeshComponent::GetChildByName(const wstring& _name)
+{
+	for (auto& child : m_vChild)
+	{
+		if (child->GetName() == _name)
+		{
+			return child;
+		}
+
+		auto found = child->GetChildByName(_name);
+		if (found)
+		{
+			return found;
+		}
+	}
+
+	return nullptr;
+}
+
 void UMeshComponent::SetLocalPosition(const Vec3& _pos)
 {
 	if (m_pMeshTrans)

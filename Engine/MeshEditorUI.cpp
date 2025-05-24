@@ -83,7 +83,7 @@ void MeshEditorUI::DrawUI()
 				m_OnCreateActor(root, m_pActor);
 
 				// 멤버 변수 초기화
-				m_meshIndex = m_rootBoneIndex = -1;
+				m_meshIndex =  -1;
 			}
 		}
 	}

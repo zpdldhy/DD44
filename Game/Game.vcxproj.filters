@@ -19,6 +19,9 @@
     <Filter Include="Test">
       <UniqueIdentifier>{d4e0bb08-4e67-4ce4-8abd-d7b0b6588aad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FSM">
+      <UniqueIdentifier>{7b412256-442e-4bcb-952a-0319c0fd1227}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -60,6 +63,18 @@
     <ClInclude Include="TestYR2.h">
       <Filter>Test</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerStates.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadRollerMove.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadRollerStates.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyState.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -100,6 +115,15 @@
     </ClCompile>
     <ClCompile Include="TestYR2.cpp">
       <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerStates.cpp">
+      <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="HeadRollerMove.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="HeadRollerStates.cpp">
+      <Filter>FSM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
