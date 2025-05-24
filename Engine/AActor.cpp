@@ -6,7 +6,7 @@
 
 AActor::AActor()
 {
-	m_pTransform = make_shared<USceneComponent>();
+	m_pTransform = make_unique<USceneComponent>();
 }
 
 void AActor::Init()
@@ -27,9 +27,7 @@ void AActor::Init()
 	{
 		script->SetOwner(shared_from_this());
 		script->Init();
-	}
-
-	
+	}	
 }
 
 void AActor::Tick()
@@ -49,7 +47,6 @@ void AActor::Tick()
 	{
 		script->Tick();
 	}
-
 }
 
 void AActor::Render()

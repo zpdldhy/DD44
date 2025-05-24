@@ -46,12 +46,12 @@ public:
 	//--------------------------------------------------------------------------------------
 protected:
 	friend class UCameraComponent;
-	shared_ptr<USceneComponent> m_pTransform = nullptr;
+	unique_ptr<USceneComponent> m_pTransform = nullptr;
 	array<shared_ptr<USceneComponent>, static_cast<size_t>(ComponentType::CT_COUNT)> m_arrComponent;
 	vector<shared_ptr<class UScriptComponent>> m_vScript;
 
 public:
-	shared_ptr<USceneComponent> GetTransform() { return m_pTransform; }
+	USceneComponent* GetTransform() { return m_pTransform.get(); }
 	template<typename T>
 	shared_ptr<T> GetMeshComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
 	shared_ptr<UMeshComponent> GetMeshComponent() { return static_pointer_cast<UMeshComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
@@ -66,7 +66,7 @@ public:
 		
 	// Script
 	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }
-	const std::vector<std::shared_ptr<class UScriptComponent>>& GetScriptList() const { return m_vScript; }
+	const std::vector<std::shared_ptr<UScriptComponent>>& GetScriptList() const { return m_vScript; }
 
 public:
 	const Vec3& GetPosition() const { return m_pTransform->GetLocalPosition(); }
@@ -83,7 +83,4 @@ public:
 	void SetWolrdMatrix(const Matrix& _mat) { m_pTransform->SetWorldMatrix(_mat); }
 	void AddPosition(const Vec3& _pos) { m_pTransform->AddLocalPosition(_pos); }
 	void AddRotation(const Vec3& _rot) { m_pTransform->AddLocalRotation(_rot); }
-
-
-
 };
