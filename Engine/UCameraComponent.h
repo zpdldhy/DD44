@@ -19,14 +19,14 @@ class UCameraComponent : public USceneComponent
 {
 protected:
 	ProjectionType m_ProjectionType = ProjectionType::PT_PERSPECTIVE;
-	ViewType	   m_ViewType = ViewType::VT_LOOKAT;
+	ViewType	   m_ViewType = ViewType::VT_LOOKTO;
 
 	Matrix m_matView = Matrix::Identity;
 	Matrix m_matProjection = Matrix::Identity;
 
 	// View
-	Vec3 m_vLookAt = { 1.f, 0.f, 0.f };
-	Vec3 m_vLookTo = { 1.f, 0.f, 0.f };
+	Vec3 m_vLookAt = { 0.f, 0.f, 1.f };
+	Vec3 m_vLookTo = { 0.f, 0.f, 1.f };
 
 	// Projection
 	// - Orthographic
