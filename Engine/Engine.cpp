@@ -36,7 +36,7 @@ void Engine::Init()
 	// 기타 기능 객체 초기화 ( input, )
 	{
 		INPUT->Init();
-		//DXWRITE->Create();
+		DXWRITE->Create();
 
 		if (_app->m_type != SCENE_TYPE::GAME) { GUI->Init(); }
 	}
@@ -84,10 +84,10 @@ void Engine::Frame()
 void Engine::Render()
 {
 	GET_SINGLE(Device)->PreRender();
-	//DXWRITE->m_pd2dRT->BeginDraw();
+	DXWRITE->BeginDraw();
 
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
-	//DXWRITE->Draw(rt, TIMER->m_szTime);
+	DXWRITE->Draw(rt, TIMER->m_szTime);
 
 	CAMERA->Render(CameraViewType::CVT_ACTOR);
 
@@ -120,7 +120,7 @@ void Engine::Render()
 		GUI->Render(); // *Fix Location* after _app->Render() }
 	}
 
-	//DXWRITE->m_pd2dRT->EndDraw();
+	DXWRITE->EndDraw();
 	GET_SINGLE(Device)->PostRender();
 }
 
