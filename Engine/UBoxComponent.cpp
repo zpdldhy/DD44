@@ -80,9 +80,9 @@ void UBoxComponent::CreateCollisionRange()
 	auto pMesh = UStaticMeshComponent::CreateCube();
 	m_pCollisionRange->SetMeshComponent(pMesh);
 
-	//auto pMaterial = make_shared<UMaterial>();
-	//pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
-	//pMesh->SetMaterial(pMaterial);
+	auto pMaterial = make_shared<UMaterial>();
+	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
+	pMesh->SetMaterial(pMaterial);
 
 	m_pCollisionRange->SetScale(m_vLocalScale);
 	m_pCollisionRange->SetPosition(m_Box.vCenter);
@@ -92,6 +92,8 @@ void UBoxComponent::CreateCollisionRange()
 
 void UBoxComponent::UpdateCollisionRange()
 {
+	m_pCollisionRange->SetScale(m_vWorldScale);
+	m_pCollisionRange->SetRotation(m_vWorldRotation);
 	m_pCollisionRange->SetPosition(m_vWorldPosition);
 	m_pCollisionRange->Tick();
 }
