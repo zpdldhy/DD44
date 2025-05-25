@@ -17,6 +17,8 @@
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
+#include "ShapeData.h"
+#include "CollisionManager.h"
 
 void TestYoooooon::Init()
 {
@@ -35,7 +37,6 @@ void TestYoooooon::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
-
 }
 
 void TestYoooooon::Update()
@@ -54,6 +55,8 @@ void TestYoooooon::Update()
 		}
 	}
 
+	if (INPUT->GetButton(LCLICK))
+		ClickMouse();
 }
 
 void TestYoooooon::Render()
@@ -472,5 +475,18 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 			}
 		}
 
+	}
+}
+
+void TestYoooooon::ClickMouse()
+{
+	m_Cursor.Click();
+
+	shared_ptr<AActor> pActor = nullptr;
+
+	if (Collision::CheckRayCollision(m_Cursor, OBJECT->GetActorIndexList(), pActor))
+	{
+		if (pActor != nullptr)
+			int a = 0;
 	}
 }

@@ -21,6 +21,7 @@ void UBoxComponent::Init()
 void UBoxComponent::Tick()
 {
 	USceneComponent::Tick();
+	UpdateBounds();
 
 	if (m_bVisible)
 	{
@@ -66,11 +67,11 @@ void UBoxComponent::UpdateBounds()
 {
 	Vec3 vMin(-0.5f, -0.5f, -0.5f);
 	Vec3 vMax(+0.5f, +0.5f, +0.5f);
+	Vec3 vCenter(0.f, 0.f, 0.f);
 
-	vMin *= m_vLocalScale;
-	vMax *= m_vLocalScale;
-
-	m_Box.Set(vMin, vMax);
+	m_Box.vMin = Vec3::Transform(vMin, m_matWorld);
+	m_Box.vMax = Vec3::Transform(vMax, m_matWorld);
+	m_Box.vCenter = Vec3::Transform(vCenter, m_matWorld);
 }
 
 void UBoxComponent::CreateCollisionRange()

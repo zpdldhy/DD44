@@ -115,16 +115,13 @@ bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, sh
 
         if (!pShape || pShape->GetShapeType() == ShapeType::ST_NONE) continue;
 
-        // Ray를 해당 Actor의 LocalMatrix로 변환
-        Ray colRay = Ray(_ray.position - pShape->GetWorldPosition(), _ray.direction);
-
         if (pShape->GetShapeType() == ShapeType::ST_BOX)
         {
             auto box = static_pointer_cast<UBoxComponent>(pObj->GetShapeComponent());
 
-            if (CheckAABBToRay(colRay, box->GetBounds(), inter))
+            if (CheckAABBToRay(_ray, box->GetBounds(), inter))
             {
-                float interdis = Vec3::Distance(inter, colRay.position);
+                float interdis = Vec3::Distance(inter, _ray.position);
                 if (dis < interdis)continue;
 
                 dis = interdis;
