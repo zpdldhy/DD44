@@ -164,13 +164,13 @@ void ActorListUI::DrawUI()
 			EditActorName(actor);
 			EditActorTransform(actor);
 
-			if (ImGui::Button("Apply"))
-			{
+			//if (ImGui::Button("Apply"))
+			//{
 				actor->SetPosition(m_vPosition);
 				actor->SetRotation(m_vRotation);
 				actor->SetScale(m_vScale);
-				actor->m_szName = m_szNewName;
-			}
+				//actor->m_szName = m_szNewName;
+			//}
 
 			ImGui::SameLine();
 
@@ -457,7 +457,8 @@ void ActorListUI::EditActorName(std::shared_ptr<class AActor>& _actor)
 	if (ImGui::InputText("Edit Name", nameBuffer, IM_ARRAYSIZE(nameBuffer)))
 	{
 		std::wstring newName(nameBuffer, nameBuffer + strlen(nameBuffer));
-		m_szNewName = newName;
+		//m_szNewName = newName;
+		_actor->m_szName = newName;
 	}
 }
 
