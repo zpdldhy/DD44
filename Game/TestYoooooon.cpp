@@ -26,8 +26,9 @@ void TestYoooooon::Init()
 
 	SetupEditorCallbacks();
 
-	//LoadAllPrefabs(".map.json");
-	//LoadAllPrefabs(".objects.json");
+	LoadAllPrefabs(".map.json");
+	//LoadAllPrefabs(".object.json");
+	LoadAllPrefabs(".objects.json");
 	LoadAllPrefabs(".character.json");
 	LoadAllPrefabs(".ui.json");
 
@@ -403,7 +404,7 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 				auto obj = make_shared<APawn>();
 				obj->m_szName = L"Object";
 				obj->SetMeshComponent(meshComp);
-				obj->SetPosition(objData.Translation);
+				obj->SetPosition(objData.Position);
 				obj->SetRotation(objData.Rotation);
 				obj->SetScale(objData.Scale);
 
@@ -430,7 +431,7 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 					auto obj = make_shared<APawn>();
 					obj->m_szName = L"Object";
 					obj->SetMeshComponent(meshComp);
-					obj->SetPosition(objData.Translation);
+					obj->SetPosition(objData.Position);
 					obj->SetRotation(objData.Rotation);
 					obj->SetScale(objData.Scale);
 
