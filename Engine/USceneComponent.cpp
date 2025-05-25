@@ -100,14 +100,14 @@ void USceneComponent::UpdateWorldMatrix()
 // No Parent(Transform)
 	if (m_pParentTransform == nullptr)
 	{
-		m_matWorld = m_matLocal;
+		m_matWorld = m_matLocal * m_matAnim;
 	}
 	// Actor - Actor && Actor - Component
 	else
 	{
 		// Parent의 SRT가 바뀐게 있으면 여기로 들어온다.
 		m_matParent = m_pParentTransform->GetWorld();
-		m_matWorld = m_matLocal * m_matParent;
+		m_matWorld = m_matLocal * m_matAnim * m_matParent;
 	}
 
 	Quaternion qRot;

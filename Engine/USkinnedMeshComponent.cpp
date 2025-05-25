@@ -18,8 +18,6 @@ void USkinnedMeshComponent::Init()
 
 void USkinnedMeshComponent::Tick()
 {
-	m_matParent = GetOwner()->GetWorld();
-
 	if (m_pBaseAnim) m_pBaseAnim->Tick();
 
 	for (auto& child : m_vChild)

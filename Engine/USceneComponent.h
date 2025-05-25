@@ -48,6 +48,8 @@ protected:
 
 	Matrix m_matParent = Matrix::Identity;
 
+	Matrix m_matAnim = Matrix::Identity;
+
 public:
 	USceneComponent() = default;
 	virtual ~USceneComponent() = default;
