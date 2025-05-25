@@ -67,6 +67,21 @@ void UMaterial::CreateEffectCB()
     assert(SUCCEEDED(hr) && "Failed to create Glow ConstantBuffer");
 }
 
+void UMaterial::CreateSlashCB()
+{
+    D3D11_BUFFER_DESC desc = {};
+    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    desc.ByteWidth = sizeof(CB_Slash);
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    HRESULT hr = DEVICE->CreateBuffer(&desc, nullptr, m_pCB_Slash.GetAddressOf());
+    if (FAILED(hr))
+    {
+        int a = 0;
+    }
+}
+
 void UMaterial::SetGlowParams(float _glowPower, const Vec3 _glowColor)
 {
     m_tEffectData.g_fGlowPower = _glowPower;
@@ -107,30 +122,6 @@ void UMaterial::SetSpecularParams(const Vec3& _coeff, float _shininess)
     m_tEffectData.g_vSpecularCoeff = _coeff;
     m_tEffectData.g_fShininess = _shininess;
     UpdateEffectBuffer();
-}
-
-{
-    m_eRenderMode = _eMode;
-    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
-    UpdateRenderModeBuffer();
-}
-
-{
-    m_eRenderMode = _eMode;
-    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
-    UpdateRenderModeBuffer();
-}
-
-{
-    m_eRenderMode = _eMode;
-    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
-    UpdateRenderModeBuffer();
-}
-
-{
-    m_eRenderMode = _eMode;
-    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
-    UpdateRenderModeBuffer();
 }
 
 void UMaterial::SetEmissiveParams(const Vec3& _color, float _power)
