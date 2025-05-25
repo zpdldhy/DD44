@@ -6,8 +6,9 @@
 class TestYoooooon : public IExecute
 {
 public:
-	shared_ptr<class ACameraActor> m_pCameraActor;
-	shared_ptr<class AActor> m_pPlayer;
+	shared_ptr<class ACameraActor> m_pCameraActor = nullptr;
+	shared_ptr<class AActor> m_pPlayer = nullptr;
+	shared_ptr<class AActor> m_pBox = nullptr;
 	class MouseRay m_Cursor;
 
 	bool m_bEnginCamera = true;
@@ -35,6 +36,9 @@ protected:
 
 	void LoadAllPrefabs(const std::string& extension);
 
+	// Collision
+	void CreateCollisionObject();
 	void ClickMouse();
+	void CheckCollision();
 };
 

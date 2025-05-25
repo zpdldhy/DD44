@@ -9,10 +9,11 @@ void Collision::Init()
 		auto boxA = static_pointer_cast<UBoxComponent>(a->GetShapeComponent());
 		auto boxB = static_pointer_cast<UBoxComponent>(b->GetShapeComponent());
 
-		// 충돌 검사 로직
-		//if (Collision::CheckAABBToAABB(boxA->GetBounds(), boxB->GetBounds())) {
-		//   // 충돌 처리
-		//}
+		//충돌 검사 로직
+		if (Collision::CheckOBBToOBB(boxA->GetBounds(), boxB->GetBounds())) {
+			// 충돌 처리
+			int i = 0;
+		}
 		boxA->CollisionAction();   // 여기서 어떤 정보를 넘겨줘야 할까?
 		boxB->CollisionAction();
 		};
@@ -95,6 +96,38 @@ void Collision::CheckCollision(vector<UINT> _vActorIndex)
 	}
 
 	vActorList.clear();
+}
+
+bool Collision::CheckCollision(shared_ptr<class AActor> _p1, shared_ptr<class AActor> _p2)
+{
+	if (_p1 == _p2) return false;
+
+	_p1->m_bCollision = true;      // 임시
+	_p2->m_bCollision = true;
+
+	if (_p1->m_bCollision == false) return false;
+	if (_p2->m_bCollision == false) return false;
+
+	auto Shape1 = _p1->GetShapeComponent();
+	if (Shape1 == nullptr ||
+		Shape1->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) return false;
+
+	auto Shape2 = _p2->GetShapeComponent();
+	if (Shape2 == nullptr ||
+		Shape2->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) return false;
+
+	auto Type1 = Shape1->GetShapeType();
+	auto Type2 = Shape2->GetShapeType();
+
+	auto key = make_pair(Type1, Type2);
+	auto iter = collisionMap.find(key);
+
+	if (iter != collisionMap.end())
+	{
+		iter->second(_p1, _p2);
+	}
+
+	return false;
 }
 
 bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor)
@@ -261,8 +294,8 @@ bool Collision::CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter)
 	Vec3 diff = _box.vCenter - _ray.position;
 
 	// box의 x상대축
-	float fDotDir = _ray.direction.Dot(_box.vAxis[0]);
-	float fDotDiff = diff.Dot(_box.vAxis[0]);
+	float fDotDir = _box.vAxis[0].Dot(_ray.direction);
+	float fDotDiff = _box.vAxis[0].Dot(diff);
 
 	if (abs(fDotDir) < 0.0001f)
 	{
@@ -285,8 +318,8 @@ bool Collision::CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter)
 	}
 
 	// box의 y상대축
-	fDotDir = _ray.direction.Dot(_box.vAxis[1]);
-	fDotDiff = diff.Dot(_box.vAxis[1]);
+	fDotDir = _box.vAxis[1].Dot(_ray.direction);
+	fDotDiff = _box.vAxis[1].Dot(diff);
 
 	if (abs(fDotDir) < 0.0001f)
 	{
@@ -309,8 +342,8 @@ bool Collision::CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter)
 	}
 
 	// box의 z상대축
-	fDotDir = _ray.direction.Dot(_box.vAxis[2]);
-	fDotDiff = diff.Dot(_box.vAxis[2]);
+	fDotDir = _box.vAxis[2].Dot(_ray.direction);
+	fDotDiff = _box.vAxis[2].Dot(diff);
 
 	if (abs(fDotDir) < 0.0001f)
 	{
@@ -333,6 +366,152 @@ bool Collision::CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter)
 	}
 
 	inter = _ray.position + _ray.direction * fMin;
+
+	return true;
+}
+
+bool Collision::CheckOBBToOBB(const Box& _box1, const Box& _box2)
+{
+	Vec3 Distance = _box1.vCenter - _box2.vCenter;
+
+	float Dot[3][3];
+	float absDot[3][3];
+	float AD[3];
+	float result;
+	float R0, R1;
+	float R01;
+
+	//A0
+	Dot[0][0] = _box1.vAxis[0].Dot(_box2.vAxis[0]);
+	Dot[0][1] = _box1.vAxis[0].Dot(_box2.vAxis[1]);
+	Dot[0][2] = _box1.vAxis[0].Dot(_box2.vAxis[2]);
+
+	AD[0] = _box1.vAxis[0].Dot(Distance);
+
+	absDot[0][0] = (float)fabs(Dot[0][0]);
+	absDot[0][1] = (float)fabs(Dot[0][1]);
+	absDot[0][2] = (float)fabs(Dot[0][2]);
+
+	result = (float)fabs(AD[0]);
+
+	R1 = _box2.vExtent.x * absDot[0][0] + _box2.vExtent.y * absDot[0][1] + _box2.vExtent.z * absDot[0][2];
+	R01 = _box1.vExtent.x + R1;
+	if (result > R01)return false;
+
+	//A1
+	Dot[1][0] = _box1.vAxis[1].Dot(_box2.vAxis[0]);
+	Dot[1][1] = _box1.vAxis[1].Dot(_box2.vAxis[1]);
+	Dot[1][2] = _box1.vAxis[1].Dot(_box2.vAxis[2]);
+
+	AD[1] = _box1.vAxis[1].Dot(Distance);
+
+	absDot[1][0] = (float)fabs(Dot[1][0]);
+	absDot[1][1] = (float)fabs(Dot[1][1]);
+	absDot[1][2] = (float)fabs(Dot[1][2]);
+
+	result = (float)fabs(AD[1]);
+
+	R1 = _box2.vExtent.x * absDot[1][0] + _box2.vExtent.y * absDot[1][1] + _box2.vExtent.z * absDot[1][2];
+	R01 = _box1.vExtent.y + R1;
+	if (result > R01)return false;
+
+	//A2
+	Dot[2][0] = _box1.vAxis[2].Dot(_box2.vAxis[0]);
+	Dot[2][1] = _box1.vAxis[2].Dot(_box2.vAxis[1]);
+	Dot[2][2] = _box1.vAxis[2].Dot(_box2.vAxis[2]);
+
+	AD[2] = _box1.vAxis[2].Dot(Distance);
+
+	absDot[2][0] = (float)fabs(Dot[2][0]);
+	absDot[2][1] = (float)fabs(Dot[2][1]);
+	absDot[2][2] = (float)fabs(Dot[2][2]);
+
+	result = (float)fabs(AD[2]);
+
+	R1 = _box2.vExtent.x * absDot[2][0] + _box2.vExtent.y * absDot[2][1] + _box2.vExtent.z * absDot[2][2];
+	R01 = _box1.vExtent.z + R1;
+	if (result > R01)return false;
+
+	//B0
+	result = fabs(_box2.vAxis[0].Dot(Distance));
+	R0 = _box1.vExtent.x * absDot[0][0] + _box1.vExtent.y * absDot[1][0] + _box1.vExtent.z * absDot[2][0];
+	R01 = R0 + _box2.vExtent.x;
+	if (result > R01)return false;
+
+	//B1
+	result = fabs(_box2.vAxis[1].Dot(Distance));
+	R0 = _box1.vExtent.x * absDot[0][1] + _box1.vExtent.y * absDot[1][1] + _box1.vExtent.z * absDot[2][1];
+	R01 = R0 + _box2.vExtent.y;
+	if (result > R01)return false;
+
+	//B2
+	result = fabs(_box2.vAxis[2].Dot(Distance));
+	R0 = _box1.vExtent.x * absDot[0][2] + _box1.vExtent.y * absDot[1][2] + _box1.vExtent.z * absDot[2][2];
+	R01 = R0 + _box2.vExtent.z;
+	if (result > R01)return false;
+
+	//A0xB0
+	result = fabs(AD[2] * Dot[1][0] - AD[1] * Dot[2][0]);
+	R0 = _box1.vExtent.y * absDot[2][0] + _box1.vExtent.z * absDot[1][0];
+	R1 = _box2.vExtent.y * absDot[0][2] + _box2.vExtent.z * absDot[0][1];
+	R01 = R0 + R1;
+	if (result > R01)return false;
+
+	//A0xB1
+	result = fabs(AD[2] * Dot[1][1] - AD[1] * Dot[2][1]);
+	R0 = _box1.vExtent.y * absDot[2][1] + _box1.vExtent.z * absDot[1][1];
+	R1 = _box2.vExtent.x * absDot[0][2] + _box2.vExtent.z * absDot[0][0];
+	R01 = R0 + R1;
+	if (result > R01)return false;
+
+	//A0xB2
+	result = fabs(AD[2] * Dot[1][2] - AD[1] * Dot[2][2]);
+	R0 = _box1.vExtent.y * absDot[2][2] + _box1.vExtent.z * absDot[1][2];
+	R1 = _box2.vExtent.x * absDot[0][1] + _box2.vExtent.y * absDot[0][0];
+	R01 = R0 + R1;
+	if (result > R01)return false;
+
+	//A1xB0
+	result = fabs(AD[0] * Dot[2][0] - AD[2] * Dot[0][0]);
+	R0 = _box1.vExtent.x * absDot[2][0] + _box1.vExtent.z * absDot[0][0];
+	R1 = _box2.vExtent.y * absDot[1][2] + _box2.vExtent.z * absDot[1][1];
+	R01 = R0 + R1;
+	if (result > R01)return false;
+
+	//A1xB1
+	result = fabs(AD[0] * Dot[2][1] - AD[2] * Dot[0][1]);
+	R0 = _box1.vExtent.x * absDot[2][1] + _box1.vExtent.z * absDot[0][1];
+	R1 = _box2.vExtent.x * absDot[1][2] + _box2.vExtent.z * absDot[1][0];
+	R01 = R0 + R1;
+	if (result > R01)return false;
+
+	//A1xB2
+	result = fabs(AD[0] * Dot[2][2] - AD[2] * Dot[0][2]);
+	R0 = _box1.vExtent.x * absDot[2][2] + _box1.vExtent.z * absDot[0][2];
+	R1 = _box2.vExtent.x * absDot[1][1] + _box2.vExtent.y * absDot[1][0];
+	R01 = R0 + R1;
+	if (result > R01)return false;
+
+	//A2xB0
+	result = fabs(AD[1] * Dot[0][0] - AD[0] * Dot[1][0]);
+	R0 = _box1.vExtent.x * absDot[1][0] + _box1.vExtent.y * absDot[0][0];
+	R1 = _box2.vExtent.y * absDot[2][2] + _box2.vExtent.z * absDot[2][1];
+	R01 = R0 + R1;
+	if (result > R01)return false;
+
+	//A2xB1
+	result = fabs(AD[1] * Dot[0][1] - AD[0] * Dot[1][1]);
+	R0 = _box1.vExtent.x * absDot[1][1] + _box1.vExtent.y * absDot[0][1];
+	R1 = _box2.vExtent.x * absDot[2][2] + _box2.vExtent.z * absDot[2][0];
+	R01 = R0 + R1;
+	if (result > R01)return false;
+
+	//A2xB2
+	result = fabs(AD[1] * Dot[0][2] - AD[0] * Dot[1][2]);
+	R0 = _box1.vExtent.x * absDot[1][2] + _box1.vExtent.y * absDot[0][2];
+	R1 = _box2.vExtent.x * absDot[2][1] + _box2.vExtent.y * absDot[2][0];
+	R01 = R0 + R1;
+	if (result > R01)return false;
 
 	return true;
 }
