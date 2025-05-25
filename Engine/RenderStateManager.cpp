@@ -40,7 +40,11 @@ void RenderStateManager::Apply(const RenderOption& option)
     case BlendType::Premultiplied:
         DC->OMSetBlendState(STATE->m_pPremultipliedAlphaBlend.Get(), nullptr, 0xffffffff);
         break;
+    case BlendType::DualSource:
+        DC->OMSetBlendState(STATE->m_pDualSourceBlend.Get(), nullptr, 0xffffffff);
+        break;
     }
+
 
     // --- Depth ¼³Á¤ ---
     switch (option.depth)

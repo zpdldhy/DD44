@@ -142,6 +142,9 @@
     <FxCompile Include="..\Resources\Shader\SpriteUV.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\Resources\Shader\Slash.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
     <FxCompile Include="..\Resources\Shader\CameraFrustum.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>

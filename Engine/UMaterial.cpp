@@ -15,6 +15,7 @@ void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
     CreateEffectCB();
     m_CB_SpriteUV = make_shared<ConstantBuffer<CB_SpriteUV>>();
     m_CB_SpriteUV->Create(4); 
+    CreateSlashCB();
     
 }
 
@@ -108,11 +109,30 @@ void UMaterial::SetSpecularParams(const Vec3& _coeff, float _shininess)
     UpdateEffectBuffer();
 }
 
-void UMaterial::SetCameraPos(const Vec3& _camPos)
 {
-    m_tEffectData.g_vCameraPos = _camPos;
-    UpdateEffectBuffer();
+    m_eRenderMode = _eMode;
+    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
+    UpdateRenderModeBuffer();
 }
+
+{
+    m_eRenderMode = _eMode;
+    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
+    UpdateRenderModeBuffer();
+}
+
+{
+    m_eRenderMode = _eMode;
+    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
+    UpdateRenderModeBuffer();
+}
+
+{
+    m_eRenderMode = _eMode;
+    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
+    UpdateRenderModeBuffer();
+}
+
 void UMaterial::SetEmissiveParams(const Vec3& _color, float _power)
 {
     m_tEffectData.g_vEmissiveColor = _color;
@@ -136,4 +156,18 @@ void UMaterial::SetUVRange(Vec2 start, Vec2 end)
     m_CB_SpriteUV->data.uvEnd = end;
     m_CB_SpriteUV->Update();
     m_CB_SpriteUV->Push();
+}
+
+void UMaterial::SetSlashProgress(float _progress)
+{
+    m_tSlashData.g_fProgress = _progress;
+
+    D3D11_MAPPED_SUBRESOURCE mapped = {};
+    DC->Map(m_pCB_Slash.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    memcpy(mapped.pData, &m_tSlashData, sizeof(CB_Slash));
+    DC->Unmap(m_pCB_Slash.Get(), 0);
+
+    // 바인딩도 여기서 바로 해도 됨
+    DC->VSSetConstantBuffers(10, 1, m_pCB_Slash.GetAddressOf());
+    DC->PSSetConstantBuffers(10, 1, m_pCB_Slash.GetAddressOf());
 }

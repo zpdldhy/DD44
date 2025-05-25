@@ -20,7 +20,9 @@ void ObjectManager::Tick()
 	{
 		// Á×´Â°Ç°¡
 		if (pActor->second->m_bDelete == true)
+		{
 			pActor = m_vActorList.erase(pActor);
+		}
 		else
 		{
 			pActor->second->Tick();

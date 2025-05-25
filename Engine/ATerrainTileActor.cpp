@@ -3,6 +3,7 @@
 #include "UMaterial.h"
 #include "UStaticMeshComponent.h"
 #include "APawn.h"
+#include "UBoxComponent.h"
 
 void ATerrainTileActor::Init()
 {
@@ -30,8 +31,16 @@ bool ATerrainTileActor::CreateTerrain(const wstring& _texturePath, const wstring
 	m_pTerrainMeshComponent->CreateGrid(m_iNumCols, m_iNumRows, m_fCellSize);
 
 	auto material = make_shared<UMaterial>();
-	material->Load(_texturePath, _shaderPath);
+	material->Load(_texturePath, _shaderPath);	
 	m_pTerrainMeshComponent->SetMaterial(material);
+
+	shared_ptr<UBoxComponent> box = make_shared<UBoxComponent>();
+	float width = m_iNumCols * m_fCellSize;
+	float depth = m_iNumRows * m_fCellSize;
+	box->SetLocalScale(Vec3(width, 1.0f, depth));
+	box->SetLocalPosition(Vec3(0, -0.5f, 0));
+	box->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	SetShapeComponent(box);
 
 	SetMeshComponent(m_pTerrainMeshComponent);
 	m_pTerrainMeshComponent->MeshCreate();

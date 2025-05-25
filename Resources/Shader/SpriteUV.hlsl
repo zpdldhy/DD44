@@ -1,5 +1,12 @@
 #include "Header.hlsli"
 
+struct PS_OUT_DUAL
+{
+    float4 c0 : SV_Target0;
+    float4 c1 : SV_Target1;
+};
+
+
 VS_OUT VS(VS_IN input)
 {
     VS_OUT output = (VS_OUT) 0;
@@ -24,12 +31,19 @@ VS_OUT VS(VS_IN input)
     return output;
 }
 
-PS_OUT PS(VS_OUT input)
+PS_OUT_DUAL PS(VS_OUT input)
 {
-    PS_OUT psOut = (PS_OUT) 0;
+    PS_OUT_DUAL psOut = (PS_OUT_DUAL) 0;
 
     float4 texColor = g_txDiffuseA.Sample(sample, remapUV(input.t));
-    psOut.c = texColor;
+
+    float alpha = max(max(texColor.r, texColor.g), texColor.b);
+
+    // SV_Target0 → 원본 색 그대로
+    psOut.c0 = float4(texColor.rgb, 1.0f);
+
+    // SV_Target1 → 감쇄용 보조 블렌딩 값
+    psOut.c1 = float4(1.0f - alpha, 1.0f - alpha, 1.0f - alpha, alpha);
 
     return psOut;
 }

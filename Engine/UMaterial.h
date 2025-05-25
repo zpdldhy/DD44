@@ -27,9 +27,6 @@ struct CB_MaterialEffect
 
 	Vec3   g_vSpecularCoeff = Vec3(1,1,1);   
 	float  g_fShininess = 32.0f;
-
-	Vec3 g_vCameraPos;
-	float padding_camera = 0.f;
 };
 
 struct CB_Material
@@ -53,6 +50,12 @@ struct CB_SpriteUV
 	Vec2 uvEnd = { 1.0f, 1.0f };
 };
 
+struct CB_Slash
+{
+	float g_fProgress = 0.0f;
+	Vec3 paading;
+};
+
 class UMaterial
 {
 	bool m_bUseEffect = true;
@@ -66,17 +69,23 @@ class UMaterial
 	ComPtr<ID3D11ShaderResourceView> m_pTexSRV;
 	
 	ComPtr<ID3D11Buffer> m_pEffectCB; // ХыЧе CB
+	ComPtr<ID3D11Buffer> m_pCB_Slash;
 	shared_ptr<class ConstantBuffer<CB_SpriteUV>> m_CB_SpriteUV;
 
 	CB_MaterialEffect m_tEffectData = {};
+
+	CB_Slash m_tSlashData;
 
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);
 	virtual void Bind();
 
 	void CreateEffectCB();
+	void CreateSlashCB();
+
 	void UpdateEffectBuffer();
-			
+	void SetSlashProgress(float _progress);
+
 	void SetEmissiveParams(const Vec3& _color, float _power);
 	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
 	void SetHitFlashTime(float _flashTime);
@@ -84,7 +93,6 @@ public:
 	void SetAmbientParams(const Vec3& _coeff, float _power);
 	void SetDiffuseParams(const Vec3& _coeff, float _power);
 	void SetSpecularParams(const Vec3& _coeff, float _shininess);
-	void SetCameraPos(const Vec3& camPos);
 	void SetUseEffect(bool _bUseEffect) { m_bUseEffect = _bUseEffect; }
 	bool IsUseEffect() { return m_bUseEffect; }
 	void SetUVRange(Vec2 start, Vec2 end);
