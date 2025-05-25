@@ -23,6 +23,8 @@ public:
 
 	POINT m_vPrevMouse = {};
 	Vec3 m_vDragStartPos = {};
+	Vec3 m_vDragStartRot = {};
+	Vec3 m_vDragStartScale = {};
 	bool m_bDragging = false;
 
 	bool m_bEnginCamera = false;

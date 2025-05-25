@@ -382,6 +382,8 @@ void Editor::SetClickPos()
 			if (actor)
 			{
 				m_vDragStartPos = actor->GetPosition();
+				m_vDragStartRot = actor->GetRotation();
+				m_vDragStartScale = actor->GetScale();
 			}
 		}
 	}
@@ -440,16 +442,51 @@ void Editor::SetActorPositionByDragging()
 				float deltaX = static_cast<float>(curMouse.x - m_vPrevMouse.x);
 				float deltaY = static_cast<float>(curMouse.y - m_vPrevMouse.y);
 				Vec3 newPos = m_vDragStartPos;
+				Vec3 newRot = m_vDragStartRot;
+				Vec3 newScale = m_vDragStartScale;
 
-				if (axis == m_pGizmoX)
-					newPos.x += deltaX * 0.07f;
-				else if (axis == m_pGizmoY)
-					newPos.y -= deltaY * 0.07f;
-				else if (axis == m_pGizmoZ)
-					newPos.z += deltaX * 0.07f;
+				auto mode = GUI->GetActorListUI()->GetMode();
 
-				actor->SetPosition(newPos);
-				SetGizmoPosition(actor->GetPosition());
+				switch (mode)
+				{
+				case GizmoMode::Translate:
+				{
+					if (axis == m_pGizmoX)
+						newPos.x += deltaX * 0.07f;
+					else if (axis == m_pGizmoY)
+						newPos.y -= deltaY * 0.07f;
+					else if (axis == m_pGizmoZ)
+						newPos.z += deltaX * 0.07f;
+
+					actor->SetPosition(newPos);
+					SetGizmoPosition(actor->GetPosition());
+					break;
+				}
+				case GizmoMode::Rotate:
+				{
+					if (axis == m_pGizmoX)
+						newRot.x += deltaX * 0.07f;
+					else if (axis == m_pGizmoY)
+						newRot.y -= deltaY * 0.07f;
+					else if (axis == m_pGizmoZ)
+						newRot.z += deltaX * 0.07f;
+
+					actor->SetRotation(newRot);
+					break;
+				}
+				case GizmoMode::Scale:
+				{
+					if (axis == m_pGizmoX)
+						newScale.x += deltaX * 0.07f;
+					else if (axis == m_pGizmoY)
+						newScale.y -= deltaY * 0.07f;
+					else if (axis == m_pGizmoZ)
+						newScale.z += deltaX * 0.07f;
+
+					actor->SetScale(newScale);
+					break;
+				}
+				}
 			}
 		}
 	}
