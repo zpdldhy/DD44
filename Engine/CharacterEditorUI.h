@@ -17,8 +17,8 @@ private:
     void SetComponent();
     void SetCameraComponent();
     void SetShapeComponent();
-	void SaveCharacterPrefab();
-	void LoadCharacterPrefab();
+    void SaveCharacterPrefab();
+    void LoadCharacterPrefab();
     void BrowserSection();
     void ResetButton();
 
@@ -35,8 +35,8 @@ public:
     {
         m_OnCreate = std::move(callback);
     }
-//public:
-//    shared_ptr<UMeshComponent> MakeMesh(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance);
+    //public:
+    //    shared_ptr<UMeshComponent> MakeMesh(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance);
 private:
     char m_szAssetPath[256] = "../Resources/Asset/crow_final.asset";
     char m_szMeshPath[256] = "../Resources/Asset/crow_final.mesh";
@@ -46,12 +46,12 @@ private:
 
     char m_szChildTextureName[256] = "../Resources/Texture/sword.png";
     char m_szChildShaderName[256] = "../Resources/Shader/Default.hlsl";
-    
+
     int m_iSelectedMeshIndex = 0;
     int m_iSelectedChildMeshIndex = 0;
     int m_iSelectedAnimIndex = 0;
     int m_iSelectedBoneIndex = 0;
-	int m_iSelectedComoponentIndex = 0;
+    int m_iSelectedComoponentIndex = 0;
     int m_iSelectedScriptIndex = 0;
 
     float m_fPosition[3] = { 0.0f, 0.0f, 0.0f };
@@ -59,8 +59,8 @@ private:
     float m_fScale[3] = { 1.0f, 1.0f, 1.0f };
 
     // Component
-	CameraComponentData m_CameraData;
-	ShapeComponentData m_ShapeData;
+    CameraComponentData m_CameraData;
+    ShapeComponentData m_ShapeData;
 
     std::shared_ptr<ActorLoader> m_pLoader;
     std::vector<std::shared_ptr<UMeshComponent>> m_vMeshList;
@@ -79,7 +79,7 @@ private:
         CameraComponentData,
         ShapeComponentData,
         int scriptType
-    )> m_OnCreate;
+        )> m_OnCreate;
 
 public:
     static bool m_bRootSet;

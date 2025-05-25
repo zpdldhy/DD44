@@ -1,20 +1,6 @@
-#ifndef COMMON_HLSLI
-#define COMMON_HLSLI
+#include "MainHeader.hlsli"
 #define MAX_BONE 250
 #define MAX_LIGHTS 4
-
-cbuffer cb0 : register(b0)
-{
-    row_major matrix g_matWorld;
-}
-
-cbuffer CameraBuffer : register(b1)
-{
-    row_major matrix g_matView;
-    row_major matrix g_matProj;
-    float3 g_vCameraPos;
-    float dummy_camera;
-};
 
 cbuffer CB_MaterialEffect : register(b2)
 {
@@ -51,10 +37,29 @@ cbuffer CB_MaterialEffect : register(b2)
 //    float g_fDissolveThreshold;
 //}
 
+cbuffer CB_SpriteUV : register(b4)
+{
+    float2 g_uvStart;
+    float2 g_uvEnd;
+}
+
 cbuffer AnimationBuffer : register(b5)
 {
     matrix obj_matAnim[MAX_BONE];
 }
+
+float2 remapUV(float2 uv)
+{
+    return lerp(g_uvStart, g_uvEnd, uv);
+}
+
+cbuffer CB_Billboard : register(b6)
+{
+    float3 g_vBillboardCenter;
+    float padding_center;
+    float2 g_vBillboardSize;
+    float2 padding_size;
+};
 
 cbuffer CB_RenderMode : register(b7)
 {
@@ -90,15 +95,6 @@ cbuffer CB_Blur : register(b11)
     float2 g_vDirection; // (1, 0): 가로 블러 / (0, 1): 세로 블러
 };
 
-
-struct VS_IN
-{
-    float3 p : POSITION;
-    float4 c : COLOR;
-    float3 n : NORMAL;
-    float2 t : TEXCOORD;
-};
-
 struct PNCTIW_IN
 {
     float3 p : POSITION;
@@ -112,14 +108,6 @@ struct PNCTIW_IN
     float4 w2 : SECONDW;
 };
 
-struct VS_OUT
-{
-    float4 p : SV_POSITION;
-    float4 c : COLOR;
-    float3 n : NORMAL;
-    float2 t : TEXCOORD;
-};
-
 struct VS_OUT_RIM
 {
     float4 p : SV_POSITION;
@@ -128,23 +116,6 @@ struct VS_OUT_RIM
     float2 t : TEXCOORD;
     float3 wPos : POSITIONWS;
 };
-
-struct PS_OUT
-{
-    float4 c : SV_Target0;
-    float4 c1 : SV_Target1;
-    float4 c2 : SV_Target2;
-    float4 c3 : SV_Target3;
-    float4 c4 : SV_Target4;
-    float4 c5 : SV_Target5;
-    float4 c6 : SV_Target6;
-    float4 c7 : SV_Target7;
-};
-
-Texture2D g_txDiffuseA : register(t0);
-//Texture2D g_txNoise : register(t1); // 노이즈 텍스처
-SamplerState sample : register(s0);
-
 
 ///funtion
 //==============================
@@ -321,5 +292,3 @@ float3 ApplyAmbient()
 {
     return UnpackAmbientColor(0) * UnpackAmbientPower(0) * g_vAmbientCoeff * g_fAmbientPower;
 }
-
-#endif

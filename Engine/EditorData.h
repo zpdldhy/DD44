@@ -2,7 +2,7 @@
 #include "ShapeData.h"
 #include "UShapeComponent.h"
 
-struct ActorData
+struct TransformData
 {
 	// Transform
 	float Position[3] = { 0.0f, 0.0f, 0.0f };
@@ -32,4 +32,11 @@ struct ShapeComponentData
 	float Position[3] = { 0.0f, 0.0f, 0.0f };
 	float Rotation[3] = { 0.0f, 0.0f, 0.0f };
 	float Scale[3] = { 1.0f, 1.0f, 1.0f };
+};
+
+struct ParticleAnimationData
+{
+	float DurationSeconds = 1.0f;  // ÃÑ Àç»ý ½Ã°£
+	bool bLoop = true;
+	bool bAutoDestroy = false;
 };

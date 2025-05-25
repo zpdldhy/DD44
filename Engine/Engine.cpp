@@ -18,7 +18,8 @@
 #include "PostProcessManager.h"
 #include "CollisionManager.h"
 #include "LightManager.h"
-
+#include "ParticleManager.h"
+#include "RenderStateManager.h"
 
 void Engine::Init()
 {
@@ -51,6 +52,7 @@ void Engine::Init()
 	POSTPROCESS->Init(8);
 	// 8개의 MRT DxState 초기화
 	STATE->Create();
+	//STATEMANAGER->InitState();
 }
 
 void Engine::Frame()
@@ -63,6 +65,7 @@ void Engine::Frame()
 		LIGHTMANAGER->UpdateLightCB();
 
 		UI->Tick();
+		PARTICLE->Tick();
 	}
 
 	GET_SINGLE(Device)->Frame();
@@ -93,10 +96,9 @@ void Engine::Render()
 	{
 		POSTPROCESS->PreRender();
 		OBJECT->Render();	// ObjectList Render
+		PARTICLE->Render();
 		POSTPROCESS->PostRender();
-
-
-
+		
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
 
@@ -104,16 +106,15 @@ void Engine::Render()
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
 		{
-			CAMERA->Render(CameraViewType::CVT_UI);
-
+			CAMERA->Render(CameraViewType::CVT_UI);		
 			POSTPROCESS->Present();
 		}
+
+		UI->Render();
 
 		DC->RSSetState(m_pCurrentRasterizer.Get());
 		m_pCurrentRasterizer.Reset();
 	}
-
-	UI->Render();
 
 	if (_app->m_type != SCENE_TYPE::GAME) {
 		GUI->Render(); // *Fix Location* after _app->Render() }
@@ -125,7 +126,8 @@ void Engine::Render()
 
 void Engine::Release()
 {
-	UI->Destroy();
+	UI->Destroy();	
+	PARTICLE->Destroy();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 	{

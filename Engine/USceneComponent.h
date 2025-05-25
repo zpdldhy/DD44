@@ -69,6 +69,7 @@ public:
 	void SetLocalPosition(const Vec3& _pos) { m_vLocalPosition = _pos; }
 	void SetLocalRotation(const Vec3& _rot) { m_vLocalRotation = _rot; }
 	void SetLocalScale(const Vec3& _scale) { m_vLocalScale = _scale; }
+	void SetWorldMatrix(const Matrix& _mat) { m_matWorld = _mat; }
 
 	void AddLocalPosition(const Vec3& _pos) { m_vLocalPosition += _pos; }
 	void AddLocalRotation(const Vec3& _rot) { m_vLocalRotation += _rot; }

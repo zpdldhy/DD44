@@ -17,6 +17,10 @@
 //#include "MeshLoader.h"
 #include "Input.h"
 #include "UBoxComponent.h"
+#include "AUIActor.h"
+#include "UIManager.h"
+#include "AParticleActor.h"
+#include "ParticleManager.h"
 
 bool bRunGame = true;
 
@@ -34,11 +38,11 @@ void Editor::Init()
 	LoadAllPrefabs(".objects.json");
 	LoadAllPrefabs(".object.json");
 	LoadAllPrefabs(".character.json");
+	LoadAllPrefabs(".ui.json");
 
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
-	//SetupGizmo();
 }
 
 void Editor::Update()
@@ -176,6 +180,8 @@ void Editor::SetupEditorCallbacks()
 	SetupCharacterEditorCallback();
 	SetupMapEditorCallback();
 	SetupObjectEditorCallback();
+	SetupUIEditorCallback();
+	SetupParticleEditorCallback();
 }
 
 void Editor::SetupCharacterEditorCallback()
@@ -347,6 +353,37 @@ void Editor::SetupObjectEditorCallback()
 			actor->SetScale(scale);
 
 			OBJECT->AddActor(actor);
+		});
+}
+
+void Editor::SetupUIEditorCallback()
+{
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Vec4 sliceUV)
+		{
+			uiActor->m_szName = L"UI";
+			auto meshComp = UStaticMeshComponent::CreatePlane();
+			uiActor->SetMeshComponent(meshComp);
+
+			auto mat = make_shared<UMaterial>();
+			mat->SetUseEffect(false);
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+			meshComp->SetMaterial(mat);
+
+			uiActor->SetIdleTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetHoverTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetActiveTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetSelectTexture(TEXTURE->Get(to_mw(texPath)));
+
+			uiActor->SetMeshComponent(meshComp);
+			uiActor->SetPosition(Vec3(actorData.Position));
+			uiActor->SetRotation(Vec3(actorData.Rotation));
+			uiActor->SetScale(Vec3(actorData.Scale));
+			uiActor->SetSliceData(sliceUV);
+
+			UI->AddUI(uiActor);
 		});
 }
 
@@ -533,6 +570,54 @@ void Editor::CreateObjectAtMousePick()
 }
 
 
+void Editor::SetupParticleEditorCallback()
+{
+	GUI->SetParticleEditorCallbck([this](
+		shared_ptr<AParticleActor> particleActor,
+		const char* texPath,
+		const char* shaderPath,
+		TransformData actorData,
+		Vec2 uvStart,
+		Vec2 uvEnd,
+		int divisions,
+		float duration,
+		bool loop,
+		bool autoDestroy)
+		{
+			particleActor->m_szName = L"Particle";
+
+			// 1. 메시 (Quad)
+			auto meshComp = UStaticMeshComponent::CreatePlane(); // 또는 CreateQuad()
+			particleActor->SetMeshComponent(meshComp);
+
+			// 2. 머티리얼 로드
+			auto mat = make_shared<UMaterial>();
+			mat->Load(
+				std::wstring(texPath, texPath + strlen(texPath)),
+				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+			);
+
+			// 3. UV 설정 (셰이더에 넘기기 위함)
+			mat->SetUVRange(uvStart, uvEnd); // → SetUVRange() 함수 내부에서 CB 업데이트
+
+			// 4. 머티리얼, 트랜스폼 적용
+			meshComp->SetMaterial(mat);
+
+			particleActor->SetMeshComponent(meshComp);
+			particleActor->SetPosition(Vec3(actorData.Position));
+			particleActor->SetRotation(Vec3(actorData.Rotation));
+			particleActor->SetScale(Vec3(actorData.Scale));
+			particleActor->InitSpriteAnimation(divisions, duration);
+			particleActor->SetLoop(loop);
+			particleActor->SetAutoDestroy(autoDestroy);
+
+			// 5. 화면에 등록
+			PARTICLE->AddUI(particleActor);
+			//particleActor->InitSpriteAnimation(4, 1.f); // 4는 divisions, 10은 frameRate
+		});
+}
+
+
 void Editor::LoadAllPrefabs(const std::string& extension)
 {
 
@@ -571,9 +656,9 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 				actor->SetMeshComponent(meshComponent);
 
 				actor->m_szName = L"Character";
-				actor->SetPosition(Vec3(characterData.actor.Position));
-				actor->SetRotation(Vec3(characterData.actor.Rotation));
-				actor->SetScale(Vec3(characterData.actor.Scale));
+				actor->SetPosition(Vec3(characterData.transform.Position));
+				actor->SetRotation(Vec3(characterData.transform.Rotation));
+				actor->SetScale(Vec3(characterData.transform.Scale));
 
 				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 
@@ -709,6 +794,38 @@ void Editor::LoadAllPrefabs(const std::string& extension)
 
 					OBJECT->AddActor(obj);
 				}
+			}
+		}
+		else if (extension == ".ui.json")
+		{
+			PrefabUIData uiData;
+			if (PREFAB->LoadUI(file, uiData))
+			{
+				auto uiActor = make_shared<AUIActor>();
+				uiActor->m_szName = to_mw(uiData.Name);
+
+				auto meshComp = UStaticMeshComponent::CreatePlane();
+				uiActor->SetMeshComponent(meshComp);
+
+				auto mat = make_shared<UMaterial>();
+				mat->SetUseEffect(false);
+				mat->Load(L"", to_mw(uiData.ShaderPath));
+				meshComp->SetMaterial(mat);
+
+				uiActor->SetIdleTexture(TEXTURE->Get(to_mw(uiData.IdleTexturePath)));
+				uiActor->SetHoverTexture(TEXTURE->Get(to_mw(uiData.HoverTexturePath)));
+				uiActor->SetActiveTexture(TEXTURE->Get(to_mw(uiData.ActiveTexturePath)));
+				uiActor->SetSelectTexture(TEXTURE->Get(to_mw(uiData.SelectedTexturePath)));
+
+				uiActor->SetMeshComponent(meshComp);
+				uiActor->SetPosition(Vec3(uiData.transform.Position));
+				uiActor->SetRotation(Vec3(uiData.transform.Rotation));
+				uiActor->SetScale(Vec3(uiData.transform.Scale));
+				uiActor->SetSliceData(Vec4(uiData.SliceUV));
+
+				uiActor->SetPrefabData(uiData);
+
+				UI->AddUI(uiActor);
 			}
 		}
 	}

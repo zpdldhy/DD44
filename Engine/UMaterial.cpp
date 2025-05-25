@@ -14,6 +14,8 @@ void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
     
     CreateEffectCB();
     CreateRenderModeCB();
+    m_CB_SpriteUV = make_shared<ConstantBuffer<CB_SpriteUV>>();
+    m_CB_SpriteUV->Create(4); 
     
 }
 
@@ -37,7 +39,7 @@ void UMaterial::Bind()
         DC->IASetInputLayout(m_pInputlayout->m_pInputLayout.Get());
 	}
 
-	if (m_pEffectCB)
+	if (m_pEffectCB && m_bUseEffect)
 	{
         DC->VSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
         DC->PSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
@@ -49,6 +51,10 @@ void UMaterial::Bind()
         DC->PSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
     }
 
+    if (m_CB_SpriteUV)
+    {
+        m_CB_SpriteUV->Push();  // b4 register에 UV 범위 바인딩
+    }
 }
 
 void UMaterial::CreateEffectCB()
@@ -168,3 +174,12 @@ void UMaterial::UpdateRenderModeBuffer()
 
 
 
+void UMaterial::SetUVRange(Vec2 start, Vec2 end)
+{
+    if (!m_CB_SpriteUV) return;
+
+    m_CB_SpriteUV->data.uvStart = start;
+    m_CB_SpriteUV->data.uvEnd = end;
+    m_CB_SpriteUV->Update();
+    m_CB_SpriteUV->Push();
+}

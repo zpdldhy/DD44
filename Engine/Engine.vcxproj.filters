@@ -324,10 +324,27 @@
     </ClInclude>
     <ClInclude Include="MeshEditorUI.h" />
     <ClInclude Include="MeshLoader.h" />
-    <ClInclude Include="EditorData.h">
+    <ClInclude Include="EditorData.h" />
+    <ClInclude Include="UIEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Profiler.h" />
+    <ClInclude Include="ParticleEditorUI.h">
+      <Filter>Utils\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="AParticleActor.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="RenderStateManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="UIState.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -546,6 +563,25 @@
     <ClCompile Include="MeshEditorUI.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="Profiler.cpp" />
+    <ClCompile Include="UIEditorUI.cpp">
+      <Filter>Utils\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleEditorUI.cpp">
+      <Filter>Utils\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="AParticleActor.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="RenderStateManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="UIState.cpp">
+      <Filter>FSM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
