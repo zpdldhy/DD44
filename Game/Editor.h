@@ -23,6 +23,8 @@ public:
 
 	POINT m_vPrevMouse = {};
 	Vec3 m_vDragStartPos = {};
+	Vec3 m_vDragStartRot = {};
+	Vec3 m_vDragStartScale = {};
 	bool m_bDragging = false;
 
 	bool m_bEnginCamera = false;
@@ -50,7 +52,6 @@ protected:
 	void SetupSkybox();
 	void SetupSunLight();
 	void SetupGizmo();
-	void SetGizmoPosition(Vec3 _pos);
 
 	void SetupEditorCallbacks();
 	void SetupCharacterEditorCallback();
@@ -62,6 +63,10 @@ protected:
 	void Slash();
 
 	void SetClickPos();
+	void SetGizmoPosition(Vec3 _pos);
+	void SetActorPositionByDragging();
+	void CreateObjectAtMousePick();
+
 	void LoadAllPrefabs(const std::string& extension);
 
 };

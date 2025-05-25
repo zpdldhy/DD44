@@ -26,4 +26,12 @@ public:
 
     float GetHeightAt(float x, float z);
     int GetCellIndexAt(float x, float z);
+
+    int GetNumCols() const { return m_iNumCols; }
+    int GetNumRows() const { return m_iNumRows; }
+    float GetCellSize() const { return m_fCellSize; }
+
+    void SetNumCols(int cols) { m_iNumCols = cols; }
+    void SetNumRows(int rows) { m_iNumRows = rows; }
+    void SetCellSize(float size) { m_fCellSize = size; }
 };

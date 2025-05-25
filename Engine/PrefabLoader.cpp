@@ -14,7 +14,7 @@ bool PrefabLoader::Save(const PrefabData& _prefab, const std::string& _filePath)
 
     j["Scale"] = { _prefab.Scale.x, _prefab.Scale.y, _prefab.Scale.z };
     j["Rotation"] = { _prefab.Rotation.x, _prefab.Rotation.y, _prefab.Rotation.z };
-    j["Translation"] = { _prefab.Translation.x, _prefab.Translation.y, _prefab.Translation.z };
+    j["Translation"] = { _prefab.Position.x, _prefab.Position.y, _prefab.Position.z };
 
     std::ofstream file(_filePath);
     if (!file.is_open()) return false;
@@ -44,7 +44,7 @@ bool PrefabLoader::Load(const std::string& _filePath, PrefabData& _prefab)
     _prefab.Rotation = Vec3(r[0], r[1], r[2]);
 
     auto t = j["Translation"];
-    _prefab.Translation = Vec3(t[0], t[1], t[2]);
+    _prefab.Position = Vec3(t[0], t[1], t[2]);
 
     return true;
 }
@@ -62,7 +62,7 @@ bool PrefabLoader::SaveScene(const std::string& _filepath, const std::vector<Pre
             { "TexturePath", data.TexturePath },
             { "Scale",       { data.Scale.x, data.Scale.y, data.Scale.z } },
             { "Rotation",    { data.Rotation.x, data.Rotation.y, data.Rotation.z } },
-            { "Translation", { data.Translation.x, data.Translation.y, data.Translation.z } }
+            { "Translation", { data.Position.x, data.Position.y, data.Position.z } }
             });
     }
 
@@ -95,7 +95,7 @@ bool PrefabLoader::LoadScene(const std::string& _filepath, std::vector<PrefabDat
         auto t = obj["Translation"];
         data.Scale = Vec3(s[0], s[1], s[2]);
         data.Rotation = Vec3(r[0], r[1], r[2]);
-        data.Translation = Vec3(t[0], t[1], t[2]);
+        data.Position = Vec3(t[0], t[1], t[2]);
 
         _placedPrefabs.push_back(data);
     }
@@ -244,11 +244,19 @@ bool PrefabLoader::SaveObject(const PrefabObjectData& _prefab, const std::string
     j["TexturePath"] = _prefab.TexturePath;
     j["Scale"] = { _prefab.Scale.x, _prefab.Scale.y, _prefab.Scale.z };
     j["Rotation"] = { _prefab.Rotation.x, _prefab.Rotation.y, _prefab.Rotation.z };
-    j["Translation"] = { _prefab.Translation.x, _prefab.Translation.y, _prefab.Translation.z };
+    j["Position"] = { _prefab.Position.x, _prefab.Position.y, _prefab.Position.z };
     j["SpecularColor"] = { _prefab.SpecularColor.x,_prefab.SpecularColor.y ,_prefab.SpecularColor.z };
     j["Shininess"] = _prefab.Shininess;
     j["EmissiveColor"] = { _prefab.EmissiveColor.x,_prefab.EmissiveColor.y ,_prefab.EmissiveColor.z };
     j["EmissivePower"] = _prefab.EmissivePower;
+
+    j["ShapeData"] = {
+        { "isUse", _prefab.ShapeData.isUse },
+        { "eShapeType", _prefab.ShapeData.eShapeType },
+        { "Scale", { _prefab.ShapeData.Scale[0], _prefab.ShapeData.Scale[1], _prefab.ShapeData.Scale[2] } },
+        { "Position", { _prefab.ShapeData.Position[0], _prefab.ShapeData.Position[1], _prefab.ShapeData.Position[2] } },
+        { "Rotation", { _prefab.ShapeData.Rotation[0], _prefab.ShapeData.Rotation[1], _prefab.ShapeData.Rotation[2] } }
+    };
 
     std::ofstream file(_filePath);
     if (!file.is_open()) return false;
@@ -276,8 +284,8 @@ bool PrefabLoader::LoadObject(const std::string& _filePath, PrefabObjectData& _p
     auto r = j["Rotation"];
     _prefab.Rotation = Vec3(r[0], r[1], r[2]);
 
-    auto t = j["Translation"];
-    _prefab.Translation = Vec3(t[0], t[1], t[2]);
+    auto t = j["Position"];
+    _prefab.Position = Vec3(t[0], t[1], t[2]);
 
     auto sc = j["SpecularColor"];
     _prefab.SpecularColor = Vec3(sc[0], sc[1], sc[2]);
@@ -286,6 +294,28 @@ bool PrefabLoader::LoadObject(const std::string& _filePath, PrefabObjectData& _p
     auto ec = j["EmissiveColor"];
     _prefab.EmissiveColor = Vec3(ec[0], ec[1], ec[2]);
     _prefab.EmissivePower = j["EmissivePower"];
+
+    if (j.contains("ShapeData"))
+    {
+        auto shape = j["ShapeData"];
+        _prefab.ShapeData.isUse = shape["isUse"];
+        _prefab.ShapeData.eShapeType = shape["eShapeType"];
+
+        auto sca = shape["Scale"];
+        _prefab.ShapeData.Scale[0] = sca[0];
+        _prefab.ShapeData.Scale[1] = sca[1];
+        _prefab.ShapeData.Scale[2] = sca[2];
+
+        auto pos = shape["Position"];
+        _prefab.ShapeData.Position[0] = pos[0];
+        _prefab.ShapeData.Position[1] = pos[1];
+        _prefab.ShapeData.Position[2] = pos[2];
+
+        auto rot = shape["Rotation"];
+        _prefab.ShapeData.Rotation[0] = rot[0];
+        _prefab.ShapeData.Rotation[1] = rot[1];
+        _prefab.ShapeData.Rotation[2] = rot[2];
+    }
 
     return true;
 }
@@ -302,30 +332,53 @@ bool PrefabLoader::LoadObjectArray(const std::string& _filePath, std::vector<Pre
 
     for (auto& item : j)
     {
-        PrefabObjectData prefab;
-        prefab.Name = item["Name"];
-        prefab.MeshPath = item["MeshPath"];
-        prefab.ShaderPath = item["ShaderPath"];
-        prefab.TexturePath = item["TexturePath"];
+        PrefabObjectData _prefab;
+        _prefab.Name = item["Name"];
+        _prefab.MeshPath = item["MeshPath"];
+        _prefab.ShaderPath = item["ShaderPath"];
+        _prefab.TexturePath = item["TexturePath"];
 
         auto s = item["Scale"];
-        prefab.Scale = Vec3(s[0], s[1], s[2]);
+        _prefab.Scale = Vec3(s[0], s[1], s[2]);
 
         auto r = item["Rotation"];
-        prefab.Rotation = Vec3(r[0], r[1], r[2]);
+        _prefab.Rotation = Vec3(r[0], r[1], r[2]);
 
-        auto t = item["Translation"];
-        prefab.Translation = Vec3(t[0], t[1], t[2]);
+        auto t = item["Position"];
+        _prefab.Position = Vec3(t[0], t[1], t[2]);
 
         auto sc = item["SpecularColor"];
-        prefab.SpecularColor = Vec3(sc[0], sc[1], sc[2]);
-        prefab.Shininess = item["Shininess"];
+        _prefab.SpecularColor = Vec3(sc[0], sc[1], sc[2]);
+        _prefab.Shininess = item["Shininess"];
 
         auto ec = item["EmissiveColor"];
-        prefab.EmissiveColor = Vec3(ec[0], ec[1], ec[2]);
-        prefab.EmissivePower = item["EmissivePower"];
+        _prefab.EmissiveColor = Vec3(ec[0], ec[1], ec[2]);
+        _prefab.EmissivePower = item["EmissivePower"];
 
-        _outPrefabs.push_back(prefab);
+        if (item.contains("ShapeData"))
+        {
+            auto shape = item["ShapeData"];
+
+            _prefab.ShapeData.isUse = shape["isUse"];
+            _prefab.ShapeData.eShapeType = shape["eShapeType"];
+
+            auto sca = shape["Scale"];
+            _prefab.ShapeData.Scale[0] = sca[0];
+            _prefab.ShapeData.Scale[1] = sca[1];
+            _prefab.ShapeData.Scale[2] = sca[2];
+
+            auto pos = shape["Position"];
+            _prefab.ShapeData.Position[0] = pos[0];
+            _prefab.ShapeData.Position[1] = pos[1];
+            _prefab.ShapeData.Position[2] = pos[2];
+
+            auto rot = shape["Rotation"];
+            _prefab.ShapeData.Rotation[0] = rot[0];
+            _prefab.ShapeData.Rotation[1] = rot[1];
+            _prefab.ShapeData.Rotation[2] = rot[2];
+        }
+
+        _outPrefabs.push_back(_prefab);
     }
 
     return true;
