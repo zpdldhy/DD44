@@ -77,17 +77,16 @@ void UBoxComponent::UpdateBounds()
 	m_Box.vMax = Vec3::Transform(vMax, m_matWorld);
 	m_Box.vCenter = Vec3::Transform(vCenter, m_matWorld);
 
-	m_Box.vAxis[0] = Vec3::TransformNormal(vAxisRoll, m_matWorld);
-	m_Box.vAxis[1] = Vec3::TransformNormal(vAxisYaw, m_matWorld);
-	m_Box.vAxis[2] = Vec3::TransformNormal(vAxisPitch, m_matWorld);
+	m_Box.vAxis[0] = XMVector3TransformNormal(vAxisRoll, m_matWorld);
+	m_Box.vAxis[1] = XMVector3TransformNormal(vAxisYaw, m_matWorld);
+	m_Box.vAxis[2] = XMVector3TransformNormal(vAxisPitch, m_matWorld);
 
 	m_Box.vAxis[0].Normalize();
 	m_Box.vAxis[1].Normalize();
 	m_Box.vAxis[2].Normalize();
 
-	m_Box.vExtent.x = (m_Box.vMax.x - m_Box.vMin.x) * 0.5f;
-	m_Box.vExtent.y = (m_Box.vMax.y - m_Box.vMin.y) * 0.5f;
-	m_Box.vExtent.z = (m_Box.vMax.z - m_Box.vMin.z) * 0.5f;
+	// 고정 박스라면 extents는 0.5, 0.5, 0.5
+	m_Box.vExtent = Vec3(0.5f, 0.5f, 0.5f) * m_vWorldScale;
 }
 
 void UBoxComponent::CreateCollisionRange()

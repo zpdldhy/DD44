@@ -482,11 +482,12 @@ void TestYoooooon::ClickMouse()
 {
 	m_Cursor.Click();
 
-	shared_ptr<AActor> pActor = nullptr;
+	auto boxCom = static_pointer_cast<UBoxComponent>(m_pPlayer->GetShapeComponent());
 
-	if (Collision::CheckRayCollision(m_Cursor, OBJECT->GetActorIndexList(), pActor))
+	Vec3 vinter;
+
+	if (Collision::CheckOBBToRay(m_Cursor, boxCom->GetBounds(), vinter))
 	{
-		if (pActor != nullptr)
-			int a = 0;
+		int a = 0;
 	}
 }
