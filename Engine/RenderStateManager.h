@@ -7,7 +7,8 @@ enum class BlendType{
     AlphaBlend,
     Additive,
     Multiply,
-    Premultiplied };
+    Premultiplied,
+    DualSource };
 
 enum class DepthType { 
     ZTestOn_ZWriteOn,

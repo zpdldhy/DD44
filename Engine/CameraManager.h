@@ -5,6 +5,8 @@ struct CameraConstantData
 {
 	Matrix matView;
 	Matrix matProjection;
+	Vec3   g_vCameraPos;
+	float  GameTime;
 };
 
 enum class CameraViewType

@@ -89,6 +89,12 @@ cbuffer InverseBoneBuffer : register(b9)
     matrix obj_matBone[MAX_BONE];
 }
 
+cbuffer CB_Slash : register(b10)
+{
+    float g_fProgress; 
+    float3 padding_slash;
+}
+
 cbuffer CB_Blur : register(b11)
 {
     float2 g_vTexelSize; // (1 / 화면 너비, 1 / 화면 높이)

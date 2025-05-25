@@ -21,6 +21,7 @@
 #include "UIManager.h"
 #include "AParticleActor.h"
 #include "ParticleManager.h"
+#include "Timer.h"
 
 bool bRunGame = true;
 
@@ -31,7 +32,15 @@ void Editor::Init()
 	actorLoader.LoadAllAsset();
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
 	meshLoader.SetAnim(actorLoader.LoadAnimMap());
-
+	
+	{
+		m_pSlashMaterial = make_shared<UMaterial>();
+		m_pSlashMaterial->Load(
+			L"../Resources/Texture/sword_slash_texture1.png",
+			L"../Resources/Shader/Slash.hlsl"
+		);
+	}
+	
 	SetupEditorCallbacks();
 
 	LoadAllPrefabs(".map.json");
@@ -47,6 +56,8 @@ void Editor::Init()
 
 void Editor::Update()
 {
+	Slash();
+	
 	if (INPUT->GetButton(O))
 	{
 		if (m_bEnginCamera)
@@ -71,6 +82,7 @@ void Editor::Update()
 
 void Editor::Render()
 {
+
 }
 
 void Editor::Destroy()
@@ -615,6 +627,47 @@ void Editor::SetupParticleEditorCallback()
 			PARTICLE->AddUI(particleActor);
 			//particleActor->InitSpriteAnimation(4, 1.f); // 4´Â divisions, 10Àº frameRate
 		});
+}
+
+void Editor::Slash()
+{
+	if (INPUT->GetButtonDown(LCLICK))
+	{
+		m_bSlashPlaying = true;
+		m_fSlashTime = 0.0f;
+	}
+
+
+	if (m_bSlashPlaying)
+	{
+		m_fSlashTime += TIMER->GetDeltaTime();
+
+		float t = m_fSlashTime;
+		float progress = 0.0f;
+
+
+		if (t <= 0.2f)
+		{
+			float ratio = t / 0.2f;
+			progress = pow(ratio, 2.0f);
+		}
+		else if (t <= 0.5f)
+		{
+			progress = 1.0f;
+		}
+		else
+		{
+			progress = -1.0f;
+		}
+
+		if (m_pSlashMaterial)
+			m_pSlashMaterial->SetSlashProgress(progress);
+
+		if (t >= m_fSlashDuration)
+		{
+			m_bSlashPlaying = false;
+		}
+	}
 }
 
 

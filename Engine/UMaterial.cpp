@@ -2,6 +2,7 @@
 #include "UMaterial.h"
 #include "Device.h"
 
+
 void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
 {
     m_TexturePath = _textureFileName;
@@ -16,6 +17,7 @@ void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
     CreateRenderModeCB();
     m_CB_SpriteUV = make_shared<ConstantBuffer<CB_SpriteUV>>();
     m_CB_SpriteUV->Create(4); 
+    CreateSlashCB();
     
 }
 
@@ -55,6 +57,8 @@ void UMaterial::Bind()
     {
         m_CB_SpriteUV->Push();  // b4 register에 UV 범위 바인딩
     }
+
+
 }
 
 void UMaterial::CreateEffectCB()
@@ -89,6 +93,21 @@ void UMaterial::CreateRenderModeCB()
 
     HRESULT hr = DEVICE->CreateBuffer(&desc, &initData, m_pRenderModeBuffer.GetAddressOf());
     assert(SUCCEEDED(hr) && "Failed to create RenderMode ConstantBuffer");
+}
+
+void UMaterial::CreateSlashCB()
+{
+    D3D11_BUFFER_DESC desc = {};
+    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    desc.ByteWidth = sizeof(CB_Slash);
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    HRESULT hr = DEVICE->CreateBuffer(&desc, nullptr, m_pCB_Slash.GetAddressOf());
+    if (FAILED(hr))
+    {
+        int a = 0;
+    }
 }
 
 
@@ -134,12 +153,6 @@ void UMaterial::SetSpecularParams(const Vec3& _coeff, float _shininess)
     UpdateEffectBuffer();
 }
 
-void UMaterial::SetCameraPos(const Vec3& _camPos)
-{
-    m_tEffectData.g_vCameraPos = _camPos;
-    UpdateEffectBuffer();
-}
-
 
 void UMaterial::SetRenderMode(ERenderMode _eMode)
 {
@@ -182,4 +195,18 @@ void UMaterial::SetUVRange(Vec2 start, Vec2 end)
     m_CB_SpriteUV->data.uvEnd = end;
     m_CB_SpriteUV->Update();
     m_CB_SpriteUV->Push();
+}
+
+void UMaterial::SetSlashProgress(float _progress)
+{
+    m_tSlashData.g_fProgress = _progress;
+
+    D3D11_MAPPED_SUBRESOURCE mapped = {};
+    DC->Map(m_pCB_Slash.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    memcpy(mapped.pData, &m_tSlashData, sizeof(CB_Slash));
+    DC->Unmap(m_pCB_Slash.Get(), 0);
+
+    // 바인딩도 여기서 바로 해도 됨
+    DC->VSSetConstantBuffers(10, 1, m_pCB_Slash.GetAddressOf());
+    DC->PSSetConstantBuffers(10, 1, m_pCB_Slash.GetAddressOf());
 }
