@@ -8,6 +8,9 @@ class ParticleManager : public Singleton<ParticleManager>
 	vector<shared_ptr<AParticleActor>> m_vParticleList;
 	vector<shared_ptr<AParticleActor>> m_vRenderParticleList;
 
+	ComPtr<ID3D11RenderTargetView> m_pPrevRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
+	ComPtr<ID3D11DepthStencilView> m_pPrevDSV;
+
 public:
 	void Tick();
 	void Render();

@@ -9,6 +9,7 @@ public:
 	ComPtr<ID3D11BlendState> m_pMultiplyBlend;
 	ComPtr<ID3D11BlendState> m_pPremultipliedAlphaBlend;
 	ComPtr<ID3D11BlendState> m_pOpaqueBlend;
+	ComPtr<ID3D11BlendState> m_pDualSourceBlend;
 
 	// SamplerState
 	ComPtr<ID3D11SamplerState> m_pLinearSS;
