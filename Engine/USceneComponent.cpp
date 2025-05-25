@@ -10,15 +10,17 @@ void USceneComponent::Init()
 	CreateConstantBuffer();
 
 	// Transform을 제외한 Component의 Parent 지정
-	if (m_pOwner.lock()->GetTransform().get() != this)
+	if (GetOwner()->GetTransform() != this)
 	{
-		m_pParentTransform = m_pOwner.lock()->GetTransform();
+		m_pParentTransform = GetOwner()->GetTransform();
 	}
+
+	UpdateMatrix();
 }
 
 void USceneComponent::Tick()
 {
-	UpdateWorldMatrix();
+	UpdateMatrix();
 }
 
 void USceneComponent::Render()
@@ -64,50 +66,72 @@ bool USceneComponent::CreateConstantBuffer()
 	return true;
 }
 
-void USceneComponent::UpdateWorldMatrix()
+void USceneComponent::UpdateMatrix()
+{
+	UpdateLocalMatrix();
+	UpdateWorldMatrix();
+}
+
+void USceneComponent::UpdateLocalMatrix()
 {
 	// Set Local
-	m_matScale = Matrix::CreateScale(m_vLocalScale);
+	m_matLocalScale = Matrix::CreateScale(m_vLocalScale);
 
-	m_matRotation = Matrix::CreateRotationZ(m_vLocalRotation.z);
-	m_matRotation *= Matrix::CreateRotationX(m_vLocalRotation.x);
-	m_matRotation *= Matrix::CreateRotationY(m_vLocalRotation.y);
+	m_matLocalRotation = Matrix::CreateRotationZ(m_vLocalRotation.z);
+	m_matLocalRotation *= Matrix::CreateRotationX(m_vLocalRotation.x);
+	m_matLocalRotation *= Matrix::CreateRotationY(m_vLocalRotation.y);
 
-	m_matTrans = Matrix::CreateTranslation(m_vLocalPosition);
+	m_matLocalTranslation = Matrix::CreateTranslation(m_vLocalPosition);
 
-	m_vLocalLook.x = m_matLocal._31; m_vLocalLook.y = m_matLocal._32; m_vLocalLook.z = m_matLocal._33;
-	m_vLocalRight.x = m_matLocal._11; m_vLocalRight.y = m_matLocal._12; m_vLocalRight.z = m_matLocal._13;
-	m_vLocalUp.x = m_matLocal._21; m_vLocalUp.y = m_matLocal._22; m_vLocalUp.z = m_matLocal._23;
+	m_matLocal = m_matLocalScale * m_matLocalRotation * m_matLocalTranslation;
+
+	m_vLocalLook = Vec3(m_matLocal._31, m_matLocal._32, m_matLocal._33);
+	m_vLocalRight = Vec3(m_matLocal._11, m_matLocal._12, m_matLocal._13);
+	m_vLocalUp = Vec3(m_matLocal._21, m_matLocal._22, m_matLocal._23);
 
 	m_vLocalLook.Normalize();
 	m_vLocalRight.Normalize();
 	m_vLocalUp.Normalize();
+}
 
+void USceneComponent::UpdateWorldMatrix()
+{
 	// Set World
-	// No Parent(Transform)
+// No Parent(Transform)
 	if (m_pParentTransform == nullptr)
 	{
-		m_vWorldLook = m_vLocalLook;
-		m_vWorldRight = m_vLocalRight;
-		m_vWorldUp = m_vLocalUp;
-
-		m_vWorldScale = m_vLocalScale;
-		m_vWorldRotation = m_vLocalRotation;
-		m_vWorldPosition = m_vLocalPosition;
+		m_matWorld = m_matLocal * m_matAnim;
 	}
 	// Actor - Actor && Actor - Component
 	else
 	{
-		m_vWorldLook = m_pParentTransform->GetLocalLook();
-		m_vWorldRight = m_pParentTransform->GetLocalRight();
-		m_vWorldUp = m_pParentTransform->GetLocalUp();
-
-		m_vWorldScale = m_vLocalScale * m_pParentTransform->GetLocalScale();
-		m_vWorldRotation = m_vLocalRotation + m_pParentTransform->GetLocalRotation();
-		m_vWorldPosition = m_vLocalPosition + m_pParentTransform->GetLocalPosition();
+		// Parent의 SRT가 바뀐게 있으면 여기로 들어온다.
+		m_matParent = m_pParentTransform->GetWorld();
+		m_matWorld = m_matLocal * m_matAnim * m_matParent;
 	}
 
-	// Set Matrix
-	m_matLocal = m_matScale * m_matRotation * m_matTrans;
-	m_matWorld = m_matLocal * m_matParent;
+	Quaternion qRot;
+	bool success = m_matWorld.Decompose(m_vWorldScale, qRot, m_vWorldPosition);
+
+	if (success)
+	{
+		// Quaternion → Euler로 변환 (선택)
+		m_vWorldRotation = qRot.ToEuler(); // 이 함수는 직접 구현하거나 XMQuaternionToEulerAngles 등 사용
+	}
+
+	m_matWorldScale = Matrix::CreateScale(m_vWorldScale);
+
+	m_matWorldRotation = Matrix::CreateRotationZ(m_vWorldRotation.z);
+	m_matWorldRotation *= Matrix::CreateRotationX(m_vWorldRotation.x);
+	m_matWorldRotation *= Matrix::CreateRotationY(m_vWorldRotation.y);
+
+	m_matWorldTranslation = Matrix::CreateTranslation(m_vWorldPosition);
+
+	m_vWorldLook = Vec3(m_matWorld._11, m_matWorld._12, m_matWorld._13);
+	m_vWorldRight = Vec3(m_matWorld._21, m_matWorld._22, m_matWorld._23);
+	m_vWorldUp = Vec3(m_matWorld._31, m_matWorld._32, m_matWorld._33);
+
+	m_vWorldLook.Normalize();
+	m_vWorldRight.Normalize();
+	m_vWorldUp.Normalize();
 }

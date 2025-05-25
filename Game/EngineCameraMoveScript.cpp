@@ -5,6 +5,12 @@
 #include "CollisionManager.h"
 #include "AActor.h"
 
+void EngineCameraMoveScript::Init()
+{
+	auto camera = GetOwner()->GetCameraComponent();
+	camera->SetLookTo(GetOwner()->GetLook());
+}
+
 void EngineCameraMoveScript::Tick()
 {
 	float deltaTime = TIMER->GetDeltaTime() * 10.f;
@@ -18,7 +24,7 @@ void EngineCameraMoveScript::Tick()
 		float fYaw = (pCurrentMousePointer.x - m_pPrevMousePos.x) * deltaTime / 4.f;
 		float fPitch = (pCurrentMousePointer.y - m_pPrevMousePos.y) * deltaTime / 4.f;
 
-		m_pOwner.lock()->AddRotation(Vec3(fPitch, fYaw, 0.0f));
+		GetOwner()->AddRotation(Vec3(fPitch, fYaw, 0.0f));
 
 		m_pPrevMousePos = pCurrentMousePointer;
 	}
@@ -27,21 +33,23 @@ void EngineCameraMoveScript::Tick()
 		deltaTime *= 10.f;
 
 	if (INPUT->GetButtonDown(W))
-		m_pOwner.lock()->AddPosition(m_pOwner.lock()->GetLook() * deltaTime);
+		GetOwner()->AddPosition(GetOwner()->GetLook() * deltaTime);
 
 	if (INPUT->GetButtonDown(A))
-		m_pOwner.lock()->AddPosition(-m_pOwner.lock()->GetRight() * deltaTime);
+		GetOwner()->AddPosition(-GetOwner()->GetRight() * deltaTime);
 
 	if (INPUT->GetButtonDown(S))
-		m_pOwner.lock()->AddPosition(-m_pOwner.lock()->GetLook() * deltaTime);
+		GetOwner()->AddPosition(-GetOwner()->GetLook() * deltaTime);
 
 	if (INPUT->GetButtonDown(D))
-		m_pOwner.lock()->AddPosition(m_pOwner.lock()->GetRight() * deltaTime);
+		GetOwner()->AddPosition(GetOwner()->GetRight() * deltaTime);
 
 	if (INPUT->GetButtonDown(Q))
-		m_pOwner.lock()->AddPosition(Vec3(0.0f, -1.0f, 0.0f) * deltaTime);
+		GetOwner()->AddPosition(Vec3(0.0f, -1.0f, 0.0f) * deltaTime);
 
 	if (INPUT->GetButtonDown(E))
-		m_pOwner.lock()->AddPosition(Vec3(0.0f, 1.0f, 0.0f) * deltaTime);
+		GetOwner()->AddPosition(Vec3(0.0f, 1.0f, 0.0f) * deltaTime);
 
+	auto camera = GetOwner()->GetCameraComponent();
+	camera->SetLookTo(GetOwner()->GetLook());
 }

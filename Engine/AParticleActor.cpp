@@ -7,7 +7,6 @@
 
 AParticleActor::AParticleActor()
 {
-	m_pTransform = make_shared<USceneComponent>();
 	m_CB_Billboard = make_shared<ConstantBuffer<CB_Billboard>>();
 	m_CB_Billboard->Create(6); // b6 ½½·Ô
 }
