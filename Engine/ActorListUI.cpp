@@ -468,15 +468,15 @@ void ActorListUI::SaveCharacterPrefab(const std::shared_ptr<class AActor>& _acto
 	data.AnimIndex = 0;
 	data.AnimSpeed = 1.0f;
 
-	data.actor.Position[0] = m_vPosition.x;
-	data.actor.Position[1] = m_vPosition.y;
-	data.actor.Position[2] = m_vPosition.z;
-	data.actor.Rotation[0] = m_vRotation.x;
-	data.actor.Rotation[1] = m_vRotation.y;
-	data.actor.Rotation[2] = m_vRotation.z;
-	data.actor.Scale[0] = m_vScale.x;
-	data.actor.Scale[1] = m_vScale.y;
-	data.actor.Scale[2] = m_vScale.z;
+	data.transform.Position[0] = m_vPosition.x;
+	data.transform.Position[1] = m_vPosition.y;
+	data.transform.Position[2] = m_vPosition.z;
+	data.transform.Rotation[0] = m_vRotation.x;
+	data.transform.Rotation[1] = m_vRotation.y;
+	data.transform.Rotation[2] = m_vRotation.z;
+	data.transform.Scale[0] = m_vScale.x;
+	data.transform.Scale[1] = m_vScale.y;
+	data.transform.Scale[2] = m_vScale.z;
 
 	auto shape = _actor->GetShapeComponent();
 	if (shape)
