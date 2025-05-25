@@ -17,6 +17,8 @@
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
+#include "ShapeData.h"
+#include "CollisionManager.h"
 
 void TestYoooooon::Init()
 {
@@ -35,7 +37,7 @@ void TestYoooooon::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
-
+	CreateCollisionObject();
 }
 
 void TestYoooooon::Update()
@@ -54,6 +56,10 @@ void TestYoooooon::Update()
 		}
 	}
 
+	if (INPUT->GetButton(LCLICK))
+		ClickMouse();
+
+	CheckCollision();
 }
 
 void TestYoooooon::Render()
@@ -473,4 +479,44 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 		}
 
 	}
+}
+
+void TestYoooooon::CreateCollisionObject()
+{
+	m_pBox = make_shared<AActor>();
+
+	auto pCube = UStaticMeshComponent::CreateCube();
+	m_pBox->SetMeshComponent(pCube);
+
+	auto pMaterial = make_shared<UMaterial>();
+	pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+	pCube->SetMaterial(pMaterial);
+
+	auto boxCol = make_shared<UBoxComponent>();
+	boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	m_pBox->SetShapeComponent(boxCol);
+
+	m_pBox->SetScale(Vec3(5.f, 5.f, 5.f));
+	m_pBox->SetPosition(Vec3(15.f, 1.f, 10.f));
+
+	OBJECT->AddActor(m_pBox);
+}
+
+void TestYoooooon::ClickMouse()
+{
+	m_Cursor.Click();
+
+	auto boxCom = static_pointer_cast<UBoxComponent>(m_pPlayer->GetShapeComponent());
+
+	Vec3 vinter;
+
+	if (Collision::CheckOBBToRay(m_Cursor, boxCom->GetBounds(), vinter))
+	{
+		int a = 0;
+	}
+}
+
+void TestYoooooon::CheckCollision()
+{
+	COLLITION->CheckCollision(m_pPlayer, m_pBox);
 }
