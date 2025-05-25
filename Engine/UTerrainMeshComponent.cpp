@@ -2,8 +2,19 @@
 #include "UTerrainMeshComponent.h"
 #include "UMaterial.h"
 
+void UTerrainMeshComponent::Init()
+{
+    USceneComponent::Init();
+}
+
+void UTerrainMeshComponent::Tick()
+{
+    USceneComponent::Tick();
+}
+
 void UTerrainMeshComponent::Render()
 {
+    USceneComponent::Render();
 	PreRender();
 	PostRender();
 }
