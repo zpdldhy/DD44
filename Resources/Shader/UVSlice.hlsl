@@ -1,5 +1,10 @@
 #include "MainHeader.hlsli"
 
+struct PS_OUT_UI
+{
+    float4 c : SV_Target0;
+};
+
 cbuffer CB_UVSlice : register(b2)
 {
     float4 g_vUVSlice;
@@ -22,9 +27,9 @@ VS_OUT VS(VS_IN input)
     return output;
 }
 
-PS_OUT PS(VS_OUT input)
+PS_OUT_UI PS(VS_OUT input)
 {     
-    PS_OUT psOut = (PS_OUT) 0;
+    PS_OUT_UI psOut = (PS_OUT_UI) 0;
     
     float left = g_vUVSlice.x;
     float right = 1 - g_vUVSlice.y;

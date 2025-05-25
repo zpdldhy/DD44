@@ -16,8 +16,6 @@ enum class ComponentType
 	CT_COUNT,
 };
 
-
-
 class AActor : public enable_shared_from_this<AActor>
 {
 public:
@@ -40,6 +38,7 @@ public:
 	bool m_bRender = true;		// 해당 Actor가 이번 Render에 출력되는지 확인하는 용도.
 	bool m_bDelete = false;	
 	bool m_bUpdateQuadTree = false;
+	bool m_bUseStencil = false;
 
 	//--------------------------------------------------------------------------------------
 	// Component
@@ -66,7 +65,7 @@ public:
 		
 	// Script
 	void AddScript(shared_ptr<class UScriptComponent> _script) { m_vScript.push_back(_script); }
-	const std::vector<std::shared_ptr<UScriptComponent>>& GetScriptList() const { return m_vScript; }
+	const std::vector<std::shared_ptr<class UScriptComponent>>& GetScriptList() const { return m_vScript; }
 
 public:
 	const Vec3& GetPosition() const { return m_pTransform->GetLocalPosition(); }

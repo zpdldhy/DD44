@@ -15,8 +15,17 @@ enum class ProjectionType
 	PT_PERSPECTIVE,
 };
 
+struct FrustumData
+{
+	Matrix matViewProjInvert;
+};
+
 class UCameraComponent : public USceneComponent
 {
+private:
+	FrustumData m_tFrustumData = { {Matrix::Identity } };
+	static ComPtr<ID3D11Buffer> m_pFrustumCB;
+
 protected:
 	ProjectionType m_ProjectionType = ProjectionType::PT_PERSPECTIVE;
 	ViewType	   m_ViewType = ViewType::VT_LOOKTO;
@@ -52,7 +61,9 @@ public:
 
 private:
 	void CreateFrustumBox();
+	void CreateFrustumBuffer();
 	void UpdateFrustumBox();
+	void UpdateFrustumBuffer();
 
 	void UpdateView();
 	void UpdateProjection();

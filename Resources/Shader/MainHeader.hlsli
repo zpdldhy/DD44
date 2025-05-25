@@ -11,7 +11,7 @@ cbuffer CameraBuffer : register(b1)
     row_major matrix g_matView;
     row_major matrix g_matProj;
     float3 g_vCameraPos;
-    float dummy_camera;
+    float g_fGameTime;
 };
 
 struct VS_IN

@@ -44,6 +44,7 @@ void Engine::Init()
 
 	// Manager ÃÊ±âÈ­
 	{
+		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
 	}

@@ -5,6 +5,8 @@
 #include "Device.h"
 #include "DxState.h"
 
+ComPtr<ID3D11Buffer> UCameraComponent::m_pFrustumCB = nullptr;
+
 void UCameraComponent::Init()
 {
 	USceneComponent::Init();
@@ -42,6 +44,7 @@ void UCameraComponent::Render()
 		DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
 		DC->RSSetState(STATE->m_pRSWireFrame.Get());
 
+		UpdateFrustumBuffer();
 		m_pFrustumBox->Render();
 
 		DC->RSSetState(m_pCurrentRasterizer.Get());
@@ -69,9 +72,6 @@ void UCameraComponent::CreateFrustumBox()
 
 	Vec3 vMin = Vec3(-1.f, -1.f, 0.f);
 	Vec3 vMax = Vec3(1.f, 1.f, 1.f);
-
-	Matrix matViewProj;
-	matViewProj = (m_matView * m_matProjection).Invert();
 
 	// Front
 	vertexList[0] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0.f, 0.f, +1.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
@@ -103,11 +103,6 @@ void UCameraComponent::CreateFrustumBox()
 	vertexList[21] = PNCT_VERTEX(Vec3(vMin.x, vMin.y, vMin.z), Vec3(0.f, +1.f, 0.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
 	vertexList[22] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMin.z), Vec3(0.f, +1.f, 0.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
 	vertexList[23] = PNCT_VERTEX(Vec3(vMax.x, vMin.y, vMax.z), Vec3(0.f, +1.f, 0.f), Vec4(0.f, 0.f, 1.f, 1.f), Vec2(0.f, 0.f));
-
-	for (int i = 0; i < 24; i++)
-	{		
-		vertexList[i].pos = Vec3::Transform(vertexList[i].pos, matViewProj);
-	}
 
 	pMeshData->SetVertexList(vertexList);
 
@@ -142,14 +137,40 @@ void UCameraComponent::CreateFrustumBox()
 
 	// Set Material
 	auto pMaterial = make_shared<UMaterial>();
-	pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
+	pMaterial->Load(L"", L"../Resources/Shader/CameraFrustum.hlsl");
+	pMaterial->SetUseEffect(false);
 	pMesh->SetMaterial(pMaterial);
 
 	m_pFrustumBox->SetMeshComponent(pMesh);
 	m_pFrustumBox->SetPosition(m_vWorldPosition);
-	m_pFrustumBox->SetRotation(m_vWorldRotation);
+	m_pFrustumBox->SetRotation(m_vWorldRotation);		
 
 	m_pFrustumBox->Init();	
+
+	CreateFrustumBuffer();
+}
+
+void UCameraComponent::CreateFrustumBuffer()
+{
+	if (m_pFrustumCB != nullptr)
+		return;
+
+	D3D11_BUFFER_DESC bd;
+	ZeroMemory(&bd, sizeof(bd));
+	bd.ByteWidth = sizeof(m_tFrustumData);
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	D3D11_SUBRESOURCE_DATA sd;
+	ZeroMemory(&sd, sizeof(sd));
+	sd.pSysMem = &m_tFrustumData;
+
+	HRESULT hr = DEVICE->CreateBuffer(&bd, &sd, m_pFrustumCB.GetAddressOf());
+
+	if (FAILED(hr))
+	{
+		DX_CHECK(hr, _T("CreateUISliceBuffer Failed"));
+	}
 }
 
 void UCameraComponent::UpdateFrustumBox()
@@ -162,6 +183,16 @@ void UCameraComponent::UpdateFrustumBox()
 	m_bVisibleFrustumBox = true;
 }
 
+void UCameraComponent::UpdateFrustumBuffer()
+{
+	if (m_pFrustumCB)
+	{
+		m_tFrustumData.matViewProjInvert = (m_matView * m_matProjection).Invert();
+		DC->UpdateSubresource(m_pFrustumCB.Get(), 0, nullptr, &m_tFrustumData, 0, 0);
+		DC->VSSetConstantBuffers(2, 1, m_pFrustumCB.GetAddressOf());
+	}
+}
+
 void UCameraComponent::UpdateView()
 {
 	Vec3 vUp = Vec3(0.f, 1.f, 0.f);
@@ -170,10 +201,38 @@ void UCameraComponent::UpdateView()
 	{
 		m_matView = DirectX::XMMatrixLookAtLH(m_vWorldPosition, m_vLookAt, vUp);
 		m_vLookTo = m_vLookAt - m_vWorldPosition;
-		m_vLookTo.Normalize();
 	}
 	else if(m_ViewType == ViewType::VT_LOOKTO)
 		m_matView = DirectX::XMMatrixLookToLH(m_vWorldPosition, m_vLookTo, vUp);
+
+	m_vLookTo.Normalize();
+	Vec3 vRight = vUp.Cross(m_vLookTo);
+
+	// look Vector가 변경됨에 따라 Rotation을 다시 구해야 한다.
+	Quaternion qRotation = Quaternion::LookRotation(m_vLookTo, vUp);
+
+	m_vWorldRotation.y = atan2f(m_vLookTo.x, m_vLookTo.z);	// Yaw : 좌우
+	m_vWorldRotation.x = asinf(-m_vLookTo.y);				// pitch : 상하	
+
+	// WorldRotation -> LocalRotation
+	m_matWorldRotation = Matrix::CreateRotationZ(m_vWorldRotation.z);
+	m_matWorldRotation *= Matrix::CreateRotationX(m_vWorldRotation.x);
+	m_matWorldRotation *= Matrix::CreateRotationY(m_vWorldRotation.y);	
+
+	auto matWorld = m_matWorldScale * m_matWorldRotation * m_matWorldTranslation;
+
+	Matrix matLocal = Matrix::Identity;
+	if (m_pParentTransform)
+		matLocal = matWorld * m_matParent.Invert();
+
+	Vec3 scale, pos;
+	Quaternion qRot;
+	bool success = matLocal.Decompose(scale, qRot, pos);
+
+	if (success)
+	{
+		m_vLocalRotation = qRot.ToEuler();
+	}
 }
 
 void UCameraComponent::UpdateProjection()

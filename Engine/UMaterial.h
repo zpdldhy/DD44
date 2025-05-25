@@ -4,13 +4,6 @@
 #include "Inputlayout.h"
 #include "ConstantBuffer.h"
 
-enum class ERenderMode
-{
-	Default = 0,
-	Silhouette = 1,
-};
-
-
 struct CB_MaterialEffect
 {
 	float g_fGlowPower;
@@ -54,12 +47,6 @@ struct CB_Material
 //	float padding[3];
 //};
 
-struct CB_RMB
-{
-	int iRenderMode = 0;
-	Vec3 padding;
-};
-
 struct CB_SpriteUV
 {
 	Vec2 uvStart = { 0.0f, 0.0f };
@@ -68,7 +55,6 @@ struct CB_SpriteUV
 
 class UMaterial
 {
-	bool m_bUseStencil = false;
 	bool m_bUseEffect = true;
 
 	std::wstring m_TexturePath;
@@ -80,24 +66,17 @@ class UMaterial
 	ComPtr<ID3D11ShaderResourceView> m_pTexSRV;
 	
 	ComPtr<ID3D11Buffer> m_pEffectCB; // ХыЧе CB
-	ComPtr<ID3D11Buffer> m_pRenderModeBuffer;
 	shared_ptr<class ConstantBuffer<CB_SpriteUV>> m_CB_SpriteUV;
 
 	CB_MaterialEffect m_tEffectData = {};
-	CB_RMB m_tRenderModeData;
-	ERenderMode m_eRenderMode = ERenderMode::Default;
 
 public:
 	virtual void Load(wstring _textureFileName, wstring _shaderFileName);
 	virtual void Bind();
 
 	void CreateEffectCB();
-	void CreateRenderModeCB();
-
 	void UpdateEffectBuffer();
-	void UpdateRenderModeBuffer();
 			
-	void SetRenderMode(ERenderMode _eMode);
 	void SetEmissiveParams(const Vec3& _color, float _power);
 	void SetGlowParams(float _glowPower, const Vec3 _glowColor);
 	void SetHitFlashTime(float _flashTime);
@@ -106,9 +85,6 @@ public:
 	void SetDiffuseParams(const Vec3& _coeff, float _power);
 	void SetSpecularParams(const Vec3& _coeff, float _shininess);
 	void SetCameraPos(const Vec3& camPos);
-
-	void SetUseStencil(bool _bUseStencil) { m_bUseStencil = _bUseStencil; }
-	bool IsUseStencil() { return m_bUseStencil; }	
 	void SetUseEffect(bool _bUseEffect) { m_bUseEffect = _bUseEffect; }
 	bool IsUseEffect() { return m_bUseEffect; }
 	void SetUVRange(Vec2 start, Vec2 end);

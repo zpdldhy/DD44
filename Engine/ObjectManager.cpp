@@ -7,6 +7,12 @@
 #include "ATerrainTileActor.h"
 
 UINT ObjectManager::ActorCount = 0;
+ComPtr<ID3D11Buffer> ObjectManager::m_pRenderModeBuffer = nullptr;
+
+void ObjectManager::Init()
+{
+	CreateRenderModeCB();
+}
 
 void ObjectManager::Tick()
 {
@@ -30,44 +36,26 @@ void ObjectManager::Render()
 
 	for (auto& pRenderActor : m_vPreRenderActorList)
 	{
-		auto pMesh = pRenderActor->GetMeshComponent<UMeshComponent>();
-
-		// No Stencil
-		if (pMesh == nullptr || pMesh->GetMaterial() == nullptr)
-		{
-			pRenderActor->Render();
-			continue;
-		}
-
 		// [1] Actor1 먼저 정상 렌더링 (깊이, 스텐실 기록 X)
-		pMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
+		SetRenderMode(ERenderMode::Default);
 		DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
 		pRenderActor->Render();
 
 		// [2] Actor1 위치에 스텐실 = 1 설정 (깊이 테스트는 하되 기록 X)
-		pMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
+		SetRenderMode(ERenderMode::Default);
 		DC->OMSetDepthStencilState(STATE->m_pDSS_StencilWrite.Get(), 1);
 		pRenderActor->Render();
 	}
 
 	for (auto& pRenderActor : m_vPostRenderActorList)
 	{
-		auto pMesh = pRenderActor->GetMeshComponent<UMeshComponent>();
-
-		// No Stencil
-		if (pMesh == nullptr || pMesh->GetMaterial() == nullptr)
-		{
-			pRenderActor->Render();
-			continue;
-		}
-
 		// [3] Actor2 실루엣으로 스텐실 == 1 영역만 출력 (깊이 Disable)
-		pMesh->GetMaterial()->SetRenderMode(ERenderMode::Silhouette);
+		SetRenderMode(ERenderMode::Silhouette);
 		DC->OMSetDepthStencilState(STATE->m_pDSS_StencilMaskEqual.Get(), 1);
 		pRenderActor->Render();
 
 		// [4] Actor2 일반 렌더링 (깊이 Enable)
-		pMesh->GetMaterial()->SetRenderMode(ERenderMode::Default);
+		SetRenderMode(ERenderMode::Default);
 		DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
 		pRenderActor->Render();
 	}
@@ -143,15 +131,7 @@ void ObjectManager::CheckStencilList()
 {
 	for (auto& pActor : m_vRenderActorList)
 	{
-		auto pMesh = pActor->GetMeshComponent<UMeshComponent>();
-
-		if (pMesh == nullptr || pMesh->GetMaterial() == nullptr)
-		{
-			m_vPreRenderActorList.emplace_back(pActor);
-			continue;
-		}
-
-		if (pMesh->GetMaterial()->IsUseStencil() == false)
+		if (pActor->m_bUseStencil == false)
 			m_vPreRenderActorList.emplace_back(pActor);
 		else
 			m_vPostRenderActorList.emplace_back(pActor);
@@ -164,4 +144,33 @@ void ObjectManager::ClearRenderList()
 	m_vPreRenderActorList.clear();
 	m_vPostRenderActorList.clear();
 	//m_vActorIndexList.clear();	// 임시 사용
+}
+
+void ObjectManager::CreateRenderModeCB()
+{
+	D3D11_BUFFER_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.ByteWidth = sizeof(RenderModeCB);
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	D3D11_SUBRESOURCE_DATA src;
+	ZeroMemory(&src, sizeof(src));
+	src.pSysMem = &m_tRenderModeData;
+
+	HRESULT hr = DEVICE->CreateBuffer(&desc, &src, m_pRenderModeBuffer.GetAddressOf());
+	assert(SUCCEEDED(hr) && "Failed to create RenderMode ConstantBuffer");
+}
+
+void ObjectManager::SetRenderMode(ERenderMode _eMode)
+{
+	m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
+
+	DC->UpdateSubresource(m_pRenderModeBuffer.Get(), 0, nullptr, &m_tRenderModeData, 0, 0);
+
+	if (m_pRenderModeBuffer)
+	{
+		DC->VSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
+		DC->PSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
+	}
 }

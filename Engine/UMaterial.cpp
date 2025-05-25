@@ -13,7 +13,6 @@ void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
 	m_pInputlayout = INPUTLAYOUT->Get();
     
     CreateEffectCB();
-    CreateRenderModeCB();
     m_CB_SpriteUV = make_shared<ConstantBuffer<CB_SpriteUV>>();
     m_CB_SpriteUV->Create(4); 
     
@@ -45,12 +44,6 @@ void UMaterial::Bind()
         DC->PSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
 	}
 
-    if (m_pRenderModeBuffer)
-    {
-        DC->VSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
-        DC->PSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
-    }
-
     if (m_CB_SpriteUV)
     {
         m_CB_SpriteUV->Push();  // b4 register에 UV 범위 바인딩
@@ -72,25 +65,6 @@ void UMaterial::CreateEffectCB()
     HRESULT hr = DEVICE->CreateBuffer(&desc, &initData, m_pEffectCB.GetAddressOf());
     assert(SUCCEEDED(hr) && "Failed to create Glow ConstantBuffer");
 }
-
-
-
-void UMaterial::CreateRenderModeCB()
-{
-    if (m_pRenderModeBuffer) return;
-
-    D3D11_BUFFER_DESC desc = {};
-    desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.ByteWidth = sizeof(CB_RMB);
-    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-
-    D3D11_SUBRESOURCE_DATA initData = {};
-    initData.pSysMem = &m_tRenderModeData;
-
-    HRESULT hr = DEVICE->CreateBuffer(&desc, &initData, m_pRenderModeBuffer.GetAddressOf());
-    assert(SUCCEEDED(hr) && "Failed to create RenderMode ConstantBuffer");
-}
-
 
 void UMaterial::SetGlowParams(float _glowPower, const Vec3 _glowColor)
 {
@@ -139,15 +113,6 @@ void UMaterial::SetCameraPos(const Vec3& _camPos)
     m_tEffectData.g_vCameraPos = _camPos;
     UpdateEffectBuffer();
 }
-
-
-void UMaterial::SetRenderMode(ERenderMode _eMode)
-{
-    m_eRenderMode = _eMode;
-    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
-    UpdateRenderModeBuffer();
-}
-
 void UMaterial::SetEmissiveParams(const Vec3& _color, float _power)
 {
     m_tEffectData.g_vEmissiveColor = _color;
@@ -162,17 +127,6 @@ void UMaterial::UpdateEffectBuffer()
     else
     DC->UpdateSubresource(m_pEffectCB.Get(), 0, nullptr, &m_tEffectData, 0, 0);
 }
-
-
-void UMaterial::UpdateRenderModeBuffer()
-{
-    if (!m_pRenderModeBuffer)
-        CreateRenderModeCB();
-    else
-        DC->UpdateSubresource(m_pRenderModeBuffer.Get(), 0, nullptr, &m_tRenderModeData, 0, 0);
-}
-
-
 
 void UMaterial::SetUVRange(Vec2 start, Vec2 end)
 {

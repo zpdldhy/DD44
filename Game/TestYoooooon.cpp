@@ -32,7 +32,7 @@ void TestYoooooon::Init()
 	LoadAllPrefabs(".ui.json");
 
 	SetupEngineCamera();
-	//SetupSkybox();
+	SetupSkybox();
 	SetupSunLight();
 
 }

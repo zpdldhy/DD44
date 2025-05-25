@@ -37,10 +37,15 @@ protected:
 
 	// Matrix
 	Matrix m_matLocal = Matrix::Identity;
+	Matrix m_matLocalScale = Matrix::Identity;
+	Matrix m_matLocalRotation = Matrix::Identity;
+	Matrix m_matLocalTranslation = Matrix::Identity;
+
 	Matrix m_matWorld = Matrix::Identity;
-	Matrix m_matScale = Matrix::Identity;
-	Matrix m_matRotation = Matrix::Identity;
-	Matrix m_matTrans = Matrix::Identity;
+	Matrix m_matWorldScale = Matrix::Identity;
+	Matrix m_matWorldRotation = Matrix::Identity;
+	Matrix m_matWorldTranslation = Matrix::Identity;
+
 	Matrix m_matParent = Matrix::Identity;
 
 public:
@@ -55,6 +60,10 @@ public:
 
 private:
 	virtual bool CreateConstantBuffer();
+	void UpdateMatrix();
+
+protected:
+	void UpdateLocalMatrix();
 	void UpdateWorldMatrix();
 
 public:
