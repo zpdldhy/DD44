@@ -206,12 +206,12 @@ void TestSJ::Update()
 		m_pActor2->SetPosition(newPos);
 	}
 	//Rim Light
-	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+	/*if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 	{
 		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetWorldPosition();
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
 		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
-	}
+	}*/
 	//Emissive
 	{
 		//m_pStaticMesh2->GetMaterial()->SetEmissiveParams(Vec3(0.0f, 1.0f, 0.0f), 0.1f);

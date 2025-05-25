@@ -33,6 +33,12 @@ public:
 
 	float time;
 
+	//shared_ptr<AActor> actor;
+	shared_ptr<UMaterial> m_pSlashMaterial = nullptr;
+	float m_fSlashTime = 0.0f;
+	bool m_bSlashPlaying = false;
+	float m_fSlashDuration = 0.5f; 
+
 public:
 	void Init() override;
 	void Update() override;
@@ -52,6 +58,8 @@ protected:
 	void SetupObjectEditorCallback();
 	void SetupUIEditorCallback();
 	void SetupParticleEditorCallback();
+
+	void Slash();
 
 	void SetClickPos();
 	void LoadAllPrefabs(const std::string& extension);

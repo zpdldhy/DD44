@@ -7,7 +7,7 @@ public:
     void Init();
     void Update();
     float GetDeltaTime() const;
-    float GetTotalTime() const { return m_fTotalTime; }
+    float GetGameTime() const { return m_fTotalTime; }
     float GetFPS() const;
 
 public:
