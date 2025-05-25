@@ -32,10 +32,19 @@ public:
 	// 타입별 저장
 	void SaveMapPrefab(const std::shared_ptr<class ATerrainTileActor>& _tileactor);
 	void SaveCharacterPrefab(const std::shared_ptr<class AActor>& _actor);
-	void SaveObjectPrefab(const std::shared_ptr<class AActor>& _actor);
+	void SaveObjectPrefab(const std::shared_ptr<class AActor>& _actor, const std::string& path);
+	void SaveObjectsPrefab(const std::vector<std::shared_ptr<AActor>>& _actors, const std::string& path);
 
 	UINT GetLastActorID();
 	UINT GetSelectedActorID();
+
+	std::vector<UINT>& GetMultiSelectedIDs();
+	const std::vector<UINT>& GetLastMultiSelectedIDs() const;
+
+	void SetMultiSelectMode(bool _mode);
+	bool IsMultiSelectMode() const;
+	void RefreshSelectionVisuals();
+
 	UINT GetSelectedGizmoAxis();
 	GizmoMode GetMode() { return m_eGizmoMode; }
 
@@ -50,11 +59,17 @@ private:
 	Vec3 m_vPosition;
 	Vec3 m_vRotation;
 	Vec3 m_vScale;
+
 	std::wstring m_szNewName;
+	char m_szSaveName[256] = "MyPrefab";
 
 	int m_iLastActorID = -1;
 	int m_iSelectedActorID = -1;
 	int m_iSelectedGizmoAxis = -1;
+
+	std::vector<UINT> m_vMultiSelectedIDs;
+	std::vector<UINT> m_vLastMultiSelectedIDs;
+	bool m_bMultiSelectMode = false;
 
 	GizmoMode m_eGizmoMode = GizmoMode::None;
 };

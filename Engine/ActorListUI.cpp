@@ -16,7 +16,9 @@ void ActorListUI::DrawUI()
 
 	ImGui::Begin("Actor List", &m_bVisible, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-	for (auto it = OBJECT->GetActorList().begin(); it != OBJECT->GetActorList().end(); ++it)
+	auto& actorMap = OBJECT->GetActorList();
+
+	for (auto it = actorMap.begin(); it != actorMap.end(); ++it)
 	{
 		UINT id = it->first;
 		auto actor = it->second;
@@ -28,13 +30,124 @@ void ActorListUI::DrawUI()
 		if (!name.empty())
 			label += " - " + name;
 
-		if (ImGui::Selectable(label.c_str(), m_iSelectedActorID == id))
+		bool selected = (m_iSelectedActorID == id) ||
+			(std::find(m_vMultiSelectedIDs.begin(), m_vMultiSelectedIDs.end(), id) != m_vMultiSelectedIDs.end());
+
+		if (ImGui::Selectable(label.c_str(), selected))
 		{
-			m_iSelectedActorID = id;
+			bool bShift = ImGui::GetIO().KeyShift;
+
+			if (bShift)
+			{
+				m_bMultiSelectMode = true;
+
+				auto found = std::find(m_vMultiSelectedIDs.begin(), m_vMultiSelectedIDs.end(), id);
+				if (found != m_vMultiSelectedIDs.end())
+					m_vMultiSelectedIDs.erase(found);
+				else
+					m_vMultiSelectedIDs.push_back(id);
+
+				m_iSelectedActorID = id;
+			}
+			else
+			{
+				m_bMultiSelectMode = false;
+
+				for (UINT oldID : m_vMultiSelectedIDs)
+				{
+					if (oldID == id) continue;
+					auto itOff = actorMap.find(oldID);
+					if (itOff != actorMap.end())
+					{
+						auto actorOff = itOff->second;
+						auto mesh = actorOff->GetMeshComponent<UMeshComponent>();
+						if (mesh && mesh->GetMaterial())
+							mesh->GetMaterial()->SetGlowParams(0.f, Vec3(0.f, 0.f, 0.f));
+					}
+				}
+
+				m_vMultiSelectedIDs.clear();
+				m_vMultiSelectedIDs.push_back(id);
+				m_iSelectedActorID = id;
+			}
 		}
 	}
 
 	ImGui::Separator(); ImGui::Spacing();
+
+	if (!m_bMultiSelectMode)
+	{
+		for (UINT id : m_vLastMultiSelectedIDs)
+		{
+			if (id == m_iSelectedActorID) continue;
+
+			auto it = actorMap.find(id);
+			if (it != actorMap.end())
+			{
+				auto actor = it->second;
+				auto mesh = actor->GetMeshComponent<UMeshComponent>();
+				if (mesh && mesh->GetMaterial())
+					mesh->GetMaterial()->SetGlowParams(0.f, Vec3(0.f, 0.f, 0.f));
+			}
+		}
+
+		if (m_iSelectedActorID != m_iLastActorID)
+		{
+			if (m_iLastActorID >= 0)
+			{
+				auto it = actorMap.find(m_iLastActorID);
+				if (it != actorMap.end())
+				{
+					auto actor = it->second;
+					auto mesh = actor->GetMeshComponent<UMeshComponent>();
+					if (mesh && mesh->GetMaterial())
+						mesh->GetMaterial()->SetGlowParams(0.f, Vec3(0.f, 0.f, 0.f));
+				}
+			}
+
+			auto it = actorMap.find(m_iSelectedActorID);
+			if (it != actorMap.end())
+			{
+				auto actor = it->second;
+				auto mesh = actor->GetMeshComponent<UMeshComponent>();
+				if (mesh && mesh->GetMaterial())
+					mesh->GetMaterial()->SetGlowParams(0.7f, Vec3(1.0f, 0.0f, 0.0f));
+			}
+
+			m_iLastActorID = m_iSelectedActorID;
+		}
+	}
+	else
+	{
+		for (UINT oldID : m_vLastMultiSelectedIDs)
+		{
+			if (std::find(m_vMultiSelectedIDs.begin(), m_vMultiSelectedIDs.end(), oldID) == m_vMultiSelectedIDs.end())
+			{
+				auto it = actorMap.find(oldID);
+				if (it != actorMap.end())
+				{
+					auto actor = it->second;
+					auto mesh = actor->GetMeshComponent<UMeshComponent>();
+					if (mesh && mesh->GetMaterial())
+						mesh->GetMaterial()->SetGlowParams(0.f, Vec3(0.f, 0.f, 0.f));
+				}
+			}
+		}
+
+		for (UINT id : m_vMultiSelectedIDs)
+		{
+			auto it = actorMap.find(id);
+			if (it != actorMap.end())
+			{
+				auto actor = it->second;
+				auto mesh = actor->GetMeshComponent<UMeshComponent>();
+				if (mesh && mesh->GetMaterial())
+					mesh->GetMaterial()->SetGlowParams(0.7f, Vec3(1.0f, 0.0f, 0.0f));
+			}
+		}
+	}
+
+	ImGui::End();
 
 	if (m_iSelectedActorID >= 0)
 	{
@@ -43,33 +156,10 @@ void ActorListUI::DrawUI()
 
 		ImGui::Begin("Selected Actor Details", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-		auto& actorMap = OBJECT->GetActorList();
 		auto it = actorMap.find(m_iSelectedActorID);
 		if (it != actorMap.end())
 		{
 			auto actor = it->second;
-
-			// 선택 변경 감지
-			if (m_iSelectedActorID != m_iLastActorID)
-			{
-				if (m_iLastActorID >= 0)
-				{
-					auto prevIt = actorMap.find(m_iLastActorID);
-					if (prevIt != actorMap.end())
-					{
-						auto prevActor = prevIt->second;
-						auto prevMeshComp = prevActor->GetMeshComponent<UMeshComponent>();
-						if (prevMeshComp && prevMeshComp->GetMaterial())
-							prevMeshComp->GetMaterial()->SetGlowParams(0.0f, Vec3(0.0f, 0.0f, 0.0f));
-					}
-				}
-
-				auto meshComp = actor->GetMeshComponent<UMeshComponent>();
-				if (meshComp && meshComp->GetMaterial())
-					meshComp->GetMaterial()->SetGlowParams(0.7f, Vec3(1.0f, 0.0f, 0.0f));
-
-				m_iLastActorID = m_iSelectedActorID;
-			}
 
 			EditActorName(actor);
 			EditActorTransform(actor);
@@ -79,7 +169,6 @@ void ActorListUI::DrawUI()
 				actor->SetPosition(m_vPosition);
 				actor->SetRotation(m_vRotation);
 				actor->SetScale(m_vScale);
-
 				actor->m_szName = m_szNewName;
 			}
 
@@ -109,101 +198,76 @@ void ActorListUI::DrawUI()
 				ImGui::TextColored(ImVec4(1, 1, 0, 1), "Map Tile Info");
 
 				auto tileActor = std::dynamic_pointer_cast<ATerrainTileActor>(actor);
-
-				// ---------------- Transform ----------------
-				//ViewTransformData(tileActor);
-				//ImGui::Separator(); ImGui::Spacing();
-
-				// ----------------- Map Data -----------------
 				ViewMapData(tileActor);
 				ImGui::Separator(); ImGui::Spacing();
-
-				// ---------------- Actor Info ----------------
 				ViewActorInformation(tileActor);
 				ImGui::Separator(); ImGui::Spacing();
-
-				// ---------------- Mesh Info ----------------
 				ViewMeshComponentData(tileActor);
 				ImGui::Separator(); ImGui::Spacing();
 
-				// ---------------- Shape Info ----------------
-				//ViewShapeComponentData(tileActor);
-				//ImGui::Separator(); ImGui::Spacing();
-
-				// ---------------- Save Prefab ----------------
 				if (ImGui::Button("Save Map Prefab"))
-				{
 					SaveMapPrefab(tileActor);
-				}
 			}
 			else if (extension == ".character.json")
 			{
-				// ---------------- Transform ----------------
-				//ViewTransformData(actor);
-				//ImGui::Separator(); ImGui::Spacing();
-
-				// -------------- Character Data --------------
 				ViewCharacterData(actor);
 				ImGui::Separator(); ImGui::Spacing();
-
-				// ---------------- Actor Info ----------------
 				ViewActorInformation(actor);
 				ImGui::Separator(); ImGui::Spacing();
-
-				// ---------------- Mesh Info ----------------
-				//ViewMeshComponentData(actor);
 				EditShapeTransformData(actor);
 				ImGui::Separator(); ImGui::Spacing();
-
-				// ---------------- Shape Info ----------------
 				ViewShapeComponentData(actor);
 				ImGui::Separator(); ImGui::Spacing();
 
-				// ---------------- Save Prefab ----------------
 				if (ImGui::Button("Save Character Prefab"))
-				{
 					SaveCharacterPrefab(actor);
-				}
 			}
 			else if (extension == ".object.json" || extension == ".objects.json")
 			{
-				// ---------------- Transform ----------------
-				//ViewTransformData(actor);
-				//ImGui::Separator(); ImGui::Spacing();
-
-				// ---------------- Actor Info ----------------
 				ViewActorInformation(actor);
 				ImGui::Separator(); ImGui::Spacing();
-
-				// ---------------- Mesh Info ----------------
 				ViewMeshComponentData(actor);
 				ImGui::Separator(); ImGui::Spacing();
-
-				// ---------------- Shape Info ----------------
-				//ViewShapeComponentData(actor);
 				EditShapeTransformData(actor);
 				ImGui::Separator(); ImGui::Spacing();
+				ViewShapeComponentData(actor);
+				ImGui::Separator(); ImGui::Spacing();
 
-				// ---------------- Save Prefab ----------------
-				if (extension == ".object.json")
+				ImGui::InputText("Save Name", m_szSaveName, IM_ARRAYSIZE(m_szSaveName));
+
+				if (ImGui::Button("Save Selected Prefab"))
 				{
-					if (ImGui::Button("Save Object Prefab"))
+					std::vector<std::shared_ptr<AActor>> selectedActors;
+					const auto& ids = GetMultiSelectedIDs();
+
+					for (UINT id : ids)
 					{
-						SaveObjectPrefab(actor);
+						auto actor = OBJECT->GetActor(id);
+						if (actor) selectedActors.push_back(actor);
 					}
-				}
-				else
-				{
-					// 다중 선택 및 다중 프리팹 저장
+
+					std::string basePath = "../Resources/Prefab/";
+					std::string fileName = m_szSaveName;
+
+					if (selectedActors.size() == 1)
+					{
+						std::string fullPath = basePath + fileName + ".object.json";
+						SaveObjectPrefab(selectedActors[0], fullPath);
+					}
+					else if (!selectedActors.empty())
+					{
+						std::string fullPath = basePath + fileName + ".objects.json";
+						SaveObjectsPrefab(selectedActors, fullPath);
+					}
 				}
 			}
 		}
-
 		ImGui::End();
 	}
 
-	ImGui::End();
+	m_vLastMultiSelectedIDs = m_vMultiSelectedIDs;
 }
+
 
 void ActorListUI::Toggle()
 {
@@ -504,7 +568,7 @@ void ActorListUI::SaveCharacterPrefab(const std::shared_ptr<class AActor>& _acto
 	PREFAB->SaveCharacter(data, _actor->GetPrefabPath());
 }
 
-void ActorListUI::SaveObjectPrefab(const std::shared_ptr<class AActor>& _actor)
+void ActorListUI::SaveObjectPrefab(const std::shared_ptr<class AActor>& _actor, const std::string& _path)
 {
 	PrefabObjectData data;
 	data.Name = to_wm(_actor->m_szName);
@@ -552,7 +616,70 @@ void ActorListUI::SaveObjectPrefab(const std::shared_ptr<class AActor>& _actor)
 		data.ShapeData.Scale[2] = ss.z;
 	}
 
-	PREFAB->SaveObject(data, _actor->GetPrefabPath());
+	PREFAB->SaveObject(data, _path);
+}
+
+void ActorListUI::SaveObjectsPrefab(const std::vector<std::shared_ptr<AActor>>& _actors, const std::string& _path)
+{
+	std::vector<PrefabObjectData> vPrefabList;
+
+	for (const auto& actor : _actors)
+	{
+		if (!actor) continue;
+
+		PrefabObjectData data;
+		data.Name = to_wm(actor->m_szName);
+		data.Position = actor->GetPosition();
+		data.Rotation = actor->GetRotation();
+		data.Scale = actor->GetScale();
+
+		auto meshComp = actor->GetMeshComponent<UMeshComponent>();
+		if (meshComp)
+		{
+			data.MeshPath = to_wm(meshComp->GetMeshPath());
+
+			auto mat = meshComp->GetMaterial();
+			if (mat)
+			{
+				data.TexturePath = to_wm(mat->GetTexturePath());
+				data.ShaderPath = to_wm(mat->GetShaderPath());
+				data.SpecularColor = { 0.f,0.f,0.f };
+				data.Shininess = 0.0f;
+				data.EmissiveColor = { 0.f,0.f,0.f };
+				data.EmissivePower = 0.0f;
+			}
+		}
+
+		auto shape = actor->GetShapeComponent();
+		if (shape)
+		{
+			data.ShapeData.isUse = true;
+			data.ShapeData.eShapeType = shape->GetShapeType();
+
+			Vec3 sp = shape->GetLocalPosition();
+			Vec3 sr = shape->GetLocalRotation();
+			Vec3 ss = shape->GetLocalScale();
+
+			data.ShapeData.Position[0] = sp.x;
+			data.ShapeData.Position[1] = sp.y;
+			data.ShapeData.Position[2] = sp.z;
+
+			data.ShapeData.Rotation[0] = sr.x;
+			data.ShapeData.Rotation[1] = sr.y;
+			data.ShapeData.Rotation[2] = sr.z;
+
+			data.ShapeData.Scale[0] = ss.x;
+			data.ShapeData.Scale[1] = ss.y;
+			data.ShapeData.Scale[2] = ss.z;
+		}
+
+		vPrefabList.push_back(data);
+	}
+
+	if (!vPrefabList.empty())
+	{
+		PREFAB->SaveObjectArray(vPrefabList, _path);
+	}
 }
 
 UINT ActorListUI::GetLastActorID()
@@ -563,6 +690,59 @@ UINT ActorListUI::GetLastActorID()
 UINT ActorListUI::GetSelectedActorID()
 {
 	return m_iSelectedActorID;
+}
+
+std::vector<UINT>& ActorListUI::GetMultiSelectedIDs()
+{
+	return m_vMultiSelectedIDs;
+}
+
+const std::vector<UINT>& ActorListUI::GetLastMultiSelectedIDs() const
+{
+	return m_vLastMultiSelectedIDs;
+}
+
+void ActorListUI::SetMultiSelectMode(bool _mode)
+{
+	m_bMultiSelectMode = _mode;
+}
+
+bool ActorListUI::IsMultiSelectMode() const
+{
+	return m_bMultiSelectMode;
+}
+
+void ActorListUI::RefreshSelectionVisuals()
+{
+	for (UINT id : m_vLastMultiSelectedIDs)
+	{
+		if (std::find(m_vMultiSelectedIDs.begin(), m_vMultiSelectedIDs.end(), id) == m_vMultiSelectedIDs.end())
+		{
+			auto it = OBJECT->GetActorList().find(id);
+			if (it != OBJECT->GetActorList().end())
+			{
+				auto actor = it->second;
+				auto mesh = actor->GetMeshComponent<UMeshComponent>();
+				if (mesh && mesh->GetMaterial())
+					mesh->GetMaterial()->SetGlowParams(0.f, Vec3(0.f, 0.f, 0.f));
+			}
+		}
+	}
+
+	for (UINT id : m_vMultiSelectedIDs)
+	{
+		auto it = OBJECT->GetActorList().find(id);
+		if (it != OBJECT->GetActorList().end())
+		{
+			auto actor = it->second;
+			auto mesh = actor->GetMeshComponent<UMeshComponent>();
+			if (mesh && mesh->GetMaterial())
+				mesh->GetMaterial()->SetGlowParams(0.7f, Vec3(1.0f, 0.0f, 0.0f));
+		}
+	}
+
+	m_vLastMultiSelectedIDs = m_vMultiSelectedIDs;
+	m_iLastActorID = m_iSelectedActorID;
 }
 
 UINT ActorListUI::GetSelectedGizmoAxis()

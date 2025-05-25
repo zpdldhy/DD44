@@ -77,7 +77,7 @@ void Editor::Update()
 		CreateObjectAtMousePick();
 	}
 
-	SetActorPositionByDragging();
+	TransformActorByDragging();
 }
 
 void Editor::Render()
@@ -411,8 +411,30 @@ void Editor::SetClickPos()
 
 		if (pActor->m_szName != L"Gizmo")
 		{
-			GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			auto& vec = GUI->GetActorListUI()->GetMultiSelectedIDs();
+			if (INPUT->GetButtonDown(LSHIFT)/* && INPUT->GetButton(LCLICK)*/)
+			{
+				GUI->GetActorListUI()->SetMultiSelectMode(true);
+
+				auto found = std::find(vec.begin(), vec.end(), pActor->m_Index);
+				if (found != vec.end())
+					vec.erase(found);
+				else
+					vec.push_back(pActor->m_Index);
+
+				GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			}
+			else
+			{
+				GUI->GetActorListUI()->SetMultiSelectMode(false);
+
+				vec.clear();
+				vec.push_back(pActor->m_Index);
+				GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			}
+
 			GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
+			GUI->GetActorListUI()->RefreshSelectionVisuals();
 		}
 		else
 		{
@@ -448,7 +470,7 @@ void Editor::SetGizmoPosition(Vec3 _pos)
 	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
 }
 
-void Editor::SetActorPositionByDragging()
+void Editor::TransformActorByDragging()
 {
 	if (GUI->GetObjectEditorUI()->IsPlacementMode()) return;
 
@@ -465,7 +487,7 @@ void Editor::SetActorPositionByDragging()
 			}
 
 			auto& actorMap = OBJECT->GetActorList();
-			auto _actor = actorMap.find(GUI->GetActorListUI()->GetSelectedActorID());
+			auto _actor = actorMap.find(selectedID);
 			if (_actor != actorMap.end())
 			{
 				auto actor = _actor->second;
@@ -486,7 +508,6 @@ void Editor::SetActorPositionByDragging()
 				auto axis = _axis->second;
 				if (!actor || !axis) return;
 
-				// 드래그 처리
 				POINT curMouse = INPUT->GetMousePos();
 				float deltaX = static_cast<float>(curMouse.x - m_vPrevMouse.x);
 				float deltaY = static_cast<float>(curMouse.y - m_vPrevMouse.y);
@@ -507,7 +528,18 @@ void Editor::SetActorPositionByDragging()
 					else if (axis == m_pGizmoZ)
 						newPos.z += deltaX * 0.07f;
 
-					actor->SetPosition(newPos);
+					Vec3 offset = newPos - m_vDragStartPos;
+
+					// 모든 선택된 애들에게 동일 offset 적용
+					const auto& selectedIDs = GUI->GetActorListUI()->GetMultiSelectedIDs();
+					for (UINT id : selectedIDs)
+					{
+						auto a = OBJECT->GetActor(id);
+						if (!a || a == actor) continue; // 기준 Actor 제외
+						a->SetPosition(a->GetPosition() + offset);
+					}
+
+					actor->SetPosition(actor->GetPosition() + offset);
 					SetGizmoPosition(actor->GetPosition());
 					break;
 				}
@@ -520,7 +552,17 @@ void Editor::SetActorPositionByDragging()
 					else if (axis == m_pGizmoZ)
 						newRot.z += deltaX * 0.07f;
 
-					actor->SetRotation(newRot);
+					Vec3 offset = newRot - m_vDragStartRot;
+
+					const auto& selectedIDs = GUI->GetActorListUI()->GetMultiSelectedIDs();
+					for (UINT id : selectedIDs)
+					{
+						auto a = OBJECT->GetActor(id);
+						if (!a || a == actor) continue;
+						a->SetRotation(a->GetRotation() + offset);
+					}
+
+					actor->SetRotation(actor->GetRotation() + offset);
 					break;
 				}
 				case GizmoMode::Scale:
@@ -532,10 +574,22 @@ void Editor::SetActorPositionByDragging()
 					else if (axis == m_pGizmoZ)
 						newScale.z += deltaX * 0.07f;
 
-					actor->SetScale(newScale);
+					Vec3 offset = newScale - m_vDragStartScale;
+
+					const auto& selectedIDs = GUI->GetActorListUI()->GetMultiSelectedIDs();
+					for (UINT id : selectedIDs)
+					{
+						auto a = OBJECT->GetActor(id);
+						if (!a || a == actor) continue;
+						a->SetScale(a->GetScale() + offset);
+					}
+
+					actor->SetScale(actor->GetScale() + offset);
 					break;
 				}
 				}
+
+				m_vPrevMouse = curMouse;
 			}
 		}
 	}
