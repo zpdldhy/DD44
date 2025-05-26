@@ -44,6 +44,7 @@ void Engine::Init()
 
 	// Manager ÃÊ±âÈ­
 	{
+		LIGHTMANAGER->Init();
 		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
@@ -72,7 +73,7 @@ void Engine::Frame()
 	GET_SINGLE(Device)->Frame();
 
 	if (_app->m_type != SCENE_TYPE::GAME) { GUI->Update(); }
-	_app->Update();
+	_app->Tick();
 
 	TIMER->Update();
 
@@ -129,6 +130,7 @@ void Engine::Release()
 {
 	UI->Destroy();	
 	PARTICLE->Destroy();
+	_app->Destroy();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 	{
@@ -159,10 +161,4 @@ void Engine::Run()
 	}
 
 	Release();
-}
-
-Engine::Engine(HINSTANCE hInstance, shared_ptr<IExecute> app)
-{
-	_hInstance = hInstance;
-	_app = app;
 }

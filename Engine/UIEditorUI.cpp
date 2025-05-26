@@ -214,6 +214,8 @@ void UIEditorUI::UpdateUIActorList()
 
     ImGui::Begin("UIActor List", &isOpen, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
+    UINT index = 0;
+
     for (auto& pUI : m_vUIList)
     {
         UINT id = pUI->m_Index;
@@ -226,15 +228,24 @@ void UIEditorUI::UpdateUIActorList()
         if (!name.empty())
             label += " - " + name;
 
-        if (ImGui::Selectable(label.c_str(), m_iSelectUIActor == id))
+        pUI->GetMeshComponent()->GetMaterial()->SetGlowParams(0.0f, Vec3(0.0f, 0.0f, 0.0f));
+
+        if (ImGui::Selectable(label.c_str()))
         {
-            m_iSelectUIActor = id;
-            m_pUIActor = m_vUIList[m_iSelectUIActor];
+            m_iSelectUIActor = index;
+            m_pUIActor = m_vUIList[m_iSelectUIActor];            
+
+            if(INPUT->GetButtonDown(LSHIFT))
+				m_vSelectedIndex.push_back(index);
+            else
+				m_vSelectedIndex.clear();
 
             m_CurrentPrefab = pUI->GetPrefabData();
             ResolvePrefabData(m_CurrentPrefab);
         }
-    }
+
+        index++;
+    }    
 
     ImGui::End();
 }
@@ -519,10 +530,31 @@ void UIEditorUI::SelectActor()
             m_CurrentPrefab = pUI->GetPrefabData();
             ResolvePrefabData(m_CurrentPrefab);
 
-            m_iSelectUIActor = pUI->m_Index;
+            UINT index = 0;
+            for (auto& p : m_vUIList)
+            {
+                if (p->m_Index == pUI->m_Index)
+                {
+                    m_iSelectUIActor = index;
+                    if (INPUT->GetButtonDown(LSHIFT))
+						m_vSelectedIndex.push_back(index);
+					else
+					{
+						m_vSelectedIndex.clear();
+						m_vSelectedIndex.push_back(index);
+					}
+                }
+                index++;
+            }
+
             break;
         }
     }
+
+	for (auto& index : m_vSelectedIndex)
+	{
+		m_vUIList[index]->GetMeshComponent()->GetMaterial()->SetGlowParams(0.7f, Vec3(1.0f, 0.0f, 0.0f));
+	}
 }
 
 void UIEditorUI::ResolvePrefabData(const PrefabUIData& data)

@@ -40,6 +40,7 @@ public:
 
 	std::shared_ptr<class ATerrainTileActor> FindTileActor();
 	void RemoveActor(std::shared_ptr<class AActor> _pActor);
+	void RemoveAll();
 	
 	shared_ptr<class AActor> GetActor(UINT _iIndex);
 	const map<UINT, shared_ptr<class AActor>>& GetActorList() const;

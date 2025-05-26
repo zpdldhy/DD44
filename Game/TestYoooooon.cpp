@@ -36,13 +36,13 @@ void TestYoooooon::Init()
 	UI->AddUIList(PToA->LoadAllPrefabs(".ui.json"));
 
 	SetupEngineCamera();
-	SetupSkybox();
+	//SetupSkybox();
 	SetupSunLight();
 
 	CreateCollisionObject();
 }
 
-void TestYoooooon::Update()
+void TestYoooooon::Tick()
 {
 	if (INPUT->GetButton(O))
 	{
@@ -288,7 +288,6 @@ void TestYoooooon::SetupUIEditorCallback()
 			uiActor->SetMeshComponent(meshComp);
 
 			auto mat = make_shared<UMaterial>();
-			mat->SetUseEffect(false);
 			mat->Load(
 				std::wstring(texPath, texPath + strlen(texPath)),
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))

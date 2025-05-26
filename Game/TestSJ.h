@@ -14,8 +14,9 @@ private:
 
 public:
 	virtual void Init() override;
-	virtual void Update() override;
+	virtual void Tick() override;
 	virtual void Render() override;
+	virtual void Destroy() override;
 	float m_fBlurScale = 0.5f;
 	bool m_bIncreasingBlur = true;
 	float m_fBlurSpeed = 5.f; // 초당 변화량

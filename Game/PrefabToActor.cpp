@@ -210,7 +210,6 @@ shared_ptr<AUIActor> PrefabToActor::MakeUI(const string& _file)
 		uiActor->SetMeshComponent(meshComp);
 
 		auto mat = make_shared<UMaterial>();
-		mat->SetUseEffect(false);
 		mat->Load(L"", to_mw(uiData.ShaderPath));
 		meshComp->SetMaterial(mat);
 

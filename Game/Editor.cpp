@@ -58,7 +58,7 @@ void Editor::Init()
 	SetupSunLight();
 }
 
-void Editor::Update()
+void Editor::Tick()
 {
 	Slash();
 	
@@ -381,7 +381,6 @@ void Editor::SetupUIEditorCallback()
 			uiActor->SetMeshComponent(meshComp);
 
 			auto mat = make_shared<UMaterial>();
-			mat->SetUseEffect(false);
 			mat->Load(
 				std::wstring(texPath, texPath + strlen(texPath)),
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))

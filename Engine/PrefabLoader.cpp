@@ -440,7 +440,12 @@ bool PrefabLoader::SaveUI(const PrefabUIData& _prefab, const std::string& _fileP
     json j;
     j["Name"] = _prefab.Name;
 
-    SaveTransform(j, _prefab.transform);
+    // position은 NDC로 변환해서 저장    
+	auto transform = _prefab.transform;
+    transform.Position[0] = transform.Position[0] / (static_cast<float>(g_windowSize.x) / 2.0f);
+	transform.Position[1] = transform.Position[1] / (static_cast<float>(g_windowSize.y) / 2.0f);
+
+    SaveTransform(j, transform);
 
     j["Color"] = { _prefab.color[0], _prefab.color[1] ,_prefab.color[2] ,_prefab.color[3] };
     j["SliceUV"] = { _prefab.SliceUV[0], _prefab.SliceUV[1], _prefab.SliceUV[2], _prefab.SliceUV[3] };
@@ -471,7 +476,12 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
 
     _prefab.Name = j["Name"];
 
+    // position은 NDC로 변환해서 로드
+
     LoadTransform(j, _prefab.transform);
+
+	_prefab.transform.Position[0] *= (static_cast<float>(g_windowSize.x) / 2.0f);
+	_prefab.transform.Position[1] *= (static_cast<float>(g_windowSize.y) / 2.0f);
 
     auto c = j["Color"];
     for (int i = 0; i < 4; i++)   _prefab.color[i] = c[i];

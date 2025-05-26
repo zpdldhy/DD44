@@ -41,7 +41,7 @@ void Game::Init()
 
 }
 
-void Game::Update()
+void Game::Tick()
 {
 	if (INPUT->GetButton(O))
 	{
@@ -65,6 +65,11 @@ void Game::Render()
 
 void Game::Destroy()
 {
+	m_pCameraActor = nullptr;
+	m_pPlayer = nullptr;
+	m_pSkyMesh = nullptr;
+	m_pSky = nullptr;
+	m_pSunLight = nullptr;
 }
 
 void Game::SetupEngineCamera()
