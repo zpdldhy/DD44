@@ -53,6 +53,11 @@ vector<shared_ptr<class AActor>> PrefabToActor::LoadAllPrefabs(const std::string
 		{
 			m_vActorList.emplace_back(MakeUI(file));
 		}
+		else if (extension == ".uis.json")
+		{
+			auto vList = MakeUIs(file);
+			m_vActorList.insert(m_vActorList.end(), vList.begin(), vList.end());
+		}
 	}
 
 	return m_vActorList;
@@ -229,6 +234,46 @@ shared_ptr<AUIActor> PrefabToActor::MakeUI(const string& _file)
 	}
 
 	return uiActor;
+}
+
+vector<shared_ptr<AUIActor>> PrefabToActor::MakeUIs(const string& _file)
+{
+	vector<shared_ptr<AUIActor>> vList;
+
+	vector<PrefabUIData> uiDatas;
+	if (PREFAB->LoadUIs(_file, uiDatas))
+	{
+		for (auto& uiData : uiDatas)
+		{
+			auto uiActor = make_shared<AUIActor>();
+			uiActor->m_szName = to_mw(uiData.Name);
+
+			auto meshComp = UStaticMeshComponent::CreatePlane();
+			uiActor->SetMeshComponent(meshComp);
+
+			auto mat = make_shared<UMaterial>();
+			mat->Load(L"", to_mw(uiData.ShaderPath));
+			meshComp->SetMaterial(mat);
+
+			uiActor->SetIdleTexture(TEXTURE->Get(to_mw(uiData.IdleTexturePath)));
+			uiActor->SetHoverTexture(TEXTURE->Get(to_mw(uiData.HoverTexturePath)));
+			uiActor->SetActiveTexture(TEXTURE->Get(to_mw(uiData.ActiveTexturePath)));
+			uiActor->SetSelectTexture(TEXTURE->Get(to_mw(uiData.SelectedTexturePath)));
+
+			uiActor->SetMeshComponent(meshComp);
+			uiActor->SetPosition(Vec3(uiData.transform.Position));
+			uiActor->SetRotation(Vec3(uiData.transform.Rotation));
+			uiActor->SetScale(Vec3(uiData.transform.Scale));
+			uiActor->SetSliceData(Vec4(uiData.SliceUV));
+			uiActor->SetColor(Color(uiData.color));
+
+			uiActor->SetPrefabData(uiData);
+
+			vList.emplace_back(uiActor);
+		}
+	}
+
+	return vList;
 }
 
 void PrefabToActor::MakeLoader()

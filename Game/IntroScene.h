@@ -4,7 +4,7 @@
 class IntroScene : public IExecute
 {
 public:
-	IntroScene() {}
+	IntroScene() { m_type = SCENE_TYPE::GAME; }
 	virtual ~IntroScene();
 
 public:

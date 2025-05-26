@@ -34,6 +34,7 @@ void TestYoooooon::Init()
 	m_pPlayer = vlist[0];
 	OBJECT->AddActorList(vlist);
 	UI->AddUIList(PToA->LoadAllPrefabs(".ui.json"));
+	UI->AddUIList(PToA->LoadAllPrefabs(".uis.json"));
 
 	SetupEngineCamera();
 	//SetupSkybox();

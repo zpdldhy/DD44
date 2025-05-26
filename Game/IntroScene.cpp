@@ -26,6 +26,8 @@ IntroScene::~IntroScene()
 
 void IntroScene::Init()
 {
+	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Intro.uis.json"));
+
 	SetupEngineCamera();
 	//SetupSkybox();
 	SetupSunLight();
