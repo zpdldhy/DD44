@@ -147,6 +147,7 @@
     <ClInclude Include="Main.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayerMoveScript.h" />
+    <ClInclude Include="PrefabToActor.h" />
     <ClInclude Include="Sample.h" />
     <ClInclude Include="TestPlayer.h" />
     <ClInclude Include="TestSJ.h" />
@@ -165,6 +166,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PlayerMoveScript.cpp" />
+    <ClCompile Include="PrefabToActor.cpp" />
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="TestPlayer.cpp" />
     <ClCompile Include="TestSJ.cpp" />

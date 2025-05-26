@@ -44,6 +44,16 @@ void UIManager::AddUIList(vector<shared_ptr<class AUIActor>> _vUIList)
     }
 }
 
+void UIManager::AddUIList(vector<shared_ptr<class AActor>> _vUIList)
+{
+    for (auto& pUI : _vUIList)
+    {
+        pUI->Init();
+        m_vUIList.insert(make_pair(m_iUIID, static_pointer_cast<AUIActor>(pUI)));
+        pUI->m_Index = m_iUIID++;
+    }
+}
+
 void UIManager::AddUI(shared_ptr<class AUIActor> _pUIActor)
 {
     _pUIActor->Init();

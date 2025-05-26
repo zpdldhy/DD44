@@ -391,6 +391,7 @@ bool PrefabLoader::SaveUI(const PrefabUIData& _prefab, const std::string& _fileP
 
     SaveTransform(j, _prefab.transform);
 
+    j["Color"] = { _prefab.color[0], _prefab.color[1] ,_prefab.color[2] ,_prefab.color[3] };
     j["SliceUV"] = { _prefab.SliceUV[0], _prefab.SliceUV[1], _prefab.SliceUV[2], _prefab.SliceUV[3] };
 
     j["TexturePath"] = {
@@ -421,6 +422,9 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
 
     LoadTransform(j, _prefab.transform);
 
+    auto c = j["Color"];
+    for (int i = 0; i < 4; i++)   _prefab.color[i] = c[i];
+
     auto s = j["SliceUV"];
     for (int i = 0; i < 4; i++)   _prefab.SliceUV[i] = s[i];
 
@@ -431,107 +435,6 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
     _prefab.ShaderPath = j["ShaderPath"];
 
     return true;
-}
-
-bool PrefabLoader::DeletePrefab(const std::string& _filePath)
-{
-    if (std::remove(_filePath.c_str()) == 0) {
-        return true; // 성공적으로 삭제됨
-    }
-    else {
-        perror("파일 삭제 실패");
-        return false;
-    }
-}
-
-
-void PrefabLoader::SaveTransform(json& j, const TransformData& data)
-{
-    j["Transform"] = {
-    { "Scale" , { data.Scale[0], data.Scale[1], data.Scale[2] }},
-    { "Rotation" , { data.Rotation[0], data.Rotation[1], data.Rotation[2] }},
-    { "Translation" , { data.Position[0], data.Position[1], data.Position[2] }}
-    };
-}
-
-void PrefabLoader::LoadTransform(json& j, TransformData& data)
-{
-    auto s = j["Transform"]["Scale"];
-    for (int i = 0; i < 3; i++) data.Scale[i] = s[i];
-
-    auto r = j["Transform"]["Rotation"];
-    for (int i = 0; i < 3; i++) data.Rotation[i] = r[i];
-
-    auto t = j["Transform"]["Translation"];
-    for (int i = 0; i < 3; i++) data.Position[i] = t[i];
-}
-
-void PrefabLoader::LoadCameraComponent(json& j, CameraComponentData& data)
-{
-    data.isUse = j["CameraComponent"]["isUse"];
-    auto pos = j["CameraComponent"]["Position"];
-    auto rot = j["CameraComponent"]["Rotation"];
-    data.Fov = j["CameraComponent"]["Fov"];
-    data.Aspect = j["CameraComponent"]["Aspect"];
-    data.Near = j["CameraComponent"]["Near"];
-    data.Far = j["CameraComponent"]["Far"];
-    for (int i = 0; i < 3; i++) data.Position[i] = pos[i];
-    for (int i = 0; i < 3; i++) data.Rotation[i] = rot[i];
-}
-
-void PrefabLoader::LoadShapeComponent(json& j, ShapeComponentData& data)
-{
-    data.isUse = j["ShapeComponent"]["isUse"];
-    data.eShapeType = static_cast<ShapeType>(j["ShapeComponent"]["ShapeType"]);
-    auto pos = j["ShapeComponent"]["Position"];
-    auto rot = j["ShapeComponent"]["Rotation"];
-    auto scale = j["ShapeComponent"]["Scale"];
-    for (int i = 0; i < 3; i++) data.Position[i] = pos[i];
-    for (int i = 0; i < 3; i++) data.Rotation[i] = rot[i];
-    for (int i = 0; i < 3; i++) data.Scale[i] = scale[i];
-}
-
-std::vector<std::string> PrefabLoader::GetPrefabFileList(const std::string& directory, const std::string& extension)
-{
-    std::vector<std::string> files;
-    std::string searchPath = directory + "*" + extension;
-
-    WIN32_FIND_DATAA findData;
-    HANDLE hFind = FindFirstFileA(searchPath.c_str(), &findData);
-
-    if (hFind != INVALID_HANDLE_VALUE)
-    {
-        do
-        {
-            if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-            {
-                files.push_back(directory + findData.cFileName);
-            }
-        } while (FindNextFileA(hFind, &findData));
-
-        FindClose(hFind);
-    }
-
-    return files;
-}
-
-std::vector<std::string> PrefabLoader::GetPrefabFileNames(const std::string& directory, const std::string& extension)
-{
-    std::vector<std::string> result;
-    auto files = GetPrefabFileList(directory, extension);
-
-    for (auto& filePath : files)
-    {
-        size_t lastSlash = filePath.find_last_of("/\\");
-        std::string fileName = (lastSlash == std::string::npos) ? filePath : filePath.substr(lastSlash + 1);
-        size_t dotPos = fileName.find_last_of('.');
-        if (dotPos != std::string::npos)
-            fileName = fileName.substr(0, dotPos);
-
-        result.push_back(fileName);
-    }
-
-    return result;
 }
 
 bool PrefabLoader::SaveParticle(const PrefabParticleData& data, const std::string& filePath)
@@ -699,4 +602,105 @@ bool PrefabLoader::LoadParticleGroup(PrefabParticleGroupData& out, const std::st
     }
 
     return true;
+}
+
+bool PrefabLoader::DeletePrefab(const std::string& _filePath)
+{
+    if (std::remove(_filePath.c_str()) == 0) {
+        return true; // 성공적으로 삭제됨
+    }
+    else {
+        perror("파일 삭제 실패");
+        return false;
+    }
+}
+
+
+void PrefabLoader::SaveTransform(json& j, const TransformData& data)
+{
+    j["Transform"] = {
+    { "Scale" , { data.Scale[0], data.Scale[1], data.Scale[2] }},
+    { "Rotation" , { data.Rotation[0], data.Rotation[1], data.Rotation[2] }},
+    { "Translation" , { data.Position[0], data.Position[1], data.Position[2] }}
+    };
+}
+
+void PrefabLoader::LoadTransform(json& j, TransformData& data)
+{
+    auto s = j["Transform"]["Scale"];
+    for (int i = 0; i < 3; i++) data.Scale[i] = s[i];
+
+    auto r = j["Transform"]["Rotation"];
+    for (int i = 0; i < 3; i++) data.Rotation[i] = r[i];
+
+    auto t = j["Transform"]["Translation"];
+    for (int i = 0; i < 3; i++) data.Position[i] = t[i];
+}
+
+void PrefabLoader::LoadCameraComponent(json& j, CameraComponentData& data)
+{
+    data.isUse = j["CameraComponent"]["isUse"];
+    auto pos = j["CameraComponent"]["Position"];
+    auto rot = j["CameraComponent"]["Rotation"];
+    data.Fov = j["CameraComponent"]["Fov"];
+    data.Aspect = j["CameraComponent"]["Aspect"];
+    data.Near = j["CameraComponent"]["Near"];
+    data.Far = j["CameraComponent"]["Far"];
+    for (int i = 0; i < 3; i++) data.Position[i] = pos[i];
+    for (int i = 0; i < 3; i++) data.Rotation[i] = rot[i];
+}
+
+void PrefabLoader::LoadShapeComponent(json& j, ShapeComponentData& data)
+{
+    data.isUse = j["ShapeComponent"]["isUse"];
+    data.eShapeType = static_cast<ShapeType>(j["ShapeComponent"]["ShapeType"]);
+    auto pos = j["ShapeComponent"]["Position"];
+    auto rot = j["ShapeComponent"]["Rotation"];
+    auto scale = j["ShapeComponent"]["Scale"];
+    for (int i = 0; i < 3; i++) data.Position[i] = pos[i];
+    for (int i = 0; i < 3; i++) data.Rotation[i] = rot[i];
+    for (int i = 0; i < 3; i++) data.Scale[i] = scale[i];
+}
+
+std::vector<std::string> PrefabLoader::GetPrefabFileList(const std::string& directory, const std::string& extension)
+{
+    std::vector<std::string> files;
+    std::string searchPath = directory + "*" + extension;
+
+    WIN32_FIND_DATAA findData;
+    HANDLE hFind = FindFirstFileA(searchPath.c_str(), &findData);
+
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+            {
+                files.push_back(directory + findData.cFileName);
+            }
+        } while (FindNextFileA(hFind, &findData));
+
+        FindClose(hFind);
+    }
+
+    return files;
+}
+
+std::vector<std::string> PrefabLoader::GetPrefabFileNames(const std::string& directory, const std::string& extension)
+{
+    std::vector<std::string> result;
+    auto files = GetPrefabFileList(directory, extension);
+
+    for (auto& filePath : files)
+    {
+        size_t lastSlash = filePath.find_last_of("/\\");
+        std::string fileName = (lastSlash == std::string::npos) ? filePath : filePath.substr(lastSlash + 1);
+        size_t dotPos = fileName.find_last_of('.');
+        if (dotPos != std::string::npos)
+            fileName = fileName.substr(0, dotPos);
+
+        result.push_back(fileName);
+    }
+
+    return result;
 }

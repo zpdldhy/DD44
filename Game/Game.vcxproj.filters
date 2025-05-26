@@ -63,6 +63,9 @@
     <ClInclude Include="TestYoooooon.h">
       <Filter>Test</Filter>
     </ClInclude>
+    <ClInclude Include="PrefabToActor.h">
+      <Filter>Prefab</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -106,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="TestYoooooon.cpp">
       <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="PrefabToActor.cpp">
+      <Filter>Prefab</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

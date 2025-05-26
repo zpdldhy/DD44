@@ -20,23 +20,25 @@
 #include "ShapeData.h"
 #include "CollisionManager.h"
 
+#include "PrefabToActor.h"
+
 void TestYoooooon::Init()
 {
-	actorLoader.LoadAllAsset();
-	meshLoader.SetMesh(actorLoader.LoadMeshMap());
-	meshLoader.SetAnim(actorLoader.LoadAnimMap());
-
 	SetupEditorCallbacks();
 
-	LoadAllPrefabs(".map.json");
-	//LoadAllPrefabs(".object.json");
-	LoadAllPrefabs(".objects.json");
-	LoadAllPrefabs(".character.json");
-	LoadAllPrefabs(".ui.json");
+	OBJECT->AddActorList(PRA->LoadAllPrefabs(".map.json"));
+	//OBJECT->AddActorList(PRA->LoadAllPrefabs(".object.json"));
+	OBJECT->AddActorList(PRA->LoadAllPrefabs(".objects.json"));
+
+	auto vlist = PRA->LoadAllPrefabs(".character.json");
+	m_pPlayer = vlist[0];
+	OBJECT->AddActorList(vlist);
+	UI->AddUIList(PRA->LoadAllPrefabs(".ui.json"));
 
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
+
 	CreateCollisionObject();
 }
 
@@ -279,7 +281,7 @@ void TestYoooooon::SetupObjectEditorCallback()
 
 void TestYoooooon::SetupUIEditorCallback()
 {
-	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Vec4 sliceUV)
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Color _color, Vec4 sliceUV)
 		{
 			uiActor->m_szName = L"UI";
 			auto meshComp = UStaticMeshComponent::CreatePlane();
@@ -303,182 +305,10 @@ void TestYoooooon::SetupUIEditorCallback()
 			uiActor->SetRotation(Vec3(actorData.Rotation));
 			uiActor->SetScale(Vec3(actorData.Scale));
 			uiActor->SetSliceData(sliceUV);
+			uiActor->SetColor(_color);
 
 			UI->AddUI(uiActor);
 		});
-}
-
-void TestYoooooon::LoadAllPrefabs(const std::string& extension)
-{
-	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
-
-	for (const auto& file : files)
-	{
-		if (extension == ".map.json")
-		{
-			PrefabMapData mapData;
-			if (PREFAB->LoadMapTile(file, mapData))
-			{
-				auto tile = std::make_shared<ATerrainTileActor>();
-				tile->m_szName = L"Terrain";
-				tile->m_iNumCols = mapData.Cols;
-				tile->m_iNumRows = mapData.Rows;
-				tile->m_fCellSize = mapData.CellSize;
-				tile->CreateTerrain(to_mw(mapData.TexturePath), to_mw(mapData.ShaderPath));
-				tile->SetPosition(mapData.Position);
-				tile->SetRotation(mapData.Rotation);
-				tile->SetScale(mapData.Scale);
-				OBJECT->AddActor(tile);
-			}
-		}
-		else if (extension == ".character.json")
-		{
-			PrefabCharacterData characterData;
-			if (PREFAB->LoadCharacter(file, characterData))
-			{
-				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
-
-				ActorLoader actorLoader;
-				actorLoader.LoadAllAsset();
-				MeshLoader meshLoader;
-				meshLoader.SetMesh(actorLoader.LoadMeshMap());
-				meshLoader.SetAnim(actorLoader.LoadAnimMap());
-
-				shared_ptr<UMeshComponent> meshComponent = meshLoader.Make(characterData.MeshPath.c_str());
-
-				actor->SetMeshComponent(meshComponent);
-
-				actor->m_szName = L"Character";
-				actor->SetPosition(Vec3(characterData.transform.Position));
-				actor->SetRotation(Vec3(characterData.transform.Rotation));
-				actor->SetScale(Vec3(characterData.transform.Scale));
-
-				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
-
-				m_pPlayer = actor;
-
-				if (characterData.camera.isUse)
-				{
-					auto cameraComponent = make_shared<UCameraComponent>();
-					cameraComponent->SetLocalPosition(Vec3(characterData.camera.Position));
-					cameraComponent->SetLocalRotation(Vec3(characterData.camera.Rotation));
-					cameraComponent->SetPerspective(characterData.camera.Fov, characterData.camera.Aspect, characterData.camera.Near, characterData.camera.Far);
-					actor->SetCameraComponent(cameraComponent);
-				}
-
-				if (characterData.shape.isUse)
-				{
-					shared_ptr<UShapeComponent> shapeComponent = nullptr;
-					if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_BOX)
-						shapeComponent = make_shared<UBoxComponent>();
-					//else if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_SPHERE)
-
-					shapeComponent->SetLocalScale(Vec3(characterData.shape.Scale));
-					shapeComponent->SetLocalPosition(Vec3(characterData.shape.Position));
-					shapeComponent->SetLocalRotation(Vec3(characterData.shape.Rotation));
-					shapeComponent->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-					actor->SetShapeComponent(shapeComponent);
-				}
-
-
-				OBJECT->AddActor(actor);
-			}
-		}
-		else if (extension == ".object.json")
-		{
-			PrefabObjectData objData;
-			if (PREFAB->LoadObject(file, objData))
-			{
-				auto meshComp = make_shared<UStaticMeshComponent>();
-				meshComp->SetMeshPath(to_mw(objData.MeshPath));
-
-				auto meshRes = make_shared<UStaticMeshResources>();
-				AssimpLoader loader;
-				vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
-				if (!meshList.empty())
-				{
-					meshRes->SetVertexList(meshList[0].m_vVertexList);
-					meshRes->SetIndexList(meshList[0].m_vIndexList);
-					meshRes->Create();
-					meshComp->SetMesh(meshRes);
-				}
-
-				auto material = make_shared<UMaterial>();
-				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
-				meshComp->SetMaterial(material);
-
-				auto obj = make_shared<APawn>();
-				obj->m_szName = L"Object";
-				obj->SetMeshComponent(meshComp);
-				obj->SetPosition(objData.Position);
-				obj->SetRotation(objData.Rotation);
-				obj->SetScale(objData.Scale);
-
-				OBJECT->AddActor(obj);
-			}
-		}
-		else if (extension == ".objects.json")
-		{
-			std::vector<PrefabObjectData> objList;
-			if (PREFAB->LoadObjectArray(file, objList))
-			{
-				for (auto& objData : objList)
-				{
-					auto meshComp = make_shared<UStaticMeshComponent>();
-					meshComp->SetMeshPath(to_mw(objData.MeshPath));
-
-					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
-					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
-
-					auto material = make_shared<UMaterial>();
-					material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
-					meshComp->SetMaterial(material);
-
-					auto obj = make_shared<APawn>();
-					obj->m_szName = L"Object";
-					obj->SetMeshComponent(meshComp);
-					obj->SetPosition(objData.Position);
-					obj->SetRotation(objData.Rotation);
-					obj->SetScale(objData.Scale);
-
-					OBJECT->AddActor(obj);
-				}
-			}
-		}
-		else if (extension == ".ui.json")
-		{
-			PrefabUIData uiData;
-			if (PREFAB->LoadUI(file, uiData))
-			{
-				auto uiActor = make_shared<AUIActor>();
-				uiActor->m_szName = to_mw(uiData.Name);
-
-				auto meshComp = UStaticMeshComponent::CreatePlane();
-				uiActor->SetMeshComponent(meshComp);
-
-				auto mat = make_shared<UMaterial>();
-				mat->SetUseEffect(false);
-				mat->Load(L"", to_mw(uiData.ShaderPath));
-				meshComp->SetMaterial(mat);
-
-				uiActor->SetIdleTexture(TEXTURE->Get(to_mw(uiData.IdleTexturePath)));
-				uiActor->SetHoverTexture(TEXTURE->Get(to_mw(uiData.HoverTexturePath)));
-				uiActor->SetActiveTexture(TEXTURE->Get(to_mw(uiData.ActiveTexturePath)));
-				uiActor->SetSelectTexture(TEXTURE->Get(to_mw(uiData.SelectedTexturePath)));
-
-				uiActor->SetMeshComponent(meshComp);
-				uiActor->SetPosition(Vec3(uiData.transform.Position));
-				uiActor->SetRotation(Vec3(uiData.transform.Rotation));
-				uiActor->SetScale(Vec3(uiData.transform.Scale));
-				uiActor->SetSliceData(Vec4(uiData.SliceUV));
-
-				uiActor->SetPrefabData(uiData);
-
-				UI->AddUI(uiActor);
-			}
-		}
-
-	}
 }
 
 void TestYoooooon::CreateCollisionObject()

@@ -370,7 +370,7 @@ void Editor::SetupObjectEditorCallback()
 
 void Editor::SetupUIEditorCallback()
 {
-	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Vec4 sliceUV)
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Color _color, Vec4 sliceUV)
 		{
 			uiActor->m_szName = L"UI";
 			auto meshComp = UStaticMeshComponent::CreatePlane();
@@ -394,6 +394,7 @@ void Editor::SetupUIEditorCallback()
 			uiActor->SetRotation(Vec3(actorData.Rotation));
 			uiActor->SetScale(Vec3(actorData.Scale));
 			uiActor->SetSliceData(sliceUV);
+			uiActor->SetColor(_color);
 
 			UI->AddUI(uiActor);
 		});

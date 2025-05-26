@@ -40,6 +40,7 @@ void UIEditorUI::DrawUI()
             m_vTextureList[0].c_str(),   // white.png
             m_szShaderPath,
             m_Trans,
+            Color(m_vColor),
             Vec4(m_vSliceUV)
         );
     }
@@ -174,6 +175,7 @@ void UIEditorUI::UpdatePrefabData()
     memcpy(m_CurrentPrefab.transform.Scale, m_Trans.Scale, sizeof(float) * 3);
     memcpy(m_CurrentPrefab.transform.Rotation, m_Trans.Rotation, sizeof(float) * 3);
     memcpy(m_CurrentPrefab.transform.Position, m_Trans.Position, sizeof(float) * 3);
+    memcpy(m_CurrentPrefab.color, m_vColor, sizeof(float) * 4);
 
     memcpy(m_CurrentPrefab.SliceUV, m_vSliceUV, sizeof(float) * 4);
 
@@ -196,6 +198,7 @@ void UIEditorUI::UpdateUIActor()
     m_pUIActor->SetScale(Vec3(m_Trans.Scale));
 
     m_pUIActor->SetSliceData(Vec4(m_vSliceUV[0], m_vSliceUV[1], m_vSliceUV[2], m_vSliceUV[3]));
+    m_pUIActor->SetColor(Vec4(m_vColor[0], m_vColor[1], m_vColor[2], m_vColor[3]));
 
     m_pUIActor->SetPrefabData(m_CurrentPrefab);
 }
@@ -242,6 +245,7 @@ void UIEditorUI::ResetData()
     for (int i = 0; i < 3; i++) m_Trans.Position[i] = 0.0f;
     for (int i = 0; i < 3; i++) m_Trans.Rotation[i] = 0.0f;
     for (int i = 0; i < 2; i++) m_Trans.Scale[i] = 100.0f;
+    for (int i = 0; i < 4; i++) m_vColor[i] = 0.0f;
     // Slice
     for (int i = 0; i < 4; i++) m_vSliceUV[i] = 0.5f;
 
@@ -253,7 +257,7 @@ void UIEditorUI::ResetData()
     m_iActiveIndex = 0;
     m_iSelectedIndex = 0;
 
-    strcpy_s(m_szShaderPath, "../Resources/Shader/UVSlice.hlsl");
+    strcpy_s(m_szShaderPath, "../Resources/Shader/DefaultUI.hlsl");
 }
 
 void UIEditorUI::SetTransform()
@@ -347,7 +351,7 @@ void UIEditorUI::SetColor()
         ImGui::PushID(i);
 
         ImGui::PushItemWidth(inputWidth);
-        ImGui::InputFloat("##Value", &m_vColor[i], 0.0f, 0.0f, "%.2f");
+        ImGui::InputFloat("##Value", &m_vColor[i], 0.0f, 0.0f, "%.3f");
         ImGui::PopItemWidth();
 
         ImGui::PopID();
@@ -526,6 +530,8 @@ void UIEditorUI::ResolvePrefabData(const PrefabUIData& data)
     memcpy(m_Trans.Scale, data.transform.Scale, sizeof(float) * 3);
     memcpy(m_Trans.Rotation, data.transform.Rotation, sizeof(float) * 3);
     memcpy(m_Trans.Position, data.transform.Position, sizeof(float) * 3);
+
+    memcpy(m_vColor, data.color, sizeof(float) * 4);
 
     memcpy(m_vSliceUV, data.SliceUV, sizeof(float) * 4);
 
