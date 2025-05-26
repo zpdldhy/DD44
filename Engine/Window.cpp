@@ -35,25 +35,6 @@ LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lPar
     return  DefWindowProc(_hWnd, _message, _wParam, _lParam);
 }
 
-MONITORINFOEX GetSecondMonitorInfo()
-{
-    std::vector<MONITORINFOEX> monitors;
-    EnumDisplayMonitors(nullptr, nullptr,
-        [](HMONITOR hMon, HDC, LPRECT, LPARAM data) -> BOOL {
-            auto& out = *reinterpret_cast<std::vector<MONITORINFOEX>*>(data);
-            MONITORINFOEX mi = {};
-            mi.cbSize = sizeof(mi);
-            GetMonitorInfo(hMon, &mi);
-            out.push_back(mi);
-            return TRUE;
-        }, reinterpret_cast<LPARAM>(&monitors));
-
-    if (monitors.size() >= 2)
-        return monitors[1];  // 두 번째 모니터
-    else
-        return monitors[0];  // 모니터가 하나뿐이면 첫 번째 사용
-}
-
 bool Window::SetWindowClass(HINSTANCE _hInstance)
 {
 	m_hInstance = _hInstance;
@@ -91,20 +72,6 @@ bool Window::SetWindow(float _windowX, float _windowY)
 
     ShowWindow(m_hWnd, SW_SHOW);
     UpdateWindow(m_hWnd);
-
-    MONITORINFOEX secondMonitor = GetSecondMonitorInfo();
-    RECT rc = secondMonitor.rcMonitor;
-    int x = rc.left;
-    int y = rc.top;
-
-    m_hWndImGui = CreateWindow(
-        L"DD44", L"Tool", WS_OVERLAPPEDWINDOW,
-        x, y, 800, m_fHeight, nullptr, nullptr, m_hInstance, nullptr);
-
-    if (!m_hWndImGui)
-    {
-        return false;
-    }
 
     return true;
 }
@@ -144,23 +111,6 @@ bool Window::SetWindowFullScreen()
         desktopRect.right - desktopRect.left,
         desktopRect.bottom - desktopRect.top,
         SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
-
-    MONITORINFOEX secondMonitor = GetSecondMonitorInfo();
-    RECT rc = secondMonitor.rcMonitor;
-    int x = rc.left;
-    int y = rc.top;
-
-    m_hWndImGui = CreateWindow(
-        L"DD44", L"Tool", WS_OVERLAPPEDWINDOW,
-        x, y, 800, m_fHeight, nullptr, nullptr, m_hInstance, nullptr);
-
-    if (!m_hWndImGui)
-    {
-        return false;
-    }
-
-    ShowWindow(m_hWndImGui, SW_SHOW);
-    UpdateWindow(m_hWndImGui);
 
     return true;
 }

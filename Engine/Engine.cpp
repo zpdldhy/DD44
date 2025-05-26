@@ -38,7 +38,8 @@ void Engine::Init()
 		INPUT->Init();
 		DXWRITE->Create();
 
-		if (_app->m_type != SCENE_TYPE::GAME) { GUI->Init(); }
+		if (_app->m_type != SCENE_TYPE::GAME)
+			GUI->Init();
 	}
 	_app->Init();
 
@@ -72,7 +73,6 @@ void Engine::Frame()
 
 	GET_SINGLE(Device)->Frame();
 
-	if (_app->m_type != SCENE_TYPE::GAME) { GUI->Update(); }
 	_app->Tick();
 
 	TIMER->Update();
@@ -81,6 +81,9 @@ void Engine::Frame()
 	{
 		CAMERA->Tick();
 	}
+
+	if (_app->m_type != SCENE_TYPE::GAME)
+		GUI->Update();
 }
 
 void Engine::Render()
@@ -118,12 +121,11 @@ void Engine::Render()
 		m_pCurrentRasterizer.Reset();
 	}
 
-	if (_app->m_type != SCENE_TYPE::GAME) {
-		GUI->Render(); // *Fix Location* after _app->Render() }
-	}
-
 	DXWRITE->EndDraw();
 	GET_SINGLE(Device)->PostRender();
+
+	if (_app->m_type != SCENE_TYPE::GAME)
+		GUI->Render();
 }
 
 void Engine::Release()
@@ -145,6 +147,9 @@ void Engine::Run()
 {
 	_window.SetWindowClass(_hInstance);	
 	_window.SetWindowFullScreen();
+
+	if (_app->m_type != SCENE_TYPE::GAME)
+		GUI->CreateImGuiWindow(_hInstance);
 
 	Init();
 

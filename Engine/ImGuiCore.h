@@ -77,6 +77,32 @@ public:
 	void Render();
 	void Release();
 
+private:
+	UINT m_iWidth = 0;
+	UINT m_iHeight = 0;
+	POINT m_pMousePos = { 0, 0 };
+	float dpiScale = 0.f;
+
+	HWND m_hWndImGui = nullptr;
+
+	// Device & SwapChain
+	ComPtr<ID3D11Device> m_pd3dDevice;
+	ComPtr<ID3D11DeviceContext> m_pd3dContext;
+	ComPtr<IDXGISwapChain> m_pSwapChain;
+
+	// Render Target View
+	ComPtr<ID3D11RenderTargetView> m_pRTV;
+
+	// Viewport
+	D3D11_VIEWPORT m_MainVP;	
+
+public:
+	bool CreateImGuiWindow(HINSTANCE _hInstance, int _win = 800, int _winY = (int)g_windowSize.y);
+	bool CreateDevice();
+	POINT GetMousePos();
+	void PreRender();
+	void PostRender();
+
 protected:
 	bool m_bDark = true;
 };
