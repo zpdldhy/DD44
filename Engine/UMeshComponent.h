@@ -32,16 +32,8 @@ public:
 	
 	void SetMeshTransform(const shared_ptr<MeshTransform>& _pMeshTrans) { m_pMeshTrans = _pMeshTrans; }
 	const shared_ptr<MeshTransform>& GetMeshTransform() { return m_pMeshTrans; }
-
-	//// USceneComponent 말고 meshTransform의 함수 호출
-	//virtual void SetLocalPosition(const Vec3& _pos) override;
-	//virtual void SetLocalRotation(const Vec3& _rot) override; 
-	//virtual void SetLocalScale(const Vec3& _scale) override; 
 public:
 	void SetVisible(bool _visible) { bRender = _visible; }
 	const bool& GetVisible() {  return bRender; }
-
-	//shared_ptr<UMeshComponent> Clone();
-
 };
 

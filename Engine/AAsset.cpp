@@ -519,6 +519,7 @@ MeshComponentData AAsset::LoadJsonMesh(const char* filepath)
 
 MeshComponentData AAsset::LoadOneJsonMeshRecursive(string idx, const nlohmann::ordered_json& j)
 {
+	Profiler p("LoadOneJsonMeshRecursive");
 	// Load One
 	MeshComponentData parent = LoadOneJsonMesh(idx, j);
 

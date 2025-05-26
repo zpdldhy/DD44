@@ -57,161 +57,161 @@ void TestYR2::Init()
 	OBJECT->AddActor(m_pActor);
 
 
-	auto meshEditor = GUI->GetMeshEditorUI();
-	//meshEditor->SetActor(m_pActor);
-	meshEditor->SetMeshList(meshResMap);
-	meshEditor->SetAnimList(animList);
-	meshEditor->SetTexList(texList);
+	//auto meshEditor = GUI->GetMeshEditorUI();
+	////meshEditor->SetActor(m_pActor);
+	//meshEditor->SetMeshList(meshResMap);
+	//meshEditor->SetAnimList(animList);
+	//meshEditor->SetTexList(texList);
 
-	GUI->SetBaseMeshEditorCallback([this](PreMeshData data, shared_ptr<APawn>& _pActor)
-		{
-			_pActor = make_shared<APawn>();
-			m_pActor = _pActor;
-			// MESH
-			////Base
-			auto iter = meshResMap.find(data.meshName);
-			if (iter == meshResMap.end()) { assert(false); }
-			shared_ptr<UMeshComponent> rootMesh;
-			if (iter->second->GetType() == (int)MeshType::M_SKINNED)
-			{
-				rootMesh = make_shared <USkinnedMeshComponent>();
-				rootMesh->SetName(data.compName);
-				auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(rootMesh);
-				skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(iter->second));
-				// ANIM
-				auto animInstance = animList[data.animIndex];
-				skinnedRoot->SetBaseAnim(animInstance);
-				shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
-				animTrack->SetBase(animList[data.animIndex]);
-				skinnedRoot->SetMeshAnim(animTrack);
+	//GUI->SetBaseMeshEditorCallback([this](PreMeshData data, shared_ptr<APawn>& _pActor)
+	//	{
+	//		_pActor = make_shared<APawn>();
+	//		m_pActor = _pActor;
+	//		// MESH
+	//		////Base
+	//		auto iter = meshResMap.find(data.meshName);
+	//		if (iter == meshResMap.end()) { assert(false); }
+	//		shared_ptr<UMeshComponent> rootMesh;
+	//		if (iter->second->GetType() == (int)MeshType::M_SKINNED)
+	//		{
+	//			rootMesh = make_shared <USkinnedMeshComponent>();
+	//			rootMesh->SetName(data.compName);
+	//			auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(rootMesh);
+	//			skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(iter->second));
+	//			// ANIM
+	//			auto animInstance = animList[data.animIndex];
+	//			skinnedRoot->SetBaseAnim(animInstance);
+	//			shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
+	//			animTrack->SetBase(animList[data.animIndex]);
+	//			skinnedRoot->SetMeshAnim(animTrack);
 
-				// MATERIAL
-				shared_ptr<UMaterial> mat = make_shared<UMaterial>();
-				wstring texPath = L"../Resources/Texture/";
-				if (!data.texPath.empty())
-				{
-					texPath += to_mw(data.texPath);
-				}
-				else
-				{
-					texPath += texList[data.texIndex];
-				}
-				wstring shaderPath = L"../Resources/Shader/";
-				if (!data.shaderPath.empty())
-				{
-					shaderPath += to_mw(data.shaderPath);
-				}
-				else
-				{
-					shaderPath += L"skinningShader.hlsl";
-				}
-				mat->Load(texPath, shaderPath);
-				mat->SetSpecularParams(data.specular, data.shininess);
-				mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
-				rootMesh->SetMaterial(mat);
+	//			// MATERIAL
+	//			shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+	//			wstring texPath = L"../Resources/Texture/";
+	//			if (!data.texPath.empty())
+	//			{
+	//				texPath += to_mw(data.texPath);
+	//			}
+	//			else
+	//			{
+	//				texPath += texList[data.texIndex];
+	//			}
+	//			wstring shaderPath = L"../Resources/Shader/";
+	//			if (!data.shaderPath.empty())
+	//			{
+	//				shaderPath += to_mw(data.shaderPath);
+	//			}
+	//			else
+	//			{
+	//				shaderPath += L"skinningShader.hlsl";
+	//			}
+	//			mat->Load(texPath, shaderPath);
+	//			mat->SetSpecularParams(data.specular, data.shininess);
+	//			mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+	//			rootMesh->SetMaterial(mat);
 
-				m_pActor->SetMeshComponent(rootMesh);
+	//			m_pActor->SetMeshComponent(rootMesh);
 
-				// ROOTMOTION
-				if (strcmp(data.rootBoneName.c_str(), ""))
-				{
-					int rootBone = skinnedRoot->GetMesh()->GetBoneIndex(to_mw(data.rootBoneName));
+	//			// ROOTMOTION
+	//			if (strcmp(data.rootBoneName.c_str(), ""))
+	//			{
+	//				int rootBone = skinnedRoot->GetMesh()->GetBoneIndex(to_mw(data.rootBoneName));
 
-					animList[data.animIndex]->CheckInPlace(true);
-					animList[data.animIndex]->SetRootIndex(rootBone);
-				}
+	//				animList[data.animIndex]->CheckInPlace(true);
+	//				animList[data.animIndex]->SetRootIndex(rootBone);
+	//			}
 
-			}
-			else
-			{
-				rootMesh = make_shared <UStaticMeshComponent>();
-				rootMesh->SetName(data.compName);
-				auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(rootMesh);
+	//		}
+	//		else
+	//		{
+	//			rootMesh = make_shared <UStaticMeshComponent>();
+	//			rootMesh->SetName(data.compName);
+	//			auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(rootMesh);
 
-				staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(iter->second));
+	//			staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(iter->second));
 
-				// MATERIAL
-				shared_ptr<UMaterial> mat = make_shared<UMaterial>();
-				wstring texPath = L"../Resources/Texture/";
-				if (!data.texPath.empty())
-				{
-					texPath += to_mw(data.texPath);
-				}
-				else
-				{
-					texPath += texList[data.texIndex];
-				}
-				wstring shaderPath = L"../Resources/Shader/";
-				if (!data.shaderPath.empty())
-				{
-					shaderPath += to_mw(data.shaderPath);
-				}
-				else
-				{
-					shaderPath += L"Default.hlsl";
-				}
-				mat->Load(texPath, shaderPath);
-				//mat->SetSpecularParams(data.specular, data.shininess);
-				rootMesh->SetMaterial(mat);
+	//			// MATERIAL
+	//			shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+	//			wstring texPath = L"../Resources/Texture/";
+	//			if (!data.texPath.empty())
+	//			{
+	//				texPath += to_mw(data.texPath);
+	//			}
+	//			else
+	//			{
+	//				texPath += texList[data.texIndex];
+	//			}
+	//			wstring shaderPath = L"../Resources/Shader/";
+	//			if (!data.shaderPath.empty())
+	//			{
+	//				shaderPath += to_mw(data.shaderPath);
+	//			}
+	//			else
+	//			{
+	//				shaderPath += L"Default.hlsl";
+	//			}
+	//			mat->Load(texPath, shaderPath);
+	//			//mat->SetSpecularParams(data.specular, data.shininess);
+	//			rootMesh->SetMaterial(mat);
 
-				m_pActor->SetMeshComponent(rootMesh);
+	//			m_pActor->SetMeshComponent(rootMesh);
 
-			}
+	//		}
 
-			m_vActorList.emplace_back(m_pActor);
-			OBJECT->AddActor(m_pActor);
-		});
-	GUI->SetChildMeshEditorCallback([this](PreMeshData data)
-		{
-			AddChild(data);
-		});
+	//		m_vActorList.emplace_back(m_pActor);
+	//		OBJECT->AddActor(m_pActor);
+	//	});
+	//GUI->SetChildMeshEditorCallback([this](PreMeshData data)
+	//	{
+	//		AddChild(data);
+	//	});
 
-	meshEditor->MoveMesh([this](int meshIndex, Vec3 position)
-		{
-			auto mesh = m_vActorList[0]->GetMeshComponent();
-			auto child = mesh->GetChild(meshIndex);
-			child->SetLocalPosition(position);
-		});
-	meshEditor->ScaleMesh([this](int meshIndex, Vec3 scale)
-		{
-			auto mesh = m_vActorList[0]->GetMeshComponent();
-			auto child = mesh->GetChild(meshIndex);
-			child->SetLocalScale(scale);
-		});
-	meshEditor->StopAnim([this](bool stop)
-		{
-			auto animInstance = m_vActorList[0]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-			animInstance->m_bPlay = !stop;
-		});
-	meshEditor->ChangeAhim([this](int currentAnim)
-		{
-			auto animInstance = m_vActorList[0]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-			animInstance->SetCurrentAnimTrack(currentAnim);
-		});
-	meshEditor->ChangeParentBone([this](int childIndex, string bone, bool inverse)
-		{
-			auto mesh = dynamic_pointer_cast<USkinnedMeshComponent>(m_vActorList[0]->GetMeshComponent());
-			auto animInstance = mesh->GetAnimInstance();
-			auto child = mesh->GetChild(childIndex);
-			int parentBone = mesh->GetMesh()->GetBoneIndex(to_mw(bone));
-			Matrix matBone = animInstance->GetBoneAnim(parentBone);
-			if (inverse)
-			{
-				matBone = matBone.Invert();
-			}
-			dynamic_pointer_cast<UStaticMeshComponent>(child)->SetMatBone(matBone);
-		});
-	meshEditor->SaveMesh([this](int i, bool b, string _name)
-		{
-			bSaveMesh = true;
-			name = _name;
-		});
-	meshEditor->ChangeVisible([this](int i, bool b)
-		{
-			auto mesh = m_vActorList[0]->GetMeshComponent();
-			auto child = mesh->GetChild(i);
-			child->SetVisible(b);
-		});
+	//meshEditor->MoveMesh([this](int meshIndex, Vec3 position)
+	//	{
+	//		auto mesh = m_vActorList[0]->GetMeshComponent();
+	//		auto child = mesh->GetChild(meshIndex);
+	//		child->SetLocalPosition(position);
+	//	});
+	//meshEditor->ScaleMesh([this](int meshIndex, Vec3 scale)
+	//	{
+	//		auto mesh = m_vActorList[0]->GetMeshComponent();
+	//		auto child = mesh->GetChild(meshIndex);
+	//		child->SetLocalScale(scale);
+	//	});
+	//meshEditor->StopAnim([this](bool stop)
+	//	{
+	//		auto animInstance = m_vActorList[0]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	//		animInstance->m_bPlay = !stop;
+	//	});
+	//meshEditor->ChangeAhim([this](int currentAnim)
+	//	{
+	//		auto animInstance = m_vActorList[0]->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	//		animInstance->SetCurrentAnimTrack(currentAnim);
+	//	});
+	//meshEditor->ChangeParentBone([this](int childIndex, string bone, bool inverse)
+	//	{
+	//		auto mesh = dynamic_pointer_cast<USkinnedMeshComponent>(m_vActorList[0]->GetMeshComponent());
+	//		auto animInstance = mesh->GetAnimInstance();
+	//		auto child = mesh->GetChild(childIndex);
+	//		int parentBone = mesh->GetMesh()->GetBoneIndex(to_mw(bone));
+	//		Matrix matBone = animInstance->GetBoneAnim(parentBone);
+	//		if (inverse)
+	//		{
+	//			matBone = matBone.Invert();
+	//		}
+	//		dynamic_pointer_cast<UStaticMeshComponent>(child)->SetMatBone(matBone);
+	//	});
+	//meshEditor->SaveMesh([this](int i, bool b, string _name)
+	//	{
+	//		bSaveMesh = true;
+	//		name = _name;
+	//	});
+	//meshEditor->ChangeVisible([this](int i, bool b)
+	//	{
+	//		auto mesh = m_vActorList[0]->GetMeshComponent();
+	//		auto child = mesh->GetChild(i);
+	//		child->SetVisible(b);
+	//	});
 }
 
 void TestYR2::Update()

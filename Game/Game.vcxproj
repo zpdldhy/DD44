@@ -140,11 +140,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BatMovement.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EnemyState.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="HeadRollerMove.h" />
     <ClInclude Include="HeadRollerStates.h" />
     <ClInclude Include="kkongchiMoveScript.h" />
     <ClInclude Include="Main.h" />
@@ -161,10 +161,10 @@
     <ClInclude Include="TestYR2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BatMovement.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="HeadRollerMove.cpp" />
     <ClCompile Include="HeadRollerStates.cpp" />
     <ClCompile Include="kkongchiMoveScript.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -172,6 +172,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PlayerMoveScript.cpp" />
+    <ClCompile Include="PlayerStates.cpp" />
     <ClCompile Include="PrefabToActor.cpp" />
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="TestPlayer.cpp" />

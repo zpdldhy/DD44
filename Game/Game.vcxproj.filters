@@ -72,15 +72,13 @@
     <ClInclude Include="PlayerStates.h">
       <Filter>FSM</Filter>
     </ClInclude>
-    <ClInclude Include="HeadRollerMove.h">
-      <Filter>Script</Filter>
-    </ClInclude>
     <ClInclude Include="HeadRollerStates.h">
       <Filter>FSM</Filter>
     </ClInclude>
     <ClInclude Include="EnemyState.h">
       <Filter>FSM</Filter>
     </ClInclude>
+    <ClInclude Include="BatMovement.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -128,6 +126,13 @@
     <ClCompile Include="PrefabToActor.cpp">
       <Filter>Prefab</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerStates.cpp">
+      <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="HeadRollerStates.cpp">
+      <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="BatMovement.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

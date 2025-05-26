@@ -99,7 +99,7 @@ void Engine::Render()
 		OBJECT->Render();	// ObjectList Render
 		PARTICLE->Render();
 		POSTPROCESS->PostRender();
-		
+
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
 
@@ -107,7 +107,7 @@ void Engine::Render()
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
 		{
-			CAMERA->Render(CameraViewType::CVT_UI);		
+			CAMERA->Render(CameraViewType::CVT_UI);
 			POSTPROCESS->Present();
 		}
 
@@ -127,7 +127,7 @@ void Engine::Render()
 
 void Engine::Release()
 {
-	UI->Destroy();	
+	UI->Destroy();
 	PARTICLE->Destroy();
 
 	if (_app->m_type != SCENE_TYPE::GAME)

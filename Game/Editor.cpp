@@ -24,6 +24,7 @@
 #include "Timer.h"
 #include "PrefabToActor.h"
 
+#include "BatMovement.h"
 bool bRunGame = true;
 
 //#undef RUN_GAME
