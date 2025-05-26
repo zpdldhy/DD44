@@ -141,8 +141,8 @@ void Editor::SetupGizmo()
 	m_pGizmoCore->SetScale(Vec3(0.04f, 0.04f, 0.04f));
 	OBJECT->AddActor(m_pGizmoCore);
 
-	float _boxScale = 5.0f;
-	float _boxPosition = 4.0f;
+	float _boxScale = 135.0f;
+	float _boxPosition = 100.0f;
 
 	m_pGizmoX = make_shared<AActor>();
 	m_pGizmoX->m_szName = L"Gizmo";
@@ -150,7 +150,7 @@ void Editor::SetupGizmo()
 	shared_ptr<UBoxComponent> _pXBox = std::make_shared<UBoxComponent>();
 	_pXBox->m_bVisible = false;
 	_pXBox->SetShapeColor(Vec4(1.0f, 0.f, 0.f, 0.f));
-	_pXBox->SetLocalScale(Vec3(_boxScale, 0.4f, 0.4f));
+	_pXBox->SetLocalScale(Vec3(_boxScale, 10.0f, 10.0f));
 	_pXBox->SetLocalPosition(Vec3(_boxPosition, 0.0f, 0.0f));
 	_pXBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pGizmoX->SetShapeComponent(_pXBox);
@@ -164,7 +164,7 @@ void Editor::SetupGizmo()
 	shared_ptr<UBoxComponent> _pYBox = std::make_shared<UBoxComponent>();
 	_pYBox->m_bVisible = false;
 	_pYBox->SetShapeColor(Vec4(0.f, 1.0f, 0.f, 0.f));
-	_pYBox->SetLocalScale(Vec3(0.4f, _boxScale, 0.4f));
+	_pYBox->SetLocalScale(Vec3(10.0f, _boxScale, 10.0f));
 	_pYBox->SetLocalPosition(Vec3(0.0f, _boxPosition, 0.0f));
 	_pYBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pGizmoY->SetShapeComponent(_pYBox);
@@ -178,7 +178,7 @@ void Editor::SetupGizmo()
 	shared_ptr<UBoxComponent> _pZBox = std::make_shared<UBoxComponent>();
 	_pZBox->m_bVisible = false;
 	_pZBox->SetShapeColor(Vec4(0.f, 0.f, 1.0f, 0.f));
-	_pZBox->SetLocalScale(Vec3(0.4f, 0.4f, _boxScale));
+	_pZBox->SetLocalScale(Vec3(10.0f, 10.0f, _boxScale));
 	_pZBox->SetLocalPosition(Vec3(0.0f, 0.0f, _boxPosition));
 	_pZBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pGizmoZ->SetShapeComponent(_pZBox);
@@ -525,11 +525,11 @@ void Editor::TransformActorByDragging()
 				case GizmoMode::Translate:
 				{
 					if (axis == m_pGizmoX)
-						newPos.x += deltaX * 0.05f;
+						newPos.x += deltaX * 0.03f;
 					else if (axis == m_pGizmoY)
-						newPos.y -= deltaY * 0.05f;
+						newPos.y -= deltaY * 0.03f;
 					else if (axis == m_pGizmoZ)
-						newPos.z += deltaX * 0.05f;
+						newPos.z += deltaX * 0.03f;
 
 					Vec3 offset = newPos - m_vDragStartPos;
 
@@ -549,11 +549,11 @@ void Editor::TransformActorByDragging()
 				case GizmoMode::Rotate:
 				{
 					if (axis == m_pGizmoX)
-						newRot.x += deltaX * 0.05f;
+						newRot.x += deltaX * 0.03f;
 					else if (axis == m_pGizmoY)
-						newRot.y -= deltaY * 0.05f;
+						newRot.y -= deltaY * 0.03f;
 					else if (axis == m_pGizmoZ)
-						newRot.z += deltaX * 0.05f;
+						newRot.z += deltaX * 0.03f;
 
 					Vec3 offset = newRot - m_vDragStartRot;
 
@@ -571,11 +571,11 @@ void Editor::TransformActorByDragging()
 				case GizmoMode::Scale:
 				{
 					if (axis == m_pGizmoX)
-						newScale.x += deltaX * 0.05f;
+						newScale.x += deltaX * 0.03f;
 					else if (axis == m_pGizmoY)
-						newScale.y -= deltaY * 0.05f;
+						newScale.y -= deltaY * 0.03f;
 					else if (axis == m_pGizmoZ)
-						newScale.z += deltaX * 0.05f;
+						newScale.z += deltaX * 0.03f;
 
 					Vec3 offset = newScale - m_vDragStartScale;
 
@@ -637,7 +637,6 @@ void Editor::CreateObjectAtMousePick()
 
 	GUI->GetObjectEditorUI()->CreateAtPosition(placePos);
 }
-
 
 void Editor::SetupParticleEditorCallback()
 {
@@ -726,7 +725,6 @@ void Editor::Slash()
 		}
 	}
 }
-
 
 void Editor::LoadAllPrefabs(const std::string& extension)
 {
