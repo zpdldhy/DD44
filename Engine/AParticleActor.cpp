@@ -12,6 +12,7 @@ AParticleActor::AParticleActor()
 	m_CB_Billboard->Create(6); // b6 ½½·Ô
 }
 
+
 void AParticleActor::Tick()
 {
 	AActor::Tick();
@@ -83,16 +84,6 @@ void AParticleActor::SetUV(Vec2 start, Vec2 end)
 	auto mat = mesh->GetMaterial();
 	mat->SetUVRange(m_uvStart, m_uvEnd);
 }
-
-//void AParticleActor::InitSpriteAnimation(int divisions, float frameRate)
-//{
-//    m_iDivisions = divisions;
-//    m_fFrameRate = frameRate;
-//
-//    m_iCurrentFrame = 0;
-//    m_fTimeAcc = 0.0f;
-//    m_bPlaying = true;
-//}
 
 void AParticleActor::InitSpriteAnimation(int divisions, float duration)
 {

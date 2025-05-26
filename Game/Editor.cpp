@@ -22,6 +22,7 @@
 #include "AParticleActor.h"
 #include "ParticleManager.h"
 #include "Timer.h"
+#include "EffectManager.h"
 
 bool bRunGame = true;
 
@@ -52,11 +53,13 @@ void Editor::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
+	EFFECT->Init();
 }
 
 void Editor::Update()
 {
 	Slash();
+	EFFECT->Tick();
 	
 	if (INPUT->GetButton(O))
 	{
@@ -72,6 +75,16 @@ void Editor::Update()
 		}
 	}
 
+	if (INPUT->GetButton(J))
+	{
+		Vec3 pos = Vec3(0.0f, 1.0f, 0.0f);
+		Vec3 velocity = Vec3(0, 10, -10); // À§·Î Æ¢°Ô
+		for (int i = 0; i < 5; ++i)
+		{
+			EFFECT->PlayEffect(EEffectType::Blood, pos, 45.0f, velocity);
+		}
+	}
+
 	if (GUI->GetObjectEditorUI()->IsPlacementMode() && INPUT->GetButton(LCLICK))
 	{
 		CreateObjectAtMousePick();
@@ -82,11 +95,12 @@ void Editor::Update()
 
 void Editor::Render()
 {
-
+	EFFECT->Render();
 }
 
 void Editor::Destroy()
 {
+	EFFECT->Destroy();
 }
 
 void Editor::SetupEngineCamera()
@@ -646,14 +660,10 @@ void Editor::Slash()
 		float progress = 0.0f;
 
 
-		if (t <= 0.2f)
+		if (t <= 0.4f)
 		{
-			float ratio = t / 0.2f;
+			float ratio = t / 0.4f;
 			progress = pow(ratio, 2.0f);
-		}
-		else if (t <= 0.5f)
-		{
-			progress = 1.0f;
 		}
 		else
 		{

@@ -21,6 +21,7 @@
 #include "ParticleManager.h"
 #include "RenderStateManager.h"
 
+
 void Engine::Init()
 {
 	GET_SINGLE(Device)->Init();
@@ -53,6 +54,7 @@ void Engine::Init()
 	// 8개의 MRT DxState 초기화
 	STATE->Create();
 	//STATEMANAGER->InitState();
+
 }
 
 void Engine::Frame()
