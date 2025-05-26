@@ -22,8 +22,8 @@ void UIEditorUI::DrawUI()
     SearchFile(searchPath, ".png", m_vTextureList, m_vTextureNameList);
     SearchFile(searchPath, ".jpg", m_vTextureList, m_vTextureNameList);
     SearchFile(searchPath, ".bmp", m_vTextureList, m_vTextureNameList);
-
-
+        
+    UpdateUIActorList();
     SelectActor();
 
     // ───────────────────────────── Create ─────────────────────────────
@@ -69,11 +69,25 @@ void UIEditorUI::DrawUI()
 
     ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
+    // ───────────────────────────── Actor State ─────────────────────────────
+
+    ImGui::Checkbox("Is Render", &m_pUIActor->m_bRender);
+
+    ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+
     // ───────────────────────────── Transform ─────────────────────────────
 
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Transform");
 
     SetTransform();
+
+    ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+
+    // ───────────────────────────── Color ─────────────────────────────
+
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Color");
+
+    SetColor();
 
     ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
@@ -123,6 +137,7 @@ void UIEditorUI::DrawUI()
     m_vPrefabNameList.clear();
     m_vTextureList.clear();
     m_vTextureNameList.clear();
+    m_vUIList.clear();
 }
 
 void UIEditorUI::DrawVec3(const char* label, float* values)
@@ -183,6 +198,42 @@ void UIEditorUI::UpdateUIActor()
     m_pUIActor->SetSliceData(Vec4(m_vSliceUV[0], m_vSliceUV[1], m_vSliceUV[2], m_vSliceUV[3]));
 
     m_pUIActor->SetPrefabData(m_CurrentPrefab);
+}
+
+void UIEditorUI::UpdateUIActorList()
+{
+    m_vUIList = UI->GetUIList();
+
+    ImGui::SetNextWindowPos(ImVec2(10.0f, ImGui::GetIO().DisplaySize.y - 760.0f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_Always);
+
+    bool isOpen = true;
+
+    ImGui::Begin("UIActor List", &isOpen, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+    for (auto& pUI : m_vUIList)
+    {
+        UINT id = pUI->m_Index;
+        auto actor = pUI;
+
+        std::wstring wName = actor->m_szName;
+        std::string name(wName.begin(), wName.end());
+
+        std::string label = "UIActor " + std::to_string(id);
+        if (!name.empty())
+            label += " - " + name;
+
+        if (ImGui::Selectable(label.c_str(), m_iSelectUIActor == id))
+        {
+            m_iSelectUIActor = id;
+            m_pUIActor = m_vUIList[m_iSelectUIActor];
+
+            m_CurrentPrefab = pUI->GetPrefabData();
+            ResolvePrefabData(m_CurrentPrefab);
+        }
+    }
+
+    ImGui::End();
 }
 
 void UIEditorUI::ResetData()
@@ -276,6 +327,35 @@ void UIEditorUI::SetTransform()
     }
 
     m_ptPrevMousePos = m_ptCurrentMousePos;
+}
+
+void UIEditorUI::SetColor()
+{
+    ImGui::SameLine(0, 25.f); ImGui::Text("%s", "R");
+    ImGui::SameLine(0, 50.f); ImGui::Text("%s", "G");
+    ImGui::SameLine(0, 50.f); ImGui::Text("%s", "B");
+    ImGui::SameLine(0, 50.f); ImGui::Text("%s", "A");
+
+    ImGui::PushID("Color");
+    ImGui::Indent(60.f);
+
+    const float inputWidth = 60.0f;
+    const float spacing = 20.f;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        ImGui::PushID(i);
+
+        ImGui::PushItemWidth(inputWidth);
+        ImGui::InputFloat("##Value", &m_vColor[i], 0.0f, 0.0f, "%.2f");
+        ImGui::PopItemWidth();
+
+        ImGui::PopID();
+        ImGui::SameLine(0, spacing);
+    }
+
+    ImGui::Unindent(60.f);
+    ImGui::PopID();
 }
 
 void UIEditorUI::SetSliceUV()
@@ -426,14 +506,16 @@ void UIEditorUI::SearchFile(const string& _directory, const string& _extension, 
 void UIEditorUI::SelectActor()
 {
     // UI를 순회하며 Select를 찾아 Main Actor 변경
-    for (auto pUI : UI->GetUIList())
+    for (auto& pUI : m_vUIList)
     {
         if (pUI->GetStateType() == UIStateType::ST_SELECT)
         {
             m_pUIActor = pUI;
-            m_CurrentPrefab = pUI->GetPrefabData();
 
+            m_CurrentPrefab = pUI->GetPrefabData();
             ResolvePrefabData(m_CurrentPrefab);
+
+            m_iSelectUIActor = pUI->m_Index;
             break;
         }
     }

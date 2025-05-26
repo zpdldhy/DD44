@@ -52,7 +52,7 @@ void AUIActor::CreateUISlice()
 
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
-	bd.ByteWidth = sizeof(UISliceData);
+	bd.ByteWidth = sizeof(UIData);
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 

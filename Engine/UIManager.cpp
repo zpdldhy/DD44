@@ -13,7 +13,8 @@ void UIManager::Tick()
         else
         {
             pUI->second->Tick();
-            m_vRenderUIList.emplace_back(pUI->second);
+            if (pUI->second->m_bRender != false)
+                m_vRenderUIList.emplace_back(pUI->second);
             pUI++;
         }
     }

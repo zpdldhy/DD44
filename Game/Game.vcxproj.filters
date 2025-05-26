@@ -136,7 +136,7 @@
     <FxCompile Include="..\Resources\Shader\Sword.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="..\Resources\Shader\UVSlice.hlsl">
+    <FxCompile Include="..\Resources\Shader\DefaultUI.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\SpriteUV.hlsl">

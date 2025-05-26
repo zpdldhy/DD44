@@ -14,9 +14,11 @@ public:
 
 private:
 	void UpdateUIActor();
+	void UpdateUIActorList();
 	void UpdatePrefabData();
 	void ResetData();
 	void SetTransform();
+	void SetColor();
 	void SetSliceUV();
 	void SetTexture();
 	void SavePrefab();
@@ -30,13 +32,17 @@ private:
 	void ResolvePrefabData(const PrefabUIData& data);
 
 private:
+	vector<shared_ptr<class AUIActor>> m_vUIList;
 	shared_ptr<class AUIActor> m_pUIActor = nullptr;
+	UINT m_iSelectUIActor = 0;
+
 	PrefabUIData m_CurrentPrefab;
 
 	TransformData m_Trans = { { 0.0f, 0.0f, 0.0f },
 								{ 0.0f, 0.0f, 0.0f },
 								{ 100.0f, 100.0f, 1.0f } };
 
+	float m_vColor[4] = { 0.f, 0.f, 0.f, 0.f };
 	float m_vSliceUV[4] = {0.5f, 0.5f, 0.5f, 0.5f};
 
 	int m_iIdleIndex = 0;
