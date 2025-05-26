@@ -51,9 +51,9 @@ private:
 	shared_ptr<StateBase>* m_pCurrentState = nullptr;
 	shared_ptr<StateBase> m_pPrevState;
 
-	weak_ptr<UMeshComponent> m_pSword;
-	weak_ptr<UMeshComponent> m_pBackSocket;
-	weak_ptr<UMeshComponent> m_pHandSocket;
+	shared_ptr<UMeshComponent> m_pSword;
+	shared_ptr<UMeshComponent> m_pBackSocket;
+	shared_ptr<UMeshComponent> m_pHandSocket;
 
 	Vec3 handSwordRot = Vec3(0.0f, 0.0f, DD_PI / 2);
 	Vec3 handSwordPos = Vec3(1.0f, 0.0f, 0.0f);
@@ -72,5 +72,5 @@ public:
 	void SetPrevState(const shared_ptr<StateBase>& _prevState) { m_pPrevState = _prevState; }
 	void SetCurrentState(shared_ptr<StateBase>* _currentState) { m_pCurrentState = _currentState; }
 	// sword, hand, back ¼ø¼­
-	void SetComponent(weak_ptr<UMeshComponent> _sword, weak_ptr<UMeshComponent> _hand, weak_ptr<UMeshComponent> _back);
+	void SetComponent(shared_ptr<UMeshComponent> _sword, shared_ptr<UMeshComponent> _hand, shared_ptr<UMeshComponent> _back);
 };

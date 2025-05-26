@@ -36,11 +36,12 @@ public:
 	*
 	* 1. 시작 시 Asset 폴더의 .asset 파일 일괄 로딩 ( LoadAllAsset)
 	* 2. MeshLoader로 MeshMap / AnimMap 전달 ( LoadMeshMap, LoadAnimMap )
-	* @return /void ActorLoader 내부에서 정보 가지고 있음
+	* @return /void ActorLoader 내부에서	정보 가지고 있음
 	*/
 	void LoadAllAsset();
 	map<wstring, shared_ptr<UMeshResources>> LoadMeshMap();
 	map < wstring, shared_ptr<UAnimInstance>> LoadAnimMap();
+	shared_ptr<UMeshResources> LoadOneRes(string _path);
 
 	////////////////////// WILL BE DEPRECATED ////////////////////////////////
 	void LoadOne(string _path);
@@ -51,7 +52,6 @@ public:
 	*
 	*/
 	vector<shared_ptr<UMeshResources>> LoadMeshResources();
-	shared_ptr<UMeshResources> LoadOneRes(string _path);
 	vector<MeshComponentData> LoadMeshData();
 	vector<shared_ptr<UMeshComponent>> LoadMesh();
 	vector<wstring> LoadTexPath();

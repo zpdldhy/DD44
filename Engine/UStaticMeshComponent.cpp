@@ -22,28 +22,12 @@ void UStaticMeshComponent::Tick()
 		auto mat = m_pAnim->GetBoneAnim(m_targetBoneIndex);
 		m_matAnim = m_matBone * mat;
 	}
-	if (m_pMeshTrans)
-	{
-		if (!m_pMeshTrans->HasParent())
-		{
-			m_pMeshTrans->SetWorldPosition(GetOwner()->GetPosition());
-			m_pMeshTrans->SetWorldRotation(GetOwner()->GetRotation());
-		}
-		m_pMeshTrans->UpdateMatrix();
+	USceneComponent::Tick();
 
-		m_matWorld = m_pMeshTrans->GetWorldMat();
-		m_pMeshTrans->SetAnimMat(m_matAnim);
-	}
-	else
-	{
-		USceneComponent::Tick();
-	}
 	for (auto& child : m_vChild)
 	{
 		child->Tick();
 	}
-
-
 }
 
 void UStaticMeshComponent::PreRender()

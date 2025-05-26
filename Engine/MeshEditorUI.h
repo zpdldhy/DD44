@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 
+class UMeshComponent;
 class UMeshResources;
 class UAnimInstance;
 class APawn;
@@ -9,8 +10,11 @@ struct PreMeshData
 {
     // Base
     bool bRoot;
+    bool bVisible;
     bool bSkeletal;
     wstring meshName;
+    wstring compName;
+    wstring parentCompName;
     // Mat
     int texIndex;
     string texPath;
@@ -39,7 +43,7 @@ public:
     {
         m_OnCreateActor = std::move(callback);
     }
-    void CreateChildMeshCallback(function<void(PreMeshData, shared_ptr<APawn>&)> callback)
+    void CreateChildMeshCallback(function<void(PreMeshData)> callback)
     {
         m_OnCreateChild = std::move(callback);
     }
@@ -67,14 +71,24 @@ public:
     {
         m_OnParentBoneChange = std::move(callback);
     }
-
+    void ChangeVisible(std::function<void(int, bool)> callback)
+    {
+        m_OnChangeMeshVisible = std::move(callback);
+    }
     // 저장
     void SaveMesh(std::function<void(int, bool, string)> callback)
     {
         m_OnMeshSave = std::move(callback);
     }
+
 public:
     void DrawMatUI();
+    void DrawMeshHierarchy();
+    void DrawMeshRecursive(shared_ptr<UMeshComponent> _child);
+    
+    void DrawAddChild();
+    void DrawModifyMesh();
+
 public:
     void SetMeshList(map<wstring, shared_ptr<UMeshResources>> _meshList);
     void SetAnimList(vector<shared_ptr<UAnimInstance>> _animList);
@@ -98,6 +112,7 @@ private:
     vector<const char*> m_vTexPtrList;
     char texPath[250];
     char shaderPath[250];
+    char compName[250];
     Vec3 m_specular;
     float m_shininess;
 
@@ -112,7 +127,6 @@ private:
     int m_parentBoneIndex = -1;
     int m_rootBoneIndex = -1;
 
-    bool m_childMeshSelected = false;
     bool m_modifyChild = false;
     bool m_inverseMatBone = false;
     bool m_moveChildMesh = false;
@@ -125,26 +139,29 @@ private:
     int m_currentAnim;
     bool m_bActorSet;
 
-
     /// <summary>
     /// flag 정리
     /// </summary>
     bool m_bRootCreated;
     bool m_bSkinnedRoot;
     char m_meshSaveName[250];
+    bool m_bVisible = true;
+    bool m_bAnimatedStatic = false;
 
 
     shared_ptr<APawn> m_pActor;
+    string m_selectedMeshName;
+    string m_rootMeshName;
 
-    //function<void(wstring, int, int, int, shared_ptr<APawn>&, wstring)> m_OnCreateActor;
     function<void(PreMeshData, shared_ptr<APawn>&)> m_OnCreateActor;
-    function<void(PreMeshData, shared_ptr<APawn>&)> m_OnCreateChild;
+    function<void(PreMeshData)> m_OnCreateChild;
     function<void(int, Vec3)> m_OnMoveChild;
     function<void(int, Vec3)> m_OnScaleChild;
     function<void(bool)> m_OnAnimStop;
     function<void(int)> m_OnAnimChange;
     function<void(int, string, bool )> m_OnParentBoneChange;
     function<void(int, bool, string)> m_OnMeshSave;
+    function<void(int, bool)> m_OnChangeMeshVisible;
 
 };
 

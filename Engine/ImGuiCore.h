@@ -57,7 +57,7 @@ public:
 	{
 		m_pMeshEditorUI->CreateActorCallback(std::move(callback));
 	}
-	void SetChildMeshEditorCallback(std::function<void(PreMeshData, shared_ptr<APawn>&)> callback)
+	void SetChildMeshEditorCallback(std::function<void(PreMeshData)> callback)
 	{
 		m_pMeshEditorUI->CreateChildMeshCallback(std::move(callback));
 	}

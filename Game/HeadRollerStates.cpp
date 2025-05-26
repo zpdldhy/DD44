@@ -123,8 +123,8 @@ void Enemy1RollState::Tick()
 	if (!animInstance->m_bOnPlayOnce)
 	{
 		// Roll_loop ½ÃÀÛ
-		*m_pCurrentState = m_pRollState;
-		m_pRollState->Enter();
+		//*m_pCurrentState = m_pRollState;
+		//m_pRollState->Enter();
 		End();
 	}
 }

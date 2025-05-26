@@ -17,15 +17,6 @@ void PlayerMoveScript::Init()
 
 	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetLocalPosition();
 	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-}
-
-	//auto shape = make_shared<UBoxComponent>();
-	//shape->SetLocalScale({ 1.f, 2.0f, 1.f });
-	//shape->SetLocalRotation({ 0.0f, 0.0f, 0.0f });
-	//shape->SetLocalPosition({ 0.0f, 1.0f, 0.0f });
-	//shape->SetOwner(GetOwner());
-	//shape->Init();
-	//GetOwner()->SetShapeComponent(shape);
 
 #pragma region crow_final6 Socket
 	{
@@ -58,9 +49,9 @@ void PlayerMoveScript::Init()
 
 #pragma region TestYR Socket
 	{
-		sword = GetOwner()->GetMeshComponent()->GetChildByName(L"Sword");
-		handSocket = GetOwner()->GetMeshComponent()->GetChildByName(L"HandSocket");
-		backSocket = GetOwner()->GetMeshComponent()->GetChildByName(L"BackSocket");
+		sword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword");
+		handSocket = GetOwner()->GetMeshComponent()->GetMeshByName(L"LeftHandSocket");
+		backSocket = GetOwner()->GetMeshComponent()->GetMeshByName(L"BackSocket");
 	}
 #pragma endregion
 
@@ -68,7 +59,7 @@ void PlayerMoveScript::Init()
 	idle = make_shared<PlayerIdleState>(m_pOwner);
 	walk = make_shared<PlayerWalkState>(m_pOwner);
 	attack = make_shared<PlayerAttackState>(m_pOwner);
-	dynamic_pointer_cast<PlayerAttackState>(attack)->SetComponent(sword, handSocket, backSocket);
+	dynamic_pointer_cast<PlayerAttackState>(attack)->SetComponent(sword.lock(), handSocket.lock(), backSocket.lock());
 
 	currentState = idle;
 	currentState->Enter();

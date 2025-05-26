@@ -17,6 +17,7 @@
 #include "MeshTransform.h"
 #include "Input.h"
 #include "AnimTrack.h"
+#include "AAsset.h"
 
 void TestYR::Init()
 {
@@ -68,178 +69,226 @@ void TestYR::Init()
 	meshLoader->SetMesh(ACTORLOADER->LoadMeshMap());
 	meshLoader->SetAnim(ACTORLOADER->LoadAnimMap());
 #pragma endregion
-#pragma region PLAYER
-	// 플레이어 세팅
-	shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
-	player = make_shared<APawn>();
-	player->m_szName = L"Player";
-
-	// 임시 texture 2 가지
+#pragma region PLAYER 
+	//	// 플레이어 세팅
+	//	shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
+	//	player = make_shared<APawn>();
+	//	player->m_szName = L"Player";
+	//
+		// 임시 texture 2 가지
 	shared_ptr<UMaterial> kMat = make_shared<UMaterial>();
 	kMat->Load(L"../Resources/Texture/crow_DIFF.png", L"../Resources/Shader/skinningShader.hlsl");
 	kMat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
 
 	shared_ptr<UMaterial> tMat = make_shared<UMaterial>();
 	tMat->Load(L"../Resources/Texture/red.png", L"../Resources/Shader/Default.hlsl");
-
-	shared_ptr<UMaterial> tCrowMat = make_shared<UMaterial>();
-	tCrowMat->Load(L"../Resources/Texture/crow_DIFF.png", L"../Resources/Shader/Default.hlsl");
-#pragma region Body
-
-	auto bodyRes = meshLoader->GetMeshRes(L"crow_finalbody");
-	shared_ptr<USkinnedMeshComponent> bodyComp = make_shared<USkinnedMeshComponent>();
-	bodyComp->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(bodyRes));
-	bodyComp->SetName(L"Body");
-
-	// ANIM
-	auto animInstance = meshLoader->GetAnimInstance(L"crow_final");
-	bodyComp->SetBaseAnim(animInstance);
-	auto bodyAT = make_shared<AnimTrack>();
-	bodyAT->SetBase(animInstance);
-	bodyComp->SetMeshAnim(bodyAT);
-
-	// MATERIAL
-	bodyComp->SetMaterial(kMat);
-
-	// TRANSFORM
-	auto bodyT = make_shared<MeshTransform>();
-	bodyComp->SetMeshTransform(bodyT);
-
-	player->SetMeshComponent(bodyComp);
-
-#pragma endregion
-#pragma region BackSocket
-	backSocketComp = UStaticMeshComponent::CreateCube();
-	backSocketComp->SetName(L"BackSocket");
-
-	// ANIM
-	// 없이 우선 가
-	backSocketComp->SetAnimInstance(animInstance);
-	backSocketComp->SetTargetBoneIndex(53);
-
-	// MATERIAL
-	backSocketComp->SetMaterial(tMat);
-
-	// TRANSFORM
-	shared_ptr<MeshTransform> backSocketT = make_shared<MeshTransform>();
-	backSocketComp->SetMeshTransform(backSocketT);
-	backSocketComp->GetMeshTransform()->SetLocalPosition(Vec3(-0.5f, -0.5f, -0.0f));
-	//socketComp->GetMeshTransform()->SetLocalScale(Vec3(0.1f, 0.1f, 0.1f));
-	backSocketComp->SetVisible(false);
-	bodyComp->AddChild(backSocketComp);
-
-#pragma endregion
-#pragma region HandSocket
-	handSocketComp = UStaticMeshComponent::CreateCube();
-	handSocketComp->SetName(L"HandSocket");
-
-	// ANIM
-	// 없이 우선 가
-	handSocketComp->SetAnimInstance(animInstance);
-	handSocketComp->SetTargetBoneIndex(43);
-
-	// MATERIAL
-	handSocketComp->SetMaterial(tMat);
-
-	// TRANSFORM
-	shared_ptr<MeshTransform> handSocketT = make_shared<MeshTransform>();
-	handSocketComp->SetMeshTransform(handSocketT);
-	handSocketComp->GetMeshTransform()->SetLocalPosition(Vec3(-0.1f, 0.0f, 0.0f));
-	//handSocketComp->GetMeshTransform()->SetLocalScale(Vec3(0.1f, 0.1f, 0.1f));
-	handSocketComp->SetVisible(false);
-	bodyComp->AddChild(handSocketComp);
-
-#pragma endregion
-#pragma region Sword
-	swordComp = make_shared<UStaticMeshComponent>();
-	auto swordRes = meshLoader->GetMeshRes(L"SworddetailSword_weaponTexture1_0");
-	swordComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(swordRes));
-	swordComp->SetName(L"Sword");
-
-	// ANIM
-	// socket의 anim 따라감.
-
-	// MATERIAL
-	swordComp->SetMaterial(tMat);
-
-	// TRANSFORM
-	shared_ptr<MeshTransform> swordT = make_shared<MeshTransform>();
-	swordComp->SetMeshTransform(swordT);
-
-	swordT->SetLocalScale(Vec3(120.0f, 120.0f, 120.0f));
-
-	backSwordRot = Vec3(0.0f, 0.3f, -DD_PI / 2);
-	backSwordPos = Vec3(-0.5f, 0.0f, 0.0f);
-	swordT->SetLocalRotation(backSwordRot);
-	swordT->SetLocalPosition(backSwordPos);
-	backSocketComp->AddChild(swordComp);
-
-	handSwordRot = Vec3(0.0f, 0.0f, DD_PI / 2);
-	handSwordPos = Vec3(1.0f, 0.0f, 0.0f);
-	//swordT->SetLocalRotation(handSwordRot);
-	//swordT->SetLocalPosition(handSwordPos);
-
-
-	//handSocketComp->AddChild(swordComp);
-
-	currentSwordParent = backSocketComp;
-
-#pragma endregion
-#pragma region WallTest
-	//auto wallComp1 = make_shared<UStaticMeshComponent>();
-	//auto wallComp2 = make_shared<UStaticMeshComponent>();
-	//auto wallComp3 = make_shared<UStaticMeshComponent>();
-
-	//auto wallRes = meshLoader->GetMeshRes(L"stone_wallStoneWallVer2_0");
-	//wallComp1->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(wallRes));
-	//wallComp2->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(wallRes));
-	//wallComp3->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(wallRes));
-
-	//wallComp1->SetName(L"Wall1");
-	//wallComp2->SetName(L"Wall2");
-	//wallComp3->SetName(L"Wall3");
-
-	//// ANIM
-	//// socket의 anim 따라감.
-
-	//// MATERIAL
-	//wallComp1->SetMaterial(tMat);
-	//wallComp2->SetMaterial(tMat);
-	//wallComp3->SetMaterial(tMat);
-
-	//// TRANSFORM
-	//shared_ptr<MeshTransform> wall1T = make_shared<MeshTransform>();
-	//shared_ptr<MeshTransform> wall2T = make_shared<MeshTransform>();
-	//shared_ptr<MeshTransform> wall3T = make_shared<MeshTransform>();
-	//wallComp1->SetMeshTransform(wall1T);
-	//wallComp2->SetMeshTransform(wall2T);
-	//wallComp3->SetMeshTransform(wall3T);
-
-	//wall2T->SetLocalPosition(Vec3(0.0f, 5.0f, 0.0f));
-	//wall3T->SetLocalPosition(Vec3(0.0f, 10.0f, 0.0f));
 	//
-	//socketComp->AddChild(wallComp1);
-	//socketComp->AddChild(wallComp2);
-	//socketComp->AddChild(wallComp3);
+	//	shared_ptr<UMaterial> tCrowMat = make_shared<UMaterial>();
+	//	tCrowMat->Load(L"../Resources/Texture/crow_DIFF.png", L"../Resources/Shader/Default.hlsl");
+	//#pragma region Body
+	//
+	//	auto bodyRes = meshLoader->GetMeshRes(L"crow_finalbody");
+	//	shared_ptr<USkinnedMeshComponent> bodyComp = make_shared<USkinnedMeshComponent>();
+	//	bodyComp->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(bodyRes));
+	//	bodyComp->SetName(L"Body");
+	//
+	//	// ANIM
+	//	auto animInstance = meshLoader->GetAnimInstance(L"crow_final");
+	//	bodyComp->SetBaseAnim(animInstance);
+	//	auto bodyAT = make_shared<AnimTrack>();
+	//	bodyAT->SetBase(animInstance);
+	//	bodyComp->SetMeshAnim(bodyAT);
+	//
+	//	// MATERIAL
+	//	bodyComp->SetMaterial(kMat);
+	//
+	//	player->SetMeshComponent(bodyComp);
+	//
+	//#pragma endregion
+	//#pragma region BackSocket
+	//	auto socketRes = meshLoader->GetMeshRes(L"gizmoCenter");
+	//	shared_ptr<UStaticMeshComponent>  backSocketComp = make_shared<UStaticMeshComponent>();
+	//	backSocketComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(socketRes));
+	//	backSocketComp->SetName(L"BackSocket");
+	//
+	//	// ANIM
+	//	backSocketComp->SetAnimInstance(animInstance);
+	//	backSocketComp->SetTargetBoneIndex(53);
+	//
+	//	// MATERIAL
+	//	backSocketComp->SetMaterial(tMat);
+	//
+	//	// TRANSFORM
+	//	backSocketComp->SetLocalPosition(Vec3(-0.5f, -0.5f, -0.0f));
+	//	//backSocketComp->SetLocalScale(Vec3(0.01f, 0.01f, 0.01f));
+	//
+	//	// PARENT-CHILD
+	//	bodyComp->AddChild(backSocketComp);
+	//	backSocketComp->SetParentTransform(dynamic_pointer_cast<USceneComponent>(bodyComp).get());
+	//	backSocketComp->SetVisible(false);
+	//#pragma endregion
+	//#pragma region HandSocket
+	//	shared_ptr<UStaticMeshComponent>  handSocketComp = make_shared<UStaticMeshComponent>();
+	//	handSocketComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(socketRes));
+	//	handSocketComp->SetName(L"HandSocket");
+	//
+	//	// ANIM
+	//	handSocketComp->SetAnimInstance(animInstance);
+	//	handSocketComp->SetTargetBoneIndex(43);
+	//
+	//	// MATERIAL
+	//	handSocketComp->SetMaterial(tMat);
+	//
+	//	// TRANSFORM
+	//	handSocketComp->SetLocalPosition(Vec3(-0.1f, 0.0f, 0.0f));
+	//	//handSocketComp->SetLocalScale(Vec3(0.01f, 0.01f, 0.01f));
+	//	// PARENT-CHILD
+	//	bodyComp->AddChild(handSocketComp);
+	//	handSocketComp->SetParentTransform(dynamic_pointer_cast<USceneComponent>(bodyComp).get());
+	//	handSocketComp->SetVisible(false);
+	//#pragma endregion
+	//#pragma region Sword
+	//	swordComp = make_shared<UStaticMeshComponent>();
+	//	auto swordRes = meshLoader->GetMeshRes(L"SworddetailSword_weaponTexture1_0");
+	//	swordComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(swordRes));
+	//	swordComp->SetName(L"Sword");
+	//
+	//	// ANIM
+	//	// socket의 anim 따라감.
+	//
+	//	// MATERIAL
+	//	swordComp->SetMaterial(tMat);
+	//
+	//	// TRANSFORM
+	//	swordComp->SetLocalScale(Vec3(120.0f, 120.0f, 120.0f));
+	//	//// BACK POS
+	//	backSwordRot = Vec3(0.0f, 0.3f, -DD_PI / 2);
+	//	backSwordPos = Vec3(-0.5f, 0.0f, 0.0f);
+	//	swordComp->SetLocalPosition(backSwordPos);
+	//	swordComp->SetLocalRotation(backSwordRot);
+	//
+	//	//// HAND POS
+	//	handSwordRot = Vec3(0.0f, 0.0f, DD_PI / 2);
+	//	handSwordPos = Vec3(1.0f, 0.0f, 0.0f);
+	//
+	//	// PARENT-CHILD
+	//	backSocketComp->AddChild(swordComp);
+	//	swordComp->SetParentTransform(dynamic_pointer_cast<USceneComponent>(backSocketComp).get());
+	//
+	//#pragma endregion
+	//	auto cameraComponent = make_shared<UCameraComponent>();
+	//	cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
+	//	player->SetCameraComponent(cameraComponent);
+	//	player->AddScript(movement);
+	//	OBJECT->AddActor(player);
+	//
+	//	AAsset::ExportJsonMesh(player, "player");
 
 #pragma endregion
-	auto cameraComponent = make_shared<UCameraComponent>();
-	cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
-	player->SetCameraComponent(cameraComponent);
-	player->AddScript(movement);
-	OBJECT->AddActor(player);
+	//AAsset::LoadJsonMesh("../Resources/Asset/player.mesh.json");
+
+#pragma region Load Player from Json
+	{
+		// 플레이어 세팅
+		shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
+		player = make_shared<APawn>();
+		auto meshComponent = meshLoader->Make("../Resources/Asset/crow_final.mesh.json");
+		player->SetMeshComponent(meshComponent);
+
+		//player->SetPosition(Vec3(10, 10, 10));
+
+#pragma region Sword
+		//swordComp = make_shared<UStaticMeshComponent>();
+		//auto swordRes = meshLoader->GetMeshRes(L"SworddetailSword_weaponTexture1_0");
+		//swordComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(swordRes));
+		//swordComp->SetName(L"Sword");
+		//auto backSocketComp = player->GetMeshComponent()->GetChildByName(L"BackSocket");
+		//// ANIM
+		//// socket의 anim 따라감.
+
+		//// MATERIAL
+		//swordComp->SetMaterial(tMat);
+
+		//// TRANSFORM
+		//swordComp->SetLocalScale(Vec3(120.0f, 120.0f, 120.0f));
+		////// BACK POS
+		//backSwordRot = Vec3(0.0f, 0.3f, -DD_PI / 2);
+		//backSwordPos = Vec3(-0.5f, 0.0f, 0.0f);
+		//swordComp->SetLocalPosition(backSwordPos);
+		//swordComp->SetLocalRotation(backSwordRot);
+
+		////// HAND POS
+		//handSwordRot = Vec3(0.0f, 0.0f, DD_PI / 2);
+		//handSwordPos = Vec3(1.0f, 0.0f, 0.0f);
+
+		//// PARENT-CHILD
+		//backSocketComp->AddChild(swordComp);
+		//swordComp->SetParentTransform(dynamic_pointer_cast<USceneComponent>(backSocketComp).get());
+
 #pragma endregion
 
+		auto cameraComponent = make_shared<UCameraComponent>();
+		cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
+		player->SetCameraComponent(cameraComponent);
+		//player->AddScript(movement);
+		OBJECT->AddActor(player);
 
+		//AAsset::ExportJsonMesh(player, "crow_final");
+
+	}
+#pragma endregion
 #pragma region HeadRoller
-	enemy1 = make_shared<APawn>();
-	auto meshComponent = meshLoader->Make("../Resources/Asset/E_HEADROLLER.mesh.json");
-	enemy1->SetMeshComponent(meshComponent);
-	enemy1->SetPosition(Vec3(5.0f, 0.0f, 0.0f));
-	OBJECT->AddActor(enemy1);
+	//enemy1 = make_shared<APawn>();
+	//auto meshComponent = meshLoader->Make("../Resources/Asset/E_HEADROLLER.mesh.json");
+	//enemy1->SetMeshComponent(meshComponent);
+	//enemy1->SetPosition(Vec3(5.0f, 0.0f, 0.0f));
+	//OBJECT->AddActor(enemy1);
 #pragma endregion
-
-
+#pragma region BAT
+//	// 플레이어 세팅
+//	player = make_shared<APawn>();
+//	player->m_szName = L"E_Bat";
+//
+//	// 임시 texture 2 가지
+//	shared_ptr<UMaterial> kMat = make_shared<UMaterial>();
+//	kMat->Load(L"../Resources/Texture/batTexture.png", L"../Resources/Shader/skinningShader.hlsl");
+//	kMat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
+//
+//	shared_ptr<UMaterial> tMat = make_shared<UMaterial>();
+//	tMat->Load(L"../Resources/Texture/batTexture.png", L"../Resources/Shader/Default.hlsl");
+//
+//	shared_ptr<UMaterial> tCrowMat = make_shared<UMaterial>();
+//	tCrowMat->Load(L"../Resources/Texture/crow_DIFF.png", L"../Resources/Shader/Default.hlsl");
+//#pragma region Body
+//
+//	auto bodyRes = meshLoader->GetMeshRes(L"_E_BAT_WhiteBat_White");
+//	shared_ptr<USkinnedMeshComponent> bodyComp = make_shared<USkinnedMeshComponent>();
+//	bodyComp->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(bodyRes));
+//	bodyComp->SetName(L"Body");
+//
+//	// ANIM
+//	auto animInstance = meshLoader->GetAnimInstance(L"_E_BAT_White");
+//	bodyComp->SetBaseAnim(animInstance);
+//	auto bodyAT = make_shared<AnimTrack>();
+//	bodyAT->SetBase(animInstance);
+//	bodyComp->SetMeshAnim(bodyAT);
+//	// root
+//		int rootBone = bodyComp->GetMesh()->GetBoneIndex(L"_ROOT");
+//		animInstance->CheckInPlace(true);
+//		animInstance->SetRootIndex(rootBone);
+//	// MATERIAL
+//	bodyComp->SetMaterial(kMat);
+//
+//	player->SetMeshComponent(bodyComp);
+//
+//#pragma endregion
+//	auto cameraComponent = make_shared<UCameraComponent>();
+//	cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
+//	player->SetCameraComponent(cameraComponent);
+//	OBJECT->AddActor(player);
+//
+//	AAsset::ExportJsonMesh(player, "E_BAT_White");
+#pragma endregion
 
 #pragma region CAMERA
 	// 카메라 세팅
@@ -275,12 +324,12 @@ void TestYR::Update()
 
 	if (INPUT->GetButton(C))
 	{
-		//auto anim = dynamic_pointer_cast<USkinnedMeshComponent>(enemy1->GetMeshComponent())->GetAnimInstance();
-		//if (++animIndex >= anim->GetAnimTrackList().size())
-		//{
-		//	animIndex = 0;
-		//}
-		//anim->SetCurrentAnimTrack(animIndex);
+		auto anim = dynamic_pointer_cast<USkinnedMeshComponent>(player->GetMeshComponent())->GetAnimInstance();
+		if (++animIndex >= anim->GetAnimTrackList().size())
+		{
+			animIndex = 0;
+		}
+		anim->SetCurrentAnimTrack(animIndex);
 	}
 
 	//if (INPUT->GetButton(LCLICK))
@@ -328,7 +377,7 @@ void TestYR::SetupEngineCamera()
 {
 	m_pCameraEngine = make_shared<ACameraActor>();
 
-	m_pCameraEngine->SetPosition({ 0.0f, 10.0f, 0.0f });
+	m_pCameraEngine->SetPosition({ 0.0f, 10.0f, -10.0f });
 	m_pCameraEngine->AddScript(make_shared<EngineCameraMoveScript>());
 	m_pCameraEngine->m_szName = L"EnginCamera";
 

@@ -78,16 +78,16 @@ void PlayerAttackState::Enter()
 	animInstance->PlayOnce(attackIndex);
 
 	// Sword 위치 설정
-	int index = m_pBackSocket.lock()->GetChildIndex(m_pSword.lock());
+	int index = m_pBackSocket->GetChildIndex(m_pSword);
 	if (index < 0)
 	{
 		assert(false);
 	}
-	m_pBackSocket.lock()->RemoveChild(index);
-	m_pHandSocket.lock()->AddChild(m_pSword.lock());
+	m_pBackSocket->RemoveChild(index);
+	m_pHandSocket->AddChild(m_pSword);
 
-	m_pSword.lock()->GetMeshTransform()->SetLocalPosition(handSwordPos);
-	m_pSword.lock()->GetMeshTransform()->SetLocalRotation(handSwordRot);
+	m_pSword->SetLocalPosition(handSwordPos);
+	m_pSword->SetLocalRotation(handSwordRot);
 
 }
 
@@ -109,23 +109,23 @@ void PlayerAttackState::End()
 	m_bOnPlaying = false;
 
 	// Sword 위치 설정
-	int index = m_pHandSocket.lock()->GetChildIndex(m_pSword.lock());
+	int index = m_pHandSocket->GetChildIndex(m_pSword);
 	if (index < 0)
 	{
 		assert(false);
 	}
-	m_pHandSocket.lock()->RemoveChild(index);
-	m_pBackSocket.lock()->AddChild(m_pSword.lock());
+	m_pHandSocket->RemoveChild(index);
+	m_pBackSocket->AddChild(m_pSword);
 
-	m_pSword.lock()->GetMeshTransform()->SetLocalPosition(backSwordPos);
-	m_pSword.lock()->GetMeshTransform()->SetLocalRotation(backSwordRot);
+	m_pSword->SetLocalPosition(backSwordPos);
+	m_pSword->SetLocalRotation(backSwordRot);
 
 	// 참조 관리
 	m_pCurrentState = nullptr;
 	m_pPrevState.reset();
 }
 
-void PlayerAttackState::SetComponent(weak_ptr<UMeshComponent> _sword, weak_ptr<UMeshComponent> _hand, weak_ptr<UMeshComponent> _back)
+void PlayerAttackState::SetComponent(shared_ptr<UMeshComponent> _sword, shared_ptr<UMeshComponent> _hand, shared_ptr<UMeshComponent> _back)
 {
 	m_pSword = _sword;
 	m_pHandSocket = _hand;

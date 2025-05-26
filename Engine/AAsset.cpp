@@ -373,121 +373,131 @@ void AAsset::ExportJsonMesh(shared_ptr<APawn> _actor, string fileName)
 
 	nlohmann::ordered_json j;
 	int i = 0;
-
+	string idx = to_string(i);
+	
 	// ROOT MESH
 	auto mesh = _actor->GetMeshComponent();
-	bool isSkinned = (dynamic_pointer_cast<USkinnedMeshComponent>(mesh) != nullptr);
-	if (isSkinned)
-	{
-		ExportSkinned(i++, j, mesh);
-	}
-	else
-	{
-		ExportStatic(i++, j, mesh);
-	}
+	ExportJsonMeshRecursive(idx, j, mesh);
 
-	int childCount = mesh->GetChildren().size();
-	j["childCount"] = childCount;
-	for (auto& child : mesh->GetChildren())
-	{
-		bool isSkinned = (dynamic_pointer_cast<USkinnedMeshComponent>(child) != nullptr);
-		if (isSkinned)
-		{
-			ExportSkinned(i++, j, child);
-		}
-		else
-		{
-			ExportStatic(i++, j, child);
-		}
-	}
-
+	
 	file << j.dump(4); // ¿¹»Ú°Ô Ãâ·Â
 }
 
-void AAsset::ExportSkinned(int num, nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh)
+void AAsset::ExportJsonMeshRecursive(string idx, nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh)
+{
+	// Export parameter
+	bool isSkinned = (dynamic_pointer_cast<USkinnedMeshComponent>(_mesh) != nullptr);
+	if (isSkinned)
+	{
+		ExportSkinned(idx, j, _mesh);
+	}
+	else
+	{
+		ExportStatic(idx, j, _mesh);
+	}
+
+	// Check child
+	int childCount = _mesh->GetChildren().size();
+	j["childCount" + idx] = childCount;
+	for (int iChild = 0; iChild < childCount; iChild++)
+	{
+		string childIdx = idx;
+		childIdx += to_string(iChild);
+		auto child = _mesh->GetChild(iChild);
+		ExportJsonMeshRecursive(childIdx, j, child);
+	}
+}
+
+void AAsset::ExportSkinned(string idx, nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh)
 {
 	auto mesh = dynamic_pointer_cast<USkinnedMeshComponent>(_mesh);
 
 	// BASE
-	j["Mesh" + to_string(num)];
 	int type = mesh->GetMesh()->GetType();
-	j["MeshType" + to_string(num)] = type;
+	j["MeshType" + idx] = type;
 	string resName = to_wm(mesh->GetMesh()->GetName());
-	j["MeshResName" + to_string(num)] = resName;
+	j["MeshResName" + idx] = resName;
+	string compName = to_wm(mesh->GetName());
+	j["CompName" + idx] = compName;
+	bool visible = mesh->GetVisible();
+	j["Visible" + idx] = visible;
 
 	// ANIM
 	bool bHasBaseAnim = mesh->GetAnimInstance() ? true : false;
-	j["HasBaseAnim" + to_string(num)] = bHasBaseAnim;
+	j["HasBaseAnim" + idx] = bHasBaseAnim;
 	
 	if (bHasBaseAnim)
 	{
 		auto animInstance = mesh->GetAnimInstance();
 		string animName = to_wm(animInstance->GetName());
-		j["animName" + to_string(num)] = animName;
+		j["animName" + idx] = animName;
 		bool bInPlace = animInstance->m_bInPlace;
 		int rootIndex = animInstance->GetRootIndex();
-		j["bInPlace" + to_string(num)] = bInPlace;
-		j["rootIndex" + to_string(num)] = rootIndex;
+		j["bInPlace" + idx] = bInPlace;
+		j["rootIndex" + idx] = rootIndex;
 	}
 
 	// MATERIAL
 	string texPath = to_wm(mesh->GetMaterial()->GetTexture()->m_pFilePath);
-	j["texPath" + to_string(num)] = texPath;
+	j["texPath" + idx] = texPath;
 
 	string shaderPath = to_wm(mesh->GetMaterial()->GetShaderPath());
-	j["shaderPath" + to_string(num)] = shaderPath;
+	j["shaderPath" + idx] = shaderPath;
 
 	// SRT
 	Vec3 pos = mesh->GetLocalPosition();
 	Vec3 rot = mesh->GetLocalRotation();
 	Vec3 scale = mesh->GetLocalScale();
 
-	j["Scale" + to_string(num)] = { scale.x, scale.y, scale.z };
-	j["Rotation" + to_string(num)] = { rot.x, rot.y, rot.z };
-	j["Translation" + to_string(num)] = { pos.x, pos.y, pos.z };
+	j["Scale" + idx] = { scale.x, scale.y, scale.z };
+	j["Rotation" + idx] = { rot.x, rot.y, rot.z };
+	j["Translation" + idx] = { pos.x, pos.y, pos.z };
 }
 
-void AAsset::ExportStatic(int num, nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh)
+void AAsset::ExportStatic(string idx, nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh)
 {
 	auto mesh = dynamic_pointer_cast<UStaticMeshComponent>(_mesh);
 
 	// BASE
 	int type = mesh->GetMesh()->GetType();
-	j["MeshType" + to_string(num)] = type;
-
+	j["MeshType" + idx] = type;
 	string resName = to_wm(mesh->GetMesh()->GetName());
-	j["MeshResName" + to_string(num)] = resName;
+	j["MeshResName" + idx] = resName;
+	string compName = to_wm(mesh->GetName());
+	j["CompName" + idx] = compName;
+	bool visible = mesh->GetVisible();
+	j["Visible" + idx] = visible;
 
 	// ANIM
 	bool bHasBaseAnim = mesh->GetAnimInstance() ? true : false;
-	j["HasBaseAnim" + to_string(num)] = bHasBaseAnim;
+	j["HasBaseAnim" + idx] = bHasBaseAnim;
 
 	if (bHasBaseAnim)
 	{
 		auto animInstance = mesh->GetAnimInstance();
 		string animName = to_wm(animInstance->GetName());
-		j["animName" + to_string(num)] = animName;
+		j["animName" + idx] = animName;
 		int targetBone = mesh->GetTargetBoneIndex();
-		j["targetBone" + to_string(num)] = targetBone;
+		j["targetBone" + idx] = targetBone;
 		Matrix matBone = mesh->GetMatBone();
-		j["matBone" + to_string(num)] = MatrixToJson(matBone);
+		j["matBone" + idx] = MatrixToJson(matBone);
 	}
 
 	// MATERAIL
 	string texPath = to_wm(mesh->GetMaterial()->GetTexture()->m_pFilePath);
-	j["texPath" + to_string(num)] = texPath;
+	j["texPath" + idx] = texPath;
 	
 	string shaderPath = to_wm(mesh->GetMaterial()->GetShaderPath());
-	j["shaderPath" + to_string(num)] = shaderPath;
+	j["shaderPath" + idx] = shaderPath;
 
 	// SRT
 	Vec3 pos = mesh->GetLocalPosition();
 	Vec3 rot = mesh->GetLocalRotation();
 	Vec3 scale = mesh->GetLocalScale();
 
-	j["Scale" + to_string(num)] = { scale.x, scale.y, scale.z };
-	j["Rotation" + to_string(num)] = { rot.x, rot.y, rot.z };
-	j["Translation" + to_string(num)] = { pos.x, pos.y, pos.z };
+	j["Scale" + idx] = { scale.x, scale.y, scale.z };
+	j["Rotation" + idx] = { rot.x, rot.y, rot.z };
+	j["Translation" + idx] = { pos.x, pos.y, pos.z };
 
 }
 
@@ -501,52 +511,67 @@ MeshComponentData AAsset::LoadJsonMesh(const char* filepath)
 	file >> j;
 
 	int num = 0;
-	MeshComponentData root = LoadOneJsonMesh(num++, j);
-
-	int childCount = j["childCount"];
-
-	for (int i = 0; i < childCount; i++)
-	{
-		MeshComponentData child = LoadOneJsonMesh(num++, j);
-		root.m_vChild.emplace_back(child);
-	}
+	string idx = to_string(num);
+	MeshComponentData root = LoadOneJsonMeshRecursive(idx, j);
 
 	return root;
 }
 
-MeshComponentData AAsset::LoadOneJsonMesh(int num, const nlohmann::ordered_json& j)
+MeshComponentData AAsset::LoadOneJsonMeshRecursive(string idx, const nlohmann::ordered_json& j)
+{
+	// Load One
+	MeshComponentData parent = LoadOneJsonMesh(idx, j);
+
+	// Check Child
+
+	int childCount = j["childCount" + idx];
+
+	for (int i = 0; i < childCount; i++)
+	{
+		string childIdx = idx;
+		childIdx += to_string(i);
+
+		MeshComponentData child = LoadOneJsonMeshRecursive(childIdx, j);
+		parent.m_vChild.emplace_back(child);
+	}
+	return parent;
+}
+
+MeshComponentData AAsset::LoadOneJsonMesh(string idx, const nlohmann::ordered_json& j)
 {
 	MeshComponentData ret;
 
 	// BASE
-	ret.m_type = j["MeshType" + to_string(num)];
-	ret.m_szRes = to_mw(j["MeshResName" + to_string(num)]);
-	bool bHasBaseAnim = (j["HasBaseAnim" + to_string(num)]);
+	ret.m_type = j["MeshType" + idx];
+	ret.m_szRes = to_mw(j["MeshResName" + idx]);
+	bool bHasBaseAnim = (j["HasBaseAnim" + idx]);
+	ret.m_szComp = to_mw(j["CompName" + idx]);
+	ret.m_bVisible = (j["Visible" + idx]);
 
 	if (bHasBaseAnim)
 	{
 		if (ret.m_type == (int)MeshType::M_SKINNED)
 		{
-			ret.m_szAnim = to_mw(j["animName" + to_string(num)]);
-			ret.m_bInPlace = j["bInPlace" + to_string(num)];
-			ret.m_rootIndex = j["rootIndex" + to_string(num)];
+			ret.m_szAnim = to_mw(j["animName" + idx]);
+			ret.m_bInPlace = j["bInPlace" + idx];
+			ret.m_rootIndex = j["rootIndex" + idx];
 		}
 		else
 		{
-			ret.m_szAnim = to_mw(j["animName" + to_string(num)]);
-			ret.m_targetBone = j["targetBone" + to_string(num)];
-			ret.m_matBone = LoadMatrixFromJson(j["matBone" + to_string(num)]);
+			ret.m_szAnim = to_mw(j["animName" + idx]);
+			ret.m_targetBone = j["targetBone" + idx];
+			ret.m_matBone = LoadMatrixFromJson(j["matBone" + idx]);
 		}
 	}
 
 	// MATERIAL
-	ret.m_szTex = to_mw(j["texPath" + to_string(num)]);
-	ret.m_szShader = to_mw(j["shaderPath" + to_string(num)]);
+	ret.m_szTex = to_mw(j["texPath" + idx]);
+	ret.m_szShader = to_mw(j["shaderPath" + idx]);
 
 	// SRT
-	auto s = j["Scale" + to_string(num)];
-	auto r = j["Rotation" + to_string(num)];
-	auto t = j["Translation" + to_string(num)];
+	auto s = j["Scale" + idx];
+	auto r = j["Rotation" + idx];
+	auto t = j["Translation" + idx];
 	ret.m_scale = Vec3(s[0], s[1], s[2]);
 	ret.m_rot = Vec3(r[0], r[1], r[2]);
 	ret.m_pos = Vec3(t[0], t[1], t[2]);

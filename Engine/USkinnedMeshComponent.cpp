@@ -21,22 +21,7 @@ void USkinnedMeshComponent::Tick()
 {
 	if (m_pBaseAnim) m_pBaseAnim->Tick();
 
-	if (m_pMeshTrans)
-	{
-		if (!m_pMeshTrans->HasParent())
-		{
-			Vec3 pos = GetOwner()->GetPosition();
-			m_pMeshTrans->SetWorldPosition(pos);
-			Vec3 rot = GetOwner()->GetRotation();
-			m_pMeshTrans->SetWorldRotation(rot);
-		}
-		m_pMeshTrans->UpdateMatrix();
-		m_matWorld = m_pMeshTrans->GetWorldMat();
-	}
-	else
-	{
-		USceneComponent::Tick();
-	}
+	USceneComponent::Tick();
 
 	for (auto& child : m_vChild)
 	{

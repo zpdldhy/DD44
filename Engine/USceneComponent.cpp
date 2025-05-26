@@ -10,7 +10,8 @@ void USceneComponent::Init()
 	CreateConstantBuffer();
 
 	// Transform을 제외한 Component의 Parent 지정
-	if (GetOwner()->GetTransform() != this)
+	// 기존에 Set해준 parent 가 없는 경우에만 Actor로 Owner 설정
+	if (!m_pParentTransform && GetOwner()->GetTransform() != this)
 	{
 		m_pParentTransform = GetOwner()->GetTransform();
 	}

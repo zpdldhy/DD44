@@ -99,8 +99,8 @@ void TestPlayer::Init()
 	
 	{
 		socket = UStaticMeshComponent::CreateCube();
-		shared_ptr<MeshTransform> mt = make_shared<MeshTransform>();
-		socket->SetMeshTransform(mt);
+		//shared_ptr<MeshTransform> mt = make_shared<MeshTransform>();
+		//socket->SetMeshTransform(mt);
 		sword->AddChild(socket);
 		socket->SetOwner(player);
 		socket->Init();
@@ -111,7 +111,7 @@ void TestPlayer::Init()
 
 void TestPlayer::Update()
 {
-	socket->SetLocalPosition(sword->GetAnimWorld());
+	//socket->SetLocalPosition(sword->GetAnimWorld());
 
 	if (INPUT->GetButton(O))
 	{
