@@ -80,10 +80,10 @@ void TestSJ::Init()
 		m_pActor2->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
-		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
-		material2->SetUseStencil(true);
+		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");		
 		
 		m_pStaticMesh2->SetMaterial(material2);
+		m_pStaticMesh2->m_bUseBoneMatrix = true;
 		
 	}
 

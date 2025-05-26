@@ -3,22 +3,39 @@
 #include "AActor.h"
 #include "Device.h"
 
+enum class ViewType
+{
+	VT_LOOKAT,
+	VT_LOOKTO,
+};
+
 enum class ProjectionType
 {
 	PT_ORTHOGRAPHIC,
 	PT_PERSPECTIVE,
 };
 
+struct FrustumData
+{
+	Matrix matViewProjInvert;
+};
+
 class UCameraComponent : public USceneComponent
 {
+private:
+	FrustumData m_tFrustumData = { {Matrix::Identity } };
+	static ComPtr<ID3D11Buffer> m_pFrustumCB;
+
 protected:
 	ProjectionType m_ProjectionType = ProjectionType::PT_PERSPECTIVE;
+	ViewType	   m_ViewType = ViewType::VT_LOOKTO;
 
-	Matrix m_matView;
-	Matrix m_matProjection;
+	Matrix m_matView = Matrix::Identity;
+	Matrix m_matProjection = Matrix::Identity;
 
-	Vec3 m_vLook;
-	float m_vLength;
+	// View
+	Vec3 m_vLookAt = { 0.f, 0.f, 1.f };
+	Vec3 m_vLookTo = { 0.f, 0.f, 1.f };
 
 	// Projection
 	// - Orthographic
@@ -32,7 +49,7 @@ protected:
 	float m_fFar = 5000.0f;
 
 	// Frustum
-	shared_ptr<class AActor> m_pFrustumBox;
+	shared_ptr<class AActor> m_pFrustumBox = nullptr;
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
 	bool m_bVisibleFrustumBox = true;
 	
@@ -44,11 +61,16 @@ public:
 
 private:
 	void CreateFrustumBox();
+	void CreateFrustumBuffer();
 	void UpdateFrustumBox();
+	void UpdateFrustumBuffer();
 
 	void UpdateView();
-	void UpdateOrthographicProjection();
-	void UpdatePersPectiveProjection();
+	void UpdateProjection();
+
+public:
+	void SetLookAt(Vec3 _FocusPosition) { m_ViewType = ViewType::VT_LOOKAT; m_vLookAt = _FocusPosition; }
+	void SetLookTo(Vec3 _Direction) { m_ViewType = ViewType::VT_LOOKTO; m_vLookTo = _Direction; }
 
 public:
 	void SetOrthographic(float _fWidth, float _fHeight);
@@ -62,7 +84,7 @@ public:
 	Matrix GetView() { return m_matView; }
 	Matrix GetProjection() { return m_matProjection; }
 
-	Vec3 GetCameraLook() { return m_vLook; }
+	Vec3 GetCameraLook() { return m_vLookTo; }
 
 public:
 	UCameraComponent(ProjectionType _projectionType = ProjectionType::PT_PERSPECTIVE) : m_ProjectionType(_projectionType) {}

@@ -17,6 +17,8 @@
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
+#include "ShapeData.h"
+#include "CollisionManager.h"
 
 void TestYoooooon::Init()
 {
@@ -27,6 +29,7 @@ void TestYoooooon::Init()
 	SetupEditorCallbacks();
 
 	LoadAllPrefabs(".map.json");
+	//LoadAllPrefabs(".object.json");
 	LoadAllPrefabs(".objects.json");
 	LoadAllPrefabs(".character.json");
 	LoadAllPrefabs(".ui.json");
@@ -34,7 +37,7 @@ void TestYoooooon::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
-
+	CreateCollisionObject();
 }
 
 void TestYoooooon::Update()
@@ -53,6 +56,10 @@ void TestYoooooon::Update()
 		}
 	}
 
+	if (INPUT->GetButton(LCLICK))
+		ClickMouse();
+
+	CheckCollision();
 }
 
 void TestYoooooon::Render()
@@ -77,33 +84,33 @@ void TestYoooooon::SetupEngineCamera()
 
 void TestYoooooon::SetupSkybox()
 {
-	m_pSky = make_shared<ASky>();
-	m_pSky->m_szName = L"Sky";
-	m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
-	m_pSky->SetMeshComponent(m_pSkyMesh);
+	auto pSky = make_shared<ASky>();
+	pSky->m_szName = L"Sky";
+	auto pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
+	pSky->SetMeshComponent(pSkyMesh);
 
 	shared_ptr<UMaterial> material = make_shared<UMaterial>();
 	material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
-	m_pSkyMesh->SetMaterial(material);
+	pSkyMesh->SetMaterial(material);
 
-	OBJECT->AddActor(m_pSky);
+	OBJECT->AddActor(pSky);
 }
 
 void TestYoooooon::SetupSunLight()
 {
 	LIGHTMANAGER->Init();
 
-	m_pSunLight = make_shared<ALight>();
-	m_pSunLight->m_szName = L"SunLight";
-	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
-	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
-	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
-	m_pSunLight->SetPosition(Vec3(0, 100.0f, 0));
-	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-	OBJECT->AddActor(m_pSunLight);
+	auto pSunLight = make_shared<ALight>();
+	pSunLight->m_szName = L"SunLight";
+	pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
+	pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
+	pSunLight->SetPosition(Vec3(0, 100.0f, 0));
+	pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+	OBJECT->AddActor(pSunLight);
 
 	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pSunLight);
+	LIGHTMANAGER->RegisterLight(pSunLight);
 }
 
 void TestYoooooon::SetupEditorCallbacks()
@@ -403,7 +410,7 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 				auto obj = make_shared<APawn>();
 				obj->m_szName = L"Object";
 				obj->SetMeshComponent(meshComp);
-				obj->SetPosition(objData.Translation);
+				obj->SetPosition(objData.Position);
 				obj->SetRotation(objData.Rotation);
 				obj->SetScale(objData.Scale);
 
@@ -430,7 +437,7 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 					auto obj = make_shared<APawn>();
 					obj->m_szName = L"Object";
 					obj->SetMeshComponent(meshComp);
-					obj->SetPosition(objData.Translation);
+					obj->SetPosition(objData.Position);
 					obj->SetRotation(objData.Rotation);
 					obj->SetScale(objData.Scale);
 
@@ -472,4 +479,44 @@ void TestYoooooon::LoadAllPrefabs(const std::string& extension)
 		}
 
 	}
+}
+
+void TestYoooooon::CreateCollisionObject()
+{
+	m_pBox = make_shared<AActor>();
+
+	auto pCube = UStaticMeshComponent::CreateCube();
+	m_pBox->SetMeshComponent(pCube);
+
+	auto pMaterial = make_shared<UMaterial>();
+	pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+	pCube->SetMaterial(pMaterial);
+
+	auto boxCol = make_shared<UBoxComponent>();
+	boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	m_pBox->SetShapeComponent(boxCol);
+
+	m_pBox->SetScale(Vec3(5.f, 5.f, 5.f));
+	m_pBox->SetPosition(Vec3(15.f, 1.f, 10.f));
+
+	OBJECT->AddActor(m_pBox);
+}
+
+void TestYoooooon::ClickMouse()
+{
+	m_Cursor.Click();
+
+	auto boxCom = static_pointer_cast<UBoxComponent>(m_pPlayer->GetShapeComponent());
+
+	Vec3 vinter;
+
+	if (Collision::CheckOBBToRay(m_Cursor, boxCom->GetBounds(), vinter))
+	{
+		int a = 0;
+	}
+}
+
+void TestYoooooon::CheckCollision()
+{
+	COLLITION->CheckCollision(m_pPlayer, m_pBox);
 }

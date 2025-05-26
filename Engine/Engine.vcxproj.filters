@@ -123,9 +123,6 @@
     <ClInclude Include="UMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
-    <ClInclude Include="USceneComponent.h">
-      <Filter>Component\Mesh</Filter>
-    </ClInclude>
     <ClInclude Include="UMeshComponent.h">
       <Filter>Component\Mesh</Filter>
     </ClInclude>
@@ -345,6 +342,9 @@
     <ClInclude Include="UIState.h">
       <Filter>FSM</Filter>
     </ClInclude>
+    <ClInclude Include="USceneComponent.h">
+      <Filter>Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -379,9 +379,6 @@
     </ClCompile>
     <ClCompile Include="UMaterial.cpp">
       <Filter>Material</Filter>
-    </ClCompile>
-    <ClCompile Include="USceneComponent.cpp">
-      <Filter>Component\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="UMeshComponent.cpp">
       <Filter>Component\Mesh</Filter>
@@ -581,6 +578,9 @@
     </ClCompile>
     <ClCompile Include="UIState.cpp">
       <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="USceneComponent.cpp">
+      <Filter>Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

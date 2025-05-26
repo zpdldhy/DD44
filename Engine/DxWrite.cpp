@@ -38,9 +38,19 @@ HRESULT DxWrite::Create()
 
 	if (FAILED(hr))
 	{
-		DX_CHECK(hr, _T(__FUNCTION__));
-		return hr;
+		if (IsRenderDocPresent())
+		{
+			OutputDebugString(L"[Warning] RenderDoc 실행 중: D2D RenderTarget 생성 실패 무시.\n");
+			m_pd2dRT.Reset(); // 사용하지 않도록 무효화
+			return S_OK;       // 실패하지 않도록 우회
+		}
+		else
+		{
+			DX_CHECK(hr, _T(__FUNCTION__));
+			return hr;
+		}
 	}
+
 	//브러쉬 설정.
 	m_pd2dRT->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_pColorBrush.GetAddressOf());
 
@@ -151,6 +161,13 @@ void DxWrite::SetAlignment(DWRITE_TEXT_ALIGNMENT _textAlign, DWRITE_PARAGRAPH_AL
 	}
 }
 
+bool DxWrite::IsRenderDocPresent()
+{
+	HMODULE hMod = GetModuleHandleW(L"renderdoc.dll");
+	m_bUseRenderDoc = true;
+	return (hMod != nullptr);
+}
+
 void DxWrite::DirectDraw(D2D1_RECT_F _layoutRect, std::wstring _msg)
 {
 	m_pd2dRT->BeginDraw();
@@ -161,13 +178,25 @@ void DxWrite::DirectDraw(D2D1_RECT_F _layoutRect, std::wstring _msg)
 	m_pd2dRT->EndDraw();
 }
 
+void DxWrite::BeginDraw()
+{
+	if (!m_bUseRenderDoc)
+		m_pd2dRT->BeginDraw();
+}
+
 void DxWrite::Draw(D2D1_RECT_F _layoutRect, std::wstring _msg)
 {
-	if (m_pd2dRT)
+	if (m_pd2dRT&&!m_bUseRenderDoc)
 	{
 		//m_pColorBrush->SetColor(Color);
 		m_pd2dRT->DrawText(_msg.c_str(), static_cast<UINT32>(_msg.size()), m_pTextFormat.Get(), &_layoutRect, m_pColorBrush.Get());
 	}
+}
+
+void DxWrite::EndDraw()
+{
+	if(!m_bUseRenderDoc)
+		m_pd2dRT->EndDraw();
 }
 
 void DxWrite::DrawMultiline(D2D1_RECT_F _layoutRect, std::wstring _msg)

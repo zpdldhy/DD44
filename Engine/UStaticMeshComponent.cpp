@@ -16,12 +16,10 @@ void UStaticMeshComponent::Init()
 
 void UStaticMeshComponent::Tick()
 {
-	m_matParent = GetOwner()->GetWorld();
-
 	if (m_pAnim)
 	{
 		auto mat = m_pAnim->GetBoneAnim(m_targetBoneIndex);
-		m_matParent = m_matBone * mat * m_matParent;
+		m_matAnim = m_matBone * mat;
 	}
 
 	for (auto& child : m_vChild)
