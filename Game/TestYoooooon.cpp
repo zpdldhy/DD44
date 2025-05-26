@@ -37,7 +37,7 @@ void TestYoooooon::Init()
 	UI->AddUIList(PToA->LoadAllPrefabs(".uis.json"));
 
 	SetupEngineCamera();
-	//SetupSkybox();
+	SetupSkybox();
 	SetupSunLight();
 
 	CreateCollisionObject();
@@ -59,10 +59,10 @@ void TestYoooooon::Tick()
 		}
 	}
 
-	if (INPUT->GetButton(LCLICK))
-		ClickMouse();
+	//if (INPUT->GetButton(LCLICK))
+		//ClickMouse();
 
-	CheckCollision();
+	//CheckCollision();
 }
 
 void TestYoooooon::Render()
@@ -101,8 +101,6 @@ void TestYoooooon::SetupSkybox()
 
 void TestYoooooon::SetupSunLight()
 {
-	LIGHTMANAGER->Init();
-
 	auto pSunLight = make_shared<ALight>();
 	pSunLight->m_szName = L"SunLight";
 	pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });

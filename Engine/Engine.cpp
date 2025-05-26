@@ -143,13 +143,10 @@ void Engine::Release()
 
 void Engine::Run()
 {
-	_window.SetWindowClass(_hInstance);
-	_window.SetWindow();
+	_window.SetWindowClass(_hInstance);	
 	_window.SetWindowFullScreen();
-	Init();
 
-	Timer timer;
-	timer.Init();
+	Init();
 
 	while (_window.CheckRun())
 	{

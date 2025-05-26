@@ -4,6 +4,7 @@ class Window
 {
 	HINSTANCE m_hInstance;
 	HWND m_hWnd;
+	HWND m_hWndImGui;
 
 	float m_fWidth;
 	float m_fHeight;
@@ -16,6 +17,6 @@ public:
 	bool ProcessMessage();
 public:
 	bool CheckRun();
-	 
+	HWND GetImGuiWnd() const { return m_hWndImGui; }
 };
 
