@@ -18,10 +18,6 @@ public:
 
 	bool m_bEnginCamera = false;
 
-	// Asset loading
-	ActorLoader actorLoader;
-	MeshLoader meshLoader;
-
 	float time;
 
 public:
@@ -35,7 +31,6 @@ protected:
 	void SetupSkybox();
 	void SetupSunLight();
 
-	void LoadAllPrefabs(const std::string& extension);
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }
 };

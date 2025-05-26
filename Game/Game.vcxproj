@@ -150,6 +150,7 @@
     <ClInclude Include="Main.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayerMoveScript.h" />
+    <ClInclude Include="PrefabToActor.h" />
     <ClInclude Include="PlayerStates.h" />
     <ClInclude Include="Sample.h" />
     <ClInclude Include="TestPlayer.h" />
@@ -171,7 +172,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PlayerMoveScript.cpp" />
-    <ClCompile Include="PlayerStates.cpp" />
+    <ClCompile Include="PrefabToActor.cpp" />
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="TestPlayer.cpp" />
     <ClCompile Include="TestSJ.cpp" />
@@ -241,7 +242,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="..\Resources\Shader\UVSlice.hlsl">
+    <FxCompile Include="..\Resources\Shader\DefaultUI.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

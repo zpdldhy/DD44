@@ -66,6 +66,9 @@
     <ClInclude Include="TestYoooooon.h">
       <Filter>Test</Filter>
     </ClInclude>
+    <ClInclude Include="PrefabToActor.h">
+      <Filter>Prefab</Filter>
+    </ClInclude>
     <ClInclude Include="PlayerStates.h">
       <Filter>FSM</Filter>
     </ClInclude>
@@ -122,6 +125,9 @@
     <ClCompile Include="TestYoooooon.cpp">
       <Filter>Test</Filter>
     </ClCompile>
+    <ClCompile Include="PrefabToActor.cpp">
+      <Filter>Prefab</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
@@ -151,7 +157,7 @@
     <FxCompile Include="..\Resources\Shader\Sword.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="..\Resources\Shader\UVSlice.hlsl">
+    <FxCompile Include="..\Resources\Shader\DefaultUI.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\SpriteUV.hlsl">

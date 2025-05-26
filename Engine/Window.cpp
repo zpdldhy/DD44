@@ -74,6 +74,30 @@ bool Window::SetWindow(float _windowX, float _windowY)
     return true;
 }
 
+bool Window::SetWindowFullScreen()
+{
+    // 현재 모니터 정보 가져오기
+    RECT desktopRect;
+    GetWindowRect(GetDesktopWindow(), &desktopRect);  // 모니터 해상도 얻기
+
+    m_fWidth = desktopRect.right;
+    m_fHeight = desktopRect.bottom;
+    g_windowSize.x = m_fWidth;
+    g_windowSize.y = m_fHeight;
+
+    // 윈도우 스타일 변경: 타이틀바/테두리 제거
+    SetWindowLongPtr(m_hWnd, GWL_STYLE, WS_VISIBLE | WS_POPUP);
+
+    // 윈도우 위치 및 크기 조정: 모니터 전체
+    SetWindowPos(m_hWnd, HWND_TOP,
+        desktopRect.left, desktopRect.top,
+        desktopRect.right - desktopRect.left,
+        desktopRect.bottom - desktopRect.top,
+        SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+
+    return true;
+}
+
 bool Window::ProcessMessage()
 {
     MSG msg;
