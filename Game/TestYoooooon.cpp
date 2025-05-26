@@ -26,14 +26,14 @@ void TestYoooooon::Init()
 {
 	SetupEditorCallbacks();
 
-	OBJECT->AddActorList(PRA->LoadAllPrefabs(".map.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
 	//OBJECT->AddActorList(PRA->LoadAllPrefabs(".object.json"));
-	OBJECT->AddActorList(PRA->LoadAllPrefabs(".objects.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
 
-	auto vlist = PRA->LoadAllPrefabs(".character.json");
+	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	m_pPlayer = vlist[0];
 	OBJECT->AddActorList(vlist);
-	UI->AddUIList(PRA->LoadAllPrefabs(".ui.json"));
+	UI->AddUIList(PToA->LoadAllPrefabs(".ui.json"));
 
 	SetupEngineCamera();
 	SetupSkybox();

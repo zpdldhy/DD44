@@ -15,7 +15,7 @@
 
 int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCmdLine, int _nCmdShow)
 {
-    shared_ptr<IExecute> app = make_shared<Game>();
+    shared_ptr<IExecute> app = make_shared<Editor>();
 
     Engine game(_hInstance, app);
     game.Run();

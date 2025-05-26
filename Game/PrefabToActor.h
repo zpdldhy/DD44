@@ -1,7 +1,7 @@
 #pragma once
 #include "Singleton.h"
 
-#define PRA GET_SINGLE(PrefabToActor)
+#define PToA GET_SINGLE(PrefabToActor)
 
 class AActor;
 

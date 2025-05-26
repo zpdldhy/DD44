@@ -25,15 +25,15 @@ void Game::Init()
 	Profiler p("Init");
 	// Asset ·Îµù
 
-	OBJECT->AddActorList(PRA->LoadAllPrefabs(".map.json"));
-	//OBJECT->AddActorList(PRA->LoadAllPrefabs(".object.json"));
-	OBJECT->AddActorList(PRA->LoadAllPrefabs(".objects.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
+	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
 
-	auto vlist = PRA->LoadAllPrefabs(".character.json");
+	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	m_pPlayer = vlist[0];
 	OBJECT->AddActorList(vlist);
 
-	UI->AddUI(PRA->MakeUI("../Resources/Prefab/UI_Health_0.ui.json"));
+	UI->AddUI(PToA->MakeUI("../Resources/Prefab/UI_Health_0.ui.json"));
 
 	SetupEngineCamera();
 	SetupSkybox();
