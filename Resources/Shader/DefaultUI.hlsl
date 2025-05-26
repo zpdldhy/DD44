@@ -8,6 +8,7 @@ struct PS_OUT_UI
 cbuffer CB_UVSlice : register(b2)
 {
     float4 g_vUVSlice;
+    float4 g_Color;
 }
 
 VS_OUT VS(VS_IN input)
@@ -69,6 +70,7 @@ PS_OUT_UI PS(VS_OUT input)
     
     float4 texColor = g_txDiffuseA.Sample(sample, tiledUV);
     
+    texColor += g_Color;
     texColor.a *= input.c.a;
     psOut.c = texColor;
   

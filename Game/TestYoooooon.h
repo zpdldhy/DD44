@@ -13,10 +13,6 @@ public:
 
 	bool m_bEnginCamera = true;
 
-	// Asset loading
-	ActorLoader actorLoader;
-	MeshLoader meshLoader;
-
 public:
 	void Init() override;
 	void Update() override;
@@ -33,8 +29,6 @@ protected:
 	void SetupMapEditorCallback();
 	void SetupObjectEditorCallback();
 	void SetupUIEditorCallback();
-
-	void LoadAllPrefabs(const std::string& extension);
 
 	// Collision
 	void CreateCollisionObject();
