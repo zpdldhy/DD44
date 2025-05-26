@@ -18,7 +18,8 @@
 #include "PostProcessManager.h"
 #include "CollisionManager.h"
 #include "LightManager.h"
-
+#include "ParticleManager.h"
+#include "RenderStateManager.h"
 
 void Engine::Init()
 {
@@ -35,7 +36,7 @@ void Engine::Init()
 	// 기타 기능 객체 초기화 ( input, )
 	{
 		INPUT->Init();
-		//DXWRITE->Create();
+		DXWRITE->Create();
 
 		if (_app->m_type != SCENE_TYPE::GAME) { GUI->Init(); }
 	}
@@ -43,6 +44,7 @@ void Engine::Init()
 
 	// Manager 초기화
 	{
+		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
 	}
@@ -51,6 +53,7 @@ void Engine::Init()
 	POSTPROCESS->Init(8);
 	// 8개의 MRT DxState 초기화
 	STATE->Create();
+	//STATEMANAGER->InitState();
 }
 
 void Engine::Frame()
@@ -63,6 +66,7 @@ void Engine::Frame()
 		LIGHTMANAGER->UpdateLightCB();
 
 		UI->Tick();
+		PARTICLE->Tick();
 	}
 
 	GET_SINGLE(Device)->Frame();
@@ -81,10 +85,10 @@ void Engine::Frame()
 void Engine::Render()
 {
 	GET_SINGLE(Device)->PreRender();
-	//DXWRITE->m_pd2dRT->BeginDraw();
+	DXWRITE->BeginDraw();
 
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
-	//DXWRITE->Draw(rt, TIMER->m_szTime);
+	DXWRITE->Draw(rt, TIMER->m_szTime);
 
 	CAMERA->Render(CameraViewType::CVT_ACTOR);
 
@@ -93,10 +97,9 @@ void Engine::Render()
 	{
 		POSTPROCESS->PreRender();
 		OBJECT->Render();	// ObjectList Render
+		PARTICLE->Render();
 		POSTPROCESS->PostRender();
-
-
-
+		
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
 
@@ -104,28 +107,28 @@ void Engine::Render()
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
 		{
-			CAMERA->Render(CameraViewType::CVT_UI);
-
+			CAMERA->Render(CameraViewType::CVT_UI);		
 			POSTPROCESS->Present();
 		}
+
+		UI->Render();
 
 		DC->RSSetState(m_pCurrentRasterizer.Get());
 		m_pCurrentRasterizer.Reset();
 	}
 
-	UI->Render();
-
 	if (_app->m_type != SCENE_TYPE::GAME) {
 		GUI->Render(); // *Fix Location* after _app->Render() }
 	}
 
-	//DXWRITE->m_pd2dRT->EndDraw();
+	DXWRITE->EndDraw();
 	GET_SINGLE(Device)->PostRender();
 }
 
 void Engine::Release()
 {
-	UI->Destroy();
+	UI->Destroy();	
+	PARTICLE->Destroy();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 	{

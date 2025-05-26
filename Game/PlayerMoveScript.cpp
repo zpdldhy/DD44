@@ -12,8 +12,12 @@
 
 void PlayerMoveScript::Init()
 {
+	auto camera = GetOwner()->GetCameraComponent();
+	camera->SetLookAt(GetOwner()->GetPosition());
+
 	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetLocalPosition();
 	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+}
 
 	//auto shape = make_shared<UBoxComponent>();
 	//shape->SetLocalScale({ 1.f, 2.0f, 1.f });
@@ -159,6 +163,8 @@ void PlayerMoveScript::Tick()
 		ChangetState(idle);
 	}
 
+	auto camera = GetOwner()->GetCameraComponent();
+	camera->SetLookAt(GetOwner()->GetPosition());
 }
 
 void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
@@ -176,6 +182,7 @@ void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
 		dynamic_pointer_cast<PlayerAttackState>(_state)->SetPrevState(currentState);
 		dynamic_pointer_cast<PlayerAttackState>(_state)->SetCurrentState(&currentState);
 	}
+
 
 	currentState = _state;
 

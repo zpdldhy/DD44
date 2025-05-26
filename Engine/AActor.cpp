@@ -6,12 +6,14 @@
 
 AActor::AActor()
 {
-	m_pTransform = make_shared<USceneComponent>();
-	m_arrComponent[static_cast<size_t>(ComponentType::CT_TRANSFORM)] = m_pTransform;
+	m_pTransform = make_unique<USceneComponent>();
 }
 
 void AActor::Init()
 {
+	m_pTransform->SetOwner(shared_from_this());
+	m_pTransform->Init();
+
 	for (auto& component : m_arrComponent)
 	{
 		if (component)
@@ -25,11 +27,13 @@ void AActor::Init()
 	{
 		script->SetOwner(shared_from_this());
 		script->Init();
-	}
+	}	
 }
 
 void AActor::Tick()
 {
+	m_pTransform->Tick();
+
 	// Component
 	for (auto& component : m_arrComponent)
 	{
@@ -47,6 +51,8 @@ void AActor::Tick()
 
 void AActor::Render()
 {
+	m_pTransform->Render();
+
 	for (auto& component : m_arrComponent)
 	{
 		if (component)
@@ -63,6 +69,8 @@ void AActor::Render()
 
 void AActor::Destroy()
 {
+	m_pTransform->Destroy();
+
 	for (auto& component : m_arrComponent)
 	{
 		if (component)

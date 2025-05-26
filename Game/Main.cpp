@@ -11,6 +11,7 @@
 #include "TestSJ.h"
 #include "TestPlayer.h"
 #include "TestYR2.h"
+#include "TestYoooooon.h"
 
 int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCmdLine, int _nCmdShow)
 {

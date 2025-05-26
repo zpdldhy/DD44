@@ -10,9 +10,10 @@ ALight::ALight()
 
     // 슬롯에 등록
     SetLightComponent(m_pLightComponent);
-
-    // Transform도 이 LightComponent로 설정
-    m_pTransform = m_pLightComponent;
+    
+    // 윤석 - 머임 이거??
+    //// Transform도 이 LightComponent로 설정
+    //m_pTransform = m_pLightComponent.get();
 
     // 기본 조명 설정 예시 (원하면 제거 가능)
     m_pLightComponent->SetLightType(ELightType::Directional);

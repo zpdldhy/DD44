@@ -130,6 +130,25 @@ void DxState::CreateBlendStates()
 			DX_CHECK(hr, _T(__FUNCTION__));
 		}
 	}
+
+	// DuelSource ( µà¾ó¼Ò½º¿ë )
+	{
+		D3D11_BLEND_DESC desc = {};
+		desc.RenderTarget[0].BlendEnable = TRUE;
+		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].DestBlend = D3D11_BLEND_SRC1_COLOR;
+		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		HRESULT hr = DEVICE->CreateBlendState(&desc, &m_pDualSourceBlend);
+		if (FAILED(hr))
+		{
+			DX_CHECK(hr, _T(__FUNCTION__));
+		}
+	}
 }
 
 void DxState::CreateSamplerStates()

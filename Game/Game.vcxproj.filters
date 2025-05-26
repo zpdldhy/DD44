@@ -63,6 +63,9 @@
     <ClInclude Include="TestYR2.h">
       <Filter>Test</Filter>
     </ClInclude>
+    <ClInclude Include="TestYoooooon.h">
+      <Filter>Test</Filter>
+    </ClInclude>
     <ClInclude Include="PlayerStates.h">
       <Filter>FSM</Filter>
     </ClInclude>
@@ -116,14 +119,8 @@
     <ClCompile Include="TestYR2.cpp">
       <Filter>Test</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerStates.cpp">
-      <Filter>FSM</Filter>
-    </ClCompile>
-    <ClCompile Include="HeadRollerMove.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="HeadRollerStates.cpp">
-      <Filter>FSM</Filter>
+    <ClCompile Include="TestYoooooon.cpp">
+      <Filter>Test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +151,18 @@
     <FxCompile Include="..\Resources\Shader\Sword.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\Resources\Shader\UVSlice.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\SpriteUV.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\Slash.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\CameraFrustum.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources\Shader\Header.hlsli">
@@ -161,6 +170,9 @@
     </None>
     <None Include="..\Resources\Prefab\MyTile.map.json">
       <Filter>Prefab</Filter>
+    </None>
+    <None Include="..\Resources\Shader\MainHeader.hlsli">
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
 </Project>

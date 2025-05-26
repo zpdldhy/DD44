@@ -13,7 +13,9 @@ void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
 	m_pInputlayout = INPUTLAYOUT->Get();
     
     CreateEffectCB();
-    CreateRenderModeCB();
+    m_CB_SpriteUV = make_shared<ConstantBuffer<CB_SpriteUV>>();
+    m_CB_SpriteUV->Create(4); 
+    CreateSlashCB();
     
 }
 
@@ -37,18 +39,16 @@ void UMaterial::Bind()
         DC->IASetInputLayout(m_pInputlayout->m_pInputLayout.Get());
 	}
 
-	if (m_pEffectCB)
+	if (m_pEffectCB && m_bUseEffect)
 	{
         DC->VSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
         DC->PSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
 	}
 
-    if (m_pRenderModeBuffer)
+    if (m_CB_SpriteUV)
     {
-        DC->VSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
-        DC->PSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
+        m_CB_SpriteUV->Push();  // b4 register에 UV 범위 바인딩
     }
-
 }
 
 void UMaterial::CreateEffectCB()
@@ -67,24 +67,20 @@ void UMaterial::CreateEffectCB()
     assert(SUCCEEDED(hr) && "Failed to create Glow ConstantBuffer");
 }
 
-
-
-void UMaterial::CreateRenderModeCB()
+void UMaterial::CreateSlashCB()
 {
-    if (m_pRenderModeBuffer) return;
-
     D3D11_BUFFER_DESC desc = {};
-    desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.ByteWidth = sizeof(CB_RMB);
     desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    desc.ByteWidth = sizeof(CB_Slash);
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-    D3D11_SUBRESOURCE_DATA initData = {};
-    initData.pSysMem = &m_tRenderModeData;
-
-    HRESULT hr = DEVICE->CreateBuffer(&desc, &initData, m_pRenderModeBuffer.GetAddressOf());
-    assert(SUCCEEDED(hr) && "Failed to create RenderMode ConstantBuffer");
+    HRESULT hr = DEVICE->CreateBuffer(&desc, nullptr, m_pCB_Slash.GetAddressOf());
+    if (FAILED(hr))
+    {
+        int a = 0;
+    }
 }
-
 
 void UMaterial::SetGlowParams(float _glowPower, const Vec3 _glowColor)
 {
@@ -128,20 +124,6 @@ void UMaterial::SetSpecularParams(const Vec3& _coeff, float _shininess)
     UpdateEffectBuffer();
 }
 
-void UMaterial::SetCameraPos(const Vec3& _camPos)
-{
-    m_tEffectData.g_vCameraPos = _camPos;
-    UpdateEffectBuffer();
-}
-
-
-void UMaterial::SetRenderMode(ERenderMode _eMode)
-{
-    m_eRenderMode = _eMode;
-    m_tRenderModeData.iRenderMode = static_cast<int>(_eMode);
-    UpdateRenderModeBuffer();
-}
-
 void UMaterial::SetEmissiveParams(const Vec3& _color, float _power)
 {
     m_tEffectData.g_vEmissiveColor = _color;
@@ -157,14 +139,26 @@ void UMaterial::UpdateEffectBuffer()
     DC->UpdateSubresource(m_pEffectCB.Get(), 0, nullptr, &m_tEffectData, 0, 0);
 }
 
-
-void UMaterial::UpdateRenderModeBuffer()
+void UMaterial::SetUVRange(Vec2 start, Vec2 end)
 {
-    if (!m_pRenderModeBuffer)
-        CreateRenderModeCB();
-    else
-        DC->UpdateSubresource(m_pRenderModeBuffer.Get(), 0, nullptr, &m_tRenderModeData, 0, 0);
+    if (!m_CB_SpriteUV) return;
+
+    m_CB_SpriteUV->data.uvStart = start;
+    m_CB_SpriteUV->data.uvEnd = end;
+    m_CB_SpriteUV->Update();
+    m_CB_SpriteUV->Push();
 }
 
+void UMaterial::SetSlashProgress(float _progress)
+{
+    m_tSlashData.g_fProgress = _progress;
 
+    D3D11_MAPPED_SUBRESOURCE mapped = {};
+    DC->Map(m_pCB_Slash.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    memcpy(mapped.pData, &m_tSlashData, sizeof(CB_Slash));
+    DC->Unmap(m_pCB_Slash.Get(), 0);
 
+    // 바인딩도 여기서 바로 해도 됨
+    DC->VSSetConstantBuffers(10, 1, m_pCB_Slash.GetAddressOf());
+    DC->PSSetConstantBuffers(10, 1, m_pCB_Slash.GetAddressOf());
+}

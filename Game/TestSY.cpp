@@ -34,6 +34,7 @@
 #include "CollisionManager.h"
 #include "LightManager.h"
 #include "ALight.h"
+#include "EditorData.h"
 
 void TestSY::Init()
 {
@@ -304,7 +305,7 @@ void TestSY::Init()
 
 
 
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 SpecularColor, float shininess, Vec3 EmissiveColor, float Emissivepower, ShapeComponentData ShapeData)
 		{
 			ActorLoader al;
 			al.LoadOne(objPath);
@@ -455,7 +456,7 @@ void TestSY::SetClickPos()
 
 	shared_ptr<AActor> pActor = nullptr;
 
-	Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
+	//Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
 
 	if (pActor)
 		int i = 0;
@@ -506,9 +507,9 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
 				actor->m_szName = L"Character";
-				actor->SetPosition(Vec3(characterData.actor.Position));
-				actor->SetRotation(Vec3(characterData.actor.Rotation));
-				actor->SetScale(Vec3(characterData.actor.Scale));
+				actor->SetPosition(Vec3(characterData.transform.Position));
+				actor->SetRotation(Vec3(characterData.transform.Rotation));
+				actor->SetScale(Vec3(characterData.transform.Scale));
 				OBJECT->AddActor(actor);
 			}
 		}
@@ -519,7 +520,7 @@ void TestSY::LoadAllPrefabs(const std::string& extension)
 			{
 				auto actor = std::make_shared<AActor>(); // 필요에 따라 오브젝트 타입으로 변경
 				actor->m_szName = L"Object";
-				actor->SetPosition(objData.Translation);
+				actor->SetPosition(objData.Position);
 				actor->SetRotation(objData.Rotation);
 				actor->SetScale(objData.Scale);
 				OBJECT->AddActor(actor);

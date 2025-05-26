@@ -12,7 +12,7 @@ struct PrefabData
 
     Vec3 Scale;
     Vec3 Rotation;
-    Vec3 Translation;
+    Vec3 Position;
 };
 
 struct PrefabObjectData
@@ -25,13 +25,15 @@ struct PrefabObjectData
 
     Vec3 Scale;
     Vec3 Rotation;
-    Vec3 Translation;
+    Vec3 Position;
 
     Vec3 SpecularColor;
     float Shininess;
 
     Vec3 EmissiveColor;
     float EmissivePower;
+
+    ShapeComponentData ShapeData;
 };
 
 struct PrefabCharacterData
@@ -48,7 +50,7 @@ struct PrefabCharacterData
     int AnimIndex;
     float AnimSpeed;
 
-    ActorData actor;
+    TransformData transform;
 
     // Component
 	CameraComponentData camera;
@@ -61,6 +63,57 @@ struct PrefabCharacterData
     };
     std::vector<ChildMeshData> ChildMeshes;
 
+};
+
+struct PrefabUIData
+{
+    std::string Name;
+
+    TransformData transform;
+
+	float SliceUV[4];
+
+    std::string IdleTexturePath;
+    std::string HoverTexturePath;
+    std::string ActiveTexturePath;
+    std::string SelectedTexturePath;
+    std::string ShaderPath;
+
+    int ScriptType;
+};
+
+struct PrefabParticleData
+{
+    std::string Name;
+
+    std::string ShaderPath;
+    std::string TexturePath;
+
+    Vec3 Scale;
+    Vec3 Rotation;
+    Vec3 Translation;
+
+    TransformData actor;
+
+    int Divisions = 4;     // NxN
+    int Row = 0;
+    int Col = 0;
+
+    Vec2 UVStart = { 0.0f, 0.0f };
+    Vec2 UVEnd = { 1.0f, 1.0f };
+
+    float BillboardSizeX = 100.0f;
+    float BillboardSizeY = 100.0f;
+
+    float Duration = 1.0f;
+    bool bLoop = true;
+    bool bAutoDestroy = false;
+};
+
+struct PrefabParticleGroupData
+{
+    std::string GroupName; 
+    std::vector<PrefabParticleData> Particles;
 };
 
 struct ModifiedCellData

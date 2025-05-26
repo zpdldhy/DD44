@@ -80,10 +80,10 @@ void TestSJ::Init()
 		m_pActor2->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
-		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
-		material2->SetUseStencil(true);
+		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");		
 		
 		m_pStaticMesh2->SetMaterial(material2);
+		m_pStaticMesh2->m_bUseBoneMatrix = true;
 		
 	}
 
@@ -206,12 +206,12 @@ void TestSJ::Update()
 		m_pActor2->SetPosition(newPos);
 	}
 	//Rim Light
-	if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
+	/*if (m_pStaticMesh && m_pStaticMesh->GetMaterial())
 	{
 		Vec3 camPos = m_pCameraActor->GetCameraComponent()->GetWorldPosition();
 		m_pStaticMesh->GetMaterial()->SetCameraPos(camPos);
 		m_pStaticMesh2->GetMaterial()->SetCameraPos(camPos);
-	}
+	}*/
 	//Emissive
 	{
 		//m_pStaticMesh2->GetMaterial()->SetEmissiveParams(Vec3(0.0f, 1.0f, 0.0f), 0.1f);
@@ -525,7 +525,7 @@ void TestSJ::Render()
 
 void TestSJ::SetupObjectEditorCallback()
 {
-	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 specularColor, float shininess, Vec3 emissiveColor, float emissivePower)
+	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 specularColor, float shininess, Vec3 emissiveColor, float emissivePower, ShapeComponentData shapeData)
 		{
 			AssimpLoader loader;
 			vector<MeshData> meshList = loader.Load(objPath);
@@ -605,9 +605,9 @@ void TestSJ::LoadAllPrefabs(const std::string& extension)
 				actor->SetMeshComponent(meshComponent);
 
 				actor->m_szName = L"Character";
-				actor->SetPosition(Vec3(characterData.actor.Position));
-				actor->SetRotation(Vec3(characterData.actor.Rotation));
-				actor->SetScale(Vec3(characterData.actor.Scale));
+				actor->SetPosition(Vec3(characterData.transform.Position));
+				actor->SetRotation(Vec3(characterData.transform.Rotation));
+				actor->SetScale(Vec3(characterData.transform.Scale));
 
 				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 
@@ -676,7 +676,7 @@ void TestSJ::LoadAllPrefabs(const std::string& extension)
 				auto obj = make_shared<APawn>();
 				obj->m_szName = L"Object";
 				obj->SetMeshComponent(meshComp);
-				obj->SetPosition(objData.Translation);
+				obj->SetPosition(objData.Position);
 				obj->SetRotation(objData.Rotation);
 				obj->SetScale(objData.Scale);
 

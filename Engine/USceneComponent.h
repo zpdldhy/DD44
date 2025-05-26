@@ -15,7 +15,7 @@ protected:
 	cbData m_cbData;
 	static ComPtr<ID3D11Buffer> m_pWorldCB;
 
-	shared_ptr<USceneComponent> m_pParentTransform = nullptr;
+	USceneComponent* m_pParentTransform = nullptr;
 
 	// Local Transform
 	Vec3 m_vLocalLook = { 0.0f,0.0f,1.0f };
@@ -37,15 +37,18 @@ protected:
 
 	// Matrix
 	Matrix m_matLocal = Matrix::Identity;
+	Matrix m_matLocalScale = Matrix::Identity;
+	Matrix m_matLocalRotation = Matrix::Identity;
+	Matrix m_matLocalTranslation = Matrix::Identity;
+
 	Matrix m_matWorld = Matrix::Identity;
-	Matrix m_matScale = Matrix::Identity;
-	Matrix m_matRotation = Matrix::Identity;
-	Matrix m_matTrans = Matrix::Identity;
+	Matrix m_matWorldScale = Matrix::Identity;
+	Matrix m_matWorldRotation = Matrix::Identity;
+	Matrix m_matWorldTranslation = Matrix::Identity;
+
 	Matrix m_matParent = Matrix::Identity;
 
-	// TEMP
-	Vec3 m_vAnimWorld;
-	Matrix m_matAnim;
+	Matrix m_matAnim = Matrix::Identity;
 
 public:
 	USceneComponent() = default;
@@ -59,6 +62,10 @@ public:
 
 private:
 	virtual bool CreateConstantBuffer();
+	void UpdateMatrix();
+
+protected:
+	void UpdateLocalMatrix();
 	void UpdateWorldMatrix();
 
 public:
@@ -70,9 +77,10 @@ public:
 	const Vec3& GetLocalRight() const { return m_vLocalRight; }
 	const Vec3& GetLocalUp() const { return m_vLocalUp; }
 
-	virtual void SetLocalPosition(const Vec3& _pos) { m_vLocalPosition = _pos; }
-	virtual void SetLocalRotation(const Vec3& _rot) { m_vLocalRotation = _rot; }
-	virtual void SetLocalScale(const Vec3& _scale) { m_vLocalScale = _scale; }
+	void SetLocalPosition(const Vec3& _pos) { m_vLocalPosition = _pos; }
+	void SetLocalRotation(const Vec3& _rot) { m_vLocalRotation = _rot; }
+	void SetLocalScale(const Vec3& _scale) { m_vLocalScale = _scale; }
+	void SetWorldMatrix(const Matrix& _mat) { m_matWorld = _mat; }
 
 	void AddLocalPosition(const Vec3& _pos) { m_vLocalPosition += _pos; }
 	void AddLocalRotation(const Vec3& _rot) { m_vLocalRotation += _rot; }
@@ -88,9 +96,6 @@ public:
 
 	// Matrix
 	const Matrix& GetWorld() const { return m_matWorld; }
-	void SetParentTransform(shared_ptr<USceneComponent> _pTransform) { if (_pTransform.get() != this) m_pParentTransform = _pTransform; }
-
-	const Vec3& GetAnimWorld();
-
+	void SetParentTransform(USceneComponent* _pTransform) { if (_pTransform != this) m_pParentTransform = _pTransform; }
 };
 

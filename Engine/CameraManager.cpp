@@ -3,6 +3,7 @@
 #include "Device.h"
 #include "ACameraActor.h"
 #include "UCameraComponent.h"
+#include "Timer.h"
 
 void CameraManager::Init()
 {	
@@ -38,6 +39,8 @@ void CameraManager::Render(CameraViewType _ViewType)
 
 	m_CameraData.matView = pCurrentComponent->GetView();
 	m_CameraData.matProjection = pCurrentComponent->GetProjection();
+	m_CameraData.g_vCameraPos = pCurrentComponent->GetWorldPosition();
+	m_CameraData.GameTime = TIMER->GetGameTime();
 
 	DC->UpdateSubresource(m_pCameraCB.Get(), 0, nullptr, &m_CameraData, 0, 0);
 	DC->VSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
