@@ -498,6 +498,49 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
     return true;
 }
 
+bool PrefabLoader::SaveUIs(const vector<PrefabUIData>& _prefabs, const string& _filePath)
+{
+    json j = json::array();
+
+    for (const auto& p : _prefabs)
+    {
+        json item;
+        item["Name"] = p.Name;
+
+        // position은 NDC로 변환해서 저장    
+        auto transform = p.transform;
+        transform.Position[0] = transform.Position[0] / (static_cast<float>(g_windowSize.x) / 2.0f);
+        transform.Position[1] = transform.Position[1] / (static_cast<float>(g_windowSize.y) / 2.0f);
+
+        SaveTransform(item, transform);
+
+        item["Color"] = { p.color[0], p.color[1] ,p.color[2] ,p.color[3] };
+        item["SliceUV"] = { p.SliceUV[0], p.SliceUV[1], p.SliceUV[2], p.SliceUV[3] };
+
+        item["TexturePath"] = {
+           { "Idle", p.IdleTexturePath },
+           { "Hover", p.HoverTexturePath },
+           { "Active", p.ActiveTexturePath },
+           { "Selected", p.SelectedTexturePath }
+        };
+
+        item["ShaderPath"] = p.ShaderPath;
+
+        j.push_back(item);
+    }
+
+    std::ofstream file(_filePath);
+    if (!file.is_open()) return false;
+
+    file << j.dump(4);
+    return true;
+}
+
+bool PrefabLoader::LoadUIs(const string& _filePath, vector<PrefabUIData>& _outPrefabs)
+{
+    return false;
+}
+
 bool PrefabLoader::SaveParticle(const PrefabParticleData& data, const std::string& filePath)
 {
     json j;

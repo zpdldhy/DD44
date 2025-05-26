@@ -230,7 +230,15 @@ void UIEditorUI::UpdateUIActorList()
 
         pUI->GetMeshComponent()->GetMaterial()->SetGlowParams(0.0f, Vec3(0.0f, 0.0f, 0.0f));
 
-        if (ImGui::Selectable(label.c_str()))
+        bool bSelected = false;
+
+        for (auto& sel : m_vSelectedIndex)
+        {
+            if (sel == index)
+                bSelected = true;
+        }
+
+        if (ImGui::Selectable(label.c_str(), bSelected))
         {
             m_iSelectUIActor = index;
             m_pUIActor = m_vUIList[m_iSelectUIActor];            
