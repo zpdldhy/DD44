@@ -39,6 +39,8 @@ public:
 	// 9-slice
 	void SetSliceData(const Vec4& _vSlice) { m_tUISliceData.vSlice = _vSlice; }
 	void SetColor(const Color& _vColor) { m_tUISliceData.vColor = _vColor; }
+	void AddColor(const Color& _vColor){ m_tUISliceData.vColor += _vColor; }
+	Color GetColor() { return m_tUISliceData.vColor; }
 
 	// Prefab
 	void SetPrefabData(const PrefabUIData& _data) { m_PrefabData = _data; }
