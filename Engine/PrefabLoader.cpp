@@ -538,7 +538,44 @@ bool PrefabLoader::SaveUIs(const vector<PrefabUIData>& _prefabs, const string& _
 
 bool PrefabLoader::LoadUIs(const string& _filePath, vector<PrefabUIData>& _outPrefabs)
 {
-    return false;
+
+    std::ifstream file(_filePath);
+    if (!file.is_open()) return false;
+
+    json j;
+    file >> j;
+
+    if (!j.is_array()) return false;
+
+    for (auto& item : j)
+    {
+		PrefabUIData _prefab;
+
+        _prefab.Name = item["Name"];
+
+        // position은 NDC로 변환해서 로드
+
+        LoadTransform(item, _prefab.transform);
+
+        _prefab.transform.Position[0] *= (static_cast<float>(g_windowSize.x) / 2.0f);
+        _prefab.transform.Position[1] *= (static_cast<float>(g_windowSize.y) / 2.0f);
+
+        auto c = item["Color"];
+        for (int i = 0; i < 4; i++)   _prefab.color[i] = c[i];
+
+        auto s = item["SliceUV"];
+        for (int i = 0; i < 4; i++)   _prefab.SliceUV[i] = s[i];
+
+        _prefab.IdleTexturePath = item["TexturePath"]["Idle"];
+        _prefab.HoverTexturePath = item["TexturePath"]["Hover"];
+        _prefab.ActiveTexturePath = item["TexturePath"]["Active"];
+        _prefab.SelectedTexturePath = item["TexturePath"]["Selected"];
+        _prefab.ShaderPath = item["ShaderPath"];
+
+        _outPrefabs.push_back(_prefab);
+    }
+
+    return true;
 }
 
 bool PrefabLoader::SaveParticle(const PrefabParticleData& data, const std::string& filePath)
