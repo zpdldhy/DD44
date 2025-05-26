@@ -172,7 +172,7 @@ void ActorListUI::DrawUI()
 				//actor->m_szName = m_szNewName;
 			//}
 
-			ImGui::SameLine();
+			//ImGui::SameLine();
 
 			if (ImGui::Button("Delete"))
 			{
@@ -259,6 +259,13 @@ void ActorListUI::DrawUI()
 						std::string fullPath = basePath + fileName + ".objects.json";
 						SaveObjectsPrefab(selectedActors, fullPath);
 					}
+				}
+
+				ImGui::InputText("Scene Name", m_szSceneName, IM_ARRAYSIZE(m_szSceneName));
+
+				if (ImGui::Button("Save Scene"))
+				{
+					SaveAllObjectsInScene(m_szSceneName);
 				}
 			}
 		}
@@ -680,6 +687,72 @@ void ActorListUI::SaveObjectsPrefab(const std::vector<std::shared_ptr<AActor>>& 
 	if (!vPrefabList.empty())
 	{
 		PREFAB->SaveObjectArray(vPrefabList, _path);
+	}
+}
+
+void ActorListUI::SaveAllObjectsInScene(const std::string& fileName)
+{
+	std::vector<PrefabObjectData> vPrefabs;
+	
+	// 일단 오브젝트만
+	for (const auto& pair : OBJECT->GetActorList())
+	{
+		auto actor = pair.second;
+		if (!actor || actor->m_szName != L"Object") continue;
+
+		PrefabObjectData data;
+		data.Name = to_wm(actor->m_szName);
+		data.Position = actor->GetPosition();
+		data.Rotation = actor->GetRotation();
+		data.Scale = actor->GetScale();
+
+		auto mesh = actor->GetMeshComponent<UMeshComponent>();
+		if (mesh)
+		{
+			data.MeshPath = to_wm(mesh->GetMeshPath());
+
+			auto mat = mesh->GetMaterial();
+			if (mat)
+			{
+				data.TexturePath = to_wm(mat->GetTexturePath());
+				data.ShaderPath = to_wm(mat->GetShaderPath());
+				data.SpecularColor = { 0.f,0.f,0.f };
+				data.Shininess = 0.0f;
+				data.EmissiveColor = { 0.f,0.f,0.f };
+				data.EmissivePower = 0.0f;
+			}
+		}
+
+		auto shape = actor->GetShapeComponent();
+		if (shape)
+		{
+			data.ShapeData.isUse = true;
+			data.ShapeData.eShapeType = shape->GetShapeType();
+
+			Vec3 sp = shape->GetLocalPosition();
+			Vec3 sr = shape->GetLocalRotation();
+			Vec3 ss = shape->GetLocalScale();
+
+			data.ShapeData.Position[0] = sp.x;
+			data.ShapeData.Position[1] = sp.y;
+			data.ShapeData.Position[2] = sp.z;
+
+			data.ShapeData.Rotation[0] = sr.x;
+			data.ShapeData.Rotation[1] = sr.y;
+			data.ShapeData.Rotation[2] = sr.z;
+
+			data.ShapeData.Scale[0] = ss.x;
+			data.ShapeData.Scale[1] = ss.y;
+			data.ShapeData.Scale[2] = ss.z;
+		}
+
+		vPrefabs.push_back(data);
+	}
+
+	if (!vPrefabs.empty())
+	{
+		std::string fullPath = "../Resources/Prefab/" + fileName + ".objects.json";
+		PREFAB->SaveObjectArray(vPrefabs, fullPath);
 	}
 }
 

@@ -34,6 +34,7 @@ public:
 	void SaveCharacterPrefab(const std::shared_ptr<class AActor>& _actor);
 	void SaveObjectPrefab(const std::shared_ptr<class AActor>& _actor, const std::string& path);
 	void SaveObjectsPrefab(const std::vector<std::shared_ptr<AActor>>& _actors, const std::string& path);
+	void SaveAllObjectsInScene(const std::string& fileName);
 
 	UINT GetLastActorID();
 	UINT GetSelectedActorID();
@@ -62,6 +63,7 @@ private:
 
 	std::wstring m_szNewName;
 	char m_szSaveName[256] = "MyPrefab";
+	char m_szSceneName[128] = "MyScene";
 
 	int m_iLastActorID = -1;
 	int m_iSelectedActorID = -1;

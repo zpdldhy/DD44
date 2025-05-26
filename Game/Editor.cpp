@@ -474,10 +474,13 @@ void Editor::TransformActorByDragging()
 {
 	if (GUI->GetObjectEditorUI()->IsPlacementMode()) return;
 
-	if (INPUT->GetButtonDown(LCLICK))
+	if (INPUT->GetButton(LCLICK))
 	{
 		SetClickPos();
+	}
 
+	if (INPUT->GetButtonDown(LCLICK))
+	{
 		UINT selectedID = GUI->GetActorListUI()->GetSelectedActorID();
 		if (selectedID > 0 && OBJECT->GetActorList().count(selectedID) > 0)
 		{
@@ -522,11 +525,11 @@ void Editor::TransformActorByDragging()
 				case GizmoMode::Translate:
 				{
 					if (axis == m_pGizmoX)
-						newPos.x += deltaX * 0.07f;
+						newPos.x += deltaX * 0.05f;
 					else if (axis == m_pGizmoY)
-						newPos.y -= deltaY * 0.07f;
+						newPos.y -= deltaY * 0.05f;
 					else if (axis == m_pGizmoZ)
-						newPos.z += deltaX * 0.07f;
+						newPos.z += deltaX * 0.05f;
 
 					Vec3 offset = newPos - m_vDragStartPos;
 
@@ -546,11 +549,11 @@ void Editor::TransformActorByDragging()
 				case GizmoMode::Rotate:
 				{
 					if (axis == m_pGizmoX)
-						newRot.x += deltaX * 0.07f;
+						newRot.x += deltaX * 0.05f;
 					else if (axis == m_pGizmoY)
-						newRot.y -= deltaY * 0.07f;
+						newRot.y -= deltaY * 0.05f;
 					else if (axis == m_pGizmoZ)
-						newRot.z += deltaX * 0.07f;
+						newRot.z += deltaX * 0.05f;
 
 					Vec3 offset = newRot - m_vDragStartRot;
 
@@ -568,11 +571,11 @@ void Editor::TransformActorByDragging()
 				case GizmoMode::Scale:
 				{
 					if (axis == m_pGizmoX)
-						newScale.x += deltaX * 0.07f;
+						newScale.x += deltaX * 0.05f;
 					else if (axis == m_pGizmoY)
-						newScale.y -= deltaY * 0.07f;
+						newScale.y -= deltaY * 0.05f;
 					else if (axis == m_pGizmoZ)
-						newScale.z += deltaX * 0.07f;
+						newScale.z += deltaX * 0.05f;
 
 					Vec3 offset = newScale - m_vDragStartScale;
 
