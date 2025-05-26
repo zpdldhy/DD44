@@ -19,6 +19,7 @@ public:
 
     bool SaveObject(const PrefabObjectData& _prefab, const std::string& _filePath);
     bool LoadObject(const std::string& _filePath, PrefabObjectData& _prefab);
+    bool SaveObjectArray(const std::vector<PrefabObjectData>& _prefabs, const std::string& _filePath);
     bool LoadObjectArray(const std::string& _filePath, std::vector<PrefabObjectData>& _outPrefabs);
 
     bool SaveUI(const PrefabUIData& _prefab, const std::string& _filePath);
