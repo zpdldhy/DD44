@@ -77,7 +77,7 @@ void Editor::Update()
 		CreateObjectAtMousePick();
 	}
 
-	SetActorPositionByDragging();
+	TransformActorByDragging();
 }
 
 void Editor::Render()
@@ -141,8 +141,8 @@ void Editor::SetupGizmo()
 	m_pGizmoCore->SetScale(Vec3(0.04f, 0.04f, 0.04f));
 	OBJECT->AddActor(m_pGizmoCore);
 
-	float _boxScale = 5.0f;
-	float _boxPosition = 4.0f;
+	float _boxScale = 135.0f;
+	float _boxPosition = 100.0f;
 
 	m_pGizmoX = make_shared<AActor>();
 	m_pGizmoX->m_szName = L"Gizmo";
@@ -150,7 +150,7 @@ void Editor::SetupGizmo()
 	shared_ptr<UBoxComponent> _pXBox = std::make_shared<UBoxComponent>();
 	_pXBox->m_bVisible = false;
 	_pXBox->SetShapeColor(Vec4(1.0f, 0.f, 0.f, 0.f));
-	_pXBox->SetLocalScale(Vec3(_boxScale, 0.4f, 0.4f));
+	_pXBox->SetLocalScale(Vec3(_boxScale, 10.0f, 10.0f));
 	_pXBox->SetLocalPosition(Vec3(_boxPosition, 0.0f, 0.0f));
 	_pXBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pGizmoX->SetShapeComponent(_pXBox);
@@ -164,7 +164,7 @@ void Editor::SetupGizmo()
 	shared_ptr<UBoxComponent> _pYBox = std::make_shared<UBoxComponent>();
 	_pYBox->m_bVisible = false;
 	_pYBox->SetShapeColor(Vec4(0.f, 1.0f, 0.f, 0.f));
-	_pYBox->SetLocalScale(Vec3(0.4f, _boxScale, 0.4f));
+	_pYBox->SetLocalScale(Vec3(10.0f, _boxScale, 10.0f));
 	_pYBox->SetLocalPosition(Vec3(0.0f, _boxPosition, 0.0f));
 	_pYBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pGizmoY->SetShapeComponent(_pYBox);
@@ -178,7 +178,7 @@ void Editor::SetupGizmo()
 	shared_ptr<UBoxComponent> _pZBox = std::make_shared<UBoxComponent>();
 	_pZBox->m_bVisible = false;
 	_pZBox->SetShapeColor(Vec4(0.f, 0.f, 1.0f, 0.f));
-	_pZBox->SetLocalScale(Vec3(0.4f, 0.4f, _boxScale));
+	_pZBox->SetLocalScale(Vec3(10.0f, 10.0f, _boxScale));
 	_pZBox->SetLocalPosition(Vec3(0.0f, 0.0f, _boxPosition));
 	_pZBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pGizmoZ->SetShapeComponent(_pZBox);
@@ -411,8 +411,30 @@ void Editor::SetClickPos()
 
 		if (pActor->m_szName != L"Gizmo")
 		{
-			GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			auto& vec = GUI->GetActorListUI()->GetMultiSelectedIDs();
+			if (INPUT->GetButtonDown(LSHIFT)/* && INPUT->GetButton(LCLICK)*/)
+			{
+				GUI->GetActorListUI()->SetMultiSelectMode(true);
+
+				auto found = std::find(vec.begin(), vec.end(), pActor->m_Index);
+				if (found != vec.end())
+					vec.erase(found);
+				else
+					vec.push_back(pActor->m_Index);
+
+				GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			}
+			else
+			{
+				GUI->GetActorListUI()->SetMultiSelectMode(false);
+
+				vec.clear();
+				vec.push_back(pActor->m_Index);
+				GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			}
+
 			GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
+			GUI->GetActorListUI()->RefreshSelectionVisuals();
 		}
 		else
 		{
@@ -448,14 +470,17 @@ void Editor::SetGizmoPosition(Vec3 _pos)
 	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
 }
 
-void Editor::SetActorPositionByDragging()
+void Editor::TransformActorByDragging()
 {
 	if (GUI->GetObjectEditorUI()->IsPlacementMode()) return;
 
-	if (INPUT->GetButtonDown(LCLICK))
+	if (INPUT->GetButton(LCLICK))
 	{
 		SetClickPos();
+	}
 
+	if (INPUT->GetButtonDown(LCLICK))
+	{
 		UINT selectedID = GUI->GetActorListUI()->GetSelectedActorID();
 		if (selectedID > 0 && OBJECT->GetActorList().count(selectedID) > 0)
 		{
@@ -465,7 +490,7 @@ void Editor::SetActorPositionByDragging()
 			}
 
 			auto& actorMap = OBJECT->GetActorList();
-			auto _actor = actorMap.find(GUI->GetActorListUI()->GetSelectedActorID());
+			auto _actor = actorMap.find(selectedID);
 			if (_actor != actorMap.end())
 			{
 				auto actor = _actor->second;
@@ -486,7 +511,6 @@ void Editor::SetActorPositionByDragging()
 				auto axis = _axis->second;
 				if (!actor || !axis) return;
 
-				// 드래그 처리
 				POINT curMouse = INPUT->GetMousePos();
 				float deltaX = static_cast<float>(curMouse.x - m_vPrevMouse.x);
 				float deltaY = static_cast<float>(curMouse.y - m_vPrevMouse.y);
@@ -501,41 +525,74 @@ void Editor::SetActorPositionByDragging()
 				case GizmoMode::Translate:
 				{
 					if (axis == m_pGizmoX)
-						newPos.x += deltaX * 0.07f;
+						newPos.x += deltaX * 0.03f;
 					else if (axis == m_pGizmoY)
-						newPos.y -= deltaY * 0.07f;
+						newPos.y -= deltaY * 0.03f;
 					else if (axis == m_pGizmoZ)
-						newPos.z += deltaX * 0.07f;
+						newPos.z += deltaX * 0.03f;
 
-					actor->SetPosition(newPos);
+					Vec3 offset = newPos - m_vDragStartPos;
+
+					// 모든 선택된 애들에게 동일 offset 적용
+					const auto& selectedIDs = GUI->GetActorListUI()->GetMultiSelectedIDs();
+					for (UINT id : selectedIDs)
+					{
+						auto a = OBJECT->GetActor(id);
+						if (!a || a == actor) continue; // 기준 Actor 제외
+						a->SetPosition(a->GetPosition() + offset);
+					}
+
+					actor->SetPosition(actor->GetPosition() + offset);
 					SetGizmoPosition(actor->GetPosition());
 					break;
 				}
 				case GizmoMode::Rotate:
 				{
 					if (axis == m_pGizmoX)
-						newRot.x += deltaX * 0.07f;
+						newRot.x += deltaX * 0.03f;
 					else if (axis == m_pGizmoY)
-						newRot.y -= deltaY * 0.07f;
+						newRot.y -= deltaY * 0.03f;
 					else if (axis == m_pGizmoZ)
-						newRot.z += deltaX * 0.07f;
+						newRot.z += deltaX * 0.03f;
 
-					actor->SetRotation(newRot);
+					Vec3 offset = newRot - m_vDragStartRot;
+
+					const auto& selectedIDs = GUI->GetActorListUI()->GetMultiSelectedIDs();
+					for (UINT id : selectedIDs)
+					{
+						auto a = OBJECT->GetActor(id);
+						if (!a || a == actor) continue;
+						a->SetRotation(a->GetRotation() + offset);
+					}
+
+					actor->SetRotation(actor->GetRotation() + offset);
 					break;
 				}
 				case GizmoMode::Scale:
 				{
 					if (axis == m_pGizmoX)
-						newScale.x += deltaX * 0.07f;
+						newScale.x += deltaX * 0.03f;
 					else if (axis == m_pGizmoY)
-						newScale.y -= deltaY * 0.07f;
+						newScale.y -= deltaY * 0.03f;
 					else if (axis == m_pGizmoZ)
-						newScale.z += deltaX * 0.07f;
+						newScale.z += deltaX * 0.03f;
 
-					actor->SetScale(newScale);
+					Vec3 offset = newScale - m_vDragStartScale;
+
+					const auto& selectedIDs = GUI->GetActorListUI()->GetMultiSelectedIDs();
+					for (UINT id : selectedIDs)
+					{
+						auto a = OBJECT->GetActor(id);
+						if (!a || a == actor) continue;
+						a->SetScale(a->GetScale() + offset);
+					}
+
+					actor->SetScale(actor->GetScale() + offset);
 					break;
 				}
 				}
+
+				m_vPrevMouse = curMouse;
 			}
 		}
 	}
@@ -580,7 +637,6 @@ void Editor::CreateObjectAtMousePick()
 
 	GUI->GetObjectEditorUI()->CreateAtPosition(placePos);
 }
-
 
 void Editor::SetupParticleEditorCallback()
 {
@@ -669,7 +725,6 @@ void Editor::Slash()
 		}
 	}
 }
-
 
 void Editor::LoadAllPrefabs(const std::string& extension)
 {

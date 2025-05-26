@@ -320,6 +320,57 @@ bool PrefabLoader::LoadObject(const std::string& _filePath, PrefabObjectData& _p
     return true;
 }
 
+bool PrefabLoader::SaveObjectArray(const std::vector<PrefabObjectData>& _prefabs, const std::string& _filePath)
+{
+    json j = json::array();
+
+    for (const auto& p : _prefabs)
+    {
+        json item;
+        item["Name"] = p.Name;
+        item["MeshPath"] = p.MeshPath;
+        item["ShaderPath"] = p.ShaderPath;
+        item["TexturePath"] = p.TexturePath;
+
+        item["Scale"] = { p.Scale.x, p.Scale.y, p.Scale.z };
+        item["Rotation"] = { p.Rotation.x, p.Rotation.y, p.Rotation.z };
+        item["Position"] = { p.Position.x, p.Position.y, p.Position.z };
+
+        item["SpecularColor"] = { p.SpecularColor.x, p.SpecularColor.y, p.SpecularColor.z };
+        item["Shininess"] = p.Shininess;
+
+        item["EmissiveColor"] = { p.EmissiveColor.x, p.EmissiveColor.y, p.EmissiveColor.z };
+        item["EmissivePower"] = p.EmissivePower;
+
+        if (p.ShapeData.isUse)
+        {
+            json shape;
+            shape["isUse"] = p.ShapeData.isUse;
+            shape["eShapeType"] = p.ShapeData.eShapeType;
+
+            shape["Scale"] = {
+                p.ShapeData.Scale[0], p.ShapeData.Scale[1], p.ShapeData.Scale[2]
+            };
+            shape["Position"] = {
+                p.ShapeData.Position[0], p.ShapeData.Position[1], p.ShapeData.Position[2]
+            };
+            shape["Rotation"] = {
+                p.ShapeData.Rotation[0], p.ShapeData.Rotation[1], p.ShapeData.Rotation[2]
+            };
+
+            item["ShapeData"] = shape;
+        }
+
+        j.push_back(item);
+    }
+
+    std::ofstream file(_filePath);
+    if (!file.is_open()) return false;
+
+    file << j.dump(4);
+    return true;
+}
+
 bool PrefabLoader::LoadObjectArray(const std::string& _filePath, std::vector<PrefabObjectData>& _outPrefabs)
 {
     std::ifstream file(_filePath);
