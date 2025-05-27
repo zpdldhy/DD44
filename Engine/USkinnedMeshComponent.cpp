@@ -3,7 +3,6 @@
 #include "AnimTrack.h"
 #include "UMaterial.h"
 #include "AActor.h"
-#include "MeshTransform.h"
 
 void USkinnedMeshComponent::Init()
 {

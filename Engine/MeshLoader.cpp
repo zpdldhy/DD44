@@ -7,7 +7,6 @@
 #include "UAnimInstance.h"
 #include "UMaterial.h"
 #include "AAsset.h"
-#include "MeshTransform.h"
 
 void MeshLoader::SetMesh(map<wstring, shared_ptr<UMeshResources>> _mesh)
 {
