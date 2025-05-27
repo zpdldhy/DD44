@@ -167,6 +167,7 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 		material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
 		meshComp->SetMaterial(material);
 
+		obj= make_shared<APawn>();
 		obj->SetPrefabPath(_file);
 		obj->m_szName = L"Object";
 		obj->SetMeshComponent(meshComp);
