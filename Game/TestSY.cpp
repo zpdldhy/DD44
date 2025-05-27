@@ -418,7 +418,7 @@ void TestSY::Init()
 	LIGHTMANAGER->RegisterLight(m_pLight);
 }
 
-void TestSY::Update()
+void TestSY::Tick()
 {
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	if (INPUT->GetButtonDown(O))

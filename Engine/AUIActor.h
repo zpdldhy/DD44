@@ -3,10 +3,11 @@
 #include "UIState.h"
 #include "PrefabData.h"
 
-struct UISliceData
+struct UIData
 {
 	// x는 left, y는 right, z는 top, w는 bottom
 	Vec4 vSlice;
+	Color vColor;
 };
 
 class Texture;
@@ -37,6 +38,9 @@ public:
 
 	// 9-slice
 	void SetSliceData(const Vec4& _vSlice) { m_tUISliceData.vSlice = _vSlice; }
+	void SetColor(const Color& _vColor) { m_tUISliceData.vColor = _vColor; }
+	void AddColor(const Color& _vColor){ m_tUISliceData.vColor += _vColor; }
+	Color GetColor() { return m_tUISliceData.vColor; }
 
 	// Prefab
 	void SetPrefabData(const PrefabUIData& _data) { m_PrefabData = _data; }
@@ -44,7 +48,7 @@ public:
 
 private:
 	// Constants
-	UISliceData m_tUISliceData = { {0.5f, 0.5f, 0.5f, 0.5f}, };
+	UIData m_tUISliceData = { {0.5f, 0.5f, 0.5f, 0.5f}, {0.f, 0.f, 0.f, 0.f} };
 	static ComPtr<ID3D11Buffer> m_pUISliceCB;
 
 	// State

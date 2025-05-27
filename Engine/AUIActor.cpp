@@ -39,7 +39,7 @@ void AUIActor::Render()
 	if (m_pUISliceCB)
 	{
 		DC->UpdateSubresource(m_pUISliceCB.Get(), 0, nullptr, &m_tUISliceData, 0, 0);
-		DC->PSSetConstantBuffers(2, 1, m_pUISliceCB.GetAddressOf());
+		DC->PSSetConstantBuffers(3, 1, m_pUISliceCB.GetAddressOf());
 	}
 
 	AActor::Render();
@@ -52,7 +52,7 @@ void AUIActor::CreateUISlice()
 
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
-	bd.ByteWidth = sizeof(UISliceData);
+	bd.ByteWidth = sizeof(UIData);
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 

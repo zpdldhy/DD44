@@ -167,7 +167,7 @@ void TestYR::Init()
 
 #pragma endregion
 }
-void TestYR::Update()
+void TestYR::Tick()
 {	
 	// 애니메이션 확인
 	if (INPUT->GetButton(LCLICK))
@@ -188,6 +188,10 @@ void TestYR::Update()
 
 }
 void TestYR::Render()
+{
+}
+
+void TestYR::Destroy()
 {
 }
 

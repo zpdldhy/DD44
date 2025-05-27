@@ -23,7 +23,10 @@ public:
     bool LoadObjectArray(const std::string& _filePath, std::vector<PrefabObjectData>& _outPrefabs);
 
     bool SaveUI(const PrefabUIData& _prefab, const std::string& _filePath);
-    bool LoadUI(const std::string& _filePath, PrefabUIData& _prefab);
+    bool LoadUI(const string& _filePath, PrefabUIData& _prefab);
+
+	bool SaveUIs(const vector<PrefabUIData>& _prefabs, const string& _filePath);
+	bool LoadUIs(const string& _filePath, vector<PrefabUIData>& _outPrefabs);
 
     //particle °³º°
     bool SaveParticle(const PrefabParticleData& data, const std::string& filePath);

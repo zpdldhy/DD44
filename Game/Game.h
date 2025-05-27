@@ -18,24 +18,19 @@ public:
 
 	bool m_bEnginCamera = false;
 
-	// Asset loading
-	ActorLoader actorLoader;
-	MeshLoader meshLoader;
-
 	float time;
 
 public:
 	void Init() override;
-	void Update() override;
+	void Tick() override;
 	void Render() override;
-	void Destroy();
+	void Destroy() override;
 
 protected:
 	void SetupEngineCamera();
 	void SetupSkybox();
 	void SetupSunLight();
 
-	void LoadAllPrefabs(const std::string& extension);
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }
 };

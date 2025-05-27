@@ -119,6 +119,13 @@ void ObjectManager::RemoveActor(std::shared_ptr<class AActor> _pActor)
 	_pActor->m_bDelete = true;
 }
 
+void ObjectManager::RemoveAll()
+{
+	ActorCount = 0;
+	m_vActorList.empty();
+	ClearRenderList();
+}
+
 shared_ptr<class AActor> ObjectManager::GetActor(UINT _iIndex)
 {
 	return m_vActorList.find(_iIndex)->second;
@@ -133,6 +140,8 @@ void ObjectManager::CheckStencilList()
 {
 	for (auto& pActor : m_vRenderActorList)
 	{
+		if (pActor->m_bRender == false) continue;
+
 		if (pActor->m_bUseStencil == false)
 			m_vPreRenderActorList.emplace_back(pActor);
 		else

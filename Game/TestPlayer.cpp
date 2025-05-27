@@ -124,11 +124,15 @@ void TestPlayer::Init()
 	#pragma endregion
 }
 
-void TestPlayer::Update()
+void TestPlayer::Tick()
 {
 	
 }
 
 void TestPlayer::Render()
+{
+}
+
+void TestPlayer::Destroy()
 {
 }

@@ -71,7 +71,8 @@ struct PrefabUIData
 
     TransformData transform;
 
-	float SliceUV[4];
+    float color[4] = { 0.f, 0.f, 0.f, 0.f };
+	float SliceUV[4] = { 0.f, 0.f, 0.f, 0.f };
 
     std::string IdleTexturePath;
     std::string HoverTexturePath;

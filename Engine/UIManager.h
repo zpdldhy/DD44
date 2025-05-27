@@ -14,6 +14,7 @@ public:
 
 public:
 	void AddUIList(vector<shared_ptr<class AUIActor>> _vUIList);
+	void AddUIList(vector<shared_ptr<class AActor>> _vUIList);
 	void AddUI(shared_ptr<class AUIActor> _pUIActor);
 
 	shared_ptr<class AUIActor> GetUI(UINT _iID);

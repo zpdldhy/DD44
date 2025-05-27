@@ -63,6 +63,12 @@
     <ClInclude Include="TestYoooooon.h">
       <Filter>Test</Filter>
     </ClInclude>
+    <ClInclude Include="PrefabToActor.h">
+      <Filter>Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="IntroScene.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -107,6 +113,12 @@
     <ClCompile Include="TestYoooooon.cpp">
       <Filter>Test</Filter>
     </ClCompile>
+    <ClCompile Include="PrefabToActor.cpp">
+      <Filter>Prefab</Filter>
+    </ClCompile>
+    <ClCompile Include="IntroScene.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
@@ -136,7 +148,7 @@
     <FxCompile Include="..\Resources\Shader\Sword.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="..\Resources\Shader\UVSlice.hlsl">
+    <FxCompile Include="..\Resources\Shader\DefaultUI.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\SpriteUV.hlsl">
@@ -146,6 +158,9 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\CameraFrustum.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\SpriteWorld.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

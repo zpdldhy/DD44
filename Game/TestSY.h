@@ -22,9 +22,9 @@ public:
 
 public:
 	void Init() override;
-	void Update() override;
+	void Tick() override;
 	void Render() override;
-	void Destroy();
+	void Destroy() override;
 
 private:
 	void SetClickPos();
