@@ -126,9 +126,6 @@
     <ClInclude Include="UMaterial.h">
       <Filter>Material</Filter>
     </ClInclude>
-    <ClInclude Include="USceneComponent.h">
-      <Filter>Component\Mesh</Filter>
-    </ClInclude>
     <ClInclude Include="UMeshComponent.h">
       <Filter>Component\Mesh</Filter>
     </ClInclude>
@@ -325,9 +322,7 @@
     <ClInclude Include="CollisionScript.h">
       <Filter>Component\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="MeshEditorUI.h" />
     <ClInclude Include="MeshLoader.h" />
-    <ClInclude Include="EditorData.h" />
     <ClInclude Include="UIEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
@@ -344,6 +339,15 @@
     </ClInclude>
     <ClInclude Include="UIState.h">
       <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="USceneComponent.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorData.h">
+      <Filter>Utils\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshEditorUI.h">
+      <Filter>Utils\Editor</Filter>
     </ClInclude>
     <ClInclude Include="EffectType.h">
       <Filter>Headers</Filter>
@@ -391,9 +395,6 @@
     </ClCompile>
     <ClCompile Include="UMaterial.cpp">
       <Filter>Material</Filter>
-    </ClCompile>
-    <ClCompile Include="USceneComponent.cpp">
-      <Filter>Component\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="UMeshComponent.cpp">
       <Filter>Component\Mesh</Filter>
@@ -572,7 +573,6 @@
     <ClCompile Include="CollisionScript.cpp">
       <Filter>Component\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="MeshEditorUI.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="UIEditorUI.cpp">
@@ -590,6 +590,12 @@
     </ClCompile>
     <ClCompile Include="UIState.cpp">
       <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="USceneComponent.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshEditorUI.cpp">
+      <Filter>Utils\Editor</Filter>
     </ClCompile>
     <ClCompile Include="AParticleActor.cpp">
       <Filter>Object\Particle</Filter>

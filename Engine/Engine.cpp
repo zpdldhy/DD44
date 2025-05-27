@@ -37,7 +37,7 @@ void Engine::Init()
 	// 기타 기능 객체 초기화 ( input, )
 	{
 		INPUT->Init();
-		//DXWRITE->Create();
+		DXWRITE->Create();
 
 		if (_app->m_type != SCENE_TYPE::GAME) { GUI->Init(); }
 	}
@@ -45,6 +45,8 @@ void Engine::Init()
 
 	// Manager 초기화
 	{
+		LIGHTMANAGER->Init();
+		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
 	}
@@ -74,7 +76,7 @@ void Engine::Frame()
 	GET_SINGLE(Device)->Frame();
 
 	if (_app->m_type != SCENE_TYPE::GAME) { GUI->Update(); }
-	_app->Update();
+	_app->Tick();
 
 	TIMER->Update();
 
@@ -87,10 +89,10 @@ void Engine::Frame()
 void Engine::Render()
 {
 	GET_SINGLE(Device)->PreRender();
-	//DXWRITE->m_pd2dRT->BeginDraw();
+	DXWRITE->BeginDraw();
 
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
-	//DXWRITE->Draw(rt, TIMER->m_szTime);
+	DXWRITE->Draw(rt, TIMER->m_szTime);
 
 	CAMERA->Render(CameraViewType::CVT_ACTOR);
 
@@ -123,7 +125,7 @@ void Engine::Render()
 		GUI->Render(); // *Fix Location* after _app->Render() }
 	}
 
-	//DXWRITE->m_pd2dRT->EndDraw();
+	DXWRITE->EndDraw();
 	GET_SINGLE(Device)->PostRender();
 }
 
@@ -131,6 +133,7 @@ void Engine::Release()
 {
 	UI->Destroy();	
 	PARTICLE->Destroy();
+	_app->Destroy();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 	{
@@ -145,6 +148,7 @@ void Engine::Run()
 {
 	_window.SetWindowClass(_hInstance);
 	_window.SetWindow();
+	_window.SetWindowFullScreen();
 	Init();
 
 	Timer timer;
@@ -160,10 +164,4 @@ void Engine::Run()
 	}
 
 	Release();
-}
-
-Engine::Engine(HINSTANCE hInstance, shared_ptr<IExecute> app)
-{
-	_hInstance = hInstance;
-	_app = app;
 }

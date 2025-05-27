@@ -1,8 +1,14 @@
 #include "MainHeader.hlsli"
 
-cbuffer CB_UVSlice : register(b2)
+struct PS_OUT_UI
+{
+    float4 c : SV_Target0;
+};
+
+cbuffer CB_UVSlice : register(b3)
 {
     float4 g_vUVSlice;
+    float4 g_Color;
 }
 
 VS_OUT VS(VS_IN input)
@@ -22,9 +28,9 @@ VS_OUT VS(VS_IN input)
     return output;
 }
 
-PS_OUT PS(VS_OUT input)
+PS_OUT_UI PS(VS_OUT input)
 {     
-    PS_OUT psOut = (PS_OUT) 0;
+    PS_OUT_UI psOut = (PS_OUT_UI) 0;
     
     float left = g_vUVSlice.x;
     float right = 1 - g_vUVSlice.y;
@@ -63,6 +69,9 @@ PS_OUT PS(VS_OUT input)
     float2 tiledUV = float2(tiledX, tiledY);
     
     float4 texColor = g_txDiffuseA.Sample(sample, tiledUV);
+    
+    texColor += g_Color;    
+    texColor = float4(ApplyGlow(texColor.rgb), texColor.a);
     
     texColor.a *= input.c.a;
     psOut.c = texColor;

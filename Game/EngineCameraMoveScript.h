@@ -10,6 +10,7 @@ public:
 	virtual ~EngineCameraMoveScript() = default;
 
 public:
+	void Init() override;
 	void Tick() override;
 };
 

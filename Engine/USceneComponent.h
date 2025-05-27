@@ -15,7 +15,7 @@ protected:
 	cbData m_cbData;
 	static ComPtr<ID3D11Buffer> m_pWorldCB;
 
-	shared_ptr<USceneComponent> m_pParentTransform = nullptr;
+	USceneComponent* m_pParentTransform = nullptr;
 
 	// Local Transform
 	Vec3 m_vLocalLook = { 0.0f,0.0f,1.0f };
@@ -37,11 +37,18 @@ protected:
 
 	// Matrix
 	Matrix m_matLocal = Matrix::Identity;
+	Matrix m_matLocalScale = Matrix::Identity;
+	Matrix m_matLocalRotation = Matrix::Identity;
+	Matrix m_matLocalTranslation = Matrix::Identity;
+
 	Matrix m_matWorld = Matrix::Identity;
-	Matrix m_matScale = Matrix::Identity;
-	Matrix m_matRotation = Matrix::Identity;
-	Matrix m_matTrans = Matrix::Identity;
+	Matrix m_matWorldScale = Matrix::Identity;
+	Matrix m_matWorldRotation = Matrix::Identity;
+	Matrix m_matWorldTranslation = Matrix::Identity;
+
 	Matrix m_matParent = Matrix::Identity;
+
+	Matrix m_matAnim = Matrix::Identity;
 
 public:
 	USceneComponent() = default;
@@ -55,6 +62,10 @@ public:
 
 private:
 	virtual bool CreateConstantBuffer();
+	void UpdateMatrix();
+
+protected:
+	void UpdateLocalMatrix();
 	void UpdateWorldMatrix();
 
 public:
@@ -85,6 +96,6 @@ public:
 
 	// Matrix
 	const Matrix& GetWorld() const { return m_matWorld; }
-	void SetParentTransform(shared_ptr<USceneComponent> _pTransform) { if (_pTransform.get() != this) m_pParentTransform = _pTransform; }
+	void SetParentTransform(USceneComponent* _pTransform) { if (_pTransform != this) m_pParentTransform = _pTransform; }
 };
 

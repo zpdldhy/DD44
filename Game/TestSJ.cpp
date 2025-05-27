@@ -80,10 +80,10 @@ void TestSJ::Init()
 		m_pActor2->SetRotation({ 0.0f, 0.0f, 0.0f });
 
 		shared_ptr<UMaterial> material2 = make_shared<UMaterial>();
-		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");
-		material2->SetUseStencil(true);
+		material2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/PREffect.hlsl");		
 		
 		m_pStaticMesh2->SetMaterial(material2);
+		m_pStaticMesh2->m_bUseBoneMatrix = true;
 		
 	}
 
@@ -185,7 +185,7 @@ void TestSJ::Init()
 	LIGHTMANAGER->RegisterLight(m_pPointLight); 
 }
 
-void TestSJ::Update()
+void TestSJ::Tick()
 {
 	m_pLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
 	//LIGHTMANAGER->UpdateLightCB();
@@ -521,6 +521,10 @@ void TestSJ::Render()
 	//	D2D1::ColorF(0.1f, 1.0f, 1.0f, 0.8f), // Glow color (청록빛)
 	//	D2D1::ColorF::White                   // 메인 텍스트 색
 	//);
+}
+
+void TestSJ::Destroy()
+{
 }
 
 void TestSJ::SetupObjectEditorCallback()

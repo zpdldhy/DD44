@@ -7,20 +7,19 @@
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
 #include "UBoxComponent.h"
+#include "PrefabToActor.h"
+#include "UIManager.h"
+#include "AUIActor.h"
 
 void PlayerMoveScript::Init()
 {
+	auto camera = GetOwner()->GetCameraComponent();
+	camera->SetLookAt(GetOwner()->GetPosition());
+
 	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetLocalPosition();
 	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-
-	//auto shape = make_shared<UBoxComponent>();
-	//shape->SetLocalScale({ 1.f, 2.0f, 1.f });
-	//shape->SetLocalRotation({ 0.0f, 0.0f, 0.0f });
-	//shape->SetLocalPosition({ 0.0f, 1.0f, 0.0f });
-	//shape->SetOwner(GetOwner());
-	//shape->Init();
-	//GetOwner()->SetShapeComponent(shape);
-
+	
+	//SetUI();
 }
 
 void PlayerMoveScript::Tick()
@@ -106,4 +105,106 @@ void PlayerMoveScript::Tick()
 		m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
 	}
 
+	// Update UI State
+	//UpdateHPUI();
+	UpdateArrowUI();
+
+	auto camera = GetOwner()->GetCameraComponent();
+	camera->SetLookAt(GetOwner()->GetPosition());
+}
+
+void PlayerMoveScript::SetUI()
+{
+	m_vHPUI.push_back(PToA->MakeUI("../Resources/Prefab/UI_Health_1.ui.json"));
+	m_vHPUI.push_back(PToA->MakeUI("../Resources/Prefab/UI_Health_2.ui.json"));
+	m_vHPUI.push_back(PToA->MakeUI("../Resources/Prefab/UI_Health_3.ui.json"));
+	m_vHPUI.push_back(PToA->MakeUI("../Resources/Prefab/UI_Health_4.ui.json"));
+
+	UI->AddUIList(m_vHPUI);
+}
+
+void PlayerMoveScript::UpdateHPUI()
+{
+	// test용
+	if (INPUT->GetButton(K))
+	{
+		m_vHP--;
+		m_bDamaged = true;
+	}
+
+	if (INPUT->GetButton(L))
+		m_vHP++;
+
+	Color RestColor;
+
+	if (m_vHP == 4)
+	{
+		RestColor = fullHP;
+		RestColor.w = -0.3f;
+
+		m_vHPUI[0]->SetColor(RestColor);
+		m_vHPUI[1]->SetColor(RestColor);
+		m_vHPUI[2]->SetColor(RestColor);
+		m_vHPUI[3]->SetColor(fullHP);
+
+		m_vHPUI[0]->m_bRender = true;
+		m_vHPUI[1]->m_bRender = true;
+		m_vHPUI[2]->m_bRender = true;
+		m_vHPUI[3]->m_bRender = true;
+	}
+
+	// 데미지를 입었을 시, UI Animation
+	if (m_bDamaged) 
+	{
+		static float currentTime = 0.0f;
+		static float damageTime = 0.0f;
+
+		damageTime = TIMER->GetDeltaTime() + currentTime;
+
+		if (m_vHP == 3)
+		{
+			m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime * 1000.f));
+			m_vHPUI[3]->m_bRender = false;
+		}
+		else if (m_vHP == 2)
+		{
+			m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime * 1000.f));
+			m_vHPUI[2]->m_bRender = false;
+		}
+		else if (m_vHP == 1)
+		{
+			RestColor = fullHP;
+			RestColor.w = -0.3f;
+
+			m_vHPUI[0]->SetColor(fullHP);
+
+			m_vHPUI[0]->m_bRender = true;
+			m_vHPUI[1]->m_bRender = false;
+			m_vHPUI[2]->m_bRender = false;
+			m_vHPUI[3]->m_bRender = false;
+		}
+		else if (m_vHP == 0)
+		{
+			m_vHPUI[0]->m_bRender = false;
+			m_vHPUI[1]->m_bRender = false;
+			m_vHPUI[2]->m_bRender = false;
+			m_vHPUI[3]->m_bRender = false;
+		}
+
+		if (currentTime > m_fDamageTime)
+		{
+			m_bDamaged = false;
+			currentTime = 0.0f;
+		}
+	}
+
+	if (m_vHP > 4)
+		m_vHP = 4;
+}
+
+void PlayerMoveScript::UpdateArrowUI()
+{
+
+	if (m_vArrowCount > 4)
+		m_vArrowCount = 4;
 }

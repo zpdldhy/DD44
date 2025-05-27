@@ -13,7 +13,8 @@ void UIManager::Tick()
         else
         {
             pUI->second->Tick();
-            m_vRenderUIList.emplace_back(pUI->second);
+            if (pUI->second->m_bRender != false)
+                m_vRenderUIList.emplace_back(pUI->second);
             pUI++;
         }
     }
@@ -39,6 +40,16 @@ void UIManager::AddUIList(vector<shared_ptr<class AUIActor>> _vUIList)
     {
         pUI->Init();
         m_vUIList.insert(make_pair(m_iUIID, pUI));
+        pUI->m_Index = m_iUIID++;
+    }
+}
+
+void UIManager::AddUIList(vector<shared_ptr<class AActor>> _vUIList)
+{
+    for (auto& pUI : _vUIList)
+    {
+        pUI->Init();
+        m_vUIList.insert(make_pair(m_iUIID, static_pointer_cast<AUIActor>(pUI)));
         pUI->m_Index = m_iUIID++;
     }
 }

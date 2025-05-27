@@ -6,26 +6,18 @@
 class TestYoooooon : public IExecute
 {
 public:
-	shared_ptr<class ACameraActor> m_pCameraActor;
+	shared_ptr<class ACameraActor> m_pCameraActor = nullptr;
+	shared_ptr<class AActor> m_pPlayer = nullptr;
+	shared_ptr<class AActor> m_pBox = nullptr;
+	class MouseRay m_Cursor;
 
-	shared_ptr<class AActor> m_pPlayer;
-
-	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
-	shared_ptr<class ASky> m_pSky;
-
-	shared_ptr<class ALight> m_pSunLight;
-
-	bool m_bEnginCamera = false;
-
-	// Asset loading
-	ActorLoader actorLoader;
-	MeshLoader meshLoader;
+	bool m_bEnginCamera = true;
 
 public:
 	void Init() override;
-	void Update() override;
+	void Tick() override;
 	void Render() override;
-	void Destroy();
+	void Destroy() override;
 
 protected:
 	void SetupEngineCamera();
@@ -38,7 +30,9 @@ protected:
 	void SetupObjectEditorCallback();
 	void SetupUIEditorCallback();
 
-	void LoadAllPrefabs(const std::string& extension);
-
+	// Collision
+	void CreateCollisionObject();
+	void ClickMouse();
+	void CheckCollision();
 };
 

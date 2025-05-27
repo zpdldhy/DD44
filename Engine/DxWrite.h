@@ -18,20 +18,25 @@ public:
 	wstring m_wsFontName = L"";
 	std::vector<std::wstring> m_vFontPaths;
 
-public:
+private:
+	bool m_bUseRenderDoc = false;
+
+private:
 	void LoadFontResources(const vector<wstring>& fontPaths);
 	void SetFont(const wstring& _fontPath);
 	void IncreaseFontSize(float _step = 2.0f);
 	void DecreaseFontSize(float _step = 2.0f);
 	void SetFontColor(D2D1::ColorF _color);
 	void SetAlignment(DWRITE_TEXT_ALIGNMENT _textAlign, DWRITE_PARAGRAPH_ALIGNMENT _paraAlign);
-
+	bool IsRenderDocPresent();
 
 public:
-	void   DirectDraw(D2D1_RECT_F _layoutRect, std::wstring _msg);
-	void   Draw(D2D1_RECT_F _layoutRect, std::wstring _msg);
-	void   DrawMultiline(D2D1_RECT_F _layoutRect, std::wstring _msg);
-	void   DrawGlow(D2D1_RECT_F rect, std::wstring msg, D2D1::ColorF glowColor, D2D1::ColorF mainColor);
+	void DirectDraw(D2D1_RECT_F _layoutRect, std::wstring _msg);
+	void BeginDraw();
+	void Draw(D2D1_RECT_F _layoutRect, std::wstring _msg);
+	void EndDraw();
+	void DrawMultiline(D2D1_RECT_F _layoutRect, std::wstring _msg);
+	void DrawGlow(D2D1_RECT_F rect, std::wstring msg, D2D1::ColorF glowColor, D2D1::ColorF mainColor);
 };
 
 class Typer : public Singleton<Typer>

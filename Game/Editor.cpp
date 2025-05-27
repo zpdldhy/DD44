@@ -22,18 +22,19 @@
 #include "AParticleActor.h"
 #include "ParticleManager.h"
 #include "Timer.h"
+#include "PrefabToActor.h"
 #include "EffectManager.h"
 
 bool bRunGame = true;
 
 //#undef RUN_GAME
 void Editor::Init()
-{
+{	
 	// Asset 로딩
 	actorLoader.LoadAllAsset();
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
 	meshLoader.SetAnim(actorLoader.LoadAnimMap());
-	
+
 	{
 		m_pSlashMaterial = make_shared<UMaterial>();
 		m_pSlashMaterial->Load(
@@ -44,18 +45,20 @@ void Editor::Init()
 	
 	SetupEditorCallbacks();
 
-	LoadAllPrefabs(".map.json");
-	LoadAllPrefabs(".objects.json");
-	LoadAllPrefabs(".object.json");
-	LoadAllPrefabs(".character.json");
-	LoadAllPrefabs(".ui.json");
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
+	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));	
+
+	auto vlist = PToA->LoadAllPrefabs(".character.json");
+	m_pPlayer = vlist[0];
+	OBJECT->AddActorList(vlist);
 
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();	
 }
 
-void Editor::Update()
+void Editor::Tick()
 {
 	Slash();
 	
@@ -88,7 +91,7 @@ void Editor::Update()
 		CreateObjectAtMousePick();
 	}
 
-	SetActorPositionByDragging();
+	TransformActorByDragging();
 }
 
 void Editor::Render()
@@ -153,8 +156,8 @@ void Editor::SetupGizmo()
 	m_pGizmoCore->SetScale(Vec3(0.04f, 0.04f, 0.04f));
 	OBJECT->AddActor(m_pGizmoCore);
 
-	float _boxScale = 5.0f;
-	float _boxPosition = 4.0f;
+	float _boxScale = 135.0f;
+	float _boxPosition = 100.0f;
 
 	m_pGizmoX = make_shared<AActor>();
 	m_pGizmoX->m_szName = L"Gizmo";
@@ -162,7 +165,7 @@ void Editor::SetupGizmo()
 	shared_ptr<UBoxComponent> _pXBox = std::make_shared<UBoxComponent>();
 	_pXBox->m_bVisible = false;
 	_pXBox->SetShapeColor(Vec4(1.0f, 0.f, 0.f, 0.f));
-	_pXBox->SetLocalScale(Vec3(_boxScale, 0.4f, 0.4f));
+	_pXBox->SetLocalScale(Vec3(_boxScale, 10.0f, 10.0f));
 	_pXBox->SetLocalPosition(Vec3(_boxPosition, 0.0f, 0.0f));
 	_pXBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pGizmoX->SetShapeComponent(_pXBox);
@@ -176,7 +179,7 @@ void Editor::SetupGizmo()
 	shared_ptr<UBoxComponent> _pYBox = std::make_shared<UBoxComponent>();
 	_pYBox->m_bVisible = false;
 	_pYBox->SetShapeColor(Vec4(0.f, 1.0f, 0.f, 0.f));
-	_pYBox->SetLocalScale(Vec3(0.4f, _boxScale, 0.4f));
+	_pYBox->SetLocalScale(Vec3(10.0f, _boxScale, 10.0f));
 	_pYBox->SetLocalPosition(Vec3(0.0f, _boxPosition, 0.0f));
 	_pYBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pGizmoY->SetShapeComponent(_pYBox);
@@ -190,7 +193,7 @@ void Editor::SetupGizmo()
 	shared_ptr<UBoxComponent> _pZBox = std::make_shared<UBoxComponent>();
 	_pZBox->m_bVisible = false;
 	_pZBox->SetShapeColor(Vec4(0.f, 0.f, 1.0f, 0.f));
-	_pZBox->SetLocalScale(Vec3(0.4f, 0.4f, _boxScale));
+	_pZBox->SetLocalScale(Vec3(10.0f, 10.0f, _boxScale));
 	_pZBox->SetLocalPosition(Vec3(0.0f, 0.0f, _boxPosition));
 	_pZBox->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pGizmoZ->SetShapeComponent(_pZBox);
@@ -382,14 +385,13 @@ void Editor::SetupObjectEditorCallback()
 
 void Editor::SetupUIEditorCallback()
 {
-	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Vec4 sliceUV)
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Color _color, Vec4 sliceUV)
 		{
 			uiActor->m_szName = L"UI";
 			auto meshComp = UStaticMeshComponent::CreatePlane();
 			uiActor->SetMeshComponent(meshComp);
 
 			auto mat = make_shared<UMaterial>();
-			mat->SetUseEffect(false);
 			mat->Load(
 				std::wstring(texPath, texPath + strlen(texPath)),
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
@@ -406,6 +408,7 @@ void Editor::SetupUIEditorCallback()
 			uiActor->SetRotation(Vec3(actorData.Rotation));
 			uiActor->SetScale(Vec3(actorData.Scale));
 			uiActor->SetSliceData(sliceUV);
+			uiActor->SetColor(_color);
 
 			UI->AddUI(uiActor);
 		});
@@ -423,8 +426,30 @@ void Editor::SetClickPos()
 
 		if (pActor->m_szName != L"Gizmo")
 		{
-			GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			auto& vec = GUI->GetActorListUI()->GetMultiSelectedIDs();
+			if (INPUT->GetButtonDown(LSHIFT)/* && INPUT->GetButton(LCLICK)*/)
+			{
+				GUI->GetActorListUI()->SetMultiSelectMode(true);
+
+				auto found = std::find(vec.begin(), vec.end(), pActor->m_Index);
+				if (found != vec.end())
+					vec.erase(found);
+				else
+					vec.push_back(pActor->m_Index);
+
+				GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			}
+			else
+			{
+				GUI->GetActorListUI()->SetMultiSelectMode(false);
+
+				vec.clear();
+				vec.push_back(pActor->m_Index);
+				GUI->GetActorListUI()->SetSelectedActorID(pActor->m_Index);
+			}
+
 			GUI->GetActorListUI()->SetSelectedGizmoAxis(-1);
+			GUI->GetActorListUI()->RefreshSelectionVisuals();
 		}
 		else
 		{
@@ -460,14 +485,17 @@ void Editor::SetGizmoPosition(Vec3 _pos)
 	m_pGizmoZ->SetPosition(m_pGizmoCore->GetPosition());
 }
 
-void Editor::SetActorPositionByDragging()
+void Editor::TransformActorByDragging()
 {
 	if (GUI->GetObjectEditorUI()->IsPlacementMode()) return;
 
-	if (INPUT->GetButtonDown(LCLICK))
+	if (INPUT->GetButton(LCLICK))
 	{
 		SetClickPos();
+	}
 
+	if (INPUT->GetButtonDown(LCLICK))
+	{
 		UINT selectedID = GUI->GetActorListUI()->GetSelectedActorID();
 		if (selectedID > 0 && OBJECT->GetActorList().count(selectedID) > 0)
 		{
@@ -477,7 +505,7 @@ void Editor::SetActorPositionByDragging()
 			}
 
 			auto& actorMap = OBJECT->GetActorList();
-			auto _actor = actorMap.find(GUI->GetActorListUI()->GetSelectedActorID());
+			auto _actor = actorMap.find(selectedID);
 			if (_actor != actorMap.end())
 			{
 				auto actor = _actor->second;
@@ -498,7 +526,6 @@ void Editor::SetActorPositionByDragging()
 				auto axis = _axis->second;
 				if (!actor || !axis) return;
 
-				// 드래그 처리
 				POINT curMouse = INPUT->GetMousePos();
 				float deltaX = static_cast<float>(curMouse.x - m_vPrevMouse.x);
 				float deltaY = static_cast<float>(curMouse.y - m_vPrevMouse.y);
@@ -513,41 +540,74 @@ void Editor::SetActorPositionByDragging()
 				case GizmoMode::Translate:
 				{
 					if (axis == m_pGizmoX)
-						newPos.x += deltaX * 0.07f;
+						newPos.x += deltaX * 0.03f;
 					else if (axis == m_pGizmoY)
-						newPos.y -= deltaY * 0.07f;
+						newPos.y -= deltaY * 0.03f;
 					else if (axis == m_pGizmoZ)
-						newPos.z += deltaX * 0.07f;
+						newPos.z += deltaX * 0.03f;
 
-					actor->SetPosition(newPos);
+					Vec3 offset = newPos - m_vDragStartPos;
+
+					// 모든 선택된 애들에게 동일 offset 적용
+					const auto& selectedIDs = GUI->GetActorListUI()->GetMultiSelectedIDs();
+					for (UINT id : selectedIDs)
+					{
+						auto a = OBJECT->GetActor(id);
+						if (!a || a == actor) continue; // 기준 Actor 제외
+						a->SetPosition(a->GetPosition() + offset);
+					}
+
+					actor->SetPosition(actor->GetPosition() + offset);
 					SetGizmoPosition(actor->GetPosition());
 					break;
 				}
 				case GizmoMode::Rotate:
 				{
 					if (axis == m_pGizmoX)
-						newRot.x += deltaX * 0.07f;
+						newRot.x += deltaX * 0.03f;
 					else if (axis == m_pGizmoY)
-						newRot.y -= deltaY * 0.07f;
+						newRot.y -= deltaY * 0.03f;
 					else if (axis == m_pGizmoZ)
-						newRot.z += deltaX * 0.07f;
+						newRot.z += deltaX * 0.03f;
 
-					actor->SetRotation(newRot);
+					Vec3 offset = newRot - m_vDragStartRot;
+
+					const auto& selectedIDs = GUI->GetActorListUI()->GetMultiSelectedIDs();
+					for (UINT id : selectedIDs)
+					{
+						auto a = OBJECT->GetActor(id);
+						if (!a || a == actor) continue;
+						a->SetRotation(a->GetRotation() + offset);
+					}
+
+					actor->SetRotation(actor->GetRotation() + offset);
 					break;
 				}
 				case GizmoMode::Scale:
 				{
 					if (axis == m_pGizmoX)
-						newScale.x += deltaX * 0.07f;
+						newScale.x += deltaX * 0.03f;
 					else if (axis == m_pGizmoY)
-						newScale.y -= deltaY * 0.07f;
+						newScale.y -= deltaY * 0.03f;
 					else if (axis == m_pGizmoZ)
-						newScale.z += deltaX * 0.07f;
+						newScale.z += deltaX * 0.03f;
 
-					actor->SetScale(newScale);
+					Vec3 offset = newScale - m_vDragStartScale;
+
+					const auto& selectedIDs = GUI->GetActorListUI()->GetMultiSelectedIDs();
+					for (UINT id : selectedIDs)
+					{
+						auto a = OBJECT->GetActor(id);
+						if (!a || a == actor) continue;
+						a->SetScale(a->GetScale() + offset);
+					}
+
+					actor->SetScale(actor->GetScale() + offset);
 					break;
 				}
 				}
+
+				m_vPrevMouse = curMouse;
 			}
 		}
 	}
@@ -592,7 +652,6 @@ void Editor::CreateObjectAtMousePick()
 
 	GUI->GetObjectEditorUI()->CreateAtPosition(placePos);
 }
-
 
 void Editor::SetupParticleEditorCallback()
 {
@@ -674,220 +733,6 @@ void Editor::Slash()
 		if (t >= m_fSlashDuration)
 		{
 			m_bSlashPlaying = false;
-		}
-	}
-}
-
-
-void Editor::LoadAllPrefabs(const std::string& extension)
-{
-
-	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
-
-	for (const auto& file : files)
-	{
-		if (extension == ".map.json")
-		{
-			PrefabMapData mapData;
-			if (PREFAB->LoadMapTile(file, mapData))
-			{
-				auto tile = std::make_shared<ATerrainTileActor>();
-				tile->SetPrefabPath(file);
-				tile->m_szName = L"Terrain";
-				tile->m_iNumCols = mapData.Cols;
-				tile->m_iNumRows = mapData.Rows;
-				tile->m_fCellSize = mapData.CellSize;
-				tile->CreateTerrain(to_mw(mapData.TexturePath), to_mw(mapData.ShaderPath));
-				tile->SetPosition(mapData.Position);
-				tile->SetRotation(mapData.Rotation);
-				tile->SetScale(mapData.Scale);
-				OBJECT->AddActor(tile);
-			}
-		}
-		else if (extension == ".character.json")
-		{
-			PrefabCharacterData characterData;
-			if (PREFAB->LoadCharacter(file, characterData))
-			{
-				auto actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
-				actor->SetPrefabPath(file);
-
-				shared_ptr<UMeshComponent> meshComponent = meshLoader.Make(characterData.MeshPath.c_str());
-
-				actor->SetMeshComponent(meshComponent);
-
-				actor->m_szName = L"Character";
-				actor->SetPosition(Vec3(characterData.transform.Position));
-				actor->SetRotation(Vec3(characterData.transform.Rotation));
-				actor->SetScale(Vec3(characterData.transform.Scale));
-
-				if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
-
-				m_pPlayer = actor;
-
-				if (characterData.camera.isUse)
-				{
-					auto cameraComponent = make_shared<UCameraComponent>();
-					cameraComponent->SetLocalPosition(Vec3(characterData.camera.Position));
-					cameraComponent->SetLocalRotation(Vec3(characterData.camera.Rotation));
-					cameraComponent->SetPerspective(characterData.camera.Fov, characterData.camera.Aspect, characterData.camera.Near, characterData.camera.Far);
-					actor->SetCameraComponent(cameraComponent);
-				}
-
-				if (characterData.shape.isUse)
-				{
-					shared_ptr<UShapeComponent> shapeComponent = nullptr;
-					if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_BOX)
-						shapeComponent = make_shared<UBoxComponent>();
-					//else if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_SPHERE)
-
-					shapeComponent->SetLocalScale(Vec3(characterData.shape.Scale));
-					shapeComponent->SetLocalPosition(Vec3(characterData.shape.Position));
-					shapeComponent->SetLocalRotation(Vec3(characterData.shape.Rotation));
-					shapeComponent->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-					actor->SetShapeComponent(shapeComponent);
-				}
-
-
-				OBJECT->AddActor(actor);
-			}
-		}
-		else if (extension == ".object.json")
-		{
-			PrefabObjectData objData;
-			if (PREFAB->LoadObject(file, objData))
-			{
-				shared_ptr<UStaticMeshComponent> meshComp = make_shared<UStaticMeshComponent>();
-				if (SplitExt(to_mw(objData.MeshPath)) == L".obj")
-				{
-					//Profiler p("Mesh From Obj");
-					AssimpLoader loader;
-					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
-					meshComp->SetMeshPath(to_mw(objData.MeshPath)); // 이거 풀네임으로 들어가야되는건가 ? 나중에 어디서 쓰이나 ? 
-					auto meshRes = make_shared<UStaticMeshResources>();
-					if (!meshList.empty())
-					{
-						meshRes->SetVertexList(meshList[0].m_vVertexList);
-						meshRes->SetIndexList(meshList[0].m_vIndexList);
-						meshRes->Create();
-						meshComp->SetMesh(meshRes);
-					}
-
-				}
-				else
-				{
-					//Profiler p("Mesh From Asset");
-					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
-					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
-					meshComp->SetMeshPath(to_mw(objData.MeshPath));
-				}
-
-				auto material = make_shared<UMaterial>();
-				material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
-				meshComp->SetMaterial(material);
-
-				auto obj = make_shared<APawn>();
-				obj->SetPrefabPath(file);
-				obj->m_szName = L"Object";
-				obj->SetMeshComponent(meshComp);
-				obj->SetPosition(objData.Position);
-				obj->SetRotation(objData.Rotation);
-				obj->SetScale(objData.Scale);
-
-				if (objData.ShapeData.isUse)
-				{
-					shared_ptr<UShapeComponent> shapeComp = nullptr;
-
-					if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
-						shapeComp = std::make_shared<UBoxComponent>();
-					// else if (...) // 다른 타입 추가 가능
-
-					shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));
-					shapeComp->SetLocalPosition(Vec3(objData.ShapeData.Position));
-					shapeComp->SetLocalRotation(Vec3(objData.ShapeData.Rotation));
-					shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-
-					obj->SetShapeComponent(shapeComp);
-				}
-
-				OBJECT->AddActor(obj);
-			}
-		}
-		else if (extension == ".objects.json")
-		{
-			std::vector<PrefabObjectData> objList;
-			if (PREFAB->LoadObjectArray(file, objList))
-			{
-				for (auto& objData : objList)
-				{
-					auto meshComp = make_shared<UStaticMeshComponent>();
-					meshComp->SetMeshPath(to_mw(objData.MeshPath));
-
-					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
-					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
-
-					auto material = make_shared<UMaterial>();
-					material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
-					meshComp->SetMaterial(material);
-
-					auto obj = make_shared<APawn>();
-					obj->SetPrefabPath(file);
-					obj->m_szName = L"Object";
-					obj->SetMeshComponent(meshComp);
-					obj->SetPosition(objData.Position);
-					obj->SetRotation(objData.Rotation);
-					obj->SetScale(objData.Scale);
-
-					if (objData.ShapeData.isUse)
-					{
-						shared_ptr<UShapeComponent> shapeComp = nullptr;
-
-						if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
-							shapeComp = std::make_shared<UBoxComponent>();
-
-						shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));
-						shapeComp->SetLocalPosition(Vec3(objData.ShapeData.Position));
-						shapeComp->SetLocalRotation(Vec3(objData.ShapeData.Rotation));
-						shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-
-						obj->SetShapeComponent(shapeComp);
-					}
-
-					OBJECT->AddActor(obj);
-				}
-			}
-		}
-		else if (extension == ".ui.json")
-		{
-			PrefabUIData uiData;
-			if (PREFAB->LoadUI(file, uiData))
-			{
-				auto uiActor = make_shared<AUIActor>();
-				uiActor->m_szName = to_mw(uiData.Name);
-
-				auto meshComp = UStaticMeshComponent::CreatePlane();
-				uiActor->SetMeshComponent(meshComp);
-
-				auto mat = make_shared<UMaterial>();
-				mat->SetUseEffect(false);
-				mat->Load(L"", to_mw(uiData.ShaderPath));
-				meshComp->SetMaterial(mat);
-
-				uiActor->SetIdleTexture(TEXTURE->Get(to_mw(uiData.IdleTexturePath)));
-				uiActor->SetHoverTexture(TEXTURE->Get(to_mw(uiData.HoverTexturePath)));
-				uiActor->SetActiveTexture(TEXTURE->Get(to_mw(uiData.ActiveTexturePath)));
-				uiActor->SetSelectTexture(TEXTURE->Get(to_mw(uiData.SelectedTexturePath)));
-
-				uiActor->SetMeshComponent(meshComp);
-				uiActor->SetPosition(Vec3(uiData.transform.Position));
-				uiActor->SetRotation(Vec3(uiData.transform.Rotation));
-				uiActor->SetScale(Vec3(uiData.transform.Scale));
-				uiActor->SetSliceData(Vec4(uiData.SliceUV));
-
-				uiActor->SetPrefabData(uiData);
-
-				UI->AddUI(uiActor);
-			}
 		}
 	}
 }
