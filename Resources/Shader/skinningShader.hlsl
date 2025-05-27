@@ -105,24 +105,24 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     finalColor.rgb = ApplyGlow(finalColor.rgb);
 
     // output.c : 최종 결과
-    output.c = float4(finalColor);
+    //output.c = float4(finalColor);
 
     // output.c1 : Blur 대상용 (보통 최종 결과와 동일하게 해도 무방)
+    
+
+    float t = 1.0f - g_fHitFlashTime; // 0 → 1 (시간 흐름 반전)
+
+    float wave = sin(t * 20.0f * 3.14159); // 10회 진동
+    float decay = exp(-t * 4.0f); // 점점 감쇠 (조절 가능)
+
+    float strength = saturate(abs(wave) * decay);
+    float3 flashColor = float3(1.0f, 0.1f, 0.1f); // 강한 붉은색
+
+    finalColor.rgb = lerp(finalColor.rgb, flashColor, strength);
+    output.c = float4(finalColor);
     output.c1 = float4(finalColor);
 
- 
-    if (texColor.r > 0.3f)
-    {
-        float hitAmount = saturate(g_fHitFlashTime);
-        float3 pureWhite = float3(1, 1, 1);
-        float alpha = lerp(0.0f, 0.5f, hitAmount); // 약한 흰색 발광
-
-        output.c3 = float4(pureWhite, alpha); // c3: HitFlash 전용 RTV
-    }
-    else
-    {
-        output.c3 = float4(0.114, 0.129, 0.125, 0); // 사용하지 않음
-    }
+    //output.c3 = float4(flashColor, flashAlpha);
     
     output.c4.rgb = (ambient + diffuse) + specular;
     output.c4.a = 1.f;

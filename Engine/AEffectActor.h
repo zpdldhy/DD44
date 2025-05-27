@@ -11,12 +11,13 @@ public:
 
     void Play(float duration, const Vec3& velocity);
     virtual void Tick() override;
-    bool IsActive() const { return m_bRender && !m_bDelete;  }
+    bool IsActive() const { return m_bRender && !m_bDelete; }
 
 public:
     void SetGravity(float gravity) { m_fGravity = gravity; }
     void SetStartScale(const Vec3& scale) { m_vStartScale = scale; }
     void SetEndScale(const Vec3& scale) { m_vEndScale = scale; }
+
 
 private:
     EEffectType m_eType;
@@ -28,5 +29,5 @@ private:
     float m_fGravity = -30.0f;
 
     Vec3 m_vStartScale = Vec3(.1f, .1f, 5.1f);
-    Vec3 m_vEndScale = Vec3(3.f,.2f, 5.1f);
+    Vec3 m_vEndScale = Vec3(3.f, .2f, 5.1f);
 };

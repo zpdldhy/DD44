@@ -14,7 +14,7 @@
 #include "ALight.h"
 #include "APawn.h"
 #include "UMaterial.h"
-
+#include "Timer.h"
 #include "Input.h"
 
 void TestPlayer::Init()
@@ -71,7 +71,7 @@ void TestPlayer::Init()
 	// 플레이어 세팅
 	shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
 	player = make_shared<APawn>();
-	auto meshComponent = meshLoader->Make("../Resources/Asset/crow_final6.mesh.json");
+	auto meshComponent = meshLoader->Make("../Resources/Asset/crow_final.mesh.json");
 	player->SetMeshComponent(meshComponent);
 
 	player->SetPosition(Vec3(10, 10, 10));
@@ -80,6 +80,7 @@ void TestPlayer::Init()
 	cameraComponent->SetLocalPosition(Vec3(20.0f, 20.0f, -20.0f));
 	player->SetCameraComponent(cameraComponent);
 	player->AddScript(movement);
+
 	OBJECT->AddActor(player);
 
 	sword = player->GetMeshComponent()->GetChild(3);
@@ -97,38 +98,50 @@ void TestPlayer::Init()
 	}
 #pragma endregion
 	
-	{
-		socket = UStaticMeshComponent::CreateCube();
-		//shared_ptr<MeshTransform> mt = make_shared<MeshTransform>();
-		//socket->SetMeshTransform(mt);
-		sword->AddChild(socket);
-		socket->SetOwner(player);
-		socket->Init();
-		//socket->SetVisible(false);
-	}
+	//{
+	//	socket = UStaticMeshComponent::CreateCube();
+	//	//shared_ptr<MeshTransform> mt = make_shared<MeshTransform>();
+	//	//socket->SetMeshTransform(mt);
+	//	sword->AddChild(socket);
+	//	socket->SetOwner(player);
+	//	socket->Init();
+	//	//socket->SetVisible(false);
+	//}
 	
 }
 
 void TestPlayer::Tick()
 {
-	//socket->SetLocalPosition(sword->GetAnimWorld());
-
-	if (INPUT->GetButton(O))
+	if (INPUT->GetButtonDown(J))
 	{
-		if (m_bEnginCamera)
+		m_fHitFlashTimer = 1.f;  // 1초 동안
+		m_bIsFlashing = true;
+	}
+
+	if (m_bIsFlashing)
+	{
+		m_fHitFlashTimer -= TIMER->GetDeltaTime();
+		if (m_fHitFlashTimer <= 0.0f)
 		{
-			m_bEnginCamera = false;
-			CAMERA->Set3DCameraActor(player);
+			m_fHitFlashTimer = 0.0f;
+			m_bIsFlashing = false;
 		}
-		else
-		{
-			m_bEnginCamera = true;
-			CAMERA->Set3DCameraActor(m_pCameraActor);
-		}
+
+		// hitFlashAmount는 1 → 0 으로 감소
+		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
+		
+		auto root = player->GetMeshComponent();
+		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
 }
 
 void TestPlayer::Render()
+{
+
+	
+}
+
+void TestPlayer::Destroy()
 {
 }
 
@@ -156,4 +169,38 @@ void TestPlayer::SetupEngineCamera()
 
 	CAMERA->Set3DCameraActor(m_pCameraEngine);
 	OBJECT->AddActor(m_pCameraEngine);
+}
+
+
+// 빈 함수, 기능 필요하면 넣기용.
+void TestPlayer::VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+	{
+	
+	}
+	
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		VisitAllMeshMaterials(comp->GetChild(i));
+	}
+}
+
+void TestPlayer::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetHitFlashTime(value); // CB에 g_fHitFlashTime 전달
+	}
+
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
+	}
 }

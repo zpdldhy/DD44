@@ -7,14 +7,14 @@
 
 void EffectManager::Init()
 {
-    for (int i = 0; i < 50; ++i) 
+    for (int i = 0; i < 50; ++i)
     {
         for (int t = 0; t <= (int)EEffectType::Dust; ++t)
         {
             auto actor = CreateEffectActor((EEffectType)t);
             actor->m_szName = L"Effect";
             m_mEffectPool[(EEffectType)t].push_back(actor);
-            OBJECT->AddActor(actor); 
+            OBJECT->AddActor(actor);
         }
     }
 }

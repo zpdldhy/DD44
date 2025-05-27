@@ -26,8 +26,8 @@ void AEffectActor::Tick()
     pos += m_vVelocity * TIMER->GetDeltaTime();
     SetPosition(pos);
 
-   /* m_vVelocity.x += RandomRange(-1.0f, 1.0f);
-    m_vVelocity.y += RandomRange(-1.0f, 1.0f);*/
+    /* m_vVelocity.x += RandomRange(-1.0f, 1.0f);
+     m_vVelocity.y += RandomRange(-1.0f, 1.0f);*/
 
     float t = 1.0f - (m_fRemainTime / m_fDuration);// 진행 비율 (0~1)
     t = pow(t, 2);
