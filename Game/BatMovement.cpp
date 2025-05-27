@@ -2,6 +2,7 @@
 #include "BatMovement.h"
 #include "Timer.h"
 #include <algorithm>
+#include "EffectManager.h"
 // temp
 #include "Input.h"
 
@@ -57,21 +58,6 @@ void BatMovement::Tick()
 		Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
 		Vec3 moveDir = tempUp.Cross(direction); // 반시계 방향
 
-		//float targetYaw = atan2f(moveDir.x, moveDir.z);
-		//Vec3 currentRot = GetOwner()->GetRotation();
-		//float currentYaw = currentRot.y;
-
-		//// 각도 차이 계산
-		//float angleDiff = targetYaw - currentYaw;
-		//while (angleDiff > DD_PI)  angleDiff -= DD_PI * 2;
-		//while (angleDiff < -DD_PI) angleDiff += DD_PI * 2;
-
-		//// Lerp 계산
-		//float smoothedYaw = currentRot.y + angleDiff * m_fRotationSpeed * TIMER->GetDeltaTime();
-
-		//currentRot.y = smoothedYaw;
-		//GetOwner()->SetRotation(currentRot);
-
 		// 회전 TargetPos 바라보기
 		float targetYaw = atan2f(moveDir.x, moveDir.z);
 		Vec3 currentRot = GetOwner()->GetRotation();
@@ -102,7 +88,7 @@ void BatMovement::Tick()
 			}
 			// 시도 2 : 다른 접점으로 이동
 			{
-	/*			Vec3 d = GetOwner()->GetPosition() - m_vCenter;
+			/*	Vec3 d = GetOwner()->GetPosition() - m_vCenter;
 				float dLength = d.Length();
 				Vec3 d_norm = d / dLength;
 
@@ -144,6 +130,16 @@ void BatMovement::Tick()
 	{
 		ChangetState(death);
 		// 죽는 효과
+	}
+
+	if (INPUT->GetButton(J))
+	{
+		Vec3 basePos = GetOwner()->GetPosition();
+		Vec3 look = GetOwner()->GetLook();
+		Vec3 velocity = look * -1.0f;
+		//basePos.z += velocity.z * 0.8f;
+		//basePos.y += 0.2f;
+		PlayBloodBurst(basePos, velocity, 10.0f, 90.0f);
 	}
 
 }
@@ -198,4 +194,17 @@ void BatMovement::ReturningToPos()
 
 	currentRot.y = smoothedYaw;
 	GetOwner()->SetRotation(currentRot);
+}
+
+void BatMovement::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)
+{
+	int count = RandomRange(_minCount, _maxCount);
+	for (int i = 0; i < count; ++i)
+	{
+		Vec3 offset = Vec3(RandomRange(-0.3f, 0.3f), RandomRange(-0.3f, 0.3f), RandomRange(-0.3f, 0.3f));
+		Vec3 pos = _origin + offset;
+
+		Vec3 baseVelocity = _direction * _speed;
+		EFFECT->PlayEffect(EEffectType::Blood, pos, _spreadAngleDeg, baseVelocity);
+	}
 }

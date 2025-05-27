@@ -37,4 +37,5 @@ public:
 public:
 	void ChangetState(shared_ptr<StateBase> _state);
 	void ReturningToPos();
+	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
 };
