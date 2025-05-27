@@ -160,16 +160,19 @@
     <FxCompile Include="..\Resources\Shader\CameraFrustum.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\Resources\Shader\SpriteWorld.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources\Shader\Header.hlsli">
       <Filter>Shader</Filter>
     </None>
-    <None Include="..\Resources\Prefab\MyTile.map.json">
-      <Filter>Prefab</Filter>
-    </None>
     <None Include="..\Resources\Shader\MainHeader.hlsli">
       <Filter>Shader</Filter>
+    </None>
+    <None Include="..\Resources\Prefab\Game.objects.json">
+      <Filter>Prefab</Filter>
     </None>
   </ItemGroup>
 </Project>

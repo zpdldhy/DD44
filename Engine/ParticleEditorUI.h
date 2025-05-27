@@ -16,6 +16,7 @@ public:
 		m_OnCreate = std::move(callback);
 	}
 
+
 private:
 	void UpdateUIActor();
 	void ResetData();

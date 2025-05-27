@@ -36,6 +36,9 @@ PS_OUT_DUAL PS(VS_OUT input)
     PS_OUT_DUAL psOut = (PS_OUT_DUAL) 0;
 
     float4 texColor = g_txDiffuseA.Sample(sample, remapUV(input.t));
+    
+    if(texColor.a < 0.1)
+        discard;
 
     float alpha = max(max(texColor.r, texColor.g), texColor.b);
 

@@ -154,7 +154,7 @@ void ActorListUI::DrawUI()
 		ImGui::SetNextWindowPos(ImVec2(10.0f, ImGui::GetIO().DisplaySize.y - 870.0f), ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(300, 600), ImGuiCond_Always);
 
-		ImGui::Begin("Selected Actor Details", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+		ImGui::Begin("Selected Actor Details", &m_bVisible, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
 		auto it = actorMap.find(m_iSelectedActorID);
 		if (it != actorMap.end())
@@ -176,6 +176,16 @@ void ActorListUI::DrawUI()
 
 			if (ImGui::Button("Delete"))
 			{
+				for (auto& pair : actorMap)
+				{
+					auto gizmo_axis = pair.second;
+
+					if (gizmo_axis->m_szName == L"Gizmo")
+					{
+						OBJECT->RemoveActor(gizmo_axis);
+					}
+				}
+
 				OBJECT->RemoveActor(actor);
 				m_iSelectedActorID = -1;
 			}

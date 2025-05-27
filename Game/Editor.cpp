@@ -23,6 +23,7 @@
 #include "ParticleManager.h"
 #include "Timer.h"
 #include "PrefabToActor.h"
+#include "EffectManager.h"
 
 bool bRunGame = true;
 
@@ -34,6 +35,9 @@ void Editor::Init()
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
 	meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
+	//actorLoader.ConvertFbxToAsset("../Resources/Obj/*.fbx");
+	//objectLoader.ConvertObjToAsset("../Resources/Obj/*.obj");
+	
 	{
 		m_pSlashMaterial = make_shared<UMaterial>();
 		m_pSlashMaterial->Load(
@@ -54,7 +58,7 @@ void Editor::Init()
 
 	SetupEngineCamera();
 	SetupSkybox();
-	SetupSunLight();
+	SetupSunLight();	
 }
 
 void Editor::Tick()
@@ -75,6 +79,16 @@ void Editor::Tick()
 		}
 	}
 
+	if (INPUT->GetButton(J))
+	{
+		Vec3 pos = Vec3(0.0f, 1.0f, 0.0f);
+		Vec3 velocity = Vec3(0, 10, -10); // À§·Î Æ¢°Ô
+		for (int i = 0; i < 5; ++i)
+		{
+			EFFECT->PlayEffect(EEffectType::Blood, pos, 45.0f, velocity);
+		}
+	}
+
 	if (GUI->GetObjectEditorUI()->IsPlacementMode() && INPUT->GetButton(LCLICK))
 	{
 		CreateObjectAtMousePick();
@@ -90,6 +104,7 @@ void Editor::Render()
 
 void Editor::Destroy()
 {
+
 }
 
 void Editor::SetupEngineCamera()
@@ -703,14 +718,10 @@ void Editor::Slash()
 		float progress = 0.0f;
 
 
-		if (t <= 0.2f)
+		if (t <= 0.4f)
 		{
-			float ratio = t / 0.2f;
+			float ratio = t / 0.4f;
 			progress = pow(ratio, 2.0f);
-		}
-		else if (t <= 0.5f)
-		{
-			progress = 1.0f;
 		}
 		else
 		{
