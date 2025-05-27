@@ -8,10 +8,6 @@ class EffectManager : public Singleton<EffectManager>
 {
 public:
     void Init();            // 초기 Pool 생성
-    void Tick();            // 수명 관리
-    void Render();          // 렌더링 호출
-    void Destroy();         // 전체 제거
-
     void PlayEffect(EEffectType type, const Vec3& pos, float angle, const Vec3& velocity);
 
 private:

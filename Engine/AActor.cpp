@@ -50,6 +50,9 @@ void AActor::Tick()
 
 void AActor::Render()
 {
+	if (!m_bRender)
+		return;
+
 	for (auto& component : m_arrComponent)
 	{
 		if (component)

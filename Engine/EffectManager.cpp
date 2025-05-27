@@ -12,6 +12,7 @@ void EffectManager::Init()
         for (int t = 0; t <= (int)EEffectType::Dust; ++t)
         {
             auto actor = CreateEffectActor((EEffectType)t);
+            actor->m_szName = L"Effect";
             m_mEffectPool[(EEffectType)t].push_back(actor);
             OBJECT->AddActor(actor); 
         }
@@ -57,10 +58,6 @@ shared_ptr<AEffectActor> EffectManager::GetReusableActor(EEffectType type)
             return actor;
     }
 
-    //// 다 쓰였으면 새로 생성
-    //auto newActor = CreateEffectActor(type);
-    //m_mEffectPool[type].push_back(newActor);
-    //OBJECT->AddActor(newActor);
     return nullptr;
 }
 
@@ -87,31 +84,3 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     actor->Play(1.0f, velocity);
 }
 
-void EffectManager::Tick()
-{
-    for (auto& pair : m_mEffectPool)
-    {
-        auto& list = pair.second;
-        for (auto& actor : list)
-            actor->Tick();
-    }
-}
-
-void EffectManager::Render()
-{
-    for (auto& pair : m_mEffectPool)
-    {
-        auto& list = pair.second;
-        for (auto& actor : list)
-            actor->Render();
-    }
-}
-
-void EffectManager::Destroy()
-{
-    for (auto& pair : m_mEffectPool)
-    {
-        pair.second.clear();
-    }
-    m_mEffectPool.clear();
-}

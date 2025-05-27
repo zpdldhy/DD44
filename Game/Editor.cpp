@@ -52,14 +52,12 @@ void Editor::Init()
 
 	SetupEngineCamera();
 	SetupSkybox();
-	SetupSunLight();
-	EFFECT->Init();
+	SetupSunLight();	
 }
 
 void Editor::Update()
 {
 	Slash();
-	EFFECT->Tick();
 	
 	if (INPUT->GetButton(O))
 	{
@@ -95,12 +93,12 @@ void Editor::Update()
 
 void Editor::Render()
 {
-	EFFECT->Render();
+
 }
 
 void Editor::Destroy()
 {
-	EFFECT->Destroy();
+
 }
 
 void Editor::SetupEngineCamera()
