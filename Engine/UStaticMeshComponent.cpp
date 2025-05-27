@@ -2,7 +2,6 @@
 #include "UStaticMeshComponent.h"
 #include "UMaterial.h"
 #include "AActor.h"
-#include "MeshTransform.h"
 
 void UStaticMeshComponent::Init()
 {

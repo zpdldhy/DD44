@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "UMeshComponent.h"
-#include "MeshTransform.h"
 
 
 void UMeshComponent::Render()
