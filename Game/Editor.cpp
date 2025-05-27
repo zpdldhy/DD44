@@ -33,6 +33,8 @@ void Editor::Init()
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
 	meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
+	//objectLoader.ConvertObjToAsset("../Resources/Obj/*.obj");
+
 	if (INPUT->GetButton(P))
 	{
 		//actorLoader.ConvertObjToAsset("../Resources/Obj/");
