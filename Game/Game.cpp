@@ -120,6 +120,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 			if (PREFAB->LoadMapTile(file, mapData))
 			{
 				auto tile = std::make_shared<ATerrainTileActor>();
+				tile->SetPrefabPath(file);
 				tile->m_szName = L"Terrain";
 				tile->m_iNumCols = mapData.Cols;
 				tile->m_iNumRows = mapData.Rows;
@@ -215,6 +216,7 @@ void Game::LoadAllPrefabs(const std::string& extension)
 					//Profiler p("Mesh From Asset");
 					auto resources = actorLoader.LoadOneRes(objData.MeshPath);
 					meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
+					meshComp->SetMeshPath(to_mw(objData.MeshPath));
 				}
 
 				auto material = make_shared<UMaterial>();
@@ -222,11 +224,28 @@ void Game::LoadAllPrefabs(const std::string& extension)
 				meshComp->SetMaterial(material);
 
 				auto obj = make_shared<APawn>();
+				obj->SetPrefabPath(file);
 				obj->m_szName = L"Object";
 				obj->SetMeshComponent(meshComp);
 				obj->SetPosition(objData.Position);
 				obj->SetRotation(objData.Rotation);
 				obj->SetScale(objData.Scale);
+
+				if (objData.ShapeData.isUse)
+				{
+					shared_ptr<UShapeComponent> shapeComp = nullptr;
+
+					if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
+						shapeComp = std::make_shared<UBoxComponent>();
+					// else if (...) // 다른 타입 추가 가능
+
+					shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));
+					shapeComp->SetLocalPosition(Vec3(objData.ShapeData.Position));
+					shapeComp->SetLocalRotation(Vec3(objData.ShapeData.Rotation));
+					shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+					obj->SetShapeComponent(shapeComp);
+				}
 
 				OBJECT->AddActor(obj);
 			}
@@ -249,11 +268,27 @@ void Game::LoadAllPrefabs(const std::string& extension)
 					meshComp->SetMaterial(material);
 
 					auto obj = make_shared<APawn>();
+					obj->SetPrefabPath(file);
 					obj->m_szName = L"Object";
 					obj->SetMeshComponent(meshComp);
 					obj->SetPosition(objData.Position);
 					obj->SetRotation(objData.Rotation);
 					obj->SetScale(objData.Scale);
+
+					if (objData.ShapeData.isUse)
+					{
+						shared_ptr<UShapeComponent> shapeComp = nullptr;
+
+						if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
+							shapeComp = std::make_shared<UBoxComponent>();
+
+						shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));
+						shapeComp->SetLocalPosition(Vec3(objData.ShapeData.Position));
+						shapeComp->SetLocalRotation(Vec3(objData.ShapeData.Rotation));
+						shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+						obj->SetShapeComponent(shapeComp);
+					}
 
 					OBJECT->AddActor(obj);
 				}

@@ -246,7 +246,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Resources\Prefab\MyTile.map.json" />
+    <None Include="..\Resources\Prefab\Game.objects.json" />
     <None Include="..\Resources\Shader\Header.hlsli" />
     <None Include="..\Resources\Shader\MainHeader.hlsli" />
   </ItemGroup>
