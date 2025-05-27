@@ -146,6 +146,7 @@
     <ClInclude Include="EnemyState.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameCameraMove.h" />
     <ClInclude Include="IntroScene.h" />
     <ClInclude Include="HeadRollerStates.h" />
     <ClInclude Include="kkongchiMoveScript.h" />
@@ -168,6 +169,7 @@
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameCameraMove.cpp" />
     <ClCompile Include="IntroScene.cpp" />
     <ClCompile Include="HeadRollerStates.cpp" />
     <ClCompile Include="kkongchiMoveScript.cpp" />

@@ -8,6 +8,7 @@ class Editor : public IExecute
 {
 public:
 	shared_ptr<class ACameraActor> m_pCameraActor;
+	shared_ptr<class ACameraActor> m_pGameCameraActor;
 
 	shared_ptr<class AActor> m_pPlayer;
 
@@ -51,6 +52,7 @@ public:
 
 protected:
 	void SetupEngineCamera();
+	void SetupGameCamera();
 	void SetupSkybox();
 	void SetupSunLight();
 	void SetupGizmo();
@@ -61,9 +63,6 @@ protected:
 	void SetupObjectEditorCallback();
 	void SetupUIEditorCallback();
 	void SetupParticleEditorCallback();
-
-	void Slash();
-	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
 
 	void SetClickPos();
 	void SetGizmoPosition(Vec3 _pos);
