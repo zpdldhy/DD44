@@ -123,3 +123,13 @@ static float RandomRange(float min, float max)
 	float t = dist(gen); // [0,1]
 	return min + (max - min) * t;
 }
+
+static float DegreesToRadians(float degrees)
+{
+	return degrees * (3.14159265f / 180.0f);
+}
+
+static float Lerp(float a, float b, float t)
+{
+	return a + (b - a) * t;
+}
