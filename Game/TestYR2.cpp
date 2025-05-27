@@ -313,8 +313,6 @@ void TestYR2::AddChild(PreMeshData data)
 
 void TestYR2::SetupLight()
 {
-	LIGHTMANAGER->Init();
-
 	auto m_pSunLight = make_shared<ALight>();
 	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
