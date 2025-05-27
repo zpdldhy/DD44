@@ -39,7 +39,7 @@ void AUIActor::Render()
 	if (m_pUISliceCB)
 	{
 		DC->UpdateSubresource(m_pUISliceCB.Get(), 0, nullptr, &m_tUISliceData, 0, 0);
-		DC->PSSetConstantBuffers(2, 1, m_pUISliceCB.GetAddressOf());
+		DC->PSSetConstantBuffers(3, 1, m_pUISliceCB.GetAddressOf());
 	}
 
 	AActor::Render();

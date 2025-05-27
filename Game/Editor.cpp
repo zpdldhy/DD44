@@ -23,6 +23,7 @@
 #include "ParticleManager.h"
 #include "Timer.h"
 #include "PrefabToActor.h"
+#include "EffectManager.h"
 
 #include "BatMovement.h"
 bool bRunGame = true;
@@ -35,6 +36,9 @@ void Editor::Init()
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
 	meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
+	//actorLoader.ConvertFbxToAsset("../Resources/Obj/*.fbx");
+	//objectLoader.ConvertObjToAsset("../Resources/Obj/*.obj");
+	
 	{
 		m_pSlashMaterial = make_shared<UMaterial>();
 		m_pSlashMaterial->Load(
@@ -46,9 +50,8 @@ void Editor::Init()
 	SetupEditorCallbacks();
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
-	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
-	UI->AddUIList(PToA->LoadAllPrefabs(".ui.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));	
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	m_pPlayer = vlist[0];
@@ -56,10 +59,10 @@ void Editor::Init()
 
 	SetupEngineCamera();
 	SetupSkybox();
-	SetupSunLight();
+	SetupSunLight();	
 }
 
-void Editor::Update()
+void Editor::Tick()
 {
 	Slash();
 	
@@ -74,6 +77,16 @@ void Editor::Update()
 		{
 			m_bEnginCamera = true;
 			CAMERA->Set3DCameraActor(m_pCameraActor);
+		}
+	}
+
+	if (INPUT->GetButton(J))
+	{
+		Vec3 pos = Vec3(0.0f, 1.0f, 0.0f);
+		Vec3 velocity = Vec3(0, 10, -10); // À§·Î Æ¢°Ô
+		for (int i = 0; i < 5; ++i)
+		{
+			EFFECT->PlayEffect(EEffectType::Blood, pos, 45.0f, velocity);
 		}
 	}
 
@@ -92,6 +105,7 @@ void Editor::Render()
 
 void Editor::Destroy()
 {
+
 }
 
 void Editor::SetupEngineCamera()
@@ -122,8 +136,6 @@ void Editor::SetupSkybox()
 
 void Editor::SetupSunLight()
 {
-	LIGHTMANAGER->Init();
-
 	m_pSunLight = make_shared<ALight>();
 	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
@@ -382,7 +394,6 @@ void Editor::SetupUIEditorCallback()
 			uiActor->SetMeshComponent(meshComp);
 
 			auto mat = make_shared<UMaterial>();
-			mat->SetUseEffect(false);
 			mat->Load(
 				std::wstring(texPath, texPath + strlen(texPath)),
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
@@ -708,14 +719,10 @@ void Editor::Slash()
 		float progress = 0.0f;
 
 
-		if (t <= 0.2f)
+		if (t <= 0.4f)
 		{
-			float ratio = t / 0.2f;
+			float ratio = t / 0.4f;
 			progress = pow(ratio, 2.0f);
-		}
-		else if (t <= 0.5f)
-		{
-			progress = 1.0f;
 		}
 		else
 		{

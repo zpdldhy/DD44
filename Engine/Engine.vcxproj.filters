@@ -79,6 +79,9 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{b1a39402-c961-4f46-9178-8b7fa133cfd9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Particle">
+      <UniqueIdentifier>{67455e0f-9624-457e-8b76-6cbcab286cd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -327,9 +330,6 @@
     <ClInclude Include="ParticleEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="AParticleActor.h">
-      <Filter>Object</Filter>
-    </ClInclude>
     <ClInclude Include="ParticleManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
@@ -348,6 +348,18 @@
     </ClInclude>
     <ClInclude Include="MeshEditorUI.h">
       <Filter>Utils\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EffectType.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="AParticleActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="AEffectActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="EffectManager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="MeshTransform.h" />
     <ClInclude Include="StateBase.h">
@@ -576,9 +588,6 @@
     <ClCompile Include="ParticleEditorUI.cpp">
       <Filter>Utils\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="AParticleActor.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
     <ClCompile Include="ParticleManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -594,6 +603,15 @@
     </ClCompile>
     <ClCompile Include="MeshEditorUI.cpp">
       <Filter>Utils\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="AParticleActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="AEffectActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectManager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

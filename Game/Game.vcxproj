@@ -146,6 +146,7 @@
     <ClInclude Include="EnemyState.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="IntroScene.h" />
     <ClInclude Include="HeadRollerStates.h" />
     <ClInclude Include="kkongchiMoveScript.h" />
     <ClInclude Include="Main.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="IntroScene.cpp" />
     <ClCompile Include="HeadRollerStates.cpp" />
     <ClCompile Include="kkongchiMoveScript.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -240,6 +242,11 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="..\Resources\Shader\SpriteWorld.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="..\Resources\Shader\Sword.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
@@ -257,7 +264,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Resources\Prefab\MyTile.map.json" />
+    <None Include="..\Resources\Prefab\Game.objects.json" />
     <None Include="..\Resources\Shader\Header.hlsli" />
     <None Include="..\Resources\Shader\MainHeader.hlsli" />
   </ItemGroup>

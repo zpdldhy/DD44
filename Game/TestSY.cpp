@@ -38,8 +38,6 @@
 
 void TestSY::Init()
 {
-	LIGHTMANAGER->Init();
-
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
 		m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
@@ -418,7 +416,7 @@ void TestSY::Init()
 	LIGHTMANAGER->RegisterLight(m_pLight);
 }
 
-void TestSY::Update()
+void TestSY::Tick()
 {
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	if (INPUT->GetButtonDown(O))

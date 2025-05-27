@@ -9,6 +9,20 @@
 
 void ParticleEditorUI::DrawUI()
 {
+	for (int i = 0; i < m_vCreatedParticles.size(); )
+	{
+		if (m_vCreatedParticles[i]->m_bDelete)
+		{
+			m_vCreatedParticles.erase(m_vCreatedParticles.begin() + i);
+			m_vParticleData.erase(m_vParticleData.begin() + i);
+			if (m_iSelectedParticleIndex >= i && m_iSelectedParticleIndex > 0)
+				m_iSelectedParticleIndex--;
+			continue;
+		}
+		++i;
+	}
+
+
 	static bool bInit = false;
 	if (!bInit)
 	{
@@ -309,9 +323,24 @@ void ParticleEditorUI::DrawUI()
 
 		ImGui::ListBox("##ParticleList", &m_iSelectedParticleIndex, particleNames.data(), (int)particleNames.size(), 5);
 
+		if (ImGui::Button("Delete Selected") && m_iSelectedParticleIndex >= 0 && m_iSelectedParticleIndex < m_vCreatedParticles.size())
+		{
+
+			auto target = m_vCreatedParticles[m_iSelectedParticleIndex];
+			target->m_bDelete = true;
+			m_vCreatedParticles.erase(m_vCreatedParticles.begin() + m_iSelectedParticleIndex);
+			m_vParticleData.erase(m_vParticleData.begin() + m_iSelectedParticleIndex);
+			m_iSelectedParticleIndex = -1;
+			m_iLastSelectedParticleIndex = -1;
+		}
+
 		if (m_iSelectedParticleIndex >= 0 && m_iSelectedParticleIndex < m_vParticleData.size())
 		{
-			m_Data = m_vParticleData[m_iSelectedParticleIndex];
+			if (m_iSelectedParticleIndex != m_iLastSelectedParticleIndex)
+			{
+				m_Data = m_vParticleData[m_iSelectedParticleIndex];
+				m_iLastSelectedParticleIndex = m_iSelectedParticleIndex;
+			}
 		}
 	}
 

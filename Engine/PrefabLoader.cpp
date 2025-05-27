@@ -440,7 +440,12 @@ bool PrefabLoader::SaveUI(const PrefabUIData& _prefab, const std::string& _fileP
     json j;
     j["Name"] = _prefab.Name;
 
-    SaveTransform(j, _prefab.transform);
+    // position은 NDC로 변환해서 저장    
+	auto transform = _prefab.transform;
+    transform.Position[0] = transform.Position[0] / (static_cast<float>(g_windowSize.x) / 2.0f);
+	transform.Position[1] = transform.Position[1] / (static_cast<float>(g_windowSize.y) / 2.0f);
+
+    SaveTransform(j, transform);
 
     j["Color"] = { _prefab.color[0], _prefab.color[1] ,_prefab.color[2] ,_prefab.color[3] };
     j["SliceUV"] = { _prefab.SliceUV[0], _prefab.SliceUV[1], _prefab.SliceUV[2], _prefab.SliceUV[3] };
@@ -471,7 +476,12 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
 
     _prefab.Name = j["Name"];
 
+    // position은 NDC로 변환해서 로드
+
     LoadTransform(j, _prefab.transform);
+
+	_prefab.transform.Position[0] *= (static_cast<float>(g_windowSize.x) / 2.0f);
+	_prefab.transform.Position[1] *= (static_cast<float>(g_windowSize.y) / 2.0f);
 
     auto c = j["Color"];
     for (int i = 0; i < 4; i++)   _prefab.color[i] = c[i];
@@ -484,6 +494,86 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
     _prefab.ActiveTexturePath = j["TexturePath"]["Active"];
     _prefab.SelectedTexturePath = j["TexturePath"]["Selected"];
     _prefab.ShaderPath = j["ShaderPath"];
+
+    return true;
+}
+
+bool PrefabLoader::SaveUIs(const vector<PrefabUIData>& _prefabs, const string& _filePath)
+{
+    json j = json::array();
+
+    for (const auto& p : _prefabs)
+    {
+        json item;
+        item["Name"] = p.Name;
+
+        // position은 NDC로 변환해서 저장    
+        auto transform = p.transform;
+        transform.Position[0] = transform.Position[0] / (static_cast<float>(g_windowSize.x) / 2.0f);
+        transform.Position[1] = transform.Position[1] / (static_cast<float>(g_windowSize.y) / 2.0f);
+
+        SaveTransform(item, transform);
+
+        item["Color"] = { p.color[0], p.color[1] ,p.color[2] ,p.color[3] };
+        item["SliceUV"] = { p.SliceUV[0], p.SliceUV[1], p.SliceUV[2], p.SliceUV[3] };
+
+        item["TexturePath"] = {
+           { "Idle", p.IdleTexturePath },
+           { "Hover", p.HoverTexturePath },
+           { "Active", p.ActiveTexturePath },
+           { "Selected", p.SelectedTexturePath }
+        };
+
+        item["ShaderPath"] = p.ShaderPath;
+
+        j.push_back(item);
+    }
+
+    std::ofstream file(_filePath);
+    if (!file.is_open()) return false;
+
+    file << j.dump(4);
+    return true;
+}
+
+bool PrefabLoader::LoadUIs(const string& _filePath, vector<PrefabUIData>& _outPrefabs)
+{
+
+    std::ifstream file(_filePath);
+    if (!file.is_open()) return false;
+
+    json j;
+    file >> j;
+
+    if (!j.is_array()) return false;
+
+    for (auto& item : j)
+    {
+		PrefabUIData _prefab;
+
+        _prefab.Name = item["Name"];
+
+        // position은 NDC로 변환해서 로드
+
+        LoadTransform(item, _prefab.transform);
+
+        _prefab.transform.Position[0] *= (static_cast<float>(g_windowSize.x) / 2.0f);
+        _prefab.transform.Position[1] *= (static_cast<float>(g_windowSize.y) / 2.0f);
+
+        auto c = item["Color"];
+        for (int i = 0; i < 4; i++)   _prefab.color[i] = c[i];
+
+        auto s = item["SliceUV"];
+        for (int i = 0; i < 4; i++)   _prefab.SliceUV[i] = s[i];
+
+        _prefab.IdleTexturePath = item["TexturePath"]["Idle"];
+        _prefab.HoverTexturePath = item["TexturePath"]["Hover"];
+        _prefab.ActiveTexturePath = item["TexturePath"]["Active"];
+        _prefab.SelectedTexturePath = item["TexturePath"]["Selected"];
+        _prefab.ShaderPath = item["ShaderPath"];
+
+        _outPrefabs.push_back(_prefab);
+    }
 
     return true;
 }

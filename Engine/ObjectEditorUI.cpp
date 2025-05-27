@@ -8,7 +8,7 @@ void ObjectEditorUI::DrawUI()
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Browse Mesh Files");
 
     ImGui::BeginChild("FileExplorer", ImVec2(0, 200), true);
-    StartFileBrowser("../Resources/Obj/", "");
+    StartFileBrowser("../Resources/Asset/", "");
     ImGui::EndChild();
 
     ImGui::Checkbox("Placement Mode", &m_bPlacementMode);
@@ -149,9 +149,13 @@ void ObjectEditorUI::DrawUI()
     ImGui::Separator(); ImGui::Spacing();
 
     // ΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑ Prefab List ΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑ
+    // ΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑ Prefab List ΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑΑ
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Prefab Browser");
 
     m_vObjectPrefabList = PREFAB->GetPrefabFileNames("../Resources/Prefab/", ".object.json");
+    auto multiList = PREFAB->GetPrefabFileNames("../Resources/Prefab/", ".objects.json");
+    m_vObjectPrefabList.insert(m_vObjectPrefabList.end(), multiList.begin(), multiList.end());
+
     static std::string selectedPrefabName = "";
 
     for (const auto& name : m_vObjectPrefabList)
@@ -164,29 +168,61 @@ void ObjectEditorUI::DrawUI()
     {
         if (ImGui::Button("Load Prefab##List"))
         {
-            PrefabObjectData data;
             std::string path = "../Resources/Prefab/" + selectedPrefabName + ".json";
-            if (PREFAB->LoadObject(path, data))
+
+            // 汗荐 橇府普 贸府 (.objects.json)
+            if (selectedPrefabName.find(".objects") != std::string::npos)
             {
-                if (m_OnCreate)
+                std::vector<PrefabObjectData> dataList;
+                if (PREFAB->LoadObjectArray(path, dataList))
                 {
-                    m_OnCreate(
-                        m_szTexturePath,
-                        m_szShaderPath,
-                        m_szObjPath,
-                        Vec3(m_fPosition[0], m_fPosition[1], m_fPosition[2]),
-                        Vec3(m_fRotation[0], m_fRotation[1], m_fRotation[2]),
-                        Vec3(m_fScale[0], m_fScale[1], m_fScale[2]),
-                        Vec3(m_fSpecularColor[0], m_fSpecularColor[1], m_fSpecularColor[2]),
-                        m_fShininess,
-                        Vec3(m_fEmissiveColor[0], m_fEmissiveColor[1], m_fEmissiveColor[2]),
-                        m_fEmissivePower,
-                        m_ShapeData
-                    );
+                    for (const auto& data : dataList)
+                    {
+                        if (m_OnCreate)
+                        {
+                            m_OnCreate(
+                                data.TexturePath.c_str(),
+                                data.ShaderPath.c_str(),
+                                data.MeshPath.c_str(),
+                                data.Position,
+                                data.Rotation,
+                                data.Scale,
+                                data.SpecularColor,
+                                data.Shininess,
+                                data.EmissiveColor,
+                                data.EmissivePower,
+                                data.ShapeData
+                            );
+                        }
+                    }
+                }
+            }
+            else // 窜老 橇府普 贸府 (.object.json)
+            {
+                PrefabObjectData data;
+                if (PREFAB->LoadObject(path, data))
+                {
+                    if (m_OnCreate)
+                    {
+                        m_OnCreate(
+                            data.TexturePath.c_str(),
+                            data.ShaderPath.c_str(),
+                            data.MeshPath.c_str(),
+                            data.Position,
+                            data.Rotation,
+                            data.Scale,
+                            data.SpecularColor,
+                            data.Shininess,
+                            data.EmissiveColor,
+                            data.EmissivePower,
+                            data.ShapeData
+                        );
+                    }
                 }
             }
         }
     }
+
     ImGui::Separator(); ImGui::Spacing();
 }
 
@@ -220,7 +256,7 @@ void ObjectEditorUI::StartFileBrowser(const std::string& root, const std::string
             if (dot != std::string::npos)
                 ext = ext.substr(dot + 1);
 
-            if (ext == "obj")
+            if (ext == "obj" || ext == "asset")
                 files.push_back(name);
         }
 

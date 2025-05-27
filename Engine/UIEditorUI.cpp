@@ -59,10 +59,17 @@ void UIEditorUI::DrawUI()
 
     if (ImGui::Button("Delete UI"))
     {
-        m_pUIActor->SetState(make_shared<IdleUIState>());
-        m_pUIActor->SetStateType(UIStateType::ST_IDLE);
-        UI->DeleteUI(m_pUIActor->m_Index);
-        m_pUIActor = nullptr;
+        for (auto& index : m_vSelectedIndex)
+        {
+            auto pUI = m_vUIList[index];
+
+            pUI->SetState(make_shared<IdleUIState>());
+            pUI->SetStateType(UIStateType::ST_IDLE);
+            UI->DeleteUI(pUI->m_Index);
+            pUI = nullptr;
+        }
+
+		m_vSelectedIndex.clear();
         ResetData();
 
         return;
@@ -121,6 +128,7 @@ void UIEditorUI::DrawUI()
 
     // 만약 다른 형식의 파일도 필요하다면 여기에 추가
     SearchFile(searchPath, ".ui.json", m_vPrefabList, m_vPrefabNameList);
+    SearchFile(searchPath, ".uis.json", m_vPrefabList, m_vPrefabNameList);
 
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "Prefab Tools");
 
@@ -214,6 +222,8 @@ void UIEditorUI::UpdateUIActorList()
 
     ImGui::Begin("UIActor List", &isOpen, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
+    UINT index = 0;
+
     for (auto& pUI : m_vUIList)
     {
         UINT id = pUI->m_Index;
@@ -226,15 +236,32 @@ void UIEditorUI::UpdateUIActorList()
         if (!name.empty())
             label += " - " + name;
 
-        if (ImGui::Selectable(label.c_str(), m_iSelectUIActor == id))
+        pUI->GetMeshComponent()->GetMaterial()->SetGlowParams(0.0f, Vec3(0.0f, 0.0f, 0.0f));
+
+        bool bSelected = false;
+
+        for (auto& sel : m_vSelectedIndex)
         {
-            m_iSelectUIActor = id;
-            m_pUIActor = m_vUIList[m_iSelectUIActor];
+            if (sel == index)
+                bSelected = true;
+        }
+
+        if (ImGui::Selectable(label.c_str(), bSelected))
+        {
+            m_iSelectUIActor = index;
+            m_pUIActor = m_vUIList[m_iSelectUIActor];            
+
+            if(INPUT->GetButtonDown(LSHIFT))
+				m_vSelectedIndex.push_back(index);
+            else
+				m_vSelectedIndex.clear();
 
             m_CurrentPrefab = pUI->GetPrefabData();
             ResolvePrefabData(m_CurrentPrefab);
         }
-    }
+
+        index++;
+    }    
 
     ImGui::End();
 }
@@ -439,9 +466,23 @@ void UIEditorUI::SavePrefab()
 {
     ImGui::InputText("Prefab Name", m_szPrefabName, IM_ARRAYSIZE(m_szPrefabName));
 
-    if (ImGui::Button("Save Prefab", ImVec2(-1, 0)))
+    if (ImGui::Button("Save Prefab", ImVec2(180, 0)))
     {
         PrefabLoader().SaveUI(m_CurrentPrefab, "../Resources/Prefab/" + std::string(m_szPrefabName) + ".ui.json");
+    }
+
+	ImGui::SameLine();
+
+    if (ImGui::Button("Save All Prefabs", ImVec2(-1, 0)))
+    {
+		vector<PrefabUIData> vPrefabs;
+
+        for (auto& index : m_vSelectedIndex)
+        {
+            vPrefabs.push_back(m_vUIList[index]->GetPrefabData());
+        }
+
+		PrefabLoader().SaveUIs(vPrefabs, "../Resources/Prefab/" + std::string(m_szPrefabName) + ".uis.json");
     }
 }
 
@@ -456,7 +497,7 @@ void UIEditorUI::LoadPrefab()
 
     ImGui::Combo("PrefabList", &m_iPrefabdIndex, NamePtrs.data(), (int)NamePtrs.size());
 
-    if (ImGui::Button("Load Prefab##File", ImVec2(-1, 0)))
+    if (ImGui::Button("Load Prefab##File", ImVec2(180, 0)))
     {
         PrefabUIData data;
         std::string path = m_vPrefabList[m_iPrefabdIndex];
@@ -465,6 +506,29 @@ void UIEditorUI::LoadPrefab()
         {
             ResolvePrefabData(data);
         }
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Load Prefabs##File", ImVec2(-1, 0)))
+    {
+        vector<PrefabUIData> data;
+        std::string path = m_vPrefabList[m_iPrefabdIndex];
+
+		if (PREFAB->LoadUIs(path, data))
+		{
+			for (auto& prefabData : data)
+			{
+				m_OnCreate(
+					make_shared<AUIActor>(),
+					prefabData.IdleTexturePath.c_str(),
+					prefabData.ShaderPath.c_str(),
+					prefabData.transform,
+					Color(prefabData.color),
+					Vec4(prefabData.SliceUV)
+				);
+			}
+		}
     }
 
     NamePtrs.clear();
@@ -519,10 +583,31 @@ void UIEditorUI::SelectActor()
             m_CurrentPrefab = pUI->GetPrefabData();
             ResolvePrefabData(m_CurrentPrefab);
 
-            m_iSelectUIActor = pUI->m_Index;
+            UINT index = 0;
+            for (auto& p : m_vUIList)
+            {
+                if (p->m_Index == pUI->m_Index)
+                {
+                    m_iSelectUIActor = index;
+                    if (INPUT->GetButtonDown(LSHIFT))
+						m_vSelectedIndex.push_back(index);
+					else
+					{
+						m_vSelectedIndex.clear();
+						m_vSelectedIndex.push_back(index);
+					}
+                }
+                index++;
+            }
+
             break;
         }
     }
+
+	for (auto& index : m_vSelectedIndex)
+	{
+		m_vUIList[index]->GetMeshComponent()->GetMaterial()->SetGlowParams(0.7f, Vec3(1.0f, 0.0f, 0.0f));
+	}
 }
 
 void UIEditorUI::ResolvePrefabData(const PrefabUIData& data)

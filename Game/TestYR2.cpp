@@ -214,7 +214,7 @@ void TestYR2::Init()
 	//	});
 }
 
-void TestYR2::Update()
+void TestYR2::Tick()
 {
 	if (bSaveMesh)
 	{
@@ -224,6 +224,10 @@ void TestYR2::Update()
 }
 
 void TestYR2::Render()
+{
+}
+
+void TestYR2::Destroy()
 {
 }
 

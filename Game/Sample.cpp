@@ -4,9 +4,13 @@
 void Sample::Init()
 {
 }
-void Sample::Update()
+void Sample::Tick()
 {
 }
 void Sample::Render()
 {
 }
+void Sample::Destroy()
+{
+}
+

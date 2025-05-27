@@ -26,7 +26,9 @@ public:
 	void SetLoop(bool b) { m_bLoop = b; }
 	void SetAutoDestroy(bool b) { m_bAutoDestroy = b; }
 	float GetDuration() const { return m_fDuration; }
-private:
+	void SetRender(bool b) { m_bRender = b; }
+	bool IsRender() const { return m_bRender; }
+protected:
 	int m_iDivisions = 4;        // 분할 수 (N x N)
 	float m_fFrameRate = 10.0f;  // 초당 프레임 수
 	float m_fTimeAcc = 0.0f;     // 시간 누적

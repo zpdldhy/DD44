@@ -2,6 +2,7 @@
 #include "IExecute.h"
 #include "ActorLoader.h"
 #include "MeshLoader.h"
+#include "ObjectLoader.h"
 
 class Editor : public IExecute
 {
@@ -32,6 +33,7 @@ public:
 	// Asset loading
 	ActorLoader actorLoader;
 	MeshLoader meshLoader;
+	ObjectLoader objectLoader;
 
 	float time;
 
@@ -43,7 +45,7 @@ public:
 
 public:
 	void Init() override;
-	void Update() override;
+	void Tick() override;
 	void Render() override;
 	void Destroy();
 

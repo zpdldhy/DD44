@@ -304,9 +304,13 @@ void TestYR::Init()
 #pragma endregion
 
 }
+void TestYR::Tick()
+{	
+	// 애니메이션 확인
+	if (INPUT->GetButton(LCLICK))
+		//int targetIndex = m_pActor->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance()->GetAnimIndex(L"Slash_Light_R_new");
+		//m_pActor->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance()->PlayOnce(targetIndex);
 
-void TestYR::Update()
-{
 	if (INPUT->GetButton(O))
 	{
 		if (m_bEnginCamera)
@@ -356,6 +360,11 @@ void TestYR::Render()
 {
 }
 
+void TestYR::Destroy()
+{
+}
+
+//shared_ptr<UMeshComponent> TestYR::MakeMC(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance)
 void TestYR::SetupSunLight()
 {
 	LIGHTMANAGER->Init();

@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "Engine.h"
 #include "Sample.h"
+#include "IntroScene.h"
 #include "Game.h"
 #include "Editor.h"
 
@@ -17,8 +18,9 @@ int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCm
 {
     shared_ptr<IExecute> app = make_shared<Editor>();
 
-    Engine game(_hInstance, app);
-    game.Run();
+	ENGINE->SetInstance(_hInstance);
+	ENGINE->SetApp(app);
+	ENGINE->Run();
 
     return 0;
 }

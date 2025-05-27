@@ -32,7 +32,7 @@ void Game::Init()
 	m_pPlayer = vlist[0];
 	OBJECT->AddActorList(vlist);
 
-	UI->AddUI(PToA->MakeUI("../Resources/Prefab/UI_Health_0.ui.json"));
+	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game.uis.json"));
 
 	SetupEngineCamera();
 	SetupSkybox();
@@ -42,7 +42,7 @@ void Game::Init()
 
 }
 
-void Game::Update()
+void Game::Tick()
 {
 	if (INPUT->GetButton(O))
 	{
@@ -66,6 +66,11 @@ void Game::Render()
 
 void Game::Destroy()
 {
+	m_pCameraActor = nullptr;
+	m_pPlayer = nullptr;
+	m_pSkyMesh = nullptr;
+	m_pSky = nullptr;
+	m_pSunLight = nullptr;
 }
 
 void Game::SetupEngineCamera()
@@ -96,8 +101,6 @@ void Game::SetupSkybox()
 
 void Game::SetupSunLight()
 {
-	LIGHTMANAGER->Init();
-
 	m_pSunLight = make_shared<ALight>();
 	m_pSunLight->m_szName = L"SunLight";
 	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });

@@ -54,6 +54,11 @@ vector<shared_ptr<class AActor>> PrefabToActor::LoadAllPrefabs(const std::string
 		{
 			m_vActorList.emplace_back(MakeUI(file));
 		}
+		else if (extension == ".uis.json")
+		{
+			auto vList = MakeUIs(file);
+			m_vActorList.insert(m_vActorList.end(), vList.begin(), vList.end());
+		}
 	}
 
 	return m_vActorList;
@@ -135,30 +140,58 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 	PrefabObjectData objData;
 	if (PREFAB->LoadObject(_file, objData))
 	{
-		auto meshComp = make_shared<UStaticMeshComponent>();
-		meshComp->SetMeshPath(to_mw(objData.MeshPath));
-
-		auto meshRes = make_shared<UStaticMeshResources>();
-		AssimpLoader loader;
-		vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
-		if (!meshList.empty())
+		shared_ptr<UStaticMeshComponent> meshComp = make_shared<UStaticMeshComponent>();
+		if (SplitExt(to_mw(objData.MeshPath)) == L".obj")
 		{
-			meshRes->SetVertexList(meshList[0].m_vVertexList);
-			meshRes->SetIndexList(meshList[0].m_vIndexList);
-			meshRes->Create();
-			meshComp->SetMesh(meshRes);
+			//Profiler p("Mesh From Obj");
+			AssimpLoader loader;
+			vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
+			meshComp->SetMeshPath(to_mw(objData.MeshPath)); // 이거 풀네임으로 들어가야되는건가 ? 나중에 어디서 쓰이나 ? 
+			auto meshRes = make_shared<UStaticMeshResources>();
+			if (!meshList.empty())
+			{
+				meshRes->SetVertexList(meshList[0].m_vVertexList);
+				meshRes->SetIndexList(meshList[0].m_vIndexList);
+				meshRes->Create();
+				meshComp->SetMesh(meshRes);
+			}
+
+		}
+		else
+		{
+			//Profiler p("Mesh From Asset");
+			auto resources = actorLoader->LoadOneRes(objData.MeshPath);
+			meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
+			meshComp->SetMeshPath(to_mw(objData.MeshPath));
 		}
 
 		auto material = make_shared<UMaterial>();
 		material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
 		meshComp->SetMaterial(material);
 
-		obj = make_shared<APawn>();
+		obj= make_shared<APawn>();
+		obj->SetPrefabPath(_file);
 		obj->m_szName = L"Object";
 		obj->SetMeshComponent(meshComp);
 		obj->SetPosition(objData.Position);
 		obj->SetRotation(objData.Rotation);
 		obj->SetScale(objData.Scale);
+
+		if (objData.ShapeData.isUse)
+		{
+			shared_ptr<UShapeComponent> shapeComp = nullptr;
+
+			if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
+				shapeComp = std::make_shared<UBoxComponent>();
+			// else if (...) // 다른 타입 추가 가능
+
+			shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));
+			shapeComp->SetLocalPosition(Vec3(objData.ShapeData.Position));
+			shapeComp->SetLocalRotation(Vec3(objData.ShapeData.Rotation));
+			shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+			obj->SetShapeComponent(shapeComp);
+		}
 	}
 
 	return obj;
@@ -184,11 +217,27 @@ vector<shared_ptr<APawn>> PrefabToActor::MakeObjects(const string& _file)
 			meshComp->SetMaterial(material);
 
 			auto obj = make_shared<APawn>();
+			obj->SetPrefabPath(_file);
 			obj->m_szName = L"Object";
 			obj->SetMeshComponent(meshComp);
 			obj->SetPosition(objData.Position);
 			obj->SetRotation(objData.Rotation);
 			obj->SetScale(objData.Scale);
+
+			if (objData.ShapeData.isUse)
+			{
+				shared_ptr<UShapeComponent> shapeComp = nullptr;
+
+				if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
+					shapeComp = std::make_shared<UBoxComponent>();
+
+				shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));
+				shapeComp->SetLocalPosition(Vec3(objData.ShapeData.Position));
+				shapeComp->SetLocalRotation(Vec3(objData.ShapeData.Rotation));
+				shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+
+				obj->SetShapeComponent(shapeComp);
+			}
 
 			vObjList.emplace_back(obj);
 		}
@@ -212,7 +261,6 @@ shared_ptr<AUIActor> PrefabToActor::MakeUI(const string& _file)
 		uiActor->SetMeshComponent(meshComp);
 
 		auto mat = make_shared<UMaterial>();
-		mat->SetUseEffect(false);
 		mat->Load(L"", to_mw(uiData.ShaderPath));
 		meshComp->SetMaterial(mat);
 
@@ -232,6 +280,46 @@ shared_ptr<AUIActor> PrefabToActor::MakeUI(const string& _file)
 	}
 
 	return uiActor;
+}
+
+vector<shared_ptr<AUIActor>> PrefabToActor::MakeUIs(const string& _file)
+{
+	vector<shared_ptr<AUIActor>> vList;
+
+	vector<PrefabUIData> uiDatas;
+	if (PREFAB->LoadUIs(_file, uiDatas))
+	{
+		for (auto& uiData : uiDatas)
+		{
+			auto uiActor = make_shared<AUIActor>();
+			uiActor->m_szName = to_mw(uiData.Name);
+
+			auto meshComp = UStaticMeshComponent::CreatePlane();
+			uiActor->SetMeshComponent(meshComp);
+
+			auto mat = make_shared<UMaterial>();
+			mat->Load(L"", to_mw(uiData.ShaderPath));
+			meshComp->SetMaterial(mat);
+
+			uiActor->SetIdleTexture(TEXTURE->Get(to_mw(uiData.IdleTexturePath)));
+			uiActor->SetHoverTexture(TEXTURE->Get(to_mw(uiData.HoverTexturePath)));
+			uiActor->SetActiveTexture(TEXTURE->Get(to_mw(uiData.ActiveTexturePath)));
+			uiActor->SetSelectTexture(TEXTURE->Get(to_mw(uiData.SelectedTexturePath)));
+
+			uiActor->SetMeshComponent(meshComp);
+			uiActor->SetPosition(Vec3(uiData.transform.Position));
+			uiActor->SetRotation(Vec3(uiData.transform.Rotation));
+			uiActor->SetScale(Vec3(uiData.transform.Scale));
+			uiActor->SetSliceData(Vec4(uiData.SliceUV));
+			uiActor->SetColor(Color(uiData.color));
+
+			uiActor->SetPrefabData(uiData);
+
+			vList.emplace_back(uiActor);
+		}
+	}
+
+	return vList;
 }
 
 void PrefabToActor::MakeLoader()

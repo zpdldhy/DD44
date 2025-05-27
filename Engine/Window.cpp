@@ -62,10 +62,12 @@ bool Window::SetWindow(float _windowX, float _windowY)
     m_hWnd = CreateWindow(
             L"DD44", L"DD44", WS_OVERLAPPEDWINDOW, 0, 0, 
             winRect.right - winRect.left, winRect.bottom - winRect.top, nullptr, nullptr, m_hInstance, nullptr);
+
     if (!m_hWnd)
     {
         return false;
     }
+
     g_hWnd = m_hWnd;
 
     ShowWindow(m_hWnd, SW_SHOW);
@@ -84,6 +86,21 @@ bool Window::SetWindowFullScreen()
     m_fHeight = desktopRect.bottom;
     g_windowSize.x = m_fWidth;
     g_windowSize.y = m_fHeight;
+
+    RECT winRect = { 0, 0, g_windowSize.x,  g_windowSize.y };
+    m_hWnd = CreateWindow(
+        L"DD44", L"DD44", WS_OVERLAPPEDWINDOW, 0, 0,
+        winRect.right - winRect.left, winRect.bottom - winRect.top, nullptr, nullptr, m_hInstance, nullptr);
+
+    if (!m_hWnd)
+    {
+        return false;
+    }
+
+    g_hWnd = m_hWnd;
+
+    ShowWindow(m_hWnd, SW_SHOW);
+    UpdateWindow(m_hWnd);
 
     // 윈도우 스타일 변경: 타이틀바/테두리 제거
     SetWindowLongPtr(m_hWnd, GWL_STYLE, WS_VISIBLE | WS_POPUP);

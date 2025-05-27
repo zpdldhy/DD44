@@ -34,6 +34,7 @@ void TestYoooooon::Init()
 	m_pPlayer = vlist[0];
 	OBJECT->AddActorList(vlist);
 	UI->AddUIList(PToA->LoadAllPrefabs(".ui.json"));
+	UI->AddUIList(PToA->LoadAllPrefabs(".uis.json"));
 
 	SetupEngineCamera();
 	SetupSkybox();
@@ -42,7 +43,7 @@ void TestYoooooon::Init()
 	CreateCollisionObject();
 }
 
-void TestYoooooon::Update()
+void TestYoooooon::Tick()
 {
 	if (INPUT->GetButton(O))
 	{
@@ -58,10 +59,10 @@ void TestYoooooon::Update()
 		}
 	}
 
-	if (INPUT->GetButton(LCLICK))
-		ClickMouse();
+	//if (INPUT->GetButton(LCLICK))
+		//ClickMouse();
 
-	CheckCollision();
+	//CheckCollision();
 }
 
 void TestYoooooon::Render()
@@ -100,8 +101,6 @@ void TestYoooooon::SetupSkybox()
 
 void TestYoooooon::SetupSunLight()
 {
-	LIGHTMANAGER->Init();
-
 	auto pSunLight = make_shared<ALight>();
 	pSunLight->m_szName = L"SunLight";
 	pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
@@ -288,7 +287,6 @@ void TestYoooooon::SetupUIEditorCallback()
 			uiActor->SetMeshComponent(meshComp);
 
 			auto mat = make_shared<UMaterial>();
-			mat->SetUseEffect(false);
 			mat->Load(
 				std::wstring(texPath, texPath + strlen(texPath)),
 				std::wstring(shaderPath, shaderPath + strlen(shaderPath))

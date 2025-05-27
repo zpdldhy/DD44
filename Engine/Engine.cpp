@@ -20,6 +20,7 @@
 #include "LightManager.h"
 #include "ParticleManager.h"
 #include "RenderStateManager.h"
+#include "EffectManager.h"
 
 void Engine::Init()
 {
@@ -38,12 +39,14 @@ void Engine::Init()
 		INPUT->Init();
 		DXWRITE->Create();
 
-		if (_app->m_type != SCENE_TYPE::GAME) { GUI->Init(); }
+		if (_app->m_type != SCENE_TYPE::GAME)
+			GUI->Init();
 	}
 	_app->Init();
 
 	// Manager 초기화
 	{
+		//LIGHTMANAGER->Init();
 		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
@@ -53,7 +56,9 @@ void Engine::Init()
 	POSTPROCESS->Init(8);
 	// 8개의 MRT DxState 초기화
 	STATE->Create();
-	//STATEMANAGER->InitState();
+	EFFECT->Init();
+	
+
 }
 
 void Engine::Frame()
@@ -71,8 +76,7 @@ void Engine::Frame()
 
 	GET_SINGLE(Device)->Frame();
 
-	if (_app->m_type != SCENE_TYPE::GAME) { GUI->Update(); }
-	_app->Update();
+	_app->Tick();
 
 	TIMER->Update();
 
@@ -80,6 +84,9 @@ void Engine::Frame()
 	{
 		CAMERA->Tick();
 	}
+
+	if (_app->m_type != SCENE_TYPE::GAME)
+		GUI->Update();
 }
 
 void Engine::Render()
@@ -99,7 +106,7 @@ void Engine::Render()
 		OBJECT->Render();	// ObjectList Render
 		PARTICLE->Render();
 		POSTPROCESS->PostRender();
-
+		
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
 
@@ -107,7 +114,7 @@ void Engine::Render()
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
 		{
-			CAMERA->Render(CameraViewType::CVT_UI);
+			CAMERA->Render(CameraViewType::CVT_UI);		
 			POSTPROCESS->Present();
 		}
 
@@ -117,18 +124,18 @@ void Engine::Render()
 		m_pCurrentRasterizer.Reset();
 	}
 
-	if (_app->m_type != SCENE_TYPE::GAME) {
-		GUI->Render(); // *Fix Location* after _app->Render() }
-	}
-
 	DXWRITE->EndDraw();
 	GET_SINGLE(Device)->PostRender();
+
+	if (_app->m_type != SCENE_TYPE::GAME)
+		GUI->Render();
 }
 
 void Engine::Release()
 {
-	UI->Destroy();
+	UI->Destroy();	
 	PARTICLE->Destroy();
+	_app->Destroy();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 	{
@@ -141,13 +148,13 @@ void Engine::Release()
 
 void Engine::Run()
 {
-	_window.SetWindowClass(_hInstance);
-	_window.SetWindow();
+	_window.SetWindowClass(_hInstance);	
 	_window.SetWindowFullScreen();
-	Init();
 
-	Timer timer;
-	timer.Init();
+	if (_app->m_type != SCENE_TYPE::GAME)
+		GUI->CreateImGuiWindow(_hInstance);
+
+	Init();
 
 	while (_window.CheckRun())
 	{
@@ -159,10 +166,4 @@ void Engine::Run()
 	}
 
 	Release();
-}
-
-Engine::Engine(HINSTANCE hInstance, shared_ptr<IExecute> app)
-{
-	_hInstance = hInstance;
-	_app = app;
 }
