@@ -16,6 +16,5 @@ public:
 	bool ProcessMessage();
 public:
 	bool CheckRun();
-	 
 };
 

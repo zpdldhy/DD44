@@ -24,6 +24,7 @@
 #define STATEMANAGER GET_SINGLE(RenderStateManager)
 #define COLLITION	GET_SINGLE(Collision)
 #define EFFECT		GET_SINGLE(EffectManager)
+#define ACTORLOADER GET_SINGLE(ActorLoader)
 
 
 #define DD_PI		3.1415926f

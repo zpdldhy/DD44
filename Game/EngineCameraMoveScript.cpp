@@ -21,8 +21,8 @@ void EngineCameraMoveScript::Tick()
 	if (INPUT->GetButtonDown(RCLICK))
 	{
 		POINT pCurrentMousePointer = INPUT->GetMousePos();
-		float fYaw = (pCurrentMousePointer.x - m_pPrevMousePos.x) * deltaTime / 4.f;
-		float fPitch = (pCurrentMousePointer.y - m_pPrevMousePos.y) * deltaTime / 4.f;
+		float fYaw = (pCurrentMousePointer.x - m_pPrevMousePos.x) * deltaTime / 20.f;
+		float fPitch = (pCurrentMousePointer.y - m_pPrevMousePos.y) * deltaTime / 20.f;
 
 		GetOwner()->AddRotation(Vec3(fPitch, fYaw, 0.0f));
 

@@ -140,15 +140,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BatMovement.h" />
+    <ClInclude Include="BatStates.h" />
     <ClInclude Include="Editor.h" />
+    <ClInclude Include="EnemyState.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="IntroScene.h" />
+    <ClInclude Include="HeadRollerStates.h" />
     <ClInclude Include="kkongchiMoveScript.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayerMoveScript.h" />
     <ClInclude Include="PrefabToActor.h" />
+    <ClInclude Include="PlayerStates.h" />
     <ClInclude Include="Sample.h" />
     <ClInclude Include="TestPlayer.h" />
     <ClInclude Include="TestSJ.h" />
@@ -158,16 +163,20 @@
     <ClInclude Include="TestYR2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BatMovement.cpp" />
+    <ClCompile Include="BatStates.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="IntroScene.cpp" />
+    <ClCompile Include="HeadRollerStates.cpp" />
     <ClCompile Include="kkongchiMoveScript.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PlayerMoveScript.cpp" />
+    <ClCompile Include="PlayerStates.cpp" />
     <ClCompile Include="PrefabToActor.cpp" />
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="TestPlayer.cpp" />
@@ -255,7 +264,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Resources\Prefab\MyTile.map.json" />
+    <None Include="..\Resources\Prefab\Game.objects.json" />
     <None Include="..\Resources\Shader\Header.hlsli" />
     <None Include="..\Resources\Shader\MainHeader.hlsli" />
   </ItemGroup>

@@ -22,7 +22,6 @@
 
 void Game::Init()
 {
-	Profiler p("Init");
 	// Asset ·Îµù
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
@@ -38,6 +37,8 @@ void Game::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
+
+
 
 }
 
@@ -100,8 +101,6 @@ void Game::SetupSkybox()
 
 void Game::SetupSunLight()
 {
-	LIGHTMANAGER->Init();
-
 	m_pSunLight = make_shared<ALight>();
 	m_pSunLight->m_szName = L"SunLight";
 	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });

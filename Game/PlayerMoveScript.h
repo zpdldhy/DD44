@@ -1,9 +1,11 @@
 #pragma once
 #include "UScriptComponent.h"
+#include "PlayerStates.h"
 
 class APawn;
 class AActor;
 class UAnimInstance;
+class UMeshComponent;
 
 class PlayerMoveScript : public UScriptComponent
 {
@@ -33,6 +35,19 @@ public:
 
 	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
 
+
+	// Child Mesh Components
+	// 어떻게 관리해야 좋을지 모르겟음
+	weak_ptr<UMeshComponent> sword;
+	weak_ptr<UMeshComponent> effect;
+	weak_ptr<UMeshComponent> handSocket;
+	weak_ptr<UMeshComponent> backSocket;
+
+	shared_ptr<StateBase> idle;
+	shared_ptr<StateBase> walk;
+	shared_ptr<StateBase> attack;
+	shared_ptr<StateBase> currentState;
+
 public:
 	void Init() override;
 	void Tick() override;
@@ -41,5 +56,7 @@ private:
 	void SetUI();
 	void UpdateHPUI();
 	void UpdateArrowUI();
+public:
+	void ChangetState(shared_ptr<StateBase> _state);
 };
 

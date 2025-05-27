@@ -28,22 +28,12 @@ shared_ptr<UMeshComponent> MeshLoader::Make(const char* _path)
 	auto originAnim = m_mAnimMap.find(meshData.m_szAnim);
 	if (originAnim == m_mAnimMap.end())
 	{
-		m_pRootComponent = MakeMesh(meshData, true);
-		auto& data = meshData;
-		for (int i = 0; i < data.m_vChild.size(); i++)
-		{
-			m_pRootComponent->AddChild(MakeMesh(data.m_vChild[i], false));
-		}
+		m_pRootComponent = MakeMeshRecursive(meshData, true);
 	}
 	else
 	{
 		auto animInstance = originAnim->second->Clone();
-		m_pRootComponent = MakeMesh(meshData, true, animInstance);
-		auto& data = meshData;
-		for (int i = 0; i < data.m_vChild.size(); i++)
-		{
-			m_pRootComponent->AddChild(MakeMesh(data.m_vChild[i], false, animInstance));
-		}
+		m_pRootComponent = MakeMeshRecursive(meshData, true, animInstance);
 	}
 
 	return m_pRootComponent;
@@ -55,23 +45,47 @@ shared_ptr<UMeshComponent> MeshLoader::Make(MeshComponentData data)
 	auto originAnim = m_mAnimMap.find(data.m_szAnim);
 	if (originAnim == m_mAnimMap.end())
 	{
-		m_pRootComponent = MakeMesh(data, true);
-		for (int i = 0; i < data.m_vChild.size(); i++)
-		{
-			m_pRootComponent->AddChild(MakeMesh(data.m_vChild[i], false));
-		}
+		m_pRootComponent = MakeMeshRecursive(data, true);
 	}
 	else
 	{
 		auto animInstance = originAnim->second->Clone();
-		m_pRootComponent = MakeMesh(data, true, animInstance);
-		for (int i = 0; i < data.m_vChild.size(); i++)
-		{
-			m_pRootComponent->AddChild(MakeMesh(data.m_vChild[i], false, animInstance));
-		}
+		m_pRootComponent = MakeMeshRecursive(data, true, animInstance);
 	}
 
 	return m_pRootComponent;
+}
+
+shared_ptr<UMeshComponent> MeshLoader::MakeMeshRecursive(MeshComponentData _data, bool _bRoot, shared_ptr<UAnimInstance> _animInstance)
+{
+	// parameter
+	shared_ptr<UMeshComponent> mesh = MakeMesh(_data, _bRoot, _animInstance);
+
+	// child
+	for (int i = 0; i < _data.m_vChild.size(); i++)
+	{
+		auto child = MakeMeshRecursive(_data.m_vChild[i], false, _animInstance);
+		mesh->AddChild(child);
+		child->SetParentTransform(dynamic_pointer_cast<UMeshComponent>(mesh).get());
+	}
+
+	return mesh;
+}
+
+shared_ptr<UMeshComponent> MeshLoader::MakeMeshRecursive(MeshComponentData _data, bool _bRoot)
+{
+	// parameter
+	shared_ptr<UMeshComponent> mesh = MakeMesh(_data, _bRoot);
+
+	// child
+	for (int i = 0; i < _data.m_vChild.size(); i++)
+	{
+		auto child = MakeMeshRecursive(_data.m_vChild[i], false);
+		mesh->AddChild(child);
+		child->SetParentTransform(dynamic_pointer_cast<UMeshComponent>(mesh).get());
+	}
+
+	return mesh;
 }
 
 shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRoot, shared_ptr<UAnimInstance> animInstance)
@@ -81,13 +95,15 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 	auto meshRes = m_mMeshMap.find(data.m_szRes);
 	if (meshRes == m_mMeshMap.end()) { assert(false); }
 
+
 	if (data.m_type == (int)MeshType::M_SKINNED)
 	{
 		//Profiler p("MeshLoader::MakeMeshSkinned");
 		mesh = make_shared<USkinnedMeshComponent>();
 		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
 		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
-
+		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		//mesh->SetMeshTransform(transform);
 		{
 			//Profiler p("Set Anim");
 
@@ -130,6 +146,10 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
 		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(meshRes->second));
 
+		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		//mesh->SetMeshTransform(transform);
+		
+
 		staticRoot->SetAnimInstance(animInstance);
 		staticRoot->SetMatBone(data.m_matBone);
 		staticRoot->SetTargetBoneIndex(data.m_targetBone);
@@ -150,6 +170,9 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 	mesh->SetLocalRotation(data.m_rot);
 	mesh->SetLocalScale(data.m_scale);
 
+	mesh->SetName(data.m_szComp);
+	mesh->SetVisible(data.m_bVisible);
+
 	return mesh;
 }
 
@@ -166,6 +189,8 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool _bR
 		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
 		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
 
+		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		//mesh->SetMeshTransform(transform);
 
 		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
 		mat->Load(data.m_szTex, data.m_szShader);
@@ -178,6 +203,10 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool _bR
 		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
 		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(meshRes->second));
 
+		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		//mesh->SetMeshTransform(transform);
+		staticRoot->SetMatBone(data.m_matBone);
+
 		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
 		mat->Load(data.m_szTex, data.m_szShader);
 		staticRoot->SetMaterial(mat);
@@ -185,6 +214,9 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool _bR
 	mesh->SetLocalPosition(data.m_pos);
 	mesh->SetLocalRotation(data.m_rot);
 	mesh->SetLocalScale(data.m_scale);
+
+	mesh->SetName(data.m_szComp);
+	mesh->SetVisible(data.m_bVisible);
 
 	return mesh;
 }
@@ -202,13 +234,46 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(wstring _resName)
 		mesh = make_shared<USkinnedMeshComponent>();
 		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
 		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(iter->second));
+
+		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		//mesh->SetMeshTransform(transform);
 	}
 	else
 	{
 		mesh = make_shared<UStaticMeshComponent>();
 		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
 		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(iter->second));
-
+		
+		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
+		//mesh->SetMeshTransform(transform);
 	}
 	return mesh;
+}
+
+shared_ptr<UMeshResources> MeshLoader::GetMeshRes(wstring _name)
+{
+	auto res = m_mMeshMap.find(_name);
+	if (res != m_mMeshMap.end())
+	{
+		return res->second;
+	}
+	else
+	{
+		assert(false);
+		//return shared_ptr<UMeshResources>();
+	}
+}
+
+shared_ptr<UAnimInstance> MeshLoader::GetAnimInstance(wstring _name)
+{
+	auto res = m_mAnimMap.find(_name);
+	if (res != m_mAnimMap.end())
+	{
+		return res->second;
+	}
+	else
+	{
+		assert(false);
+		//return shared_ptr<UMeshResources>();
+	}
 }

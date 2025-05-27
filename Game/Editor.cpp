@@ -25,6 +25,7 @@
 #include "PrefabToActor.h"
 #include "EffectManager.h"
 
+#include "BatMovement.h"
 bool bRunGame = true;
 
 //#undef RUN_GAME
@@ -35,6 +36,9 @@ void Editor::Init()
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
 	meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
+	//actorLoader.ConvertFbxToAsset("../Resources/Obj/*.fbx");
+	//objectLoader.ConvertObjToAsset("../Resources/Obj/*.obj");
+	
 	{
 		m_pSlashMaterial = make_shared<UMaterial>();
 		m_pSlashMaterial->Load(
@@ -46,7 +50,7 @@ void Editor::Init()
 	SetupEditorCallbacks();
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
-	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));	
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
@@ -129,8 +133,6 @@ void Editor::SetupSkybox()
 
 void Editor::SetupSunLight()
 {
-	LIGHTMANAGER->Init();
-
 	m_pSunLight = make_shared<ALight>();
 	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));

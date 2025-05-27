@@ -36,8 +36,6 @@ void TestSJ::Init()
 
 	SOUNDMANAGER->LoadAllSounds();
 
-	LIGHTMANAGER->Init();
-
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
 		m_pCameraActor->SetPosition({ 0.0f, 0.0f, -15.0f });

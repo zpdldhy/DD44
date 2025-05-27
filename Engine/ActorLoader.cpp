@@ -1,14 +1,21 @@
 #include "pch.h"
 #include "ActorLoader.h"
+
 #include "UStaticMeshComponent.h"
 #include "USkinnedMeshComponent.h"
-#include "UMaterial.h"
-#include "AAsset.h"
-#include "APawn.h"
-#include "AnimTrack.h"
 #include "USkeletalMeshResources.h"
 #include "UStaticMeshResources.h"
+
+#include "UMaterial.h"
 #include "Inputlayout.h"
+
+#include "AAsset.h"
+
+#include "APawn.h"
+
+#include "UAnimInstance.h"
+#include "AnimTrack.h"
+
 
 void ActorLoader::ConvertFbxToAsset(string _path)
 {
@@ -32,20 +39,105 @@ void ActorLoader::ConvertFbxToAsset(string _path)
 		AAsset::Export(ret, fileList[iPath]);
 	}
 }
+void ActorLoader::ConvertObjToAsset(string _path)
+{
+	vector<string> fileList = GetFileNames(_path);
+
+	for (int iPath = 0; iPath < fileList.size(); iPath++)
+	{
+		LoadAsFbxResource(fileList[iPath]);
+	}
+}
+void ActorLoader::LoadAsFbxResource(string path)
+{
+	TFbxResource ret;
+	ret.Clear();
+	vector<MeshData> dataList = m_ObjImporter.Load(path);
+	ret.m_iMeshCount = 1;
+	ret.m_vMeshList.emplace_back(dataList[0]);
+
+	AAsset::Export(ret, path);
+}
 
 void ActorLoader::LoadAllAsset()
 {
-	vector<shared_ptr<AActor>> actorList;
-	// 파일 이름 
 	vector<string> fileNames = GetFileNames("../Resources/Asset/*.asset");
 
 	// TFbxResource 파싱
-
 	for (int iPath = 0; iPath < fileNames.size(); iPath++)
 	{
 		TFbxResource resource = AAsset::Load(fileNames[iPath].c_str());
 		m_vFbxList.emplace_back(resource);
 	}
+}
+map<wstring, shared_ptr<UMeshResources>> ActorLoader::LoadMeshMap()
+{
+	Profiler p("ActorLoader::LoadMeshMap");
+	m_mMeshMap.clear();
+	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	{
+		for (int iMesh = 0; iMesh < m_vFbxList[iFbx].m_vMeshList.size(); iMesh++)
+		{
+			auto& data = m_vFbxList[iFbx].m_vMeshList[iMesh];
+			shared_ptr<UMeshResources> meshResource;
+			wstring name = m_vFbxList[iFbx].name + m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName;
+			if (data.m_bSkeleton)
+			{
+				meshResource = make_shared<USkeletalMeshResources>();
+				meshResource->SetName(name); 
+				auto skeletalMesh = dynamic_pointer_cast<USkeletalMeshResources>(meshResource);
+				meshResource->SetVertexList(data.m_vVertexList);
+				skeletalMesh->SetInverseBindPose(m_vFbxList[iFbx].m_vInverseBindPose[iMesh]);
+				skeletalMesh->SetIwList(data.m_vIwList);
+				meshResource->Create();
+				// BONE
+				map<wstring, BoneNode> bones;
+				for (auto& data : m_vFbxList[iFbx].m_mSkeletonList)
+				{
+					bones.insert(make_pair(data.second.m_szName, data.second));
+				}
+				skeletalMesh->AddSkeleton(bones);
+			}
+			else
+			{
+				meshResource = make_shared<UStaticMeshResources>();
+				meshResource->SetName(name);
+				auto staticMesh = dynamic_pointer_cast<UStaticMeshResources>(meshResource);
+				staticMesh->SetVertexList(data.m_vVertexList);
+				if (data.m_vIndexList.size() > 0)
+				{
+					staticMesh->SetIndexList(data.m_vIndexList);
+				}
+				staticMesh->Create();
+			}
+			m_mMeshMap.insert(make_pair(name, meshResource));
+			m_mResPathMap.insert(make_pair(m_vFbxList[iFbx].m_ResPathName, meshResource));
+		}
+	}
+	return m_mMeshMap;
+}
+map<wstring, shared_ptr<UAnimInstance>> ActorLoader::LoadAnimMap()
+{
+	m_vAnimInstanceMap.clear();
+	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	{
+		// Animation
+		wstring name = m_vFbxList[iFbx].name;
+		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
+		{
+			animInstance->SetName(name);
+			animInstance->CreateConstantBuffer();
+			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
+			{
+				AnimList animTrack;
+				animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
+				animTrack.animList = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_vAnim;
+				animInstance->AddTrack(animTrack);
+			}
+		}
+		m_vAnimInstanceMap.insert(make_pair(name, animInstance));
+	}
+	return m_vAnimInstanceMap;
 }
 
 void ActorLoader::LoadOne(string _path)
@@ -54,7 +146,6 @@ void ActorLoader::LoadOne(string _path)
 	TFbxResource resource = AAsset::Load(_path.c_str());
 	m_vFbxList.emplace_back(resource);
 }
-
 shared_ptr<UMeshResources> ActorLoader::LoadOneRes(string _path)
 {
 	//Profiler p("ActorLoader::LoadOneRes");
@@ -63,7 +154,6 @@ shared_ptr<UMeshResources> ActorLoader::LoadOneRes(string _path)
 
 	return iter->second;
 }
-
 vector<MeshComponentData> ActorLoader::LoadMeshData()
 {
 	vector<string> fileNames = GetFileNames("../Resources/Asset/*.json");
@@ -75,7 +165,6 @@ vector<MeshComponentData> ActorLoader::LoadMeshData()
 	}
 	return m_vMeshDataList;
 }
-
 vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 {
 	//TEMP MESH TEXTUER
@@ -135,53 +224,6 @@ vector<shared_ptr<UMeshComponent>> ActorLoader::LoadMesh()
 	}
 	return m_vMeshList;
 }
-
-map<wstring, shared_ptr<UMeshResources>> ActorLoader::LoadMeshMap()
-{
-	Profiler p("ActorLoader::LoadMeshMap");
-	m_mMeshMap.clear();
-	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
-	{
-		for (int iMesh = 0; iMesh < m_vFbxList[iFbx].m_vMeshList.size(); iMesh++)
-		{
-			auto& data = m_vFbxList[iFbx].m_vMeshList[iMesh];
-			shared_ptr<UMeshResources> meshResource;
-			wstring name = m_vFbxList[iFbx].name + m_vFbxList[iFbx].m_vMeshList[iMesh].m_szName;
-			if (data.m_bSkeleton)
-			{
-				meshResource = make_shared<USkeletalMeshResources>();
-				meshResource->SetName(name);
-				auto skeletalMesh = dynamic_pointer_cast<USkeletalMeshResources>(meshResource);
-				meshResource->SetVertexList(data.m_vVertexList);
-				skeletalMesh->SetInverseBindPose(m_vFbxList[iFbx].m_vInverseBindPose[iMesh]);
-				skeletalMesh->SetIwList(data.m_vIwList);
-				meshResource->Create();
-				// BONE
-				map<wstring, BoneNode> bones;
-				for (auto& data : m_vFbxList[iFbx].m_mSkeletonList)
-				{
-					bones.insert(make_pair(data.second.m_szName, data.second));
-				}
-				skeletalMesh->AddSkeleton(bones);
-			}
-			else
-			{
-				meshResource = make_shared<UStaticMeshResources>();
-				meshResource->SetName(name);
-				auto staticMesh = dynamic_pointer_cast<UStaticMeshResources>(meshResource);
-				staticMesh->SetVertexList(data.m_vVertexList);
-				if (data.m_vIndexList.size() > 0)
-				{
-					staticMesh->SetIndexList(data.m_vIndexList);
-				}
-				staticMesh->Create();
-			}
-			m_mMeshMap.insert(make_pair(name, meshResource));
-			m_mResPathMap.insert(make_pair(m_vFbxList[iFbx].m_ResPathName, meshResource));
-		}
-	}
-	return m_mMeshMap;
-}
 vector<shared_ptr<UMeshResources>> ActorLoader::LoadMeshResources()
 {
 	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
@@ -224,7 +266,6 @@ vector<shared_ptr<UMeshResources>> ActorLoader::LoadMeshResources()
 	}
 	return m_vMeshResList;
 }
-
 vector<wstring> ActorLoader::LoadTexPath()
 {
 	vector<wstring> texPathList;
@@ -237,7 +278,6 @@ vector<wstring> ActorLoader::LoadTexPath()
 	}
 	return texPathList;
 }
-
 vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
 {
 	vector<shared_ptr<UAnimInstance>> animList;
@@ -263,31 +303,6 @@ vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
 
 	return animList;
 }
-
-map<wstring, shared_ptr<UAnimInstance>> ActorLoader::LoadAnimMap()
-{
-	m_vAnimInstanceMap.clear();
-	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
-	{
-		// Animation
-		wstring name = m_vFbxList[iFbx].name;
-		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
-		{
-			animInstance->SetName(name);
-			animInstance->CreateConstantBuffer();
-			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
-			{
-				AnimList animTrack;
-				animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
-				animTrack.animList = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_vAnim;
-				animInstance->AddTrack(animTrack);
-			}
-		}
-		m_vAnimInstanceMap.insert(make_pair(name, animInstance));
-	}
-	return m_vAnimInstanceMap;
-}
-
 shared_ptr<APawn> ActorLoader::LoadOneActor(string _path)
 {
 	TFbxResource resource = AAsset::Load(_path.c_str());
@@ -405,7 +420,6 @@ shared_ptr<APawn> ActorLoader::LoadOneActor(string _path)
 
 	return actor;
 }
-
 vector<shared_ptr<APawn>> ActorLoader::LoadAllActor()
 {
 	vector<shared_ptr<APawn>> actorList;
@@ -419,7 +433,6 @@ vector<shared_ptr<APawn>> ActorLoader::LoadAllActor()
 
 	return actorList;
 }
-
 shared_ptr<APawn> ActorLoader::LoadRedeemer(string _path)
 {
 	TFbxResource resource = AAsset::Load(_path.c_str());

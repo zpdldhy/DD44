@@ -20,11 +20,13 @@ void USkinnedMeshComponent::Tick()
 {
 	if (m_pBaseAnim) m_pBaseAnim->Tick();
 
+	USceneComponent::Tick();
+
 	for (auto& child : m_vChild)
 	{
 		child->Tick();
 	}
-	USceneComponent::Tick();
+
 
 }
 
@@ -34,8 +36,8 @@ void USkinnedMeshComponent::PreRender()
 
 	if (m_pMeshAnim) m_pMeshAnim->Render();
 
-	if (m_pMesh) 
-	{ 
+	if (m_pMesh)
+	{
 		m_pMesh->Bind();
 		m_pMesh->UpdateBindPoseData();
 	}
