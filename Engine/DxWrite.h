@@ -1,57 +1,34 @@
 #pragma once
 #include "Singleton.h"
 
+class Font;
+
 class DxWrite : public Singleton<DxWrite>
 {
 public:
-	ComPtr<ID2D1Factory>			m_pd2dFactory;
-	ComPtr<IDWriteFactory>			m_pDxWrite;
+	ComPtr<ID2D1Factory>			m_pd2dFactory = nullptr;
+	ComPtr<ID2D1RenderTarget>		m_pd2dRT = nullptr;
+	ComPtr<IDWriteFactory>			m_pDxWrite = nullptr;
 
-	ComPtr<ID2D1RenderTarget>		m_pd2dRT;
-
-	ComPtr<IDWriteTextFormat>		m_pTextFormat;
-	ComPtr<ID2D1SolidColorBrush>	m_pColorBrush;
+	shared_ptr<class Font>			m_pMainFont = nullptr;
+	vector<wstring> 				m_vFontPaths;
 
 public:
 	HRESULT   Create();
 
-public:
-	float m_fFontSize = 20.0f;
-	wstring m_wsFontName = L"";
-	std::vector<std::wstring> m_vFontPaths;
-
 private:
 	bool m_bUseRenderDoc = false;
 
+public:
+	bool LoadFontResources(const wstring& fontPaths);
+	bool LoadFontResources(const vector<wstring>& fontPaths);
+
 private:
-	void LoadFontResources(const vector<wstring>& fontPaths);
-	void SetFont(const wstring& _fontPath);
-	void IncreaseFontSize(float _step = 2.0f);
-	void DecreaseFontSize(float _step = 2.0f);
-	void SetFontColor(D2D1::ColorF _color);
-	void SetAlignment(DWRITE_TEXT_ALIGNMENT _textAlign, DWRITE_PARAGRAPH_ALIGNMENT _paraAlign);
 	bool IsRenderDocPresent();
 
 public:
 	void BeginDraw();
 	void Draw(D2D1_RECT_F _layoutRect, std::wstring _msg);
 	void EndDraw();
-	void DrawMultiline(D2D1_RECT_F _layoutRect, std::wstring _msg);
-	void DrawGlow(D2D1_RECT_F rect, std::wstring msg, D2D1::ColorF glowColor, D2D1::ColorF mainColor);
-};
-
-class Typer : public Singleton<Typer>
-{
-private:
-	std::wstring fullText;
-	std::wstring currentText;
-	float m_fCharDelay = 0.05f;
-	float m_fTimer = 0.0f;
-	size_t visibleLength = 0;
-	bool m_bFinished = false;
-
-public:
-	void Reset(const std::wstring& newText);
-	void Update(float deltaTime);
-	void Draw(D2D1_RECT_F rect);
+	//void DrawGlow(D2D1_RECT_F rect, std::wstring msg, D2D1::ColorF glowColor, D2D1::ColorF mainColor);
 };

@@ -361,6 +361,9 @@
     <ClInclude Include="EffectManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -605,6 +608,9 @@
     </ClCompile>
     <ClCompile Include="EffectManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

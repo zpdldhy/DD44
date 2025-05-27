@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "DxWrite.h"
 #include "Device.h"
+#include "Text.h"
 
 HRESULT DxWrite::Create()
 {
@@ -51,114 +52,51 @@ HRESULT DxWrite::Create()
 		}
 	}
 
-	//브러쉬 설정.
-	m_pd2dRT->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), m_pColorBrush.GetAddressOf());
+	m_vFontPaths.push_back(L"");
 
-	//DirectWrite 팩토리 설정.
+	//DirectWrite 팩토리 생성
 	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), (IUnknown**)m_pDxWrite.GetAddressOf());
 
-	//폰트 등록
-	m_vFontPaths = { L"../Resources/Font/font6.ttf",
-	L"../Resources/Font/font7.ttf",
-	L"../Resources/Font/font5.ttf",
-	L"../Resources/Font/font4.ttf",
-	L"../Resources/Font/font3.ttf",
-	L"../Resources/Font/font2.ttf",
-	L"../Resources/Font/font.ttf",
-	L"../Resources/Font/font8.ttf" };
-	LoadFontResources(m_vFontPaths);
+	// Main 폰트 생성
+	m_pMainFont = make_shared<Font>();
+	m_pMainFont->Create(L"", 20.f, Color(1.f, 0.f, 0.f, 1.f));
 
-	//초기 폰트, 크기
-	m_wsFontName = L"Mapo홍대프리덤";
-	m_fFontSize = 20;
-
-	if (SUCCEEDED(hr))
-	{
-		//텍스트 포맷설정.
-		hr = m_pDxWrite->CreateTextFormat(m_wsFontName.c_str(), NULL, DWRITE_FONT_WEIGHT_THIN, DWRITE_FONT_STYLE_NORMAL,
-			DWRITE_FONT_STRETCH_NORMAL, m_fFontSize, L"ko-kr", m_pTextFormat.GetAddressOf());
-
-		if (FAILED(hr))
-		{
-			DX_CHECK(hr, _T(__FUNCTION__));
-			return hr;
-		}
-	}
 	return hr;
 }
 
+bool DxWrite::LoadFontResources(const wstring& _szFontPath)
+{
+	for (auto& font : m_vFontPaths)
+		if (font == _szFontPath)
+			return false;
+			
+	m_vFontPaths.push_back(_szFontPath);
+	wstring ext = SplitPath(_szFontPath);
+	int added = AddFontResource(_szFontPath.c_str());
+	if (added > 0)
+	{
+		return true;
+	}
+
+	assert(0 && "Failed to load font resource");
+
+	return false;
+}
+
 //폰트 등록 함수.
-void DxWrite::LoadFontResources(const vector<wstring>& fontPaths)
+bool DxWrite::LoadFontResources(const vector<wstring>& _szFontPaths)
 {
-	int totalFontsAdded = 0;
-
-	for (const auto& path : fontPaths)
+	for (const auto& path : _szFontPaths)
 	{
-		int added = AddFontResource(path.c_str());
-		if (added > 0)
+		if (!LoadFontResources(path))
 		{
-			totalFontsAdded += added;
+			wstring str = L"[DxWrite] Failed to load font resource: " + path + L"\n";
+			OutputDebugString(str.c_str());
 		}
+
+		return false;
 	}
-
-}
-
-// 동적으로 폰트 변경.
-void DxWrite::SetFont(const std::wstring& _fontName)
-{
-	m_wsFontName = _fontName;
-
-	if (!m_pDxWrite)
-	{
-		return;
-	}
-
-	//m_pTextFormat.ReleaseAndGetAddressOf()을 통해서 이전 포맷을 안전하게 해제 후 새포인터 할당.
-	HRESULT hr = m_pDxWrite->CreateTextFormat(
-		_fontName.c_str(),
-		NULL,
-		DWRITE_FONT_WEIGHT_REGULAR,
-		DWRITE_FONT_STYLE_NORMAL,
-		DWRITE_FONT_STRETCH_NORMAL,
-		m_fFontSize,
-		L"",
-		m_pTextFormat.ReleaseAndGetAddressOf()
-	);
-
-	if (FAILED(hr))
-	{
-		DX_CHECK(hr, _T(__FUNCTION__));
-		return;
-	}
-}
-
-void DxWrite::IncreaseFontSize(float _step)
-{
-	m_fFontSize += _step;
-	SetFont(m_wsFontName);
-}
-
-void DxWrite::DecreaseFontSize(float _step)
-{
-	m_fFontSize -= _step;
-	SetFont(m_wsFontName);
-}
-
-void DxWrite::SetFontColor(D2D1::ColorF _color)
-{
-	if (m_pColorBrush)
-	{
-		m_pColorBrush->SetColor(_color);
-	}
-}
-
-void DxWrite::SetAlignment(DWRITE_TEXT_ALIGNMENT _textAlign, DWRITE_PARAGRAPH_ALIGNMENT _paraAlign)
-{
-	if (m_pTextFormat)
-	{
-		m_pTextFormat->SetTextAlignment(_textAlign);
-		m_pTextFormat->SetParagraphAlignment(_paraAlign);
-	}
+	return true;
 }
 
 bool DxWrite::IsRenderDocPresent()
@@ -176,108 +114,48 @@ void DxWrite::BeginDraw()
 
 void DxWrite::Draw(D2D1_RECT_F _layoutRect, std::wstring _msg)
 {
-	if (m_pd2dRT&&!m_bUseRenderDoc)
+	if (m_pd2dRT && !m_bUseRenderDoc)
 	{
 		//m_pColorBrush->SetColor(Color);
-		m_pd2dRT->DrawText(_msg.c_str(), static_cast<UINT32>(_msg.size()), m_pTextFormat.Get(), &_layoutRect, m_pColorBrush.Get());
+		m_pd2dRT->DrawText(
+			_msg.c_str(),
+			static_cast<UINT32>(_msg.size()), 
+			m_pMainFont->GetTextFormat(), &_layoutRect,
+			m_pMainFont->GetBrush());
 	}
 }
 
 void DxWrite::EndDraw()
 {
-	if(!m_bUseRenderDoc)
+	if (!m_bUseRenderDoc)
 		m_pd2dRT->EndDraw();
 }
 
-void DxWrite::DrawMultiline(D2D1_RECT_F _layoutRect, std::wstring _msg)
-{
-	if (!m_pd2dRT || !m_pTextFormat || !m_pColorBrush)
-		return;
-
-	// 텍스트 레이아웃 생성
-	ComPtr<IDWriteTextLayout> textLayout;
-	HRESULT hr = m_pDxWrite->CreateTextLayout(
-		_msg.c_str(),
-		(UINT32)_msg.length(),
-		m_pTextFormat.Get(),
-		_layoutRect.right - _layoutRect.left,
-		_layoutRect.bottom - _layoutRect.top,
-		textLayout.GetAddressOf()
-	);
-
-	if (FAILED(hr))
-	{
-		OutputDebugString(L"[DxWrite] Failed to create TextLayout\n");
-		return;
-	}
-
-	// 색상 설정 및 그리기
-	m_pd2dRT->DrawTextLayout(
-		{ _layoutRect.left, _layoutRect.top },
-		textLayout.Get(),
-		m_pColorBrush.Get()
-	);
-}
-
-//발광효과 글씨표현.
-void DxWrite::DrawGlow(D2D1_RECT_F rect, std::wstring msg, D2D1::ColorF glowColor, D2D1::ColorF mainColor)
-{
-	if (!m_pd2dRT || !m_pTextFormat) return;
-
-	const float glowOffsets[] = { -1, 0, 1 };
-
-	for (float dx : glowOffsets)
-	{
-		for (float dy : glowOffsets)
-		{
-			if (dx == 0 && dy == 0) continue;
-
-			D2D1_RECT_F glowRect = rect;
-			glowRect.left += dx;
-			glowRect.top += dy;
-			glowRect.right += dx;
-			glowRect.bottom += dy;
-
-			m_pColorBrush->SetColor(glowColor);
-			m_pd2dRT->DrawText(msg.c_str(), static_cast<UINT32>(msg.size()), m_pTextFormat.Get(), &glowRect, m_pColorBrush.Get());
-		}
-	}
-
-	// 중앙 본 텍스트
-	m_pColorBrush->SetColor(mainColor);
-	m_pd2dRT->DrawText(msg.c_str(), static_cast<UINT32>(msg.size()), m_pTextFormat.Get(), &rect, m_pColorBrush.Get());
-}
-
-void Typer::Reset(const std::wstring& newText)
-{
-	fullText = newText;
-	currentText.clear();
-	visibleLength = 0;
-	m_fTimer = 0.0f;
-	m_bFinished = false;
-}
-
-void Typer::Update(float deltaTime)
-{
-	if (m_bFinished) return;
-
-	m_fTimer += deltaTime;
-	while (m_fTimer >= m_fCharDelay && visibleLength < fullText.size())
-	{
-		m_fTimer -= m_fCharDelay;
-		visibleLength++;
-		currentText = fullText.substr(0, visibleLength);
-
-		if (visibleLength == fullText.size())
-		{
-			m_bFinished = true;
-		}
-	}
-}
-
-void Typer::Draw(D2D1_RECT_F rect)
-{
-	DXWRITE->DrawMultiline(rect, currentText);
-}
-
-
+////발광효과 글씨표현.
+//void DxWrite::DrawGlow(D2D1_RECT_F rect, std::wstring msg, D2D1::ColorF glowColor, D2D1::ColorF mainColor)
+//{
+//	if (!m_pd2dRT || !m_pTextFormat) return;
+//
+//	const float glowOffsets[] = { -1, 0, 1 };
+//
+//	for (float dx : glowOffsets)
+//	{
+//		for (float dy : glowOffsets)
+//		{
+//			if (dx == 0 && dy == 0) continue;
+//
+//			D2D1_RECT_F glowRect = rect;
+//			glowRect.left += dx;
+//			glowRect.top += dy;
+//			glowRect.right += dx;
+//			glowRect.bottom += dy;
+//
+//			m_pColorBrush->SetColor(glowColor);
+//			m_pd2dRT->DrawText(msg.c_str(), static_cast<UINT32>(msg.size()), m_pTextFormat.Get(), &glowRect, m_pColorBrush.Get());
+//		}
+//	}
+//
+//	// 중앙 본 텍스트
+//	m_pColorBrush->SetColor(mainColor);
+//	m_pd2dRT->DrawText(msg.c_str(), static_cast<UINT32>(msg.size()), m_pTextFormat.Get(), &rect, m_pColorBrush.Get());
+//}
