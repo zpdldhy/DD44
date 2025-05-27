@@ -31,5 +31,11 @@ public:
 	void SetupSunLight();
 	void SetupEngineCamera();
 
+public:
+	void VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp);
+	float m_fHitFlashTimer = 0.0f;
+	bool m_bIsFlashing = false;
+	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
+
 };
 

@@ -35,5 +35,6 @@ public:
 public:
 	void SetVisible(bool _visible) { bRender = _visible; }
 	const bool& GetVisible() {  return bRender; }
+	int GetChildCount() const { return static_cast<int>(m_vChild.size()); }
 };
 
