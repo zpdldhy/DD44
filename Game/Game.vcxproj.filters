@@ -78,7 +78,12 @@
     <ClInclude Include="EnemyState.h">
       <Filter>FSM</Filter>
     </ClInclude>
-    <ClInclude Include="BatMovement.h" />
+    <ClInclude Include="BatStates.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="BatMovement.h">
+      <Filter>Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -132,7 +137,12 @@
     <ClCompile Include="HeadRollerStates.cpp">
       <Filter>FSM</Filter>
     </ClCompile>
-    <ClCompile Include="BatMovement.cpp" />
+    <ClCompile Include="BatStates.cpp">
+      <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="BatMovement.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

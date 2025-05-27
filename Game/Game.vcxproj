@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BatMovement.h" />
+    <ClInclude Include="BatStates.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EnemyState.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
@@ -162,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BatMovement.cpp" />
+    <ClCompile Include="BatStates.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="Game.cpp" />
