@@ -45,7 +45,7 @@ void Engine::Init()
 
 	// Manager ÃÊ±âÈ­
 	{
-		LIGHTMANAGER->Init();
+		//LIGHTMANAGER->Init();
 		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();

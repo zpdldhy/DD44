@@ -32,7 +32,7 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     switch (type)
     {
     case EEffectType::Blood:
-        mat->Load(L"../Resources/Texture/Blood.png", L"../Resources/Shader/SpriteUV.hlsl");
+        mat->Load(L"../Resources/Texture/Blood2.png", L"../Resources/Shader/SpriteUV.hlsl");
         break;
     case EEffectType::Dust:
         mat->Load(L"../Resources/Texture/Dust.png", L"../Resources/Shader/SpriteUV.hlsl");
@@ -67,20 +67,24 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     if (!actor)
         return;
 
-    float randomAngleDeg = RandomRange(-maxAngleSpreadDeg, maxAngleSpreadDeg);
-    float rad = DegreesToRadians(randomAngleDeg);
+    // 회전 각도 계산 (baseVelocity 기준으로 랜덤 방향 산탄)
+    float angleRad = DegreesToRadians(RandomRange(-maxAngleSpreadDeg * 0.5f, maxAngleSpreadDeg * 0.5f));
+    float speed = baseVelocity.Length();
+    float zSpread = RandomRange(0.3f, 0.8f); // 위로 튀는 느낌
 
-    // baseVelocity 회전
-    Vec3 velocity;
-    velocity.x = baseVelocity.x * cos(rad) - baseVelocity.y * sin(rad);
-    velocity.y = baseVelocity.x * sin(rad) + baseVelocity.y * cos(rad);
-    velocity.z = baseVelocity.z;
+    Vec3 dir = Vec3(cos(angleRad), sin(angleRad), zSpread);
+    dir.Normalize();
+    Vec3 velocity = dir * speed;
 
-    // 방향에 맞는 각도 계산
-    float visualAngle = atan2(velocity.y, velocity.x) * (180.0f / 3.14159265f);
+    // 방향에 맞는 회전 각도 (XY 평면 기준 시각용)
+    float visualAngle = atan2(dir.y, dir.x) * (180.0f / 3.14159265f);
 
     actor->SetPosition(pos);
-    actor->SetRotation(Vec3(0, 0, visualAngle)); // sprite 회전 적용
-    actor->Play(1.0f, velocity);
+    actor->SetRotation(Vec3(0, 0, visualAngle));
+    actor->SetGravity(-30.0f); // 중력 세게
+    actor->SetStartScale(Vec3(0.3f)); // 작게 시작
+    actor->SetEndScale(Vec3(RandomRange(0.8f, 1.3f))); // 팡 하고 퍼짐
+
+    actor->Play(.7f, velocity); // 빠르게 사라짐
 }
 

@@ -78,12 +78,9 @@ void Editor::Tick()
 
 	if (INPUT->GetButton(J))
 	{
-		Vec3 pos = Vec3(0.0f, 1.0f, 0.0f);
-		Vec3 velocity = Vec3(0, 10, -10); // 위로 튀게
-		for (int i = 0; i < 5; ++i)
-		{
-			EFFECT->PlayEffect(EEffectType::Blood, pos, 45.0f, velocity);
-		}
+		Vec3 basePos = Vec3(0.0f, 1.0f, 0.0f);			// 피터지는 캐릭터 위치
+		Vec3 velocity = Vec3(0, 15, -20);				// 피터지는 방향(Look 반대)
+		PlayBloodBurst(basePos, velocity, 1.0f, 90.0f);  // 3번째 인자 속도 4번째 인자 각도
 	}
 
 	if (GUI->GetObjectEditorUI()->IsPlacementMode() && INPUT->GetButton(LCLICK))
@@ -717,9 +714,9 @@ void Editor::Slash()
 		float progress = 0.0f;
 
 
-		if (t <= 0.4f)
+		if (t <= 0.3f)
 		{
-			float ratio = t / 0.4f;
+			float ratio = t / 0.3f;
 			progress = pow(ratio, 2.0f);
 		}
 		else
@@ -734,5 +731,18 @@ void Editor::Slash()
 		{
 			m_bSlashPlaying = false;
 		}
+	}
+}
+
+void Editor::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)
+{
+	int count = RandomRange(_minCount, _maxCount);
+	for (int i = 0; i < count; ++i)
+	{
+		Vec3 offset = Vec3(RandomRange(-0.3f, 0.3f), RandomRange(-0.3f, 0.3f), RandomRange(-0.3f, 0.3f));
+		Vec3 pos = _origin + offset;
+
+		Vec3 baseVelocity = _direction * _speed;
+		EFFECT->PlayEffect(EEffectType::Blood, pos, _spreadAngleDeg, baseVelocity);
 	}
 }
