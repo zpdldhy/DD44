@@ -14,7 +14,7 @@
 #include "ALight.h"
 #include "APawn.h"
 #include "UMaterial.h"
-#include "MeshTransform.h"
+
 #include "Input.h"
 
 void TestPlayer::Init()
