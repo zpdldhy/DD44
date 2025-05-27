@@ -36,6 +36,7 @@ void Engine::Init()
 
 	// 기타 기능 객체 초기화 ( input, )
 	{
+		LIGHTMANAGER->Init();
 		INPUT->Init();
 		DXWRITE->Create();
 
