@@ -48,6 +48,15 @@ public:
 	shared_ptr<StateBase> attack;
 	shared_ptr<StateBase> currentState;
 
+	// Slash 
+	shared_ptr<UMaterial> m_pSlashMaterial = nullptr;
+	float m_fSlashTime = 0.0f;
+	bool m_bSlashPlaying = false;
+	float m_fSlashDuration = 0.5f;
+
+	// Camera Offset
+	Vec3 m_vCameraOffset = { 20.0f, 30.0f, -20.0f };
+
 public:
 	void Init() override;
 	void Tick() override;
@@ -58,5 +67,8 @@ private:
 	void UpdateArrowUI();
 public:
 	void ChangetState(shared_ptr<StateBase> _state);
+public:
+	void Slash();
+	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
 };
 

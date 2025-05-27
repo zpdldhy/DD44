@@ -33,7 +33,7 @@ void AEffectActor::Tick()
     t = pow(t, 2);
     Vec3 scale;
     scale.x = Lerp(m_vStartScale.x, m_vEndScale.x, t);
-    scale.y = Lerp(m_vStartScale.y, m_vEndScale.y, pow(t, 2.5));
+    scale.y = Lerp(m_vStartScale.y, m_vEndScale.y, pow(t,2.5));
     scale.z = 1.0f;
     SetScale(scale);
 

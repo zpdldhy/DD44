@@ -87,6 +87,9 @@
     <ClInclude Include="BatMovement.h">
       <Filter>Script</Filter>
     </ClInclude>
+    <ClInclude Include="GameCameraMove.h">
+      <Filter>Script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -147,6 +150,9 @@
       <Filter>FSM</Filter>
     </ClCompile>
     <ClCompile Include="BatMovement.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="GameCameraMove.cpp">
       <Filter>Script</Filter>
     </ClCompile>
   </ItemGroup>

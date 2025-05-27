@@ -9,6 +9,7 @@
 #include "ATerrainTileActor.h"
 #include "UStaticMeshComponent.h"
 #include "EngineCameraMoveScript.h"
+#include "GameCameraMove.h"
 #include "PlayerMoveScript.h"
 #include "AssimpLoader.h"
 #include "LightManager.h"
@@ -38,15 +39,7 @@ void Editor::Init()
 
 	//actorLoader.ConvertFbxToAsset("../Resources/Obj/*.fbx");
 	//objectLoader.ConvertObjToAsset("../Resources/Obj/*.obj");
-	
-	{
-		m_pSlashMaterial = make_shared<UMaterial>();
-		m_pSlashMaterial->Load(
-			L"../Resources/Texture/sword_slash_texture1.png",
-			L"../Resources/Shader/Slash.hlsl"
-		);
-	}
-	
+
 	SetupEditorCallbacks();
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
@@ -54,36 +47,30 @@ void Editor::Init()
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));	
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
+	// 수정 필요
 	m_pPlayer = vlist[0];
 	OBJECT->AddActorList(vlist);
 
 	SetupEngineCamera();
+	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();	
 }
 
 void Editor::Tick()
-{
-	Slash();
-	
+{	
 	if (INPUT->GetButton(O))
 	{
 		if (m_bEnginCamera)
 		{
 			m_bEnginCamera = false;
-			CAMERA->Set3DCameraActor(m_pPlayer);
+			CAMERA->Set3DCameraActor(m_pGameCameraActor);
 		}
 		else
 		{
 			m_bEnginCamera = true;
 			CAMERA->Set3DCameraActor(m_pCameraActor);
 		}
-	}
-	if (INPUT->GetButton(J))
-	{
-		Vec3 basePos = Vec3(0.0f, 1.0f, 0.0f);			// 피터지는 캐릭터 위치
-		Vec3 velocity = Vec3(0, 15, -20);				// 피터지는 방향(Look 반대)
-		PlayBloodBurst(basePos, velocity, 1.0f, 90.0f);  // 3번째 인자 속도 4번째 인자 각도
 	}
 
 	if (GUI->GetObjectEditorUI()->IsPlacementMode() && INPUT->GetButton(LCLICK))
@@ -115,7 +102,19 @@ void Editor::SetupEngineCamera()
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	OBJECT->AddActor(m_pCameraActor);
 }
+void Editor::SetupGameCamera()
+{
+	m_pGameCameraActor = make_shared<ACameraActor>();
 
+	//m_pGameCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
+	auto script = make_shared<GameCameraMove>(m_pPlayer);
+	m_pGameCameraActor->AddScript(script);
+	m_pGameCameraActor->m_szName = L"GameCamera";
+
+	CAMERA->Set3DCameraActor(m_pGameCameraActor);
+	OBJECT->AddActor(m_pGameCameraActor);
+
+}
 void Editor::SetupSkybox()
 {
 	m_pSky = make_shared<ASky>();
@@ -696,55 +695,4 @@ void Editor::SetupParticleEditorCallback()
 			PARTICLE->AddUI(particleActor);
 			//particleActor->InitSpriteAnimation(4, 1.f); // 4는 divisions, 10은 frameRate
 		});
-}
-
-void Editor::Slash()
-{
-	if (INPUT->GetButtonDown(LCLICK))
-	{
-		m_bSlashPlaying = true;
-		m_fSlashTime = 0.0f;
-	}
-
-
-	if (m_bSlashPlaying)
-	{
-		m_fSlashTime += TIMER->GetDeltaTime();
-
-		float t = m_fSlashTime;
-		float progress = 0.0f;
-
-
-		if (t <= 0.3f)
-		{
-			float ratio = t / 0.3f;
-			progress = pow(ratio, 2.0f);
-		}
-		else
-		{
-			progress = -1.0f;
-		}
-
-		if (m_pSlashMaterial)
-			m_pSlashMaterial->SetSlashProgress(progress);
-
-		if (t >= m_fSlashDuration)
-		{
-			m_bSlashPlaying = false;
-		}
-	}
-}
-
-
-void Editor::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)
-{
-	int count = RandomRange(_minCount, _maxCount);
-	for (int i = 0; i < count; ++i)
-	{
-		Vec3 offset = Vec3(RandomRange(-0.3f, 0.3f), RandomRange(-0.3f, 0.3f), RandomRange(-0.3f, 0.3f));
-		Vec3 pos = _origin + offset;
-
-		Vec3 baseVelocity = _direction * _speed;
-		EFFECT->PlayEffect(EEffectType::Blood, pos, _spreadAngleDeg, baseVelocity);
-	}
 }

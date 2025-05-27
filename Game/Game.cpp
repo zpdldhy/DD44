@@ -8,6 +8,7 @@
 #include "ATerrainTileActor.h"
 #include "UStaticMeshComponent.h"
 #include "EngineCameraMoveScript.h"
+#include "GameCameraMove.h"
 #include "PlayerMoveScript.h"
 #include "AssimpLoader.h"
 #include "LightManager.h"
@@ -29,12 +30,14 @@ void Game::Init()
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
+	// 수정 필요
 	m_pPlayer = vlist[0];
 	OBJECT->AddActorList(vlist);
 
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game.uis.json"));
 
 	SetupEngineCamera();
+	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
 
@@ -49,7 +52,7 @@ void Game::Tick()
 		if (m_bEnginCamera)
 		{
 			m_bEnginCamera = false;
-			CAMERA->Set3DCameraActor(m_pPlayer);
+			CAMERA->Set3DCameraActor(m_pGameCameraActor);
 		}
 		else
 		{
@@ -83,6 +86,20 @@ void Game::SetupEngineCamera()
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	OBJECT->AddActor(m_pCameraActor);
+}
+
+void Game::SetupGameCamera()
+{
+	m_pGameCameraActor = make_shared<ACameraActor>();
+
+	//m_pGameCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
+	auto script = make_shared<GameCameraMove>(m_pPlayer);
+	m_pGameCameraActor->AddScript(script);
+	m_pGameCameraActor->m_szName = L"GameCamera";
+
+	CAMERA->Set3DCameraActor(m_pGameCameraActor);
+	OBJECT->AddActor(m_pGameCameraActor);
+
 }
 
 void Game::SetupSkybox()

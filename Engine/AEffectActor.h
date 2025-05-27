@@ -18,6 +18,11 @@ public:
     void SetStartScale(const Vec3& scale) { m_vStartScale = scale; }
     void SetEndScale(const Vec3& scale) { m_vEndScale = scale; }
 
+public:
+    void SetGravity(float gravity) { m_fGravity = gravity; }
+    void SetStartScale(const Vec3& scale) { m_vStartScale = scale; }
+    void SetEndScale(const Vec3& scale) { m_vEndScale = scale; }
+
 private:
     EEffectType m_eType;
     float m_fRemainTime = 0.0f;
