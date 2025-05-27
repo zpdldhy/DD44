@@ -15,7 +15,7 @@ void UCameraComponent::Init()
 	UpdateProjection();
 
 #ifndef DEBUG
-	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
+	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE&& g_bRangeVisibleMode)
 		CreateFrustumBox();
 #endif // DEBUG
 }
@@ -28,7 +28,7 @@ void UCameraComponent::Tick()
 	UpdateProjection();
 
 #ifndef DEBUG
-	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE)
+	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE && g_bRangeVisibleMode)
 		UpdateFrustumBox();
 #endif // DEBUG
 }
@@ -36,7 +36,7 @@ void UCameraComponent::Tick()
 void UCameraComponent::Render()
 {
 #ifndef DEBUG
-	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE && m_bVisibleFrustumBox == true)
+	if (m_ProjectionType == ProjectionType::PT_PERSPECTIVE && m_bVisibleFrustumBox == true && g_bRangeVisibleMode)
 	{
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
