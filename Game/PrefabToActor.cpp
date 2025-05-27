@@ -187,6 +187,7 @@ vector<shared_ptr<APawn>> PrefabToActor::MakeObjects(const string& _file)
 			meshComp->SetMaterial(material);
 
 			auto obj = make_shared<APawn>();
+			obj->SetPrefabPath(_file);
 			obj->m_szName = L"Object";
 			obj->SetMeshComponent(meshComp);
 			obj->SetPosition(objData.Position);

@@ -97,7 +97,7 @@ private:
 	D3D11_VIEWPORT m_MainVP;	
 
 public:
-	bool CreateImGuiWindow(HINSTANCE _hInstance, int _win = 800, int _winY = (int)g_windowSize.y);
+	bool CreateImGuiWindow(HINSTANCE _hInstance, int _winX = 1000, int _winY = (int)g_windowSize.y - 100);
 	bool CreateDevice();
 	POINT GetMousePos();
 	void PreRender();
