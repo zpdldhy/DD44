@@ -32,14 +32,15 @@ void AUIActor::Tick()
 		GetMeshComponent()->GetMaterial()->SetTexture(m_pSelectTexture);
 	}
 
-	UpdateText();
+	if (m_bTextUI)
+		UpdateText();
 
 	AActor::Tick();
 }
 
 void AUIActor::Render()
 {
-	if (m_bTextureUI)
+	if (m_bTextUI)
 	{
 		TextRender();
 		return;
@@ -89,13 +90,16 @@ void AUIActor::CreateText()
 {
 	m_pText = make_unique<Text>();
 	m_pFont = make_unique<Font>();
-	m_pFont->Create(m_szFontPath, 30.0f, Color(1.f, 1.f, 1.f, 1.f));
-	m_pFont->SetAlignment(DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	m_pFont->Create(m_szFontPath, 30.0f, m_tUISliceData.vColor);
 	UpdateText();
 }
 
 void AUIActor::UpdateText()
-{
+{	
+	m_pFont->SetPath(m_szFontPath);
+	m_pFont->SetSize(m_fFontSize);
+	m_pFont->SetColor(m_tUISliceData.vColor);
+	m_pFont->SetAlignment(DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	Vec2 scale(GetScale().x, GetScale().y);
 	m_pText->Create(m_szText, scale, m_pFont.get());
 }

@@ -22,6 +22,11 @@ void UIEditorUI::DrawUI()
     SearchFile(searchPath, ".png", m_vTextureList, m_vTextureNameList);
     SearchFile(searchPath, ".jpg", m_vTextureList, m_vTextureNameList);
     SearchFile(searchPath, ".bmp", m_vTextureList, m_vTextureNameList);
+
+    searchPath = "../Resources/Font/";
+
+    SearchFile(searchPath, ".otf", m_vFontList, m_vFontNameList);
+    SearchFile(searchPath, ".ttf", m_vFontList, m_vFontNameList);
         
     UpdateUIActorList();
     SelectActor();
@@ -83,7 +88,7 @@ void UIEditorUI::DrawUI()
 
     ImGui::SameLine();
 
-    ImGui::Checkbox("TextUI", &m_pUIActor->m_bTextureUI);
+    ImGui::Checkbox("TextUI", &m_bTextUI);
 
     ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
@@ -103,24 +108,31 @@ void UIEditorUI::DrawUI()
 
     ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
-    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Text 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
+    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Font 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
 
-    if (m_pUIActor->m_bTextureUI == true)
+    if (m_bTextUI == true)
+    {
+        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Font");
+
+        SetFont();
+
+        ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+    }
+
+    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Text 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
+    
+    if (m_bTextUI == true)
     {
         ImGui::TextColored(ImVec4(1, 1, 0, 1), "Text");
 
         ImGui::InputText("Text", m_szText, IM_ARRAYSIZE(m_szText));
-
-        string helpme(m_szText);
-
-        m_pUIActor->SetText(to_mw(helpme));
 
         ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
     }
 
     // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 SliceUV 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
 
-    if (m_pUIActor->m_bTextureUI == false)
+    if (m_bTextUI == false)
     {
         ImGui::TextColored(ImVec4(1, 1, 0, 1), "SliceUV");
 
@@ -131,7 +143,7 @@ void UIEditorUI::DrawUI()
 
     // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Materials 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
 
-    if (m_pUIActor->m_bTextureUI == false)
+    if (m_bTextUI == false)
     {
         ImGui::TextColored(ImVec4(1, 1, 0, 1), "Materials");
 
@@ -171,6 +183,8 @@ void UIEditorUI::DrawUI()
     m_vPrefabNameList.clear();
     m_vTextureList.clear();
     m_vTextureNameList.clear();
+    m_vFontList.clear();
+    m_vFontNameList.clear();
     m_vUIList.clear();
 }
 
@@ -205,10 +219,19 @@ void UIEditorUI::UpdatePrefabData()
 {
     m_CurrentPrefab.Name = to_wm(m_pUIActor->m_szName);
 
+    m_CurrentPrefab.isTextureUI = m_pUIActor->m_bTextUI;
+
     memcpy(m_CurrentPrefab.transform.Scale, m_Trans.Scale, sizeof(float) * 3);
     memcpy(m_CurrentPrefab.transform.Rotation, m_Trans.Rotation, sizeof(float) * 3);
     memcpy(m_CurrentPrefab.transform.Position, m_Trans.Position, sizeof(float) * 3);
     memcpy(m_CurrentPrefab.color, m_vColor, sizeof(float) * 4);
+
+    // Font
+    m_CurrentPrefab.FontSize = m_pUIActor->GetFontSize();
+    m_CurrentPrefab.FontPath = to_wm(m_pUIActor->GetFontPath());
+    
+    // Text
+    m_CurrentPrefab.Text = to_wm(m_pUIActor->GetText());
 
     memcpy(m_CurrentPrefab.SliceUV, m_vSliceUV, sizeof(float) * 4);
 
@@ -226,9 +249,17 @@ void UIEditorUI::UpdateUIActor()
     if (m_pUIActor == nullptr)
         return;
 
+    m_pUIActor->m_bTextUI = m_bTextUI;
+
     m_pUIActor->SetPosition(Vec3(m_Trans.Position));
     m_pUIActor->SetRotation(Vec3(m_Trans.Rotation));
     m_pUIActor->SetScale(Vec3(m_Trans.Scale));
+
+    // Font
+    m_pUIActor->SetFontSize(m_fFontSize);
+
+    string fuckingChar(m_szText);
+    m_pUIActor->SetText(to_mw(fuckingChar));
 
     m_pUIActor->SetSliceData(Vec4(m_vSliceUV[0], m_vSliceUV[1], m_vSliceUV[2], m_vSliceUV[3]));
     m_pUIActor->SetColor(Vec4(m_vColor[0], m_vColor[1], m_vColor[2], m_vColor[3]));
@@ -293,11 +324,21 @@ void UIEditorUI::UpdateUIActorList()
 
 void UIEditorUI::ResetData()
 {
+    m_bTextUI = false;
+
     // Transform
     for (int i = 0; i < 3; i++) m_Trans.Position[i] = 0.0f;
     for (int i = 0; i < 3; i++) m_Trans.Rotation[i] = 0.0f;
     for (int i = 0; i < 2; i++) m_Trans.Scale[i] = 100.0f;
     for (int i = 0; i < 4; i++) m_vColor[i] = 0.0f;
+
+    // Font
+    m_fFontSize = 20.f;
+    m_iFontIndex = 0;
+
+    // Text
+    strcpy_s(m_szText, "Hello World");
+
     // Slice
     for (int i = 0; i < 4; i++) m_vSliceUV[i] = 0.5f;
 
@@ -387,10 +428,10 @@ void UIEditorUI::SetTransform()
 
 void UIEditorUI::SetColor()
 {
-    ImGui::SameLine(0, 25.f); ImGui::Text("%s", "R");
-    ImGui::SameLine(0, 50.f); ImGui::Text("%s", "G");
-    ImGui::SameLine(0, 50.f); ImGui::Text("%s", "B");
-    ImGui::SameLine(0, 50.f); ImGui::Text("%s", "A");
+    ImGui::SameLine(0, 50.f); ImGui::Text("%s", "R");
+    ImGui::SameLine(0, 73.f); ImGui::Text("%s", "G");
+    ImGui::SameLine(0, 73.f); ImGui::Text("%s", "B");
+    ImGui::SameLine(0, 73.f); ImGui::Text("%s", "A");
 
     ImGui::PushID("Color");
     ImGui::Indent(60.f);
@@ -412,6 +453,29 @@ void UIEditorUI::SetColor()
 
     ImGui::Unindent(60.f);
     ImGui::PopID();
+}
+
+void UIEditorUI::SetFont()
+{
+    ImGui::InputFloat("##Value", &m_fFontSize, 0.0f, 0.0f, "%.3f");
+    ImGui::SameLine(); ImGui::Text("%s", "FontSize");
+
+    static std::vector<const char*> NamePtrs;
+    if (NamePtrs.empty())
+    {
+        for (auto& name : m_vFontNameList)
+            NamePtrs.push_back(name.c_str());
+    }
+
+    static int iPreIdleIndex = 0;
+    ImGui::Combo("Font", &m_iFontIndex, NamePtrs.data(), (int)NamePtrs.size());
+    if (m_iFontIndex != iPreIdleIndex)
+    {
+        iPreIdleIndex = m_iFontIndex;
+        m_pUIActor->SetFontPath(to_mw(m_vFontList[iPreIdleIndex]));
+    }
+
+    NamePtrs.clear();
 }
 
 void UIEditorUI::SetSliceUV()
@@ -637,11 +701,22 @@ void UIEditorUI::SelectActor()
 
 void UIEditorUI::ResolvePrefabData(const PrefabUIData& data)
 {
+    m_bTextUI = data.isTextureUI;
+
     memcpy(m_Trans.Scale, data.transform.Scale, sizeof(float) * 3);
     memcpy(m_Trans.Rotation, data.transform.Rotation, sizeof(float) * 3);
     memcpy(m_Trans.Position, data.transform.Position, sizeof(float) * 3);
 
     memcpy(m_vColor, data.color, sizeof(float) * 4);
+
+    // Font
+    m_fFontSize = data.FontSize;
+    for (size_t i = 0; i < m_vFontList.size(); i++)
+        if (!strcmp(m_vFontList[i].c_str(), data.FontPath.c_str()))
+            m_iFontIndex = i;
+
+    // Texts
+    strcpy_s(m_szText, data.Text.c_str());
 
     memcpy(m_vSliceUV, data.SliceUV, sizeof(float) * 4);
 

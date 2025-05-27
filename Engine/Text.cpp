@@ -6,7 +6,7 @@ HRESULT Font::Create(const wstring& _szFontPath, float _fFontSize, Color _color)
 {
 	DXWRITE->LoadFontResources(_szFontPath);
 
-	wstring name = m_szFontName = SplitName(_szFontPath);
+	wstring name = m_szFontPath = _szFontPath;
 	m_fFontSize = _fFontSize;
 	m_color = _color;
 
@@ -56,32 +56,50 @@ HRESULT Font::CreateTextFormat(const wstring& _szFontName, float _fFontSize)
 	return hr;
 }
 
+void Font::SetPath(wstring _path)
+{
+	if (m_szFontPath == _path)
+		return;
+
+	m_szFontPath = _path;
+	CreateTextFormat(m_szFontPath, m_fFontSize);
+}
+
 void Font::SetSize(float _size)
 {
+	if (m_fFontSize == _size)
+		return;
+
 	m_fFontSize = _size;
-	CreateTextFormat(m_szFontName, m_fFontSize);
+	CreateTextFormat(m_szFontPath, m_fFontSize);
 }
 
 void Font::IncreaseSize(float _step)
 {
 	m_fFontSize += _step;
-	CreateTextFormat(m_szFontName, m_fFontSize);
+	CreateTextFormat(m_szFontPath, m_fFontSize);
 }
 
 void Font::DecreaseSize(float _step)
 {
 	m_fFontSize -= _step;
-	CreateTextFormat(m_szFontName, m_fFontSize);
+	CreateTextFormat(m_szFontPath, m_fFontSize);
 }
 
 void Font::SetColor(Color _color)
 {
+	if (m_color == _color)
+		return;
+
 	m_color = _color;
 	m_pColorBrush->SetColor(D2D1::ColorF(_color.x, _color.y, _color.z, _color.w));
 }
 
 void Font::SetAlignment(DWRITE_TEXT_ALIGNMENT _textAlign, DWRITE_PARAGRAPH_ALIGNMENT _paraAlign)
 {
+	if (m_horizontal == _textAlign && m_vertical == _paraAlign)
+		return;
+
 	if (m_pTextFormat)
 	{
 		m_pTextFormat->SetTextAlignment(_textAlign);

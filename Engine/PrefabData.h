@@ -68,6 +68,7 @@ struct PrefabCharacterData
 struct PrefabUIData
 {
     std::string Name;
+    bool isTextureUI = false;
 
     TransformData transform;
 
@@ -80,7 +81,11 @@ struct PrefabUIData
     std::string SelectedTexturePath;
     std::string ShaderPath;
 
-    int ScriptType;
+    std::string FontPath = "";
+    float FontSize = 20.f;
+    std::string Text = "";
+
+    int ScriptType = -1;
 };
 
 struct PrefabParticleData

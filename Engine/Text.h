@@ -6,9 +6,11 @@ class Font
 	ComPtr<IDWriteTextFormat>		m_pTextFormat = nullptr;
 	ComPtr<ID2D1SolidColorBrush>	m_pColorBrush = nullptr;
 
-	wstring m_szFontName = L"";
+	wstring m_szFontPath = L"";
 	float m_fFontSize = 20.0f;
 	Color m_color = { 0.f, 0.f, 0.f, 1.f };
+	DWRITE_TEXT_ALIGNMENT m_horizontal = DWRITE_TEXT_ALIGNMENT_CENTER;
+	DWRITE_PARAGRAPH_ALIGNMENT m_vertical = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
 
 public:
 	HRESULT Create(const wstring& _szFontPath, float _fFontSize, Color _color);
@@ -20,13 +22,14 @@ public:
 	IDWriteTextFormat* GetTextFormat() const { return m_pTextFormat.Get(); }
 	ID2D1SolidColorBrush* GetBrush() const { return m_pColorBrush.Get(); }
 
+	void SetPath(wstring _path);
 	void SetSize(float _size);
 	void IncreaseSize(float _step);
 	void DecreaseSize(float _step);
 	void SetColor(Color _color);
 	void SetAlignment(DWRITE_TEXT_ALIGNMENT _textAlign, DWRITE_PARAGRAPH_ALIGNMENT _paraAlign);
 
-	wstring GetFontName() const { return m_szFontName; }
+	wstring GetFontPath() const { return m_szFontPath; }
 	float GetFontSize() const { return m_fFontSize; }
 	Color GetColor() const { return m_color; }
 

@@ -47,15 +47,19 @@ public:
 	Color GetColor() { return m_tUISliceData.vColor; }
 
 	// Text
+	void SetFontSize(const float& _scale) { m_fFontSize = _scale; }
+	float GetFontSize() { return m_fFontSize; }
+	void SetFontPath(const wstring& _szPath) { m_szFontPath = _szPath; }
+	wstring GetFontPath() { return m_szFontPath; }
 	void SetText(const wstring& _szText) { m_szText = _szText; }
-
+	wstring GetText() { return m_szText; }
 
 	// Prefab
 	void SetPrefabData(const PrefabUIData& _data) { m_PrefabData = _data; }
 	PrefabUIData GetPrefabData() { return m_PrefabData; }
 
 public:
-	bool m_bTextureUI = false;
+	bool m_bTextUI = false;
 
 protected:
 	// Constants
@@ -72,10 +76,13 @@ protected:
 	shared_ptr<Texture> m_pActiveTexture = nullptr;
 	shared_ptr<Texture> m_pSelectTexture = nullptr;
 
+	// Font
+	wstring m_szFontPath = L"../Resources/Font/LibreBaskerville-Regular.ttf";
+	float m_fFontSize = 20.0f;
+
 	// Text
 	unique_ptr<Font> m_pFont = nullptr;
 	unique_ptr<Text> m_pText = nullptr;
-	wstring m_szFontPath = L"../Resources/Font/LibreBaskerville-Regular.ttf";
 	wstring m_szText = L"Hello World";
 
 	// Prefab
