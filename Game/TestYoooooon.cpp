@@ -37,7 +37,7 @@ void TestYoooooon::Init()
 	UI->AddUIList(PToA->LoadAllPrefabs(".uis.json"));
 
 	SetupEngineCamera();
-	SetupSkybox();
+	//SetupSkybox();
 	SetupSunLight();
 
 	CreateCollisionObject();

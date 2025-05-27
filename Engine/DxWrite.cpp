@@ -168,16 +168,6 @@ bool DxWrite::IsRenderDocPresent()
 	return (hMod != nullptr);
 }
 
-void DxWrite::DirectDraw(D2D1_RECT_F _layoutRect, std::wstring _msg)
-{
-	m_pd2dRT->BeginDraw();
-	if (m_pd2dRT)
-	{
-		m_pd2dRT->DrawText(_msg.c_str(), static_cast<UINT32>(_msg.size()), m_pTextFormat.Get(), &_layoutRect, m_pColorBrush.Get());
-	}
-	m_pd2dRT->EndDraw();
-}
-
 void DxWrite::BeginDraw()
 {
 	if (!m_bUseRenderDoc)

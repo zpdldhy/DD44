@@ -5,8 +5,10 @@ class DxWrite : public Singleton<DxWrite>
 {
 public:
 	ComPtr<ID2D1Factory>			m_pd2dFactory;
-	ComPtr<ID2D1RenderTarget>		m_pd2dRT;
 	ComPtr<IDWriteFactory>			m_pDxWrite;
+
+	ComPtr<ID2D1RenderTarget>		m_pd2dRT;
+
 	ComPtr<IDWriteTextFormat>		m_pTextFormat;
 	ComPtr<ID2D1SolidColorBrush>	m_pColorBrush;
 
@@ -31,7 +33,6 @@ private:
 	bool IsRenderDocPresent();
 
 public:
-	void DirectDraw(D2D1_RECT_F _layoutRect, std::wstring _msg);
 	void BeginDraw();
 	void Draw(D2D1_RECT_F _layoutRect, std::wstring _msg);
 	void EndDraw();
