@@ -44,6 +44,7 @@ private:
 								{ 100.0f, 100.0f, 1.0f } };
 
 	float m_vColor[4] = { 0.f, 0.f, 0.f, 0.f };
+	char m_szText[256] = "Hello World";
 	float m_vSliceUV[4] = {0.5f, 0.5f, 0.5f, 0.5f};
 
 	int m_iIdleIndex = 0;

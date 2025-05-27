@@ -82,6 +82,12 @@
     <Filter Include="Object\Particle">
       <UniqueIdentifier>{67455e0f-9624-457e-8b76-6cbcab286cd3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\UI">
+      <UniqueIdentifier>{9fcf5876-3ff4-479e-8d64-4d41495f3307}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Character">
+      <UniqueIdentifier>{c52c903c-b868-4c58-9f7c-b2f35a4a0c21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -89,9 +95,6 @@
     </ClInclude>
     <ClInclude Include="Device.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ACharacter.h">
-      <Filter>Object</Filter>
     </ClInclude>
     <ClInclude Include="APawn.h">
       <Filter>Object</Filter>
@@ -281,9 +284,6 @@
     <ClInclude Include="ViewPortTexture.h">
       <Filter>Resources</Filter>
     </ClInclude>
-    <ClInclude Include="AUIActor.h">
-      <Filter>Object</Filter>
-    </ClInclude>
     <ClInclude Include="PrefabLoader.h">
       <Filter>Utils\ModelLoader</Filter>
     </ClInclude>
@@ -364,6 +364,12 @@
     <ClInclude Include="Text.h">
       <Filter>Resources</Filter>
     </ClInclude>
+    <ClInclude Include="AUIActor.h">
+      <Filter>Object\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ACharacter.h">
+      <Filter>Object\Character</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -409,9 +415,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="AActor.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="ACharacter.cpp">
       <Filter>Object</Filter>
     </ClCompile>
     <ClCompile Include="APawn.cpp">
@@ -539,9 +542,6 @@
     <ClCompile Include="ViewPortTexture.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
-    <ClCompile Include="AUIActor.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
     <ClCompile Include="PrefabLoader.cpp">
       <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
@@ -611,6 +611,12 @@
     </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="AUIActor.cpp">
+      <Filter>Object\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ACharacter.cpp">
+      <Filter>Object\Character</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

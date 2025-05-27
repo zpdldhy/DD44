@@ -1,4 +1,5 @@
 #pragma once
+#include "Singleton.h"
 
 class Font
 {
@@ -25,6 +26,10 @@ public:
 	void SetColor(Color _color);
 	void SetAlignment(DWRITE_TEXT_ALIGNMENT _textAlign, DWRITE_PARAGRAPH_ALIGNMENT _paraAlign);
 
+	wstring GetFontName() const { return m_szFontName; }
+	float GetFontSize() const { return m_fFontSize; }
+	Color GetColor() const { return m_color; }
+
 public:
 	Font() = default;
 	virtual ~Font();
@@ -34,17 +39,17 @@ class Text
 {
 	ComPtr<IDWriteTextLayout>	m_pTextLayout = nullptr;
 
-	shared_ptr<Font> 			m_pFont = nullptr;
-	wstring 					m_szMessage = L"";
-	Vec2						m_vSize = { 0.f, 0.f };
+	Font*	m_pFont = nullptr;
+	wstring m_szMessage = L"";
+	Vec2	m_vSize = { 0.f, 0.f };
 
 public:
-	HRESULT Create(const wstring& _msg, const Vec2& _size, shared_ptr<Font> _font);
+	HRESULT Create(const wstring& _msg, const Vec2& _size, Font* _font);
 	void Draw(const Vec2& _position);
 
 public:
 	IDWriteTextLayout* GetTextLayout() const { return m_pTextLayout.Get(); }
-	void SetFont(shared_ptr<Font> font);
+	void SetFont(Font* font);
 	void SetMessage(const wstring& msg);
 	void SetSize(const Vec2& size);
 

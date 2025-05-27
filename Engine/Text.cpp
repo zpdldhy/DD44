@@ -103,7 +103,7 @@ Font::~Font()
 	}
 }
 
-HRESULT Text::Create(const wstring& _msg, const Vec2& _size, shared_ptr<Font> _font)
+HRESULT Text::Create(const wstring& _msg, const Vec2& _size, Font* _font)
 {
 	if (m_pTextLayout)
 	{
@@ -140,15 +140,22 @@ HRESULT Text::Create(const wstring& _msg, const Vec2& _size, shared_ptr<Font> _f
 
 void Text::Draw(const Vec2& _position)
 {
+	if (m_pFont == nullptr || m_pTextLayout == nullptr)
+		return;
+
 	// 색상 설정 및 그리기
 	DXWRITE->m_pd2dRT->DrawTextLayout(
-		{ _position.x, _position.y },
+		{ _position.x - (m_vSize.x / 2.f),
+		_position.y - (m_vSize.y / 2.f) },
 		m_pTextLayout.Get(),
 		m_pFont->GetBrush());
 }
 
-void Text::SetFont(shared_ptr<Font> font)
+void Text::SetFont(Font* font)
 {
+	if (m_pFont == font)
+		return;
+
 	if (!font)
 	{
 		OutputDebugString(L"[Text] Font is null.\n");
@@ -161,12 +168,18 @@ void Text::SetFont(shared_ptr<Font> font)
 
 void Text::SetMessage(const wstring& msg)
 {
+	if (m_szMessage == msg)
+		return;
+
 	m_szMessage = msg;
 	Create(m_szMessage, m_vSize, m_pFont);
 }
 
 void Text::SetSize(const Vec2& size)
 {
+	if (m_vSize == size)
+		return;
+
 	m_vSize = size;
 	Create(m_szMessage, m_vSize, m_pFont);
 }

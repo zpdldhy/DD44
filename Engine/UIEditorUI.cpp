@@ -81,6 +81,10 @@ void UIEditorUI::DrawUI()
 
     ImGui::Checkbox("Is Render", &m_pUIActor->m_bRender);
 
+    ImGui::SameLine();
+
+    ImGui::Checkbox("TextUI", &m_pUIActor->m_bTextureUI);
+
     ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
     // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Transform 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
@@ -99,23 +103,44 @@ void UIEditorUI::DrawUI()
 
     ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
+    // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Text 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
+
+    if (m_pUIActor->m_bTextureUI == true)
+    {
+        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Text");
+
+        ImGui::InputText("Text", m_szText, IM_ARRAYSIZE(m_szText));
+
+        string helpme(m_szText);
+
+        m_pUIActor->SetText(to_mw(helpme));
+
+        ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+    }
+
     // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 SliceUV 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
 
-    ImGui::TextColored(ImVec4(1, 1, 0, 1), "SliceUV");
+    if (m_pUIActor->m_bTextureUI == false)
+    {
+        ImGui::TextColored(ImVec4(1, 1, 0, 1), "SliceUV");
 
-    SetSliceUV();
+        SetSliceUV();
 
-    ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+        ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+    }
 
     // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Materials 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
 
-    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Materials");
+    if (m_pUIActor->m_bTextureUI == false)
+    {
+        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Materials");
 
-    SetTexture();
+        SetTexture();
 
-    ImGui::InputText("Shader", m_szShaderPath, IM_ARRAYSIZE(m_szShaderPath));
+        ImGui::InputText("Shader", m_szShaderPath, IM_ARRAYSIZE(m_szShaderPath));
 
-    ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+        ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
+    }
 
     // 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 Update 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式
 
