@@ -16,6 +16,7 @@
 #include "UMaterial.h"
 #include "Timer.h"
 #include "Input.h"
+#include "GameCameraMove.h"
 
 void TestPlayer::Init()
 {
@@ -87,15 +88,8 @@ void TestPlayer::Init()
 #pragma endregion
 #pragma region CAMERA
 	// 카메라 세팅
-	{
-		m_pCameraActor = make_shared<ACameraActor>();
-		{
-			m_pCameraActor->SetPosition(player->GetPosition());
-			m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
-		}
-		CAMERA->Set3DCameraActor(player);
-		OBJECT->AddActor(m_pCameraActor);
-	}
+	SetupGameCamera();
+	SetupEngineCamera();
 #pragma endregion
 	
 	//{
@@ -133,6 +127,20 @@ void TestPlayer::Tick()
 		auto root = player->GetMeshComponent();
 		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
+
+	if (INPUT->GetButton(O))
+	{
+		if (m_bEnginCamera)
+		{
+			m_bEnginCamera = false;
+			CAMERA->Set3DCameraActor(m_pGameCameraActor);
+		}
+		else
+		{
+			m_bEnginCamera = true;
+			CAMERA->Set3DCameraActor(m_pCameraActor);
+		}
+	}
 }
 
 void TestPlayer::Render()
@@ -161,14 +169,14 @@ void TestPlayer::SetupSunLight()
 
 void TestPlayer::SetupEngineCamera()
 {
-	m_pCameraEngine = make_shared<ACameraActor>();
+	m_pCameraActor = make_shared<ACameraActor>();
 
-	m_pCameraEngine->SetPosition({ 0.0f, 10.0f, 0.0f });
-	m_pCameraEngine->AddScript(make_shared<EngineCameraMoveScript>());
-	m_pCameraEngine->m_szName = L"EnginCamera";
+	m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
+	m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
+	m_pCameraActor->m_szName = L"EnginCamera";
 
-	CAMERA->Set3DCameraActor(m_pCameraEngine);
-	OBJECT->AddActor(m_pCameraEngine);
+	CAMERA->Set3DCameraActor(m_pCameraActor);
+	OBJECT->AddActor(m_pCameraActor);
 }
 
 
@@ -203,4 +211,18 @@ void TestPlayer::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, fl
 	{
 		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
 	}
+}
+
+void TestPlayer::SetupGameCamera()
+{
+	m_pGameCameraActor = make_shared<ACameraActor>();
+
+	//m_pGameCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
+	auto script = make_shared<GameCameraMove>(player);
+	m_pGameCameraActor->AddScript(script);
+	m_pGameCameraActor->m_szName = L"GameCamera";
+
+	CAMERA->Set3DCameraActor(m_pGameCameraActor);
+	OBJECT->AddActor(m_pGameCameraActor);
+
 }

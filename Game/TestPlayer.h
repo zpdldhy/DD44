@@ -15,6 +15,8 @@ class TestPlayer : public IExecute
 
 	shared_ptr<class ACameraActor> m_pCameraActor;
 	shared_ptr<class ACameraActor> m_pCameraEngine;
+	shared_ptr<class ACameraActor> m_pGameCameraActor;
+
 
 	vector<shared_ptr<APawn>> gizmo;
 
@@ -30,6 +32,8 @@ public:
 public:
 	void SetupSunLight();
 	void SetupEngineCamera();
+	void SetupGameCamera();
+
 
 public:
 	void VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp);
