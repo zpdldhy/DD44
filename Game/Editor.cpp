@@ -49,7 +49,7 @@ void Editor::Init()
 	SetupEditorCallbacks();
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
-	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));	
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
