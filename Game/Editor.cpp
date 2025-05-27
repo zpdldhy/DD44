@@ -35,6 +35,9 @@ void Editor::Init()
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
 	meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
+	//actorLoader.ConvertFbxToAsset("../Resources/Obj/*.fbx");
+	//objectLoader.ConvertObjToAsset("../Resources/Obj/*.obj");
+	
 	{
 		m_pSlashMaterial = make_shared<UMaterial>();
 		m_pSlashMaterial->Load(

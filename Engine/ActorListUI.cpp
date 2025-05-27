@@ -176,6 +176,16 @@ void ActorListUI::DrawUI()
 
 			if (ImGui::Button("Delete"))
 			{
+				for (auto& pair : actorMap)
+				{
+					auto gizmo_axis = pair.second;
+
+					if (gizmo_axis->m_szName == L"Gizmo")
+					{
+						OBJECT->RemoveActor(gizmo_axis);
+					}
+				}
+
 				OBJECT->RemoveActor(actor);
 				m_iSelectedActorID = -1;
 			}
