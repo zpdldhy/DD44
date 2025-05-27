@@ -60,9 +60,13 @@ PS_OUT PS(VS_OUT input)
    
 
     
-    float4 outline;    
-  
-        // Normal ±â¹Ý »ùÇÃ
+// ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+// ¿§Áö °¨Áö: Normal + Depth
+// ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    float normalThreshold = 0.05f;
+    float depthThreshold = 0.005f;
+
+// Normal ±â¹Ý »ùÇÃ¸µ
     float3 centerN = g_txNormal.Sample(sample, uv).rgb;
     float3 leftN = g_txNormal.Sample(sample, uv + float2(-g_vTexelSize.x, 0)).rgb;
     float3 rightN = g_txNormal.Sample(sample, uv + float2(g_vTexelSize.x, 0)).rgb;
@@ -70,26 +74,21 @@ PS_OUT PS(VS_OUT input)
     float3 downN = g_txNormal.Sample(sample, uv + float2(0, g_vTexelSize.y)).rgb;
 
     float normalDiff = 0.0f;
-    normalDiff += length(centerN - leftN);
-    normalDiff += length(centerN - rightN);
-    normalDiff += length(centerN - upN);
-    normalDiff += length(centerN - downN);
+    normalDiff += step(normalThreshold, length(centerN - leftN));
+    normalDiff += step(normalThreshold, length(centerN - rightN));
+    normalDiff += step(normalThreshold, length(centerN - upN));
+    normalDiff += step(normalThreshold, length(centerN - downN));
 
-// Depth ±â¹Ý »ùÇÃ
+// Depth ±â¹Ý »ùÇÃ¸µ
     float centerD = g_txDepth.Sample(sample, uv).r;
-    float leftD = g_txDepth.Sample(sample, uv + float2(-g_vTexelSize.x, 0)).r;
-    float rightD = g_txDepth.Sample(sample, uv + float2(g_vTexelSize.x, 0)).r;
-    float upD = g_txDepth.Sample(sample, uv + float2(0, -g_vTexelSize.y)).r;
-    float downD = g_txDepth.Sample(sample, uv + float2(0, g_vTexelSize.y)).r;
-
     float depthDiff = 0.0f;
-    depthDiff += abs(centerD - leftD);
-    depthDiff += abs(centerD - rightD);
-    depthDiff += abs(centerD - upD);
-    depthDiff += abs(centerD - downD);
+    depthDiff += step(depthThreshold, abs(centerD - g_txDepth.Sample(sample, uv + float2(-g_vTexelSize.x, 0)).r));
+    depthDiff += step(depthThreshold, abs(centerD - g_txDepth.Sample(sample, uv + float2(g_vTexelSize.x, 0)).r));
+    depthDiff += step(depthThreshold, abs(centerD - g_txDepth.Sample(sample, uv + float2(0, -g_vTexelSize.y)).r));
+    depthDiff += step(depthThreshold, abs(centerD - g_txDepth.Sample(sample, uv + float2(0, g_vTexelSize.y)).r));
 
-// ÃÖÁ¾ ¿§Áö °¨Áö°ª
-    float edge = saturate((normalDiff + depthDiff * 10.0f) * 5.0f); // depth´Â °¨µµ ³ôÀÌ±â À§ÇØ *10
+// ÃÖÁ¾ ¿§Áö °­µµ: ÃÖ´ë 8 ¡æ 0~1 ¹üÀ§ Á¤±ÔÈ­
+    float edge = saturate((normalDiff + depthDiff) / 8.0f);
 
 // ¿§Áö Ãâ·Â
    
@@ -97,8 +96,13 @@ PS_OUT PS(VS_OUT input)
     switch (g_iDebugMode)
     {
         case 0:
-            psOut.c = result;
-            break;
+            {
+                float edgeAlpha = smoothstep(0.05f, 0.2f, edge); // ¿§Áö °¨Áö °­µµ
+                float3 finalColor = result.rgb * (1.0f + edgeAlpha * 0.5f); // ¹à±â¸¸ »ìÂ¦ Áõ°¡
+                psOut.c.rgb = saturate(finalColor); // »ö ¹üÀ§ Å¬·¥ÇÎ
+                psOut.c.a = input.c.a;
+                break;
+            }
         case 1:
             psOut.c = original;
             break;
@@ -121,16 +125,8 @@ PS_OUT PS(VS_OUT input)
             psOut.c = normal;
             break;
         case 8:
-            if (edge > 0.2f)
-            {
-                psOut.c.rgb = float3(1, 1, 1); // À±°û¼± Èò»ö
-                psOut.c.a = 1.0f;
-            }
-            else
-            {
-                psOut.c = outline;
-                psOut.c.a = input.c.a;
-            }
+            psOut.c.rgb = (edge > 0.2f) ? float3(1, 1, 1) : float3(0, 0, 0);
+            psOut.c.a = 1.0f;
             break;
         default:
             psOut.c = result;

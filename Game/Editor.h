@@ -63,6 +63,7 @@ protected:
 	void SetupParticleEditorCallback();
 
 	void Slash();
+	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
 
 	void SetClickPos();
 	void SetGizmoPosition(Vec3 _pos);
