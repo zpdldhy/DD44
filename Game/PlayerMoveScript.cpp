@@ -16,48 +16,9 @@
 
 void PlayerMoveScript::Init()
 {
-	auto camera = GetOwner()->GetCameraComponent();
-	camera->SetLookAt(GetOwner()->GetPosition());
-
-	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetLocalPosition();
+	m_vLook = -m_vCameraOffset;
 	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 
-#pragma region crow_final6 Socket
-	{
-		// Set Socket
-		// [주의] crow_final6.mesh.json 파일 시에만 가능
-		//sword = GetOwner()->GetMeshComponent()->GetChild(2);
-		//effect = GetOwner()->GetMeshComponent()->GetChild(6);
-		//sword_socket1 = GetOwner()->GetMeshComponent()->GetChild(3);
-		//sword_socket2 = GetOwner()->GetMeshComponent()->GetChild(4);
-		//back_socket = GetOwner()->GetMeshComponent()->GetChild(5);
-
-		//effect.lock()->SetVisible(false);
-		//sword_socket1.lock()->SetVisible(false);
-		//sword_socket2.lock()->SetVisible(false);
-		//back_socket.lock()->SetVisible(false);
-
-		//sword.lock()->AddChild(sword_socket1.lock());
-		//sword.lock()->AddChild(sword_socket2.lock());
-
-
-		//auto socketTemp = UStaticMeshComponent::CreateCube();
-		//auto transform = make_shared<MeshTransform>();
-		////socketTemp->SetMeshTransform(transform);
-		//back_socket.lock()->AddChild(sword.lock());
-
-		//sword.lock()->SetLocalPosition(back_socket.lock()->GetAnimWorld());
-
-	}
-#pragma endregion
-
-#pragma region TestYR Socket
-	{
-		sword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword");
-		handSocket = GetOwner()->GetMeshComponent()->GetMeshByName(L"LeftHandSocket");
-		backSocket = GetOwner()->GetMeshComponent()->GetMeshByName(L"BackSocket");
-	}
-#pragma endregion
 	idle = make_shared<PlayerIdleState>(m_pOwner);
 	walk = make_shared<PlayerWalkState>(m_pOwner);
 	attack = make_shared<PlayerAttackState>(m_pOwner);
@@ -67,6 +28,8 @@ void PlayerMoveScript::Init()
 
 	currentState = idle;
 	currentState->Enter();
+
+	m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetMeshByName(L"Slash")->GetMaterial();
 }
 
 void PlayerMoveScript::Tick()
@@ -183,9 +146,6 @@ void PlayerMoveScript::Tick()
 	// Update UI State
 	//UpdateHPUI();
 	UpdateArrowUI();
-
-	auto camera = GetOwner()->GetCameraComponent();
-	camera->SetLookAt(GetOwner()->GetPosition());
 }
 
 void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)

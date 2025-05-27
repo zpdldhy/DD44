@@ -8,6 +8,7 @@ class Game : public IExecute
 {
 public:
 	shared_ptr<class ACameraActor> m_pCameraActor;
+	shared_ptr<class ACameraActor> m_pGameCameraActor;
 
 	shared_ptr<class AActor> m_pPlayer;
 
@@ -28,6 +29,7 @@ public:
 
 protected:
 	void SetupEngineCamera();
+	void SetupGameCamera();
 	void SetupSkybox();
 	void SetupSunLight();
 
