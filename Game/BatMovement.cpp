@@ -7,7 +7,24 @@ void BatMovement::Init()
 {
 	// Set Center
 	m_vCenter = GetOwner()->GetPosition();
+	m_vCenter.z -= m_fRadius;
 	Vec3 currentRot = GetOwner()->GetRotation();
+
+	// Init Rotation
+	{
+		// direction을 이용한 회전
+		Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
+		Vec3 tempDir = { -1.0f,  0.0f, 0.0f };
+
+		// 회전		
+
+		float targetYaw = atan2f(tempDir.x, tempDir.z);
+		Vec3 currentRot = GetOwner()->GetRotation();
+		float currentYaw = currentRot.y;
+		currentRot.y = targetYaw;
+
+		GetOwner()->SetRotation(currentRot);
+	}
 }
 
 
@@ -24,18 +41,15 @@ void BatMovement::Tick()
 	pos.x = m_vCenter.x + m_fRadius * std::cos(angle);
 	pos.z = m_vCenter.z + m_fRadius * std::sin(angle);
 
-	Vec3 direction = GetOwner()->GetPosition() - pos;
-	//direction.z = abs(direction.z);
-	//direction.x = abs(direction.x);
+	Vec3 direction = m_vCenter - GetOwner()->GetPosition();
 	direction.y = 0;
 	direction.Normalize();
-
 
 	GetOwner()->SetPosition(pos);
 
 	// direction을 이용한 회전
 	Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
-	Vec3 moveDir = direction.Cross(tempUp);
+	Vec3 moveDir = tempUp.Cross(direction); // 반시계 방향
 
 	// 회전		
 	{
@@ -49,7 +63,8 @@ void BatMovement::Tick()
 		while (angleDiff < -DD_PI) angleDiff += DD_PI * 2;
 
 		// Lerp 계산
-		float smoothedYaw = currentRot.y + angleDiff * 7.0f * deltaTime;
+		// 5.0 이 아니면 아예 회전 방향이 이상해짐 .. . . .. 왜 ? 
+		float smoothedYaw = currentRot.y + angleDiff * 5.0f * deltaTime;
 
 		currentRot.y = smoothedYaw;
 		GetOwner()->SetRotation(currentRot);

@@ -110,7 +110,7 @@ void PlayerMoveScript::Tick()
 		m_bAttack = true;
 		//int targetIndex = m_pAnimInstance->GetAnimIndex(L"Slash_Light_R_new");
 		//m_pAnimInstance->PlayOnce(targetIndex);
-		ChangetState(attack);
+		//ChangetState(attack);
 
 	}
 	else
