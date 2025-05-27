@@ -197,6 +197,8 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="RenderStateManager.h" />
     <ClInclude Include="ShapeData.h" />
     <ClInclude Include="SkeletalMeshData.h" />
+    <ClInclude Include="StateBase.h" />
+    <ClInclude Include="StateMachine.h" />
     <ClInclude Include="UAnimInstance.h" />
     <ClInclude Include="UBoxComponent.h" />
     <ClInclude Include="UIEditorUI.h" />

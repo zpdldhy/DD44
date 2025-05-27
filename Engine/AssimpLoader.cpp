@@ -17,7 +17,7 @@ vector<MeshData> AssimpLoader::Load(const string& fileName)
 
 bool AssimpLoader::Init(const string& fileName)
 {
-	m_pScene = aiImportFile(fileName.c_str(), aiProcess_JoinIdenticalVertices |        // 동일한 꼭지점 결합, 인덱싱 최적화
+	m_pScene = m_importer.ReadFile(fileName.c_str(), aiProcess_JoinIdenticalVertices |        // 동일한 꼭지점 결합, 인덱싱 최적화
 		aiProcess_ValidateDataStructure |        // 로더의 출력을 검증
 		aiProcess_ImproveCacheLocality |        // 출력 정점의 캐쉬위치를 개선
 		aiProcess_RemoveRedundantMaterials |    // 중복된 매터리얼 제거

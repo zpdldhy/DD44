@@ -22,7 +22,6 @@
 
 void Game::Init()
 {
-	Profiler p("Init");
 	// Asset ·Îµù
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
@@ -38,6 +37,8 @@ void Game::Init()
 	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();
+
+
 
 }
 

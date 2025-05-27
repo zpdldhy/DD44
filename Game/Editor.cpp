@@ -25,6 +25,7 @@
 #include "PrefabToActor.h"
 #include "EffectManager.h"
 
+#include "BatMovement.h"
 bool bRunGame = true;
 
 //#undef RUN_GAME

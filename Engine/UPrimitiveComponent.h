@@ -1,7 +1,6 @@
 #pragma once
 #include "USceneComponent.h"
-
-class UMaterial;
+#include "UMaterial.h"
 
 class UPrimitiveComponent : public USceneComponent
 {
