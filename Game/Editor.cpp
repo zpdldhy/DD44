@@ -33,13 +33,8 @@ void Editor::Init()
 	meshLoader.SetMesh(actorLoader.LoadMeshMap());
 	meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
+	//actorLoader.ConvertFbxToAsset("../Resources/Obj/*.fbx");
 	//objectLoader.ConvertObjToAsset("../Resources/Obj/*.obj");
-
-	if (INPUT->GetButton(P))
-	{
-		//actorLoader.ConvertObjToAsset("../Resources/Obj/");
-		//actorLoader.ConvertFbxToAsset("../Resources/Obj/");
-	}
 	
 	{
 		m_pSlashMaterial = make_shared<UMaterial>();
