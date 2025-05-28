@@ -3,6 +3,7 @@
 #include "Timer.h"
 #include <algorithm>
 #include "EffectManager.h"
+#include "UMeshComponent.h"
 // temp
 #include "Input.h"
 
@@ -153,12 +154,31 @@ void BatMovement::Tick()
 
 	if (INPUT->GetButton(J))
 	{
+		// Blood FX
 		Vec3 basePos = GetOwner()->GetPosition();
+		basePos.y += RandomRange(0.5, 2);
 		Vec3 look = GetOwner()->GetLook();
-		Vec3 velocity = look * -1.0f;
-		//basePos.z += velocity.z * 0.8f;
-		//basePos.y += 0.2f;
-		PlayBloodBurst(basePos, velocity, 10.0f, 90.0f);
+		velocity = -look;
+		PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+
+
+		m_fHitFlashTimer = 1.f;  // 1초 동안
+		m_bIsFlashing = true;
+	}
+	if (m_bIsFlashing)
+	{
+		m_fHitFlashTimer -= TIMER->GetDeltaTime();
+		if (m_fHitFlashTimer <= 0.0f)
+		{
+			m_fHitFlashTimer = 0.0f;
+			m_bIsFlashing = false;
+		}
+
+		// hitFlashAmount는 1 → 0 으로 감소
+		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
+
+		auto root = GetOwner()->GetMeshComponent();
+		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
 
 }
@@ -225,5 +245,37 @@ void BatMovement::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, fl
 
 		Vec3 baseVelocity = _direction * _speed;
 		EFFECT->PlayEffect(EEffectType::Blood, pos, _spreadAngleDeg, baseVelocity);
+	}
+}
+// 빈 함수, 기능 필요하면 넣기용.
+void BatMovement::VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+	{
+
+	}
+
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		VisitAllMeshMaterials(comp->GetChild(i));
+	}
+}
+
+void BatMovement::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetHitFlashTime(value); // CB에 g_fHitFlashTime 전달
+	}
+
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
 	}
 }

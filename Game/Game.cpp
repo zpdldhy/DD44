@@ -21,9 +21,6 @@
 
 #include "PrefabToActor.h"
 
-// temp
-#include "AAsset.h"
-
 void Game::Init()
 {
 	// Asset ·Îµù

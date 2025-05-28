@@ -4,6 +4,7 @@
 #include "BatStates.h"
 #include <random>
 
+class UMeshComponent;
 
 class BatMovement : public UScriptComponent
 {
@@ -22,6 +23,9 @@ public:
 	float rotateSpeed = 0.5f;
 	float m_fRotationSpeed = 8.0f;
 
+	//
+	Vec3 m_vLastMoveDir;
+	Vec3 velocity;
 	// 
 	bool m_bReturn;
 	Vec3 m_vReturnPos;
@@ -43,4 +47,8 @@ public:
 	void ChangetState(shared_ptr<StateBase> _state);
 	void ReturningToPos();
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
+	void VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp);
+	float m_fHitFlashTimer = 0.0f;
+	bool m_bIsFlashing = false;
+	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
 };
