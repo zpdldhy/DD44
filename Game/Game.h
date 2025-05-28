@@ -22,6 +22,9 @@ public:
 	vector<shared_ptr<class AUIActor>> m_vHP;
 	vector<shared_ptr<class AUIActor>> m_vArrow;
 
+	// TEMP
+	vector<shared_ptr<AActor>> enemyList; 
+
 public:
 	void Init() override;
 	void Tick() override;
@@ -33,6 +36,9 @@ protected:
 	void SetupGameCamera();
 	void SetupSkybox();
 	void SetupSunLight();
+
+protected:
+	void CheckEnemyCollision();
 
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }

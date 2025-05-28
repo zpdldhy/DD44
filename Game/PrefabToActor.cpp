@@ -104,7 +104,7 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 		actor->SetScale(Vec3(characterData.transform.Scale));
 
 		if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
-		if (characterData.ScriptType == 2) actor->AddScript(std::make_shared<BatMovement>());
+		if (characterData.ScriptType == 2) { actor->AddScript(std::make_shared<BatMovement>()); }
 
 		if (characterData.camera.isUse)
 		{

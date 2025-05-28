@@ -15,10 +15,13 @@
 
 void PlayerMoveScript::Init()
 {
+	m_fCurrentSpeed = m_fSpeed;
+
 	m_vLook = -m_vCameraOffset;
 
 	idle = make_shared<PlayerIdleState>(m_pOwner);
 	walk = make_shared<PlayerWalkState>(m_pOwner);
+	roll = make_shared<PlayerRollState>(m_pOwner);
 	attack = make_shared<PlayerAttackState>(m_pOwner);
 	hit = make_shared<PlayerHitState>(m_pOwner);
 	die = make_shared<PlayerDieState>(m_pOwner);
@@ -35,8 +38,8 @@ void PlayerMoveScript::Init()
 
 void PlayerMoveScript::Tick()
 {
+#pragma region EFFECT
 	Slash();
-
 	if (m_bIsFlashing)
 	{
 		m_fHitFlashTimer -= TIMER->GetDeltaTime();
@@ -45,25 +48,37 @@ void PlayerMoveScript::Tick()
 			m_fHitFlashTimer = 0.0f;
 			m_bIsFlashing = false;
 		}
-	
+
 		// hitFlashAmount는 1 → 0 으로 감소
 		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
 
 		auto root = GetOwner()->GetMeshComponent();
 		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
+#pragma endregion
 
 	// UI 
 	//UpdateHPUI();
 	UpdateArrowUI();
 
-	// STATE-ANIM
+#pragma region STATE_ANIM
+	if (m_bCountCoolTime)
+	{
+		m_fDamageCoolTime -= TIMER->GetDeltaTime();
+		if (m_fDamageCoolTime < 0)
+		{
+			m_bCountCoolTime = false;
+			m_fDamageCoolTime = 1.0f;
+			m_bCanBeHit = true;
+		}
+	}
 	currentState->Tick();
 	if (currentState->GetId() == PLAYER_STATE::PLAYER_S_DEATH)
 	{
 		return;
 	}
-	if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK || currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
+
+	if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK || currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT || currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
 	{
 		if (!currentState->IsPlaying())
 		{
@@ -72,43 +87,67 @@ void PlayerMoveScript::Tick()
 				handSword.lock()->SetVisible(false);
 				backSword.lock()->SetVisible(true);
 			}
+			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
+			{
+				m_bCountCoolTime = true;
+			}
 			ChangetState(idle);
 		}
 		else
 		{
+			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
+			{
+				RollMove();
+			}
 			return;
 		}
 	}
 	else
 	{
-		// 여기 있어야 중복 안남
-		// HIT
-		if (INPUT->GetButton(J))
+		if (m_bCanBeHit)
 		{
-			// Blood FX
-			Vec3 basePos = GetOwner()->GetPosition();
-			basePos.y += RandomRange(0.5, 2);
-			Vec3 look = GetOwner()->GetLook();
-			velocity = -look;
-			PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
-
-			m_fHitFlashTimer = 1.f;  // 1초 동안
-			m_bIsFlashing = true;
-
-			// Anim
-			// HP 
-			m_hp -= 1;
-			if (m_hp > 0)
+			// 여기 있어야 중복 안남
+			// HIT
+#pragma region TEMP_COLLISION
+			if (GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
 			{
-				ChangetState(hit);
-			}
-			else
-			{
-				ChangetState(die);
+				//if (INPUT->GetButton(J))
+				{
+					// Blood FX
+					Vec3 basePos = GetOwner()->GetPosition();
+					basePos.y += RandomRange(0.5, 2);
+					Vec3 look = GetOwner()->GetLook();
+					velocity = -look;
+					PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+
+					m_fHitFlashTimer = 1.f;  // 1초 동안
+					m_bIsFlashing = true;
+
+					// Anim
+					// HP 
+					//m_hp -= 1;
+					if (m_hp > 0)
+					{
+						ChangetState(hit);
+						m_bCanBeHit = false;
+					}
+					else
+					{
+						ChangetState(die);
+					}
+				}
 			}
 		}
-	}
+#pragma endregion
 
+		if (INPUT->GetButton(SPACE))
+		{
+			// 구르기
+			m_vRollLook = GetOwner()->GetLook();
+			ChangetState(roll);
+		}
+	}
+#pragma endregion
 #pragma region MOVEMENT
 	float deltaTime = TIMER->GetDeltaTime();
 	Vec3 up = { 0, 1, 0 };
@@ -150,7 +189,7 @@ void PlayerMoveScript::Tick()
 		// 이동
 		{
 			moveDir.Normalize();
-			Vec3 pos = moveDir * m_fSpeed * deltaTime;
+			Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
 			GetOwner()->AddPosition(pos);
 		}
 
@@ -190,6 +229,8 @@ void PlayerMoveScript::Tick()
 		m_bSlashPlaying = true;
 		m_fSlashTime = 0.0f;
 	}
+
+
 }
 
 void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
@@ -377,4 +418,10 @@ void PlayerMoveScript::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> co
 	{
 		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
 	}
+}
+
+void PlayerMoveScript::RollMove()
+{
+	Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();
+	GetOwner()->AddPosition(pos);
 }

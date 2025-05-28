@@ -183,4 +183,34 @@ void PlayerDieState::End()
 	m_bOnPlaying = false;
 }
 
+PlayerRollState::PlayerRollState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_ROLL)
+{
+	m_pOwner = _pOwner;
+	m_bCanInterrupt = false;
+}
 
+void PlayerRollState::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+
+	// 애니메이션 Attack 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int index = animInstance->GetAnimIndex(L"Roll_heavy");
+	animInstance->PlayOnce(index);
+}
+
+void PlayerRollState::Tick()
+{
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	if (!animInstance->m_bOnPlayOnce)
+	{
+		End();
+	}
+}
+
+void PlayerRollState::End()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = false;
+}

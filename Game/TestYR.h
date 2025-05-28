@@ -2,6 +2,7 @@
 #include "IExecute.h"
 
 class APawn;
+class AActor;
 class ACameraActor;
 class UMeshComponent;
 class MeshLoader;
@@ -10,12 +11,12 @@ class UStaticMeshComponent;
 class TestYR : public IExecute
 {
 	shared_ptr <MeshLoader> meshLoader;
-	shared_ptr<APawn> player;
-	shared_ptr<APawn> enemy1;
+	shared_ptr<AActor> player;
+	vector<shared_ptr<AActor>> enemyList;
 	shared_ptr<APawn> projectile;
 	vector<shared_ptr<UMeshComponent>> meshList;
 
-	shared_ptr<class ACameraActor> m_pCameraActor;
+	shared_ptr<class ACameraActor> m_pGameCameraActor;
 	shared_ptr<class ACameraActor> m_pCameraEngine;
 
 	vector<shared_ptr<APawn>> gizmo;
@@ -44,6 +45,8 @@ public:
 public:
 	void SetupSunLight();
 	void SetupEngineCamera();
+	void SetupGameCamera();
+	void CheckEnemyCollision();
 
 };
 

@@ -12,12 +12,18 @@ public:
 	PlayerMoveScript() = default;
 	virtual ~PlayerMoveScript() = default;
 public:
-	float m_fSpeed  = 13.0f; 
+	float m_fSpeed = 10.0f;
+	float m_fRollSpeed  = 15.0f;
+	float m_fCurrentSpeed;
 	float m_fRotationSpeed = 8.0f;
+	float m_fDamageCoolTime = 1.0f;
+	bool m_bCanBeHit = true;
+	bool m_bCountCoolTime = false;
 	Vec3 m_vLook;
 	Vec3 m_vRight;
 	Vec3 m_vLastMoveDir;
 	Vec3 velocity;
+	Vec3 m_vRollLook;
 
 	// 상호작용
 	bool m_bDamaged = false;
@@ -40,6 +46,7 @@ public:
 
 	shared_ptr<StateBase> idle;
 	shared_ptr<StateBase> walk;
+	shared_ptr<StateBase> roll;
 	shared_ptr<StateBase> attack;
 	shared_ptr<StateBase> hit;
 	shared_ptr<StateBase> die;
@@ -71,5 +78,7 @@ public:
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
+public:
+	void RollMove();
 };
 

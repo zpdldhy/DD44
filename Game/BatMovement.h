@@ -2,7 +2,6 @@
 #include "UScriptComponent.h"
 #include "BatMovement.h"
 #include "BatStates.h"
-#include <random>
 
 class UMeshComponent;
 
@@ -23,7 +22,7 @@ public:
 	float rotateSpeed = 0.35f;
 	float originRotateSpeed = 0.35f;
 	float m_fRotationSpeed = 8.0f;
-
+	bool m_bCanStartAttack = false;
 	//
 	Vec3 m_vLastMoveDir;
 	Vec3 velocity;
@@ -37,7 +36,7 @@ public:
 	shared_ptr<StateBase> death;
 	shared_ptr<StateBase> currentState;
 
-
+	weak_ptr<AActor> player;
 public:
 	void Init() override;
 	void Tick() override;
@@ -50,4 +49,6 @@ public:
 	bool m_bIsFlashing = false;
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
 	void Flashing();
+	void Attack();
+	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
 };

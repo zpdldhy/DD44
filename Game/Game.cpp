@@ -20,6 +20,8 @@
 #include "UIManager.h"
 
 #include "PrefabToActor.h"
+#include "BatMovement.h"
+#include "CollisionManager.h"
 
 void Game::Init()
 {
@@ -29,11 +31,18 @@ void Game::Init()
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
 
-	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	OBJECT->AddActorList(vlist);
-
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	OBJECT->AddActor(m_pPlayer);
+
+	auto vlist = PToA->LoadAllPrefabs(".character.json");
+	enemyList = vlist;
+	OBJECT->AddActorList(vlist);
+	for (auto& enemy : vlist)
+	{
+		if(enemy->GetScriptList().size() <= 0) { continue; }
+		dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0])->SetPlayer(m_pPlayer);
+	}
+
 
 	// UI
 	m_vHP = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
@@ -68,6 +77,7 @@ void Game::Tick()
 		}
 	}
 
+	CheckEnemyCollision();
 }
 
 void Game::Render()
@@ -136,4 +146,18 @@ void Game::SetupSunLight()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
+}
+
+void Game::CheckEnemyCollision()
+{
+	for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	{
+		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+		{
+			iter = enemyList.erase(iter);
+			continue;
+		}
+		COLLITION->CheckCollision(m_pPlayer, *iter);
+		iter++;
+	}
 }

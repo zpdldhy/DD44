@@ -13,7 +13,9 @@ void Collision::Init()
 		if (Collision::CheckOBBToOBB(boxA->GetBounds(), boxB->GetBounds())) {
 			// 충돌 처리
 			int i = 0;
-		}
+			boxA->AddCollision(boxB);
+			boxB->AddCollision(boxA);
+		};
 		boxA->CollisionAction();   // 여기서 어떤 정보를 넘겨줘야 할까?
 		boxB->CollisionAction();
 		};

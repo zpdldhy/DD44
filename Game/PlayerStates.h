@@ -7,6 +7,7 @@ enum PLAYER_STATE
 {
 	PLAYER_S_IDLE = 0,
 	PLAYER_S_WALK,
+	PLAYER_S_ROLL,
 	PLAYER_S_ATTACK,
 	PLAYER_S_HIT,
 	PLAYER_S_DEATH,
@@ -36,6 +37,21 @@ private:
 public:
 	PlayerWalkState(weak_ptr<AActor> _pOwner);
 	~PlayerWalkState() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+
+};
+
+class PlayerRollState : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+public:
+	PlayerRollState(weak_ptr<AActor> _pOwner);
+	~PlayerRollState() {}
 public:
 	virtual void Enter() override;
 	virtual void Tick() override;
