@@ -66,7 +66,7 @@ void BatMovement::Tick()
 		float deltaTime = TIMER->GetDeltaTime();
 		{
 			// 획일성을 줄이기 위해 
-			rotateSpeed = RandomRange((rotateSpeed - 0.005f), (rotateSpeed + 0.01f));
+			rotateSpeed = RandomRange((originRotateSpeed - 0.005f), (originRotateSpeed + 0.01f));
 
 		}
 		angle += rotateSpeed * deltaTime;
