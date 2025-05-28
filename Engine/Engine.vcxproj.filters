@@ -370,6 +370,9 @@
     <ClInclude Include="ACharacter.h">
       <Filter>Object\Character</Filter>
     </ClInclude>
+    <ClInclude Include="SceneState.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -617,6 +620,9 @@
     </ClCompile>
     <ClCompile Include="ACharacter.cpp">
       <Filter>Object\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneState.cpp">
+      <Filter>FSM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

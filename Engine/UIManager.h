@@ -22,5 +22,7 @@ public:
 
 	void DeleteUI(shared_ptr<class AUIActor> _pUIActor);
 	void DeleteUI(UINT _iID);
+
+	void RemoveAll();
 };
 
