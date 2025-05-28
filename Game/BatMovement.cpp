@@ -7,8 +7,6 @@
 // temp
 #include "Input.h"
 
-static std::mt19937 gen(std::random_device{}());
-
 void BatMovement::Init()
 {
 	m_vCenter = GetOwner()->GetPosition();
@@ -21,35 +19,54 @@ void BatMovement::Init()
 
 	currentState = idle;
 	currentState->Enter(); 
-	
-	std::random_device rd;
-	
 }
 
 
 void BatMovement::Tick()
 {	
-	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_DEATH)
-	{
-		return;
-	}
+	Flashing();
 
 	currentState->Tick();
+	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_DEATH )
+	{
+		if (!currentState->IsPlaying())
+		{
+			// bat 죽음
+			GetOwner()->m_bDelete = true;
+		}
+		return;
+	}
 
 	if (m_bReturn)
 	{
 		ReturningToPos();
 		return;
 	}
+	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
+	{
+		// 여기 있어야 중복 막음
+		if (INPUT->GetButton(J))
+		{
+			// Blood FX
+			Vec3 basePos = GetOwner()->GetPosition();
+			basePos.y += RandomRange(0.5, 2);
+			Vec3 look = GetOwner()->GetLook();
+			velocity = -look;
+			PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
 
+
+			m_fHitFlashTimer = 1.f;  // 1초 동안
+			m_bIsFlashing = true;
+
+			ChangetState(death);
+		}
+	}
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_ATTACK)
 	{
 		float deltaTime = TIMER->GetDeltaTime();
 		{
 			// 획일성을 줄이기 위해 
-			std::uniform_real_distribution<float> dist((rotateSpeed - 0.01f), (rotateSpeed + 0.01f));
-			float randomFloat = dist(gen);
-			rotateSpeed =  randomFloat;
+			rotateSpeed = RandomRange((rotateSpeed - 0.005f), (rotateSpeed + 0.01f));
 
 		}
 		angle += rotateSpeed * deltaTime;
@@ -59,13 +76,6 @@ void BatMovement::Tick()
 
 		// 위치 갱신
 		Vec3 pos;
-		std::mt19937 gen(rd());
-		float min = 4.9f;
-		float max = 5.1f;
-		std::uniform_real_distribution<float> dist(min, max);
-
-		float randomFloat = dist(gen);
-
 		pos.x = m_vCenter.x + m_fRadius * std::cos(angle);
 		pos.z = m_vCenter.z + m_fRadius * std::sin(angle);
 		GetOwner()->SetPosition(pos);
@@ -144,41 +154,6 @@ void BatMovement::Tick()
 
 		ChangetState(attack);
 
-	}
-
-	if (INPUT->GetButton(X))
-	{
-		ChangetState(death);
-		// 죽는 효과
-	}
-
-	if (INPUT->GetButton(J))
-	{
-		// Blood FX
-		Vec3 basePos = GetOwner()->GetPosition();
-		basePos.y += RandomRange(0.5, 2);
-		Vec3 look = GetOwner()->GetLook();
-		velocity = -look;
-		PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
-
-
-		m_fHitFlashTimer = 1.f;  // 1초 동안
-		m_bIsFlashing = true;
-	}
-	if (m_bIsFlashing)
-	{
-		m_fHitFlashTimer -= TIMER->GetDeltaTime();
-		if (m_fHitFlashTimer <= 0.0f)
-		{
-			m_fHitFlashTimer = 0.0f;
-			m_bIsFlashing = false;
-		}
-
-		// hitFlashAmount는 1 → 0 으로 감소
-		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
-
-		auto root = GetOwner()->GetMeshComponent();
-		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
 
 }
@@ -277,5 +252,24 @@ void BatMovement::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, f
 	for (int i = 0; i < comp->GetChildCount(); ++i)
 	{
 		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
+	}
+}
+
+void BatMovement::Flashing()
+{
+	if (m_bIsFlashing)
+	{
+		m_fHitFlashTimer -= TIMER->GetDeltaTime();
+		if (m_fHitFlashTimer <= 0.0f)
+		{
+			m_fHitFlashTimer = 0.0f;
+			m_bIsFlashing = false;
+		}
+
+		// hitFlashAmount는 1 → 0 으로 감소
+		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
+
+		auto root = GetOwner()->GetMeshComponent();
+		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
 }

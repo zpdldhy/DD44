@@ -36,31 +36,7 @@ void PlayerMoveScript::Init()
 void PlayerMoveScript::Tick()
 {
 	Slash();
-	// HIT
-	if (INPUT->GetButton(J))
-	{
-		// Blood FX
-		Vec3 basePos = GetOwner()->GetPosition();
-		basePos.y += RandomRange(0.5, 2);
-		Vec3 look = GetOwner()->GetLook();
-		velocity = -look;
-		PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
-		
-		m_fHitFlashTimer = 1.f;  // 1초 동안
-		m_bIsFlashing = true;
-		
-		// Anim
-		// HP 
-		//m_hp -= 1;
-		if (m_hp > 0)
-		{
-			ChangetState(hit);
-		}
-		else
-		{
-			ChangetState(die);
-		}
-	}
+
 	if (m_bIsFlashing)
 	{
 		m_fHitFlashTimer -= TIMER->GetDeltaTime();
@@ -101,6 +77,35 @@ void PlayerMoveScript::Tick()
 		else
 		{
 			return;
+		}
+	}
+	else
+	{
+		// 여기 있어야 중복 안남
+		// HIT
+		if (INPUT->GetButton(J))
+		{
+			// Blood FX
+			Vec3 basePos = GetOwner()->GetPosition();
+			basePos.y += RandomRange(0.5, 2);
+			Vec3 look = GetOwner()->GetLook();
+			velocity = -look;
+			PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+
+			m_fHitFlashTimer = 1.f;  // 1초 동안
+			m_bIsFlashing = true;
+
+			// Anim
+			// HP 
+			m_hp -= 1;
+			if (m_hp > 0)
+			{
+				ChangetState(hit);
+			}
+			else
+			{
+				ChangetState(die);
+			}
 		}
 	}
 

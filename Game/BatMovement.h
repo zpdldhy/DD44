@@ -20,7 +20,7 @@ public:
 	float m_fRadius = 8.0f;
 	float angle = 0.0f; 
 	float angularSpeed = 1.0f;
-	float rotateSpeed = 0.5f;
+	float rotateSpeed = 0.35f;
 	float m_fRotationSpeed = 8.0f;
 
 	//
@@ -36,9 +36,6 @@ public:
 	shared_ptr<StateBase> death;
 	shared_ptr<StateBase> currentState;
 
-	// temp
-	std::random_device rd;
-
 
 public:
 	void Init() override;
@@ -51,4 +48,5 @@ public:
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
+	void Flashing();
 };
