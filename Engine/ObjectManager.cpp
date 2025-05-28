@@ -122,7 +122,7 @@ void ObjectManager::RemoveActor(std::shared_ptr<class AActor> _pActor)
 void ObjectManager::RemoveAll()
 {
 	ActorCount = 0;
-	m_vActorList.empty();
+	m_vActorList.clear();
 	ClearRenderList();
 }
 

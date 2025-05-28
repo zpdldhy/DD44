@@ -71,3 +71,4 @@ using json = nlohmann::json;
 extern POINT g_windowSize;
 extern HWND g_hWnd;
 extern bool bRunGame;
+extern bool g_bRangeVisibleMode;

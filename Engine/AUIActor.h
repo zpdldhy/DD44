@@ -2,6 +2,7 @@
 #include "AActor.h"
 #include "UIState.h"
 #include "PrefabData.h"
+#include "Text.h"
 
 struct UIData
 {
@@ -23,8 +24,11 @@ public:
 	void Tick() override;
 	void Render() override;
 
-public:
+private:
+	void TextRender();
 	void CreateUISlice();
+	void CreateText();
+	void UpdateText();
 
 public:
 	void SetState(shared_ptr<UIState> _pState) { m_pState = _pState; }
@@ -42,11 +46,22 @@ public:
 	void AddColor(const Color& _vColor){ m_tUISliceData.vColor += _vColor; }
 	Color GetColor() { return m_tUISliceData.vColor; }
 
+	// Text
+	void SetFontSize(const float& _scale) { m_fFontSize = _scale; }
+	float GetFontSize() { return m_fFontSize; }
+	void SetFontPath(const wstring& _szPath) { m_szFontPath = _szPath; }
+	wstring GetFontPath() { return m_szFontPath; }
+	void SetText(const wstring& _szText) { m_szText = _szText; }
+	wstring GetText() { return m_szText; }
+
 	// Prefab
 	void SetPrefabData(const PrefabUIData& _data) { m_PrefabData = _data; }
 	PrefabUIData GetPrefabData() { return m_PrefabData; }
 
-private:
+public:
+	bool m_bTextUI = false;
+
+protected:
 	// Constants
 	UIData m_tUISliceData = { {0.5f, 0.5f, 0.5f, 0.5f}, {0.f, 0.f, 0.f, 0.f} };
 	static ComPtr<ID3D11Buffer> m_pUISliceCB;
@@ -60,6 +75,15 @@ private:
 	shared_ptr<Texture> m_pHoverTexture = nullptr;
 	shared_ptr<Texture> m_pActiveTexture = nullptr;
 	shared_ptr<Texture> m_pSelectTexture = nullptr;
+
+	// Font
+	wstring m_szFontPath = L"../Resources/Font/LibreBaskerville-Regular.ttf";
+	float m_fFontSize = 20.0f;
+
+	// Text
+	unique_ptr<Font> m_pFont = nullptr;
+	unique_ptr<Text> m_pText = nullptr;
+	wstring m_szText = L"Hello World";
 
 	// Prefab
 	PrefabUIData m_PrefabData;

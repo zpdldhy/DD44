@@ -19,6 +19,7 @@
 #include "UIManager.h"
 #include "ShapeData.h"
 #include "CollisionManager.h"
+#include "DxWrite.h"
 
 #include "PrefabToActor.h"
 
@@ -28,7 +29,7 @@ void TestYoooooon::Init()
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
 	//OBJECT->AddActorList(PRA->LoadAllPrefabs(".object.json"));
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
+	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	m_pPlayer = vlist[0];
@@ -37,7 +38,7 @@ void TestYoooooon::Init()
 	UI->AddUIList(PToA->LoadAllPrefabs(".uis.json"));
 
 	SetupEngineCamera();
-	SetupSkybox();
+	//SetupSkybox();
 	SetupSunLight();
 
 	CreateCollisionObject();
@@ -67,6 +68,7 @@ void TestYoooooon::Tick()
 
 void TestYoooooon::Render()
 {
+
 }
 
 void TestYoooooon::Destroy()
