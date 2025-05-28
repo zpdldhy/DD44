@@ -270,8 +270,6 @@
     <ClInclude Include="CollisionManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="UAnimInstance.h" />
-    <ClInclude Include="AnimTrack.h" />
     <ClInclude Include="SkeletalMeshData.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
@@ -322,11 +320,9 @@
     <ClInclude Include="CollisionScript.h">
       <Filter>Component\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="MeshLoader.h" />
     <ClInclude Include="UIEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="Profiler.h" />
     <ClInclude Include="ParticleEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
@@ -360,6 +356,24 @@
     </ClInclude>
     <ClInclude Include="EffectManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="StateBase.h">
+      <Filter>Headers\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachine.h">
+      <Filter>Headers\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimTrack.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshLoader.h">
+      <Filter>Utils\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="UAnimInstance.h">
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Text.h">
       <Filter>Resources</Filter>
@@ -531,8 +545,6 @@
     <ClCompile Include="CollisionManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="UAnimInstance.cpp" />
-    <ClCompile Include="AnimTrack.cpp" />
     <ClCompile Include="SkeletalMeshData.cpp">
       <Filter>Headers\Data</Filter>
     </ClCompile>
@@ -579,8 +591,6 @@
     <ClCompile Include="CollisionScript.cpp">
       <Filter>Component\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="MeshLoader.cpp" />
-    <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="UIEditorUI.cpp">
       <Filter>Utils\Editor</Filter>
     </ClCompile>
@@ -611,6 +621,18 @@
     </ClCompile>
     <ClCompile Include="EffectManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimTrack.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshLoader.cpp">
+      <Filter>Utils\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="UAnimInstance.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Resources</Filter>

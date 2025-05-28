@@ -21,13 +21,12 @@ void UStaticMeshComponent::Tick()
 		auto mat = m_pAnim->GetBoneAnim(m_targetBoneIndex);
 		m_matAnim = m_matBone * mat;
 	}
+	USceneComponent::Tick();
 
 	for (auto& child : m_vChild)
 	{
 		child->Tick();
 	}
-
-	USceneComponent::Tick();
 }
 
 void UStaticMeshComponent::PreRender()

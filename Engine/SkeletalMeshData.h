@@ -2,8 +2,10 @@
 
 struct MeshComponentData
 {
+	wstring m_szComp;
 	wstring m_szRes;
 	int m_type = 0;
+	bool m_bVisible = true;
 	
 	wstring m_szAnim;
 	int m_targetBone = 0;

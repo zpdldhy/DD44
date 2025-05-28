@@ -15,4 +15,12 @@ private:
 
     shared_ptr<AEffectActor> CreateEffectActor(EEffectType type);
     shared_ptr<AEffectActor> GetReusableActor(EEffectType type);
+
+    void MakeBillboardQuadVerts(
+        const Vec3& center,
+        const Vec2& size,
+        const Vec3& cameraPos,
+        std::array<Vec3, 4>& outVerts,
+        std::array<Vec2, 4>& outUVs
+    );
 };

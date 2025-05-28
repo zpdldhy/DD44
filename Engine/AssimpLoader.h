@@ -1,13 +1,12 @@
 #pragma once
 #include "SkeletalMeshData.h"
 
-class APawn;
-
 class AssimpLoader
 {
 private:
-    const aiScene* m_pScene;        //모델 정보
-    vector<MeshData> m_meshes;        //매쉬 정보
+    Assimp::Importer m_importer;
+    const aiScene* m_pScene;      // Assimp::Importer 에서 메모리 관리
+    vector<MeshData> m_meshes;    // 매쉬 정보
     UINT m_numVertices;
     UINT m_numMaterial;
     Vec3 center;
@@ -19,6 +18,5 @@ public:
     void ParseMesh(UINT index, const aiMesh* pMesh);
     UINT getNumMesh() const { return (UINT)m_meshes.size(); }
     void GetCenter(const aiMesh* pMesh);
-    //void Destroy();
 };
 

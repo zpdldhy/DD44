@@ -1,7 +1,9 @@
 #pragma once
 #include "UPrimitiveComponent.h"
 
-class UMeshComponent : public UPrimitiveComponent
+class MeshTransform;
+
+class UMeshComponent : public UPrimitiveComponent, enable_shared_from_this<UMeshComponent>
 {
 public:
 	UMeshComponent() = default;
@@ -10,17 +12,29 @@ public:
 protected:
 	std::wstring m_MeshPath;
 	vector<shared_ptr<UMeshComponent>>	m_vChild;
+	bool bRender = true;
+	shared_ptr<MeshTransform> m_pMeshTrans;
 
-public:	
+public:
 	void Render() override;
 
 public:
 	void SetMeshPath(const std::wstring& path) { m_MeshPath = path; }
 	const std::wstring& GetMeshPath() const { return m_MeshPath; }
 
-	void AddChild(shared_ptr<UMeshComponent> _child) { m_vChild.push_back(_child); }
+	void AddChild(shared_ptr<UMeshComponent> _child);// { m_vChild.push_back(_child); }
+	void RemoveChild(int _index);
+	void RemoveChild(const wstring& _name);
+	int GetChildIndex(shared_ptr<UMeshComponent> _child);
 	shared_ptr<UMeshComponent> GetChild(int _index) { return m_vChild[_index]; }
-
 	vector<shared_ptr<UMeshComponent>> GetChildren() { return m_vChild; }
+	shared_ptr<UMeshComponent> GetMeshByName(const wstring& _name);
+	
+	void SetMeshTransform(const shared_ptr<MeshTransform>& _pMeshTrans) { m_pMeshTrans = _pMeshTrans; }
+	const shared_ptr<MeshTransform>& GetMeshTransform() { return m_pMeshTrans; }
+public:
+	void SetVisible(bool _visible) { bRender = _visible; }
+	const bool& GetVisible() {  return bRender; }
+	int GetChildCount() const { return static_cast<int>(m_vChild.size()); }
 };
 

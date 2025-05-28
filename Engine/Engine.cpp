@@ -38,6 +38,7 @@ void Engine::Init()
 
 	// 기타 기능 객체 초기화 ( input, )
 	{
+		LIGHTMANAGER->Init();
 		INPUT->Init();
 		DXWRITE->Create();
 
@@ -53,7 +54,7 @@ void Engine::Init()
 
 	// Manager 초기화
 	{
-		LIGHTMANAGER->Init();
+		//LIGHTMANAGER->Init();
 		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();

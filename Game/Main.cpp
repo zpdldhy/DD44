@@ -16,7 +16,7 @@
 
 int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _lpCmdLine, int _nCmdShow)
 {
-    shared_ptr<IExecute> app = make_shared<IntroScene>();
+    shared_ptr<IExecute> app = make_shared<TestPlayer>();
 
 	ENGINE->SetInstance(_hInstance);
 	ENGINE->SetApp(app);

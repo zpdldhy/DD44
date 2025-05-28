@@ -4,28 +4,40 @@
 #include "Timer.h"
 #include "APawn.h"
 #include "AActor.h"
+#include "UStaticMeshComponent.h"
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
 #include "UBoxComponent.h"
 #include "PrefabToActor.h"
 #include "UIManager.h"
 #include "AUIActor.h"
+#include "EffectManager.h"
+
 
 void PlayerMoveScript::Init()
 {
-	auto camera = GetOwner()->GetCameraComponent();
-	camera->SetLookAt(GetOwner()->GetPosition());
-
-	m_vLook = GetOwner()->GetPosition() - GetOwner()->GetCameraComponent()->GetLocalPosition();
+	m_vLook = -m_vCameraOffset;
 	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	
+
+	idle = make_shared<PlayerIdleState>(m_pOwner);
+	walk = make_shared<PlayerWalkState>(m_pOwner);
+	attack = make_shared<PlayerAttackState>(m_pOwner);
+	dynamic_pointer_cast<PlayerAttackState>(attack)->SetComponent(sword.lock(), handSocket.lock(), backSocket.lock());
+
 	//SetUI();
+
+	currentState = idle;
+	currentState->Enter();
+
+	m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetMeshByName(L"Slash")->GetMaterial();
 }
 
 void PlayerMoveScript::Tick()
 {
-	float deltaTime = TIMER->GetDeltaTime();
+	currentState->Tick();
 
+	float deltaTime = TIMER->GetDeltaTime();
+#pragma region 이동량 계산
 	Vec3 up = { 0, 1, 0 };
 	m_vRight = up.Cross(m_vLook);
 	m_vLook.y = 0.0f;
@@ -55,23 +67,46 @@ void PlayerMoveScript::Tick()
 		moveDir += m_vRight;
 	}
 
+#pragma endregion
+
 	if (INPUT->GetButton(LCLICK))
 	{
-		m_bAttack  = true;
-		int targetIndex = m_pAnimInstance->GetAnimIndex(L"Slash_Light_R_new");
-		m_pAnimInstance->PlayOnce(targetIndex);
+		m_bAttack = true;
+		//int targetIndex = m_pAnimInstance->GetAnimIndex(L"Slash_Light_R_new");
+		//m_pAnimInstance->PlayOnce(targetIndex);
+		//ChangetState(attack);
+		m_bSlashPlaying = true;
+		m_fSlashTime = 0.0f;
 	}
 	else
 	{
 		m_bAttack = false;
 	}
 
+	if (INPUT->GetButton(J))
+	{
+		Vec3 basePos = GetOwner()->GetPosition();
+		basePos.y += RandomRange(0.5 ,2);
+
+		Vec3 look = GetOwner()->GetLook();
+		velocity = -look;
+
+		PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+	}
+
+	//Profiler p(to_string(velocity.x) + "oo" + to_string(velocity.z));
+
+
+	Slash();
+
+#pragma region 이동 및 회전
 	if (moveDir.Length() > 0 && !m_pAnimInstance->m_bOnPlayOnce)
 	{
 		// 애님 ( 추후 처리 로직 업데이트 필요 )
 		{
-			int targetIndex = m_pAnimInstance->GetAnimIndex(L"Run");
-			m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
+			//int targetIndex = m_pAnimInstance->GetAnimIndex(L"Run");
+			//m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
+			ChangetState(walk);
 		}
 
 		// 이동
@@ -98,19 +133,74 @@ void PlayerMoveScript::Tick()
 			currentRot.y = smoothedYaw;
 			GetOwner()->SetRotation(currentRot);
 		}
+
+		m_vLastMoveDir = moveDir;
+
 	}
 	else
 	{
-		int targetIndex = m_pAnimInstance->GetAnimIndex(L"Idle_0");
-		m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
+		//int targetIndex = m_pAnimInstance->GetAnimIndex(L"Idle_0");
+		//m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
+		ChangetState(idle);
 	}
+#pragma endregion
 
 	// Update UI State
 	//UpdateHPUI();
 	UpdateArrowUI();
+}
 
-	auto camera = GetOwner()->GetCameraComponent();
-	camera->SetLookAt(GetOwner()->GetPosition());
+void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
+{
+	if (!currentState->IsInterruptible() && currentState->IsPlaying())
+	{
+		return;
+	}
+
+	if (currentState)
+		currentState->End();
+
+	if (_state->GetId() == PLAYER_STATE::PLAYER_S_ATTACK)
+	{
+		dynamic_pointer_cast<PlayerAttackState>(_state)->SetPrevState(currentState);
+		dynamic_pointer_cast<PlayerAttackState>(_state)->SetCurrentState(&currentState);
+	}
+
+
+	currentState = _state;
+
+	if (currentState)
+		currentState->Enter();
+}
+
+void PlayerMoveScript::Slash()
+{
+	if (m_bSlashPlaying)
+	{
+		m_fSlashTime += TIMER->GetDeltaTime();
+
+		float t = m_fSlashTime;
+		float progress = 0.0f;
+
+
+		if (t <= 0.3f)
+		{
+			float ratio = t / 0.3f;
+			progress = pow(ratio, 2.0f);
+		}
+		else
+		{
+			progress = -1.0f;
+		}
+
+		if (m_pSlashMaterial)
+			m_pSlashMaterial->SetSlashProgress(progress);
+
+		if (t >= m_fSlashDuration)
+		{
+			m_bSlashPlaying = false;
+		}
+	}
 }
 
 void PlayerMoveScript::SetUI()
@@ -154,7 +244,7 @@ void PlayerMoveScript::UpdateHPUI()
 	}
 
 	// 데미지를 입었을 시, UI Animation
-	if (m_bDamaged) 
+	if (m_bDamaged)
 	{
 		static float currentTime = 0.0f;
 		static float damageTime = 0.0f;
@@ -207,4 +297,17 @@ void PlayerMoveScript::UpdateArrowUI()
 
 	if (m_vArrowCount > 4)
 		m_vArrowCount = 4;
+}
+
+void PlayerMoveScript::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)
+{
+	int count = RandomRange(_minCount, _maxCount);
+	for (int i = 0; i < count; ++i)
+	{
+		Vec3 offset = Vec3(RandomRange(-0.3f, 0.3f), RandomRange(-0.3f, 0.3f), RandomRange(-0.3f, 0.3f));
+		Vec3 pos = _origin + offset;
+
+		Vec3 baseVelocity = _direction * _speed;
+		EFFECT->PlayEffect(EEffectType::Blood, pos, _spreadAngleDeg, baseVelocity);
+	}
 }

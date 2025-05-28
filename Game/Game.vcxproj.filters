@@ -19,6 +19,9 @@
     <Filter Include="Test">
       <UniqueIdentifier>{d4e0bb08-4e67-4ce4-8abd-d7b0b6588aad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FSM">
+      <UniqueIdentifier>{7b412256-442e-4bcb-952a-0319c0fd1227}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -68,6 +71,24 @@
     </ClInclude>
     <ClInclude Include="IntroScene.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerStates.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadRollerStates.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyState.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="BatStates.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="BatMovement.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="GameCameraMove.h">
+      <Filter>Script</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -119,6 +140,21 @@
     <ClCompile Include="IntroScene.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerStates.cpp">
+      <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="HeadRollerStates.cpp">
+      <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="BatStates.cpp">
+      <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="BatMovement.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="GameCameraMove.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
@@ -161,6 +197,9 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\SpriteWorld.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\Blood.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>
