@@ -26,8 +26,9 @@ private:
 
     float m_fStartScale = 0.2f;
     float m_fEndScale = 1.0f;
-    float m_fGravity = -30.0f;
+    float m_fGravity = 0.0f;
 
-    Vec3 m_vStartScale = Vec3(.1f, .1f, 5.1f);
-    Vec3 m_vEndScale = Vec3(3.f, .2f, 5.1f);
+    Vec3 m_vStartScale = Vec3(.3f, .2f, .2f);
+    Vec3 m_vEndScale = Vec3(3.5f, .5f, 3.f);
+    Vec3 m_vInitDir;
 };

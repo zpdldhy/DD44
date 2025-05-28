@@ -18,23 +18,31 @@ void AEffectActor::Tick()
 
     if (!m_bRender)
         return;
-    m_vVelocity *= 0.95f;
-    m_vVelocity.y += m_fGravity * TIMER->GetDeltaTime();
 
+    m_vVelocity *= 0.97f;
+    m_vVelocity.y += m_fGravity * TIMER->GetDeltaTime();
 
     Vec3 pos = GetPosition();
     pos += m_vVelocity * TIMER->GetDeltaTime();
     SetPosition(pos);
 
-    /* m_vVelocity.x += RandomRange(-1.0f, 1.0f);
-     m_vVelocity.y += RandomRange(-1.0f, 1.0f);*/
+    // billboard용 회전 행렬은 그대로 두고 위치만 덮어쓰기
+    Matrix mat = GetWorld();
+    mat._41 = pos.x;
+    mat._42 = pos.y;
+    mat._43 = pos.z;
+    SetWorldMatrix(mat); // g_matWorld에 반영될 matrix
 
     float t = 1.0f - (m_fRemainTime / m_fDuration);// 진행 비율 (0~1)
-    t = pow(t, 2);
+    //t = pow(t, 1.5);
+    float growT = min(t * 2.0f, 1.0f); // 0~0.5초까지만 0~1로 증가 후 고정
+
+    float endFactor = pow(1.0f - t, 2.5f);
+
     Vec3 scale;
-    scale.x = Lerp(m_vStartScale.x, m_vEndScale.x, t);
-    scale.y = Lerp(m_vStartScale.y, m_vEndScale.y, pow(t,2.5));
-    scale.z = 1.0f;
+    scale.x = Lerp(m_vStartScale.x, m_vEndScale.x * .5f, growT);
+    scale.y = Lerp(m_vStartScale.y, m_vEndScale.y * .5f, growT);
+    scale.z = Lerp(m_vStartScale.z, m_vEndScale.z * .5f, growT);
     SetScale(scale);
 
     m_fRemainTime -= TIMER->GetDeltaTime();

@@ -86,16 +86,15 @@ void PlayerMoveScript::Tick()
 	if (INPUT->GetButton(J))
 	{
 		Vec3 basePos = GetOwner()->GetPosition();
+		basePos.y += RandomRange(0.5 ,2);
+
 		Vec3 look = GetOwner()->GetLook();
-		Vec3 velocity = look * -1.0f;
-		//basePos.z += velocity.z * 0.8f;
-		//basePos.y += 0.2f;
-		PlayBloodBurst(basePos, velocity, 10.0f, 90.0f);
+		velocity = -look;
+
+		PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
 	}
 
-	// 실시간 look을 확인하려면, 아래 주석을 풀면 출력창에 뜹니다 (많이.. )
-	//Vec3 look = GetOwner()->GetLook();
-	//Profiler p(to_string(look.x) + " " + to_string(look.z));
+	//Profiler p(to_string(velocity.x) + "oo" + to_string(velocity.z));
 
 
 	Slash();
@@ -134,6 +133,9 @@ void PlayerMoveScript::Tick()
 			currentRot.y = smoothedYaw;
 			GetOwner()->SetRotation(currentRot);
 		}
+
+		m_vLastMoveDir = moveDir;
+
 	}
 	else
 	{
