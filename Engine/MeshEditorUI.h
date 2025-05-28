@@ -49,13 +49,17 @@ public:
     }
 
     // mesh 변경
-    void MoveMesh(std::function<void(int, Vec3)> callback)
+    void MoveMesh(std::function<void(string, Vec3)> callback)
     {
         m_OnMoveChild = std::move(callback);
     }
-    void ScaleMesh(std::function<void(int, Vec3)> callback)
+    void ScaleMesh(std::function<void(string, Vec3)> callback)
     {
         m_OnScaleChild = std::move(callback);
+    }
+    void RotateMesh(std::function<void(string, Vec3)> callback)
+    {
+        m_OnRotateChild = std::move(callback);
     }
 
     // animation 관련
@@ -67,13 +71,17 @@ public:
     {
         m_OnAnimChange = std::move(callback);
     }
-    void ChangeParentBone(std::function<void(int, string, bool)> callback)
+    void ChangeParentBone(std::function<void(string, string, bool)> callback)
     {
         m_OnParentBoneChange = std::move(callback);
     }
-    void ChangeVisible(std::function<void(int, bool)> callback)
+    void ChangeVisible(std::function<void(string, bool)> callback)
     {
         m_OnChangeMeshVisible = std::move(callback);
+    }
+    void RemoveMesh(std::function<void(string)> callback)
+    {
+        m_OnRemoveChild = std::move(callback);
     }
     // 저장
     void SaveMesh(std::function<void(int, bool, string)> callback)
@@ -86,8 +94,12 @@ public:
     void DrawMeshHierarchy();
     void DrawMeshRecursive(shared_ptr<UMeshComponent> _child);
     
+    void DrawSetRoot();
+    void DrawRemoveChild();
     void DrawAddChild();
     void DrawModifyMesh();
+    void DrawAnimFactor();
+    void DrawSave();
 
 public:
     void SetMeshList(map<wstring, shared_ptr<UMeshResources>> _meshList);
@@ -95,12 +107,17 @@ public:
     void SetTexList(vector<wstring> _texureList);
     void SetBoneList(wstring _meshName);
     void SetActor(shared_ptr<APawn>& _actor);
+public:
+    void UpdateChildComboData();
+    void UpdateChildRecursive(shared_ptr<UMeshComponent> _comp);
 
 private:
     map<wstring, shared_ptr<UMeshResources>> m_mMeshResMap;
     vector<string> m_vMeshNameList;
     vector<const char*> m_vMeshPtrList;
-    vector<const char*> m_vChildMeshPtrList;
+
+    vector<string> m_vChildCompNameList;
+    vector<const char*> m_vChildCompPtrList;
 
     vector<string> m_vAnimList;
     vector<const char*> m_vAnimPtrList;
@@ -133,6 +150,7 @@ private:
     int m_childIndex;
     Vec3 m_pos;
     Vec3 m_scale;
+    Vec3 m_rot;
     PreMeshData m_childData;
 
     bool m_animStop;
@@ -155,13 +173,16 @@ private:
 
     function<void(PreMeshData, shared_ptr<APawn>&)> m_OnCreateActor;
     function<void(PreMeshData)> m_OnCreateChild;
-    function<void(int, Vec3)> m_OnMoveChild;
-    function<void(int, Vec3)> m_OnScaleChild;
+    function<void(string, Vec3)> m_OnMoveChild;
+    function<void(string, Vec3)> m_OnScaleChild;
+    function<void(string, Vec3)> m_OnRotateChild;
     function<void(bool)> m_OnAnimStop;
     function<void(int)> m_OnAnimChange;
-    function<void(int, string, bool )> m_OnParentBoneChange;
+    function<void(string, string, bool )> m_OnParentBoneChange;
     function<void(int, bool, string)> m_OnMeshSave;
-    function<void(int, bool)> m_OnChangeMeshVisible;
+    function<void(string, bool)> m_OnChangeMeshVisible;
+    function<void(string)> m_OnRemoveChild;
+
 
 };
 

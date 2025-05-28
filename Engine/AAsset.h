@@ -2,6 +2,7 @@
 #include "FbxLoader.h"
 
 class APawn;
+class AActor;
 class UMeshComponent;
 class UMaterial;
 class MeshComponentData;
@@ -20,7 +21,7 @@ public:
 	static MeshComponentData LoadOneMesh(FILE* pFile);
 
 
-	static void ExportJsonMesh(shared_ptr<APawn> _actor, string filepath);
+	static void ExportJsonMesh(shared_ptr<AActor> _actor, string filepath);
 	static void ExportJsonMeshRecursive(string idx, nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh);
 	static void ExportSkinned(string idx ,nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh);
 	static void ExportStatic(string idx, nlohmann::ordered_json& j, shared_ptr<UMeshComponent> _mesh);

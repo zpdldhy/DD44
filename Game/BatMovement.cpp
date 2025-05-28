@@ -3,6 +3,7 @@
 #include "Timer.h"
 #include <algorithm>
 #include "EffectManager.h"
+#include "UMeshComponent.h"
 // temp
 #include "Input.h"
 
@@ -17,28 +18,57 @@ void BatMovement::Init()
 	death = make_shared<BatDieState>(m_pOwner);
 
 	currentState = idle;
-	currentState->Enter();
+	currentState->Enter(); 
 }
 
 
 void BatMovement::Tick()
 {	
-	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_DEATH)
-	{
-		return;
-	}
+	Flashing();
 
 	currentState->Tick();
+	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_DEATH )
+	{
+		if (!currentState->IsPlaying())
+		{
+			// bat 죽음
+			GetOwner()->m_bDelete = true;
+		}
+		return;
+	}
 
 	if (m_bReturn)
 	{
 		ReturningToPos();
 		return;
 	}
+	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
+	{
+		// 여기 있어야 중복 막음
+		if (INPUT->GetButton(J))
+		{
+			// Blood FX
+			Vec3 basePos = GetOwner()->GetPosition();
+			basePos.y += RandomRange(0.5, 2);
+			Vec3 look = GetOwner()->GetLook();
+			velocity = -look;
+			PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
 
+
+			m_fHitFlashTimer = 1.f;  // 1초 동안
+			m_bIsFlashing = true;
+
+			ChangetState(death);
+		}
+	}
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_ATTACK)
 	{
 		float deltaTime = TIMER->GetDeltaTime();
+		{
+			// 획일성을 줄이기 위해 
+			rotateSpeed = RandomRange((rotateSpeed - 0.005f), (rotateSpeed + 0.01f));
+
+		}
 		angle += rotateSpeed * deltaTime;
 
 		// 2PI 넘으면 되돌림
@@ -126,22 +156,6 @@ void BatMovement::Tick()
 
 	}
 
-	if (INPUT->GetButton(X))
-	{
-		ChangetState(death);
-		// 죽는 효과
-	}
-
-	if (INPUT->GetButton(J))
-	{
-		Vec3 basePos = GetOwner()->GetPosition();
-		Vec3 look = GetOwner()->GetLook();
-		Vec3 velocity = look * -1.0f;
-		//basePos.z += velocity.z * 0.8f;
-		//basePos.y += 0.2f;
-		PlayBloodBurst(basePos, velocity, 10.0f, 90.0f);
-	}
-
 }
 
 void BatMovement::ChangetState(shared_ptr<StateBase> _state)
@@ -206,5 +220,56 @@ void BatMovement::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, fl
 
 		Vec3 baseVelocity = _direction * _speed;
 		EFFECT->PlayEffect(EEffectType::Blood, pos, _spreadAngleDeg, baseVelocity);
+	}
+}
+// 빈 함수, 기능 필요하면 넣기용.
+void BatMovement::VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+	{
+
+	}
+
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		VisitAllMeshMaterials(comp->GetChild(i));
+	}
+}
+
+void BatMovement::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetHitFlashTime(value); // CB에 g_fHitFlashTime 전달
+	}
+
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
+	}
+}
+
+void BatMovement::Flashing()
+{
+	if (m_bIsFlashing)
+	{
+		m_fHitFlashTimer -= TIMER->GetDeltaTime();
+		if (m_fHitFlashTimer <= 0.0f)
+		{
+			m_fHitFlashTimer = 0.0f;
+			m_bIsFlashing = false;
+		}
+
+		// hitFlashAmount는 1 → 0 으로 감소
+		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
+
+		auto root = GetOwner()->GetMeshComponent();
+		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
 }

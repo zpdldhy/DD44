@@ -2,6 +2,9 @@
 #include "UScriptComponent.h"
 #include "BatMovement.h"
 #include "BatStates.h"
+#include <random>
+
+class UMeshComponent;
 
 class BatMovement : public UScriptComponent
 {
@@ -17,9 +20,12 @@ public:
 	float m_fRadius = 8.0f;
 	float angle = 0.0f; 
 	float angularSpeed = 1.0f;
-	float rotateSpeed = 0.5f;
+	float rotateSpeed = 0.35f;
 	float m_fRotationSpeed = 8.0f;
 
+	//
+	Vec3 m_vLastMoveDir;
+	Vec3 velocity;
 	// 
 	bool m_bReturn;
 	Vec3 m_vReturnPos;
@@ -38,4 +44,9 @@ public:
 	void ChangetState(shared_ptr<StateBase> _state);
 	void ReturningToPos();
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
+	void VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp);
+	float m_fHitFlashTimer = 0.0f;
+	bool m_bIsFlashing = false;
+	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
+	void Flashing();
 };

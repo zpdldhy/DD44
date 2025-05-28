@@ -69,8 +69,8 @@ void BatAttackState::Enter()
 	m_bOnPlaying = true;
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	int idleIndex = animInstance->GetAnimIndex(L"Bite");
-	animInstance->PlayOnce(idleIndex);
+	int index = animInstance->GetAnimIndex(L"Bite");
+	animInstance->PlayOnce(index);
 }
 
 void BatAttackState::Tick()
@@ -102,14 +102,22 @@ void BatDieState::Enter()
 	m_bOnPlaying = true;
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	int idleIndex = animInstance->GetAnimIndex(L"Shock");
-	animInstance->PlayOnce(idleIndex);
+	int index = animInstance->GetAnimIndex(L"Shock");
+	animInstance->PlayOnce(index);
 }
 
 void BatDieState::Tick()
 {
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	if (!animInstance->m_bOnPlayOnce)
+	{
+		// 애니메이션 종료
+		End();
+	}
+	
 }
 
 void BatDieState::End()
 {
+	m_bOnPlaying = false;
 }

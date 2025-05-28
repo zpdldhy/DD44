@@ -19,8 +19,6 @@ void PlayerIdleState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int idleIndex = animInstance->GetAnimIndex(L"Idle_0");
 	animInstance->SetCurrentAnimTrack(idleIndex);
-
-
 }
 
 void PlayerIdleState::Tick()
@@ -76,19 +74,6 @@ void PlayerAttackState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int attackIndex = animInstance->GetAnimIndex(L"Slash_Light_R_new");
 	animInstance->PlayOnce(attackIndex);
-
-	// Sword 위치 설정
-	int index = m_pBackSocket->GetChildIndex(m_pSword);
-	if (index < 0)
-	{
-		assert(false);
-	}
-	m_pBackSocket->RemoveChild(index);
-	m_pHandSocket->AddChild(m_pSword);
-
-	m_pSword->SetLocalPosition(handSwordPos);
-	m_pSword->SetLocalRotation(handSwordRot);
-
 }
 
 void PlayerAttackState::Tick()
@@ -97,8 +82,6 @@ void PlayerAttackState::Tick()
 	if (!animInstance->m_bOnPlayOnce)
 	{
 		// 애니메이션 종료
-		*m_pCurrentState = m_pPrevState;
-		m_pPrevState->Enter();
 		End();
 	}
 }
@@ -107,22 +90,6 @@ void PlayerAttackState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
-
-	// Sword 위치 설정
-	int index = m_pHandSocket->GetChildIndex(m_pSword);
-	if (index < 0)
-	{
-		assert(false);
-	}
-	m_pHandSocket->RemoveChild(index);
-	m_pBackSocket->AddChild(m_pSword);
-
-	m_pSword->SetLocalPosition(backSwordPos);
-	m_pSword->SetLocalRotation(backSwordRot);
-
-	// 참조 관리
-	m_pCurrentState = nullptr;
-	m_pPrevState.reset();
 }
 
 void PlayerAttackState::SetComponent(shared_ptr<UMeshComponent> _sword, shared_ptr<UMeshComponent> _hand, shared_ptr<UMeshComponent> _back)
@@ -131,4 +98,89 @@ void PlayerAttackState::SetComponent(shared_ptr<UMeshComponent> _sword, shared_p
 	m_pHandSocket = _hand;
 	m_pBackSocket = _back;
 }
+
+PlayerHitState::PlayerHitState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_HIT)
+{
+	m_pOwner = _pOwner;
+	m_bCanInterrupt = false;
+}
+
+void PlayerHitState::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+	m_bPlayNext = true;
+
+	// 애니메이션 Attack 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int index = animInstance->GetAnimIndex(L"Hit_back");
+	animInstance->PlayOnce(index);
+}
+
+void PlayerHitState::Tick()
+{
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	if (!animInstance->m_bOnPlayOnce)
+	{
+		// 1번만 다음 애니메이션 재생
+		if (m_bPlayNext)
+		{
+			int index = animInstance->GetAnimIndex(L"Hit_Recover");
+			animInstance->PlayOnce(index);
+			m_bPlayNext = false;
+			return;
+		}
+		
+		End();
+	}
+}
+
+void PlayerHitState::End()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = false;
+}
+
+PlayerDieState::PlayerDieState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_DEATH)
+{
+	m_pOwner = _pOwner;
+	m_bCanInterrupt = false;
+}
+
+void PlayerDieState::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+	m_bPlayNext = true;
+
+	// 애니메이션 Attack 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int index = animInstance->GetAnimIndex(L"Hit_back");
+	animIndex = animInstance->GetAnimIndex(L"Hit_idle");
+	animInstance->PlayOnce(index);
+}
+
+void PlayerDieState::Tick()
+{
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	if (!animInstance->m_bOnPlayOnce)
+	{
+		// 다음 애니메이션 재생
+		if (m_bPlayNext)
+		{
+			animInstance->SetCurrentAnimTrack(animIndex);
+			m_bPlayNext = false;
+			return;
+		}
+	}
+	// end 하지 않음. 게임 종료 . 이처리를 어디서
+
+}
+
+void PlayerDieState::End()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = false;
+}
+
 
