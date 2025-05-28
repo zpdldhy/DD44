@@ -47,14 +47,14 @@ PS_OUT PS(VS_OUT input)
     
     float4 result = original;
     
-    if (blurMask > 0.5f)
-        result = lerp(original, blur, 0.8f);
+    //if (blurMask > 0.5f)
+    //    result = lerp(original, blur, 0.8f);
 
-    if (bloomMask > 0.5f && result.r > 0.5f)
-        result.rgb += float3(1, 0.1, 0.1) * 0.7f; // ºû³ª´Â ´À³¦ Ãß°¡
+    //if (bloomMask > 0.5f && result.r > 0.5f)
+    //    result.rgb += float3(1, 0.1, 0.1) * 0.7f; // ºû³ª´Â ´À³¦ Ãß°¡
 
-    if (bloom.a > 0.01f)
-        result.rgb += bloom.rgb * bloom.a * 2.0f;
+    //if (bloom.a > 0.01f)
+    //    result.rgb += bloom.rgb * bloom.a * 2.0f;
     
     result.rgb = saturate(result.rgb);
    

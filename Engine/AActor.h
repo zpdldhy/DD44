@@ -84,7 +84,7 @@ public:
 	void SetPosition(const Vec3& _pos) { m_pTransform->SetLocalPosition(_pos); }
 	void SetRotation(const Vec3& _rot) { m_pTransform->SetLocalRotation(_rot); }
 	void SetScale(const Vec3& _scale) { m_pTransform->SetLocalScale(_scale); }
-	void SetWolrdMatrix(const Matrix& _mat) { m_pTransform->SetWorldMatrix(_mat); }
+	void SetWorldMatrix(const Matrix& _mat) { m_pTransform->SetWorldMatrix(_mat); }
 	void AddPosition(const Vec3& _pos) { m_pTransform->AddLocalPosition(_pos); }
 	void AddRotation(const Vec3& _rot) { m_pTransform->AddLocalRotation(_rot); }
 };
