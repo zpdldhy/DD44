@@ -27,8 +27,8 @@
 
 void IntroScene::Init()
 {
-	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Intro_Scene.uis.json"));
-	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Intro_Arrow.uis.json");
+	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Intro_BackGround.uis.json"));
+	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Intro_SelectArrow.uis.json");
 	UI->AddUIList(m_vArrowUI);
 
 	SetupEngineCamera();
