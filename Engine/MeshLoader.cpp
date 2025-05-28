@@ -149,10 +149,12 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
 		//mesh->SetMeshTransform(transform);
 		
-
-		staticRoot->SetAnimInstance(animInstance);
-		staticRoot->SetMatBone(data.m_matBone);
-		staticRoot->SetTargetBoneIndex(data.m_targetBone);
+		if (data.m_bHasAnim)
+		{
+			staticRoot->SetAnimInstance(animInstance);
+			staticRoot->SetMatBone(data.m_matBone);
+			staticRoot->SetTargetBoneIndex(data.m_targetBone);
+		}
 
 		{
 			//Profiler p("StaticMesh : SetMat");

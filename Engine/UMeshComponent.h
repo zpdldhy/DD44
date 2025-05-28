@@ -24,7 +24,7 @@ public:
 
 	void AddChild(shared_ptr<UMeshComponent> _child);// { m_vChild.push_back(_child); }
 	void RemoveChild(int _index);
-	void RemoveChild(const wstring& _name);
+	bool RemoveChild(const wstring& _name);
 	int GetChildIndex(shared_ptr<UMeshComponent> _child);
 	shared_ptr<UMeshComponent> GetChild(int _index) { return m_vChild[_index]; }
 	vector<shared_ptr<UMeshComponent>> GetChildren() { return m_vChild; }

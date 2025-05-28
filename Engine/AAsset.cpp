@@ -362,7 +362,7 @@ void AAsset::ExportStatic(FILE* pFile, shared_ptr<UMeshComponent> _mesh)
 	fwrite(&scale, sizeof(Vec3), 1, pFile);
 }
 
-void AAsset::ExportJsonMesh(shared_ptr<APawn> _actor, string fileName)
+void AAsset::ExportJsonMesh(shared_ptr<AActor> _actor, string fileName)
 {
 	string path = "../Resources/Asset/";
 	fileName += ".mesh.json";
@@ -548,6 +548,7 @@ MeshComponentData AAsset::LoadOneJsonMesh(string idx, const nlohmann::ordered_js
 	bool bHasBaseAnim = (j["HasBaseAnim" + idx]);
 	ret.m_szComp = to_mw(j["CompName" + idx]);
 	ret.m_bVisible = (j["Visible" + idx]);
+	ret.m_bHasAnim = bHasBaseAnim;
 
 	if (bHasBaseAnim)
 	{

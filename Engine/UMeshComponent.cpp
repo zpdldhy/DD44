@@ -29,10 +29,22 @@ void UMeshComponent::RemoveChild(int _index)
 
 }
 
-void UMeshComponent::RemoveChild(const wstring& _name)
+bool UMeshComponent::RemoveChild(const wstring& _name)
 {
-	
+		for (auto it = m_vChild.begin(); it != m_vChild.end(); ++it) {
+			if ((*it)->GetName() == _name) {
+				m_vChild.erase(it);
+				return true;
+			}
+		}
 
+		for (auto& child : m_vChild) {
+			if (child->RemoveChild(_name)) {
+				return true;
+			}
+		}
+
+		return false;
 }
 
 int UMeshComponent::GetChildIndex(shared_ptr<UMeshComponent> _child)

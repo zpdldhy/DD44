@@ -13,31 +13,78 @@
 #include "AUIActor.h"
 #include "EffectManager.h"
 
-
 void PlayerMoveScript::Init()
 {
 	m_vLook = -m_vCameraOffset;
-	m_pAnimInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 
 	idle = make_shared<PlayerIdleState>(m_pOwner);
 	walk = make_shared<PlayerWalkState>(m_pOwner);
 	attack = make_shared<PlayerAttackState>(m_pOwner);
-	dynamic_pointer_cast<PlayerAttackState>(attack)->SetComponent(sword.lock(), handSocket.lock(), backSocket.lock());
-
+	hit = make_shared<PlayerHitState>(m_pOwner);
+	die = make_shared<PlayerDieState>(m_pOwner);
 	//SetUI();
 
 	currentState = idle;
 	currentState->Enter();
 
 	m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetMeshByName(L"Slash")->GetMaterial();
+
+	backSword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword");
+	handSword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword2");
 }
 
 void PlayerMoveScript::Tick()
 {
-	currentState->Tick();
+	// HIT
+	if (INPUT->GetButton(J))
+	{
+		// FX
+		Vec3 basePos = GetOwner()->GetPosition();
+		Vec3 look = GetOwner()->GetLook();
+		Vec3 velocity = look * -1.0f;
+		PlayBloodBurst(basePos, velocity, 10.0f, 90.0f);
+		// HP 
+		m_hp -= 1;
+		if (m_hp > 0)
+		{
+			ChangetState(hit);
+		}
+		else
+		{
+			ChangetState(die);
+		}
+	}
+	Slash();
 
+	// UI 
+	//UpdateHPUI();
+	UpdateArrowUI();
+
+	// STATE-ANIM
+	currentState->Tick();
+	if (currentState->GetId() == PLAYER_STATE::PLAYER_S_DEATH)
+	{
+		return;
+	}
+	if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK || currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
+	{
+		if (!currentState->IsPlaying())
+		{
+			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK)
+			{
+				handSword.lock()->SetVisible(false);
+				backSword.lock()->SetVisible(true);
+			}
+			ChangetState(idle);
+		}
+		else
+		{
+			return;
+		}
+	}
+
+#pragma region MOVEMENT
 	float deltaTime = TIMER->GetDeltaTime();
-#pragma region 이동량 계산
 	Vec3 up = { 0, 1, 0 };
 	m_vRight = up.Cross(m_vLook);
 	m_vLook.y = 0.0f;
@@ -67,46 +114,10 @@ void PlayerMoveScript::Tick()
 		moveDir += m_vRight;
 	}
 
-#pragma endregion
-
-	if (INPUT->GetButton(LCLICK))
-	{
-		m_bAttack = true;
-		//int targetIndex = m_pAnimInstance->GetAnimIndex(L"Slash_Light_R_new");
-		//m_pAnimInstance->PlayOnce(targetIndex);
-		//ChangetState(attack);
-		m_bSlashPlaying = true;
-		m_fSlashTime = 0.0f;
-	}
-	else
-	{
-		m_bAttack = false;
-	}
-
-	if (INPUT->GetButton(J))
-	{
-		Vec3 basePos = GetOwner()->GetPosition();
-		Vec3 look = GetOwner()->GetLook();
-		Vec3 velocity = look * -1.0f;
-		//basePos.z += velocity.z * 0.8f;
-		//basePos.y += 0.2f;
-		PlayBloodBurst(basePos, velocity, 10.0f, 90.0f);
-	}
-
-	// 실시간 look을 확인하려면, 아래 주석을 풀면 출력창에 뜹니다 (많이.. )
-	//Vec3 look = GetOwner()->GetLook();
-	//Profiler p(to_string(look.x) + " " + to_string(look.z));
-
-
-	Slash();
-
-#pragma region 이동 및 회전
-	if (moveDir.Length() > 0 && !m_pAnimInstance->m_bOnPlayOnce)
+	if (moveDir.Length() > 0)// && !m_pAnimInstance->m_bOnPlayOnce)
 	{
 		// 애님 ( 추후 처리 로직 업데이트 필요 )
 		{
-			//int targetIndex = m_pAnimInstance->GetAnimIndex(L"Run");
-			//m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
 			ChangetState(walk);
 		}
 
@@ -137,15 +148,19 @@ void PlayerMoveScript::Tick()
 	}
 	else
 	{
-		//int targetIndex = m_pAnimInstance->GetAnimIndex(L"Idle_0");
-		//m_pAnimInstance->SetCurrentAnimTrack(targetIndex);
 		ChangetState(idle);
 	}
 #pragma endregion
 
-	// Update UI State
-	//UpdateHPUI();
-	UpdateArrowUI();
+	// ATTACK
+	if (INPUT->GetButton(LCLICK))
+	{
+		handSword.lock()->SetVisible(true);
+		backSword.lock()->SetVisible(false);
+		ChangetState(attack);
+		m_bSlashPlaying = true;
+		m_fSlashTime = 0.0f;
+	}
 }
 
 void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
@@ -157,13 +172,6 @@ void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
 
 	if (currentState)
 		currentState->End();
-
-	if (_state->GetId() == PLAYER_STATE::PLAYER_S_ATTACK)
-	{
-		dynamic_pointer_cast<PlayerAttackState>(_state)->SetPrevState(currentState);
-		dynamic_pointer_cast<PlayerAttackState>(_state)->SetCurrentState(&currentState);
-	}
-
 
 	currentState = _state;
 

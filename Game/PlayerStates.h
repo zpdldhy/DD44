@@ -10,6 +10,7 @@ enum PLAYER_STATE
 	PLAYER_S_ATTACK,
 	PLAYER_S_HIT,
 	PLAYER_S_DEATH,
+	PLAYER_S_GETITEM,
 	PLAYER_S_COUNT
 };
 
@@ -73,4 +74,37 @@ public:
 	void SetCurrentState(shared_ptr<StateBase>* _currentState) { m_pCurrentState = _currentState; }
 	// sword, hand, back ¼ø¼­
 	void SetComponent(shared_ptr<UMeshComponent> _sword, shared_ptr<UMeshComponent> _hand, shared_ptr<UMeshComponent> _back);
+};
+
+class PlayerHitState : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+	bool m_bPlayNext = true;
+
+public:
+	PlayerHitState(weak_ptr<AActor> _pOwner);
+	~PlayerHitState() {}
+
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+};
+
+class PlayerDieState : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+	bool m_bPlayNext = true;
+	int animIndex;
+
+public:
+	PlayerDieState(weak_ptr<AActor> _pOwner);
+	~PlayerDieState() {}
+
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
 };

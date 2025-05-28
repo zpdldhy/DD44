@@ -63,12 +63,11 @@ void TestYR::Init()
 	}
 #pragma endregion
 #pragma region LOAD_ASSET
-
-//	ACTORLOADER->LoadAllAsset();
-//	meshLoader = make_shared<MeshLoader>();
-//	meshLoader->SetMesh(ACTORLOADER->LoadMeshMap());
-//	meshLoader->SetAnim(ACTORLOADER->LoadAnimMap());
-//#pragma endregion
+	ACTORLOADER->LoadAllAsset();
+	meshLoader = make_shared<MeshLoader>();
+	meshLoader->SetMesh(ACTORLOADER->LoadMeshMap());
+	meshLoader->SetAnim(ACTORLOADER->LoadAnimMap());
+#pragma endregion
 //#pragma region PLAYER 
 //	// 플레이어 세팅
 //	shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
@@ -189,12 +188,12 @@ void TestYR::Init()
 
 #pragma region Load Player from Json
 	{
-		//// 플레이어 세팅
-		//shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
-		//player = make_shared<APawn>();
-		//auto meshComponent = meshLoader->Make("../Resources/Asset/crow_final.mesh.json");
-		//player->SetMeshComponent(meshComponent);
-
+		// 플레이어 세팅
+		shared_ptr<PlayerMoveScript> movement = make_shared<PlayerMoveScript>();
+		player = make_shared<APawn>();
+		auto meshComponent = meshLoader->Make("../Resources/Asset/crow_final_final.mesh.json");
+		player->SetMeshComponent(meshComponent);
+		OBJECT->AddActor(player);
 		//player->SetPosition(Vec3(10, 10, 10));
 
 #pragma region Sword

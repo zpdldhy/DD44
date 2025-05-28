@@ -8,6 +8,7 @@ struct MeshComponentData
 	bool m_bVisible = true;
 	
 	wstring m_szAnim;
+	bool m_bHasAnim;
 	int m_targetBone = 0;
 	Matrix m_matBone;
 	bool m_bInPlace = false;
