@@ -375,6 +375,9 @@
     <ClInclude Include="UAnimInstance.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="AFireParticleActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -627,6 +630,9 @@
     </ClCompile>
     <ClCompile Include="UAnimInstance.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="AFireParticleActor.cpp">
+      <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -131,6 +131,12 @@ void UMaterial::SetEmissiveParams(const Vec3& _color, float _power)
     UpdateEffectBuffer();
 }
 
+void UMaterial::SetTintColor(const Vec4& color)
+{
+    m_tEffectData.TintColor = color;
+    UpdateEffectBuffer();
+}
+
 void UMaterial::UpdateEffectBuffer()
 {
     if (!m_pEffectCB)

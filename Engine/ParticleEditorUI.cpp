@@ -5,6 +5,7 @@
 #include "UMaterial.h"
 #include "Texture.h"
 #include "Functions.h"
+#include "AFireParticleActor.h"
 
 
 void ParticleEditorUI::DrawUI()
@@ -30,6 +31,11 @@ void ParticleEditorUI::DrawUI()
 		ResetData();
 	}
 
+	const char* typeList[] = { "Default", "Fire" };
+	int typeIndex = static_cast<int>(m_eSelectedType);
+	ImGui::Combo("Particle Type", &typeIndex, typeList, IM_ARRAYSIZE(typeList));
+	m_eSelectedType = static_cast<EParticleType>(typeIndex);
+
 	if (ImGui::Button("Create New Particle"))
 	{
 		if (!m_OnCreate)
@@ -37,7 +43,16 @@ void ParticleEditorUI::DrawUI()
 			ImGui::TextColored(ImVec4(1, 0, 0, 1), "Error: OnCreate callback is not set!");
 			return;
 		}
-		auto newParticle = make_shared<AParticleActor>();
+		shared_ptr<AParticleActor> newParticle;
+		switch (m_eSelectedType)
+		{
+		case EParticleType::Fire:
+			newParticle = make_shared<AFireParticleActor>();
+			break;
+		default:
+			newParticle = make_shared<AParticleActor>();
+			break;
+		}
 
 		m_vCreatedParticles.push_back(newParticle);
 		m_vParticleData.push_back(m_Data);
@@ -63,6 +78,14 @@ void ParticleEditorUI::DrawUI()
 			m_AnimData.bLoop,
 			m_AnimData.bAutoDestroy
 		);
+
+		auto mesh = newParticle->GetMeshComponent();
+		if (mesh)
+		{
+			auto mat = mesh->GetMaterial();
+			if (mat)
+				mat->SetTintColor(Vec4(1.0f, 0.4f, 0.1f, 1.0f)); // 주황색
+		}
 
 		newParticle->InitSpriteAnimation(m_iDivisions, m_AnimData.DurationSeconds);
 		newParticle->SetLoop(m_AnimData.bLoop);
@@ -271,7 +294,17 @@ void ParticleEditorUI::DrawUI()
 			copy.Position[1] = randPos.y;
 			copy.Position[2] = randPos.z;
 
-			auto newParticle = make_shared<AParticleActor>();
+			shared_ptr<AParticleActor> newParticle;
+
+			switch (m_eSelectedType)
+			{
+			case EParticleType::Fire:
+				newParticle = make_shared<AFireParticleActor>();
+				break;
+			default:
+				newParticle = make_shared<AParticleActor>();
+				break;
+			}
 			m_vCreatedParticles.push_back(newParticle);
 			m_vParticleData.push_back(copy);
 
@@ -298,6 +331,14 @@ void ParticleEditorUI::DrawUI()
 			newParticle->SetPosition(randPos);
 			newParticle->SetRotation(Vec3(copy.Rotation));
 			newParticle->SetScale(Vec3(copy.Scale));
+
+			auto mesh = newParticle->GetMeshComponent();
+			if (mesh)
+			{
+				auto mat = mesh->GetMaterial();
+				if (mat)
+					mat->SetTintColor(Vec4(1.0f, 0.4f, 0.1f, 1.0f)); // 주황색
+			}
 		}
 	}
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
@@ -330,6 +371,18 @@ void ParticleEditorUI::DrawUI()
 			target->m_bDelete = true;
 			m_vCreatedParticles.erase(m_vCreatedParticles.begin() + m_iSelectedParticleIndex);
 			m_vParticleData.erase(m_vParticleData.begin() + m_iSelectedParticleIndex);
+			m_iSelectedParticleIndex = -1;
+			m_iLastSelectedParticleIndex = -1;
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("Delete All"))
+		{
+			for (auto& p : m_vCreatedParticles)
+				p->m_bDelete = true;
+
+			m_vCreatedParticles.clear();
+			m_vParticleData.clear();
 			m_iSelectedParticleIndex = -1;
 			m_iLastSelectedParticleIndex = -1;
 		}

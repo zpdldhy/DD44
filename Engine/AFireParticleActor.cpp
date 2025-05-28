@@ -1,0 +1,34 @@
+#include "pch.h"
+#include "AFireParticleActor.h"
+#include "Timer.h"
+
+AFireParticleActor::AFireParticleActor()
+{
+    m_vAmplitude = Vec3(RandomRange(0.1f, 0.5f), RandomRange(0.2f, 0.8f), 0.0f);
+    m_vRandomFreq = Vec3(RandomRange(1.0f, 3.0f), RandomRange(1.5f, 4.0f), 0.0f);
+    m_vRandomOffset = Vec3(RandomRange(0.0f, 100.0f), RandomRange(0.0f, 100.0f), 0.0f);
+
+    m_fFlickerValue = 0.0f;
+    m_bBaseInitialized = false;
+}
+
+void AFireParticleActor::Tick()
+{
+    AParticleActor::Tick(); // 기본 애니메이션 등 유지
+    if (!m_bBaseInitialized)
+    {
+        m_vBasePosition = GetPosition();
+        m_bBaseInitialized = true;
+    }
+
+    float t = TIMER->GetGameTime();
+
+    float x = sin(t * m_vRandomFreq.x + m_vRandomOffset.x) * m_vAmplitude.x;
+    float y = sin(t * m_vRandomFreq.y + m_vRandomOffset.y) * m_vAmplitude.y;
+
+    // 랜덤 flicker에 보간 적용
+    float targetFlicker = RandomRange(-0.03f, 0.03f);
+    m_fFlickerValue = Lerp(m_fFlickerValue, targetFlicker, TIMER->GetDeltaTime() * 5.0f);
+
+    SetPosition(m_vBasePosition + Vec3(x, y + m_fFlickerValue, 0));
+}
