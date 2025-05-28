@@ -2,6 +2,8 @@
 #include "UScriptComponent.h"
 #include "BatMovement.h"
 #include "BatStates.h"
+#include <random>
+
 
 class BatMovement : public UScriptComponent
 {
@@ -29,6 +31,9 @@ public:
 	shared_ptr<StateBase> attack;
 	shared_ptr<StateBase> death;
 	shared_ptr<StateBase> currentState;
+
+	// temp
+	std::random_device rd;
 
 
 public:

@@ -34,7 +34,7 @@ void Game::Init()
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	// 수정 필요
-	m_pPlayer = vlist[0];
+	m_pPlayer = vlist[2];
 	OBJECT->AddActorList(vlist);
 
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game.uis.json"));
