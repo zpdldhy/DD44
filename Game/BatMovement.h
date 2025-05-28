@@ -21,6 +21,7 @@ public:
 	float angle = 0.0f; 
 	float angularSpeed = 1.0f;
 	float rotateSpeed = 0.35f;
+	float originRotateSpeed = 0.35f;
 	float m_fRotationSpeed = 8.0f;
 
 	//
