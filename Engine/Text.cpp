@@ -41,7 +41,7 @@ HRESULT Font::CreateTextFormat(const wstring& _szFontName, float _fFontSize)
 	//텍스트 포맷 생성
 	HRESULT hr = DXWRITE->m_pDxWrite->CreateTextFormat(
 		_szFontName.c_str(), NULL,
-		DWRITE_FONT_WEIGHT_THIN,
+		DWRITE_FONT_WEIGHT_REGULAR,
 		DWRITE_FONT_STYLE_NORMAL,
 		DWRITE_FONT_STRETCH_NORMAL,
 		_fFontSize, L"ko-kr",

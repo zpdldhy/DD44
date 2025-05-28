@@ -254,6 +254,7 @@ shared_ptr<AUIActor> PrefabToActor::MakeUI(const string& _file)
 	{
 		uiActor = make_shared<AUIActor>();
 		uiActor->m_szName = to_mw(uiData.Name);
+		uiActor->m_bTextUI = uiData.isTextUI;
 
 		auto meshComp = UStaticMeshComponent::CreatePlane();
 		uiActor->SetMeshComponent(meshComp);
@@ -271,8 +272,11 @@ shared_ptr<AUIActor> PrefabToActor::MakeUI(const string& _file)
 		uiActor->SetPosition(Vec3(uiData.transform.Position));
 		uiActor->SetRotation(Vec3(uiData.transform.Rotation));
 		uiActor->SetScale(Vec3(uiData.transform.Scale));
-		uiActor->SetSliceData(Vec4(uiData.SliceUV));
 		uiActor->SetColor(Color(uiData.color));
+		uiActor->SetFontSize(uiData.FontSize);
+		uiActor->SetFontPath(to_mw(uiData.FontPath));
+		uiActor->SetText(to_mw(uiData.Text));
+		uiActor->SetSliceData(Vec4(uiData.SliceUV));
 
 		uiActor->SetPrefabData(uiData);
 	}
@@ -291,6 +295,7 @@ vector<shared_ptr<AUIActor>> PrefabToActor::MakeUIs(const string& _file)
 		{
 			auto uiActor = make_shared<AUIActor>();
 			uiActor->m_szName = to_mw(uiData.Name);
+			uiActor->m_bTextUI = uiData.isTextUI;
 
 			auto meshComp = UStaticMeshComponent::CreatePlane();
 			uiActor->SetMeshComponent(meshComp);
@@ -308,8 +313,11 @@ vector<shared_ptr<AUIActor>> PrefabToActor::MakeUIs(const string& _file)
 			uiActor->SetPosition(Vec3(uiData.transform.Position));
 			uiActor->SetRotation(Vec3(uiData.transform.Rotation));
 			uiActor->SetScale(Vec3(uiData.transform.Scale));
-			uiActor->SetSliceData(Vec4(uiData.SliceUV));
 			uiActor->SetColor(Color(uiData.color));
+			uiActor->SetFontSize(uiData.FontSize);
+			uiActor->SetFontPath(to_mw(uiData.FontPath));
+			uiActor->SetText(to_mw(uiData.Text));
+			uiActor->SetSliceData(Vec4(uiData.SliceUV));
 
 			uiActor->SetPrefabData(uiData);
 

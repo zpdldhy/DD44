@@ -68,7 +68,7 @@ struct PrefabCharacterData
 struct PrefabUIData
 {
     std::string Name;
-    bool isTextureUI = false;
+    bool isTextUI = false;
 
     TransformData transform;
 
@@ -83,7 +83,7 @@ struct PrefabUIData
 
     std::string FontPath = "";
     float FontSize = 20.f;
-    std::string Text = "";
+    std::string Text = "Hello World";
 
     int ScriptType = -1;
 };

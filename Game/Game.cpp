@@ -33,7 +33,7 @@ void Game::Init()
 	m_pPlayer = vlist[0];
 	OBJECT->AddActorList(vlist);
 
-	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game.uis.json"));
+	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_GameScene.uis.json"));
 
 	SetupEngineCamera();
 	SetupSkybox();

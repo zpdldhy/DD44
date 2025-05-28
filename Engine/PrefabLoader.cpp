@@ -440,6 +440,8 @@ bool PrefabLoader::SaveUI(const PrefabUIData& _prefab, const std::string& _fileP
     json j;
     j["Name"] = _prefab.Name;
 
+    j["IsTextUI"] = _prefab.isTextUI;
+
     // position은 NDC로 변환해서 저장    
 	auto transform = _prefab.transform;
     transform.Position[0] = transform.Position[0] / (static_cast<float>(g_windowSize.x) / 2.0f);
@@ -448,6 +450,14 @@ bool PrefabLoader::SaveUI(const PrefabUIData& _prefab, const std::string& _fileP
     SaveTransform(j, transform);
 
     j["Color"] = { _prefab.color[0], _prefab.color[1] ,_prefab.color[2] ,_prefab.color[3] };
+
+    // Font
+    j["FontSize"] = _prefab.FontSize;
+    j["FontPath"] = _prefab.FontPath;
+
+    // Text
+    j["Text"] = _prefab.Text;
+
     j["SliceUV"] = { _prefab.SliceUV[0], _prefab.SliceUV[1], _prefab.SliceUV[2], _prefab.SliceUV[3] };
 
     j["TexturePath"] = {
@@ -476,6 +486,8 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
 
     _prefab.Name = j["Name"];
 
+    _prefab.isTextUI = j["IsTextUI"];
+
     // position은 NDC로 변환해서 로드
 
     LoadTransform(j, _prefab.transform);
@@ -485,6 +497,13 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
 
     auto c = j["Color"];
     for (int i = 0; i < 4; i++)   _prefab.color[i] = c[i];
+
+    // Font
+    _prefab.FontSize = j["FontSize"];
+    _prefab.FontPath = j["FontPath"];
+
+    // Text
+    _prefab.Text = j["Text"];
 
     auto s = j["SliceUV"];
     for (int i = 0; i < 4; i++)   _prefab.SliceUV[i] = s[i];
@@ -507,6 +526,8 @@ bool PrefabLoader::SaveUIs(const vector<PrefabUIData>& _prefabs, const string& _
         json item;
         item["Name"] = p.Name;
 
+        item["IsTextUI"] = p.isTextUI;
+
         // position은 NDC로 변환해서 저장    
         auto transform = p.transform;
         transform.Position[0] = transform.Position[0] / (static_cast<float>(g_windowSize.x) / 2.0f);
@@ -515,6 +536,14 @@ bool PrefabLoader::SaveUIs(const vector<PrefabUIData>& _prefabs, const string& _
         SaveTransform(item, transform);
 
         item["Color"] = { p.color[0], p.color[1] ,p.color[2] ,p.color[3] };
+
+        // Font
+        item["FontSize"] = p.FontSize;
+        item["FontPath"] = p.FontPath;
+
+        // Text
+        item["Text"] = p.Text;
+
         item["SliceUV"] = { p.SliceUV[0], p.SliceUV[1], p.SliceUV[2], p.SliceUV[3] };
 
         item["TexturePath"] = {
@@ -553,6 +582,8 @@ bool PrefabLoader::LoadUIs(const string& _filePath, vector<PrefabUIData>& _outPr
 
         _prefab.Name = item["Name"];
 
+        _prefab.isTextUI = item["IsTextUI"];
+
         // position은 NDC로 변환해서 로드
 
         LoadTransform(item, _prefab.transform);
@@ -562,6 +593,13 @@ bool PrefabLoader::LoadUIs(const string& _filePath, vector<PrefabUIData>& _outPr
 
         auto c = item["Color"];
         for (int i = 0; i < 4; i++)   _prefab.color[i] = c[i];
+
+        // Font
+        _prefab.FontSize = item["FontSize"];
+        _prefab.FontPath = item["FontPath"];
+
+        // Text
+        _prefab.Text = item["Text"];
 
         auto s = item["SliceUV"];
         for (int i = 0; i < 4; i++)   _prefab.SliceUV[i] = s[i];

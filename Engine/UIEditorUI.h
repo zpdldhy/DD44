@@ -1,5 +1,6 @@
 #pragma once
 #include "PrefabLoader.h"
+#include <set>
 
 class UIEditorUI
 {
@@ -34,7 +35,7 @@ private:
 
 private:
 	vector<shared_ptr<class AUIActor>> m_vUIList;
-	vector<UINT> m_vSelectedIndex;
+	set<UINT> m_vSelectedIndex;
 	shared_ptr<class AUIActor> m_pUIActor = nullptr;
 	UINT m_iSelectUIActor = 0;
 

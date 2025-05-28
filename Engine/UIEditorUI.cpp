@@ -88,7 +88,13 @@ void UIEditorUI::DrawUI()
 
     ImGui::SameLine();
 
-    ImGui::Checkbox("TextUI", &m_bTextUI);
+    if (ImGui::Checkbox("TextUI", &m_bTextUI))
+    {
+        if (m_bTextUI == true)
+            m_vColor[3] = 1.f;
+        else
+            m_vColor[3] = 0.f;
+    }
 
     ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 
@@ -219,7 +225,7 @@ void UIEditorUI::UpdatePrefabData()
 {
     m_CurrentPrefab.Name = to_wm(m_pUIActor->m_szName);
 
-    m_CurrentPrefab.isTextureUI = m_pUIActor->m_bTextUI;
+    m_CurrentPrefab.isTextUI = m_pUIActor->m_bTextUI;
 
     memcpy(m_CurrentPrefab.transform.Scale, m_Trans.Scale, sizeof(float) * 3);
     memcpy(m_CurrentPrefab.transform.Rotation, m_Trans.Rotation, sizeof(float) * 3);
@@ -308,7 +314,7 @@ void UIEditorUI::UpdateUIActorList()
             m_pUIActor = m_vUIList[m_iSelectUIActor];            
 
             if(INPUT->GetButtonDown(LSHIFT))
-				m_vSelectedIndex.push_back(index);
+				m_vSelectedIndex.insert(index);
             else
 				m_vSelectedIndex.clear();
 
@@ -458,6 +464,10 @@ void UIEditorUI::SetColor()
 void UIEditorUI::SetFont()
 {
     ImGui::InputFloat("##Value", &m_fFontSize, 0.0f, 0.0f, "%.3f");
+
+    if (m_fFontSize <= 0.f)
+        m_fFontSize = 1.f;
+
     ImGui::SameLine(); ImGui::Text("%s", "FontSize");
 
     static std::vector<const char*> NamePtrs;
@@ -467,12 +477,12 @@ void UIEditorUI::SetFont()
             NamePtrs.push_back(name.c_str());
     }
 
-    static int iPreIdleIndex = 0;
+    static int iPreFontIndex = 0;
     ImGui::Combo("Font", &m_iFontIndex, NamePtrs.data(), (int)NamePtrs.size());
-    if (m_iFontIndex != iPreIdleIndex)
+    if (m_iFontIndex != iPreFontIndex)
     {
-        iPreIdleIndex = m_iFontIndex;
-        m_pUIActor->SetFontPath(to_mw(m_vFontList[iPreIdleIndex]));
+        iPreFontIndex = m_iFontIndex;
+        m_pUIActor->SetFontPath(to_mw(m_vFontList[iPreFontIndex]));
     }
 
     NamePtrs.clear();
@@ -679,11 +689,11 @@ void UIEditorUI::SelectActor()
                 {
                     m_iSelectUIActor = index;
                     if (INPUT->GetButtonDown(LSHIFT))
-						m_vSelectedIndex.push_back(index);
+						m_vSelectedIndex.insert(index);
 					else
 					{
 						m_vSelectedIndex.clear();
-						m_vSelectedIndex.push_back(index);
+						m_vSelectedIndex.insert(index);
 					}
                 }
                 index++;
@@ -701,7 +711,7 @@ void UIEditorUI::SelectActor()
 
 void UIEditorUI::ResolvePrefabData(const PrefabUIData& data)
 {
-    m_bTextUI = data.isTextureUI;
+    m_bTextUI = data.isTextUI;
 
     memcpy(m_Trans.Scale, data.transform.Scale, sizeof(float) * 3);
     memcpy(m_Trans.Rotation, data.transform.Rotation, sizeof(float) * 3);
