@@ -37,7 +37,13 @@ void Game::Init()
 	m_pPlayer = vlist[2];
 	OBJECT->AddActorList(vlist);
 
-	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game.uis.json"));
+	// UI
+	m_vHP = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
+	m_vArrow = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
+
+	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
+	UI->AddUIList(m_vHP);
+	UI->AddUIList(m_vArrow);
 
 	SetupEngineCamera();
 	SetupGameCamera();

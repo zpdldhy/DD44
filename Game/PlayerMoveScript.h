@@ -16,6 +16,8 @@ public:
 	float m_fRotationSpeed = 8.0f;
 	Vec3 m_vLook;
 	Vec3 m_vRight;
+	Vec3 m_vLastMoveDir;
+	Vec3 velocity;
 
 	// 상호작용
 	bool m_bDamaged = false;

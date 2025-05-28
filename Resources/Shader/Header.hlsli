@@ -71,6 +71,7 @@ cbuffer CB_Blur : register(b11)
     float2 g_vDirection; // (1, 0): 가로 블러 / (0, 1): 세로 블러
 };
 
+
 struct PNCTIW_IN
 {
     float3 p : POSITION;

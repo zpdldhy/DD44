@@ -145,6 +145,9 @@ void PlayerMoveScript::Tick()
 			currentRot.y = smoothedYaw;
 			GetOwner()->SetRotation(currentRot);
 		}
+
+		m_vLastMoveDir = moveDir;
+
 	}
 	else
 	{

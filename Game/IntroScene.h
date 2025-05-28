@@ -1,11 +1,19 @@
 #pragma once
 #include "IExecute.h"
 
+enum SelectMenu
+{
+	SM_START = 0,
+	SM_OPTION,
+	SM_EXIT,
+	SM_COUNT,
+};
+
 class IntroScene : public IExecute
 {
 public:
 	IntroScene() { m_type = SCENE_TYPE::GAME; }
-	virtual ~IntroScene();
+	virtual ~IntroScene() = default;
 
 public:
 	void Init() override;
@@ -19,6 +27,7 @@ private:
 	void SetupSunLight();
 
 private:
-
+	vector<shared_ptr<class AUIActor>> m_vArrowUI;
+	UINT m_vSelectMenu = 0;
 };
 

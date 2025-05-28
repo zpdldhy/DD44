@@ -4,12 +4,15 @@
 #include "LightManager.h"
 #include "ObjectManager.h"
 #include "UIManager.h"
+#include "Input.h"
 #include "PrefabToActor.h"
+#include "Engine.h"
 
 // Actor
 #include "ACameraActor.h"
 #include "ASky.h"
 #include "ALight.h"
+#include "AUIActor.h"
 
 // component
 #include "UMaterial.h"
@@ -19,14 +22,14 @@
 // Script
 #include "EngineCameraMoveScript.h"
 
-IntroScene::~IntroScene()
-{
-	OBJECT->RemoveAll();
-}
+// Scene
+#include "Game.h"
 
 void IntroScene::Init()
 {
-	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Intro.uis.json"));
+	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Intro_BackGround.uis.json"));
+	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Intro_SelectArrow.uis.json");
+	UI->AddUIList(m_vArrowUI);
 
 	SetupEngineCamera();
 	//SetupSkybox();
@@ -35,6 +38,50 @@ void IntroScene::Init()
 
 void IntroScene::Tick()
 {
+	if (INPUT->GetButton(UP))
+	{
+		if (m_vSelectMenu != SM_START)
+		{
+			m_vSelectMenu--;
+			for (auto& pUI : m_vArrowUI)
+				pUI->AddPosition(Vec3(0.f, +0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
+		}
+	}
+
+	if (INPUT->GetButton(DOWN))
+	{
+		if (m_vSelectMenu != SM_EXIT)
+		{
+			m_vSelectMenu++;
+			for (auto& pUI : m_vArrowUI)
+				pUI->AddPosition(Vec3(0.f, -0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
+		}
+	}
+
+	if (INPUT->GetButton(ENTER))
+	{
+		switch (m_vSelectMenu)
+		{
+		case SM_START:
+		{
+			Destroy();
+			auto game = make_shared<Game>();
+			game->Init();
+			Engine::GetInstance()->SetApp(game);
+		}
+		break;
+		case SM_OPTION:
+		{
+
+		}
+		break;
+		case SM_EXIT:
+		{
+			PostQuitMessage(0);
+		}
+		break;
+		}
+	}
 }
 
 void IntroScene::Render()
@@ -43,6 +90,9 @@ void IntroScene::Render()
 
 void IntroScene::Destroy()
 {
+	m_vArrowUI.clear();
+	OBJECT->RemoveAll();
+	UI->RemoveAll();
 }
 
 void IntroScene::SetupEngineCamera()

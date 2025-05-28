@@ -19,6 +19,7 @@
 #include "UIManager.h"
 #include "ShapeData.h"
 #include "CollisionManager.h"
+#include "DxWrite.h"
 
 #include "PrefabToActor.h"
 
@@ -28,16 +29,14 @@ void TestYoooooon::Init()
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
 	//OBJECT->AddActorList(PRA->LoadAllPrefabs(".object.json"));
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
+	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	m_pPlayer = vlist[0];
 	OBJECT->AddActorList(vlist);
-	UI->AddUIList(PToA->LoadAllPrefabs(".ui.json"));
-	UI->AddUIList(PToA->LoadAllPrefabs(".uis.json"));
 
 	SetupEngineCamera();
-	SetupSkybox();
+	//SetupSkybox();
 	SetupSunLight();
 
 	CreateCollisionObject();
@@ -67,6 +66,7 @@ void TestYoooooon::Tick()
 
 void TestYoooooon::Render()
 {
+
 }
 
 void TestYoooooon::Destroy()
@@ -280,30 +280,38 @@ void TestYoooooon::SetupObjectEditorCallback()
 
 void TestYoooooon::SetupUIEditorCallback()
 {
-	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, const char* texPath, const char* shaderPath, TransformData actorData, Color _color, Vec4 sliceUV)
+	GUI->SetUIEditorCallback([this](shared_ptr<AUIActor> uiActor, PrefabUIData _prefabData)
 		{
 			uiActor->m_szName = L"UI";
 			auto meshComp = UStaticMeshComponent::CreatePlane();
 			uiActor->SetMeshComponent(meshComp);
+			uiActor->m_bTextUI = _prefabData.isTextUI;
 
 			auto mat = make_shared<UMaterial>();
 			mat->Load(
-				std::wstring(texPath, texPath + strlen(texPath)),
-				std::wstring(shaderPath, shaderPath + strlen(shaderPath))
+				to_mw(_prefabData.IdleTexturePath),
+				to_mw(_prefabData.ShaderPath)
 			);
 			meshComp->SetMaterial(mat);
 
-			uiActor->SetIdleTexture(TEXTURE->Get(to_mw(texPath)));
-			uiActor->SetHoverTexture(TEXTURE->Get(to_mw(texPath)));
-			uiActor->SetActiveTexture(TEXTURE->Get(to_mw(texPath)));
-			uiActor->SetSelectTexture(TEXTURE->Get(to_mw(texPath)));
+			uiActor->SetIdleTexture(TEXTURE->Get(to_mw(_prefabData.IdleTexturePath)));
+			uiActor->SetHoverTexture(TEXTURE->Get(to_mw(_prefabData.HoverTexturePath)));
+			uiActor->SetActiveTexture(TEXTURE->Get(to_mw(_prefabData.ActiveTexturePath)));
+			uiActor->SetSelectTexture(TEXTURE->Get(to_mw(_prefabData.SelectedTexturePath)));
 
 			uiActor->SetMeshComponent(meshComp);
-			uiActor->SetPosition(Vec3(actorData.Position));
-			uiActor->SetRotation(Vec3(actorData.Rotation));
-			uiActor->SetScale(Vec3(actorData.Scale));
-			uiActor->SetSliceData(sliceUV);
-			uiActor->SetColor(_color);
+			uiActor->SetPosition(Vec3(_prefabData.transform.Position));
+			uiActor->SetRotation(Vec3(_prefabData.transform.Rotation));
+			uiActor->SetScale(Vec3(_prefabData.transform.Scale));
+			uiActor->SetColor(Vec4(_prefabData.color));
+
+			uiActor->SetFontSize(_prefabData.FontSize);
+			uiActor->SetFontPath(to_mw(_prefabData.FontPath));
+			uiActor->SetText(to_mw(_prefabData.Text));
+
+			uiActor->SetSliceData(Vec4(_prefabData.SliceUV));
+
+			uiActor->SetPrefabData(_prefabData);
 
 			UI->AddUI(uiActor);
 		});

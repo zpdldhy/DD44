@@ -22,6 +22,8 @@
 #include "RenderStateManager.h"
 #include "EffectManager.h"
 
+bool g_bRangeVisibleMode;
+
 void Engine::Init()
 {
 	GET_SINGLE(Device)->Init();
@@ -41,7 +43,12 @@ void Engine::Init()
 		DXWRITE->Create();
 
 		if (_app->m_type != SCENE_TYPE::GAME)
+		{
 			GUI->Init();
+			g_bRangeVisibleMode = true;
+		}
+		else
+			g_bRangeVisibleMode = false;
 	}
 	_app->Init();
 
@@ -154,6 +161,8 @@ void Engine::Run()
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 		GUI->CreateImGuiWindow(_hInstance);
+
+	g_bRangeVisibleMode = true;
 
 	Init();
 

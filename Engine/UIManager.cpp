@@ -98,3 +98,10 @@ void UIManager::DeleteUI(UINT _iID)
         m_vUIList.erase(iter);
     }
 }
+
+void UIManager::RemoveAll()
+{
+    m_vUIList.clear();
+    m_vRenderUIList.clear();
+    m_iUIID = 0;
+}

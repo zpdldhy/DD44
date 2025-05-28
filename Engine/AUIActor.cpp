@@ -8,6 +8,7 @@ void AUIActor::Init()
 {
 	AActor::Init();
 	CreateUISlice();
+	CreateText();
 }
 
 void AUIActor::Tick()
@@ -31,11 +32,20 @@ void AUIActor::Tick()
 		GetMeshComponent()->GetMaterial()->SetTexture(m_pSelectTexture);
 	}
 
+	if (m_bTextUI)
+		UpdateText();
+
 	AActor::Tick();
 }
 
 void AUIActor::Render()
 {
+	if (m_bTextUI)
+	{
+		TextRender();
+		return;
+	}
+
 	if (m_pUISliceCB)
 	{
 		DC->UpdateSubresource(m_pUISliceCB.Get(), 0, nullptr, &m_tUISliceData, 0, 0);
@@ -43,6 +53,14 @@ void AUIActor::Render()
 	}
 
 	AActor::Render();
+}
+
+void AUIActor::TextRender()
+{
+	Vec2 pos;
+	pos.x = GetPosition().x + static_cast<float>(g_windowSize.x) / 2.0f;
+	pos.y = -(GetPosition().y - static_cast<float>(g_windowSize.y) / 2.0f);
+	m_pText->Draw(pos);
 }
 
 void AUIActor::CreateUISlice()
@@ -67,3 +85,22 @@ void AUIActor::CreateUISlice()
 		DX_CHECK(hr, _T("CreateUISliceBuffer Failed"));
 	}
 }
+
+void AUIActor::CreateText()
+{
+	m_pText = make_unique<Text>();
+	m_pFont = make_unique<Font>();
+	m_pFont->Create(m_szFontPath, 30.0f, m_tUISliceData.vColor);
+	UpdateText();
+}
+
+void AUIActor::UpdateText()
+{	
+	m_pFont->SetPath(m_szFontPath);
+	m_pFont->SetSize(m_fFontSize);
+	m_pFont->SetColor(m_tUISliceData.vColor);
+	m_pFont->SetAlignment(DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	Vec2 scale(GetScale().x, GetScale().y);
+	m_pText->Create(m_szText, scale, m_pFont.get());
+}
+

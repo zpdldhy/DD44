@@ -73,9 +73,10 @@ void ImGuiCore::Update()
 
 	// Press 'F1' key to pop-up UI Tool
 	if (INPUT->GetButton(GameKey::F1))
-	{
-		m_bEditorToolVisible = !m_bEditorToolVisible;
-	}
+		m_bEditorToolVisible = !m_bEditorToolVisible;	
+
+	if(INPUT->GetButton(GameKey::F2))
+		g_bRangeVisibleMode = !g_bRangeVisibleMode;
 
 	if (m_bEditorToolVisible)
 	{
