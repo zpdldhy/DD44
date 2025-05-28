@@ -45,14 +45,14 @@ void BatMovement::Tick()
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
 	{
 		// 여기 있어야 중복 막음
-		if (INPUT->GetButton(J))
+		if (INPUT->GetButton(K))
 		{
 			// Blood FX
 			Vec3 basePos = GetOwner()->GetPosition();
-			basePos.y += RandomRange(0.5, 2);
+			basePos.y += RandomRange(3, 4);
 			Vec3 look = GetOwner()->GetLook();
 			velocity = -look;
-			PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 
 
 			m_fHitFlashTimer = 1.f;  // 1초 동안
