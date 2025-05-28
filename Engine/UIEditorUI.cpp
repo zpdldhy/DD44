@@ -42,12 +42,7 @@ void UIEditorUI::DrawUI()
         // 초기값 세팅
         m_OnCreate(
             m_pUIActor,
-            m_vTextureList[0].c_str(),   // white.png
-            m_szShaderPath,
-            m_Trans,
-            Color(m_vColor),
-            Vec4(m_vSliceUV)
-        );
+            m_CurrentPrefab);
     }
 
     if (m_pUIActor == nullptr)
@@ -620,12 +615,7 @@ void UIEditorUI::LoadPrefab()
 			{
 				m_OnCreate(
 					make_shared<AUIActor>(),
-					prefabData.IdleTexturePath.c_str(),
-					prefabData.ShaderPath.c_str(),
-					prefabData.transform,
-					Color(prefabData.color),
-					Vec4(prefabData.SliceUV)
-				);
+                    prefabData);
 			}
 		}
     }

@@ -8,7 +8,7 @@ public:
 	void DrawUI();
 	void DrawVec3(const char* label, float* values);
 
-	void SetOnCreateCallback(std::function<void(shared_ptr<class AUIActor>, const char*, const char*, TransformData, Color, Vec4)> callback)
+	void SetOnCreateCallback(std::function<void(shared_ptr<class AUIActor>, PrefabUIData)> callback)
 	{
 		m_OnCreate = std::move(callback);
 	}
@@ -77,7 +77,7 @@ private:
 	vector<string> m_vPrefabNameList;
 	int m_iPrefabdIndex = 0;
 
-	std::function<void(shared_ptr<AUIActor>, const char*, const char*, TransformData, Color, Vec4)> m_OnCreate;
+	std::function<void(shared_ptr<AUIActor>, PrefabUIData)> m_OnCreate;
 
 private:
 	POINT m_ptCurrentMousePos = { 0, 0 };

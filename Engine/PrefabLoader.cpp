@@ -442,10 +442,13 @@ bool PrefabLoader::SaveUI(const PrefabUIData& _prefab, const std::string& _fileP
 
     j["IsTextUI"] = _prefab.isTextUI;
 
-    // position은 NDC로 변환해서 저장    
+    // scale, position은 NDC로 변환해서 저장    
 	auto transform = _prefab.transform;
     transform.Position[0] = transform.Position[0] / (static_cast<float>(g_windowSize.x) / 2.0f);
 	transform.Position[1] = transform.Position[1] / (static_cast<float>(g_windowSize.y) / 2.0f);
+
+    transform.Scale[0] = transform.Scale[0] / (static_cast<float>(g_windowSize.x) / 2.0f);
+    transform.Scale[1] = transform.Scale[1] / (static_cast<float>(g_windowSize.y) / 2.0f);
 
     SaveTransform(j, transform);
 
@@ -492,6 +495,9 @@ bool PrefabLoader::LoadUI(const std::string& _filePath, PrefabUIData& _prefab)
 
     LoadTransform(j, _prefab.transform);
 
+    _prefab.transform.Scale[0] *= (static_cast<float>(g_windowSize.x) / 2.0f);
+    _prefab.transform.Scale[1] *= (static_cast<float>(g_windowSize.y) / 2.0f);
+
 	_prefab.transform.Position[0] *= (static_cast<float>(g_windowSize.x) / 2.0f);
 	_prefab.transform.Position[1] *= (static_cast<float>(g_windowSize.y) / 2.0f);
 
@@ -532,6 +538,9 @@ bool PrefabLoader::SaveUIs(const vector<PrefabUIData>& _prefabs, const string& _
         auto transform = p.transform;
         transform.Position[0] = transform.Position[0] / (static_cast<float>(g_windowSize.x) / 2.0f);
         transform.Position[1] = transform.Position[1] / (static_cast<float>(g_windowSize.y) / 2.0f);
+
+        transform.Scale[0] = transform.Scale[0] / (static_cast<float>(g_windowSize.x) / 2.0f);
+        transform.Scale[1] = transform.Scale[1] / (static_cast<float>(g_windowSize.y) / 2.0f);
 
         SaveTransform(item, transform);
 
@@ -587,6 +596,9 @@ bool PrefabLoader::LoadUIs(const string& _filePath, vector<PrefabUIData>& _outPr
         // position은 NDC로 변환해서 로드
 
         LoadTransform(item, _prefab.transform);
+
+        _prefab.transform.Scale[0] *= (static_cast<float>(g_windowSize.x) / 2.0f);
+        _prefab.transform.Scale[1] *= (static_cast<float>(g_windowSize.y) / 2.0f);
 
         _prefab.transform.Position[0] *= (static_cast<float>(g_windowSize.x) / 2.0f);
         _prefab.transform.Position[1] *= (static_cast<float>(g_windowSize.y) / 2.0f);
