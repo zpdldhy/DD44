@@ -40,9 +40,9 @@ void AEffectActor::Tick()
     float endFactor = pow(1.0f - t, 2.5f);
 
     Vec3 scale;
-    scale.x = Lerp(m_vStartScale.x, m_vEndScale.x * .5f, growT);
-    scale.y = Lerp(m_vStartScale.y, m_vEndScale.y * .5f, growT);
-    scale.z = Lerp(m_vStartScale.z, m_vEndScale.z * .5f, growT);
+    scale.x = Lerp(m_vStartScale.x, m_vEndScale.x * 1.f, growT);
+    scale.y = Lerp(m_vStartScale.y, m_vEndScale.y * 1.f, growT);
+    scale.z = Lerp(m_vStartScale.z, m_vEndScale.z * 1.f, growT);
     SetScale(scale);
 
     m_fRemainTime -= TIMER->GetDeltaTime();

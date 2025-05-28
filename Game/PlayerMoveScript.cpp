@@ -90,7 +90,7 @@ void PlayerMoveScript::Tick()
 			basePos.y += RandomRange(0.5, 2);
 			Vec3 look = GetOwner()->GetLook();
 			velocity = -look;
-			PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 
 			m_fHitFlashTimer = 1.f;  // 1ÃÊ µ¿¾È
 			m_bIsFlashing = true;
