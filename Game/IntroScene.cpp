@@ -7,6 +7,7 @@
 #include "Input.h"
 #include "PrefabToActor.h"
 #include "Engine.h"
+#include "Timer.h"
 
 // Actor
 #include "ACameraActor.h"
@@ -27,8 +28,11 @@
 
 void IntroScene::Init()
 {
+	UI->SetFadeActor(PToA->MakeUI("../Resources/Prefab/UI_Fade.ui.json"));
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Intro_BackGround.uis.json"));
+	m_vMenu = PToA->MakeUIs("../Resources/Prefab/UI_Intro_Menu.uis.json");
 	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Intro_SelectArrow.uis.json");
+	UI->AddUIList(m_vMenu);
 	UI->AddUIList(m_vArrowUI);
 
 	SetupEngineCamera();
@@ -38,50 +42,7 @@ void IntroScene::Init()
 
 void IntroScene::Tick()
 {
-	if (INPUT->GetButton(UP))
-	{
-		if (m_vSelectMenu != SM_START)
-		{
-			m_vSelectMenu--;
-			for (auto& pUI : m_vArrowUI)
-				pUI->AddPosition(Vec3(0.f, +0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
-		}
-	}
-
-	if (INPUT->GetButton(DOWN))
-	{
-		if (m_vSelectMenu != SM_EXIT)
-		{
-			m_vSelectMenu++;
-			for (auto& pUI : m_vArrowUI)
-				pUI->AddPosition(Vec3(0.f, -0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
-		}
-	}
-
-	if (INPUT->GetButton(ENTER))
-	{
-		switch (m_vSelectMenu)
-		{
-		case SM_START:
-		{
-			Destroy();
-			auto game = make_shared<Game>();
-			game->Init();
-			Engine::GetInstance()->SetApp(game);
-		}
-		break;
-		case SM_OPTION:
-		{
-
-		}
-		break;
-		case SM_EXIT:
-		{
-			PostQuitMessage(0);
-		}
-		break;
-		}
-	}
+	UpdateUIState();
 }
 
 void IntroScene::Render()
@@ -90,6 +51,7 @@ void IntroScene::Render()
 
 void IntroScene::Destroy()
 {
+	m_vMenu.clear();
 	m_vArrowUI.clear();
 	OBJECT->RemoveAll();
 	UI->RemoveAll();
@@ -134,4 +96,84 @@ void IntroScene::SetupSunLight()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(pSunLight);
+}
+
+void IntroScene::UpdateUIState()
+{
+	if (INPUT->GetButton(UP))
+	{
+		if (m_vSelectMenu != SM_START)
+		{
+			m_vSelectMenu--;
+			for (auto& pUI : m_vArrowUI)
+				pUI->AddPosition(Vec3(0.f, +0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
+		}
+	}
+
+	if (INPUT->GetButton(DOWN))
+	{
+		if (m_vSelectMenu != SM_EXIT)
+		{
+			m_vSelectMenu++;
+			for (auto& pUI : m_vArrowUI)
+				pUI->AddPosition(Vec3(0.f, -0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
+		}
+	}
+
+	for (auto& menu : m_vMenu)
+	{
+		menu->SetColor(Color(0.5f, 0.5f, 0.5f, 1.f));
+	}
+
+	switch (m_vSelectMenu)
+	{
+	case SM_START:
+	{
+		m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+
+		if (INPUT->GetButton(ENTER))
+		{
+			UI->DoFadeIn();
+			m_bSelectStartButton = true;
+		}
+	}
+	break;
+	case SM_OPTION:
+	{
+		m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+
+	}
+	break;
+	case SM_EXIT:
+	{
+		m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+
+		if (INPUT->GetButton(ENTER))
+			PostQuitMessage(0);
+	}
+	break;
+	}
+
+	// UIThrow
+	if (m_bSelectStartButton)
+	{		
+		m_bthrowUI = true;
+		m_bSelectStartButton = false;
+	}
+
+	// Do FadeIn
+	if (m_bthrowUI)
+	{
+		UI->DoFadeIn();
+		m_bthrowUI = false;
+	}
+
+	// Select Start Button
+	if (UI->GetFadeWorkDone())
+	{
+		Destroy();
+		auto game = make_shared<Game>();
+		game->Init();
+		Engine::GetInstance()->SetApp(game);
+	}
 }

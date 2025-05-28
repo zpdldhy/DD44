@@ -37,6 +37,7 @@ void UIEditorUI::DrawUI()
     {
         m_pUIActor = make_shared<AUIActor>();
 
+        UpdatePrefabData();
         ResetData();
 
         // 초기값 세팅
