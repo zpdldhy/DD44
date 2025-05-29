@@ -19,6 +19,8 @@ void BatMovement::Init()
 
 	currentState = idle;
 	currentState->Enter();
+
+	m_bClockWise = (RandomRange(0, 10) > 5.0f) ? true: false;
 }
 
 
@@ -68,10 +70,17 @@ void BatMovement::Tick()
 		float deltaTime = TIMER->GetDeltaTime();
 		{
 			// 획일성을 줄이기 위해 
-			rotateSpeed = RandomRange((originRotateSpeed - 0.005f), (originRotateSpeed + 0.01f));
+			rotateSpeed = RandomRange((originRotateSpeed - 0.3f), (originRotateSpeed + 0.5f));
 
 		}
-		angle += rotateSpeed * deltaTime;
+		if (m_bClockWise)
+		{
+			angle -= rotateSpeed * deltaTime; // 시계
+		}
+		else
+		{
+			angle += rotateSpeed * deltaTime; // 반시계
+		}
 
 		// 2PI 넘으면 되돌림
 		if (angle > 2 * DD_PI) angle -= 2 * DD_PI;
@@ -88,7 +97,15 @@ void BatMovement::Tick()
 
 		// direction을 이용한 회전
 		Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
-		Vec3 moveDir = tempUp.Cross(direction); // 반시계 방향
+		Vec3 moveDir;
+		if (m_bClockWise)
+		{
+			moveDir = direction.Cross(tempUp); // 시계 방향
+		}
+		else
+		{
+			moveDir = tempUp.Cross(direction); // 반시계 방향
+		}
 
 		// 회전 TargetPos 바라보기
 		float targetYaw = atan2f(moveDir.x, moveDir.z);

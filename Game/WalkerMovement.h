@@ -25,12 +25,14 @@ private:
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
 	// Movement
+	float m_wait;
+	bool m_bWait;
 	Vec3 m_vPos[4];
 	Vec3 m_vCurrentTarget;
 	int m_currentPosIdx;
 	float m_half = 5;
 	Vec3 m_vDistance;
-	float m_walkSpeed = 0.003;
+	float m_walkSpeed = 0.008;
 	float m_fRotationSpeed = 5.0f;
 	bool m_rotate;
 	Vec3 moveDir;

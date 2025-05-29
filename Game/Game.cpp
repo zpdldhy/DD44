@@ -24,9 +24,11 @@
 #include "BatMovement.h"
 #include "WalkerMovement.h"
 #include "CollisionManager.h"
+#include "EffectManager.h"
 
 void Game::Init()
 {
+	EFFECT->Init();
 	// Asset ·Îµù
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));

@@ -16,13 +16,15 @@ public:
 	Vec3 m_vPrevPos;
 	float m_fLerp = -0.05;
 	float m_fLerpOffset = 0.005f;
-	float m_fRadius = 8.0f;
+	float m_fRadius = 5.0f;
 	float angle = 0.0f; 
 	float angularSpeed = 1.0f;
 	float rotateSpeed = 0.35f;
 	float originRotateSpeed = 0.35f;
 	float m_fRotationSpeed = 8.0f;
 	bool m_bCanStartAttack = false;
+	//
+	bool m_bClockWise = false;
 	//
 	Vec3 m_vLastMoveDir;
 	Vec3 velocity;

@@ -16,9 +16,15 @@ public:
 	float m_fRollSpeed  = 15.0f;
 	float m_fCurrentSpeed;
 	float m_fRotationSpeed = 8.0f;
+
+	bool m_bDamageCoolTime = false;
 	float m_fDamageCoolTime = 1.0f;
 	bool m_bCanBeHit = true;
-	bool m_bCountCoolTime = false;
+
+	bool m_bRollCoolTime = false;
+	float m_fRollCoolTime = 0.3f;
+	bool m_bCanRoll = true;
+
 	Vec3 m_vLook;
 	Vec3 m_vRight;
 	Vec3 m_vLastMoveDir;

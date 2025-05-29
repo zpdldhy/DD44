@@ -62,14 +62,24 @@ void PlayerMoveScript::Tick()
 	UpdateArrowUI();
 
 #pragma region STATE_ANIM
-	if (m_bCountCoolTime)
+	if (m_bDamageCoolTime)
 	{
 		m_fDamageCoolTime -= TIMER->GetDeltaTime();
 		if (m_fDamageCoolTime < 0)
 		{
-			m_bCountCoolTime = false;
+			m_bDamageCoolTime = false;
 			m_fDamageCoolTime = 1.0f;
 			m_bCanBeHit = true;
+		}
+	}
+	if (m_bRollCoolTime)
+	{
+		m_fRollCoolTime -= TIMER->GetDeltaTime();
+		if (m_fRollCoolTime < 0)
+		{
+			m_bRollCoolTime = false;
+			m_fRollCoolTime = 0.5f;
+			m_bCanRoll = true;
 		}
 	}
 	currentState->Tick();
@@ -89,7 +99,11 @@ void PlayerMoveScript::Tick()
 			}
 			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
 			{
-				m_bCountCoolTime = true;
+				m_bDamageCoolTime = true;
+			}
+			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
+			{
+				m_bRollCoolTime = true;
 			}
 			ChangetState(idle);
 		}
@@ -140,11 +154,12 @@ void PlayerMoveScript::Tick()
 		}
 #pragma endregion
 
-		if (INPUT->GetButton(SPACE))
+		if (INPUT->GetButton(SPACE) && m_bCanRoll)
 		{
 			// ±¸¸£±â
 			m_vRollLook = GetOwner()->GetLook();
 			ChangetState(roll);
+			m_bCanRoll = false;
 		}
 	}
 #pragma endregion
@@ -159,22 +174,22 @@ void PlayerMoveScript::Tick()
 	m_vRight.Normalize();
 
 	Vec3 moveDir;
-	if (INPUT->GetButtonDown(UP))
+	if (INPUT->GetButtonDown(W))
 	{
 		moveDir += m_vLook;
 	}
 
-	if (INPUT->GetButtonDown(LEFT))
+	if (INPUT->GetButtonDown(A))
 	{
 		moveDir += -m_vRight;
 	}
 
-	if (INPUT->GetButtonDown(DOWN))
+	if (INPUT->GetButtonDown(S))
 	{
 		moveDir += -m_vLook;
 	}
 
-	if (INPUT->GetButtonDown(RIGHT))
+	if (INPUT->GetButtonDown(D))
 	{
 		moveDir += m_vRight;
 	}

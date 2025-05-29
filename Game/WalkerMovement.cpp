@@ -11,8 +11,8 @@
 void WalkerMovement::Init()
 {
 	// position
-	float hypotenuse = sqrt(2 *m_half * m_half);
-	auto p = GetOwner()->GetPosition();
+	
+	m_bWait = true;
 	m_vPos[0] = GetOwner()->GetPosition() - m_half * Vec3(1, 0, 1);
 	m_vPos[1] = GetOwner()->GetPosition() - m_half * Vec3(1, 0, -1);
 	m_vPos[2] = GetOwner()->GetPosition() - m_half * Vec3(-1, 0, -1);
@@ -47,6 +47,19 @@ void WalkerMovement::Tick()
 {
 	Flashing();
 	LerpRotate();
+	if (m_bWait)
+	{
+		m_wait -= TIMER->GetDeltaTime();
+		if (m_wait < 0)
+		{
+			ChangeState(walk);
+			m_bWait = false;
+		}
+		else
+		{
+			return;
+		}
+	}
 	currentState->Tick();
 	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_DEATH)
 	{
@@ -68,7 +81,7 @@ void WalkerMovement::Tick()
 	}
 
 	// 걷는 상황일 때 위치 조절해가며 걷기
-	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_WALK)
+	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_WALK && !m_bWait)
 	{
 		Vec3 pos = GetOwner()->GetPosition();
 		Vec3 diff = m_vCurrentTarget - pos;
@@ -88,6 +101,10 @@ void WalkerMovement::Tick()
 			Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
 			moveDir = tempUp.Cross(direction); // 반시계 방향
 			m_rotate = true;
+
+			// 랜덤 time 대기
+			m_bWait = true;
+			m_wait = RandomRange(0.0f, 1.0f);
 		}
 		else
 		{
