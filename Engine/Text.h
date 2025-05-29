@@ -9,8 +9,8 @@ class Font
 	wstring m_szFontPath = L"";
 	float m_fFontSize = 20.0f;
 	Color m_color = { 0.f, 0.f, 0.f, 1.f };
-	DWRITE_TEXT_ALIGNMENT m_horizontal = DWRITE_TEXT_ALIGNMENT_CENTER;
-	DWRITE_PARAGRAPH_ALIGNMENT m_vertical = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
+	DWRITE_TEXT_ALIGNMENT m_horizontal = DWRITE_TEXT_ALIGNMENT_JUSTIFIED;
+	DWRITE_PARAGRAPH_ALIGNMENT m_vertical = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;
 
 public:
 	HRESULT Create(const wstring& _szFontPath, float _fFontSize, Color _color);

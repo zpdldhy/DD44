@@ -19,6 +19,7 @@ public:
 
 	float time;
 
+	// UI
 	vector<shared_ptr<class AUIActor>> m_vHP;
 	vector<shared_ptr<class AUIActor>> m_vArrow;
 

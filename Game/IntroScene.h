@@ -26,8 +26,16 @@ private:
 	void SetupSkybox();
 	void SetupSunLight();
 
+	void UpdateUIState();
+
 private:
+	vector<shared_ptr<class AUIActor>> m_vBackGround;
+	vector<shared_ptr<class AUIActor>> m_vMenu;
 	vector<shared_ptr<class AUIActor>> m_vArrowUI;
-	UINT m_vSelectMenu = 0;
+	UINT m_vSelectMenu = 0;	
+	float m_vDefaultSelectY = 0.f;
+	bool m_bSelectStartButton = false;	
+	bool m_bSelectEndButton = false;
+	bool m_bthrowUI = false;	
 };
 

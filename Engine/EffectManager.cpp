@@ -123,9 +123,9 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
 
     // 2. EndScale은 방향 기반 + 랜덤 요소로 찢어짐 효과
     Vec3 endScale;
-    endScale.x = Lerp(0.8f, 1.3f, RandomRange(0.0f, 1.0f)) + absDir.x * 3.0f;
+    endScale.x = Lerp(0.8f, 1.3f, RandomRange(0.0f, 1.0f)) + absDir.x * 2.0f;
     endScale.y = Lerp(0.8f, 1.3f, RandomRange(0.0f, 1.0f)) + absDir.y * 0.3f; // y는 작게
-    endScale.z = Lerp(0.8f, 1.3f, RandomRange(0.0f, 1.0f)) + absDir.z * 3.0f;
+    endScale.z = Lerp(0.8f, 1.3f, RandomRange(0.0f, 1.0f)) + absDir.z * 2.0f;
 
     actor->SetEndScale(endScale);
     // Billboard용 월드 행렬 구성

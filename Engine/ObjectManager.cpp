@@ -128,7 +128,13 @@ void ObjectManager::RemoveAll()
 
 shared_ptr<class AActor> ObjectManager::GetActor(UINT _iIndex)
 {
-	return m_vActorList.find(_iIndex)->second;
+	auto it = m_vActorList.find(_iIndex);
+	if (it != m_vActorList.end())
+	{
+		return it->second;
+	}
+
+	return nullptr;
 }
 
 const map<UINT, shared_ptr<AActor>>& ObjectManager::GetActorList() const

@@ -18,6 +18,7 @@
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
+#include "Timer.h"
 
 #include "PrefabToActor.h"
 #include "BatMovement.h"
@@ -50,14 +51,12 @@ void Game::Init()
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
 	UI->AddUIList(m_vHP);
 	UI->AddUIList(m_vArrow);
+	UI->DoFadeOut();
 
 	SetupEngineCamera();
 	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
-
-
-
 }
 
 void Game::Tick()
@@ -126,7 +125,7 @@ void Game::SetupSkybox()
 	m_pSky->SetMeshComponent(m_pSkyMesh);
 
 	shared_ptr<UMaterial> material = make_shared<UMaterial>();
-	material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
+	material->Load(L"../Resources/Texture/skypano.png", L"../Resources/Shader/Sky.hlsl");
 	m_pSkyMesh->SetMaterial(material);
 
 	OBJECT->AddActor(m_pSky);

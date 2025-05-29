@@ -41,7 +41,7 @@ HRESULT Font::CreateTextFormat(const wstring& _szFontName, float _fFontSize)
 	//텍스트 포맷 생성
 	HRESULT hr = DXWRITE->m_pDxWrite->CreateTextFormat(
 		_szFontName.c_str(), NULL,
-		DWRITE_FONT_WEIGHT_REGULAR,
+		DWRITE_FONT_WEIGHT_NORMAL,
 		DWRITE_FONT_STYLE_NORMAL,
 		DWRITE_FONT_STRETCH_NORMAL,
 		_fFontSize, L"ko-kr",
@@ -97,9 +97,6 @@ void Font::SetColor(Color _color)
 
 void Font::SetAlignment(DWRITE_TEXT_ALIGNMENT _textAlign, DWRITE_PARAGRAPH_ALIGNMENT _paraAlign)
 {
-	if (m_horizontal == _textAlign && m_vertical == _paraAlign)
-		return;
-
 	if (m_pTextFormat)
 	{
 		m_pTextFormat->SetTextAlignment(_textAlign);

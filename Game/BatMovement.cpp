@@ -45,10 +45,10 @@ void BatMovement::Tick()
 		{
 			// Blood FX
 			Vec3 basePos = GetOwner()->GetPosition();
-			basePos.y += RandomRange(0.5, 2);
+			basePos.y += RandomRange(3, 4);
 			Vec3 look = GetOwner()->GetLook();
 			velocity = -look;
-			PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 
 
 			m_fHitFlashTimer = 1.f;  // 1ÃÊ µ¿¾È
