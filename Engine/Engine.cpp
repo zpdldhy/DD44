@@ -94,7 +94,11 @@ void Engine::Frame()
 	}
 
 	if (_app->m_type != SCENE_TYPE::GAME)
+	{
+		if (INPUT->GetButton(V))
+			Device::GetInstance()->ChangeWireFrame();
 		GUI->Update();
+	}
 }
 
 void Engine::Render()
@@ -102,8 +106,10 @@ void Engine::Render()
 	GET_SINGLE(Device)->PreRender();
 	DXWRITE->BeginDraw();
 
+#ifndef DEBUG
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
 	DXWRITE->Draw(rt, TIMER->m_szTime);
+#endif // DEBUG
 
 	CAMERA->Render(CameraViewType::CVT_ACTOR);
 
