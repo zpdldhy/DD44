@@ -13,6 +13,7 @@
 #include "WalkerMovement.h"
 #include "CollisionManager.h"
 #include "EffectManager.h"
+#include "Sound.h"
 
 // Actor
 #include "ATerrainTileActor.h"
