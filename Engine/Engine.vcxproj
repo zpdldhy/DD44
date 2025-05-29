@@ -169,7 +169,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="AssimpLoader.h" />
     <ClInclude Include="AUIActor.h" />
     <ClInclude Include="CharacterEditorUI.h" />
-    <ClInclude Include="CollisionScript.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="EditorData.h" />
     <ClInclude Include="EffectEditorUI.h" />
@@ -269,7 +268,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="AssimpLoader.cpp" />
     <ClCompile Include="AUIActor.cpp" />
     <ClCompile Include="CharacterEditorUI.cpp" />
-    <ClCompile Include="CollisionScript.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="EffectEditorUI.cpp" />
     <ClCompile Include="CollisionManager.cpp" />

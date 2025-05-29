@@ -10,14 +10,12 @@ void Collision::Init()
 		auto boxB = static_pointer_cast<UBoxComponent>(b->GetShapeComponent());
 
 		//충돌 검사 로직
-		if (Collision::CheckOBBToOBB(boxA->GetBounds(), boxB->GetBounds())) {
+		if (Collision::CheckOBBToOBB(boxA->GetBounds(), boxB->GetBounds()))
+		{
 			// 충돌 처리
-			int i = 0;
-			boxA->AddCollision(boxB);
-			boxB->AddCollision(boxA);
-		};
-		boxA->CollisionAction();   // 여기서 어떤 정보를 넘겨줘야 할까?
-		boxB->CollisionAction();
+			boxA->AddCollision(b->m_Index);
+			boxB->AddCollision(a->m_Index);
+		}
 		};
 
 	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_SPHERE}] = [](auto a, auto b) {

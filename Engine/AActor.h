@@ -16,6 +16,18 @@ enum class ComponentType
 	CT_COUNT,
 };
 
+enum class ActorType
+{
+	AT_NONE,
+	AT_CHARACTER,
+	AT_MONSTER,
+	AT_OBJECT,
+	AT_GROUND,
+	AT_STAIR,
+	AT_PROJECTILE,
+	AT_COUNT,
+};
+
 class AActor : public enable_shared_from_this<AActor>
 {
 public:
@@ -39,6 +51,7 @@ public:
 	bool m_bDelete = false;	
 	bool m_bUpdateQuadTree = false;
 	bool m_bUseStencil = false;
+	ActorType m_eActorType = ActorType::AT_NONE;
 
 	//--------------------------------------------------------------------------------------
 	// Component

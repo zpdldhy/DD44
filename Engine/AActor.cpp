@@ -50,7 +50,7 @@ void AActor::Tick()
 
 	if (GetShapeComponent())
 	{
-		GetShapeComponent()->ReserCollisionList();
+		GetShapeComponent()->ResetCollisionList();
 	}
 }
 

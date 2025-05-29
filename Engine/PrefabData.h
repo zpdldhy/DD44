@@ -1,23 +1,24 @@
 #pragma once
 #include "EditorData.h"
 
-struct PrefabData
-{
-    std::string Name;
-    std::string ActorType;
-
-    std::string MeshPath;
-    std::string ShaderPath;
-    std::string TexturePath;
-
-    Vec3 Scale;
-    Vec3 Rotation;
-    Vec3 Position;
-};
+//struct PrefabData
+//{
+//    std::string Name;
+//    std::string ActorType;
+//
+//    std::string MeshPath;
+//    std::string ShaderPath;
+//    std::string TexturePath;
+//
+//    Vec3 Scale;
+//    Vec3 Rotation;
+//    Vec3 Position;
+//};
 
 struct PrefabObjectData
 {
     std::string Name;
+    UINT m_eActorType;
 
     std::string MeshPath;
     std::string ShaderPath;
@@ -39,6 +40,7 @@ struct PrefabObjectData
 struct PrefabCharacterData
 {
     std::string Name;
+    UINT m_eActorType;
 
     std::string RootMeshPath;
     std::string MeshPath;

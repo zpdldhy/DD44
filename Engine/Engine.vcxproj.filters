@@ -317,9 +317,6 @@
     <ClInclude Include="LightData.h">
       <Filter>Headers\Data</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionScript.h">
-      <Filter>Component\Collision</Filter>
-    </ClInclude>
     <ClInclude Include="UIEditorUI.h">
       <Filter>Utils\Editor</Filter>
     </ClInclude>
@@ -587,9 +584,6 @@
     </ClCompile>
     <ClCompile Include="ShapeData.cpp">
       <Filter>Headers\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisionScript.cpp">
-      <Filter>Component\Collision</Filter>
     </ClCompile>
     <ClCompile Include="UIEditorUI.cpp">
       <Filter>Utils\Editor</Filter>
