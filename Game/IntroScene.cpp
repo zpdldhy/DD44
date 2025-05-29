@@ -111,6 +111,12 @@ void IntroScene::SetupSunLight()
 
 void IntroScene::UpdateUIState()
 {
+	if (m_iPrevMenu != m_vSelectMenu)
+	{
+		m_iPrevMenu = m_vSelectMenu;
+		SOUNDMANAGER->GetPtr(ESoundType::Hover)->PlayEffect2D();
+	}
+
 	if (!m_bSelectStartButton || !m_bSelectEndButton)
 	{
 		Vec3 idle(cosf(TIMER->GetGameTime() * 7.f) * 0.2f, 0.f, 0.f);
@@ -152,6 +158,8 @@ void IntroScene::UpdateUIState()
 					m_bSelectStartButton = true;
 				else if (iSelect == 2)
 					m_bSelectEndButton = true;
+
+				SOUNDMANAGER->GetPtr(ESoundType::Click)->PlayEffect2D();
 			}		
 
 			menu->SetColor(Color(0.5f, 0.5f, 0.5f, 1.f));
@@ -172,7 +180,10 @@ void IntroScene::UpdateUIState()
 			}
 
 			if (INPUT->GetButton(ENTER))
+			{
 				m_bSelectStartButton = true;
+				SOUNDMANAGER->GetPtr(ESoundType::Click)->PlayEffect2D(); // 추가
+			}
 		}
 		break;
 		case SM_OPTION:
@@ -200,7 +211,10 @@ void IntroScene::UpdateUIState()
 			}
 
 			if (INPUT->GetButton(ENTER))
+			{
 				m_bSelectEndButton = true;
+				SOUNDMANAGER->GetPtr(ESoundType::Click)->PlayEffect2D(); // 추가
+			}
 		}
 		break;
 		}
