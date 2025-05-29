@@ -31,7 +31,7 @@
 
 void Game::Init()
 {
-	//EFFECT->Init();
+	EFFECT->Init();
 	// Asset ·Îµù
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
