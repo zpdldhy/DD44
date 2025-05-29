@@ -44,6 +44,7 @@ void CameraManager::Render(CameraViewType _ViewType)
 
 	DC->UpdateSubresource(m_pCameraCB.Get(), 0, nullptr, &m_CameraData, 0, 0);
 	DC->VSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
+	DC->PSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
 }
 
 void CameraManager::Destroy()

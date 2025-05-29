@@ -13,6 +13,7 @@
 #include "WalkerMovement.h"
 #include "CollisionManager.h"
 #include "EffectManager.h"
+#include "Sound.h"
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -52,6 +53,7 @@ void Game::Init()
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
 	UI->DoFadeOut();
 
+	EFFECT->Init();
 	SetupEngineCamera();
 	SetupGameCamera();
 	SetupSkybox();
@@ -60,6 +62,11 @@ void Game::Init()
 
 void Game::Tick()
 {
+	//bgm
+	{
+		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
+	}
+	
 	if (INPUT->GetButton(O))
 	{
 		if (m_bEnginCamera)

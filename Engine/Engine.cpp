@@ -21,6 +21,7 @@
 #include "ParticleManager.h"
 #include "RenderStateManager.h"
 #include "EffectManager.h"
+#include "Sound.h"
 
 bool g_bRangeVisibleMode;
 
@@ -42,6 +43,7 @@ void Engine::Init()
 		LIGHTMANAGER->Init();
 		INPUT->Init();
 		DXWRITE->Create();
+		SOUNDMANAGER->LoadAllSounds();
 
 		if (_app->m_type != SCENE_TYPE::GAME)
 		{
@@ -58,6 +60,7 @@ void Engine::Init()
 		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
+		
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
