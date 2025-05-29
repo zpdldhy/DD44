@@ -147,6 +147,19 @@ void SoundManager::LoadAllSounds()
 {
 	Load(ESoundType::Intro, L"../Resources/Sound/intro.mp3");
 	Load(ESoundType::Stage0, L"../Resources/Sound/state0.mp3");
+	Load(ESoundType::Walk, L"../Resources/Sound/hero_walk_footsteps_stone_louder.wav");
+	Load(ESoundType::Dash, L"../Resources/Sound/hero_dash.wav");
+	Load(ESoundType::Slash, L"../Resources/Sound/hero_slash.wav");
+	Load(ESoundType::Hit, L"../Resources/Sound/hero_damaged.wav");
+
+	Load(ESoundType::Attack_Bat, L"../Resources/Sound/bat_attack.wav");
+	Load(ESoundType::Enemy_Damaged, L"../Resources/Sound/enemy_damage.wav");
+
+
+	Load(ESoundType::Hover, L"../Resources/Sound/ui_hover.wav");
+	Load(ESoundType::Click, L"../Resources/Sound/ui_save.wav");
+
+	
 }
 
 Sound* SoundManager::GetPtr(ESoundType type)

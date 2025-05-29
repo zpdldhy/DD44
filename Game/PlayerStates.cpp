@@ -3,6 +3,7 @@
 #include "AActor.h"
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
+#include "Sound.h"
 
 
 PlayerIdleState::PlayerIdleState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_IDLE)
@@ -47,6 +48,8 @@ void PlayerWalkState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int idleIndex = animInstance->GetAnimIndex(L"Run");
 	animInstance->SetCurrentAnimTrack(idleIndex);
+
+	SOUNDMANAGER->GetPtr(ESoundType::Walk)->Play2D();
 }
 
 void PlayerWalkState::Tick()
@@ -57,6 +60,7 @@ void PlayerWalkState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	SOUNDMANAGER->GetPtr(ESoundType::Walk)->Stop();
 }
 
 PlayerAttackState::PlayerAttackState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_ATTACK)
@@ -69,6 +73,7 @@ void PlayerAttackState::Enter()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = true;
+	SOUNDMANAGER->GetPtr(ESoundType::Walk)->PlayEffect2D();
 
 	// 애니메이션 Attack 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();

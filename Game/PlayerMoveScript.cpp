@@ -258,6 +258,11 @@ void PlayerMoveScript::Tick()
 
 void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
 {
+	if (_state == currentState)
+	{
+		return;
+	}
+
 	if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
 		return;
@@ -300,6 +305,7 @@ void PlayerMoveScript::Slash()
 			m_bSlashPlaying = false;
 		}
 	}
+
 }
 
 void PlayerMoveScript::SetUI()

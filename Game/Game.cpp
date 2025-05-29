@@ -44,6 +44,7 @@ void Game::Init()
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
+	m_pPlayer->SetUseStencil(true);
 	OBJECT->AddActor(m_pPlayer);
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
@@ -68,7 +69,7 @@ void Game::Tick()
 {
 	//bgm
 	{
-		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
+		//SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
 	}
 	
 	if (INPUT->GetButton(O))
