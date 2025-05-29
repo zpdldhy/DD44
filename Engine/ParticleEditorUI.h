@@ -2,13 +2,6 @@
 #include "PrefabLoader.h"
 #include "EditorData.h"
 
-enum class EParticleType
-{
-	Default = 0,
-	Fire,
-};
-
-
 class ParticleEditorUI
 {
 public:

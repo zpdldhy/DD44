@@ -8,9 +8,9 @@ AFireParticleActor::AFireParticleActor()
     m_vRandomFreq = Vec3(RandomRange(1.0f, 3.0f), RandomRange(1.5f, 4.0f), 0.0f);
     m_vRandomOffset = Vec3(RandomRange(0.0f, 100.0f), RandomRange(0.0f, 100.0f), 0.0f);
 
-    m_fFlickerValue = 0.0f;
     m_bBaseInitialized = false;
     m_fTimeOffset = RandomRange(0.0f, 100.0f); 
+    m_fLocalTime = 0.0f;
 }
 
 void AFireParticleActor::Tick()
@@ -22,13 +22,13 @@ void AFireParticleActor::Tick()
         m_bBaseInitialized = true;
     }
 
-    //float t = TIMER->GetGameTime();
-    float t = TIMER->GetGameTime() + m_fTimeOffset;
+    m_fLocalTime += TIMER->GetDeltaTime();
 
-    float x = sin(t * m_vRandomFreq.x + m_vRandomOffset.x) * m_vAmplitude.x;
-    float y = sin(t * m_vRandomFreq.y + m_vRandomOffset.y) * m_vAmplitude.y;
+    float t = m_fLocalTime + m_fTimeOffset;
 
-    // 랜덤 flicker에 보간 적용
+    float x = sinf(t * m_vRandomFreq.x) * m_vAmplitude.x;
+    float y = sinf(t * m_vRandomFreq.y) * m_vAmplitude.y;
+
     float targetFlicker = RandomRange(-0.03f, 0.03f);
     m_fFlickerValue = Lerp(m_fFlickerValue, targetFlicker, TIMER->GetDeltaTime() * 5.0f);
 

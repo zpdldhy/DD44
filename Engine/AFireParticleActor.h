@@ -8,20 +8,26 @@ public:
 
     virtual void Tick() override;
 
-private:
-    //Vec3 m_vBasePosition;
-    //Vec3 m_vAmplitude = { 1.0f, 1.5f, 0.0f }; // 흔들림 강도
-    //float m_fSpeed = 2.0f;                   // 진동 속도
-    //float m_fOffset = 0.0f;                  // 위상차
-    //bool m_bBaseInitialized = false;
+    Vec3 GetAmplitude() { return m_vAmplitude; }
+    Vec3 GetRandomFreq() { return m_vRandomFreq; }
+    Vec3 GetRandomOffset() { return m_vRandomOffset; }
+    float GetTimeOffset() { return m_fTimeOffset; }
 
-    Vec3 m_vBasePosition;
+    void SetAmplitude(const Vec3& _Amplitude) { m_vAmplitude = _Amplitude; }
+    void SetRandomFreq(const Vec3& _RandomFreq) { m_vRandomFreq = _RandomFreq; }
+    void SetRandomOffset(const Vec3& _RandomOffset) { m_vRandomOffset = _RandomOffset; }
+    void SetTimeOffset(float _TimeOffset) { m_fTimeOffset = _TimeOffset; }
+
+private: 
     Vec3 m_vAmplitude;
     Vec3 m_vRandomFreq;
     Vec3 m_vRandomOffset;
 
-    float m_fFlickerValue = 0.0f;
     float m_fTimeOffset = 0.0f;
+    float m_fLocalTime = 0.0f;
+    float m_fFlickerValue = 0.0f;
 
+    Vec3 m_vBasePosition;
     bool m_bBaseInitialized;
+    
 };

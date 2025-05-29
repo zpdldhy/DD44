@@ -11,6 +11,7 @@
 #include "APawn.h"
 #include "AUIActor.h"
 #include "AParticleActor.h"
+#include "AFireParticleActor.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -349,7 +350,21 @@ vector<shared_ptr<class AParticleActor>> PrefabToActor::MakeParticleGroup(const 
 	{
 		for (auto& p : group.Particles)
 		{
-			auto newParticle = make_shared<AParticleActor>();
+			shared_ptr<AParticleActor> newParticle;
+
+			if (p.Type == EParticleType::Fire)
+			{
+				auto fire = make_shared<AFireParticleActor>();
+				fire->SetAmplitude(p.Amplitude);
+				fire->SetRandomFreq(p.RandomFreq);
+				fire->SetRandomOffset(p.RandomOffset);
+				fire->SetTimeOffset(p.TimeOffset);
+				newParticle = fire;
+			}
+			else
+			{
+				newParticle = make_shared<AParticleActor>();
+			}
 
 			// 트랜스폼
 			newParticle->SetPosition(p.Translation);
@@ -364,7 +379,7 @@ vector<shared_ptr<class AParticleActor>> PrefabToActor::MakeParticleGroup(const 
 
 			newParticle->SetMeshComponent(mesh);
 
-			// 애니메이션 세팅 (내부 처리용)
+			// 애니메이션 세팅
 			newParticle->SetUV(p.UVStart, p.UVEnd);
 			newParticle->InitSpriteAnimation(p.Divisions, p.Duration);
 			newParticle->SetLoop(p.bLoop);
