@@ -35,6 +35,7 @@ private:
 	UINT m_vSelectMenu = 0;	
 	float m_vDefaultSelectY = 0.f;
 	bool m_bSelectStartButton = false;	
+	bool m_bSelectEndButton = false;
 	bool m_bthrowUI = false;	
 };
 
