@@ -19,6 +19,7 @@
 #include "PlayerMoveScript.h"
 #include "BatMovement.h"
 #include "WalkerMovement.h"
+#include "BettyMovement.h"
 
 unique_ptr<ActorLoader> PrefabToActor::actorLoader = nullptr;
 unique_ptr<MeshLoader> PrefabToActor::meshLoader = nullptr;
@@ -104,9 +105,11 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 		actor->SetRotation(Vec3(characterData.transform.Rotation));
 		actor->SetScale(Vec3(characterData.transform.Scale));
 
+		// 추후 script manager 만들어 수정할 예정
 		if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 		if (characterData.ScriptType == 2) { actor->AddScript(std::make_shared<BatMovement>()); }
 		if (characterData.ScriptType == 3) { actor->AddScript(std::make_shared<WalkerMovement>()); }
+		if (characterData.ScriptType == 4) { actor->AddScript(std::make_shared<BettyMovement>()); }
 
 		if (characterData.camera.isUse)
 		{

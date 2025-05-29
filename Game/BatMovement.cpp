@@ -43,7 +43,7 @@ void BatMovement::Tick()
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
 	{
 		Vec3 distance = player.lock()->GetPosition() - GetOwner()->GetPosition();
-		if (distance.Length() < 3.0f && INPUT->GetButton(LCLICK))
+		if (distance.Length() < 4.0f && INPUT->GetButton(LCLICK))
 		{
 			// Blood FX
 			Vec3 basePos = GetOwner()->GetPosition();

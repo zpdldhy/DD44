@@ -142,6 +142,8 @@
   <ItemGroup>
     <ClInclude Include="BatMovement.h" />
     <ClInclude Include="BatStates.h" />
+    <ClInclude Include="BettyMovement.h" />
+    <ClInclude Include="BettyStates.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EnemyState.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
@@ -156,6 +158,7 @@
     <ClInclude Include="PrefabToActor.h" />
     <ClInclude Include="PlayerStates.h" />
     <ClInclude Include="Sample.h" />
+    <ClInclude Include="TempBossCamera.h" />
     <ClInclude Include="TestPlayer.h" />
     <ClInclude Include="TestSJ.h" />
     <ClInclude Include="TestSY.h" />
@@ -168,6 +171,8 @@
   <ItemGroup>
     <ClCompile Include="BatMovement.cpp" />
     <ClCompile Include="BatStates.cpp" />
+    <ClCompile Include="BettyMovement.cpp" />
+    <ClCompile Include="BettyStates.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -183,6 +188,7 @@
     <ClCompile Include="PlayerStates.cpp" />
     <ClCompile Include="PrefabToActor.cpp" />
     <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="TempBossCamera.cpp" />
     <ClCompile Include="TestPlayer.cpp" />
     <ClCompile Include="TestSJ.cpp" />
     <ClCompile Include="TestSY.cpp" />
