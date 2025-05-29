@@ -17,6 +17,7 @@ public:
     vector<shared_ptr<class APawn>> MakeObjects(const string& _file);
     shared_ptr<class AUIActor> MakeUI(const string& _file);
     vector<shared_ptr<class AUIActor>> MakeUIs(const string& _file);
+    vector<shared_ptr<class AParticleActor>> MakeParticleGroup(const std::string& _filePath);
 
 private:
     void MakeLoader();

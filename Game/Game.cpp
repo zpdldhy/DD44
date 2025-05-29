@@ -39,8 +39,9 @@ void Game::Init()
 	// Asset ·Îµù
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
-	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	OBJECT->AddActor(m_pPlayer);

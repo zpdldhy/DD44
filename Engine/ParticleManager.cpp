@@ -90,8 +90,6 @@ void ParticleManager::AddParticleList(vector<shared_ptr<AParticleActor>> _vParti
 		pParticle->Init();
 		m_vParticleList.emplace_back(pParticle);
 	}
-		
-	
 }
 
 void ParticleManager::AddUI(shared_ptr<AParticleActor> _vParticleActor)

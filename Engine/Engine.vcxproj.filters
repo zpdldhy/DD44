@@ -387,6 +387,9 @@
     <ClInclude Include="SceneState.h">
       <Filter>FSM</Filter>
     </ClInclude>
+    <ClInclude Include="AFireParticleActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -645,6 +648,9 @@
     </ClCompile>
     <ClCompile Include="SceneState.cpp">
       <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="AFireParticleActor.cpp">
+      <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

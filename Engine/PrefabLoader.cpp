@@ -654,6 +654,16 @@ bool PrefabLoader::SaveParticle(const PrefabParticleData& data, const std::strin
     j["bLoop"] = data.bLoop;
     j["bAutoDestroy"] = data.bAutoDestroy;
 
+    j["Type"] = static_cast<int>(data.Type);
+
+    if (data.Type == EParticleType::Fire)
+    {
+        j["Amplitude"] = { data.Amplitude.x, data.Amplitude.y, data.Amplitude.z };
+        j["RandomFreq"] = { data.RandomFreq.x, data.RandomFreq.y, data.RandomFreq.z };
+        j["RandomOffset"] = { data.RandomOffset.x, data.RandomOffset.y, data.RandomOffset.z };
+        j["TimeOffset"] = data.TimeOffset;
+    }
+
     std::ofstream file(filePath);
     if (!file.is_open())
         return false;
@@ -700,7 +710,18 @@ bool PrefabLoader::LoadParticle(PrefabParticleData& outData, const std::string& 
     outData.bLoop = j.value("bLoop", true);
     outData.bAutoDestroy = j.value("bAutoDestroy", false);
 
+    outData.Type = static_cast<EParticleType>(j.value("Type", 0)); // ±âº» Default
 
+    if (outData.Type == EParticleType::Fire)
+    {
+        auto a = j["Amplitude"];
+        auto f = j["RandomFreq"];
+        auto o = j["RandomOffset"];
+        outData.Amplitude = Vec3(a[0], a[1], a[2]);
+        outData.RandomFreq = Vec3(f[0], f[1], f[2]);
+        outData.RandomOffset = Vec3(o[0], o[1], o[2]);
+        outData.TimeOffset = j["TimeOffset"];
+    }
 
     return true;
 }
@@ -734,6 +755,16 @@ bool PrefabLoader::SaveParticleGroup(const PrefabParticleGroupData& data, const 
         p["Duration"] = particle.Duration;
         p["bLoop"] = particle.bLoop;
         p["bAutoDestroy"] = particle.bAutoDestroy;
+
+        p["Type"] = static_cast<int>(particle.Type);
+
+        if (particle.Type == EParticleType::Fire)
+        {
+            p["Amplitude"] = { particle.Amplitude.x, particle.Amplitude.y, particle.Amplitude.z };
+            p["RandomFreq"] = { particle.RandomFreq.x, particle.RandomFreq.y, particle.RandomFreq.z };
+            p["RandomOffset"] = { particle.RandomOffset.x, particle.RandomOffset.y, particle.RandomOffset.z };
+            p["TimeOffset"] = particle.TimeOffset;
+        }
 
         j["Particles"].push_back(p);
     }
@@ -788,6 +819,19 @@ bool PrefabLoader::LoadParticleGroup(PrefabParticleGroupData& out, const std::st
         particle.Duration = p.value("Duration", 1.0f);
         particle.bLoop = p.value("bLoop", true);
         particle.bAutoDestroy = p.value("bAutoDestroy", false);
+
+        particle.Type = static_cast<EParticleType>(p.value("Type", 0));
+
+        if (particle.Type == EParticleType::Fire)
+        {
+            auto a = p["Amplitude"];
+            auto f = p["RandomFreq"];
+            auto o = p["RandomOffset"];
+            particle.Amplitude = Vec3(a[0], a[1], a[2]);
+            particle.RandomFreq = Vec3(f[0], f[1], f[2]);
+            particle.RandomOffset = Vec3(o[0], o[1], o[2]);
+            particle.TimeOffset = p["TimeOffset"];
+        }
 
         out.Particles.push_back(particle);
     }

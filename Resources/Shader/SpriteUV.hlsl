@@ -35,17 +35,29 @@ PS_OUT_DUAL PS(VS_OUT input)
 {
     PS_OUT_DUAL psOut = (PS_OUT_DUAL) 0;
 
-    float4 texColor = g_txDiffuseA.Sample(sample, remapUV(input.t));
-    
-    if(texColor.a < 0.1)
+    float2 uv = remapUV(input.t);
+    float4 texColor = g_txDiffuseA.Sample(sample, uv);
+
+    if (texColor.a < 0.1)
         discard;
+
+   // [1] 중심 거리 기반 edge factor 계산
+    float distFromCenter = distance(uv, float2(0.5f, 0.5f));
+    float edgeFactor = saturate(distFromCenter * 2.0f); // 0: 중심, 1: 외곽
+
+    // [2] 중심은 흰색, 바깥은 g_vTintColor로 보간
+    float3 innerColor = float3(1.0f, 1.0f, 1.0f); // 흰색 중심
+    float3 tint = lerp(innerColor, g_vTintColor.rgb, edgeFactor);
+ 
+    texColor.rgb *= tint;
+    // [3] 알파 보정 - 바깥으로 갈수록 흐리게
+    float alphaFalloff = 1.0f - edgeFactor * 0.5f; // 바깥쪽에서 알파 줄이기
+    texColor.a *= alphaFalloff;
 
     float alpha = max(max(texColor.r, texColor.g), texColor.b);
 
-    // SV_Target0 → 원본 색 그대로
-    psOut.c0 = float4(texColor.rgb, 1.0f);
-
-    // SV_Target1 → 감쇄용 보조 블렌딩 값
+    // [4] Output to render targets
+    psOut.c0 = float4(texColor.rgb, texColor.a);
     psOut.c1 = float4(1.0f - alpha, 1.0f - alpha, 1.0f - alpha, alpha);
 
     return psOut;

@@ -41,6 +41,8 @@ cbuffer CB_MaterialEffect : register(b2)
 
     float3 g_vSpecularCoeff; // 정반사 색상
     float g_fShininess;
+    
+    float4 g_vTintColor;
 };
 
 struct VS_IN
