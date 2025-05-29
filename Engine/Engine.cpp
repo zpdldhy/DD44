@@ -58,7 +58,6 @@ void Engine::Init()
 		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
-		EFFECT->Init();
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
