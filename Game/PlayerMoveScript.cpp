@@ -12,6 +12,8 @@
 #include "UIManager.h"
 #include "AUIActor.h"
 #include "EffectManager.h"
+#include "UPhysicsComponent.h"
+#include "ObjectManager.h"
 
 void PlayerMoveScript::Init()
 {
@@ -35,6 +37,10 @@ void PlayerMoveScript::Init()
 
 	backSword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword");
 	handSword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword2");
+
+	// SetPhysics
+	auto pPhysics = GetOwner()->GetPhysics();
+	pPhysics->SetWeight(0.3f);
 }
 
 void PlayerMoveScript::Tick()
@@ -130,32 +136,44 @@ void PlayerMoveScript::Tick()
 #pragma region TEMP_COLLISION
 			if (GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
 			{
-				m_bHPUIChange = true;
-				//if (INPUT->GetButton(J))
+				// Enemy 인지
+				auto list = GetOwner()->GetShapeComponent()->GetCollisionList();
+				bool isCol = false;
+				for (auto& index : list)
 				{
-					// Blood FX
-					Vec3 basePos = GetOwner()->GetPosition();
-					basePos.y += RandomRange(0.5, 2);
-					Vec3 look = GetOwner()->GetLook();
-					velocity = -look;
-					PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+					if (OBJECT->GetActor(index.first)->m_szName == L"Enemy")
+						isCol = true;
+				}
 
-					m_fHitFlashTimer = 1.f;  // 1초 동안
-					m_bIsFlashing = true;
-
-					// Anim
-					// HP 
-					if (m_vHP != 0)
-						m_vHP -= 1;
-
-					if (m_vHP > 0)
+				if (isCol)
+				{
+					m_bHPUIChange = true;
+					//if (INPUT->GetButton(J))
 					{
-						ChangetState(hit);
-						m_bCanBeHit = false;
-					}
-					else
-					{
-						ChangetState(die);
+						// Blood FX
+						Vec3 basePos = GetOwner()->GetPosition();
+						basePos.y += RandomRange(0.5, 2);
+						Vec3 look = GetOwner()->GetLook();
+						velocity = -look;
+						PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+
+						m_fHitFlashTimer = 1.f;  // 1초 동안
+						m_bIsFlashing = true;
+
+						// Anim
+						// HP 
+						if (m_vHP != 0)
+							m_vHP -= 1;
+
+						if (m_vHP > 0)
+						{
+							ChangetState(hit);
+							m_bCanBeHit = false;
+						}
+						else
+						{
+							ChangetState(die);
+						}
 					}
 				}
 			}

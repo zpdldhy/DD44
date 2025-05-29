@@ -100,7 +100,7 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 
 		actor->SetMeshComponent(meshComponent);
 
-		actor->m_szName = L"Character";
+		actor->m_szName = to_mw(characterData.Name);
 		actor->m_eActorType = static_cast<ActorType>(characterData.m_eActorType);
 		actor->SetPosition(Vec3(characterData.transform.Position));
 		actor->SetRotation(Vec3(characterData.transform.Rotation));

@@ -60,13 +60,14 @@ public:
 protected:
 	friend class UCameraComponent;
 	unique_ptr<USceneComponent> m_pTransform = nullptr;
-	unique_ptr< UPhysicsComponent> m_pPhysics = nullptr;
+	unique_ptr<UPhysicsComponent> m_pPhysics = nullptr;
 	array<shared_ptr<USceneComponent>, static_cast<size_t>(ComponentType::CT_COUNT)> m_arrComponent;
 	vector<shared_ptr<class UScriptComponent>> m_vScript;
 	std::string m_sPrefabPath = {  };
 
 public:
 	USceneComponent* GetTransform() { return m_pTransform.get(); }
+	UPhysicsComponent* GetPhysics() { return m_pPhysics.get(); }
 	template<typename T>
 	shared_ptr<T> GetMeshComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
 	shared_ptr<UMeshComponent> GetMeshComponent() { return static_pointer_cast<UMeshComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }

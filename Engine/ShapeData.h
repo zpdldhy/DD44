@@ -25,7 +25,7 @@ struct Box
 	Vec3 vMin = { 0.f, 0.f, 0.f };
 	// OBB
 	Vec3 vAxis[3] = { {0.f, 0.f, 0.f}, };
-	Vec3 vExtent = { 0.f, 0.f, 0.f };
+	float vExtent[3] = {0.f, 0.f, 0.f};
 
 	Box(){}
 
@@ -43,15 +43,8 @@ struct Box
 		vAxis[0] = { 1,0,0 };
 		vAxis[1] = { 0,1,0 };
 		vAxis[2] = { 0,0,1 };
-		vExtent = _max - vCenter;
-
-		//vVertex[0] = { vMin.x, vMax.y, vMin.z };	// front ÁÂ»ó
-		//vVertex[1] = { vMax.x, vMax.y, vMin.z };	// front ¿ì»ó
-		//vVertex[2] = vMin;	// front ÁÂÇÏ
-		//vVertex[3] = { vMax.x, vMin.y, vMin.z };	// front ¿ìÇÏ
-		//vVertex[4] = { vMin.x, vMax.y, vMax.z };	// back ÁÂ»ó
-		//vVertex[5] = vMax;	// back ¿ì»ó
-		//vVertex[6] = { vMin.x, vMin.y, vMax.z };	// back ÁÂÇÏ
-		//vVertex[7] = { vMax.x, vMin.y, vMax.z };	// back ¿ìÇÏ
+		vExtent[0] = (_max - vCenter).x;
+		vExtent[1] = (_max - vCenter).y;
+		vExtent[2] = (_max - vCenter).z;
 	}
 };

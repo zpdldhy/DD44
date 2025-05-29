@@ -165,14 +165,17 @@ void Game::SetEnemyScript()
 
 void Game::CheckEnemyCollision()
 {
-	for (auto iter = enemyList.begin(); iter != enemyList.end();)
-	{
-		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
-		{
-			iter = enemyList.erase(iter);
-			continue;
-		}
-		COLLITION->CheckCollision(m_pPlayer, *iter);
-		iter++;
-	}
+	//for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	//{
+	//	if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+	//	{
+	//		iter = enemyList.erase(iter);
+	//		continue;
+	//	}
+	//	COLLITION->CheckCollision(m_pPlayer, *iter);
+	//	iter++;
+	//}
+
+	auto list = OBJECT->GetActorIndexList();
+	COLLITION->CheckCollision(list);
 }

@@ -2,6 +2,12 @@
 #include "UPrimitiveComponent.h"
 #include <set>
 
+struct CollisionData
+{
+	Vec3 ColNormal = { 0.f, 0.f, 0.f };
+	bool bColGround = false;
+};
+
 enum class CollisionEnabled
 {
 	CE_NOCOLLISION,
@@ -17,7 +23,7 @@ protected:
 	DirectX::SimpleMath::Color m_pShapeColor = { 0.f, 0.f, 0.f, 0.f };
 
 	// temp 
-	set<UINT> m_vCollisionList;
+	map<UINT, CollisionData> m_vCollisionList;
 
 public:
 	UShapeComponent() = default;
@@ -32,8 +38,8 @@ public:
 
 	const ShapeType& const GetShapeType() { return m_ShapeType; }
 	const CollisionEnabled& const GetCollisionType() { return m_CollisionEnabled; }
-	void AddCollision(UINT _colActor) { m_vCollisionList.insert(_colActor); }
-	set<UINT>& GetCollisionList() { return m_vCollisionList; }
+	void AddCollision(UINT _colActor, CollisionData _colData) { m_vCollisionList.insert(make_pair(_colActor, _colData)); }
+	map<UINT, CollisionData>& GetCollisionList() { return m_vCollisionList; }
 	size_t GetCollisionCount() { return m_vCollisionList.size(); }
 	void ResetCollisionList() { m_vCollisionList.clear(); }
 };

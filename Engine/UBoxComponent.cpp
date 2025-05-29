@@ -93,7 +93,9 @@ void UBoxComponent::UpdateBounds()
 	m_Box.vAxis[2].Normalize();
 
 	// 고정 박스라면 extents는 0.5, 0.5, 0.5
-	m_Box.vExtent = Vec3(0.5f, 0.5f, 0.5f) * m_vWorldScale;
+	m_Box.vExtent[0] = 0.5f * m_vWorldScale.x;
+	m_Box.vExtent[1] = 0.5f * m_vWorldScale.y;
+	m_Box.vExtent[2] = 0.5f * m_vWorldScale.z;
 }
 
 void UBoxComponent::CreateCollisionRange()

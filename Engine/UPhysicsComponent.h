@@ -24,12 +24,21 @@ public:
 	Vec3 GetSpeed() { return m_vSpeed; }
 
 private:
+	void CollisionCalculate();
+
+public:
+	bool m_bFly = false;
+
+private:
 	// Gravity
-	float m_fMaxGravity = 5.f;
+	float m_fMaxGravity = 0.5f;
+	float m_fGravityAcceleration = 1.f;
+	Vec3 m_fGravityDirection = { 0.f, -1.f, 0.f };
 	float m_fCurrentGravity = 0.f;	// 연산에 사용되는 놈
-	float m_fWeight = 5.f;
+	float m_fWeight = 0.f;
 
 	// Speed
+	bool m_bColGrounded = false;
 	float m_fAcceleration = 0.f;
 	float m_fMaxSpeed = 0.5f;
 	float m_fCurrentSpeed = 0.f;	// 연산에 사용되는 놈

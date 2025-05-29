@@ -25,6 +25,7 @@ public:
 
 	// TEMP
 	vector<shared_ptr<AActor>> enemyList; 
+	vector<shared_ptr<AActor>> m_vObjectList;
 
 public:
 	void Init() override;

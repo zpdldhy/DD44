@@ -31,9 +31,9 @@ void TestYoooooon::Init()
 	//OBJECT->AddActorList(PRA->LoadAllPrefabs(".object.json"));
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
 
-	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	m_pPlayer = vlist[0];
-	OBJECT->AddActorList(vlist);
+	//auto vlist = PToA->LoadAllPrefabs(".character.json");
+	//m_pPlayer = vlist[0];
+	//OBJECT->AddActorList(vlist);
 
 	SetupEngineCamera();
 	//SetupSkybox();
@@ -49,7 +49,7 @@ void TestYoooooon::Tick()
 		if (m_bEnginCamera)
 		{
 			m_bEnginCamera = false;
-			CAMERA->Set3DCameraActor(m_pPlayer);
+			//CAMERA->Set3DCameraActor(m_pPlayer);
 		}
 		else
 		{
