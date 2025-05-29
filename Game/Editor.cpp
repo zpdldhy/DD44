@@ -28,6 +28,7 @@
 
 #include "BatMovement.h"
 #include "WalkerMovement.h"
+#include "BettyMovement.h"
 #include "CollisionManager.h"
 
 //#undef RUN_GAME
@@ -717,6 +718,7 @@ void Editor::SetEnemyScript()
 {
 	for (auto& enemy : enemyList)
 	{
+		if (enemy->GetScriptList().size() <= 0) { continue; }
 		// bat
 		{
 			auto script = dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0]);
@@ -726,6 +728,12 @@ void Editor::SetEnemyScript()
 		// walker
 		{
 			auto script = dynamic_pointer_cast<WalkerMovement>(enemy->GetScriptList()[0]);
+			if (script) { script->SetPlayer(m_pPlayer); }
+		}
+
+		// betty
+		{
+			auto script = dynamic_pointer_cast<BettyMovement>(enemy->GetScriptList()[0]);
 			if (script) { script->SetPlayer(m_pPlayer); }
 		}
 	}

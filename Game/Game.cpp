@@ -9,8 +9,6 @@
 #include "Timer.h"
 #include "Input.h"
 #include "PrefabToActor.h"
-#include "BatMovement.h"
-#include "WalkerMovement.h"
 #include "CollisionManager.h"
 #include "EffectManager.h"
 #include "Sound.h"
@@ -29,6 +27,11 @@
 #include "EngineCameraMoveScript.h"
 #include "GameCameraMove.h"
 
+
+// TEMP
+#include "BatMovement.h"
+#include "WalkerMovement.h"
+#include "BettyMovement.h"
 
 void Game::Init()
 {
@@ -108,12 +111,10 @@ void Game::SetupEngineCamera()
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	OBJECT->AddActor(m_pCameraActor);
 }
-
 void Game::SetupGameCamera()
 {
 	m_pGameCameraActor = make_shared<ACameraActor>();
-
-	//m_pGameCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
+	
 	auto script = make_shared<GameCameraMove>(m_pPlayer);
 	m_pGameCameraActor->AddScript(script);
 	m_pGameCameraActor->m_szName = L"GameCamera";
@@ -156,6 +157,8 @@ void Game::SetEnemyScript()
 {
 	for (auto& enemy : enemyList)
 	{
+		// 
+		if (enemy->GetScriptList().size() <= 0) { continue; }
 		// bat
 		{
 			auto script = dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0]);
@@ -167,6 +170,13 @@ void Game::SetEnemyScript()
 			auto script = dynamic_pointer_cast<WalkerMovement>(enemy->GetScriptList()[0]);
 			if (script) { script->SetPlayer(m_pPlayer); }
 		}
+
+		// betty
+		{
+			auto script = dynamic_pointer_cast<BettyMovement>(enemy->GetScriptList()[0]);
+			if (script) { script->SetPlayer(m_pPlayer); }
+		}
+
 	}
 }
 

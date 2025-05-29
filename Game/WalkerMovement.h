@@ -32,7 +32,7 @@ private:
 	int m_currentPosIdx;
 	float m_half = 5;
 	Vec3 m_vDistance;
-	float m_walkSpeed = 0.008;
+	float m_walkSpeed = 0.006;
 	float m_fRotationSpeed = 5.0f;
 	bool m_rotate;
 	Vec3 moveDir;

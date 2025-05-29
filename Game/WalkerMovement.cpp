@@ -104,7 +104,7 @@ void WalkerMovement::Tick()
 
 			// ·£´ý time ´ë±â
 			m_bWait = true;
-			m_wait = RandomRange(0.0f, 1.0f);
+			m_wait = RandomRange(0.2f, 1.5f);
 		}
 		else
 		{
@@ -117,7 +117,7 @@ void WalkerMovement::Tick()
 
 	Vec3 distance = player.lock()->GetPosition() - GetOwner()->GetPosition();
 
-	if (distance.Length() < 3.0f && INPUT->GetButton(LCLICK))
+	if (distance.Length() < 4.0f && INPUT->GetButton(LCLICK))
 	{
 		// Blood FX
 		Vec3 basePos = GetOwner()->GetPosition();
