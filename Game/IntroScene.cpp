@@ -103,7 +103,7 @@ void IntroScene::SetupSunLight()
 
 void IntroScene::UpdateUIState()
 {
-	if (!m_bSelectStartButton)
+	if (!m_bSelectStartButton || !m_bSelectEndButton)
 	{
 		Vec3 idle(cosf(TIMER->GetGameTime() * 7.f) * 0.2f, 0.f, 0.f);
 
@@ -139,7 +139,12 @@ void IntroScene::UpdateUIState()
 			if (menu->GetStateType() == UIStateType::ST_HOVER)
 				m_vSelectMenu = iSelect;
 			else if (menu->GetStateType() == UIStateType::ST_SELECT)
-				m_bSelectStartButton = true;
+			{
+				if (iSelect == 0)
+					m_bSelectStartButton = true;
+				else if (iSelect == 2)
+					m_bSelectEndButton = true;
+			}		
 
 			menu->SetColor(Color(0.5f, 0.5f, 0.5f, 1.f));
 			iSelect++;
@@ -159,9 +164,7 @@ void IntroScene::UpdateUIState()
 			}
 
 			if (INPUT->GetButton(ENTER))
-			{
 				m_bSelectStartButton = true;
-			}
 		}
 		break;
 		case SM_OPTION:
@@ -189,7 +192,7 @@ void IntroScene::UpdateUIState()
 			}
 
 			if (INPUT->GetButton(ENTER))
-				PostQuitMessage(0);
+				m_bSelectEndButton = true;
 		}
 		break;
 		}
@@ -218,6 +221,9 @@ void IntroScene::UpdateUIState()
 			m_bSelectStartButton = false;
 		}
 	}
+
+	if (m_bSelectEndButton)
+		PostQuitMessage(0);
 
 	// Do FadeIn
 	if (m_bthrowUI)
