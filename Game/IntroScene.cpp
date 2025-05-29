@@ -36,6 +36,8 @@ void IntroScene::Init()
 	UI->AddUIList(m_vMenu);
 	UI->AddUIList(m_vArrowUI);
 
+	m_vDefaultSelectY = m_vArrowUI[0]->GetPosition().y;
+
 	SetupEngineCamera();
 	//SetupSkybox();
 	SetupSunLight();
@@ -112,13 +114,12 @@ void IntroScene::UpdateUIState()
 		auto temp1 = m_vArrowUI[0]->GetPosition().x;
 		auto temp2 = m_vArrowUI[1]->GetPosition().x;
 
+		// 키보드 입력
 		if (INPUT->GetButton(UP))
 		{
 			if (m_vSelectMenu != SM_START)
 			{
 				m_vSelectMenu--;
-				for (auto& pUI : m_vArrowUI)
-					pUI->AddPosition(Vec3(0.f, +0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
 			}
 		}
 
@@ -127,14 +128,21 @@ void IntroScene::UpdateUIState()
 			if (m_vSelectMenu != SM_EXIT)
 			{
 				m_vSelectMenu++;
-				for (auto& pUI : m_vArrowUI)
-					pUI->AddPosition(Vec3(0.f, -0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
 			}
 		}
 
+		// 마우스 입력
+		UINT iSelect = 0;
+
 		for (auto& menu : m_vMenu)
 		{
+			if (menu->GetStateType() == UIStateType::ST_HOVER)
+				m_vSelectMenu = iSelect;
+			else if (menu->GetStateType() == UIStateType::ST_SELECT)
+				m_bSelectStartButton = true;
+
 			menu->SetColor(Color(0.5f, 0.5f, 0.5f, 1.f));
+			iSelect++;
 		}
 
 		switch (m_vSelectMenu)
@@ -142,6 +150,13 @@ void IntroScene::UpdateUIState()
 		case SM_START:
 		{
 			m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+
+			for (auto& pUI : m_vArrowUI)
+			{
+				Vec3 NowPos(pUI->GetPosition());
+				NowPos.y = m_vDefaultSelectY;
+				pUI->SetPosition(NowPos);
+			}
 
 			if (INPUT->GetButton(ENTER))
 			{
@@ -153,11 +168,25 @@ void IntroScene::UpdateUIState()
 		{
 			m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
 
+			for (auto& pUI : m_vArrowUI)
+			{
+				Vec3 NowPos(pUI->GetPosition());
+				NowPos.y = m_vDefaultSelectY - 0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2);
+				pUI->SetPosition(NowPos);
+			}
+
 		}
 		break;
 		case SM_EXIT:
 		{
 			m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+
+			for (auto& pUI : m_vArrowUI)
+			{
+				Vec3 NowPos(pUI->GetPosition());
+				NowPos.y = m_vDefaultSelectY - 2.f * 0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2);
+				pUI->SetPosition(NowPos);
+			}
 
 			if (INPUT->GetButton(ENTER))
 				PostQuitMessage(0);
