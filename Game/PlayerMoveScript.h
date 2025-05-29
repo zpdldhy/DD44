@@ -32,16 +32,13 @@ public:
 	Vec3 m_vRollLook;
 
 	// 상호작용
-	bool m_bDamaged = false;
-	float m_fDamageTime = 1.f;
-
-	int m_hp = 4;
 	UINT m_vHP = 4;
 	UINT m_vArrowCount = 4;
 
 	// UI Actor
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
 	vector<shared_ptr<class AUIActor>> m_vArrowUI;
+	bool m_bHPUIChange = false;
 
 	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
 

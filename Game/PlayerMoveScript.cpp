@@ -25,7 +25,8 @@ void PlayerMoveScript::Init()
 	attack = make_shared<PlayerAttackState>(m_pOwner);
 	hit = make_shared<PlayerHitState>(m_pOwner);
 	die = make_shared<PlayerDieState>(m_pOwner);
-	//SetUI();
+
+	SetUI();
 
 	currentState = idle;
 	currentState->Enter();
@@ -38,6 +39,10 @@ void PlayerMoveScript::Init()
 
 void PlayerMoveScript::Tick()
 {
+	// Test
+	if (INPUT->GetButton(L))
+		m_vHP++;
+
 #pragma region EFFECT
 	Slash();
 	if (m_bIsFlashing)
@@ -58,7 +63,7 @@ void PlayerMoveScript::Tick()
 #pragma endregion
 
 	// UI 
-	//UpdateHPUI();
+	UpdateHPUI();
 	UpdateArrowUI();
 
 #pragma region STATE_ANIM
@@ -125,6 +130,7 @@ void PlayerMoveScript::Tick()
 #pragma region TEMP_COLLISION
 			if (GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
 			{
+				m_bHPUIChange = true;
 				//if (INPUT->GetButton(J))
 				{
 					// Blood FX
@@ -139,8 +145,10 @@ void PlayerMoveScript::Tick()
 
 					// Anim
 					// HP 
-					//m_hp -= 1;
-					if (m_hp > 0)
+					if (m_vHP != 0)
+						m_vHP -= 1;
+
+					if (m_vHP > 0)
 					{
 						ChangetState(hit);
 						m_bCanBeHit = false;
@@ -296,32 +304,20 @@ void PlayerMoveScript::Slash()
 
 void PlayerMoveScript::SetUI()
 {
-	m_vHPUI.push_back(PToA->MakeUI("../Resources/Prefab/UI_Health_1.ui.json"));
-	m_vHPUI.push_back(PToA->MakeUI("../Resources/Prefab/UI_Health_2.ui.json"));
-	m_vHPUI.push_back(PToA->MakeUI("../Resources/Prefab/UI_Health_3.ui.json"));
-	m_vHPUI.push_back(PToA->MakeUI("../Resources/Prefab/UI_Health_4.ui.json"));
-
+	m_vHPUI= PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
+	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
 	UI->AddUIList(m_vHPUI);
+	UI->AddUIList(m_vArrowUI);
 }
 
 void PlayerMoveScript::UpdateHPUI()
 {
-	// test용
-	if (INPUT->GetButton(K))
-	{
-		m_vHP--;
-		m_bDamaged = true;
-	}
-
-	if (INPUT->GetButton(L))
-		m_vHP++;
-
 	Color RestColor;
 
 	if (m_vHP == 4)
 	{
 		RestColor = fullHP;
-		RestColor.w = -0.3f;
+		RestColor.w = -0.5f;
 
 		m_vHPUI[0]->SetColor(RestColor);
 		m_vHPUI[1]->SetColor(RestColor);
@@ -335,34 +331,39 @@ void PlayerMoveScript::UpdateHPUI()
 	}
 
 	// 데미지를 입었을 시, UI Animation
-	if (m_bDamaged)
+	if (m_bHPUIChange)
 	{
 		static float currentTime = 0.0f;
 		static float damageTime = 0.0f;
 
-		damageTime = TIMER->GetDeltaTime() + currentTime;
+		damageTime += currentTime = TIMER->GetDeltaTime();
 
 		if (m_vHP == 3)
 		{
-			m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime * 1000.f));
+			if (m_vHPUI[2]->GetColor().w < 0.f)
+				m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+			else
+				m_bHPUIChange = false;
+
 			m_vHPUI[3]->m_bRender = false;
 		}
 		else if (m_vHP == 2)
 		{
-			m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime * 1000.f));
+			if (m_vHPUI[1]->GetColor().w < 0.f)
+				m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+			else
+				m_bHPUIChange = false;
+
 			m_vHPUI[2]->m_bRender = false;
 		}
 		else if (m_vHP == 1)
 		{
-			RestColor = fullHP;
-			RestColor.w = -0.3f;
+			if (m_vHPUI[0]->GetColor().w < 0.f)
+				m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+			else
+				m_bHPUIChange = false;
 
-			m_vHPUI[0]->SetColor(fullHP);
-
-			m_vHPUI[0]->m_bRender = true;
 			m_vHPUI[1]->m_bRender = false;
-			m_vHPUI[2]->m_bRender = false;
-			m_vHPUI[3]->m_bRender = false;
 		}
 		else if (m_vHP == 0)
 		{
@@ -370,12 +371,6 @@ void PlayerMoveScript::UpdateHPUI()
 			m_vHPUI[1]->m_bRender = false;
 			m_vHPUI[2]->m_bRender = false;
 			m_vHPUI[3]->m_bRender = false;
-		}
-
-		if (currentTime > m_fDamageTime)
-		{
-			m_bDamaged = false;
-			currentTime = 0.0f;
 		}
 	}
 
