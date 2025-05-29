@@ -21,6 +21,7 @@
 
 #include "PrefabToActor.h"
 #include "BatMovement.h"
+#include "WalkerMovement.h"
 #include "CollisionManager.h"
 
 void Game::Init()
@@ -35,13 +36,11 @@ void Game::Init()
 	OBJECT->AddActor(m_pPlayer);
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	enemyList = vlist;
 	OBJECT->AddActorList(vlist);
-	for (auto& enemy : vlist)
-	{
-		if(enemy->GetScriptList().size() <= 0) { continue; }
-		dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0])->SetPlayer(m_pPlayer);
-	}
+	
+	// Temp
+	enemyList = vlist;
+	SetEnemyScript();
 
 
 	// UI
@@ -146,6 +145,24 @@ void Game::SetupSunLight()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
+}
+
+void Game::SetEnemyScript()
+{
+	for (auto& enemy : enemyList)
+	{
+		// bat
+		{
+			auto script = dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0]);
+			if (script) { script->SetPlayer(m_pPlayer); }
+		}
+
+		// walker
+		{
+			auto script = dynamic_pointer_cast<WalkerMovement>(enemy->GetScriptList()[0]);
+			if (script) { script->SetPlayer(m_pPlayer); }
+		}
+	}
 }
 
 void Game::CheckEnemyCollision()

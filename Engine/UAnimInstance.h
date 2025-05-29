@@ -27,6 +27,7 @@ public:
 	bool m_bInPlace = false;
 	bool m_bPlay = true;
 	float m_fAnimPlayRate = 25.0f;
+	map<int, UINT> m_mKeyFrameMap;
 public:
 	void CreateConstantBuffer();
 	void PlayOnce(int _index);
@@ -43,6 +44,7 @@ public:
 	void SetCurrentAnimTrack(int _index);
 	int GetAnimIndex(wstring _animName);
 	Matrix GetBoneAnim(int _boneIndex);
+	void SetKeyFrame(int _trackIndex, UINT _key);
 public:
 	const std::vector<AnimList>& GetAnimTrackList() const { return animTrackList; }
 };

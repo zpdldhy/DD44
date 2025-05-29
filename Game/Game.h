@@ -38,8 +38,8 @@ protected:
 	void SetupSunLight();
 
 protected:
+	void SetEnemyScript();
 	void CheckEnemyCollision();
-
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }
 };

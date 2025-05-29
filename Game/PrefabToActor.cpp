@@ -18,6 +18,7 @@
 // Script
 #include "PlayerMoveScript.h"
 #include "BatMovement.h"
+#include "WalkerMovement.h"
 
 unique_ptr<ActorLoader> PrefabToActor::actorLoader = nullptr;
 unique_ptr<MeshLoader> PrefabToActor::meshLoader = nullptr;
@@ -105,6 +106,7 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 
 		if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 		if (characterData.ScriptType == 2) { actor->AddScript(std::make_shared<BatMovement>()); }
+		if (characterData.ScriptType == 3) { actor->AddScript(std::make_shared<WalkerMovement>()); }
 
 		if (characterData.camera.isUse)
 		{

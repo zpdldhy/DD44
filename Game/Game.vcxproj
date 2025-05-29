@@ -162,6 +162,8 @@
     <ClInclude Include="TestYoooooon.h" />
     <ClInclude Include="TestYR.h" />
     <ClInclude Include="TestYR2.h" />
+    <ClInclude Include="WalkerMovement.h" />
+    <ClInclude Include="WalkerStates.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BatMovement.cpp" />
@@ -187,6 +189,8 @@
     <ClCompile Include="TestYoooooon.cpp" />
     <ClCompile Include="TestYR.cpp" />
     <ClCompile Include="TestYR2.cpp" />
+    <ClCompile Include="WalkerMovement.cpp" />
+    <ClCompile Include="WalkerStates.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
