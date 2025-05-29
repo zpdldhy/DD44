@@ -12,24 +12,33 @@ public:
 	PlayerMoveScript() = default;
 	virtual ~PlayerMoveScript() = default;
 public:
-	float m_fSpeed  = 13.0f; 
+	float m_fSpeed = 10.0f;
+	float m_fRollSpeed  = 15.0f;
+	float m_fCurrentSpeed;
 	float m_fRotationSpeed = 8.0f;
+
+	bool m_bDamageCoolTime = false;
+	float m_fDamageCoolTime = 1.0f;
+	bool m_bCanBeHit = true;
+
+	bool m_bRollCoolTime = false;
+	float m_fRollCoolTime = 0.3f;
+	bool m_bCanRoll = true;
+
 	Vec3 m_vLook;
 	Vec3 m_vRight;
 	Vec3 m_vLastMoveDir;
 	Vec3 velocity;
+	Vec3 m_vRollLook;
 
 	// 상호작용
-	bool m_bDamaged = false;
-	float m_fDamageTime = 1.f;
-
-	int m_hp = 4;
 	UINT m_vHP = 4;
 	UINT m_vArrowCount = 4;
 
 	// UI Actor
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
 	vector<shared_ptr<class AUIActor>> m_vArrowUI;
+	bool m_bHPUIChange = false;
 
 	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
 
@@ -40,6 +49,7 @@ public:
 
 	shared_ptr<StateBase> idle;
 	shared_ptr<StateBase> walk;
+	shared_ptr<StateBase> roll;
 	shared_ptr<StateBase> attack;
 	shared_ptr<StateBase> hit;
 	shared_ptr<StateBase> die;
@@ -71,5 +81,7 @@ public:
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
+public:
+	void RollMove();
 };
 

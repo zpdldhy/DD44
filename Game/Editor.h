@@ -44,6 +44,9 @@ public:
 	bool m_bSlashPlaying = false;
 	float m_fSlashDuration = 0.5f; 
 
+	// TEMP
+	vector<shared_ptr<AActor>> enemyList;
+
 public:
 	void Init() override;
 	void Tick() override;
@@ -68,5 +71,9 @@ protected:
 	void SetGizmoPosition(Vec3 _pos);
 	void TransformActorByDragging();
 	void CreateObjectAtMousePick();
+
+protected:
+	void SetEnemyScript();
+	void CheckEnemyCollision();
 };
 

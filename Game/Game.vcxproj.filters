@@ -90,6 +90,10 @@
     <ClInclude Include="GameCameraMove.h">
       <Filter>Script</Filter>
     </ClInclude>
+    <ClInclude Include="WalkerStates.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="WalkerMovement.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -155,6 +159,10 @@
     <ClCompile Include="GameCameraMove.cpp">
       <Filter>Script</Filter>
     </ClCompile>
+    <ClCompile Include="WalkerStates.cpp">
+      <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="WalkerMovement.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

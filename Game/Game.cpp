@@ -1,50 +1,55 @@
 #include "pch.h"
 #include "Game.h"
-#include "ImGuiCore.h"
+
+// Manager
 #include "ObjectManager.h"
 #include "CameraManager.h"
-#include "ACameraActor.h"
-#include "ASky.h"
-#include "ATerrainTileActor.h"
-#include "UStaticMeshComponent.h"
-#include "EngineCameraMoveScript.h"
-#include "GameCameraMove.h"
-#include "PlayerMoveScript.h"
-#include "AssimpLoader.h"
 #include "LightManager.h"
-#include "ALight.h"
-//#include "MeshLoader.h"
-#include "Input.h"
-#include "UBoxComponent.h"
-#include "AUIActor.h"
 #include "UIManager.h"
 #include "Timer.h"
-#include "Sound.h"
-
+#include "Input.h"
 #include "PrefabToActor.h"
+#include "BatMovement.h"
+#include "WalkerMovement.h"
+#include "CollisionManager.h"
 #include "EffectManager.h"
+
+// Actor
+#include "ATerrainTileActor.h"
+#include "ACameraActor.h"
+#include "ASky.h"
+#include "ALight.h"
+#include "AUIActor.h"
+
+// Component
+#include "UStaticMeshComponent.h"
+
+// Script
+#include "EngineCameraMoveScript.h"
+#include "GameCameraMove.h"
+
 
 void Game::Init()
 {
+	EFFECT->Init();
 	// Asset ·Îµù
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
 
-	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	OBJECT->AddActorList(vlist);
-
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	OBJECT->AddActor(m_pPlayer);
 
-	// UI
-	m_vHP = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
-	m_vArrow = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
+	auto vlist = PToA->LoadAllPrefabs(".character.json");
+	OBJECT->AddActorList(vlist);
+	
+	// Temp
+	enemyList = vlist;
+	SetEnemyScript();
 
+	// UI
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
-	UI->AddUIList(m_vHP);
-	UI->AddUIList(m_vArrow);
 	UI->DoFadeOut();
 
 	EFFECT->Init();
@@ -74,6 +79,8 @@ void Game::Tick()
 			CAMERA->Set3DCameraActor(m_pCameraActor);
 		}
 	}
+
+	CheckEnemyCollision();
 }
 
 void Game::Render()
@@ -142,4 +149,36 @@ void Game::SetupSunLight()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
+}
+
+void Game::SetEnemyScript()
+{
+	for (auto& enemy : enemyList)
+	{
+		// bat
+		{
+			auto script = dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0]);
+			if (script) { script->SetPlayer(m_pPlayer); }
+		}
+
+		// walker
+		{
+			auto script = dynamic_pointer_cast<WalkerMovement>(enemy->GetScriptList()[0]);
+			if (script) { script->SetPlayer(m_pPlayer); }
+		}
+	}
+}
+
+void Game::CheckEnemyCollision()
+{
+	for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	{
+		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+		{
+			iter = enemyList.erase(iter);
+			continue;
+		}
+		COLLITION->CheckCollision(m_pPlayer, *iter);
+		iter++;
+	}
 }
