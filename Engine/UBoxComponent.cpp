@@ -11,11 +11,12 @@ void UBoxComponent::Init()
 	USceneComponent::Init();
 	UpdateBounds();
 
+#ifndef DEBUG
 	if (m_bVisible && g_bRangeVisibleMode)
 	{
 		CreateCollisionRange();
 	}
-
+#endif // DEBUG
 }
 
 void UBoxComponent::Tick()
@@ -23,10 +24,12 @@ void UBoxComponent::Tick()
 	USceneComponent::Tick();
 	UpdateBounds();
 
+#ifndef DEBUG
 	if (m_bVisible && g_bRangeVisibleMode)
 	{
 		UpdateCollisionRange();
 	}
+#endif // DEBUG
 }
 
 void UBoxComponent::PreRender()
@@ -35,6 +38,7 @@ void UBoxComponent::PreRender()
 
 void UBoxComponent::Render()
 {
+#ifndef DEBUG
 	if (m_bVisible && g_bRangeVisibleMode)
 	{
 		if (m_pCurrentRasterizer)
@@ -49,6 +53,7 @@ void UBoxComponent::Render()
 
 		m_pCurrentRasterizer.Reset();
 	}
+#endif // DEBUG
 }
 
 void UBoxComponent::PostRender()
@@ -57,10 +62,12 @@ void UBoxComponent::PostRender()
 
 void UBoxComponent::Destroy()
 {
+#ifndef DEBUG
 	if (m_pCollisionRange)
 	{
 		m_pCollisionRange->Destroy();
 	}
+#endif // DEBUG
 }
 
 void UBoxComponent::UpdateBounds()

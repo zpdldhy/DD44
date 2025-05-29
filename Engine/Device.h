@@ -30,6 +30,7 @@ private:
 
 public:
     void OnResize(UINT _width, UINT _height);
+    void ChangeWireFrame() { m_bWireFrame = !m_bWireFrame; }
 
 public:
     void Init();

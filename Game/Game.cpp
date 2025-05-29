@@ -18,6 +18,7 @@
 #include "UBoxComponent.h"
 #include "AUIActor.h"
 #include "UIManager.h"
+#include "Timer.h"
 
 #include "PrefabToActor.h"
 
@@ -42,14 +43,12 @@ void Game::Init()
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
 	UI->AddUIList(m_vHP);
 	UI->AddUIList(m_vArrow);
+	UI->DoFadeOut();
 
 	SetupEngineCamera();
 	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
-
-
-
 }
 
 void Game::Tick()
@@ -67,7 +66,6 @@ void Game::Tick()
 			CAMERA->Set3DCameraActor(m_pCameraActor);
 		}
 	}
-
 }
 
 void Game::Render()

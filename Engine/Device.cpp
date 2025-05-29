@@ -179,10 +179,6 @@ void Device::Init()
 
 void Device::Frame()
 {
-    if (INPUT->GetButton(V))
-    {
-        m_bWireFrame = !m_bWireFrame;
-    }
 }
 
 void Device::PreRender()
