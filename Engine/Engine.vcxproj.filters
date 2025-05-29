@@ -88,6 +88,9 @@
     <Filter Include="Object\Character">
       <UniqueIdentifier>{c52c903c-b868-4c58-9f7c-b2f35a4a0c21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Physics">
+      <UniqueIdentifier>{5e1a85a4-856f-45a6-8f77-e5c8a688e237}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -384,6 +387,9 @@
     <ClInclude Include="SceneState.h">
       <Filter>FSM</Filter>
     </ClInclude>
+    <ClInclude Include="UPhysicsComponent.h">
+      <Filter>Component\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -639,6 +645,9 @@
     </ClCompile>
     <ClCompile Include="SceneState.cpp">
       <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="UPhysicsComponent.cpp">
+      <Filter>Component\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

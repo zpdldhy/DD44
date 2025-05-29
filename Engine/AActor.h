@@ -4,6 +4,7 @@
 #include "UCameraComponent.h"
 #include "UShapeComponent.h"
 #include "ULightComponent.h"
+#include "UPhysicsComponent.h"
 #include "ConstantBuffer.h"
 
 enum class ComponentType
@@ -59,6 +60,7 @@ public:
 protected:
 	friend class UCameraComponent;
 	unique_ptr<USceneComponent> m_pTransform = nullptr;
+	unique_ptr< UPhysicsComponent> m_pPhysics = nullptr;
 	array<shared_ptr<USceneComponent>, static_cast<size_t>(ComponentType::CT_COUNT)> m_arrComponent;
 	vector<shared_ptr<class UScriptComponent>> m_vScript;
 	std::string m_sPrefabPath = {  };
@@ -100,4 +102,7 @@ public:
 	void SetWorldMatrix(const Matrix& _mat) { m_pTransform->SetWorldMatrix(_mat); }
 	void AddPosition(const Vec3& _pos) { m_pTransform->AddLocalPosition(_pos); }
 	void AddRotation(const Vec3& _rot) { m_pTransform->AddLocalRotation(_rot); }
+
+public:	
+	void SetMove(const Vec3& _vDir, const float& _fMaxSpeed, const float& _fAccle = 1.0f) { m_pPhysics->SetMove(_vDir, _fMaxSpeed, _fAccle); }
 };

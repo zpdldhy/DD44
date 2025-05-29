@@ -180,7 +180,7 @@ void PlayerMoveScript::Tick()
 
 	m_vLook.Normalize();
 	m_vRight.Normalize();
-
+		
 	Vec3 moveDir;
 	if (INPUT->GetButtonDown(W))
 	{
@@ -213,7 +213,7 @@ void PlayerMoveScript::Tick()
 		{
 			moveDir.Normalize();
 			Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->AddPosition(pos);
+			GetOwner()->SetMove(pos, 0.5f, 12.f);
 		}
 
 		// È¸Àü		
@@ -433,5 +433,5 @@ void PlayerMoveScript::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> co
 void PlayerMoveScript::RollMove()
 {
 	Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();
-	GetOwner()->AddPosition(pos);
+	GetOwner()->SetMove(pos, 1.f, 30.f);
 }
