@@ -66,6 +66,8 @@ void Game::Init()
 
 void Game::Tick()
 {
+	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
+
 	//bgm
 	{
 		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
