@@ -65,8 +65,6 @@ void Engine::Init()
 	// 8개의 MRT DxState 초기화
 	STATE->Create();
 	EFFECT->Init();
-	
-
 }
 
 void Engine::Frame()

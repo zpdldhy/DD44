@@ -1,26 +1,29 @@
 #include "pch.h"
 #include "Game.h"
-#include "ImGuiCore.h"
+
+// Manager
 #include "ObjectManager.h"
 #include "CameraManager.h"
-#include "ACameraActor.h"
-#include "ASky.h"
-#include "ATerrainTileActor.h"
-#include "UStaticMeshComponent.h"
-#include "EngineCameraMoveScript.h"
-#include "GameCameraMove.h"
-#include "PlayerMoveScript.h"
-#include "AssimpLoader.h"
 #include "LightManager.h"
-#include "ALight.h"
-//#include "MeshLoader.h"
-#include "Input.h"
-#include "UBoxComponent.h"
-#include "AUIActor.h"
 #include "UIManager.h"
 #include "Timer.h"
-
+#include "Input.h"
 #include "PrefabToActor.h"
+
+// Actor
+#include "ATerrainTileActor.h"
+#include "ACameraActor.h"
+#include "ASky.h"
+#include "ALight.h"
+#include "AUIActor.h"
+
+// Component
+#include "UStaticMeshComponent.h"
+
+// Script
+#include "EngineCameraMoveScript.h"
+#include "GameCameraMove.h"
+
 
 void Game::Init()
 {
@@ -37,12 +40,7 @@ void Game::Init()
 	OBJECT->AddActor(m_pPlayer);
 
 	// UI
-	m_vHP = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
-	m_vArrow = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
-
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
-	UI->AddUIList(m_vHP);
-	UI->AddUIList(m_vArrow);
 	UI->DoFadeOut();
 
 	SetupEngineCamera();
