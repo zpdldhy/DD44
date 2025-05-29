@@ -9,6 +9,10 @@
 #include "Timer.h"
 #include "Input.h"
 #include "PrefabToActor.h"
+#include "BatMovement.h"
+#include "WalkerMovement.h"
+#include "CollisionManager.h"
+#include "EffectManager.h"
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -27,17 +31,23 @@
 
 void Game::Init()
 {
+	EFFECT->Init();
 	// Asset ·Îµù
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
 
-	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	OBJECT->AddActorList(vlist);
-
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	OBJECT->AddActor(m_pPlayer);
+
+	auto vlist = PToA->LoadAllPrefabs(".character.json");
+	OBJECT->AddActorList(vlist);
+	
+	// Temp
+	enemyList = vlist;
+	SetEnemyScript();
+
 
 	// UI
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
@@ -64,6 +74,8 @@ void Game::Tick()
 			CAMERA->Set3DCameraActor(m_pCameraActor);
 		}
 	}
+
+	CheckEnemyCollision();
 }
 
 void Game::Render()
@@ -132,4 +144,36 @@ void Game::SetupSunLight()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
+}
+
+void Game::SetEnemyScript()
+{
+	for (auto& enemy : enemyList)
+	{
+		// bat
+		{
+			auto script = dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0]);
+			if (script) { script->SetPlayer(m_pPlayer); }
+		}
+
+		// walker
+		{
+			auto script = dynamic_pointer_cast<WalkerMovement>(enemy->GetScriptList()[0]);
+			if (script) { script->SetPlayer(m_pPlayer); }
+		}
+	}
+}
+
+void Game::CheckEnemyCollision()
+{
+	for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	{
+		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+		{
+			iter = enemyList.erase(iter);
+			continue;
+		}
+		COLLITION->CheckCollision(m_pPlayer, *iter);
+		iter++;
+	}
 }

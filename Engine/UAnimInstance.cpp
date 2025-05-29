@@ -10,14 +10,30 @@ void UAnimInstance::Tick()
 	if (!m_bPlay) { return; }
 	animFrame += TIMER->GetDeltaTime() * m_fAnimPlayRate;
 
-	if (animFrame >= animTrackList[currentAnimTrackIndex].animList[0].size())
+	UINT lastFrame = animTrackList[currentAnimTrackIndex].animList[0].size();
+
+	auto iter = m_mKeyFrameMap.find(currentAnimTrackIndex);
+	bool hasEnd = false;
+	if (iter != m_mKeyFrameMap.end())
 	{
-		if (m_bOnPlayOnce)
+		hasEnd = true;
+		lastFrame = iter->second;
+	}
+
+
+	if (animFrame >= lastFrame)
+	{
+		m_bOnPlayOnce = false;
+		if (!hasEnd)
 		{
-			currentAnimTrackIndex = prevIndex;
-			m_bOnPlayOnce = false;
+			if (m_bOnPlayOnce)
+			{
+				currentAnimTrackIndex = prevIndex;
+				m_bOnPlayOnce = false;
+			}
+
+			animFrame = 0;
 		}
-		animFrame = 0;
 	}
 
 	// ROOTMOTION
@@ -135,4 +151,16 @@ Matrix UAnimInstance::GetBoneAnim(int _boneIndex)
 	}
 
 	return ret;
+}
+
+// set end frame
+void UAnimInstance::SetKeyFrame(int _trackIndex, UINT _key)
+{
+	if (_key >= animTrackList[_trackIndex].animList[0].size() || _key < 0)
+	{
+		return;
+	}
+
+	m_mKeyFrameMap.insert(make_pair(_trackIndex, _key));
+
 }

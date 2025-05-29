@@ -17,6 +17,9 @@ protected:
 	ShapeType m_ShapeType = ShapeType::ST_NONE;
 	DirectX::SimpleMath::Color m_pShapeColor = { 0.f, 0.f, 0.f, 0.f };
 
+	// temp 
+	vector<weak_ptr<UShapeComponent>> m_vCollisionList;
+
 public:
 	UShapeComponent() = default;
 	virtual ~UShapeComponent() = default;
@@ -31,5 +34,9 @@ public:
 
 	const ShapeType& const GetShapeType() { return m_ShapeType; }
 	const CollisionEnabled& const GetCollisionType() { return m_CollisionEnabled; }
+	void AddCollision(weak_ptr<UShapeComponent> _col) { m_vCollisionList.push_back(_col); }
+	vector<weak_ptr<UShapeComponent>>& GetCollisionList() { return m_vCollisionList; }
+	int GetCollisionCount() { return m_vCollisionList.size(); }
+	void ReserCollisionList() { m_vCollisionList.clear(); }
 };
 
