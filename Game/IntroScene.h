@@ -29,6 +29,7 @@ private:
 	void UpdateUIState();
 
 private:
+	vector<shared_ptr<class AUIActor>> m_vBackGround;
 	vector<shared_ptr<class AUIActor>> m_vMenu;
 	vector<shared_ptr<class AUIActor>> m_vArrowUI;
 	UINT m_vSelectMenu = 0;

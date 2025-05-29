@@ -29,9 +29,10 @@
 void IntroScene::Init()
 {
 	UI->SetFadeActor(PToA->MakeUI("../Resources/Prefab/UI_Fade.ui.json"));
-	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Intro_BackGround.uis.json"));
+	m_vBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Intro_BackGround.uis.json");
 	m_vMenu = PToA->MakeUIs("../Resources/Prefab/UI_Intro_Menu.uis.json");
 	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Intro_SelectArrow.uis.json");
+	UI->AddUIList(m_vBackGround);
 	UI->AddUIList(m_vMenu);
 	UI->AddUIList(m_vArrowUI);
 
@@ -100,65 +101,93 @@ void IntroScene::SetupSunLight()
 
 void IntroScene::UpdateUIState()
 {
-	if (INPUT->GetButton(UP))
+	if (!m_bSelectStartButton)
 	{
-		if (m_vSelectMenu != SM_START)
+		Vec3 idle(cosf(TIMER->GetGameTime() * 7.f) * 0.2f, 0.f, 0.f);
+
+		// 화살표 Idle
+		m_vArrowUI[0]->AddPosition(idle);
+		m_vArrowUI[1]->AddPosition(-idle);
+
+		auto temp1 = m_vArrowUI[0]->GetPosition().x;
+		auto temp2 = m_vArrowUI[1]->GetPosition().x;
+
+		if (INPUT->GetButton(UP))
 		{
-			m_vSelectMenu--;
-			for (auto& pUI : m_vArrowUI)
-				pUI->AddPosition(Vec3(0.f, +0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
+			if (m_vSelectMenu != SM_START)
+			{
+				m_vSelectMenu--;
+				for (auto& pUI : m_vArrowUI)
+					pUI->AddPosition(Vec3(0.f, +0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
+			}
 		}
-	}
 
-	if (INPUT->GetButton(DOWN))
-	{
-		if (m_vSelectMenu != SM_EXIT)
+		if (INPUT->GetButton(DOWN))
 		{
-			m_vSelectMenu++;
-			for (auto& pUI : m_vArrowUI)
-				pUI->AddPosition(Vec3(0.f, -0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
+			if (m_vSelectMenu != SM_EXIT)
+			{
+				m_vSelectMenu++;
+				for (auto& pUI : m_vArrowUI)
+					pUI->AddPosition(Vec3(0.f, -0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2), 0.f));
+			}
 		}
-	}
 
-	for (auto& menu : m_vMenu)
-	{
-		menu->SetColor(Color(0.5f, 0.5f, 0.5f, 1.f));
-	}
-
-	switch (m_vSelectMenu)
-	{
-	case SM_START:
-	{
-		m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
-
-		if (INPUT->GetButton(ENTER))
+		for (auto& menu : m_vMenu)
 		{
-			UI->DoFadeIn();
-			m_bSelectStartButton = true;
+			menu->SetColor(Color(0.5f, 0.5f, 0.5f, 1.f));
 		}
-	}
-	break;
-	case SM_OPTION:
-	{
-		m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
 
-	}
-	break;
-	case SM_EXIT:
-	{
-		m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+		switch (m_vSelectMenu)
+		{
+		case SM_START:
+		{
+			m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
 
-		if (INPUT->GetButton(ENTER))
-			PostQuitMessage(0);
-	}
-	break;
+			if (INPUT->GetButton(ENTER))
+			{
+				m_bSelectStartButton = true;
+			}
+		}
+		break;
+		case SM_OPTION:
+		{
+			m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+
+		}
+		break;
+		case SM_EXIT:
+		{
+			m_vMenu[m_vSelectMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+
+			if (INPUT->GetButton(ENTER))
+				PostQuitMessage(0);
+		}
+		break;
+		}
 	}
 
 	// UIThrow
 	if (m_bSelectStartButton)
-	{		
-		m_bthrowUI = true;
-		m_bSelectStartButton = false;
+	{
+		// 화살표
+		m_vArrowUI[0]->AddPosition(Vec3(+TIMER->GetDeltaTime() * 1500.f, 0.f, 0.f));
+		m_vArrowUI[1]->AddPosition(Vec3(-TIMER->GetDeltaTime() * 1500.f, 0.f, 0.f));
+
+		// 선택창
+		for (auto& pUI : m_vMenu)
+			pUI->AddPosition(Vec3(0.f, -TIMER->GetDeltaTime() * 1000.f, 0.f));
+
+		// 타이틀
+		m_vBackGround[1]->AddPosition(Vec3(0.f, TIMER->GetDeltaTime() * 1000.f, 0.f));
+
+		auto what = m_vMenu[0]->GetPosition().y;
+
+		if ((m_vMenu[0]->GetPosition().y + (m_vMenu[0]->GetScale().y / 2) < -1.f * (static_cast<float>(g_windowSize.y) / 2.f)) &&
+			(m_vBackGround[1]->GetPosition().y - (m_vBackGround[1]->GetScale().y / 2) > 1.f * (static_cast<float>(g_windowSize.y) / 2.f)))
+		{
+			m_bthrowUI = true;
+			m_bSelectStartButton = false;
+		}
 	}
 
 	// Do FadeIn
