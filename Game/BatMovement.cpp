@@ -6,6 +6,7 @@
 #include "UMeshComponent.h"
 // temp
 #include "Input.h"
+#include "Sound.h"
 
 void BatMovement::Init()
 {
