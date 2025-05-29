@@ -58,15 +58,13 @@ void Engine::Init()
 		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
+		EFFECT->Init();
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
 	POSTPROCESS->Init(8);
 	// 8개의 MRT DxState 초기화
 	STATE->Create();
-	//EFFECT->Init();
-	
-
 }
 
 void Engine::Frame()

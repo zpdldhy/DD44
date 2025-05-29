@@ -31,7 +31,7 @@
 
 void Game::Init()
 {
-	EFFECT->Init();
+	//EFFECT->Init();
 	// Asset ·Îµù
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
@@ -47,7 +47,6 @@ void Game::Init()
 	// Temp
 	enemyList = vlist;
 	SetEnemyScript();
-
 
 	// UI
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));

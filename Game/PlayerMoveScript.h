@@ -32,7 +32,6 @@ public:
 	Vec3 m_vRollLook;
 
 	// 상호작용
-	int m_hp = 4;
 	UINT m_vHP = 4;
 	UINT m_vArrowCount = 4;
 

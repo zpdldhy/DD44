@@ -39,6 +39,10 @@ void PlayerMoveScript::Init()
 
 void PlayerMoveScript::Tick()
 {
+	// Test
+	if (INPUT->GetButton(L))
+		m_vHP++;
+
 #pragma region EFFECT
 	Slash();
 	if (m_bIsFlashing)
@@ -126,6 +130,7 @@ void PlayerMoveScript::Tick()
 #pragma region TEMP_COLLISION
 			if (GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
 			{
+				m_bHPUIChange = true;
 				//if (INPUT->GetButton(J))
 				{
 					// Blood FX
@@ -140,8 +145,10 @@ void PlayerMoveScript::Tick()
 
 					// Anim
 					// HP 
-					//m_hp -= 1;
-					if (m_hp > 0)
+					if (m_vHP != 0)
+						m_vHP -= 1;
+
+					if (m_vHP > 0)
 					{
 						ChangetState(hit);
 						m_bCanBeHit = false;
@@ -305,17 +312,6 @@ void PlayerMoveScript::SetUI()
 
 void PlayerMoveScript::UpdateHPUI()
 {
-	// test¿ë
-	if (INPUT->GetButton(K))
-	{
-		if (m_vHP != 0)
-			m_vHP--;
-		m_bHPUIChange = true;
-	}
-
-	if (INPUT->GetButton(L))
-		m_vHP++;
-
 	Color RestColor;
 
 	if (m_vHP == 4)
