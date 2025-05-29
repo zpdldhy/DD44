@@ -40,6 +40,8 @@ public:
 	bool m_bUpdateQuadTree = false;
 	bool m_bUseStencil = false;
 
+	void SetUseStencil(bool _isStencil) { m_bUseStencil = _isStencil; }
+
 	//--------------------------------------------------------------------------------------
 	// Component
 	//--------------------------------------------------------------------------------------

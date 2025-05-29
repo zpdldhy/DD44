@@ -16,8 +16,23 @@ enum class ESoundType
 	Die,
 	Ending,
 
+	//Charactor
+	Slash,
+	Dash,
+	Walk,
 	Hit,
+
+	//Bat
+	Attack_Bat,
+	Enemy_Damaged,
+
+	//UI
+	Hover,
+	Click,
+
 	Max
+
+
 };
 
 
