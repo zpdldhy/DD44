@@ -34,7 +34,49 @@ PS_OUT PS(VS_OUT input)
     
     float4 texColor = g_txDiffuseA.Sample(sample, input.t);
     psOut.c = texColor;
- 
+
+    float speed = 0.02;
+    float t = fmod(g_fGameTime * speed, 1.0);
+
+    // 기본 HSV
+    float h = 0.0;
+    float s = 1.0;
+    float v = 1.0;
+
+    // 구간별 조건 처리
+    if (t < 0.2 || t >= 0.6)
+    {
+        // 낮
+        h = 0.0;
+        s = 1.0;
+        v = 1.0;
+    }
+    else if (t < 0.3)
+    {
+        // 노을 (0.2 ~ 0.3)
+        float k = (t - 0.2) / 0.1; // 0~1
+        h = lerp(0.0, 30.0, k);
+        s = lerp(1.0, 5.0, k);
+        v = lerp(1.0, 0.4, k);
+    }
+    else if (t < 0.5)
+    {
+        // 밤 (0.3 ~ 0.5)
+        float k = (t - 0.3) / 0.2;
+        h = 30.0;
+        s = lerp(5.0, 0.4, k);
+        v = 0.4;
+    }
+    else if (t < 0.6)
+    {
+        // 새벽 (0.5 ~ 0.6)
+        float k = (t - 0.5) / 0.1;
+        h = lerp(30.0, 0.0, k);
+        s = lerp(0.4, 1.0, k);
+        v = lerp(0.4, 1.0, k);
+    }
+
+    psOut.c.xyz = clamp(TransformHSV(psOut.c.xyz, h, s, v), 0.0, 1.0);
    
     return psOut;
 }
