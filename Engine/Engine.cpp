@@ -64,7 +64,7 @@ void Engine::Init()
 	POSTPROCESS->Init(8);
 	// 8개의 MRT DxState 초기화
 	STATE->Create();
-	EFFECT->Init();
+	//EFFECT->Init();
 	
 
 }

@@ -18,34 +18,32 @@ void BatMovement::Init()
 	death = make_shared<BatDieState>(m_pOwner);
 
 	currentState = idle;
-	currentState->Enter(); 
+	currentState->Enter();
+
+	m_bClockWise = (RandomRange(0, 10) > 5.0f) ? true: false;
 }
 
 
 void BatMovement::Tick()
-{	
+{
 	Flashing();
 
 	currentState->Tick();
-	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_DEATH )
+	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_DEATH)
 	{
 		if (!currentState->IsPlaying())
 		{
 			// bat 죽음
 			GetOwner()->m_bDelete = true;
+			//GetOwner()->GetMeshComponent()->SetVisible(false);
 		}
 		return;
 	}
 
-	if (m_bReturn)
-	{
-		ReturningToPos();
-		return;
-	}
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
 	{
-		// 여기 있어야 중복 막음
-		if (INPUT->GetButton(K))
+		Vec3 distance = player.lock()->GetPosition() - GetOwner()->GetPosition();
+		if (distance.Length() < 3.0f && INPUT->GetButton(LCLICK))
 		{
 			// Blood FX
 			Vec3 basePos = GetOwner()->GetPosition();
@@ -59,17 +57,30 @@ void BatMovement::Tick()
 			m_bIsFlashing = true;
 
 			ChangetState(death);
+			return;
 		}
+	}
+	if (m_bReturn)
+	{
+		ReturningToPos();
+		return;
 	}
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_ATTACK)
 	{
 		float deltaTime = TIMER->GetDeltaTime();
 		{
 			// 획일성을 줄이기 위해 
-			rotateSpeed = RandomRange((originRotateSpeed - 0.005f), (originRotateSpeed + 0.01f));
+			rotateSpeed = RandomRange((originRotateSpeed - 0.3f), (originRotateSpeed + 0.5f));
 
 		}
-		angle += rotateSpeed * deltaTime;
+		if (m_bClockWise)
+		{
+			angle -= rotateSpeed * deltaTime; // 시계
+		}
+		else
+		{
+			angle += rotateSpeed * deltaTime; // 반시계
+		}
 
 		// 2PI 넘으면 되돌림
 		if (angle > 2 * DD_PI) angle -= 2 * DD_PI;
@@ -86,13 +97,33 @@ void BatMovement::Tick()
 
 		// direction을 이용한 회전
 		Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
-		Vec3 moveDir = tempUp.Cross(direction); // 반시계 방향
+		Vec3 moveDir;
+		if (m_bClockWise)
+		{
+			moveDir = direction.Cross(tempUp); // 시계 방향
+		}
+		else
+		{
+			moveDir = tempUp.Cross(direction); // 반시계 방향
+		}
 
 		// 회전 TargetPos 바라보기
 		float targetYaw = atan2f(moveDir.x, moveDir.z);
 		Vec3 currentRot = GetOwner()->GetRotation();
 		currentRot.y = targetYaw;
 		GetOwner()->SetRotation(currentRot);
+
+		//
+		Vec3 distance = player.lock()->GetPosition() - GetOwner()->GetPosition();
+
+		if (distance.Length() < 5.0f && distance.Length() > 3.0f)
+		{
+			m_bCanStartAttack = true;
+			m_vTargetPos = player.lock()->GetPosition();
+		}
+
+
+		Attack();
 	}
 	else
 	{
@@ -108,24 +139,24 @@ void BatMovement::Tick()
 			// ReturnPos 찾기
 			// 시도 1 : 가장 가까운 원 위의 한 점으로 이동
 			{
-				Vec3 dir = m_vCenter - GetOwner()->GetPosition();
-				Vec3 rDir = dir;
-				rDir.Normalize();
-				Vec3 temp = rDir * m_fRadius;
+				//Vec3 dir = m_vCenter - GetOwner()->GetPosition();
+				//Vec3 rDir = dir;
+				//rDir.Normalize();
+				//Vec3 temp = rDir * m_fRadius;
 
-				Vec3 diff = dir - temp;
-				m_vReturnPos = GetOwner()->GetPosition() + diff;
+				//Vec3 diff = dir - temp;
+				//m_vReturnPos = GetOwner()->GetPosition() + diff;
 			}
 			// 시도 2 : 다른 접점으로 이동
 			{
-			/*	Vec3 d = GetOwner()->GetPosition() - m_vCenter;
+				Vec3 d = GetOwner()->GetPosition() - m_vCenter;
 				float dLength = d.Length();
 				Vec3 d_norm = d / dLength;
 
 				Vec3 tempUp = Vec3(0, 1, 0);
 				Vec3 t1 = d_norm.Cross(tempUp);
 
-				m_vReturnPos = m_vCenter + t1 * m_fRadius;*/
+				m_vReturnPos = m_vCenter + t1 * m_fRadius;
 			}
 
 			// 
@@ -135,34 +166,18 @@ void BatMovement::Tick()
 		}
 	}
 
-	if (INPUT->GetButton(M)) // 실제 로직에선 플레이어 인식 후 targetPos 업데이트
-	{
-		// 이 부분 처리 개선 필요
-		if (!currentState->IsInterruptible() && currentState->IsPlaying())
-		{
-			return;
-		}
-		m_vPrevPos = GetOwner()->GetPosition();
-		m_vTargetPos = m_vPrevPos + GetOwner()->GetLook() * 5.0f;
-		Vec3 diff = m_vTargetPos - GetOwner()->GetPosition();
-
-		// 회전 TargetPos 바라보기
-		float targetYaw = atan2f(diff.x, diff.z);
-		Vec3 currentRot = GetOwner()->GetRotation();
-		currentRot.y = targetYaw;
-		GetOwner()->SetRotation(currentRot);
-
-		ChangetState(attack);
-
-	}
 
 }
 
 void BatMovement::ChangetState(shared_ptr<StateBase> _state)
 {
+
 	if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
-		return;
+		if (!_state->GetId() == ENEMY_S_DEATH)
+		{
+			return;
+		}
 	}
 
 	if (currentState)
@@ -177,13 +192,13 @@ void BatMovement::ChangetState(shared_ptr<StateBase> _state)
 void BatMovement::ReturningToPos()
 {
 	Vec3 ownerPos = GetOwner()->GetPosition();
-	Vec3 diff = m_vReturnPos - ownerPos ;
-	if ( abs(diff.x) <= 0.15f || abs(diff.z) <= 0.15f)
+	Vec3 diff = m_vReturnPos - ownerPos;
+	if (abs(diff.x) <= 0.5f || abs(diff.z) <= 0.5f)
 	{
 		m_bReturn = false;
 	}
 
-	Vec3 pos = diff * 0.01f;
+	Vec3 pos = diff * 0.005f;
 	GetOwner()->AddPosition(pos);
 
 	Vec3 currentPos = GetOwner()->GetPosition();
@@ -271,5 +286,29 @@ void BatMovement::Flashing()
 
 		auto root = GetOwner()->GetMeshComponent();
 		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
+	}
+}
+
+void BatMovement::Attack()
+{
+	if (m_bCanStartAttack) // 실제 로직에선 플레이어 인식 후 targetPos 업데이트
+	{
+		// 이 부분 처리 개선 필요
+		if (!currentState->IsInterruptible() && currentState->IsPlaying())
+		{
+			return;
+		}
+		m_vPrevPos = GetOwner()->GetPosition();
+		//m_vTargetPos = m_vPrevPos + GetOwner()->GetLook() * 5.0f;
+		Vec3 diff = m_vTargetPos - GetOwner()->GetPosition();
+
+		// 회전 TargetPos 바라보기
+		float targetYaw = atan2f(diff.x, diff.z);
+		Vec3 currentRot = GetOwner()->GetRotation();
+		currentRot.y = targetYaw;
+		GetOwner()->SetRotation(currentRot);
+
+		ChangetState(attack);
+		m_bCanStartAttack = false;
 	}
 }

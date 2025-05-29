@@ -27,7 +27,8 @@
 #include "EffectManager.h"
 
 #include "BatMovement.h"
-bool bRunGame = true;
+#include "WalkerMovement.h"
+#include "CollisionManager.h"
 
 //#undef RUN_GAME
 void Editor::Init()
@@ -51,6 +52,10 @@ void Editor::Init()
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	OBJECT->AddActor(m_pPlayer);
+
+	// Temp
+	enemyList = vlist;
+	SetEnemyScript();
 
 	SetupEngineCamera();
 	SetupGameCamera();
@@ -80,6 +85,8 @@ void Editor::Tick()
 	}
 
 	TransformActorByDragging();
+
+	CheckEnemyCollision();
 }
 
 void Editor::Render()
@@ -704,4 +711,36 @@ void Editor::SetupParticleEditorCallback()
 			PARTICLE->AddUI(particleActor);
 			//particleActor->InitSpriteAnimation(4, 1.f); // 4´Â divisions, 10Àº frameRate
 		});
+}
+
+void Editor::SetEnemyScript()
+{
+	for (auto& enemy : enemyList)
+	{
+		// bat
+		{
+			auto script = dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0]);
+			if (script) { script->SetPlayer(m_pPlayer); }
+		}
+
+		// walker
+		{
+			auto script = dynamic_pointer_cast<WalkerMovement>(enemy->GetScriptList()[0]);
+			if (script) { script->SetPlayer(m_pPlayer); }
+		}
+	}
+}
+
+void Editor::CheckEnemyCollision()
+{
+	for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	{
+		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+		{
+			iter = enemyList.erase(iter);
+			continue;
+		}
+		COLLITION->CheckCollision(m_pPlayer, *iter);
+		iter++;
+	}
 }

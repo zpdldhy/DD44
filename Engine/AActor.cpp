@@ -47,6 +47,11 @@ void AActor::Tick()
 	{
 		script->Tick();
 	}
+
+	if (GetShapeComponent())
+	{
+		GetShapeComponent()->ReserCollisionList();
+	}
 }
 
 void AActor::Render()
