@@ -7,10 +7,16 @@
 
 enum class ESoundType
 {
-	Bomb,
-	Bgm,
-	Hit,
+	Intro,
+	Stage0,
+	Boss1,
+	Stage1,
+	Boss2,
+	STage2,
 	Die,
+	Ending,
+
+	Hit,
 	Max
 };
 

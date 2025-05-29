@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "IntroScene.h"
+
+// Manager
 #include "CameraManager.h"
 #include "LightManager.h"
 #include "ObjectManager.h"
@@ -23,6 +25,9 @@
 // Script
 #include "EngineCameraMoveScript.h"
 
+// Sound
+#include "Sound.h"
+
 // Scene
 #include "Game.h"
 
@@ -35,16 +40,19 @@ void IntroScene::Init()
 	UI->AddUIList(m_vBackGround);
 	UI->AddUIList(m_vMenu);
 	UI->AddUIList(m_vArrowUI);
+	
 
 	m_vDefaultSelectY = m_vArrowUI[0]->GetPosition().y;
 
 	SetupEngineCamera();
 	//SetupSkybox();
 	SetupSunLight();
+	
 }
 
 void IntroScene::Tick()
 {
+	SOUNDMANAGER->GetPtr(ESoundType::Intro)->Play2D();
 	UpdateUIState();
 }
 
@@ -239,5 +247,6 @@ void IntroScene::UpdateUIState()
 		auto game = make_shared<Game>();
 		game->Init();
 		Engine::GetInstance()->SetApp(game);
+		SOUNDMANAGER->GetPtr(ESoundType::Intro)->Stop();
 	}
 }
