@@ -19,8 +19,10 @@
 #include "AUIActor.h"
 #include "UIManager.h"
 #include "Timer.h"
+#include "Sound.h"
 
 #include "PrefabToActor.h"
+#include "EffectManager.h"
 
 void Game::Init()
 {
@@ -45,6 +47,7 @@ void Game::Init()
 	UI->AddUIList(m_vArrow);
 	UI->DoFadeOut();
 
+	EFFECT->Init();
 	SetupEngineCamera();
 	SetupGameCamera();
 	SetupSkybox();
@@ -53,6 +56,11 @@ void Game::Init()
 
 void Game::Tick()
 {
+	//bgm
+	{
+		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
+	}
+	
 	if (INPUT->GetButton(O))
 	{
 		if (m_bEnginCamera)

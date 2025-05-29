@@ -145,8 +145,8 @@ bool SoundManager::Load(ESoundType type, const std::wstring& path)
 
 void SoundManager::LoadAllSounds()
 {
-	Load(ESoundType::Bomb, L"../Resources/Sound/bomb.wav");
-	Load(ESoundType::Bgm, L"../Resources/Sound/boss.mp3");
+	Load(ESoundType::Intro, L"../Resources/Sound/intro.mp3");
+	Load(ESoundType::Stage0, L"../Resources/Sound/state0.mp3");
 }
 
 Sound* SoundManager::GetPtr(ESoundType type)
