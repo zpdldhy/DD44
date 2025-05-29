@@ -115,7 +115,7 @@ void Game::SetupSkybox()
 	m_pSky->SetMeshComponent(m_pSkyMesh);
 
 	shared_ptr<UMaterial> material = make_shared<UMaterial>();
-	material->Load(L"../Resources/Texture/Sky.jpg", L"../Resources/Shader/Sky.hlsl");
+	material->Load(L"../Resources/Texture/skypano.png", L"../Resources/Shader/Sky.hlsl");
 	m_pSkyMesh->SetMaterial(material);
 
 	OBJECT->AddActor(m_pSky);
