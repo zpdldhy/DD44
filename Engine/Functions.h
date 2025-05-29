@@ -84,6 +84,17 @@ static std::string to_wm(const std::wstring& _src)
 	return converter.to_bytes(_src);
 }
 
+static std::string to_mbs(const std::wstring& wstr)
+{
+	if (wstr.empty()) return {};
+
+	int size = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+	std::string result(size, 0);
+	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &result[0], size, nullptr, nullptr);
+	result.pop_back(); // null Á¦°Å
+	return result;
+}
+
 static std::string ReplaceAsterisk(const std::string& pathTemplate, const std::string& filename) {
 	size_t pos = pathTemplate.find('*');
 	if (pos != std::string::npos) {

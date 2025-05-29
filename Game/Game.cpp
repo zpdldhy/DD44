@@ -35,7 +35,6 @@
 
 void Game::Init()
 {
-	EFFECT->Init();
 	// Asset ·Îµù
 
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
@@ -69,7 +68,12 @@ void Game::Tick()
 {
 	//bgm
 	{
-		//SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
+		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
+	}
+	
+	if (INPUT->GetButton(H))
+	{
+		SOUNDMANAGER->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
 	}
 	
 	if (INPUT->GetButton(O))
