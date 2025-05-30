@@ -34,8 +34,8 @@ void AFireParticleActor::Tick()
 
     SetPosition(m_vBasePosition + Vec3(x, y + m_fFlickerValue, 0));
 
-    float rotZ = sinf(t) * 0.5f; // 예: 흔들리는 회전
-    SetRotation(Vec3(0, 0, rotZ)); // 회전만 설정
+   /* float rotZ = sinf(t) * 0.2f; 
+    SetRotation(Vec3(0, 0, rotZ)); */
 
 
 }
