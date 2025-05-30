@@ -6,6 +6,7 @@ enum class UIStateType
 	ST_HOVER,
 	ST_ACTIVE,
 	ST_SELECT,
+	ST_COUNT,
 };
 
 class AUIActor;

@@ -5,11 +5,11 @@
 class PrefabLoader : public Singleton<PrefabLoader>
 {
 public:
-    bool Save(const PrefabData& _prefab, const std::string& _filePath);
-    bool Load(const std::string& _filePath, PrefabData& _prefab);
+    //bool Save(const PrefabData& _prefab, const std::string& _filePath);
+    //bool Load(const std::string& _filePath, PrefabData& _prefab);
 
-    bool SaveScene(const std::string& _filepath, const std::vector<PrefabData>& _placedPrefabs);
-    bool LoadScene(const std::string& _filepath, std::vector<PrefabData>& _placedPrefabs);
+    //bool SaveScene(const std::string& _filepath, const std::vector<PrefabData>& _placedPrefabs);
+    //bool LoadScene(const std::string& _filepath, std::vector<PrefabData>& _placedPrefabs);
 
     bool SaveCharacter(const PrefabCharacterData& _data, const std::string& _filePath);
     bool LoadCharacter(const std::string& _filePath, PrefabCharacterData& _data);

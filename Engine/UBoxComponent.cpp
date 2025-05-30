@@ -84,16 +84,29 @@ void UBoxComponent::UpdateBounds()
 	m_Box.vMax = Vec3::Transform(vMax, m_matWorld);
 	m_Box.vCenter = Vec3::Transform(vCenter, m_matWorld);
 
-	m_Box.vAxis[0] = XMVector3TransformNormal(vAxisRoll, m_matWorld);
-	m_Box.vAxis[1] = XMVector3TransformNormal(vAxisYaw, m_matWorld);
-	m_Box.vAxis[2] = XMVector3TransformNormal(vAxisPitch, m_matWorld);
+	m_Box.vAxis[0] = XMVector3TransformNormal(vAxisRoll, m_matWorldRotation);
+	m_Box.vAxis[1] = XMVector3TransformNormal(vAxisYaw, m_matWorldRotation);
+	m_Box.vAxis[2] = XMVector3TransformNormal(vAxisPitch, m_matWorldRotation);
 
 	m_Box.vAxis[0].Normalize();
 	m_Box.vAxis[1].Normalize();
-	m_Box.vAxis[2].Normalize();
+	m_Box.vAxis[2].Normalize();	
 
 	// 고정 박스라면 extents는 0.5, 0.5, 0.5
-	m_Box.vExtent = Vec3(0.5f, 0.5f, 0.5f) * m_vWorldScale;
+	m_Box.vExtent[0] = 0.5f * m_vWorldScale.x;
+	m_Box.vExtent[1] = 0.5f * m_vWorldScale.y;
+	m_Box.vExtent[2] = 0.5f * m_vWorldScale.z;
+
+	m_LookRay.position = m_Box.vCenter;
+	m_LookRay.direction = m_Box.vAxis[0] * m_Box.vExtent[0];
+
+	m_GroundRay.position = m_Box.vCenter;
+	m_GroundRay.direction = -m_Box.vAxis[1] * m_Box.vExtent[1];
+
+	if (GetOwner()->m_szName == L"MyCharacter")
+	{
+		int i = 0;
+	}
 }
 
 void UBoxComponent::CreateCollisionRange()

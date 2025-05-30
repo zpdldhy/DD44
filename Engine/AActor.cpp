@@ -7,12 +7,16 @@
 AActor::AActor()
 {
 	m_pTransform = make_unique<USceneComponent>();
+	m_pPhysics = make_unique<UPhysicsComponent>();
 }
 
 void AActor::Init()
 {
 	m_pTransform->SetOwner(shared_from_this());
 	m_pTransform->Init();
+
+	m_pPhysics->SetOwner(shared_from_this());
+	m_pPhysics->Init();
 
 	for (auto& component : m_arrComponent)
 	{
@@ -32,6 +36,8 @@ void AActor::Init()
 
 void AActor::Tick()
 {
+	m_pPhysics->Tick();
+
 	m_pTransform->Tick();
 
 	// Component
@@ -50,7 +56,7 @@ void AActor::Tick()
 
 	if (GetShapeComponent())
 	{
-		GetShapeComponent()->ReserCollisionList();
+		GetShapeComponent()->ResetCollisionList();
 	}
 }
 
@@ -60,6 +66,7 @@ void AActor::Render()
 	//	return;
 
 	m_pTransform->Render();
+	m_pPhysics->Render();
 
 	for (auto& component : m_arrComponent)
 	{
@@ -78,6 +85,7 @@ void AActor::Render()
 void AActor::Destroy()
 {
 	m_pTransform->Destroy();
+	m_pPhysics->Destroy();
 
 	for (auto& component : m_arrComponent)
 	{

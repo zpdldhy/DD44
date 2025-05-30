@@ -14,7 +14,7 @@ public:
 public:
 	float m_fSpeed = 10.0f;
 	float m_fRollSpeed  = 15.0f;
-	float m_fCurrentSpeed;
+	float m_fCurrentSpeed = 0.f;
 	float m_fRotationSpeed = 8.0f;
 
 	bool m_bDamageCoolTime = false;

@@ -1,6 +1,5 @@
 #pragma once
 #include "Singleton.h"
-#include "UBoxComponent.h"
 
 struct pair_hash {
     template<typename T1, typename T2>
@@ -19,6 +18,7 @@ public:
 
 public:
     void CheckCollision(vector<UINT> _vActorIndex);
+    void CheckCollision(vector<shared_ptr<class AActor>> _vActorIist);
     bool CheckCollision(shared_ptr<class AActor> _p1, shared_ptr<class AActor> _p2);
     static bool CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor);
 
@@ -28,7 +28,7 @@ public:
     static bool CheckMousePicking(const Ray& _ray, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2, const Vec3& _normal, Vec3& _inter);
     static bool CheckAABBToRay(const Ray& _ray, const Box& _box, Vec3& _inter);
     static bool CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter);
-    static bool CheckOBBToOBB(const Box& _box1, const Box& _box2);
+    static bool CheckOBBToOBB(const Box& _box1, const Box& _box2, Vec3* _outNormal);
 
     static bool GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& _inter);
     static bool PointInPolygon(const Vec3& _inter, const Vec3& _faceNormal, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2);

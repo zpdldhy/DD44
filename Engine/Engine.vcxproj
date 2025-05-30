@@ -170,7 +170,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="AssimpLoader.h" />
     <ClInclude Include="AUIActor.h" />
     <ClInclude Include="CharacterEditorUI.h" />
-    <ClInclude Include="CollisionScript.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="EditorData.h" />
     <ClInclude Include="EffectEditorUI.h" />
@@ -208,6 +207,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="UIState.h" />
     <ClInclude Include="ULightComponent.h" />
+    <ClInclude Include="UPhysicsComponent.h" />
     <ClInclude Include="UShapeComponent.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="ATerrainTileActor.h" />
@@ -271,7 +271,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="AssimpLoader.cpp" />
     <ClCompile Include="AUIActor.cpp" />
     <ClCompile Include="CharacterEditorUI.cpp" />
-    <ClCompile Include="CollisionScript.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="EffectEditorUI.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
@@ -304,6 +303,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="UIState.cpp" />
     <ClCompile Include="ULightComponent.cpp" />
+    <ClCompile Include="UPhysicsComponent.cpp" />
     <ClCompile Include="UShapeComponent.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="ATerrainTileActor.cpp" />

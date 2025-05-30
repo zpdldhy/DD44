@@ -5,6 +5,8 @@ class UBoxComponent : public UShapeComponent
 {
 protected:
 	// 실제 연산
+	Ray m_LookRay;
+	Ray m_GroundRay;
 	Box m_Box;
 
 	// 범위 표기
@@ -29,6 +31,8 @@ public:
 public:
 	virtual void UpdateBounds() override;
 	const Box& const GetBounds() { return m_Box; }
+	const Ray& const GetLookRay() { return m_LookRay; }
+	const Ray& const GetGroundRay() { return m_GroundRay; }
 
 public:
 	void CreateCollisionRange();

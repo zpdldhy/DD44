@@ -37,9 +37,12 @@ void Game::Init()
 {
 	// Asset ·Îµù
 
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
+	m_vMapList = PToA->LoadAllPrefabs(".map.json");
+	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
+
+	OBJECT->AddActorList(m_vMapList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
+	OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
@@ -195,6 +198,28 @@ void Game::CheckEnemyCollision()
 		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 		{
 			iter = enemyList.erase(iter);
+			continue;
+		}
+		COLLITION->CheckCollision(m_pPlayer, *iter);
+		iter++;
+	}
+
+	for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
+	{
+		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+		{
+			iter = m_vObjectList.erase(iter);
+			continue;
+		}
+		COLLITION->CheckCollision(m_pPlayer, *iter);
+		iter++;
+	}
+
+	for (auto iter = m_vMapList.begin(); iter != m_vMapList.end();)
+	{
+		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+		{
+			iter = m_vMapList.erase(iter);
 			continue;
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
