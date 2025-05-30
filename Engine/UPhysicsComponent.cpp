@@ -135,14 +135,14 @@ void UPhysicsComponent::CollisionCalculate(const Vec3& currentPos, const Vec3& t
 				m_bColGrounded = true;
 				m_fCurrentGravity = 0.f;
 
-				auto pos = GetOwner()->GetPosition();
+				//auto pos = GetOwner()->GetPosition();
 
 
-				float y = box2.vCenter.y + box2.vAxis[1].y * box2.vExtent[1];
-				if (pos.y - (box1.vCenter.y + box1.vAxis[1].y * box1.vExtent[1]) < y)
-					pos.y = y;
+				//float y = box2.vCenter.y + box2.vAxis[1].y * box2.vExtent[1];
+				//if (pos.y - (box1.vCenter.y + box1.vAxis[1].y * box1.vExtent[1]) < y)
+				//	pos.y = y;
 
-				GetOwner()->SetPosition(pos);
+				//GetOwner()->SetPosition(pos);
 			}
 			else if (normal.y > 0.5f)
 			{
