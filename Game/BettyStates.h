@@ -9,7 +9,7 @@ enum BETTY_STATE
 	BETTY_S_INTRO,
 	BETTY_S_WALK,
 	BETTY_S_CHASE,
-	BETTY_S_ATTACK,
+	BETTY_S_GROUNDSLAM,
 	BETTY_S_HIT,
 	BETTY_S_DEATH,
 	BETTY_S_COUNT
@@ -36,6 +36,20 @@ private:
 public:
 	BettyIntroState(weak_ptr<AActor> _pOwner);
 	~BettyIntroState() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+};
+
+class BettySlamState : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+	bool m_bNextAnim = true;
+public:
+	BettySlamState(weak_ptr<AActor> _pOwner);
+	~BettySlamState() {}
 public:
 	virtual void Enter() override;
 	virtual void Tick() override;

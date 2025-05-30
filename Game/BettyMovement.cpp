@@ -7,14 +7,31 @@ void BettyMovement::Init()
 	// state
 	idle = make_shared<BettyIdleState>(m_pOwner);
 	intro = make_shared<BettyIntroState>(m_pOwner);
+	tempSlam = make_shared<BettySlamState>(m_pOwner);
 	currentState = idle;
 	currentState->Enter();
 }
 
 void BettyMovement::Tick()
 {
-	//currentState->Tick();
+	currentState->Tick();
+	
+	Vec3 diff = player.lock()->GetPosition() - GetOwner()->GetPosition();
+	if (m_bPlayOnce && diff.Length() < 20.0f)
+	{
+		ChangetState(tempSlam);
+		m_bPlayOnce = false;
+	}
+	if (!m_bPlayOnce && diff.Length() > 20.0f)
+	{
+		m_bPlayOnce = true;
+	}
 
+	if (currentState->GetId() == BETTY_S_GROUNDSLAM && !currentState->IsPlaying())
+	{
+		currentState->End();
+		ChangetState(idle);
+	}
 	//// 1회성 Intro 재생
 	//Vec3 diff = player.lock()->GetPosition() - GetOwner()->GetPosition();
 	//if (b)
