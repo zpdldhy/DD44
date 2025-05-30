@@ -39,7 +39,8 @@ void USkinnedMeshComponent::PreRender()
 	if (m_pMesh)
 	{
 		m_pMesh->Bind();
-		m_pMesh->UpdateBindPoseData();
+		// 성능에 영향이 있을까
+		static_pointer_cast<USkeletalMeshResources>(m_pMesh)->UpdateBindPoseData();
 	}
 
 	if (m_pMaterial) { m_pMaterial->Bind(); }

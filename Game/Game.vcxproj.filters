@@ -102,7 +102,6 @@
     <ClInclude Include="BettyMovement.h">
       <Filter>Script</Filter>
     </ClInclude>
-    <ClInclude Include="TempBossCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -180,7 +179,6 @@
     <ClCompile Include="BettyMovement.cpp">
       <Filter>Script</Filter>
     </ClCompile>
-    <ClCompile Include="TempBossCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

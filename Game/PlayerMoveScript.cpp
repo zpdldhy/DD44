@@ -33,11 +33,13 @@ void PlayerMoveScript::Init()
 	currentState = idle;
 	currentState->Enter();
 
-	m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetMeshByName(L"Slash")->GetMaterial();
+	auto body = dynamic_pointer_cast<UMeshComponent>(GetOwner()->GetMeshComponent());
 
-	backSword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword");
-	handSword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword2");
+	m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetChildByName(L"Slash")->GetMaterial();
 
+	body->GetChildByName(L"Body");
+	backSword = body->GetChildByName(L"Sword");
+	handSword = body->GetChildByName(L"Sword2");
 	// SetPhysics
 	auto pPhysics = GetOwner()->GetPhysics();
 	pPhysics->SetWeight(1.f);
