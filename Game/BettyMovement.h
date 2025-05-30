@@ -11,10 +11,12 @@ private:
 	// States 
 	shared_ptr<StateBase> idle;
 	shared_ptr<StateBase> intro;
+	shared_ptr<StateBase> tempSlam;
 	shared_ptr<StateBase> currentState;
 	
 	weak_ptr<AActor> player;
 
+	bool m_bPlayOnce = true;
 	bool b = true;
 public:
 	void Init();

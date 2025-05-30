@@ -41,7 +41,14 @@ void PlayerMoveScript::Tick()
 {
 	// Test
 	if (INPUT->GetButton(L))
+	{
 		m_vHP++;
+		if (currentState->GetId() == PLAYER_S_DEATH)
+		{
+			currentState->End();
+			ChangetState(idle);
+		}
+	}
 
 #pragma region EFFECT
 	Slash();
