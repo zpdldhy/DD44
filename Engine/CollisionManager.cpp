@@ -29,8 +29,9 @@ void Collision::Init()
 		{
 			// 충돌 처리
 			CollisionData data;
+			data.box = boxB->GetBounds();
 			data.ColNormal = output;
-			if (b->m_szName == L"Terrain")
+			if (b->m_szName == L"Terrain"|| b->m_szName == L"Stair")
 				data.bColGround = true;
 
 			boxA->AddCollision(b->m_Index, data);

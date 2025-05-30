@@ -21,28 +21,30 @@ public:
 
 	float GetCurrentGravity() { return m_fCurrentGravity; }
 	float GetCurrentSpeed() { return m_fCurrentGravity; }
-	Vec3 GetSpeed() { return m_vSpeed; }
+	Vec3 GetVelocity() { return m_vVelocity; }
 
 private:
-	void CollisionCalculate();
+	void CollisionCalculate(const Vec3& currentPos, const Vec3& targetPos, Vec3& velocity);
 
 public:
 	bool m_bFly = false;
 
 private:
+	bool m_bColGrounded = false;
+
 	// Gravity
 	float m_fMaxGravity = 0.5f;
-	float m_fGravityAcceleration = 1.f;
 	Vec3 m_fGravityDirection = { 0.f, -1.f, 0.f };
 	float m_fCurrentGravity = 0.f;	// 연산에 사용되는 놈
 	float m_fWeight = 0.f;
 
 	// Speed
-	bool m_bColGrounded = false;
 	float m_fAcceleration = 0.f;
 	float m_fMaxSpeed = 0.5f;
 	float m_fCurrentSpeed = 0.f;	// 연산에 사용되는 놈
 	Vec3 m_vDirection = { 0.f, 0.f, 0.f };
-	Vec3 m_vSpeed = { 0.f, 0.f, 0.f };
+	Vec3 m_vVelocity = { 0.f, 0.f, 0.f };
+
+	Vec3 m_normal = { 0.f, 0.f, 0.f };
 };
 

@@ -36,8 +36,9 @@ void AActor::Init()
 
 void AActor::Tick()
 {
-	m_pTransform->Tick();
 	m_pPhysics->Tick();
+
+	m_pTransform->Tick();
 
 	// Component
 	for (auto& component : m_arrComponent)

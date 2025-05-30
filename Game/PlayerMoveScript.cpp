@@ -40,7 +40,7 @@ void PlayerMoveScript::Init()
 
 	// SetPhysics
 	auto pPhysics = GetOwner()->GetPhysics();
-	pPhysics->SetWeight(0.3f);
+	pPhysics->SetWeight(1.f);
 }
 
 void PlayerMoveScript::Tick()
@@ -231,7 +231,7 @@ void PlayerMoveScript::Tick()
 		{
 			moveDir.Normalize();
 			Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->SetMove(pos, 0.5f, 12.f);
+			GetOwner()->SetMove(pos, 0.25f, 5.f);
 		}
 
 		// È¸Àü		
@@ -450,6 +450,6 @@ void PlayerMoveScript::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> co
 
 void PlayerMoveScript::RollMove()
 {
-	Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();
-	GetOwner()->SetMove(pos, 1.f, 30.f);
+	Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
+	GetOwner()->SetMove(pos, 0.5f, 5.f);
 }
