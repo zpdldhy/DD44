@@ -36,6 +36,10 @@ private:
 	float m_vDefaultSelectY = 0.f;
 	bool m_bSelectStartButton = false;	
 	bool m_bSelectEndButton = false;
-	bool m_bthrowUI = false;	
+	bool m_bthrowUI = false;
+
+private:
+	int m_iPrevMenu = -1; 
+
 };
 

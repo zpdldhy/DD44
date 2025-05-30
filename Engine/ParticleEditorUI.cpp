@@ -4,8 +4,7 @@
 #include "AParticleActor.h"
 #include "UMaterial.h"
 #include "Texture.h"
-#include "Functions.h"
-
+#include "AFireParticleActor.h"
 
 void ParticleEditorUI::DrawUI()
 {
@@ -30,6 +29,11 @@ void ParticleEditorUI::DrawUI()
 		ResetData();
 	}
 
+	const char* typeList[] = { "Default", "Fire" };
+	int typeIndex = static_cast<int>(m_eSelectedType);
+	ImGui::Combo("Particle Type", &typeIndex, typeList, IM_ARRAYSIZE(typeList));
+	m_eSelectedType = static_cast<EParticleType>(typeIndex);
+
 	if (ImGui::Button("Create New Particle"))
 	{
 		if (!m_OnCreate)
@@ -37,7 +41,16 @@ void ParticleEditorUI::DrawUI()
 			ImGui::TextColored(ImVec4(1, 0, 0, 1), "Error: OnCreate callback is not set!");
 			return;
 		}
-		auto newParticle = make_shared<AParticleActor>();
+		shared_ptr<AParticleActor> newParticle;
+		switch (m_eSelectedType)
+		{
+		case EParticleType::Fire:
+			newParticle = make_shared<AFireParticleActor>();
+			break;
+		default:
+			newParticle = make_shared<AParticleActor>();
+			break;
+		}
 
 		m_vCreatedParticles.push_back(newParticle);
 		m_vParticleData.push_back(m_Data);
@@ -64,6 +77,14 @@ void ParticleEditorUI::DrawUI()
 			m_AnimData.bAutoDestroy
 		);
 
+		//auto mesh = newParticle->GetMeshComponent();
+		//if (mesh)
+		//{
+		//	auto mat = mesh->GetMaterial();
+		//	if (mat)
+		//		mat->SetTintColor(Vec4(1.0f, 0.4f, 0.1f, 1.0f)); // 주황색
+		//}
+
 		newParticle->InitSpriteAnimation(m_iDivisions, m_AnimData.DurationSeconds);
 		newParticle->SetLoop(m_AnimData.bLoop);
 		newParticle->SetAutoDestroy(m_AnimData.bAutoDestroy);
@@ -83,9 +104,24 @@ void ParticleEditorUI::DrawUI()
 	{
 		std::string path = "../Resources/Prefab/" + std::string(loadName) + ".particle.json";
 		PrefabParticleData data;
+
+		shared_ptr<AParticleActor> newParticle;
 		if (PREFAB->LoadParticle(data, path))
 		{
-			auto newParticle = make_shared<AParticleActor>();
+			if (data.Type == EParticleType::Fire)
+			{
+				auto fire = make_shared<AFireParticleActor>();
+				fire->SetAmplitude(data.Amplitude);
+				fire->SetRandomFreq(data.RandomFreq);
+				fire->SetRandomOffset(data.RandomOffset);
+				fire->SetTimeOffset(data.TimeOffset);
+				newParticle = fire;
+			}
+			else
+			{
+				newParticle = make_shared<AParticleActor>();
+			}
+
 			m_vCreatedParticles.push_back(newParticle);
 			m_vParticleData.push_back(m_Data);
 
@@ -165,7 +201,21 @@ void ParticleEditorUI::DrawUI()
 		{
 			for (auto& p : group.Particles)
 			{
-				auto newParticle = make_shared<AParticleActor>();
+				shared_ptr<AParticleActor> newParticle;
+
+				if (p.Type == EParticleType::Fire)
+				{
+					auto fire = make_shared<AFireParticleActor>();
+					fire->SetAmplitude(p.Amplitude);
+					fire->SetRandomFreq(p.RandomFreq);
+					fire->SetRandomOffset(p.RandomOffset);
+					fire->SetTimeOffset(p.TimeOffset);
+					newParticle = fire;
+				}
+				else
+				{
+					newParticle = make_shared<AParticleActor>();
+				}
 				m_vCreatedParticles.push_back(newParticle);
 				TransformData tempData;
 				tempData.Position[0] = p.Translation.x;
@@ -271,7 +321,17 @@ void ParticleEditorUI::DrawUI()
 			copy.Position[1] = randPos.y;
 			copy.Position[2] = randPos.z;
 
-			auto newParticle = make_shared<AParticleActor>();
+			shared_ptr<AParticleActor> newParticle;
+
+			switch (m_eSelectedType)
+			{
+			case EParticleType::Fire:
+				newParticle = make_shared<AFireParticleActor>();
+				break;
+			default:
+				newParticle = make_shared<AParticleActor>();
+				break;
+			}
 			m_vCreatedParticles.push_back(newParticle);
 			m_vParticleData.push_back(copy);
 
@@ -298,6 +358,14 @@ void ParticleEditorUI::DrawUI()
 			newParticle->SetPosition(randPos);
 			newParticle->SetRotation(Vec3(copy.Rotation));
 			newParticle->SetScale(Vec3(copy.Scale));
+
+			//auto mesh = newParticle->GetMeshComponent();
+			//if (mesh)
+			//{
+			//	auto mat = mesh->GetMaterial();
+			//	if (mat)
+			//		mat->SetTintColor(Vec4(1.0f, 0.4f, 0.1f, 1.0f)); // 주황색
+			//}
 		}
 	}
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
@@ -330,6 +398,18 @@ void ParticleEditorUI::DrawUI()
 			target->m_bDelete = true;
 			m_vCreatedParticles.erase(m_vCreatedParticles.begin() + m_iSelectedParticleIndex);
 			m_vParticleData.erase(m_vParticleData.begin() + m_iSelectedParticleIndex);
+			m_iSelectedParticleIndex = -1;
+			m_iLastSelectedParticleIndex = -1;
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("Delete All"))
+		{
+			for (auto& p : m_vCreatedParticles)
+				p->m_bDelete = true;
+
+			m_vCreatedParticles.clear();
+			m_vParticleData.clear();
 			m_iSelectedParticleIndex = -1;
 			m_iLastSelectedParticleIndex = -1;
 		}
@@ -368,6 +448,24 @@ void ParticleEditorUI::DrawUI()
 		data.Duration = m_AnimData.DurationSeconds;
 		data.bLoop = m_AnimData.bLoop;
 		data.bAutoDestroy = m_AnimData.bAutoDestroy;
+		if (m_eSelectedType == EParticleType::Fire)
+		{
+			data.Type = EParticleType::Fire;
+
+			auto actor = dynamic_pointer_cast<AFireParticleActor>(GetSelectedActor());
+			if (actor)
+			{
+				data.Amplitude = actor->GetAmplitude();
+				data.RandomFreq = actor->GetRandomFreq();
+				data.RandomOffset = actor->GetRandomOffset();
+				data.TimeOffset = actor->GetTimeOffset();
+			}
+		}
+		else
+		{
+			data.Type = EParticleType::Default;
+		}
+
 
 		std::string path = "../Resources/Prefab/" + data.Name + ".particle.json";
 		PREFAB->SaveParticle(data, path);
@@ -405,6 +503,24 @@ void ParticleEditorUI::DrawUI()
 			data.Duration = m_AnimData.DurationSeconds;
 			data.bLoop = m_AnimData.bLoop;
 			data.bAutoDestroy = m_AnimData.bAutoDestroy;
+
+			if (m_vCreatedParticles[i] && m_eSelectedType == EParticleType::Fire)
+			{
+				data.Type = EParticleType::Fire;
+
+				auto fireActor = dynamic_pointer_cast<AFireParticleActor>(m_vCreatedParticles[i]);
+				if (fireActor)
+				{
+					data.Amplitude = fireActor->GetAmplitude();
+					data.RandomFreq = fireActor->GetRandomFreq();
+					data.RandomOffset = fireActor->GetRandomOffset();
+					data.TimeOffset = fireActor->GetTimeOffset();
+				}
+			}
+			else
+			{
+				data.Type = EParticleType::Default;
+			}
 
 			group.Particles.push_back(data);
 		}
@@ -521,6 +637,7 @@ void ParticleEditorUI::SetTexture()
 		string searchPath = "../Resources/Sprite/";
 		SearchFile(searchPath, ".png");
 		SearchFile(searchPath, ".jpg");
+		SearchFile(searchPath, ".dds");
 	}
 
 	static std::vector<const char*> namePtrs;

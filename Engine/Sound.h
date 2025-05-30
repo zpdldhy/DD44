@@ -7,11 +7,35 @@
 
 enum class ESoundType
 {
-	Bomb,
-	Bgm,
-	Hit,
+	Intro,
+	Stage0,
+	Boss1,
+	Stage1,
+	Boss2,
+	STage2,
 	Die,
+	Ending,
+
+	//Charactor
+	Slash,
+	Dash,
+	Walk,
+	Hit,
+
+	//Bat
+	Attack_Bat,
+	Enemy_Damaged,
+
+	//UI
+	Hover,
+	Click,
+
+	//Fire
+	Fire,
+
 	Max
+
+
 };
 
 
@@ -20,7 +44,12 @@ class Sound
 private:
 	FMOD::System* m_pSystem = nullptr;
 	FMOD::Sound* m_pSound = nullptr;
+
+	// BGM용 채널
 	FMOD::Channel* m_pChannel = nullptr;
+
+	// 효과음용 채널리스트
+	std::vector<FMOD::Channel*> m_pEffectChannels;
 
 public:
 	float m_fVolume = 0.5f;
@@ -31,6 +60,7 @@ public:
 public:
 	void Play2D(bool bLoop = true);
 	void PlayEffect2D(bool bLoop = false);
+	
 	void Stop();
 	void Paused();
 	void VolumeUp(float fVolume);
@@ -45,6 +75,11 @@ public:
 	Sound(std::wstring key) : m_csName(key) {}
 
 };
+
+
+
+
+
 
 class SoundManager : public Singleton<SoundManager>
 {

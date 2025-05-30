@@ -60,6 +60,8 @@ private:
 	int m_iSelectedRow = 0;
 	int m_iSelectedCol = 0;
 
+	EParticleType m_eSelectedType = EParticleType::Default;
+
 	char m_szGroupName[64] = "MyParticleGroup";
 	std::function<void(shared_ptr<AParticleActor>, const char*, const char*, TransformData, Vec2, Vec2, int divisions, float duration, bool loop, bool autoDestroy)> m_OnCreate;
 };

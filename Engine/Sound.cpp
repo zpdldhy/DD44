@@ -4,8 +4,16 @@
 void Sound::Update()
 {
 	if (m_pSystem)
-	{
 		m_pSystem->update();
+
+	auto it = m_pEffectChannels.begin();
+	while (it != m_pEffectChannels.end())
+	{
+		bool isPlaying = false;
+		if (*it && (*it)->isPlaying(&isPlaying) == FMOD_OK && !isPlaying)
+			it = m_pEffectChannels.erase(it);
+		else
+			++it;
 	}
 }
 
@@ -16,6 +24,9 @@ void Sound::Destroy()
 		m_pSound->release();
 		m_pSound = nullptr;
 	}
+
+	m_pEffectChannels.clear();
+	m_pChannel = nullptr;
 }
 
 
@@ -32,38 +43,29 @@ bool Sound::Load(FMOD::System* _pSystem, std::wstring _filename)
 
 void	Sound::Play2D(bool bLoop)
 {
-	bool  bPlay = false;
-	if (m_pChannel != nullptr)
-	{
+	bool bPlay = false;
+	if (m_pChannel)
 		m_pChannel->isPlaying(&bPlay);
-	}
-	if (bPlay == false)
+
+	if (!bPlay)
 	{
 		FMOD_RESULT hr = m_pSystem->playSound(m_pSound, nullptr, false, &m_pChannel);
-		if (hr == FMOD_OK)
+		if (hr == FMOD_OK && m_pChannel)
 		{
 			m_pChannel->setVolume(m_fVolume);
-			if (bLoop)
-				m_pChannel->setMode(FMOD_LOOP_NORMAL);
-			else
-				m_pChannel->setMode(FMOD_LOOP_OFF);
+			m_pChannel->setMode(bLoop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
 		}
-
 	}
 }
 void	Sound::PlayEffect2D(bool bLoop)
 {
-	FMOD_RESULT hr = m_pSystem->playSound(m_pSound, nullptr, false, &m_pChannel);
-	if (hr == FMOD_OK)
+	FMOD::Channel* pNewChannel = nullptr;
+	FMOD_RESULT hr = m_pSystem->playSound(m_pSound, nullptr, false, &pNewChannel);
+	if (hr == FMOD_OK && pNewChannel)
 	{
-		if (hr == FMOD_OK)
-		{
-			m_pChannel->setVolume(m_fVolume);
-			if (bLoop)
-				m_pChannel->setMode(FMOD_LOOP_NORMAL);
-			else
-				m_pChannel->setMode(FMOD_LOOP_OFF);
-		}
+		pNewChannel->setVolume(m_fVolume);
+		pNewChannel->setMode(bLoop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+		m_pEffectChannels.push_back(pNewChannel);
 	}
 }
 
@@ -134,6 +136,7 @@ bool SoundManager::Load(ESoundType type, const std::wstring& path)
 	if (pSound->Load(m_pSystem, path))
 	{
 		m_Sounds[static_cast<int>(type)] = pSound;
+		maplist[path] = pSound;
 		return true;
 	}
 	else
@@ -141,12 +144,35 @@ bool SoundManager::Load(ESoundType type, const std::wstring& path)
 		delete pSound;
 		return false;
 	}
+
+	
 }
 
 void SoundManager::LoadAllSounds()
 {
-	Load(ESoundType::Bomb, L"../Resources/Sound/bomb.wav");
-	Load(ESoundType::Bgm, L"../Resources/Sound/boss.mp3");
+	//BGM
+	Load(ESoundType::Intro, L"../Resources/Sound/intro.mp3");
+	Load(ESoundType::Stage0, L"../Resources/Sound/state0.mp3");
+
+	//Charactor
+	Load(ESoundType::Walk, L"../Resources/Sound/hero_walk_footsteps_stone_louder.wav");
+	Load(ESoundType::Dash, L"../Resources/Sound/hero_dash.wav");
+	Load(ESoundType::Slash, L"../Resources/Sound/hero_slash.wav");
+	Load(ESoundType::Hit, L"../Resources/Sound/hero_damaged.wav");
+	Load(ESoundType::Die, L"../Resources/Sound/hero_damaged.wav");
+
+	//Fire
+	Load(ESoundType::Die, L"../Resources/Sound/FireLoop.wav");
+
+	//Monster
+	Load(ESoundType::Attack_Bat, L"../Resources/Sound/bat_attack.wav");
+	Load(ESoundType::Enemy_Damaged, L"../Resources/Sound/enemy_damage.wav");
+
+	//UI
+	Load(ESoundType::Hover, L"../Resources/Sound/ui_hover.wav");
+	Load(ESoundType::Click, L"../Resources/Sound/ui_save.wav");
+
+	
 }
 
 Sound* SoundManager::GetPtr(ESoundType type)

@@ -3,6 +3,7 @@
 #include "AActor.h"
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
+#include "Sound.h"
 
 
 WalkerIdleState::WalkerIdleState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_IDLE)
@@ -72,6 +73,8 @@ void WalkerHitState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|Stun");
 	animInstance->PlayOnce(index);
+	// »ç¿îµå
+	SOUNDMANAGER->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
 }
 
 void WalkerHitState::Tick()

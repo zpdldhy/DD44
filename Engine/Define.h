@@ -27,3 +27,4 @@
 
 
 #define DD_PI		3.1415926f
+#define DD_2PI		6.2831852f	

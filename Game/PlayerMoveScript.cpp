@@ -47,7 +47,14 @@ void PlayerMoveScript::Tick()
 {
 	// Test
 	if (INPUT->GetButton(L))
+	{
 		m_vHP++;
+		if (currentState->GetId() == PLAYER_S_DEATH)
+		{
+			currentState->End();
+			ChangetState(idle);
+		}
+	}
 
 #pragma region EFFECT
 	Slash();
@@ -276,6 +283,11 @@ void PlayerMoveScript::Tick()
 
 void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
 {
+	if (_state == currentState)
+	{
+		return;
+	}
+
 	if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
 		return;
@@ -318,6 +330,7 @@ void PlayerMoveScript::Slash()
 			m_bSlashPlaying = false;
 		}
 	}
+
 }
 
 void PlayerMoveScript::SetUI()
@@ -452,4 +465,13 @@ void PlayerMoveScript::RollMove()
 {
 	Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
 	GetOwner()->SetMove(pos, 0.5f, 5.f);
+}
+
+bool PlayerMoveScript::CanAttack()
+{
+	if (currentState->GetId() == PLAYER_S_HIT || currentState->GetId() == PLAYER_S_DEATH)
+	{
+		return false;
+	}
+	return true;
 }

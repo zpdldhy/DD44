@@ -83,5 +83,6 @@ public:
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
 public:
 	void RollMove();
+	bool CanAttack();
 };
 

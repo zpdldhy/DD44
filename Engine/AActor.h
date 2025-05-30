@@ -54,6 +54,8 @@ public:
 	bool m_bUseStencil = false;
 	ActorType m_eActorType = ActorType::AT_NONE;
 
+	void SetUseStencil(bool _isStencil) { m_bUseStencil = _isStencil; }
+
 	//--------------------------------------------------------------------------------------
 	// Component
 	//--------------------------------------------------------------------------------------

@@ -4,11 +4,14 @@
 #include "ActorLoader.h"
 #include "MeshLoader.h"
 #include "AssimpLoader.h"
+#include "ParticleManager.h"
 
 // Actor
 #include "ATerrainTileActor.h"
 #include "APawn.h"
 #include "AUIActor.h"
+#include "AParticleActor.h"
+#include "AFireParticleActor.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -19,6 +22,7 @@
 #include "PlayerMoveScript.h"
 #include "BatMovement.h"
 #include "WalkerMovement.h"
+#include "BettyMovement.h"
 
 unique_ptr<ActorLoader> PrefabToActor::actorLoader = nullptr;
 unique_ptr<MeshLoader> PrefabToActor::meshLoader = nullptr;
@@ -60,6 +64,12 @@ vector<shared_ptr<class AActor>> PrefabToActor::LoadAllPrefabs(const std::string
 			auto vList = MakeUIs(file);
 			m_vActorList.insert(m_vActorList.end(), vList.begin(), vList.end());
 		}
+		else if (extension == ".particlegroup.json")
+		{
+			auto particles = PrefabToActor::MakeParticleGroup(file);
+			PARTICLE->AddParticleList(particles);
+		}
+
 	}
 
 	return m_vActorList;
@@ -106,9 +116,11 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 		actor->SetRotation(Vec3(characterData.transform.Rotation));
 		actor->SetScale(Vec3(characterData.transform.Scale));
 
+		// 추후 script manager 만들어 수정할 예정
 		if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
 		if (characterData.ScriptType == 2) { actor->AddScript(std::make_shared<BatMovement>()); }
 		if (characterData.ScriptType == 3) { actor->AddScript(std::make_shared<WalkerMovement>()); }
+		if (characterData.ScriptType == 4) { actor->AddScript(std::make_shared<BettyMovement>()); }
 
 		if (characterData.camera.isUse)
 		{
@@ -332,6 +344,57 @@ vector<shared_ptr<AUIActor>> PrefabToActor::MakeUIs(const string& _file)
 	}
 
 	return vList;
+}
+
+vector<shared_ptr<class AParticleActor>> PrefabToActor::MakeParticleGroup(const std::string& _filePath)
+{
+	vector<shared_ptr<AParticleActor>> result;
+
+	PrefabParticleGroupData group;
+	if (PREFAB->LoadParticleGroup(group, _filePath))
+	{
+		for (auto& p : group.Particles)
+		{
+			shared_ptr<AParticleActor> newParticle;
+
+			if (p.Type == EParticleType::Fire)
+			{
+				auto fire = make_shared<AFireParticleActor>();
+				fire->SetAmplitude(p.Amplitude);
+				fire->SetRandomFreq(p.RandomFreq);
+				fire->SetRandomOffset(p.RandomOffset);
+				fire->SetTimeOffset(p.TimeOffset);
+				newParticle = fire;
+			}
+			else
+			{
+				newParticle = make_shared<AParticleActor>();
+			}
+
+			// 트랜스폼
+			newParticle->SetPosition(p.Translation);
+			newParticle->SetRotation(p.Rotation);
+			newParticle->SetScale(p.Scale);
+
+			// 메시 및 머티리얼
+			auto mesh = UStaticMeshComponent::CreatePlane();
+			auto mat = make_shared<UMaterial>();
+			mat->Load(to_mw(p.TexturePath), to_mw(p.ShaderPath));
+			mesh->SetMaterial(mat);
+
+			newParticle->SetMeshComponent(mesh);
+
+			// 애니메이션 세팅
+			newParticle->SetUV(p.UVStart, p.UVEnd);
+			newParticle->InitSpriteAnimation(p.Divisions, p.Duration);
+			newParticle->SetLoop(p.bLoop);
+			newParticle->SetAutoDestroy(p.bAutoDestroy);
+
+			result.push_back(newParticle);
+		}
+	}
+
+	return result;
 }
 
 void PrefabToActor::MakeLoader()

@@ -3,6 +3,7 @@
 #include "AActor.h"
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
+#include "Sound.h"
 
 BatIdleState::BatIdleState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_IDLE)
 {
@@ -18,7 +19,6 @@ void BatIdleState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int idleIndex = animInstance->GetAnimIndex(L"Idle");
 	animInstance->SetCurrentAnimTrack(idleIndex);
-
 }
 
 void BatIdleState::Tick()
@@ -71,6 +71,8 @@ void BatAttackState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Bite");
 	animInstance->PlayOnce(index);
+	// 사운드
+	SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
 }
 
 void BatAttackState::Tick()
@@ -104,6 +106,8 @@ void BatDieState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Shock");
 	animInstance->PlayOnce(index);
+	// 사운드
+	SOUNDMANAGER->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
 }
 
 void BatDieState::Tick()

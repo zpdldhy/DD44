@@ -41,6 +41,8 @@ cbuffer CB_MaterialEffect : register(b2)
 
     float3 g_vSpecularCoeff; // 정반사 색상
     float g_fShininess;
+    
+    float4 g_vTintColor;
 };
 
 struct VS_IN
@@ -126,6 +128,31 @@ float4 ApplyHitFlash(float4 color)
     float3 flashColor = lerp(color.rgb, float3(1, 1, 1), hitStrength);
     float alpha = lerp(color.a, 0.8f, hitStrength); // 알파도 줄이기
     return float4(flashColor, alpha);
+}
+
+float3 TransformHSV(
+    float3 inputCol, // color to transform
+    float h, // 색조:hue shift (in degrees) : 
+    float s, // 채도:saturation multiplier (scalar)
+    float v // 색상전체의 밝기를 조정:value multiplier (scalar)
+)
+{
+    float vsu = v * s * cos(h * 3.141592 / 180.0);
+    float vsw = v * s * sin(h * 3.141592 / 180.0);
+    
+    // RGB 변환
+    float3 ret = float3(0, 0, 0);
+    ret.r = (.299 * v + .701 * vsu + .168 * vsw) * inputCol.r
+        + (.587 * v - .587 * vsu + .330 * vsw) * inputCol.g
+        + (.114 * v - .114 * vsu - .497 * vsw) * inputCol.b;
+    ret.g = (.299 * v - .299 * vsu - .328 * vsw) * inputCol.r
+        + (.587 * v + .413 * vsu + .035 * vsw) * inputCol.g
+        + (.114 * v - .114 * vsu + .292 * vsw) * inputCol.b;
+    ret.b = (.299 * v - .300 * vsu + 1.25 * vsw) * inputCol.r
+        + (.587 * v - .588 * vsu - 1.05 * vsw) * inputCol.g
+        + (.114 * v + .886 * vsu - .203 * vsw) * inputCol.b;
+    
+    return ret;
 }
 
 #endif

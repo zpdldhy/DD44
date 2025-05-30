@@ -6,6 +6,10 @@
 #include "UMeshComponent.h"
 // temp
 #include "Input.h"
+#include "Sound.h"
+
+// temp
+#include "PlayerMoveScript.h"
 
 void BatMovement::Init()
 {
@@ -42,22 +46,26 @@ void BatMovement::Tick()
 
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
 	{
-		Vec3 distance = player.lock()->GetPosition() - GetOwner()->GetPosition();
-		if (distance.Length() < 3.0f && INPUT->GetButton(LCLICK))
+		auto pScript = dynamic_pointer_cast<PlayerMoveScript>(player.lock()->GetScriptList()[0]);
+		if (pScript->CanAttack())
 		{
-			// Blood FX
-			Vec3 basePos = GetOwner()->GetPosition();
-			basePos.y += RandomRange(3, 4);
-			Vec3 look = GetOwner()->GetLook();
-			velocity = -look;
-			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
+			Vec3 distance = player.lock()->GetPosition() - GetOwner()->GetPosition();
+			if (distance.Length() < 4.0f && INPUT->GetButton(LCLICK))
+			{
+				// Blood FX
+				Vec3 basePos = GetOwner()->GetPosition();
+				basePos.y += RandomRange(3, 4);
+				Vec3 look = GetOwner()->GetLook();
+				velocity = -look;
+				PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 
 
-			m_fHitFlashTimer = 1.f;  // 1초 동안
-			m_bIsFlashing = true;
+				m_fHitFlashTimer = 1.f;  // 1초 동안
+				m_bIsFlashing = true;
 
-			ChangetState(death);
-			return;
+				ChangetState(death);
+				return;
+			}
 		}
 	}
 	if (m_bReturn)

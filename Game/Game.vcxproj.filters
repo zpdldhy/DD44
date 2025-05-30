@@ -10,9 +10,6 @@
     <Filter Include="Headers">
       <UniqueIdentifier>{54431514-562b-4a9e-9c11-46b90321147b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Script">
-      <UniqueIdentifier>{565dca02-3e03-4554-8ec9-dfc978045924}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Prefab">
       <UniqueIdentifier>{4c236e50-0c9b-4856-98ca-b71f6cea1d4c}</UniqueIdentifier>
     </Filter>
@@ -21,6 +18,9 @@
     </Filter>
     <Filter Include="FSM">
       <UniqueIdentifier>{7b412256-442e-4bcb-952a-0319c0fd1227}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script">
+      <UniqueIdentifier>{565dca02-3e03-4554-8ec9-dfc978045924}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -93,7 +93,16 @@
     <ClInclude Include="WalkerStates.h">
       <Filter>FSM</Filter>
     </ClInclude>
-    <ClInclude Include="WalkerMovement.h" />
+    <ClInclude Include="WalkerMovement.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="BettyStates.h">
+      <Filter>FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="BettyMovement.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="TempBossCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -162,7 +171,16 @@
     <ClCompile Include="WalkerStates.cpp">
       <Filter>FSM</Filter>
     </ClCompile>
-    <ClCompile Include="WalkerMovement.cpp" />
+    <ClCompile Include="WalkerMovement.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="BettyStates.cpp">
+      <Filter>FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="BettyMovement.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="TempBossCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

@@ -27,6 +27,8 @@ struct CB_MaterialEffect
 
 	Vec3   g_vSpecularCoeff = Vec3(1,1,1);   
 	float  g_fShininess = 32.0f;
+
+	Vec4 TintColor = Vec4(1, 1, 1, 1);
 };
 
 struct CB_Material
@@ -96,6 +98,7 @@ public:
 	void SetUseEffect(bool _bUseEffect) { m_bUseEffect = _bUseEffect; }
 	bool IsUseEffect() { return m_bUseEffect; }
 	void SetUVRange(Vec2 start, Vec2 end);
+	void SetTintColor(const Vec4& color);
 public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
 	virtual void SetTexture(shared_ptr<Texture> _texture) { m_pTexture = _texture; }

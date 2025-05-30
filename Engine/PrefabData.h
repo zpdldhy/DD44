@@ -90,6 +90,12 @@ struct PrefabUIData
     int ScriptType = -1;
 };
 
+enum class EParticleType
+{
+    Default = 0,
+    Fire,
+};
+
 struct PrefabParticleData
 {
     std::string Name;
@@ -116,6 +122,14 @@ struct PrefabParticleData
     float Duration = 1.0f;
     bool bLoop = true;
     bool bAutoDestroy = false;
+
+    EParticleType Type = EParticleType::Default;
+
+    //Fire 타입 전용 파라미터
+    Vec3 Amplitude = { 0.0f, 0.0f, 0.0f };
+    Vec3 RandomFreq = { 0.0f, 0.0f, 0.0f };
+    Vec3 RandomOffset = { 0.0f, 0.0f, 0.0f };
+    float TimeOffset = 0.0f;
 };
 
 struct PrefabParticleGroupData

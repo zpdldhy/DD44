@@ -3,7 +3,7 @@
 struct CB_Billboard
 {
 	Vec3 center;
-	float padding_center;
+	float Rotation;
 	Vec2 size;
 	Vec2  padding_size;
 };
