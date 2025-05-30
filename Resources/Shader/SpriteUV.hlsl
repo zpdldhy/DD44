@@ -7,17 +7,48 @@ struct PS_OUT_DUAL
 };
 
 
+//VS_OUT VS(VS_IN input)
+//{
+//    VS_OUT output = (VS_OUT) 0;
+
+
+//    float3 right = float3(g_matView._11, g_matView._21, g_matView._31);
+//    float3 up = float3(g_matView._12, g_matView._22, g_matView._32);
+
+    
+//    float3 offset = (input.p.x * right * g_vBillboardSize.x) +
+//                (input.p.y * up * g_vBillboardSize.y);
+
+//    float3 worldPos = g_vBillboardCenter + offset;
+
+//    float4 viewPos = mul(float4(worldPos, 1.0f), g_matView);
+//    output.p = mul(viewPos, g_matProj);
+
+//    output.c = input.c;
+//    output.n = input.n;
+//    output.t = input.t;
+
+//    return output;
+//}
+
 VS_OUT VS(VS_IN input)
 {
     VS_OUT output = (VS_OUT) 0;
 
-
     float3 right = float3(g_matView._11, g_matView._21, g_matView._31);
     float3 up = float3(g_matView._12, g_matView._22, g_matView._32);
 
-    
-    float3 offset = (input.p.x * right * g_vBillboardSize.x) +
-                (input.p.y * up * g_vBillboardSize.y);
+    // 회전 적용
+    float s = sin(g_fBillboardRotation);
+    float c = cos(g_fBillboardRotation);
+
+    float2 rotated = float2(
+        input.p.x * c - input.p.y * s,
+        input.p.x * s + input.p.y * c
+    );
+
+    float3 offset = (rotated.x * right * g_vBillboardSize.x) +
+                    (rotated.y * up * g_vBillboardSize.y);
 
     float3 worldPos = g_vBillboardCenter + offset;
 

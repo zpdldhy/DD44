@@ -67,6 +67,7 @@ void AParticleActor::Render()
 	{
 		Vec3 scale = GetScale();
 		m_CB_Billboard->data.center = GetPosition();
+		m_CB_Billboard->data.Rotation = GetRotation().z;
 		m_CB_Billboard->data.size = Vec2(scale.x, scale.y); // uniform scale
 		m_CB_Billboard->Update();
 		m_CB_Billboard->Push();
@@ -90,7 +91,7 @@ void AParticleActor::InitSpriteAnimation(int divisions, float duration)
 	m_fDuration = duration;
 	SetDuration(duration);
 	m_iCurrentFrame = 0;
-	m_fTimeAcc = 0.0f;
+	m_fTimeAcc = RandomRange(0.0f, duration);
 	m_bPlaying = true;
 	m_bDelete = false;
 }

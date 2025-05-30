@@ -26,7 +26,7 @@ float2 remapUV(float2 uv)
 cbuffer CB_Billboard : register(b6)
 {
     float3 g_vBillboardCenter;
-    float padding_center;
+    float  g_fBillboardRotation;
     float2 g_vBillboardSize;
     float2 padding_size;
 };
