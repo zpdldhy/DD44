@@ -448,3 +448,12 @@ void PlayerMoveScript::RollMove()
 	Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();
 	GetOwner()->AddPosition(pos);
 }
+
+bool PlayerMoveScript::CanAttack()
+{
+	if (currentState->GetId() == PLAYER_S_HIT || currentState->GetId() == PLAYER_S_DEATH)
+	{
+		return false;
+	}
+	return true;
+}
