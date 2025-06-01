@@ -9,6 +9,7 @@ public:
 	shared_ptr<class ACameraActor> m_pCameraActor = nullptr;
 	shared_ptr<class AActor> m_pPlayer = nullptr;
 	shared_ptr<class AActor> m_pBox = nullptr;
+	vector<shared_ptr<class AActor>> m_vGround;
 	class MouseRay m_Cursor;
 
 	bool m_bEnginCamera = true;

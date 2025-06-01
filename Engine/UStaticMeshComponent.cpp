@@ -70,6 +70,7 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateRay(Vec3 _vStart, V
 	// Mesh Setting
 	pMesh = make_shared<UStaticMeshResources>();
 	pMesh->SetVertexList(vVertexList);
+	pMesh->SetTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 	pMesh->Create();
 
 	// StaticMeshComponent Setting

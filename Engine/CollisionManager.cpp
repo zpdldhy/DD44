@@ -370,7 +370,7 @@ bool Collision::CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter)
 
 	if (abs(fDotDir) < 0.0001f)
 	{
-		if (-fDotDiff - _box.vExtent[0] > 0 || -fDotDiff + _box.vExtent[0] > 0)
+		if (fabs(fDotDiff) > _box.vExtent[0])
 			return false;
 	}
 	else
@@ -394,7 +394,7 @@ bool Collision::CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter)
 
 	if (abs(fDotDir) < 0.0001f)
 	{
-		if (-fDotDiff - _box.vExtent[1] > 0 || -fDotDiff + _box.vExtent[1] > 0)
+		if (fabs(fDotDiff) > _box.vExtent[1])
 			return false;
 	}
 	else
@@ -418,7 +418,7 @@ bool Collision::CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter)
 
 	if (abs(fDotDir) < 0.0001f)
 	{
-		if (-fDotDiff - _box.vExtent[2] > 0 || -fDotDiff + _box.vExtent[2] > 0)
+		if (fabs(fDotDiff) > _box.vExtent[2])
 			return false;
 	}
 	else

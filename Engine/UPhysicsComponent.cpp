@@ -113,6 +113,22 @@ void UPhysicsComponent::CollisionCalculate(const Vec3& currentPos, const Vec3& t
 		Vec3 normal = colData.second.ColNormal;
 		normal.Normalize();
 
+		// Ray로 Pos 보정
+		auto myBox = dynamic_pointer_cast<UBoxComponent>(GetOwner()->GetShapeComponent());
+		auto LookRay = myBox->GetLookRay();
+		auto box = colData.second.box;
+		Vec3 inter;
+		if (Collision::CheckOBBToRay(LookRay, box, inter))
+		{
+			GetOwner()->SetPosition(inter - LookRay.direction);
+		}
+
+		auto GroundRay = myBox->GetGroundRay();
+		if (colData.second.bColGround&&Collision::CheckOBBToRay(GroundRay, box, inter))
+		{
+			GetOwner()->SetPosition(inter - GroundRay.direction / 2);
+		}
+
 		float dot = velocity.Dot(normal);
 
 		if (dot < 0.f)
@@ -120,29 +136,10 @@ void UPhysicsComponent::CollisionCalculate(const Vec3& currentPos, const Vec3& t
 			// 침투 보정: 이동 방향에서 충돌면 법선 제거
 			velocity -= dot * normal;
 
-			auto box1 = dynamic_pointer_cast<UBoxComponent>(GetOwner()->GetShapeComponent())->GetBounds();
-			auto box2 = colData.second.box;
-			auto ray = dynamic_pointer_cast<UBoxComponent>(GetOwner()->GetShapeComponent())->GetLookRay();
-
-			//Vec3 inter;
-			//if (Collision::CheckOBBToRay(ray, box2, inter))
-			//{
-			//	GetOwner()->SetPosition(inter - ray.direction);
-			//}
-
 			if (colData.second.bColGround)
 			{
 				m_bColGrounded = true;
 				m_fCurrentGravity = 0.f;
-
-				//auto pos = GetOwner()->GetPosition();
-
-
-				//float y = box2.vCenter.y + box2.vAxis[1].y * box2.vExtent[1];
-				//if (pos.y - (box1.vCenter.y + box1.vAxis[1].y * box1.vExtent[1]) < y)
-				//	pos.y = y;
-
-				//GetOwner()->SetPosition(pos);
 			}
 			else if (normal.y > 0.5f)
 			{

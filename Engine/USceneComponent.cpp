@@ -127,10 +127,10 @@ void USceneComponent::UpdateWorldMatrix()
 	m_matWorldRotation *= Matrix::CreateRotationY(m_vWorldRotation.y);
 
 	m_matWorldTranslation = Matrix::CreateTranslation(m_vWorldPosition);
-
-	m_vWorldLook = Vec3(m_matWorld._11, m_matWorld._12, m_matWorld._13);
-	m_vWorldRight = Vec3(m_matWorld._21, m_matWorld._22, m_matWorld._23);
-	m_vWorldUp = Vec3(m_matWorld._31, m_matWorld._32, m_matWorld._33);
+		
+	m_vWorldLook = Vec3(m_matWorld._31, m_matWorld._32, m_matWorld._33);
+	m_vWorldRight = Vec3(m_matWorld._11, m_matWorld._12, m_matWorld._13);
+	m_vWorldUp = Vec3(m_matWorld._21, m_matWorld._22, m_matWorld._23);
 
 	m_vWorldLook.Normalize();
 	m_vWorldRight.Normalize();
