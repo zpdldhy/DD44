@@ -164,6 +164,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="ActorLoader.h" />
     <ClInclude Include="ADustActor.h" />
     <ClInclude Include="AEffectActor.h" />
+    <ClInclude Include="AFeatherActor.h" />
     <ClInclude Include="AFireParticleActor.h" />
     <ClInclude Include="ALight.h" />
     <ClInclude Include="AParticleActor.h" />
@@ -267,6 +268,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="ActorLoader.cpp" />
     <ClCompile Include="ADustActor.cpp" />
     <ClCompile Include="AEffectActor.cpp" />
+    <ClCompile Include="AFeatherActor.cpp" />
     <ClCompile Include="AFireParticleActor.cpp" />
     <ClCompile Include="ALight.cpp" />
     <ClCompile Include="AParticleActor.cpp" />
