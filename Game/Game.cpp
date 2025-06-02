@@ -76,24 +76,24 @@ void Game::Tick()
 		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
 	}
 	
-	//if (INPUT->GetButton(H))
-	//{
-	//	SOUNDMANAGER->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
-	//}
-	//
-	//if (INPUT->GetButton(O))
-	//{
-	//	if (m_bEnginCamera)
-	//	{
-	//		m_bEnginCamera = false;
-	//		CAMERA->Set3DCameraActor(m_pGameCameraActor);
-	//	}
-	//	else
-	//	{
-	//		m_bEnginCamera = true;
-	//		CAMERA->Set3DCameraActor(m_pCameraActor);
-	//	}
-	//}
+	if (INPUT->GetButton(H))
+	{
+		SOUNDMANAGER->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
+	}
+	
+	if (INPUT->GetButton(O))
+	{
+		if (m_bEnginCamera)
+		{
+			m_bEnginCamera = false;
+			CAMERA->Set3DCameraActor(m_pGameCameraActor);
+		}
+		else
+		{
+			m_bEnginCamera = true;
+			CAMERA->Set3DCameraActor(m_pCameraActor);
+		}
+	}
 
 	CheckEnemyCollision();
 }
