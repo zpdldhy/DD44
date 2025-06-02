@@ -6,6 +6,7 @@
 #include "CameraManager.h"
 #include "ABloodActor.h"
 #include "ADustActor.h"
+#include "ParticleManager.h"
 
 
 void EffectManager::Init()
@@ -14,10 +15,15 @@ void EffectManager::Init()
     {
         for (int t = 0; t <= (int)EEffectType::Dust; ++t)
         {
+            EEffectType type = (EEffectType)t;
             auto actor = CreateEffectActor((EEffectType)t);
             actor->m_szName = L"Effect";
             m_mEffectPool[(EEffectType)t].push_back(actor);
-            OBJECT->AddActor(actor);
+            
+            if (type == EEffectType::Dust)
+                PARTICLE->AddUI(actor);
+            else
+                OBJECT->AddActor(actor);
         }
     }
 }
@@ -81,7 +87,17 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     if (!actor)
         return;
 
-    actor->Play(0.7f, actor->Prepare(pos, baseVelocity));
+    
+    float duration = 1.0f;
+
+    switch (type)
+    {
+    case EEffectType::Dust:       duration = 1.0f; break;
+    case EEffectType::Blood:      duration = 0.7f; break;
+    default:                      duration = 1.0f; break;
+    }
+
+    actor->Play(duration, actor->Prepare(pos, baseVelocity));
 }
 
 

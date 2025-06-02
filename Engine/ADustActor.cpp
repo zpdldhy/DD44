@@ -21,15 +21,17 @@ Vec3 ADustActor::Prepare(const Vec3& pos, const Vec3& baseVelocity)
     Vec3 finalVelocity = finalDir * baseVelocity.Length() * speedFactor;
 
     // 약한 gravity
-    SetGravity(30.0f);
+    SetGravity(1.0f);
 
     // 작게 시작해서 부드럽게 사라짐
     SetStartScale(Vec3(0.5f));
     SetEndScale(Vec3(1.2f)); // 아주 부드럽게 퍼지게
 
-    InitSpriteAnimation(4, 12.f);
+    InitSpriteAnimation(4, 0.5f);
 
     SetPosition(pos);
+
+    m_bReversePlay = true;
 
     return finalVelocity;
 }
