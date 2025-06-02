@@ -91,7 +91,8 @@ void AParticleActor::InitSpriteAnimation(int divisions, float duration)
 	m_fDuration = duration;
 	SetDuration(duration);
 	m_iCurrentFrame = 0;
-	m_fTimeAcc = RandomRange(0.0f, duration);
+	//m_fTimeAcc = RandomRange(0.0f, duration);
+	m_fTimeAcc = 0.0f;
 	m_bPlaying = true;
 	m_bDelete = false;
 }
