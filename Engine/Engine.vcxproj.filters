@@ -399,6 +399,9 @@
     <ClInclude Include="ABloodActor.h">
       <Filter>Object\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="AFeatherActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -665,6 +668,9 @@
       <Filter>Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="ADustActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="AFeatherActor.cpp">
       <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>

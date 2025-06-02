@@ -7,13 +7,14 @@
 #include "ABloodActor.h"
 #include "ADustActor.h"
 #include "ParticleManager.h"
+#include "AFeatherActor.h"
 
 
 void EffectManager::Init()
 {
     for (int i = 0; i < 20; ++i)
     {
-        for (int t = 0; t <= (int)EEffectType::Dust; ++t)
+        for (int t = 0; t <= (int)EEffectType::Feather; ++t)
         {
             EEffectType type = (EEffectType)t;
             auto actor = CreateEffectActor((EEffectType)t);
@@ -40,6 +41,9 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     case EEffectType::Dust:
         actor = make_shared<ADustActor>();
         break;
+    case EEffectType::Feather:
+        actor = make_shared<AFeatherActor>();
+        break;
     }
 
     // ¸Þ½Ã
@@ -56,6 +60,9 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     case EEffectType::Dust:
         mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
         break;
+    case EEffectType::Feather:
+        mat->Load(L"../Resources/Texture/feather.png", L"../Resources/Shader/SpriteUV.hlsl");
+        break;
     }
 
     mesh->SetMaterial(mat);
@@ -64,7 +71,6 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     actor->SetLoop(false);
     actor->SetAutoDestroy(false);
     actor->SetRender(false);
-    actor->SetDuration(0.5f);
 
     return actor;
 }
