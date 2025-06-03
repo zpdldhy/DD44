@@ -83,6 +83,22 @@ void Editor::Tick()
 		}
 	}
 
+	if (INPUT->GetButtonDown(LCTRL))
+	{
+		if (INPUT->GetButton(W))
+		{
+			GUI->GetActorListUI()->SetGizmoMode(GizmoMode::Translate);
+		}
+		else if (INPUT->GetButton(E))
+		{
+			GUI->GetActorListUI()->SetGizmoMode(GizmoMode::Rotate);
+		}
+		else if (INPUT->GetButton(R))
+		{
+			GUI->GetActorListUI()->SetGizmoMode(GizmoMode::Scale);
+		}
+	}
+
 	if (GUI->GetObjectEditorUI()->IsPlacementMode() && INPUT->GetButton(LCLICK))
 	{
 		CreateObjectAtMousePick();
