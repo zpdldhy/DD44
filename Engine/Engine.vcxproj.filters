@@ -393,6 +393,15 @@
     <ClInclude Include="UPhysicsComponent.h">
       <Filter>Component\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="ADustActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="ABloodActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="AFeatherActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -654,6 +663,15 @@
     </ClCompile>
     <ClCompile Include="UPhysicsComponent.cpp">
       <Filter>Component\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="ABloodActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="ADustActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="AFeatherActor.cpp">
+      <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

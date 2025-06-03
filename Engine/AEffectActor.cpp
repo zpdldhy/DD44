@@ -2,6 +2,7 @@
 #include "AEffectActor.h"
 #include "Timer.h"
 
+
 void AEffectActor::Play(float duration, const Vec3& velocity)
 {
 	InitSpriteAnimation(m_iDivisions, duration);
@@ -14,7 +15,7 @@ void AEffectActor::Play(float duration, const Vec3& velocity)
 
 void AEffectActor::Tick()
 {
-    AActor::Tick();
+    AParticleActor::Tick();
 
     if (!m_bRender)
         return;
@@ -36,7 +37,6 @@ void AEffectActor::Tick()
     float t = 1.0f - (m_fRemainTime / m_fDuration);// 진행 비율 (0~1)
     //t = pow(t, 1.5);
     float growT = min(t * 2.0f, 1.0f); // 0~0.5초까지만 0~1로 증가 후 고정
-
     float endFactor = pow(1.0f - t, 2.5f);
 
     Vec3 scale;
@@ -51,3 +51,10 @@ void AEffectActor::Tick()
         SetRender(false);
     }
 }
+
+Vec3 AEffectActor::Prepare(const Vec3& pos, const Vec3& baseVelocity)
+{
+    return baseVelocity;
+}
+
+

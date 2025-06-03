@@ -3,4 +3,5 @@ enum class EEffectType
 {
     Blood,
     Dust,
+    Feather,
 };

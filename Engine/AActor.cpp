@@ -61,8 +61,8 @@ void AActor::Tick()
 
 void AActor::Render()
 {
-	//if (!m_bRender)
-	//	return;
+	if (!m_bRender)
+		return;
 
 	m_pPhysics->Render();
 	m_pTransform->Render();

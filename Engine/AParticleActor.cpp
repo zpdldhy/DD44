@@ -16,6 +16,8 @@ void AParticleActor::Tick()
 {
 	AActor::Tick();
 
+	if (!m_bPlaying)
+		return;
 
 	float deltaTime = TIMER->GetDeltaTime();
 	m_fTimeAcc += deltaTime;
@@ -27,37 +29,52 @@ void AParticleActor::Tick()
 
 		int maxFrames = m_iDivisions * m_iDivisions;
 
-		// 루프 중이거나 아직 끝나지 않았으면 진행
-		if (m_iCurrentFrame < maxFrames || m_bLoop)
-		{
+		if (m_bReversePlay)
+			m_iCurrentFrame--;
+		else
 			m_iCurrentFrame++;
 
+		// 종료 조건 처리
+		if (m_bReversePlay)
+		{
+			if (m_iCurrentFrame < 0)
+			{
+				if (m_bLoop)
+					m_iCurrentFrame = maxFrames - 1;
+				else
+				{
+					m_iCurrentFrame = 0;
+					m_bPlaying = false;
+					if (m_bAutoDestroy)
+						m_bDelete = true;
+				}
+			}
+		}
+		else
+		{
 			if (m_iCurrentFrame >= maxFrames)
 			{
 				if (m_bLoop)
-				{
 					m_iCurrentFrame = 0;
-				}
 				else
 				{
 					m_iCurrentFrame = maxFrames - 1;
 					m_bPlaying = false;
 					if (m_bAutoDestroy)
-					{
 						m_bDelete = true;
-					}
 				}
 			}
-
-			int row = m_iCurrentFrame / m_iDivisions;
-			int col = m_iCurrentFrame % m_iDivisions;
-
-			float cellSize = 1.0f / m_iDivisions;
-			Vec2 uvStart(col * cellSize, row * cellSize);
-			Vec2 uvEnd((col + 1) * cellSize, (row + 1) * cellSize);
-
-			SetUV(uvStart, uvEnd);
 		}
+
+		// UV 계산
+		int row = m_iCurrentFrame / m_iDivisions;
+		int col = m_iCurrentFrame % m_iDivisions;
+
+		float cellSize = 1.0f / m_iDivisions;
+		Vec2 uvStart(col * cellSize, row * cellSize);
+		Vec2 uvEnd((col + 1) * cellSize, (row + 1) * cellSize);
+
+		SetUV(uvStart, uvEnd);
 	}
 }
 
@@ -90,8 +107,11 @@ void AParticleActor::InitSpriteAnimation(int divisions, float duration)
 	m_iDivisions = divisions;
 	m_fDuration = duration;
 	SetDuration(duration);
-	m_iCurrentFrame = 0;
-	m_fTimeAcc = RandomRange(0.0f, duration);
+	
+	int totalFrames = m_iDivisions * m_iDivisions;
+	m_iCurrentFrame = m_bReversePlay ? totalFrames - 1 : 0;
+	//m_fTimeAcc = RandomRange(0.0f, duration);
+	m_fTimeAcc = 0.0f;
 	m_bPlaying = true;
 	m_bDelete = false;
 }
