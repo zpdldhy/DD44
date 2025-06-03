@@ -19,6 +19,12 @@ LRESULT CALLBACK WndProcImGui(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM 
 		PostQuitMessage(0);
 		break;
 
+	case WM_MOUSEHOVER:
+		EnableWindow(GUI->GetImGuiWindowHandle(), true);
+		EnableWindow(g_hWnd, false);
+		SetForegroundWindow(GUI->GetImGuiWindowHandle());
+		break;
+
 	return 0;
 	}
 	return  DefWindowProc(_hWnd, _message, _wParam, _lParam);

@@ -18,6 +18,12 @@ LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lPar
 		PostQuitMessage(0);
 		break;
 
+	case WM_MOUSEHOVER:
+		EnableWindow(g_hWnd, true);
+		EnableWindow(GUI->GetImGuiWindowHandle(), false);
+		SetForegroundWindow(g_hWnd);
+		break;
+
 	//case WM_SIZE:
 	//    if (_wParam != SIZE_MINIMIZED)
 	//    {
