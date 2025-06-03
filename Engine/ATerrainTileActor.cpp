@@ -108,23 +108,31 @@ float ATerrainTileActor::GetHeightAt(float x, float z)
 	int numRows = m_iNumRows;
 	float cellSize = m_fCellSize;
 
-	float halfWidth = numCols * 0.5f * cellSize;
-	float halfHeight = numRows * 0.5f * cellSize;
+	// 타일 월드 위치를 고려하여 로컬 좌표 변환
+	Vec3 tilePos = GetPosition();
+	float localX = x - tilePos.x;
+	float localZ = z - tilePos.z;
 
-	float gridX = (x + halfWidth) / cellSize;
-	float gridZ = (z + halfHeight) / cellSize;
+	float halfWidth = (numCols) * 0.5f * cellSize;
+	float halfHeight = (numRows) * 0.5f * cellSize;
+
+	// 좌상단을 기준으로 변환
+	float gridX = (localX + halfWidth) / cellSize;
+	float gridZ = (localZ + halfHeight) / cellSize;
 
 	int col = (int)gridX;
 	int row = (int)gridZ;
 
-	if (col < 0 || col >= numCols - 1 || row < 0 || row >= numRows - 1)
+	if (col < 0 || col >= numCols || row < 0 || row >= numRows)
 	{
 		return 0.0f;
 	}
 
-	int idxLT = row * numCols + col;
+	int vertexCountX = numCols + 1;
+
+	int idxLT = row * vertexCountX + col;
 	int idxRT = idxLT + 1;
-	int idxLB = (row + 1) * numCols + col;
+	int idxLB = (row + 1) * vertexCountX + col;
 	int idxRB = idxLB + 1;
 
 	float yLT = vertexList[idxLT].pos.y;
@@ -145,7 +153,7 @@ float ATerrainTileActor::GetHeightAt(float x, float z)
 		height = yRB + (yLB - yRB) * (1.0f - dx) + (yRT - yRB) * (1.0f - dz);
 	}
 
-	return height;
+	return height + tilePos.y;
 }
 
 int ATerrainTileActor::GetCellIndexAt(float x, float z)
