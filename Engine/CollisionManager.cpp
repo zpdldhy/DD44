@@ -205,8 +205,7 @@ bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, sh
 		auto actor = OBJECT->GetActor(index);
 		if (actor)
 		{
-			if (actor->m_szName == L"Terrain")
-				vActorList.emplace_back(actor);
+			vActorList.emplace_back(actor);
 		}
 	}
 
