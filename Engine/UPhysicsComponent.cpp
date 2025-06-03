@@ -105,46 +105,59 @@ void UPhysicsComponent::CollisionCalculate(const Vec3& currentPos, const Vec3& t
 		return;
 
 	m_bColGrounded = false;
+	static float currentVelocity = 0.f;
+	static size_t preColSize = 0;
+	static float preVelocity = 0.f;
+
+	auto list = pShape->GetCollisionList();
 
 	for (const auto& colData : pShape->GetCollisionList())
 	{
-		Vec3 normal = colData.second.ColNormal;
-		normal.Normalize();
+		auto p = OBJECT->GetActor(colData.first);
+		
+		if (p->m_szName == L"")
+			int i = 0;
 
-		// Ray로 Pos 보정
-		auto myBox = dynamic_pointer_cast<UBoxComponent>(GetOwner()->GetShapeComponent());
-		auto LookRay = myBox->GetLookRay();
-		auto box = colData.second.box;
-		Vec3 inter;
-		if (Collision::CheckOBBToRay(LookRay, box, inter))
-		{
-			GetOwner()->SetPosition(inter - LookRay.direction);
-		}
+		//Vec3 normal = colData.second.ColNormal;
+		//normal.Normalize();
 
-		auto GroundRay = myBox->GetGroundRay();
-		if (colData.second.bColGround&&Collision::CheckOBBToRay(GroundRay, box, inter))
-		{
-			GetOwner()->SetPosition(inter - GroundRay.direction / 2);
-		}
+		//float dot = velocity.Dot(normal);
 
-		float dot = velocity.Dot(normal);
+		//if (dot < 0.f)
+		//{
+		//	// 침투 보정: 이동 방향에서 충돌면 법선 제거
+		//	velocity -= dot * normal;
 
-		if (dot < 0.f)
-		{
-			// 침투 보정: 이동 방향에서 충돌면 법선 제거
-			velocity -= dot * normal;
-
-			if (colData.second.bColGround)
-			{
-				m_bColGrounded = true;
-				m_fCurrentGravity = 0.f;
-			}
-			else if (normal.y > 0.5f)
-			{
-				m_bColGrounded = true;
-				m_fCurrentGravity = 0.f;
-			}
-
-		}
+		//	if (colData.second.bColGround)
+		//	{
+		//		m_bColGrounded = true;
+		//		m_fCurrentGravity = 0.f;
+		//	}
+		//	else if (normal.y > 0.5f)
+		//	{
+		//		m_bColGrounded = true;
+		//		m_fCurrentGravity = 0.f;
+		//	}
+		//}
 	}
+
+	velocity.y = 0.f;
+
+	if (GetOwner()->m_szName == L"MyCharacter")
+	{
+		currentVelocity = velocity.Length();
+
+		if (preColSize == 1 && pShape->GetCollisionList().size() == 2)
+			int i = 0;
+
+		if (pShape->GetCollisionList().size() == 1 || pShape->GetCollisionList().size() == 0)
+			int i = 0;
+
+		if (preColSize == 2 && preVelocity <= 0.001f && currentVelocity > preVelocity)
+			int i = 0;
+
+		preColSize = pShape->GetCollisionList().size();
+		preVelocity = currentVelocity;
+	}
+
 }
