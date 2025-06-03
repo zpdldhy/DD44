@@ -29,7 +29,7 @@ void EngineCameraMoveScript::Tick()
 		m_pPrevMousePos = pCurrentMousePointer;
 	}
 
-	if(INPUT->GetButtonDown(LSHIFT))
+	if(INPUT->GetButtonDown(LSHIFT) || INPUT->GetButtonDown(RSHIFT))
 		deltaTime *= 10.f;
 
 	if (INPUT->GetButtonDown(UP))

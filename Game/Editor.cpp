@@ -61,8 +61,8 @@ void Editor::Init()
 	enemyList = vlist;
 	SetEnemyScript();
 
-	SetupEngineCamera();
 	SetupGameCamera();
+	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();	
 }
@@ -654,9 +654,8 @@ void Editor::CreateObjectAtMousePick()
 
 	Box box = static_pointer_cast<UBoxComponent>(terrain->GetShapeComponent())->GetBounds();
 	Vec3 hitPos;
-	Ray castRay(ray.position, ray.direction);
 
-	if (!Collision::CheckAABBToRay(castRay, box, hitPos))
+	if (!Collision::CheckOBBToRay(ray, box, hitPos))
 		return;
 
 	float x = hitPos.x;
