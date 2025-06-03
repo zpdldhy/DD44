@@ -86,7 +86,7 @@ PS_OUT_DUAL PS(VS_OUT input)
     texColor.a *= alphaFalloff;
 
     float alpha = max(max(texColor.r, texColor.g), texColor.b);
-
+    
     // [4] Output to render targets
     psOut.c0 = float4(texColor.rgb, texColor.a);
     psOut.c1 = float4(1.0f - alpha, 1.0f - alpha, 1.0f - alpha, alpha);

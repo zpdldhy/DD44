@@ -76,9 +76,9 @@ void Game::Tick()
 		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
 	}
 	
-	if (INPUT->GetButton(H))
+	if (INPUT->GetButton(U))
 	{
-		SOUNDMANAGER->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
+		EFFECT->PlayEffect(EEffectType::Wind, Vec3::Zero, 0.0f, Vec3::Zero);
 	}
 	
 	if (INPUT->GetButton(O))

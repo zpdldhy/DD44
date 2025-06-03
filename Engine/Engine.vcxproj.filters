@@ -402,6 +402,9 @@
     <ClInclude Include="AFeatherActor.h">
       <Filter>Object\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="AWindActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -671,6 +674,9 @@
       <Filter>Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="AFeatherActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="AWindActor.cpp">
       <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>

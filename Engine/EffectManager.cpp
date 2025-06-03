@@ -8,6 +8,7 @@
 #include "ADustActor.h"
 #include "ParticleManager.h"
 #include "AFeatherActor.h"
+#include "AWindActor.h"
 
 
 void EffectManager::Init()
@@ -44,6 +45,10 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     case EEffectType::Feather:
         actor = make_shared<AFeatherActor>();
         break;
+
+    case EEffectType::Wind:
+        actor = make_shared<AWindActor>();
+        break;
     }
 
     // ¸Þ½Ã
@@ -62,6 +67,9 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
         break;
     case EEffectType::Feather:
         mat->Load(L"../Resources/Texture/feather.png", L"../Resources/Shader/SpriteUV.hlsl");
+        break;
+    case EEffectType::Wind:
+        mat->Load(L"../Resources/Texture/Wind.png", L"../Resources/Shader/SpriteUV.hlsl");
         break;
     }
 
@@ -100,6 +108,8 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     {
     case EEffectType::Dust:       duration = 1.0f; break;
     case EEffectType::Blood:      duration = 0.7f; break;
+    case EEffectType::Feather:    duration = 1.0f; break;
+    case EEffectType::Wind:       duration = 3.0f; break;
     default:                      duration = 1.0f; break;
     }
 
