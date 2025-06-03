@@ -98,6 +98,7 @@ private:
 
 public:
 	bool CreateImGuiWindow(HINSTANCE _hInstance, int _winX = 1000, int _winY = (int)g_windowSize.y - 100);
+	HWND GetImGuiWindowHandle() { return m_hWndImGui; }
 	bool CreateDevice();
 	POINT GetMousePos();
 	void PreRender();
