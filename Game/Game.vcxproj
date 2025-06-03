@@ -281,7 +281,9 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Resources\Prefab\Game.objects.json" />
+    <None Include="..\Resources\Prefab\GridBox_Stage_0.map.json" />
+    <None Include="..\Resources\Prefab\GridBox_Stage_1.map.json" />
+    <None Include="..\Resources\Prefab\Stage_0.objects.json" />
     <None Include="..\Resources\Shader\Header.hlsli" />
     <None Include="..\Resources\Shader\MainHeader.hlsli" />
   </ItemGroup>
