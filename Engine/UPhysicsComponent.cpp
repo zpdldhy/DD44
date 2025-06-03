@@ -30,10 +30,8 @@ void UPhysicsComponent::Tick()
 	m_fCurrentGravity = Clamp(m_fCurrentGravity, 0.f, m_fMaxGravity);
 
 	// 수평 속도 처리
-	if (m_bColGrounded) {
-		m_fCurrentSpeed -= 3.f * deltaTime;
-		m_fCurrentSpeed = Clamp(m_fCurrentSpeed, 0.f, m_fMaxSpeed);
-	}
+	m_fCurrentSpeed -= 3.f * deltaTime;
+	m_fCurrentSpeed = Clamp(m_fCurrentSpeed, 0.f, m_fMaxSpeed);
 
 	// 방향 정규화
 	m_vDirection.Normalize();

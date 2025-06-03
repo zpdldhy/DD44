@@ -101,11 +101,6 @@ void UBoxComponent::UpdateBounds()
 
 	m_GroundRay.position = m_Box.vCenter;
 	m_GroundRay.direction = -m_Box.vAxis[1] * m_Box.vExtent[1];
-
-	if (GetOwner()->m_szName == L"MyCharacter")
-	{
-		int i = 0;
-	}
 }
 
 void UBoxComponent::CreateCollisionRange()

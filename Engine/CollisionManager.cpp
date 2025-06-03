@@ -365,75 +365,31 @@ bool Collision::CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter)
 	Vec3 diff = _box.vCenter - _ray.position;
 
 	// box의 x상대축
-	float fDotDir = _box.vAxis[0].Dot(_ray.direction);
-	float fDotDiff = _box.vAxis[0].Dot(diff);
 
-	if (abs(fDotDir) < 0.0001f)
+	for (int i = 0; i < 3; i++)
 	{
-		if (fabs(fDotDiff) > _box.vExtent[0])
-			return false;
-	}
-	else
-	{
-		float ret1 = (fDotDiff - _box.vExtent[0]) / fDotDir;
-		float ret2 = (fDotDiff + _box.vExtent[0]) / fDotDir;
+		float fDotDir = _box.vAxis[i].Dot(_ray.direction);
+		float fDotDiff = _box.vAxis[i].Dot(diff);
 
-		if (ret1 > ret2)
-			swap(ret1, ret2);
+		if (abs(fDotDir) < 0.0001f)
+		{
+			if (fabs(fDotDiff) > _box.vExtent[i])
+				return false;
+		}
+		else
+		{
+			float ret1 = (fDotDiff - _box.vExtent[i]) / fDotDir;
+			float ret2 = (fDotDiff + _box.vExtent[i]) / fDotDir;
 
-		fMin = max(fMin, ret1);
-		fMax = min(fMax, ret2);
+			if (ret1 > ret2)
+				swap(ret1, ret2);
 
-		if (fMin > fMax)
-			return false;
-	}
+			fMin = max(fMin, ret1);
+			fMax = min(fMax, ret2);
 
-	// box의 y상대축
-	fDotDir = _box.vAxis[1].Dot(_ray.direction);
-	fDotDiff = _box.vAxis[1].Dot(diff);
-
-	if (abs(fDotDir) < 0.0001f)
-	{
-		if (fabs(fDotDiff) > _box.vExtent[1])
-			return false;
-	}
-	else
-	{
-		float ret1 = (fDotDiff - _box.vExtent[1]) / fDotDir;
-		float ret2 = (fDotDiff + _box.vExtent[1]) / fDotDir;
-
-		if (ret1 > ret2)
-			swap(ret1, ret2);
-
-		fMin = max(fMin, ret1);
-		fMax = min(fMax, ret2);
-
-		if (fMin > fMax)
-			return false;
-	}
-
-	// box의 z상대축
-	fDotDir = _box.vAxis[2].Dot(_ray.direction);
-	fDotDiff = _box.vAxis[2].Dot(diff);
-
-	if (abs(fDotDir) < 0.0001f)
-	{
-		if (fabs(fDotDiff) > _box.vExtent[2])
-			return false;
-	}
-	else
-	{
-		float ret1 = (fDotDiff - _box.vExtent[2]) / fDotDir;
-		float ret2 = (fDotDiff + _box.vExtent[2]) / fDotDir;
-
-		if (ret1 > ret2)
-			swap(ret1, ret2);
-
-		fMin = max(fMin, ret1);
-		fMax = min(fMax, ret2);
-
-		if (fMin > fMax)
-			return false;
+			if (fMin > fMax)
+				return false;
+		}
 	}
 
 	inter = _ray.position + _ray.direction * fMin;
