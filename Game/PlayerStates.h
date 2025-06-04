@@ -42,6 +42,7 @@ public:
 	virtual void Tick() override;
 	virtual void End() override;
 public:
+	float m_fDustTimer = 0.0f;
 
 };
 
@@ -57,7 +58,8 @@ public:
 	virtual void Tick() override;
 	virtual void End() override;
 public:
-
+	int m_iDustSpawnCount = 0;
+	float m_fDustSpawnTimer = 0.0f;
 };
 
 class PlayerAttackState : public StateBase
