@@ -27,13 +27,14 @@ void TestYoooooon::Init()
 {
 	SetupEditorCallbacks();
 
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".map.json"));
+	m_vGround = PToA->LoadAllPrefabs(".map.json");
+	OBJECT->AddActorList(m_vGround);
 	//OBJECT->AddActorList(PRA->LoadAllPrefabs(".object.json"));
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
 
-	//auto vlist = PToA->LoadAllPrefabs(".character.json");
-	//m_pPlayer = vlist[0];
-	//OBJECT->AddActorList(vlist);
+	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
+	OBJECT->AddActor(m_pPlayer);
+	m_pPlayer->SetPosition(Vec3(-50.f, 0.f, 0.f));
 
 	SetupEngineCamera();
 	//SetupSkybox();
@@ -49,7 +50,7 @@ void TestYoooooon::Tick()
 		if (m_bEnginCamera)
 		{
 			m_bEnginCamera = false;
-			//CAMERA->Set3DCameraActor(m_pPlayer);
+			CAMERA->Set3DCameraActor(m_pPlayer);
 		}
 		else
 		{
@@ -61,7 +62,7 @@ void TestYoooooon::Tick()
 	//if (INPUT->GetButton(LCLICK))
 		//ClickMouse();
 
-	//CheckCollision();
+	CheckCollision();
 }
 
 void TestYoooooon::Render()
@@ -77,9 +78,10 @@ void TestYoooooon::SetupEngineCamera()
 {
 	m_pCameraActor = make_shared<ACameraActor>();
 
-	m_pCameraActor->SetPosition({ 0.0f, 10.0f, 0.0f });
 	m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	m_pCameraActor->m_szName = L"EnginCamera";
+	m_pCameraActor->SetPosition(Vec3(0.f, 10.f, -50.f));
+	m_pCameraActor->SetRotation(Vec3(1.f, 0.f, 0.f));
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	OBJECT->AddActor(m_pCameraActor);
@@ -332,7 +334,7 @@ void TestYoooooon::CreateCollisionObject()
 	boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pBox->SetShapeComponent(boxCol);
 
-	m_pBox->SetScale(Vec3(5.f, 5.f, 5.f));
+	m_pBox->SetScale(Vec3(50.f, 50.f, 50.f));
 	m_pBox->SetPosition(Vec3(15.f, 1.f, 10.f));
 
 	OBJECT->AddActor(m_pBox);
@@ -355,4 +357,7 @@ void TestYoooooon::ClickMouse()
 void TestYoooooon::CheckCollision()
 {
 	COLLITION->CheckCollision(m_pPlayer, m_pBox);
+
+	for (auto& ground : m_vGround)
+		COLLITION->CheckCollision(m_pPlayer, ground);
 }

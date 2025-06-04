@@ -11,6 +11,8 @@ protected:
 
 	// 범위 표기
 	shared_ptr<class AActor> m_pCollisionRange = nullptr;
+	shared_ptr<class AActor> m_pLookRange = nullptr;
+	shared_ptr<class AActor> m_pDownRange = nullptr;
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
 
 public:

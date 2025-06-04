@@ -36,6 +36,4 @@ void AFireParticleActor::Tick()
 
    /* float rotZ = sinf(t) * 0.2f; 
     SetRotation(Vec3(0, 0, rotZ)); */
-
-
 }

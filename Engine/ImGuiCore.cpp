@@ -2,6 +2,33 @@
 #include "ImGuiCore.h"
 #include "Device.h"
 #include "Input.h"
+#include "Window.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+LRESULT CALLBACK WndProcImGui(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lParam)
+{
+	if (ImGui_ImplWin32_WndProcHandler(_hWnd, _message, _wParam, _lParam))
+	{
+		return true;
+	}
+
+	switch (_message)
+	{
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+
+	case WM_MOUSEHOVER:
+		EnableWindow(GUI->GetImGuiWindowHandle(), true);
+		EnableWindow(g_hWnd, false);
+		SetForegroundWindow(GUI->GetImGuiWindowHandle());
+		break;
+
+	return 0;
+	}
+	return  DefWindowProc(_hWnd, _message, _wParam, _lParam);
+}
 
 MONITORINFOEX GetSecondMonitorInfo()
 {
@@ -175,8 +202,17 @@ bool ImGuiCore::CreateImGuiWindow(HINSTANCE _hInstance, int _winX, int _winY)
 	int x = rc.left;
 	int y = rc.top;
 
+	WNDCLASSEXW wcex;
+	ZeroMemory(&wcex, sizeof(wcex));
+	wcex.cbSize = sizeof(WNDCLASSEXW);
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProcImGui;
+	wcex.hInstance = _hInstance;
+	wcex.lpszClassName = L"Editor";
+	RegisterClassExW(&wcex);
+
 	m_hWndImGui = CreateWindow(
-		L"DD44", L"Tool", WS_OVERLAPPEDWINDOW,
+		L"Editor", L"Tool", WS_OVERLAPPEDWINDOW,
 		x, y, _winX, _winY, nullptr, nullptr, _hInstance, nullptr);
 
 	GetClientRect(m_hWndImGui, &rc);

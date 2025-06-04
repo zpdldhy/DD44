@@ -61,8 +61,8 @@ void Editor::Init()
 	enemyList = vlist;
 	SetEnemyScript();
 
-	SetupEngineCamera();
 	SetupGameCamera();
+	SetupEngineCamera();
 	SetupSkybox();
 	SetupSunLight();	
 }
@@ -80,6 +80,22 @@ void Editor::Tick()
 		{
 			m_bEnginCamera = true;
 			CAMERA->Set3DCameraActor(m_pCameraActor);
+		}
+	}
+
+	if (INPUT->GetButtonDown(LCTRL))
+	{
+		if (INPUT->GetButton(W))
+		{
+			GUI->GetActorListUI()->SetGizmoMode(GizmoMode::Translate);
+		}
+		else if (INPUT->GetButton(E))
+		{
+			GUI->GetActorListUI()->SetGizmoMode(GizmoMode::Rotate);
+		}
+		else if (INPUT->GetButton(R))
+		{
+			GUI->GetActorListUI()->SetGizmoMode(GizmoMode::Scale);
 		}
 	}
 
@@ -654,9 +670,8 @@ void Editor::CreateObjectAtMousePick()
 
 	Box box = static_pointer_cast<UBoxComponent>(terrain->GetShapeComponent())->GetBounds();
 	Vec3 hitPos;
-	Ray castRay(ray.position, ray.direction);
 
-	if (!Collision::CheckAABBToRay(castRay, box, hitPos))
+	if (!Collision::CheckOBBToRay(ray, box, hitPos))
 		return;
 
 	float x = hitPos.x;

@@ -22,6 +22,9 @@
     <Filter Include="Script">
       <UniqueIdentifier>{565dca02-3e03-4554-8ec9-dfc978045924}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Prefab\data">
+      <UniqueIdentifier>{4cee819a-7ec6-48b4-9bb3-a7d2a0faf294}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -234,8 +237,14 @@
     <None Include="..\Resources\Shader\MainHeader.hlsli">
       <Filter>Shader</Filter>
     </None>
-    <None Include="..\Resources\Prefab\Game.objects.json">
-      <Filter>Prefab</Filter>
+    <None Include="..\Resources\Prefab\GridBox_Stage_0.map.json">
+      <Filter>Prefab\data</Filter>
+    </None>
+    <None Include="..\Resources\Prefab\GridBox_Stage_1.map.json">
+      <Filter>Prefab\data</Filter>
+    </None>
+    <None Include="..\Resources\Prefab\Stage_0.objects.json">
+      <Filter>Prefab\data</Filter>
     </None>
   </ItemGroup>
 </Project>

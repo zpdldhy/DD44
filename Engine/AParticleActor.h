@@ -38,7 +38,7 @@ protected:
 	Vec2 m_uvStart = { 0.0f, 0.0f };
 	Vec2 m_uvEnd = { 1.0f, 1.0f };
 	shared_ptr<ConstantBuffer<CB_Billboard>> m_CB_Billboard;
-
+	bool m_bReversePlay = false;
 
 public:
 	bool m_bLoop = true;
