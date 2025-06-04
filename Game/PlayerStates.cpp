@@ -251,7 +251,7 @@ void PlayerRollState::Tick()
 	// 먼지 반복 생성
 	m_fDustSpawnTimer += TIMER->GetDeltaTime();
 
-	if (m_iDustSpawnCount < 3 && m_fDustSpawnTimer >= 0.1f)
+	if (m_iDustSpawnCount < 3 && m_fDustSpawnTimer >= 0.15f)
 	{
 		Vec3 pos = owner->GetPosition();
 		Vec3 dir = owner->GetLook();
