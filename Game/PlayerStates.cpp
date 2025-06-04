@@ -4,6 +4,8 @@
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
 #include "Sound.h"
+#include "EffectManager.h"
+#include "Timer.h"
 
 
 PlayerIdleState::PlayerIdleState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_IDLE)
@@ -50,10 +52,31 @@ void PlayerWalkState::Enter()
 	animInstance->SetCurrentAnimTrack(idleIndex);
 
 	SOUNDMANAGER->GetPtr(ESoundType::Walk)->Play2D();
+
+	m_fDustTimer = 0.0f;
 }
 
 void PlayerWalkState::Tick()
 {
+	auto owner = m_pOwner.lock();
+	if (!owner)
+		return;
+
+	float deltaTime = TIMER->GetDeltaTime();
+	m_fDustTimer += deltaTime;
+
+	// 걷는 도중 0.5초마다 먼지 생성
+	if (m_fDustTimer >= 0.5f)
+	{
+		Vec3 pos = owner->GetPosition();
+		Vec3 dir = owner->GetLook();
+		pos.y += 0.3f;
+
+		Vec3 dustVelocity = dir * 20.0f + Vec3(0, 5.0f, 0);
+		EFFECT->PlayEffect(EEffectType::Dust, pos, 10.0f, dustVelocity);
+
+		m_fDustTimer = 0.0f;
+	}
 }
 
 void PlayerWalkState::End()
@@ -61,6 +84,7 @@ void PlayerWalkState::End()
 	// 기본 state 세팅
 	m_bOnPlaying = false;
 	SOUNDMANAGER->GetPtr(ESoundType::Walk)->Stop();
+	m_fDustTimer = 0.0f;
 }
 
 PlayerAttackState::PlayerAttackState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_ATTACK)
@@ -205,6 +229,8 @@ void PlayerRollState::Enter()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = true;
+	m_iDustSpawnCount = 0;
+	m_fDustSpawnTimer = 0.0f;
 
 	// 애니메이션 Attack 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
@@ -218,6 +244,26 @@ void PlayerRollState::Enter()
 
 void PlayerRollState::Tick()
 {
+	auto owner = m_pOwner.lock();
+	if (!owner)
+		return;
+
+	// 먼지 반복 생성
+	m_fDustSpawnTimer += TIMER->GetDeltaTime();
+
+	if (m_iDustSpawnCount < 3 && m_fDustSpawnTimer >= 0.1f)
+	{
+		Vec3 pos = owner->GetPosition();
+		Vec3 dir = owner->GetLook();
+		pos.y += 0.3f;
+
+		Vec3 dustVelocity = dir * 20.0f + Vec3(0, 5.0f, 0);
+		EFFECT->PlayEffect(EEffectType::Feather, pos, 10.0f, dustVelocity);
+
+		m_fDustSpawnTimer = 0.0f;
+		m_iDustSpawnCount++;
+	}
+
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	if (!animInstance->m_bOnPlayOnce)
 	{
