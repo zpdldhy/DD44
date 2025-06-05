@@ -29,10 +29,11 @@ private:
 	float m_fWeight = 0.f;
 
 	// Move	
-	Vec3 m_vCurrentDir = { 0.f, 0.f, 0.f };
-	float m_fFriction = 0.1f;				// 마찰
-	float m_fCurrentSpeed = 0.f;
-	float m_fMaxSpeed = 0.f;
-	Vec3 m_vVelocity = { 0.f, 0.f, 0.f };	// 최종결과
+	Vec3 m_vCurrentDir = { 0.f, 0.f, 0.f };	// 진행 방향(normalize)
+	float m_fFriction = 0.1f;				// 지면 마찰력
+	float m_fCurrentSpeed = 0.f;			// 현재 Speed
+	float m_fMaxSpeed = 0.f;				// 제한 Speed
+
+	Vec3 m_vVelocity = { 0.f, 0.f, 0.f };	// 최종 결과
 };
 

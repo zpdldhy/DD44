@@ -22,7 +22,7 @@ void UPhysicsComponent::Tick()
 		m_fCurrentSpeed = 0.f;
 
 	if (m_fCurrentSpeed > m_fMaxSpeed)
-		m_fCurrentSpeed = m_fMaxSpeed;
+		m_fCurrentSpeed = m_fMaxSpeed;	
 
 	m_vVelocity = m_vCurrentDir * m_fCurrentSpeed;
 
