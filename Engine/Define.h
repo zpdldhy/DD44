@@ -24,7 +24,7 @@
 #define COLLITION	GET_SINGLE(Collision)
 #define EFFECT		GET_SINGLE(EffectManager)
 #define ACTORLOADER GET_SINGLE(ActorLoader)
-
+#define WIND		GET_SINGLE(WindManager)
 
 #define DD_PI		3.1415926f
 #define DD_2PI		6.2831852f	

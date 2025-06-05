@@ -30,6 +30,7 @@ PS_OUT PS(VS_OUT input)
     float4 bloom = g_txBloom.Sample(sample, input.t);
     float4 light = g_txLight.Sample(sample, input.t);
     float4 normal = g_txNormal.Sample(sample, input.t);
+    float4 wind = g_txTemp.Sample(sample, input.t);
     
     float weights[5] =
     {

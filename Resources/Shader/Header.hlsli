@@ -18,11 +18,6 @@ cbuffer AnimationBuffer : register(b5)
     matrix obj_matAnim[MAX_BONE];
 }
 
-float2 remapUV(float2 uv)
-{
-    return lerp(g_uvStart, g_uvEnd, uv);
-}
-
 cbuffer CB_Billboard : register(b6)
 {
     float3 g_vBillboardCenter;
@@ -53,7 +48,6 @@ cbuffer CB_LightArray : register(b8)
     float3 padding_light;
 }
 
-
 cbuffer InverseBoneBuffer : register(b9)
 {
     matrix obj_matBone[MAX_BONE];
@@ -69,6 +63,14 @@ cbuffer CB_Blur : register(b11)
 {
     float2 g_vTexelSize; // (1 / 화면 너비, 1 / 화면 높이)
     float2 g_vDirection; // (1, 0): 가로 블러 / (0, 1): 세로 블러
+};
+
+cbuffer CB_Wind : register(b12) 
+{
+    float2 g_vUVStart;
+    float2 g_vUVSize;
+    float2 g_vUVOffset;
+    float2 padding;
 };
 
 
@@ -221,4 +223,10 @@ float3 ApplySpecular(float3 normal, float3 worldPos)
 float3 ApplyAmbient()
 {
     return UnpackAmbientColor(0) * UnpackAmbientPower(0) * g_vAmbientCoeff * g_fAmbientPower;
+}
+
+
+float2 remapUV(float2 uv)
+{
+    return lerp(g_uvStart, g_uvEnd, uv);
 }

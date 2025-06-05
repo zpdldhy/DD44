@@ -12,6 +12,7 @@
 #include "CollisionManager.h"
 #include "EffectManager.h"
 #include "Sound.h"
+#include "WindManager.h"
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -19,6 +20,7 @@
 #include "ASky.h"
 #include "ALight.h"
 #include "AUIActor.h"
+#include "AWindActor.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -32,6 +34,7 @@
 #include "BatMovement.h"
 #include "WalkerMovement.h"
 #include "BettyMovement.h"
+#include "ViewPortTexture.h"
 
 void Game::Init()
 {
@@ -65,6 +68,16 @@ void Game::Init()
 	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
+
+	{
+		auto wind = make_shared<AWindActor>();
+		wind->SetSize(Vec2(0.4f, 0.15f));                 // 적당한 사이즈
+		wind->SetUV(Vec2(0.f, 0.f), Vec2(1.f, 1.f));      // 전체 UV
+		wind->SetSpeed(0.2f);                             // UV 스크롤 속도
+		wind->SetPosition(Vec3(0.0f, 0.0f, 0.95f));       // NDC 화면 중앙
+		WIND->AddWind(wind);
+	}
+
 }
 
 void Game::Tick()
@@ -94,6 +107,8 @@ void Game::Tick()
 			CAMERA->Set3DCameraActor(m_pCameraActor);
 		}
 	}
+
+
 
 	CheckEnemyCollision();
 }

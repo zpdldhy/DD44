@@ -169,3 +169,5 @@ void UMaterial::SetSlashProgress(float _progress)
     DC->VSSetConstantBuffers(10, 1, m_pCB_Slash.GetAddressOf());
     DC->PSSetConstantBuffers(10, 1, m_pCB_Slash.GetAddressOf());
 }
+
+

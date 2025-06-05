@@ -22,6 +22,8 @@
 #include "RenderStateManager.h"
 #include "EffectManager.h"
 #include "Sound.h"
+#include "WindManager.h"
+#include "AWindQuadActor.h"
 
 bool g_bRangeVisibleMode;
 
@@ -60,7 +62,7 @@ void Engine::Init()
 		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
-		
+		WIND->Init();
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
@@ -80,6 +82,7 @@ void Engine::Frame()
 
 		UI->Tick();
 		PARTICLE->Tick();
+		WIND->Tick();
 	}
 
 	GET_SINGLE(Device)->Frame();
@@ -120,7 +123,10 @@ void Engine::Render()
 		OBJECT->Render();	// ObjectList Render
 		PARTICLE->Render();
 		POSTPROCESS->PostRender();
-		
+
+		WIND->Render();
+
+		//POSTPROCESS->SetSRVToSlot(0, WIND->GetSRV());
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
 
@@ -128,8 +134,9 @@ void Engine::Render()
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
 		{
-			CAMERA->Render(CameraViewType::CVT_UI);		
+			CAMERA->Render(CameraViewType::CVT_UI);
 			POSTPROCESS->Present();
+			WIND->Present();
 		}
 
 		UI->Render();
@@ -147,7 +154,7 @@ void Engine::Render()
 
 void Engine::Release()
 {
-	UI->Destroy();	
+	UI->Destroy();
 	PARTICLE->Destroy();
 	_app->Destroy();
 
@@ -162,7 +169,7 @@ void Engine::Release()
 
 void Engine::Run()
 {
-	_window.SetWindowClass(_hInstance);	
+	_window.SetWindowClass(_hInstance);
 	_window.SetWindowFullScreen();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
