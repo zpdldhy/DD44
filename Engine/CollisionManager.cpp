@@ -552,6 +552,28 @@ bool Collision::CheckOBBToOBB(const Box& _box0, const Box& _box1)
 	return true;
 }
 
+bool Collision::CheckSphereToSphere(const Sphere& _Sphere0, const Sphere& _Sphere1, Vec3& _normal)
+{
+	float Dis = (_Sphere0.vCenter - _Sphere1.vCenter).Length();
+	float totalRadius = _Sphere0.fRadius + _Sphere1.fRadius;
+
+	if (Dis > totalRadius)
+		return false;
+
+	// normal은 Sphere0 기준의 normal 벡터
+	_normal = _Sphere1.vCenter - _Sphere0.vCenter;
+	_normal.Normalize();
+
+	return true;
+}
+
+bool Collision::CheckSphereToOBB(const Sphere& _Sphere, const Box& _Box)
+{
+
+
+	return true;
+}
+
 bool Collision::GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& _inter)
 {
 	float dot1 = _normal.Dot(_ray.direction);

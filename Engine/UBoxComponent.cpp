@@ -8,7 +8,7 @@
 
 void UBoxComponent::Init()
 {
-	USceneComponent::Init();
+	UShapeComponent::Init();
 	UpdateBounds();
 
 #ifndef DEBUG
@@ -21,7 +21,7 @@ void UBoxComponent::Init()
 
 void UBoxComponent::Tick()
 {
-	USceneComponent::Tick();
+	UShapeComponent::Tick();
 	UpdateBounds();
 
 #ifndef DEBUG
@@ -32,12 +32,10 @@ void UBoxComponent::Tick()
 #endif // DEBUG
 }
 
-void UBoxComponent::PreRender()
-{
-}
-
 void UBoxComponent::Render()
 {
+	UShapeComponent::Render();
+
 #ifndef DEBUG
 	if (m_bVisible && g_bRangeVisibleMode)
 	{
@@ -59,10 +57,6 @@ void UBoxComponent::Render()
 #endif // DEBUG
 }
 
-void UBoxComponent::PostRender()
-{
-}
-
 void UBoxComponent::Destroy()
 {
 #ifndef DEBUG
@@ -75,13 +69,9 @@ void UBoxComponent::Destroy()
 
 void UBoxComponent::UpdateBounds()
 {
-	Vec3 vMin(-0.5f, -0.5f, -0.5f);
-	Vec3 vMax(+0.5f, +0.5f, +0.5f);
-	Vec3 vCenter(0.f, 0.f, 0.f);
-
-	m_Box.vMin = Vec3::Transform(vMin, m_matWorld);
-	m_Box.vMax = Vec3::Transform(vMax, m_matWorld);
-	m_Box.vCenter = Vec3::Transform(vCenter, m_matWorld);
+	m_Box.vMin = Vec3::Transform(Vec3(-0.5f, -0.5f, -0.5f), m_matWorld);
+	m_Box.vMax = Vec3::Transform(Vec3(+0.5f, +0.5f, +0.5f), m_matWorld);
+	m_Box.vCenter = m_vWorldPosition;
 
 	m_Box.vAxis[0] = m_vWorldLook;
 	m_Box.vAxis[1] = m_vWorldUp;
@@ -115,7 +105,7 @@ void UBoxComponent::CreateCollisionRange()
 		pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
 		pMesh->SetMaterial(pMaterial);
 
-		m_pCollisionRange->SetScale(m_vLocalScale);
+		m_pCollisionRange->SetScale(m_vWorldScale);
 		m_pCollisionRange->SetRotation(m_vWorldRotation);
 		m_pCollisionRange->SetPosition(m_vWorldPosition);
 
@@ -131,7 +121,7 @@ void UBoxComponent::CreateCollisionRange()
 		pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");		
 		pMesh->SetMaterial(pMaterial);
 
-		m_pLookRange->SetScale(m_vLocalScale);
+		m_pLookRange->SetScale(m_vWorldScale);
 		m_pLookRange->SetRotation(m_vWorldRotation);
 		m_pLookRange->SetPosition(m_vWorldPosition);
 
@@ -147,7 +137,7 @@ void UBoxComponent::CreateCollisionRange()
 		pMaterial->Load(L"", L"../Resources/Shader/DefaultColor.hlsl");
 		pMesh->SetMaterial(pMaterial);
 
-		m_pDownRange->SetScale(m_vLocalScale);
+		m_pDownRange->SetScale(m_vWorldScale);
 		m_pDownRange->SetRotation(m_vWorldRotation);
 		m_pDownRange->SetPosition(m_vWorldPosition);
 

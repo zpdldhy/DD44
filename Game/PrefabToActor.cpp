@@ -17,6 +17,7 @@
 #include "UStaticMeshComponent.h"
 #include "UStaticMeshResources.h"
 #include "UBoxComponent.h"
+#include "USphereComponent.h"
 
 // Script
 #include "PlayerMoveScript.h"
@@ -136,7 +137,8 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 			shared_ptr<UShapeComponent> shapeComponent = nullptr;
 			if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_BOX)
 				shapeComponent = make_shared<UBoxComponent>();
-			//else if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_SPHERE)
+			else if (static_cast<ShapeType>(characterData.shape.eShapeType) == ShapeType::ST_SPHERE)
+				shapeComponent = make_shared<USphereComponent>();
 
 			shapeComponent->SetLocalScale(Vec3(characterData.shape.Scale));
 			shapeComponent->SetLocalPosition(Vec3(characterData.shape.Position));

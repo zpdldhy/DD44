@@ -23,15 +23,31 @@ protected:
 	ShapeType m_ShapeType = ShapeType::ST_NONE;
 	DirectX::SimpleMath::Color m_pShapeColor = { 0.f, 0.f, 0.f, 0.f };
 
+	// 범위 표기
+	shared_ptr<class AActor> m_pCollisionRange = nullptr;
+	shared_ptr<class AActor> m_pLookRange = nullptr;
+	shared_ptr<class AActor> m_pDownRange = nullptr;
+	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
+
 	// temp 
 	map<UINT, CollisionData> m_vCollisionList;
+
+public:
+	bool m_bVisible = true;
 
 public:
 	UShapeComponent() = default;
 	virtual ~UShapeComponent() = default;
 
-public:
+private:
+	void PreRender() override {}
+	void PostRender() override {}
+
+protected:
 	virtual void UpdateBounds() abstract;
+
+	virtual void CreateCollisionRange() abstract;
+	virtual void UpdateCollisionRange() abstract;
 
 public:
 	void SetShapeColor(DirectX::SimpleMath::Color _color) { m_pShapeColor = _color; }

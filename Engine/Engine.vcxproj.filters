@@ -402,6 +402,7 @@
     <ClInclude Include="AFeatherActor.h">
       <Filter>Object\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="USphereComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -673,6 +674,7 @@
     <ClCompile Include="AFeatherActor.cpp">
       <Filter>Object\Particle</Filter>
     </ClCompile>
+    <ClCompile Include="USphereComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
