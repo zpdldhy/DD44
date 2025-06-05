@@ -24,5 +24,8 @@ protected:
 
 	void CreateCollisionRange() override;
 	void UpdateCollisionRange() override;
+
+public:
+	const Sphere& const GetBounds() { return m_Sphere; }
 };
 

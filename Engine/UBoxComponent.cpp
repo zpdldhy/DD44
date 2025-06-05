@@ -73,9 +73,9 @@ void UBoxComponent::UpdateBounds()
 	m_Box.vMax = Vec3::Transform(Vec3(+0.5f, +0.5f, +0.5f), m_matWorld);
 	m_Box.vCenter = m_vWorldPosition;
 
-	m_Box.vAxis[0] = m_vWorldLook;
+	m_Box.vAxis[0] = m_vWorldRight;
 	m_Box.vAxis[1] = m_vWorldUp;
-	m_Box.vAxis[2] = m_vWorldRight;
+	m_Box.vAxis[2] = m_vWorldLook;
 
 	m_Box.vAxis[0].Normalize();
 	m_Box.vAxis[1].Normalize();

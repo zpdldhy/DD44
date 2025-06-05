@@ -5,6 +5,7 @@
 struct CollisionData
 {
 	Box box;
+	Vec3 Inter = { 0.f, 0.f, 0.f };
 	Vec3 ColNormal = { 0.f, 0.f, 0.f };
 	bool bColGround = false;
 };

@@ -3,6 +3,7 @@
 #include "ObjectManager.h"
 #include "AActor.h"
 #include "UBoxComponent.h"
+#include "USphereComponent.h"
 
 void Collision::Init()
 {
@@ -36,7 +37,22 @@ void Collision::Init()
 		};
 
 	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_BOX}] = [](auto a, auto b) {
-		// ...
+		auto Sphere = static_pointer_cast<USphereComponent>(a->GetShapeComponent());
+		auto Box = static_pointer_cast<UBoxComponent>(b->GetShapeComponent());
+
+		Vec3 Inter;
+		if (Collision::CheckSphereToOBB(Sphere->GetBounds(), Box->GetBounds(), Inter))
+		{
+			// 충돌 처리
+			CollisionData data;
+			data.box = Box->GetBounds();
+			data.Inter = Inter;
+			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
+				data.bColGround = true;
+
+			Sphere->AddCollision(b->m_Index, data);
+		}
+
 		};
 
 	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_SPHERE}] = [](auto a, auto b) {
@@ -567,10 +583,29 @@ bool Collision::CheckSphereToSphere(const Sphere& _Sphere0, const Sphere& _Spher
 	return true;
 }
 
-bool Collision::CheckSphereToOBB(const Sphere& _Sphere, const Box& _Box)
+bool Collision::CheckSphereToOBB(const Sphere& _Sphere, const Box& _Box, Vec3& _Inter)
 {
+	Vec3 Dir = _Box.vCenter - _Sphere.vCenter;
+	Vec3 DirNormal = Dir;	DirNormal.Normalize();
+	Vec3 DirLength = DirNormal * _Sphere.fRadius;
+	// Box 내부의 Sphere와 가장 가까운 한 점
+	Vec3 closePoint = _Box.vCenter;
 
+	for (int i = 0; i < 3; i++)
+	{
+		// Box의 중심으로부터 원에 가까운 점까지의 벡터를 각 축에 내적.
+		float D = (DirLength - Dir).Dot(_Box.vAxis[i]);
+		float Clamp = max(-_Box.vExtent[i], min(_Box.vExtent[i], D));
 
+		closePoint = closePoint + _Box.vAxis[i] * Clamp;
+	}
+
+	Vec3 diff = _Sphere.vCenter - closePoint;
+
+	if (diff.Length() > _Sphere.fRadius)
+		return false;
+
+	_Inter = closePoint;
 	return true;
 }
 
