@@ -31,6 +31,6 @@ public:
 	const Ray& const GetGroundRay() { return m_GroundRay; }
 
 public:
-	const Vec3& GetBoxCenter()  { return m_Box.vCenter; }
+	const Vec3& const GetCenter() override { return m_Box.vCenter; }
 };
 

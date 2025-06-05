@@ -261,8 +261,8 @@ void PlayerMoveScript::Tick()
 		// 이동
 		{
 			moveDir.Normalize();
-			Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->SetMove(pos, 0.25f, 5.f);
+			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
+			GetOwner()->SetMove(moveDir, 0.25f);
 		}
 
 		// 회전		
@@ -487,8 +487,8 @@ void PlayerMoveScript::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> co
 
 void PlayerMoveScript::RollMove()
 {
-	Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
-	GetOwner()->SetMove(pos, 0.5f, 5.f);
+	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
+	GetOwner()->SetMove(m_vRollLook, 0.5f);
 }
 
 bool PlayerMoveScript::CanAttack()

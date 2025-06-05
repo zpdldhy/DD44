@@ -27,5 +27,6 @@ protected:
 
 public:
 	const Sphere& const GetBounds() { return m_Sphere; }
+	const Vec3& const GetCenter() override { return m_Sphere.vCenter; }
 };
 

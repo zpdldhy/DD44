@@ -334,8 +334,8 @@ void TestYoooooon::CreateCollisionObject()
 	boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	m_pBox->SetShapeComponent(boxCol);
 
-	m_pBox->SetScale(Vec3(50.f, 50.f, 50.f));
-	m_pBox->SetPosition(Vec3(15.f, 1.f, 10.f));
+	m_pBox->SetScale(Vec3(30.f, 30.f, 30.f));
+	m_pBox->SetPosition(Vec3(0.f, 10.f, 0.f));
 
 	OBJECT->AddActor(m_pBox);
 }

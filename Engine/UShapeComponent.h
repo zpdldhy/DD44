@@ -53,6 +53,7 @@ protected:
 public:
 	void SetShapeColor(DirectX::SimpleMath::Color _color) { m_pShapeColor = _color; }
 	void SetCollisionEnabled(CollisionEnabled _type) { m_CollisionEnabled = _type; }
+	virtual const Vec3& const GetCenter() abstract;
 
 	const ShapeType& const GetShapeType() { return m_ShapeType; }
 	const CollisionEnabled& const GetCollisionType() { return m_CollisionEnabled; }
