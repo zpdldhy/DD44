@@ -17,7 +17,7 @@ private:
     shared_ptr<class UMaterial> m_pMaterial;
     WindData m_tWindData;
 
-    Vec2 m_vSize = Vec2(0.3f, 0.1f); // NDC 단위 크기
+    Vec2 m_vSize = Vec2(1, 1); // NDC 단위 크기
     float m_fSpeed = 0.2f;
     float m_fTimeAcc = 0.f;
 

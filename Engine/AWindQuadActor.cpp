@@ -8,7 +8,9 @@ void AWindQuadActor::Init()
     AActor::Init();
 
     // 풀스크린용 NDC 정규 크기
-    SetScale(Vec3(200.f, 200.f, 1.1f));
+    SetScale(Vec3(2.0f, 2.0f, 1.0f)); // NDC 기준 전체 화면 덮도록 수정
+    SetPosition(Vec3(0.f, 0.f, 0.97f)); // 중심 유지
+
 
     // Plane 메시
     auto pMesh = UStaticMeshComponent::CreatePlane();
@@ -19,7 +21,6 @@ void AWindQuadActor::Init()
 
     pMesh->SetMaterial(m_pMaterial);
     SetMeshComponent(pMesh);
-    SetPosition(Vec3(0, 0, 0.97f));
 }
 
 void AWindQuadActor::SetSRV(ID3D11ShaderResourceView* _srv)

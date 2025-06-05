@@ -71,10 +71,10 @@ void Game::Init()
 
 	{
 		auto wind = make_shared<AWindActor>();
-		wind->SetSize(Vec2(0.4f, 0.15f));                 // 적당한 사이즈
+		wind->SetScale(Vec3(0.00001f,1,0));                 // 적당한 사이즈
 		wind->SetUV(Vec2(0.f, 0.f), Vec2(1.f, 1.f));      // 전체 UV
 		wind->SetSpeed(0.2f);                             // UV 스크롤 속도
-		wind->SetPosition(Vec3(0.0f, 0.0f, 0.95f));       // NDC 화면 중앙
+		wind->SetPosition(Vec3(0.0f, 0.0f, 0.0f));       // NDC 화면 중앙
 		WIND->AddWind(wind);
 	}
 
@@ -83,7 +83,7 @@ void Game::Init()
 void Game::Tick()
 {
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
-
+	
 	//bgm
 	{
 		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();

@@ -11,6 +11,7 @@ private:
     vector<shared_ptr<AWindActor>> m_vWindList;
 
     unique_ptr<ViewPortTexture> m_pWindTarget;
+    unique_ptr<ViewPortTexture> m_pWindCompositeTarget;
     ComPtr<ID3D11RenderTargetView> m_pPrevRTV;
 
     shared_ptr<AWindQuadActor> m_pQuadActor;
@@ -25,6 +26,8 @@ public:
     void PostRender();
 
     void AddWind(shared_ptr<AWindActor> wind);
+    void CompositeQuadToTexture();
+    ID3D11ShaderResourceView* GetCompositeSRV();
 
     ID3D11ShaderResourceView* GetSRV(); 
 

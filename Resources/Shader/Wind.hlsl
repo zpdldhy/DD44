@@ -3,19 +3,18 @@
 VS_OUT VS(VS_IN input)
 {
     VS_OUT output;
-    
-    // 월드 → 뷰 → 프로젝션 제거
-    float2 ndcOffset = g_matWorld._41_42; // 위치값만 사용
-    float2 ndcPos = input.p.xy + ndcOffset;
 
-    output.p = float4(ndcPos, 0.0f, 1.0f); // NDC로 직접 출력
+    float4 local = float4(input.p.xy, 0.0f, 1.0f);
+    output.p = mul(local, g_matWorld); // 위치, 스케일 반영
+
     output.t = input.t * g_vUVSize + g_vUVStart + g_vUVOffset;
-
     return output;
 }
 
 float4 PS(VS_OUT input) : SV_Target
 {
-    return g_txDiffuseA.Sample(sample, input.t);
+    float4 result = g_txDiffuseA.Sample(sample, input.t);
+    return float4(1, 0, 1, 0);
+    //return result;
 
 }

@@ -4,6 +4,7 @@
 #include "Device.h"
 #include "Timer.h"
 #include "UStaticMeshComponent.h"
+#include "USceneComponent.h"
 
 ComPtr<ID3D11Buffer> AWindActor::m_pWindCB = nullptr;
 
@@ -15,34 +16,33 @@ AWindActor::AWindActor()
 
 void AWindActor::Init()
 {
+    
+    
     AActor::Init();
-
     CreateWindCB();
     auto mesh = UStaticMeshComponent::CreatePlane();
     mesh->SetMaterial(m_pMaterial);
     SetMeshComponent(mesh);
 
     SetScale(Vec3(m_vSize.x, m_vSize.y, 1.f));
-    SetPosition(Vec3(0.f, 0.f, 0.97f));
+    SetPosition(Vec3(0.f, 0.f, 0.f));
 }
 
 void AWindActor::Tick()
 {
     AActor::Tick();
 
-    m_fTimeAcc += TIMER->GetDeltaTime();
+    //m_fTimeAcc += TIMER->GetDeltaTime();
 
-    m_tWindData.vUVOffset.x = fmod(m_fTimeAcc * m_fSpeed, 1.0f);
-
-    //Vec3 pos = GetPosition();
-    //pos.x += 0.05f * TIMER->GetDeltaTime(); // 오른쪽으로 천천히 이동
-    //SetPosition(pos);
-
+    //m_tWindData.vUVOffset.x = fmod(m_fTimeAcc * m_fSpeed, 1.0f);
   
 }
 
 void AWindActor::Render()
 {
+    if (m_pTransform)
+        SetWorldMatrix(m_pTransform->GetWorld());
+
     if (m_pWindCB)
     {
         // CB 데이터 전달

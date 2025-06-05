@@ -122,11 +122,14 @@ void Engine::Render()
 		POSTPROCESS->PreRender();
 		OBJECT->Render();	// ObjectList Render
 		PARTICLE->Render();
+		WIND->Render();                      // [1]
+		WIND->CompositeQuadToTexture();     // [2]
+		POSTPROCESS->SetSRVToSlot(7, WIND->GetCompositeSRV()); // [3]
 		POSTPROCESS->PostRender();
 
-		WIND->Render();
+		
 
-		//POSTPROCESS->SetSRVToSlot(0, WIND->GetSRV());
+		
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
 
@@ -136,7 +139,6 @@ void Engine::Render()
 		{
 			CAMERA->Render(CameraViewType::CVT_UI);
 			POSTPROCESS->Present();
-			WIND->Present();
 		}
 
 		UI->Render();

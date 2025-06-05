@@ -102,6 +102,7 @@ PS_OUT PS(VS_OUT input)
                 float3 finalColor = result.rgb * (1.0f + edgeAlpha * 0.5f); // 밝기만 살짝 증가
                 psOut.c.rgb = saturate(finalColor); // 색 범위 클램핑
                 psOut.c.a = input.c.a;
+                psOut.c.rgb = lerp(psOut.c.rgb, wind.rgb, wind.a);
                 break;
             }
         case 1:
