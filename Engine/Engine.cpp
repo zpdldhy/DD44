@@ -72,8 +72,7 @@ void Engine::Init()
 void Engine::Frame()
 {
 	INPUT->Tick();
-
-	_app->Tick();
+	TIMER->Update();
 
 	// Object Tick
 	{
@@ -84,7 +83,7 @@ void Engine::Frame()
 		PARTICLE->Tick();
 	}
 
-	TIMER->Update();
+	_app->Tick();
 
 	// Manager Tick
 	{

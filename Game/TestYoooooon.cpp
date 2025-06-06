@@ -81,7 +81,7 @@ void TestYoooooon::SetupEngineCamera()
 	m_pCameraActor->AddScript(make_shared<EngineCameraMoveScript>());
 	m_pCameraActor->m_szName = L"EnginCamera";
 	m_pCameraActor->SetPosition(Vec3(0.f, 10.f, -50.f));
-	m_pCameraActor->SetRotation(Vec3(1.f, 0.f, 0.f));
+	m_pCameraActor->SetRotation(Vec3(0.f, -0.3f, 0.f));
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	OBJECT->AddActor(m_pCameraActor);

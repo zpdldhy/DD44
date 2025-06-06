@@ -13,6 +13,7 @@ void UPhysicsComponent::Init()
 
 void UPhysicsComponent::Tick()
 {
+	m_vPrePosition = GetOwner()->GetPosition();
 	m_vCurrentDir.Normalize();
 
 	// 지면 마찰
@@ -26,7 +27,15 @@ void UPhysicsComponent::Tick()
 
 	UpdateDirection();
 
-	m_vVelocity = m_vCurrentDir * m_fCurrentSpeed;
+	// 중력
+	if (m_bColGrounded == false && m_fWeight > 0.f)
+		m_vCurrentGravity += 0.1f * m_fWeight;
+
+	if (m_vCurrentGravity > m_vMaxGravity)
+		m_vCurrentGravity = m_vMaxGravity;
+
+	m_vCurrentDir.Normalize();
+	m_vVelocity = m_vCurrentDir * m_fCurrentSpeed + Vec3(0.f, -m_vCurrentGravity, 0.f);
 
 	if (m_bColGrounded)
 		int i = 0;
@@ -60,8 +69,6 @@ void UPhysicsComponent::UpdateDirection()
 	if (shape == nullptr)
 		return;
 
-	listNum = shape->GetCollisionList().size();
-
 	for (auto& colShape : shape->GetCollisionList())
 	{
 		auto inter = colShape.second.Inter;
@@ -71,23 +78,9 @@ void UPhysicsComponent::UpdateDirection()
 		if (colShape.second.bColGround == true)
 		{
 			m_bColGrounded = true;
-
-			m_vCurrentDir.y = 0.f;
-			auto CurrentPos = GetOwner()->GetPosition();
-
-			if (shape->GetShapeType() == ShapeType::ST_SPHERE)
-			{
-				auto sphere = dynamic_pointer_cast<USphereComponent>(shape);
-				CurrentPos.y = inter.y + sphere->GetBounds().fRadius;
-			}
-
-			GetOwner()->SetPosition(CurrentPos);
+			m_vCurrentGravity = 0.f;			
 		}
 
 		m_vCurrentDir -= normal;
-	}
-
-	if (m_bColGrounded)
-	{
 	}
 }

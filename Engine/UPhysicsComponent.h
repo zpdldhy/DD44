@@ -30,6 +30,8 @@ private:
 
 	// Gravity
 	float m_fWeight = 0.f;
+	float m_vCurrentGravity = 0.f;
+	float m_vMaxGravity = 0.5f;
 
 	// Move	
 	Vec3 m_vCurrentDir = { 0.f, 0.f, 0.f };	// 진행 방향(normalize)
@@ -40,6 +42,6 @@ private:
 	Vec3 m_vVelocity = { 0.f, 0.f, 0.f };	// 최종 결과
 
 	// Temp
-	size_t listNum = 0;
+	Vec3 m_vPrePosition = { 0.f, 0.f, 0.f };
 };
 
