@@ -19,6 +19,9 @@ public:
 	void SetFriction(const float& _fFriction) { m_fFriction = _fFriction; }
 	void SetMove(const Vec3& _vDir, const float& _fMaxSpeed, const float& _fAccle = 1.0f);
 
+private:
+	void UpdateDirection();
+
 public:
 	bool m_bFly = false;
 
@@ -35,5 +38,8 @@ private:
 	float m_fMaxSpeed = 0.f;				// 제한 Speed
 
 	Vec3 m_vVelocity = { 0.f, 0.f, 0.f };	// 최종 결과
+
+	// Temp
+	size_t listNum = 0;
 };
 

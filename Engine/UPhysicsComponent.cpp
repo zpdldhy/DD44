@@ -24,9 +24,17 @@ void UPhysicsComponent::Tick()
 	if (m_fCurrentSpeed > m_fMaxSpeed)
 		m_fCurrentSpeed = m_fMaxSpeed;	
 
+	UpdateDirection();
+
 	m_vVelocity = m_vCurrentDir * m_fCurrentSpeed;
 
+	if (m_bColGrounded)
+		int i = 0;
+
 	GetOwner()->AddPosition(m_vVelocity);
+
+	// reset
+	m_bColGrounded = false;
 }
 
 void UPhysicsComponent::Render()
@@ -43,4 +51,43 @@ void UPhysicsComponent::SetMove(const Vec3& _vDir, const float& _fMaxSpeed, cons
 	m_vCurrentDir += _vDir;
 	m_fMaxSpeed = _fMaxSpeed;
 	m_fCurrentSpeed += _fAccle;
+}
+
+void UPhysicsComponent::UpdateDirection()
+{
+	auto shape = GetOwner()->GetShapeComponent();
+
+	if (shape == nullptr)
+		return;
+
+	listNum = shape->GetCollisionList().size();
+
+	for (auto& colShape : shape->GetCollisionList())
+	{
+		auto inter = colShape.second.Inter;
+		auto normal = inter - shape->GetCenter();
+		normal.Normalize();
+
+		if (colShape.second.bColGround == true)
+		{
+			m_bColGrounded = true;
+
+			m_vCurrentDir.y = 0.f;
+			auto CurrentPos = GetOwner()->GetPosition();
+
+			if (shape->GetShapeType() == ShapeType::ST_SPHERE)
+			{
+				auto sphere = dynamic_pointer_cast<USphereComponent>(shape);
+				CurrentPos.y = inter.y + sphere->GetBounds().fRadius;
+			}
+
+			GetOwner()->SetPosition(CurrentPos);
+		}
+
+		m_vCurrentDir -= normal;
+	}
+
+	if (m_bColGrounded)
+	{
+	}
 }

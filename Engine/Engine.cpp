@@ -73,6 +73,8 @@ void Engine::Frame()
 {
 	INPUT->Tick();
 
+	_app->Tick();
+
 	// Object Tick
 	{
 		OBJECT->Tick();
@@ -81,10 +83,6 @@ void Engine::Frame()
 		UI->Tick();
 		PARTICLE->Tick();
 	}
-
-	GET_SINGLE(Device)->Frame();
-
-	_app->Tick();
 
 	TIMER->Update();
 
