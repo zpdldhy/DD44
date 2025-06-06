@@ -402,6 +402,12 @@
     <ClInclude Include="AFeatherActor.h">
       <Filter>Object\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="AWindActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="WindManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -672,6 +678,12 @@
     </ClCompile>
     <ClCompile Include="AFeatherActor.cpp">
       <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="AWindActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="WindManager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

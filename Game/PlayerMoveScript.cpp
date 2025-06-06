@@ -40,7 +40,7 @@ void PlayerMoveScript::Init()
 
 	// SetPhysics
 	auto pPhysics = GetOwner()->GetPhysics();
-	pPhysics->SetWeight(1.f);
+	//pPhysics->SetWeight(1.f);
 }
 
 void PlayerMoveScript::Tick()

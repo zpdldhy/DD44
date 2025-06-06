@@ -22,6 +22,7 @@
 #include "RenderStateManager.h"
 #include "EffectManager.h"
 #include "Sound.h"
+#include "WindManager.h"
 
 bool g_bRangeVisibleMode;
 
@@ -60,7 +61,7 @@ void Engine::Init()
 		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
-		
+		WIND->Init();
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
@@ -91,6 +92,7 @@ void Engine::Frame()
 	// Manager Tick
 	{
 		CAMERA->Tick();
+		WIND->Tick();
 	}
 
 	if (_app->m_type != SCENE_TYPE::GAME)
@@ -119,6 +121,8 @@ void Engine::Render()
 		POSTPROCESS->PreRender();
 		OBJECT->Render();	// ObjectList Render
 		PARTICLE->Render();
+		WIND->Render();
+		POSTPROCESS->SetSRVToSlot(7, WIND->GetSRV());
 		POSTPROCESS->PostRender();
 		
 		if (m_pCurrentRasterizer)

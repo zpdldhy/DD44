@@ -12,6 +12,7 @@
 #include "CollisionManager.h"
 #include "EffectManager.h"
 #include "Sound.h"
+#include "WindManager.h"
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -19,6 +20,7 @@
 #include "ASky.h"
 #include "ALight.h"
 #include "AUIActor.h"
+#include "AWindActor.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -65,6 +67,14 @@ void Game::Init()
 	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
+
+
+	{
+		auto wind = std::make_shared<AWindActor>();
+		wind->SetPosition(Vec3(0.f, 0.f, 0.95f));     // 살짝 앞쪽 Z (카메라 무시 대상)
+		wind->SetScale(Vec3(0.5f, 0.15f, 1.f));      // 바람 길이, 너비 조절
+		WIND->AddWind(wind);
+	}
 }
 
 void Game::Tick()

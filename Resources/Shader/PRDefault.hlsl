@@ -30,6 +30,7 @@ PS_OUT PS(VS_OUT input)
     float4 bloom = g_txBloom.Sample(sample, input.t);
     float4 light = g_txLight.Sample(sample, input.t);
     float4 normal = g_txNormal.Sample(sample, input.t);
+    float4 wind = g_txTemp.Sample(sample, input.t);
     
     float weights[5] =
     {
@@ -98,9 +99,11 @@ PS_OUT PS(VS_OUT input)
         case 0:
             {
                 float edgeAlpha = smoothstep(0.05f, 0.2f, edge); // 엣지 감지 강도
-                float3 finalColor = result.rgb * (1.0f + edgeAlpha * 0.5f); // 밝기만 살짝 증가
-                psOut.c.rgb = saturate(finalColor); // 색 범위 클램핑
-                psOut.c.a = input.c.a;
+                float3 baseColor = result.rgb * (1.0f + edgeAlpha * 0.5f);
+                float3 finalColor = lerp(baseColor, wind.rgb, wind.a);
+
+                psOut.c.rgb = saturate(finalColor);
+                psOut.c.a = input.c.a; // 알파는 원본 그대로 유지
                 break;
             }
         case 1:
