@@ -142,6 +142,16 @@ const map<UINT, shared_ptr<AActor>>& ObjectManager::GetActorList() const
 	return m_vActorList;
 }
 
+void ObjectManager::CollisionStabilization()
+{
+	for (auto iter : m_vActorList)
+	{
+		auto pActor = iter.second;
+		
+		auto physics = pActor->GetPhysicsComponent();		
+	}
+}
+
 void ObjectManager::CheckStencilList()
 {
 	for (auto& pActor : m_vRenderActorList)

@@ -22,7 +22,7 @@ void Collision::Init()
 			if (b->m_szName == L"Terrain"|| b->m_szName == L"Stair")
 				data.bColGround = true;
 
-			boxA->AddCollision(b->m_Index, data);
+			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
 		}
 		};
 
@@ -50,15 +50,7 @@ void Collision::Init()
 			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
 				data.bColGround = true;
 
-			// 침투 보정
-			//auto CurrentPos = a->GetPosition();
-			//auto diff = CurrentPos - Inter;
-			//auto normal = diff;
-			//normal.Normalize();
-			//auto sphere = dynamic_pointer_cast<USphereComponent>(a->GetShapeComponent());
-			//a->SetPosition(Inter + normal * sphere->GetBounds().fRadius * 0.1f);
-
-			Sphere->AddCollision(b->m_Index, data);
+			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
 		}
 
 		};

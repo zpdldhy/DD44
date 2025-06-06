@@ -53,10 +53,7 @@ void AActor::Tick()
 		script->Tick();
 	}
 
-	if (GetShapeComponent())
-	{
-		GetShapeComponent()->ResetCollisionList();
-	}
+	m_vCollisionList.clear();
 }
 
 void AActor::Render()

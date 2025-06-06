@@ -69,7 +69,7 @@ void UPhysicsComponent::UpdateDirection()
 	if (shape == nullptr)
 		return;
 
-	for (auto& colShape : shape->GetCollisionList())
+	for (auto& colShape : GetOwner()->m_vCollisionList)
 	{
 		auto inter = colShape.second.Inter;
 		auto normal = inter - shape->GetCenter();

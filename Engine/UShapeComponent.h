@@ -30,9 +30,6 @@ protected:
 	shared_ptr<class AActor> m_pDownRange = nullptr;
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
 
-	// temp 
-	map<UINT, CollisionData> m_vCollisionList;
-
 public:
 	bool m_bVisible = true;
 
@@ -57,9 +54,5 @@ public:
 
 	const ShapeType& const GetShapeType() { return m_ShapeType; }
 	const CollisionEnabled& const GetCollisionType() { return m_CollisionEnabled; }
-	void AddCollision(UINT _colActor, CollisionData _colData) { m_vCollisionList.insert(make_pair(_colActor, _colData)); }
-	map<UINT, CollisionData>& GetCollisionList() { return m_vCollisionList; }
-	size_t GetCollisionCount() { return m_vCollisionList.size(); }
-	void ResetCollisionList() { m_vCollisionList.clear(); }
 };
 

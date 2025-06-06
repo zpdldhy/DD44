@@ -165,10 +165,10 @@ void PlayerMoveScript::Tick()
 			// 여기 있어야 중복 안남
 			// HIT
 #pragma region TEMP_COLLISION
-			if (GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
+			if (GetOwner()->m_vCollisionList.size() > 0)
 			{
 				// Enemy 인지
-				auto list = GetOwner()->GetShapeComponent()->GetCollisionList();
+				auto list = GetOwner()->m_vCollisionList;
 				bool isCol = false;
 				for (auto& index : list)
 				{
