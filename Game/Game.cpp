@@ -34,6 +34,7 @@
 #include "BatMovement.h"
 #include "WalkerMovement.h"
 #include "BettyMovement.h"
+#include "Timer.h"
 
 void Game::Init()
 {
@@ -69,12 +70,13 @@ void Game::Init()
 	SetupSunLight();
 
 
-	{
-		auto wind = std::make_shared<AWindActor>();
-		wind->SetPosition(Vec3(0.f, 0.f, 0.95f));     // 살짝 앞쪽 Z (카메라 무시 대상)
-		wind->SetScale(Vec3(0.5f, 0.15f, 1.f));      // 바람 길이, 너비 조절
-		WIND->AddWind(wind);
-	}
+	//{
+	//	auto wind = std::make_shared<AWindActor>();
+	//	wind->SetPosition(Vec3(0.f, 0.f, 0.95f));     // 살짝 앞쪽 Z (카메라 무시 대상)
+	//	wind->SetScale(Vec3(0.5f, 0.05f, 1.f));      // 바람 길이, 너비 조절
+	//	wind->SetRotation(Vec3(0, 0, 3));
+	//	WIND->AddWind(wind);
+	//}
 }
 
 void Game::Tick()
@@ -86,10 +88,13 @@ void Game::Tick()
 		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
 	}
 	
-	if (INPUT->GetButton(H))
+	if (INPUT->GetButton(L))
 	{
-		SOUNDMANAGER->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
+		m_bWind = !m_bWind;
 	}
+
+	if(m_bWind)
+	CreateWind();
 	
 	if (INPUT->GetButton(O))
 	{
@@ -172,6 +177,43 @@ void Game::SetupSunLight()
 
 	LIGHTMANAGER->Clear();
 	LIGHTMANAGER->RegisterLight(m_pSunLight);
+}
+
+void Game::CreateWind()
+{
+	static float accTime = 0.f;
+	static float randTarget = RandomRange(0.5f, 2.0f); // 처음 랜덤 타이밍
+
+	accTime += TIMER->GetDeltaTime();
+
+	if (accTime >= randTarget)
+	{
+		accTime = 0.f;
+		randTarget = RandomRange(0.8f, 1.5f); // 다음 타이밍
+
+		int spawnCount = RandomRange(2, 3);
+
+		for (int i = 0; i < spawnCount; ++i)
+		{
+			// NDC 기준 왼쪽 위에서 오른쪽 아래로
+			float startX = RandomRange(-1.2f, 0); // 살짝 바깥쪽에서 시작
+			float startY = RandomRange(0.5f, 1.5f); // 상단에서만
+			if (startY < 1.0f)
+			{
+				startX = -1.2f;
+			}
+
+			Vec3 pos = Vec3(startX, startY, 0.95f); // 화면 앞으로
+
+			auto wind = std::make_shared<AWindActor>();
+			wind->SetPosition(pos);
+			wind->SetScale(Vec3(0.3f, 0.015f, 1.f));  // NDC 기준 적절한 크기
+			wind->SetRotation(Vec3(0, 0, 2.5f));     // ↘ 방향
+
+			WIND->AddWind(wind);
+		}
+		
+	}
 }
 
 void Game::SetEnemyScript()

@@ -2,6 +2,8 @@
 #include "AWindActor.h"
 #include "UStaticMeshComponent.h"
 #include "UMaterial.h"
+#include "Timer.h"
+#include "CameraManager.h"
 
 AWindActor::AWindActor()
 {
@@ -14,11 +16,33 @@ AWindActor::AWindActor()
     pMesh->SetMaterial(pMat);
     SetMeshComponent(pMesh);
 
-    // 적당한 스케일 설정
-    SetScale(Vec3(100.f, 30.f, 1.f));
+    m_vVelocity = Vec3(0.4f, -0.4f, 0.0f);
+    
 }
 
 void AWindActor::Init()
 {
     AActor::Init();
+}
+
+void AWindActor::Tick()
+{
+    AActor::Tick();
+
+    // 위치 이동
+    Vec3 pos = GetPosition();
+    float time = TIMER->GetDeltaTime();
+    pos += m_vVelocity * time;
+
+
+    Vec3 cameraDelta = CAMERA->GetCameraDelta(); 
+    pos.x -= cameraDelta.x * 0.015f;
+    pos.y -= cameraDelta.y * 0.015f;
+
+
+    SetPosition(pos);
+
+    // 화면 바깥 나가면 삭제
+    if (pos.x > 1.2f || pos.y < -1.2f)
+        m_bDelete = true;
 }
