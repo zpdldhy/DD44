@@ -34,11 +34,12 @@ void AWindActor::Tick()
     float time = TIMER->GetDeltaTime();
     pos += m_vVelocity * time;
 
+    Vec3 delta = CAMERA->GetCameraDelta();
+    float offsetX = delta.x / (float)g_windowSize.x * 25.f;
+    float offsetY = delta.y / (float)g_windowSize.y * 25.f;
 
-    Vec3 cameraDelta = CAMERA->GetCameraDelta(); 
-    pos.x -= cameraDelta.x * 0.015f;
-    pos.y -= cameraDelta.y * 0.015f;
-
+    pos.x -= offsetX;  // º¸Á¤ °­µµ´Â Æ©´× °¡´É
+    pos.y -= offsetY;
 
     SetPosition(pos);
 

@@ -208,7 +208,13 @@ void Game::CreateWind()
 			auto wind = std::make_shared<AWindActor>();
 			wind->SetPosition(pos);
 			wind->SetScale(Vec3(0.3f, 0.015f, 1.f));  // NDC 기준 적절한 크기
-			wind->SetRotation(Vec3(0, 0, 2.5f));     // ↘ 방향
+			float randomAngle = RandomRange(2.4f, 2.6f);
+			wind->SetRotation(Vec3(0, 0, randomAngle));     // ↘ 방향
+			float speed = RandomRange(0.35f, 0.45f);     // 바람 세기
+
+			Vec3 velocity = Vec3(1,-1,0) * speed;
+			wind->SetVelocity(velocity);
+
 
 			WIND->AddWind(wind);
 		}
