@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "BettyMovement.h"
+#include "Input.h"
+#include "EffectManager.h"
 //#include "CameraManager.h"
 
 void BettyMovement::Init()
@@ -15,7 +17,7 @@ void BettyMovement::Init()
 void BettyMovement::Tick()
 {
 	currentState->Tick();
-	
+
 	Vec3 diff = player.lock()->GetPosition() - GetOwner()->GetPosition();
 	if (m_bPlayOnce && diff.Length() < 20.0f)
 	{
@@ -32,6 +34,15 @@ void BettyMovement::Tick()
 		currentState->End();
 		ChangetState(idle);
 	}
+
+	if (INPUT->GetButton(K))
+	{
+		Vec3 pos = GetOwner()->GetPosition();
+		EFFECT->PlayDustBurst(pos, 10.f);
+		EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero);
+		EFFECT->PlayBeamBurst(pos, 20);
+	}
+
 	//// 1회성 Intro 재생
 	//Vec3 diff = player.lock()->GetPosition() - GetOwner()->GetPosition();
 	//if (b)

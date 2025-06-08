@@ -408,6 +408,15 @@
     <ClInclude Include="WindManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="AShockwaveActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="ABeamActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="APoppingDust.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -684,6 +693,15 @@
     </ClCompile>
     <ClCompile Include="WindManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="AShockwaveActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="ABeamActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="APoppingDust.cpp">
+      <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
