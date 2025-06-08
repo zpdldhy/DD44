@@ -179,9 +179,16 @@ void ObjectManager::CollisionStabilization()
 			auto normal = diff;
 			normal.Normalize();
 
+			auto radius = pSphere->GetBounds().fRadius;
+
 			auto len = pSphere->GetBounds().fRadius - diff.Length();
 
 			pActor->AddPosition(normal * len);
+			if (pActor->GetShapeComponent())
+			{
+				pActor->GetShapeComponent()->UpdateMatrix();
+				pActor->GetShapeComponent()->UpdateBounds();
+			}
 		}
 	}
 }

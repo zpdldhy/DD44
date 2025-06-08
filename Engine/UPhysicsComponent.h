@@ -19,13 +19,8 @@ public:
 	void SetFriction(const float& _fFriction) { m_fFriction = _fFriction; }
 	void SetMove(const Vec3& _vDir, const float& _fMaxSpeed, const float& _fAccle = 1.0f);
 
-private:
-	//void UpdateDirection();
-
 public:
 	bool m_bFly = false;
-
-private:
 	bool m_bColGrounded = false;
 
 	// Gravity
