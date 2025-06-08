@@ -62,9 +62,9 @@ public:
 
 private:
 	virtual bool CreateConstantBuffer();
-	void UpdateMatrix();
 
-protected:
+public:
+	void UpdateMatrix();
 	void UpdateLocalMatrix();
 	void UpdateWorldMatrix();
 
@@ -77,14 +77,14 @@ public:
 	const Vec3& GetLocalRight() const { return m_vLocalRight; }
 	const Vec3& GetLocalUp() const { return m_vLocalUp; }
 
-	void SetLocalPosition(const Vec3& _pos) { m_vLocalPosition = _pos; }
-	void SetLocalRotation(const Vec3& _rot) { m_vLocalRotation = _rot; }
-	void SetLocalScale(const Vec3& _scale) { m_vLocalScale = _scale; }
+	void SetLocalPosition(const Vec3& _pos) { m_vLocalPosition = _pos; UpdateMatrix(); }
+	void SetLocalRotation(const Vec3& _rot) { m_vLocalRotation = _rot; UpdateMatrix(); }
+	void SetLocalScale(const Vec3& _scale) { m_vLocalScale = _scale; UpdateMatrix(); }
 	void SetWorldMatrix(const Matrix& _mat) { m_matWorld = _mat; }
 
-	void AddLocalPosition(const Vec3& _pos) { m_vLocalPosition += _pos; }
-	void AddLocalRotation(const Vec3& _rot) { m_vLocalRotation += _rot; }
-	void AddLocalScale(const Vec3& _scale) { m_vLocalScale += _scale; }
+	void AddLocalPosition(const Vec3& _pos) { m_vLocalPosition += _pos; UpdateMatrix(); }
+	void AddLocalRotation(const Vec3& _rot) { m_vLocalRotation += _rot; UpdateMatrix(); }
+	void AddLocalScale(const Vec3& _scale) { m_vLocalScale += _scale; UpdateMatrix(); }
 
 	// World
 	const Vec3& GetWorldPosition() const { return m_vWorldPosition; }

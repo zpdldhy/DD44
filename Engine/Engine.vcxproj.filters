@@ -417,6 +417,7 @@
     <ClInclude Include="APoppingDust.h">
       <Filter>Object\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="USphereComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -703,6 +704,7 @@
     <ClCompile Include="APoppingDust.cpp">
       <Filter>Object\Particle</Filter>
     </ClCompile>
+    <ClCompile Include="USphereComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

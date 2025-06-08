@@ -13,8 +13,6 @@ AActor::AActor()
 void AActor::Init()
 {
 	m_pPhysics->SetOwner(shared_from_this());
-	m_pPhysics->Init();
-
 	m_pTransform->SetOwner(shared_from_this());
 	m_pTransform->Init();
 
@@ -36,7 +34,6 @@ void AActor::Init()
 
 void AActor::Tick()
 {
-	m_pPhysics->Tick();
 	m_pTransform->Tick();
 
 	// Component
@@ -53,10 +50,7 @@ void AActor::Tick()
 		script->Tick();
 	}
 
-	if (GetShapeComponent())
-	{
-		GetShapeComponent()->ResetCollisionList();
-	}
+	m_vCollisionList.clear();
 }
 
 void AActor::Render()
@@ -64,7 +58,6 @@ void AActor::Render()
 	if (!m_bRender)
 		return;
 
-	m_pPhysics->Render();
 	m_pTransform->Render();
 
 	for (auto& component : m_arrComponent)

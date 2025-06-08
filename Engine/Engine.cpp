@@ -73,21 +73,20 @@ void Engine::Init()
 void Engine::Frame()
 {
 	INPUT->Tick();
+	TIMER->Update();
 
 	// Object Tick
 	{
-		OBJECT->Tick();
+		OBJECT->ObjectMove();			// 1. Move
 		LIGHTMANAGER->UpdateLightCB();
 
 		UI->Tick();
 		PARTICLE->Tick();
 	}
 
-	GET_SINGLE(Device)->Frame();
-
-	_app->Tick();
-
-	TIMER->Update();
+	_app->Tick();						// 2. 충돌
+	OBJECT->CollisionStabilization();	// 3. 보정
+	OBJECT->Tick();
 
 	// Manager Tick
 	{

@@ -39,8 +39,8 @@ void PlayerMoveScript::Init()
 	handSword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword2");
 
 	// SetPhysics
-	auto pPhysics = GetOwner()->GetPhysics();
-	//pPhysics->SetWeight(1.f);
+	auto pPhysics = GetOwner()->GetPhysicsComponent();
+	pPhysics->SetWeight(1.f);
 }
 
 void PlayerMoveScript::Tick()
@@ -144,10 +144,10 @@ void PlayerMoveScript::Tick()
 			// 여기 있어야 중복 안남
 			// HIT
 #pragma region TEMP_COLLISION
-			if (GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
+			if (GetOwner()->m_vCollisionList.size() > 0)
 			{
 				// Enemy 인지
-				auto list = GetOwner()->GetShapeComponent()->GetCollisionList();
+				auto list = GetOwner()->m_vCollisionList;
 				bool isCol = false;
 				for (auto& index : list)
 				{
@@ -241,8 +241,8 @@ void PlayerMoveScript::Tick()
 		// 이동
 		{
 			moveDir.Normalize();
-			Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->SetMove(pos, 0.25f, 5.f);
+			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
+			GetOwner()->SetMove(moveDir, 0.25f);
 		}
 
 		// 회전		
@@ -467,8 +467,8 @@ void PlayerMoveScript::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> co
 
 void PlayerMoveScript::RollMove()
 {
-	Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
-	GetOwner()->SetMove(pos, 0.5f, 5.f);
+	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
+	GetOwner()->SetMove(m_vRollLook, 0.5f);
 }
 
 bool PlayerMoveScript::CanAttack()

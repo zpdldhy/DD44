@@ -54,6 +54,9 @@ public:
 	bool m_bUseStencil = false;
 	ActorType m_eActorType = ActorType::AT_NONE;
 
+	// Collision
+	map<UINT, CollisionData> m_vCollisionList;
+
 	void SetUseStencil(bool _isStencil) { m_bUseStencil = _isStencil; }
 
 	//--------------------------------------------------------------------------------------
@@ -69,7 +72,7 @@ protected:
 
 public:
 	USceneComponent* GetTransform() { return m_pTransform.get(); }
-	UPhysicsComponent* GetPhysics() { return m_pPhysics.get(); }
+	UPhysicsComponent* GetPhysicsComponent() { return m_pPhysics.get(); }
 	template<typename T>
 	shared_ptr<T> GetMeshComponent() { return static_pointer_cast<T>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }
 	shared_ptr<UMeshComponent> GetMeshComponent() { return static_pointer_cast<UMeshComponent>(m_arrComponent[static_cast<size_t>(ComponentType::CT_MESH)]); }

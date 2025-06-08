@@ -35,6 +35,10 @@ public:
 	void Destroy();
 
 public:
+	void ObjectMove();
+	void CollisionStabilization();
+
+public:
 	void AddActor(shared_ptr<class AActor> _pActor);
 	void AddActorList(vector<shared_ptr<class AActor>> _vActorList);
 
@@ -46,11 +50,15 @@ public:
 	const map<UINT, shared_ptr<class AActor>>& GetActorList() const;
 
 	vector<UINT> GetActorIndexList() { return m_vActorIndexList; }	// 임시 사용
+
 private:
 	void CheckStencilList();
 	void ClearRenderList();
 
 	void CreateRenderModeCB();
 	void SetRenderMode(ERenderMode _eMode);
+
+	// 충돌
+
 };
 
