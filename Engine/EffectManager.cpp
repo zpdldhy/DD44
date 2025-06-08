@@ -10,6 +10,7 @@
 #include "AFeatherActor.h"
 #include "AShockwaveActor.h"
 #include "ABeamActor.h"
+#include "APoppingDust.h"
 
 
 void EffectManager::Init()
@@ -23,7 +24,7 @@ void EffectManager::Init()
             actor->m_szName = L"Effect";
             m_mEffectPool[(EEffectType)t].push_back(actor);
             
-            if (type == EEffectType::Dust)
+            if (type == EEffectType::Dust || type == EEffectType::PoppingDust)
                 PARTICLE->AddUI(actor);
             else
                 OBJECT->AddActor(actor);
@@ -52,6 +53,9 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     case EEffectType::Beam:
         actor = make_shared<ABeamActor>();
         break;
+    case EEffectType::PoppingDust:
+        actor = make_shared<APoppingDust>();
+        break;
     }
 
     // 메시
@@ -76,6 +80,9 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
         break;
     case EEffectType::Beam:
         mat->Load(L"../Resources/Texture/Wind.png", L"../Resources/Shader/SpriteWorld.hlsl");
+        break;
+    case EEffectType::PoppingDust:
+        mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
         break;
     }
 
@@ -146,7 +153,7 @@ void EffectManager::PlayDustBurst(const Vec3& _origin, float _speed)
         
         Vec3 velocity = dir * (_speed * 1.8f); 
 
-        PlayEffect(EEffectType::Dust, _origin, 0.f, velocity);
+        PlayEffect(EEffectType::PoppingDust, _origin, 0.f, velocity);
     }
 }
 
@@ -157,8 +164,14 @@ void EffectManager::PlayBeamBurst(const Vec3& origin, int count)
     for (int i = 0; i < count; ++i)
     {
         float angle = i * angleStep;
-        Vec3 dir = Vec3(sinf(angle), 0.0f, cosf(angle));
+
+        // 수평 방향 + 랜덤 위로 튐
+        float randomY = RandomRange(0.3f, 0.7f); // 위쪽 분산 (0이면 바닥, 1이면 수직)
+        Vec3 dir = Vec3(sinf(angle), randomY, cosf(angle));
+        dir.Normalize();
 
         PlayEffect(EEffectType::Beam, origin, 0.0f, dir);
     }
+
+  
 }

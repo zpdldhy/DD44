@@ -414,6 +414,9 @@
     <ClInclude Include="ABeamActor.h">
       <Filter>Object\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="APoppingDust.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -695,6 +698,9 @@
       <Filter>Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="ABeamActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="APoppingDust.cpp">
       <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>

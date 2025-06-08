@@ -6,5 +6,6 @@ enum class EEffectType
     Feather,
     Shockwave,
     Beam,
+    PoppingDust,
     MAX,
 };

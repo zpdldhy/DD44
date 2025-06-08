@@ -24,12 +24,12 @@ float4 PS(VS_OUT input) : SV_Target
     float distFromCenter = distance(uv, float2(0.5f, 0.5f));
     float edgeFactor = saturate(distFromCenter * 2.0f);
 
-    // 중심은 흰색, 외곽은 연한 푸른색 보간
-    float3 centerColor = float3(1.0f, 1.0f, 1.0f);
-    float3 outerTint = float3(0.6f, 0.8f, 1.0f); // 연한 파랑
+    //// 중심은 흰색, 외곽은 연한 푸른색 보간
+    //float3 centerColor = float3(1.0f, 1.0f, 1.0f);
+    //float3 outerTint = float3(0.6f, 0.8f, 1.0f); // 연한 파랑
 
-    float3 finalColor = lerp(centerColor, outerTint, edgeFactor);
-    texColor.rgb *= finalColor;
+    //float3 finalColor = lerp(centerColor, outerTint, edgeFactor);
+    //texColor.rgb *= finalColor;
 
     // 알파 점점 줄이기
     float alphaFalloff = 1.0f - edgeFactor * 0.5f;

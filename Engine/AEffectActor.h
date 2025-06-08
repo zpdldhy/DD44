@@ -23,7 +23,7 @@ public:
     virtual Vec3 Prepare(const Vec3& pos, const Vec3& baseVelocity);
     float m_fRemainTime = 0.0f;
 
-private:
+protected:
     EEffectType m_eType;
     Vec3 m_vVelocity = Vec3(0, 0, 0);
 
