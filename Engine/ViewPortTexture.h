@@ -20,6 +20,7 @@ public:
 
 public:
 	void CreateViewPortTexture(FLOAT _fWidth, FLOAT _fHeight);
+	void ClearViewPortTransparent();
 	//void BeginViewPort();
 	//void EndViewPort();
 

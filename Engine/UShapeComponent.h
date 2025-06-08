@@ -5,8 +5,8 @@
 struct CollisionData
 {
 	Box box;
+	Vec3 Inter = { 0.f, 0.f, 0.f };
 	Vec3 ColNormal = { 0.f, 0.f, 0.f };
-	bool bColGround = false;
 };
 
 enum class CollisionEnabled
@@ -23,26 +23,36 @@ protected:
 	ShapeType m_ShapeType = ShapeType::ST_NONE;
 	DirectX::SimpleMath::Color m_pShapeColor = { 0.f, 0.f, 0.f, 0.f };
 
-	// temp 
-	map<UINT, CollisionData> m_vCollisionList;
+	// 범위 표기
+	shared_ptr<class AActor> m_pCollisionRange = nullptr;
+	shared_ptr<class AActor> m_pLookRange = nullptr;
+	shared_ptr<class AActor> m_pDownRange = nullptr;
+	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
+
+public:
+	bool m_bVisible = true;
 
 public:
 	UShapeComponent() = default;
 	virtual ~UShapeComponent() = default;
-public:
-	bool m_bVisible = true;
+
+private:
+	void PreRender() override {}
+	void PostRender() override {}
+
 public:
 	virtual void UpdateBounds() abstract;
+
+protected:
+	virtual void CreateCollisionRange() abstract;
+	virtual void UpdateCollisionRange() abstract;
 
 public:
 	void SetShapeColor(DirectX::SimpleMath::Color _color) { m_pShapeColor = _color; }
 	void SetCollisionEnabled(CollisionEnabled _type) { m_CollisionEnabled = _type; }
+	virtual const Vec3& const GetCenter() abstract;
 
 	const ShapeType& const GetShapeType() { return m_ShapeType; }
 	const CollisionEnabled& const GetCollisionType() { return m_CollisionEnabled; }
-	void AddCollision(UINT _colActor, CollisionData _colData) { m_vCollisionList.insert(make_pair(_colActor, _colData)); }
-	map<UINT, CollisionData>& GetCollisionList() { return m_vCollisionList; }
-	size_t GetCollisionCount() { return m_vCollisionList.size(); }
-	void ResetCollisionList() { m_vCollisionList.clear(); }
 };
 

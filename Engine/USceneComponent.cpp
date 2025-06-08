@@ -21,6 +21,9 @@ void USceneComponent::Init()
 
 void USceneComponent::Tick()
 {
+	if (GetOwner()->m_szName == L"MyCharacter")
+		int i = 0;
+
 	UpdateMatrix();
 }
 

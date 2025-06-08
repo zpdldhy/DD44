@@ -42,7 +42,7 @@ void PlayerMoveScript::Init()
 	backSword = body->GetChildByName(L"Sword");
 	handSword = body->GetChildByName(L"Sword2");
 	// SetPhysics
-	auto pPhysics = GetOwner()->GetPhysics();
+	auto pPhysics = GetOwner()->GetPhysicsComponent();
 	pPhysics->SetWeight(1.f);
 
 	// AttackRange
@@ -92,29 +92,8 @@ void PlayerMoveScript::Tick()
 		}
 	}
 
-	if (INPUT->GetButton(H))
-	{
-		Vec3 pos = GetOwner()->GetPosition();
-		Vec3 dir = GetOwner()->GetLook();
 
-		// 살짝 위로 뜨고 살짝 퍼지게 만들기
-		pos.y += 0.3f;
 
-		Vec3 dustVelocity = dir * 20.0f + Vec3(0, 5.0f, 0); // 약간 위로 퍼지게
-		EFFECT->PlayEffect(EEffectType::Dust, pos, 10.0f, dustVelocity);
-	}
-
-	if (INPUT->GetButton(J))
-	{
-		Vec3 pos = GetOwner()->GetPosition();
-		Vec3 dir = GetOwner()->GetLook();
-
-		// 살짝 위로 뜨고 살짝 퍼지게 만들기
-		pos.y += 0.3f;
-
-		Vec3 dustVelocity = dir * 20.0f + Vec3(0, 5.0f, 0); // 약간 위로 퍼지게
-		EFFECT->PlayEffect(EEffectType::Feather, pos, 10.0f, dustVelocity);
-	}
 
 #pragma region EFFECT
 	Slash();
@@ -204,10 +183,10 @@ void PlayerMoveScript::Tick()
 			// 여기 있어야 중복 안남
 			// HIT
 #pragma region TEMP_COLLISION
-			if (GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
+			if (GetOwner()->m_vCollisionList.size() > 0)
 			{
 				// Enemy 인지
-				auto list = GetOwner()->GetShapeComponent()->GetCollisionList();
+				auto list = GetOwner()->m_vCollisionList;
 				bool isCol = false;
 				for (auto& index : list)
 				{
@@ -256,16 +235,6 @@ void PlayerMoveScript::Tick()
 			m_vRollLook = GetOwner()->GetLook();
 			ChangetState(roll);
 
-			// FX
-			Vec3 pos = GetOwner()->GetPosition();
-			Vec3 dir = GetOwner()->GetLook();
-
-			// 살짝 위로 뜨고 살짝 퍼지게 만들기
-			pos.y += 0.3f;
-
-			Vec3 dustVelocity = dir * 20.0f + Vec3(0, 5.0f, 0); // 약간 위로 퍼지게
-			EFFECT->PlayEffect(EEffectType::Feather, pos, 10.0f, dustVelocity);
-
 			m_bCanRoll = false;
 		}
 	}
@@ -308,21 +277,11 @@ void PlayerMoveScript::Tick()
 			ChangetState(walk);
 		}
 
-		// FX
-		Vec3 pos = GetOwner()->GetPosition();
-		Vec3 dir = GetOwner()->GetLook();
-
-		// 살짝 위로 뜨고 살짝 퍼지게 만들기
-		pos.y += 0.3f;
-
-		Vec3 dustVelocity = dir * 20.0f + Vec3(0, 5.0f, 0); // 약간 위로 퍼지게
-		EFFECT->PlayEffect(EEffectType::Dust, pos, 10.0f, dustVelocity);
-
 		// 이동
 		{
 			moveDir.Normalize();
-			Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->SetMove(pos, 0.25f, 5.f);
+			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
+			GetOwner()->SetMove(moveDir, 0.25f);
 		}
 
 		// 회전		
@@ -551,8 +510,8 @@ void PlayerMoveScript::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> co
 
 void PlayerMoveScript::RollMove()
 {
-	Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
-	GetOwner()->SetMove(pos, 0.5f, 5.f);
+	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
+	GetOwner()->SetMove(m_vRollLook, 0.5f);
 }
 
 bool PlayerMoveScript::CanAttack()

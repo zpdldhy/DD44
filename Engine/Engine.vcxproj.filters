@@ -402,6 +402,22 @@
     <ClInclude Include="AFeatherActor.h">
       <Filter>Object\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="AWindActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="WindManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="AShockwaveActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="ABeamActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="APoppingDust.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="USphereComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -673,6 +689,22 @@
     <ClCompile Include="AFeatherActor.cpp">
       <Filter>Object\Particle</Filter>
     </ClCompile>
+    <ClCompile Include="AWindActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="WindManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="AShockwaveActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="ABeamActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="APoppingDust.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="USphereComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

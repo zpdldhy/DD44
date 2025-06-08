@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "BettyMovement.h"
+#include "EffectManager.h"
+//#include "CameraManager.h"
 
 #include "Timer.h"
 #include "CollisionManager.h"
@@ -156,6 +158,18 @@ void BettyMovement::Tick()
 
 	//// Attack 7 ( one hand slam ) 
 	//if (INPUT->GetButton(A))
+
+	if (INPUT->GetButton(K))
+	{
+		Vec3 pos = GetOwner()->GetPosition();
+		EFFECT->PlayDustBurst(pos, 10.f);
+		EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero);
+		EFFECT->PlayBeamBurst(pos, 20);
+	}
+
+	//// 1회성 Intro 재생
+	//Vec3 diff = player.lock()->GetPosition() - GetOwner()->GetPosition();
+	//if (b)
 	//{
 	//	dynamic_pointer_cast<BettyOneHandDownAttack>(oneHandDownAttack)->CheckDirection(player.lock()->GetPosition());
 	//	ChangeState(oneHandDownAttack);
