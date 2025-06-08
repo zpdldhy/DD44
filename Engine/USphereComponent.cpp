@@ -64,6 +64,9 @@ void USphereComponent::Destroy()
 
 void USphereComponent::UpdateBounds()
 {
+	if (GetOwner()->m_vCollisionList.size() == 2)
+		int i = 0;
+
 	m_Sphere.vCenter = m_vWorldPosition;
 	m_Sphere.fRadius = 0.5f * m_vWorldScale.x;
 }

@@ -13,7 +13,6 @@ void UPhysicsComponent::Init()
 
 void UPhysicsComponent::Tick()
 {
-	m_vPrePosition = GetOwner()->GetPosition();
 	m_vCurrentDir.Normalize();
 
 	// 지면 마찰
@@ -25,7 +24,7 @@ void UPhysicsComponent::Tick()
 	if (m_fCurrentSpeed > m_fMaxSpeed)
 		m_fCurrentSpeed = m_fMaxSpeed;	
 
-	UpdateDirection();
+	//UpdateDirection();
 
 	// 중력
 	if (m_bColGrounded == false && m_fWeight > 0.f)
@@ -36,9 +35,6 @@ void UPhysicsComponent::Tick()
 
 	m_vCurrentDir.Normalize();
 	m_vVelocity = m_vCurrentDir * m_fCurrentSpeed + Vec3(0.f, -m_vCurrentGravity, 0.f);
-
-	if (m_bColGrounded)
-		int i = 0;
 
 	GetOwner()->AddPosition(m_vVelocity);
 
@@ -62,25 +58,28 @@ void UPhysicsComponent::SetMove(const Vec3& _vDir, const float& _fMaxSpeed, cons
 	m_fCurrentSpeed += _fAccle;
 }
 
-void UPhysicsComponent::UpdateDirection()
-{
-	auto shape = GetOwner()->GetShapeComponent();
-
-	if (shape == nullptr)
-		return;
-
-	for (auto& colShape : GetOwner()->m_vCollisionList)
-	{
-		auto inter = colShape.second.Inter;
-		auto normal = inter - shape->GetCenter();
-		normal.Normalize();
-
-		if (colShape.second.bColGround == true)
-		{
-			m_bColGrounded = true;
-			m_vCurrentGravity = 0.f;			
-		}
-
-		m_vCurrentDir -= normal;
-	}
-}
+//void UPhysicsComponent::UpdateDirection()
+//{
+//	auto shape = GetOwner()->GetShapeComponent();
+//
+//	if (shape == nullptr)
+//		return;
+//
+//	// 이전 Frame의 결과
+//	for (auto& colShape : GetOwner()->m_vCollisionList)
+//	{
+//		auto inter = colShape.second.Inter;
+//		auto normal = inter - shape->GetCenter();
+//		normal.Normalize();
+//
+//		auto D = normal.Dot(m_vCurrentDir);
+//
+//		if (colShape.second.bColGround == true)
+//		{
+//			m_bColGrounded = true;
+//			m_vCurrentGravity = 0.f;			
+//		}
+//
+//		//m_vCurrentDir -= D * normal;
+//	}
+//}

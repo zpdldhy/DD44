@@ -39,7 +39,7 @@ void PlayerMoveScript::Init()
 	handSword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword2");
 
 	// SetPhysics
-	auto pPhysics = GetOwner()->GetPhysics();
+	auto pPhysics = GetOwner()->GetPhysicsComponent();
 	pPhysics->SetWeight(1.f);
 }
 

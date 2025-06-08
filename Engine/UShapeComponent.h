@@ -41,9 +41,10 @@ private:
 	void PreRender() override {}
 	void PostRender() override {}
 
-protected:
+public:
 	virtual void UpdateBounds() abstract;
 
+protected:
 	virtual void CreateCollisionRange() abstract;
 	virtual void UpdateCollisionRange() abstract;
 

@@ -6,6 +6,10 @@
 #include "DxState.h"
 #include "ATerrainTileActor.h"
 
+// Component
+#include "UBoxComponent.h"
+#include "USphereComponent.h"
+
 UINT ObjectManager::ActorCount = 0;
 ComPtr<ID3D11Buffer> ObjectManager::m_pRenderModeBuffer = nullptr;
 
@@ -142,13 +146,43 @@ const map<UINT, shared_ptr<AActor>>& ObjectManager::GetActorList() const
 	return m_vActorList;
 }
 
-void ObjectManager::CollisionStabilization()
+void ObjectManager::ObjectMove()
 {
 	for (auto iter : m_vActorList)
 	{
 		auto pActor = iter.second;
-		
-		auto physics = pActor->GetPhysicsComponent();		
+
+		pActor->GetPhysicsComponent()->Tick();
+		if (pActor->GetShapeComponent())
+		{
+			pActor->GetShapeComponent()->UpdateMatrix();
+			pActor->GetShapeComponent()->UpdateBounds();
+		}
+	}
+}
+
+void ObjectManager::CollisionStabilization()
+{
+	for (auto iter : m_vActorList)
+	{
+		auto pActor = iter.second;		
+		if (pActor->m_vCollisionList.empty()) continue;
+		auto pShape = pActor->GetShapeComponent();
+		if (pShape == nullptr) continue;
+
+		auto pSphere = dynamic_pointer_cast<USphereComponent>(pShape);
+
+		for (auto& ColData : pActor->m_vCollisionList)
+		{
+			auto inter = ColData.second.Inter;
+			auto diff = pShape->GetCenter() - inter;
+			auto normal = diff;
+			normal.Normalize();
+
+			auto len = pSphere->GetBounds().fRadius - diff.Length();
+
+			pActor->AddPosition(normal * len);
+		}
 	}
 }
 

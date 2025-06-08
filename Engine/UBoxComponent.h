@@ -19,9 +19,9 @@ public:
 	void Render() override;
 	void Destroy() override;
 
-protected:
 	void UpdateBounds() override;
 
+protected:
 	void CreateCollisionRange() override;
 	void UpdateCollisionRange() override;
 

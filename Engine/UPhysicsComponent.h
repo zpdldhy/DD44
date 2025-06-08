@@ -20,7 +20,7 @@ public:
 	void SetMove(const Vec3& _vDir, const float& _fMaxSpeed, const float& _fAccle = 1.0f);
 
 private:
-	void UpdateDirection();
+	//void UpdateDirection();
 
 public:
 	bool m_bFly = false;
@@ -40,8 +40,5 @@ private:
 	float m_fMaxSpeed = 0.f;				// 제한 Speed
 
 	Vec3 m_vVelocity = { 0.f, 0.f, 0.f };	// 최종 결과
-
-	// Temp
-	Vec3 m_vPrePosition = { 0.f, 0.f, 0.f };
 };
 

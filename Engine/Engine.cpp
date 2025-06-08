@@ -76,7 +76,7 @@ void Engine::Frame()
 
 	// Object Tick
 	{
-		OBJECT->Tick();					// 1. Move
+		OBJECT->ObjectMove();			// 1. Move
 		LIGHTMANAGER->UpdateLightCB();
 
 		UI->Tick();
@@ -85,6 +85,7 @@ void Engine::Frame()
 
 	_app->Tick();						// 2. 충돌
 	OBJECT->CollisionStabilization();	// 3. 보정
+	OBJECT->Tick();
 
 	// Manager Tick
 	{

@@ -5,6 +5,14 @@
 #include "UBoxComponent.h"
 #include "USphereComponent.h"
 
+template <typename T>
+T Clamp(T value, T min, T max)
+{
+	if (value < min) return min;
+	if (value > max) return max;
+	return value;
+}
+
 void Collision::Init()
 {
 	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_BOX}] = [](auto a, auto b) {
@@ -39,6 +47,9 @@ void Collision::Init()
 	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_BOX}] = [](auto a, auto b) {
 		auto Sphere = static_pointer_cast<USphereComponent>(a->GetShapeComponent());
 		auto Box = static_pointer_cast<UBoxComponent>(b->GetShapeComponent());
+
+		if (a->m_szName == L"MyCharacter")
+			int i = 0;
 
 		Vec3 Inter;
 		if (Collision::CheckSphereToOBB(Sphere->GetBounds(), Box->GetBounds(), Inter))
@@ -585,27 +596,80 @@ bool Collision::CheckSphereToSphere(const Sphere& _Sphere0, const Sphere& _Spher
 
 bool Collision::CheckSphereToOBB(const Sphere& _Sphere, const Box& _Box, Vec3& _Inter)
 {
-	Vec3 Dir = _Sphere.vCenter - _Box.vCenter;
-	// Box 내부의 Sphere와 가장 가까운 한 점
-	Vec3 closePoint = _Box.vCenter;
+	float minDist = FLT_MAX;
+	Vec3 bestPoint;
 
-	for (int i = 0; i < 3; i++)
+	// 박스의 3개 축 (Right, Up, Forward 등)
+	for (int axisIdx = 0; axisIdx < 3; axisIdx++)
 	{
-		// Box의 중심으로부터 원에 가까운 점까지의 벡터를 각 축에 내적.
-		float D = (Dir).Dot(_Box.vAxis[i]);
-		float Clamp = max(-_Box.vExtent[i], min(_Box.vExtent[i], D));
+		Vec3 N = _Box.vAxis[axisIdx]; // 축 방향
+		float extent = _Box.vExtent[axisIdx];
 
-		closePoint = closePoint + _Box.vAxis[i] * Clamp;
+		for (int sign = -1; sign <= 1; sign += 2)
+		{
+			// 면의 중심 위치 계산 (+/- extent 방향)
+			Vec3 planeCenter = _Box.vCenter + N * extent * float(sign);
+
+			// 면의 두 직교 축: 다른 두 축 선택
+			int axis1 = (axisIdx + 1) % 3;
+			int axis2 = (axisIdx + 2) % 3;
+
+			Vec3 A = _Box.vAxis[axis1];
+			Vec3 B = _Box.vAxis[axis2];
+
+			// 구 중심을 면의 평면에 수직 투영
+			Vec3 dirToCenter = _Sphere.vCenter - planeCenter;
+			float distToPlane = dirToCenter.Dot(N); // 평면까지의 거리
+			Vec3 projected = _Sphere.vCenter - N * distToPlane; // 평면 위 점
+
+			// projected를 면 안쪽으로 클램핑
+			float da = (projected - planeCenter).Dot(A);
+			float db = (projected - planeCenter).Dot(B);
+
+			da = Clamp(da, -_Box.vExtent[axis1], _Box.vExtent[axis1]);
+			db = Clamp(db, -_Box.vExtent[axis2], _Box.vExtent[axis2]);
+
+			Vec3 closestOnPlane = planeCenter + A * da + B * db;
+
+			// 거리 계산
+			float distSqr = (_Sphere.vCenter - closestOnPlane).LengthSquared();
+			if (distSqr < minDist)
+			{
+				minDist = distSqr;
+				bestPoint = closestOnPlane;
+			}
+		}
 	}
 
-	Vec3 diff = _Sphere.vCenter - closePoint;
-
-	if (diff.Length() > _Sphere.fRadius)
+	// 충돌 여부 판단
+	if (minDist > _Sphere.fRadius * _Sphere.fRadius)
 		return false;
 
-	_Inter = closePoint;
+	_Inter = bestPoint;
 	return true;
 }
+
+//bool Collision::CheckSphereToOBB(const Sphere& _Sphere, const Box& _Box, Vec3& _Inter)
+//{
+//	Vec3 Dir = _Sphere.vCenter - _Box.vCenter;
+//	Vec3 closePoint = _Box.vCenter;
+//
+//	for (int i = 0; i < 3; i++)
+//	{
+//		float D = (Dir).Dot(_Box.vAxis[i]);
+//		float Clamp = max(-_Box.vExtent[i], min(_Box.vExtent[i], D));
+//
+//		closePoint = closePoint + _Box.vAxis[i] * Clamp;
+//	}
+//
+//	Vec3 diff = _Sphere.vCenter - closePoint;
+//
+//	if (diff.Length() > _Sphere.fRadius)
+//		return false;
+//
+//	_Inter = closePoint;
+//	return true;
+//}
 
 bool Collision::GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& _inter)
 {

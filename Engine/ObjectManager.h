@@ -35,6 +35,7 @@ public:
 	void Destroy();
 
 public:
+	void ObjectMove();
 	void CollisionStabilization();
 
 public:
@@ -58,6 +59,6 @@ private:
 	void SetRenderMode(ERenderMode _eMode);
 
 	// Ãæµ¹
-		
+
 };
 
