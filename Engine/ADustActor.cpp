@@ -2,7 +2,7 @@
 #include "ADustActor.h"
 #include "CameraManager.h"
 
-Vec3 ADustActor::Prepare(const Vec3& pos, const Vec3& baseVelocity)
+Vec3 ADustActor::Prepare(const Vec3& pos, const Vec3& baseVelocity, float _scale)
 {
     // 방향은 baseVelocity 기반으로 약간 랜덤 회전
     Vec3 dir = baseVelocity;

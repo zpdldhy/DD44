@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "APoppingDust.h"
 
-Vec3 APoppingDust::Prepare(const Vec3& pos, const Vec3& baseVelocity)
+Vec3 APoppingDust::Prepare(const Vec3& pos, const Vec3& baseVelocity, float scale)
 {
     // 방향은 baseVelocity 기반으로 약간 랜덤 회전
     Vec3 dir = baseVelocity;

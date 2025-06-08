@@ -2,7 +2,7 @@
 #include "ABeamActor.h"
 #include "Timer.h"
 
-Vec3 ABeamActor::Prepare(const Vec3& _pos, const Vec3& baseVelocity)
+Vec3 ABeamActor::Prepare(const Vec3& _pos, const Vec3& baseVelocity, float _scale)
 {
     Vec3 pos = _pos;
     //pos.y += 5.f;

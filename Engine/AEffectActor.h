@@ -20,7 +20,7 @@ public:
     void SetStartScale(const Vec3& scale) { m_vStartScale = scale; }
     void SetEndScale(const Vec3& scale) { m_vEndScale = scale; }
 
-    virtual Vec3 Prepare(const Vec3& pos, const Vec3& baseVelocity);
+    virtual Vec3 Prepare(const Vec3& _pos, const Vec3& _baseVelocity, float _scale=1.f);
     float m_fRemainTime = 0.0f;
 
 protected:

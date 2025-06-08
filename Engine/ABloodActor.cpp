@@ -2,7 +2,7 @@
 #include "ABloodActor.h"
 #include "CameraManager.h"
 
-Vec3 ABloodActor::Prepare(const Vec3& pos, const Vec3& baseVelocity)
+Vec3 ABloodActor::Prepare(const Vec3& pos, const Vec3& baseVelocity, float _scale)
 {
     float speed = baseVelocity.Length();
     if (speed < 0.001f)
