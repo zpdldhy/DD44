@@ -325,6 +325,7 @@ void TestYoooooon::CreateCollisionObject()
 
 	auto pCube = UStaticMeshComponent::CreateCube();
 	m_pBox->SetMeshComponent(pCube);
+	m_pBox->m_szName = L"Stair";
 
 	auto pMaterial = make_shared<UMaterial>();
 	pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
@@ -335,7 +336,8 @@ void TestYoooooon::CreateCollisionObject()
 	m_pBox->SetShapeComponent(boxCol);
 
 	m_pBox->SetScale(Vec3(30.f, 30.f, 30.f));
-	m_pBox->SetPosition(Vec3(0.f, 10.f, 0.f));
+	m_pBox->SetRotation(Vec3(0.f, 0.f, DD_PI / 8.f));
+	m_pBox->SetPosition(Vec3(0.f, -10.f, 0.f));
 
 	OBJECT->AddActor(m_pBox);
 }
