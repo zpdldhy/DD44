@@ -8,6 +8,8 @@
 #include "Sound.h"
 #include "Timer.h"
 
+#include "CollisionManager.h"
+
 void JumpMotionHandler::Init(Vec3 _start, Vec3 _end, float _height, float _total, float _hangDuration, float _fall)
 {
 	// 초기화
@@ -281,7 +283,7 @@ void BettyOneHandBackAttack::End()
 	// 기본 state 세팅
 	m_bOnPlaying = false;
 }
-void BettyOneHandBackAttack::CheckDirection(Vec3 _targetPos)
+bool BettyOneHandBackAttack::CheckDirection(Vec3 _targetPos)
 {
 	Vec3 look = m_pOwner.lock()->GetLook();
 	look.Normalize();
@@ -300,6 +302,8 @@ void BettyOneHandBackAttack::CheckDirection(Vec3 _targetPos)
 		bRight = false;
 	}
 	targetYaw = atan2f(dir.x, dir.z);
+
+	return bRight;
 }
 
 
@@ -346,7 +350,7 @@ void BettyOneHandDownAttack::End()
 	// 기본 state 세팅
 	m_bOnPlaying = false;
 }
-void BettyOneHandDownAttack::CheckDirection(Vec3 _targetPos)
+bool BettyOneHandDownAttack::CheckDirection(Vec3 _targetPos)
 {
 	Vec3 look = m_pOwner.lock()->GetLook();
 	look.Normalize();
@@ -365,6 +369,8 @@ void BettyOneHandDownAttack::CheckDirection(Vec3 _targetPos)
 		bRight = false;
 	}
 	targetYaw = atan2f(dir.x, dir.z);
+
+	return bRight;
 }
 
 
@@ -407,11 +413,12 @@ void BettyRollAttack::Tick()
 	case RollPhase::Middle:
 		middle->Tick();
 		rollElapsed += TIMER->GetDeltaTime();
-		if (rollElapsed > 0.5f)
-		{
-			rollElapsed = 0.0f;
-			bHitWall = true;
-		}
+		//if (rollElapsed > 0.5f)
+		//{
+		//	rollElapsed = 0.0f;
+		//	bHitWall = true;
+		//}
+		bHitWall = middle->CheckWallCollision();
 		if (bHitWall)
 		{
 			middle->End(); // 얘는 end 꼭 여기서.
@@ -462,13 +469,13 @@ void BettyRollAttack::SetTarget(weak_ptr<AActor> _target)
 	dir.y = 0;
 	dir.Normalize();
 }
-void BettyRollAttack::CheckHitWall(bool _hitWall)
-{
-	if (currentPhase == RollPhase::Middle)
-	{
-		bHitWall = _hitWall;
-	}
-}
+//void BettyRollAttack::CheckHitWall(bool _hitWall)
+//{
+//	if (currentPhase == RollPhase::Middle)
+//	{
+//		bHitWall = _hitWall;
+//	}
+//}
 #pragma region roll_subState
 BettyRollStart::BettyRollStart(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_ROLL)
 {
@@ -557,11 +564,68 @@ void BettyRollMiddle::Tick()
 	dir.y = 0;
 	dir.Normalize();
 	m_pOwner.lock()->AddPosition(dir * 1.2f);
+	CheckWallCollision();
 }
 void BettyRollMiddle::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+}
+
+bool BettyRollMiddle::CheckWallCollision()
+{
+	Vec3 pos = m_pOwner.lock()->GetPosition();
+	Vec3 look = dir;
+
+	float offset = 4.0f;
+	Vec3 right = m_pOwner.lock()->GetRight();
+	Ray leftRay(pos + (-right * offset), look);
+	Ray rightRay(pos + (right * offset), look);
+	Ray middleRay(pos, look);
+
+	for (const auto& colData : m_pOwner.lock()->m_vCollisionList)
+	{
+		Vec3 normal = colData.second.ColNormal;
+		normal.Normalize();
+
+		auto box = colData.second.box;
+		Vec3 inter;
+		Vec3 range(5.0f, 0.0f, 5.0f);
+
+		if (Collision::CheckOBBToRay(middleRay, box, inter))
+		{
+			// 
+			Vec3 dis = pos - inter;
+			dis.y = 0;
+			if (dis.Length() < range.Length())
+			{
+				return true;
+			}
+		}
+
+		if (Collision::CheckOBBToRay(leftRay, box, inter))
+		{
+			// 
+			Vec3 dis = pos - inter;
+			dis.y = 0;
+			if (dis.Length() < range.Length())
+			{
+				return true;
+			}
+		}
+
+		if (Collision::CheckOBBToRay(rightRay, box, inter))
+		{
+			// 
+			Vec3 dis = pos - inter;
+			dis.y = 0;
+			if (dis.Length() < range.Length())
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 BettyRollEnd::BettyRollEnd(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_ROLL)

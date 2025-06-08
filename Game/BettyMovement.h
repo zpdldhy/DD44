@@ -19,6 +19,7 @@ private:
 	Vec3 nearOffset = { 5.0f, 0.0f, 5.0f };
 	weak_ptr<UMeshComponent> leftHand;
 	weak_ptr<UMeshComponent> rightHand;
+
 	shared_ptr<AActor> leftRange;
 	shared_ptr<AActor> rightRange;
 	shared_ptr<AActor> bodyRange;
@@ -86,7 +87,6 @@ public:
 public:
 	//Collision
 	void CheckHit();
-	void CheckWallCollision();
 	void AddColliderActor();
 public:
 	//FX

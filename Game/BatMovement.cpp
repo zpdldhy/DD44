@@ -83,10 +83,10 @@ void BatMovement::Tick()
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
 	{
 		// 충돌 확인
-		if (GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
+		if (GetOwner()->m_vCollisionList.size() > 0)
 		{
 			// Melee 인지
-			auto list = GetOwner()->GetShapeComponent()->GetCollisionList();
+			auto list = GetOwner()->m_vCollisionList;
 			bool isCol = false;
 			for (auto& index : list)
 			{

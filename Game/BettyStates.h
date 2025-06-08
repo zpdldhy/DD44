@@ -127,7 +127,7 @@ public:
 	virtual void Tick() override;
 	virtual void End() override;
 public:
-	void CheckDirection(Vec3 _targetPos);
+	bool CheckDirection(Vec3 _targetPos);
 };
 
 class BettyOneHandDownAttack : public StateBase
@@ -146,7 +146,7 @@ public:
 	virtual void Tick() override;
 	virtual void End() override;
 public:
-	void CheckDirection(Vec3 _targetPos);
+	bool CheckDirection(Vec3 _targetPos);
 };
 
 class BettyRollAttack : public StateBase
@@ -174,7 +174,6 @@ public:
 	virtual void End() override;
 public:
 	void SetTarget(weak_ptr<AActor> _target);
-	void CheckHitWall(bool _hitWall);
 };
 #pragma region RollSubState
 class BettyRollStart : public StateBase
@@ -210,6 +209,7 @@ public:
 	virtual void End() override;
 public:
 	void SetDirection(Vec3 _dir) { dir = _dir; }
+	bool CheckWallCollision();
 
 };
 class BettyRollEnd : public StateBase

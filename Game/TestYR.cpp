@@ -128,82 +128,69 @@ void TestYR::Init()
 #pragma endregion
 #pragma region wall
 	{
-		//auto wall = make_shared<AActor>();
-		//wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
-		////wall->GetMeshComponent()->SetVisible(false);
-		////wall->SetPosition(Vec3(0.0f, 15.0f, -30.0f));
-		//wall->SetPosition(Vec3(0.0f, 3.0f, -30.0f));
-		//wall->SetScale(Vec3(5.f, 30.0f, 60.0f));
-		//auto mat2 = make_shared<UMaterial>();
-		//mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-		//wall->GetMeshComponent()->SetMaterial(mat2);
-		//auto collider2 = make_shared<UBoxComponent>();
-		//collider2->m_bVisible = false;
-		//collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-		//wall-= L"Object";
-		//wall->SetShapeComponent(collider2);
-		//m_vObjectList.emplace_back(wall);
-		//OBJECT->AddActor(wall);>m_szName 
+		auto wall = make_shared<AActor>();
+		wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
+		wall->SetPosition(Vec3(0.0f, 5.0f, -35.0f));
+		wall->SetScale(Vec3(70.f, 20.0f, 5.0f));
+		auto mat2 = make_shared<UMaterial>();
+		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		wall->GetMeshComponent()->SetMaterial(mat2);
+		auto collider2 = make_shared<UBoxComponent>();
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		wall->m_szName = L"Object";
+		wall->SetShapeComponent(collider2);
+		m_vObjectList.emplace_back(wall);
+		OBJECT->AddActor(wall); 
 	}
 
 	{
-		//auto wall = make_shared<AActor>();
-		//wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
-		////wall->GetMeshComponent()->SetVisible(false);
-		//wall->SetScale(Vec3(5.f, 30.0f, 60.0f));
-		//wall->SetPosition(Vec3(0.0f, 15.0f, -30.0f));
-		//auto mat2 = make_shared<UMaterial>();
-		//mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-		//wall->GetMeshComponent()->SetMaterial(mat2);
-		//auto collider2 = make_shared<UBoxComponent>();
-		////collider2->m_bVisible = false;
-		//collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-		////collider2->SetLocalPosition(wall->GetPosition());
-		////collider2->SetLocalScale(wall->GetScale());
-		//wall->m_szName = L"Object";
-		//wall->SetShapeComponent(collider2);
-		//m_vObjectList.emplace_back(wall);
-		//OBJECT->AddActor(wall);
+		auto wall = make_shared<AActor>();
+		wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
+		wall->SetPosition(Vec3(0.0f, 5.0f, 35.0f));
+		wall->SetScale(Vec3(70.f, 20.0f, 5.0f));
+		auto mat2 = make_shared<UMaterial>();
+		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		wall->GetMeshComponent()->SetMaterial(mat2);
+		auto collider2 = make_shared<UBoxComponent>();
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		wall->m_szName = L"Object";
+		wall->SetShapeComponent(collider2);
+		m_vObjectList.emplace_back(wall);
+		OBJECT->AddActor(wall);
 	}
 
-	//{
-	//	auto wall = make_shared<AActor>();
-	//	wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
-	//	wall->SetScale(Vec3(60.f, 30.0f, 5.0f));
-	//	wall->SetPosition(Vec3(30.0f, 15.0f, 0.0f));
-	//	auto mat2 = make_shared<UMaterial>();
-	//	mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-	//	wall->GetMeshComponent()->SetMaterial(mat2);
-	//	auto collider2 = make_shared<UBoxComponent>();
-	//	collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	//	collider2->m_bVisible = false;
+	{
+		auto wall = make_shared<AActor>();
+		wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
+		wall->SetPosition(Vec3(30.0f, 5.0f, 0.0f));
+		wall->SetScale(Vec3(5.f, 20.0f, 70.0f));
+		auto mat2 = make_shared<UMaterial>();
+		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		wall->GetMeshComponent()->SetMaterial(mat2);
+		auto collider2 = make_shared<UBoxComponent>();
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		wall->m_szName = L"Object";
+		wall->SetShapeComponent(collider2);
+		m_vObjectList.emplace_back(wall);
+		OBJECT->AddActor(wall);
+	}
 
-	//	//collider2->SetLocalPosition(wall->GetPosition());
-	//	//collider2->SetLocalScale(wall->GetScale());
-	//	wall->m_szName = L"Object";
-	//	wall->SetShapeComponent(collider2);
-	//	m_vObjectList.emplace_back(wall);
-	//	OBJECT->AddActor(wall);
-	//}
-
-	//{
-	//	auto wall = make_shared<AActor>();
-	//	wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
-	//	wall->SetScale(Vec3(60.f, 30.0f, 5.0f));
-	//	wall->SetPosition(Vec3(-30.0f, 15.0f, 0.0f));
-	//	auto mat2 = make_shared<UMaterial>();
-	//	mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-	//	wall->GetMeshComponent()->SetMaterial(mat2);
-	//	auto collider2 = make_shared<UBoxComponent>();
-	//	collider2->m_bVisible = false;
-	//	collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	//	//collider2->SetLocalPosition(wall->GetPosition());
-	//	//collider2->SetLocalScale(wall->GetScale());
-	//	wall->m_szName = L"Object";
-	//	wall->SetShapeComponent(collider2);
-	//	m_vObjectList.emplace_back(wall);
-	//	OBJECT->AddActor(wall);
-	//}
+	{
+		auto wall = make_shared<AActor>();
+		wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
+		wall->SetPosition(Vec3(-30.0f, 5.0f, 0.0f));
+		wall->SetScale(Vec3(70.f, 20.0f, 5.0f));
+		wall->SetRotation(Vec3(0.0f, DD_PI/2, 0.0f));
+		auto mat2 = make_shared<UMaterial>();
+		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		wall->GetMeshComponent()->SetMaterial(mat2);
+		auto collider2 = make_shared<UBoxComponent>();
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		wall->m_szName = L"Object";
+		wall->SetShapeComponent(collider2);
+		m_vObjectList.emplace_back(wall);
+		OBJECT->AddActor(wall);
+	}
 
 	
 #pragma endregion

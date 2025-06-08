@@ -173,6 +173,10 @@ void ObjectManager::CollisionStabilization()
 		if (pShape == nullptr) continue;
 
 		auto pSphere = dynamic_pointer_cast<USphereComponent>(pShape);
+		if (!pSphere)
+		{
+			continue;
+		}
 
 		for (auto& ColData : pActor->m_vCollisionList)
 		{
