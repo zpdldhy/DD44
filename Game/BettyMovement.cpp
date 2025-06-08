@@ -1,63 +1,301 @@
 #include "pch.h"
 #include "BettyMovement.h"
-//#include "CameraManager.h"
+
+#include "Timer.h"
+#include "CollisionManager.h"
+#include "ObjectManager.h"
+#include "AActor.h"
+#include "UStaticMeshComponent.h"
+#include "UBoxComponent.h"
+#include "EnemyCollisionManager.h"
+
+// temp temp temp !!!!!
+#include "Input.h"
 
 void BettyMovement::Init()
 {
 	// state
 	idle = make_shared<BettyIdleState>(m_pOwner);
 	intro = make_shared<BettyIntroState>(m_pOwner);
-	tempSlam = make_shared<BettySlamState>(m_pOwner);
-	currentState = idle;
-	currentState->Enter();
+	jumpAttack = make_shared<BettyJumpAttack>(m_pOwner);
+	twoHandAttack = make_shared<BettyTwoHandAttack>(m_pOwner);
+	oneHandBackAttack = make_shared<BettyOneHandBackAttack>(m_pOwner);
+	oneHandDownAttack = make_shared<BettyOneHandDownAttack>(m_pOwner);
+	rollAttack = make_shared<BettyRollAttack>(m_pOwner);
+	dropAttack = make_shared<BettyDropAttack>(m_pOwner);
+	roarAttack = make_shared<BettyRoarAttack>(m_pOwner);
+	death = make_shared<BettyDeathState>(m_pOwner);
+
+	meleeState.push_back(twoHandAttack);
+	meleeState.push_back(oneHandDownAttack);
+	meleeState.push_back(oneHandBackAttack);
+
+	rangedState.push_back(jumpAttack);
+	rangedState.push_back(rollAttack);
+	// 3페이즈에 가서 추가
+	//rangedState.push_back(dropAttack);
+
+	ChangeState(idle);
+
+	SetSnowBall();
+
+	// Collider 
+	auto body = dynamic_pointer_cast<UMeshComponent>(GetOwner()->GetMeshComponent());
+	leftHand = body->GetChildByName(L"LeftHand");
+	rightHand = body->GetChildByName(L"RightHand");
 }
 
 void BettyMovement::Tick()
 {
-	currentState->Tick();
-	
-	Vec3 diff = player.lock()->GetPosition() - GetOwner()->GetPosition();
-	if (m_bPlayOnce && diff.Length() < 20.0f)
+	// 공격
+	switch (currentAction)
 	{
-		ChangetState(tempSlam);
-		m_bPlayOnce = false;
+	case BettyAction::Intro: {
+		// 진입 조건 변경 필요 
+		Vec3 diff = player.lock()->GetPosition() - GetOwner()->GetPosition();
+		if (diff.Length() < 20.0f)
+		{
+			ChangeState(intro);
+			currentAction = BettyAction::Attack;
+		}
+		break;
 	}
-	if (!m_bPlayOnce && diff.Length() > 20.0f)
-	{
-		m_bPlayOnce = true;
+	case BettyAction::Attack: {
+		auto delta = TIMER->GetDeltaTime();
+		currentState->Tick();
+
+		if (currentStateId == BETTY_S_IDLE || !currentState->IsPlaying())
+		{
+			currentState->End();
+			// 거리 확인
+			distance = (player.lock()->GetPosition() - GetOwner()->GetPosition());
+			HandleAttack(delta);
+		}
+		if (bSnowControl)
+		{
+			//auto delta = TIMER->GetDeltaTime();
+			DropSnowBall(delta);
+			HandleSnowBall();
+		}
+		break;
+	}
+	case BettyAction::Die: {
+		auto delta = TIMER->GetDeltaTime();
+		currentState->Tick();
+	}
 	}
 
-	if (currentState->GetId() == BETTY_S_GROUNDSLAM && !currentState->IsPlaying())
+	// 피격
+	if (currentState->GetId() != BETTY_STATE::BETTY_S_DEATH)
 	{
-		currentState->End();
-		ChangetState(idle);
+		//// 피격 확인
+		CheckHit();
 	}
-	//// 1회성 Intro 재생
-	//Vec3 diff = player.lock()->GetPosition() - GetOwner()->GetPosition();
-	//if (b)
+	//// 피격 효과
+	Flashing();
+
+#pragma region AttackTest
+
+	//// Attack 1 ( Jump and Slam hard )
+	//if (INPUT->GetButton(J))
 	//{
-	//	if (diff.Length() < 50.0f)
-	//	{
-	//		CAMERA->ChangeCamera(1);
-	//		ChangetState(intro);
-	//		b = false;
-	//	}
+	//	ChangeState(jumpAttack);
 	//}
 
-	//if (currentState->GetId() == BETTY_S_INTRO && !currentState->IsPlaying())
+	//// Attack 2 ( two hand slam in place ) 
+	//if (INPUT->GetButton(L))
 	//{
-	//	CAMERA->ChangeCamera(2);
+	//	ChangeState(twoHandAttack);
 	//}
 
+	//// Attack 3 ( one hand backward swing ) 
+	//if (INPUT->GetButton(N))
+	//{
+	//	dynamic_pointer_cast<BettyOneHandBackAttack>(oneHandBackAttack)->CheckDirection(player.lock()->GetPosition());
+	//	ChangeState(oneHandBackAttack);
+	//}
+
+	//// Attack 4 ( roll one time ) 
+	//if (INPUT->GetButton(M))
+	//{
+	//	dynamic_pointer_cast<BettyRollAttack>(rollAttack)->SetTarget(player);
+
+	//	ChangeState(rollAttack);
+	//}
+
+	//// Attack 4 ( check collision )
+	//// should remove timer in roll state
+	//if (currentStateId == BETTY_S_A_ROLL)
+	//{
+	//	CheckWallCollision();
+	//}
+
+	//// Attack 5 ( drop 2 snowball )
+	///*if (INPUT->GetButton(T))
+	//{
+	//	DropSnowBall(0.0f);
+	//}*/
+
+	//// Attack 6 ( trigger an avalanche )
+	//if (INPUT->GetButton(T))
+	//{
+	//	//currentPhase = BettyPhase::Third;
+	//	ChangeState(dropAttack);
+	//	snowDropCount = 0;
+	//	currentSnowDropCount = 7;
+	//	snowOffset = snowDropInterval * (currentSnowDropCount + 1);
+	//	snowElapsed = snowOffset;
+	//}
+
+	//if (currentStateId == BETTY_S_A_DROPSNOW)
+	//{
+	//	auto delta = TIMER->GetDeltaTime();
+	//	DropSnowBall(delta);
+	//	HandleSnowBall();
+	//}
+
+	//// Attack 7 ( one hand slam ) 
+	//if (INPUT->GetButton(A))
+	//{
+	//	dynamic_pointer_cast<BettyOneHandDownAttack>(oneHandDownAttack)->CheckDirection(player.lock()->GetPosition());
+	//	ChangeState(oneHandDownAttack);
+	//}
+
+	//// Attack 8 ( Roar ) 
+	//if (INPUT->GetButton(S))
+	//{
+	//	ChangeState(roarAttack);
+	//}
+#pragma endregion
 
 }
 
-void BettyMovement::ChangetState(shared_ptr<StateBase> _state)
+#pragma region Snowball
+void BettyMovement::SetSnowBall()
 {
-
-	if (!currentState->IsInterruptible() && currentState->IsPlaying())
+	snowList.resize(15);
+	for (int i = 0; i < 15; i++)
 	{
-		//if (!_state->GetId() == ENEMY_S_DEATH)
+		snowList[i] = CreateSnowBall();
+	}
+
+}
+shared_ptr<AActor> BettyMovement::CreateSnowBall()
+{
+	auto snow = make_shared<AActor>();
+	auto mesh = UStaticMeshComponent::CreateSphere(13, 13);
+	mesh->SetLocalScale(Vec3(1.5f, 1.5f, 1.5f));
+	auto material = make_shared<UMaterial>();
+	material->Load(L"../Resources/Texture/white.png", L"../Resources/Shader/Default.hlsl");
+	mesh->SetMaterial(material);
+	snow->SetMeshComponent(mesh);
+	auto collider = make_shared<UBoxComponent>();
+	collider->SetName(L"Enemy");
+	collider->SetLocalScale(Vec3(1.0f, 1.0f, 1.0f));
+	collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	snow->SetShapeComponent(collider);
+	snow->m_szName = L"Enemy";
+	auto pPhysics = GetOwner()->GetPhysics();
+	pPhysics->SetWeight(0.f);
+
+	OBJECT->AddActor(snow);
+	ENEMYCOLLIDER->Add(snow);
+
+	snow->m_bCollision = false;
+	mesh->SetVisible(false);
+	collider->m_bVisible = false;
+
+	return snow;
+}
+shared_ptr<AActor> BettyMovement::GetSnowBall()
+{
+	for (auto& snow : snowList)
+	{
+		if (snow->m_bCollision == false)
+		{
+			return snow;
+		}
+	}
+
+	// no more snow
+	{
+		return CreateSnowBall();
+	}
+
+}
+void BettyMovement::HandleSnowBall()
+{
+	for (auto iter = activeSnowList.begin(); iter != activeSnowList.end(); )
+	{
+		// ground 높이 확인 필요
+		if ((*iter)->GetPosition().y <= 0.5f)
+		{
+			(*iter)->m_bCollision = false;
+			(*iter)->SetPosition(Vec3(0.0f, 20.0f, 0.0f));
+			(*iter)->GetPhysics()->SetWeight(0.0f);
+			(*iter)->GetMeshComponent()->SetVisible(false);
+			(*iter)->GetShapeComponent()->m_bVisible = false;
+			iter = activeSnowList.erase(iter);
+		}
+		else
+		{
+			iter++;
+		}
+	}
+}
+void BettyMovement::DropSnowBall(float _delta)
+{
+	if (!bDropping)
+	{
+		snowElapsed += _delta;
+		if (snowElapsed > snowOffset && snowDropCount == 0)
+		{
+			snowDropCount = currentSnowDropCount;
+			snowDropElapsed = 0.0f;
+			snowElapsed = 0.0f;
+			bDropping = true;
+		}
+	}
+
+	if (snowDropCount > 0)
+	{
+		snowDropElapsed += _delta;
+
+		if (snowDropElapsed >= snowDropInterval)
+		{
+			snowDropElapsed = 0.0f;
+
+			// snowball 생성
+			float randomX = RandomRange(-20.0f, 20.0f);
+			float randomZ = RandomRange(-20.0f, 20.0f);
+			Vec3 snowPos = GetOwner()->GetPosition();
+			snowPos.x += randomX;
+			snowPos.z += randomZ;
+			snowPos.y = 20.0f;
+
+			auto snow = GetSnowBall();
+			snow->m_bCollision = true;
+			snow->GetShapeComponent()->m_bVisible = true;
+			snow->GetMeshComponent()->SetVisible(true);
+			snow->SetPosition(snowPos);
+			activeSnowList.push_back(snow);
+
+			auto pPhysics = snow->GetPhysics();
+			pPhysics->SetWeight(0.5f);
+
+			if (--snowDropCount == 0)
+			{
+				bDropping = false;
+				bSnowControl = false;
+			}
+		}
+	}
+}
+void BettyMovement::ChangeState(shared_ptr<StateBase> _state)
+{
+	if (currentState && !currentState->IsInterruptible() && currentState->IsPlaying())
+	{
+		if (!_state->GetId() == BETTY_S_DEATH)
 		{
 			return;
 		}
@@ -69,5 +307,213 @@ void BettyMovement::ChangetState(shared_ptr<StateBase> _state)
 	currentState = _state;
 
 	if (currentState)
+	{
 		currentState->Enter();
+		currentStateId = currentState->GetId();
+	}
+}
+#pragma endregion Snowball
+
+void BettyMovement::HandleAttack(float _delta)
+{
+	if (distance.Length() < 20.0f)
+	{
+		// 근접 공격
+		auto look = GetOwner()->GetLook();
+		float dot = look.Dot(distance);
+		// 뒤 ? 무조건 OneHandBack
+		if (dot < 0)
+		{
+			auto next = oneHandBackAttack;
+			dynamic_pointer_cast<BettyOneHandBackAttack>(next)->CheckDirection(player.lock()->GetPosition());
+			ChangeState(next);
+		}
+		else
+		{
+			//meleeIndex = (meleeIndex + 1) % meleeState.size();
+			meleeIndex = (int)RandomRange(0.0f, meleeState.size());
+			auto next = meleeState[meleeIndex];
+			if (next->GetId() == BETTY_S_A_HANDBACK)
+			{
+				dynamic_pointer_cast<BettyOneHandBackAttack>(next)->CheckDirection(player.lock()->GetPosition());
+			}
+			if (next->GetId() == BETTY_S_A_HANDDOWN)
+			{
+				dynamic_pointer_cast<BettyOneHandDownAttack>(next)->CheckDirection(player.lock()->GetPosition());
+			}
+			ChangeState(next);
+		}
+
+	}
+	else
+	{
+		// 원거리 공격
+		auto nextIndex = (int)RandomRange(0.0f, rangedState.size());
+		// 중복 방지
+		while (nextIndex == rangedIndex)
+		{
+			nextIndex = (int)RandomRange(0.0f, rangedState.size());
+		}
+		rangedIndex = nextIndex;
+		auto next = rangedState[rangedIndex];
+		if (next->GetId() == BETTY_S_A_ROLL)
+		{
+			dynamic_pointer_cast<BettyRollAttack>(next)->SetTarget(player);
+		}
+		if (next->GetId() == BETTY_S_A_JUMPHIGH)
+		{
+			dynamic_pointer_cast<BettyJumpAttack>(next)->SetTargetPos(player.lock()->GetPosition());
+		}
+		if (next->GetId() == BETTY_S_A_DROPSNOW)
+		{
+			// attack 시작 후 1초 후 눈덩이 떨어짐
+			bSnowControl = true;
+		}
+		ChangeState(next);
+	}
+
+	if (hp < 15 && hp > 10)
+	{
+		// Phase 2
+		currentSnowDropCount = 2;
+		bSnowControl = true;
+	}
+
+	if (bCanStart3 && hp < 10)
+	{
+		// Phase 3
+		bSnowControl = false;
+		bCanStart3 = false;
+		currentSnowDropCount = 15;
+		snowOffset = 1.5f;
+		rangedState.push_back(dropAttack);
+	}
+}
+
+
+void BettyMovement::CheckHit()
+{
+	hitElapsed += TIMER->GetDeltaTime();
+	// 충돌 확인
+	if (hitElapsed > 1.0f && GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
+	{
+
+		// Melee 인지
+		auto list = GetOwner()->GetShapeComponent()->GetCollisionList();
+		bool isCol = false;
+		for (auto& index : list)
+		{
+			if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
+				isCol = true;
+		}
+
+		if (isCol)
+		{
+			// 
+			hitElapsed = 0.0f;
+			// 피격 시 경직 없고, flashing 뿐
+			m_fHitFlashTimer = 1.f;  // 1초 동안
+			m_bIsFlashing = true;
+
+			// Anim
+			if (--hp <= 0)
+			{
+				currentAction = BettyAction::Die;
+				ChangeState(death);
+			}
+		}
+	}
+}
+
+void BettyMovement::CheckWallCollision()
+{
+	Vec3 pos = GetOwner()->GetPosition();
+	Vec3 look = GetOwner()->GetShapeComponent()->GetLocalLook();
+	float offset = 4.0f;
+	Vec3 right = GetOwner()->GetRight();
+	Ray leftRay(pos + (-right * offset), look);
+	Ray rightRay(pos + (right * offset), look);
+	Ray middleRay(pos, look);
+
+	for (const auto& colData : GetOwner()->GetShapeComponent()->GetCollisionList())
+	{
+		Vec3 normal = colData.second.ColNormal;
+		normal.Normalize();
+
+		// Ray로 Pos 보정
+		auto box = colData.second.box;
+		Vec3 inter;
+		Vec3 range(5.0f, 0.0f, 5.0f);
+
+		if (Collision::CheckOBBToRay(middleRay, box, inter))
+		{
+			// 
+			Vec3 dis = pos - inter;
+			dis.y = 0;
+			if (dis.Length() < range.Length())
+			{
+				dynamic_pointer_cast<BettyRollAttack>(rollAttack)->CheckHitWall(true);
+				return;
+			}
+		}
+
+		if (Collision::CheckOBBToRay(leftRay, box, inter))
+		{
+			// 
+			Vec3 dis = pos - inter;
+			dis.y = 0;
+			if (dis.Length() < range.Length())
+			{
+				dynamic_pointer_cast<BettyRollAttack>(rollAttack)->CheckHitWall(true);
+				return;
+			}
+		}
+
+		if (Collision::CheckOBBToRay(rightRay, box, inter))
+		{
+			// 
+			Vec3 dis = pos - inter;
+			dis.y = 0;
+			if (dis.Length() < range.Length())
+			{
+				dynamic_pointer_cast<BettyRollAttack>(rollAttack)->CheckHitWall(true);
+				return;
+			}
+		}
+
+	}
+}
+
+void BettyMovement::Flashing()
+{
+	if (m_bIsFlashing)
+	{
+		m_fHitFlashTimer -= TIMER->GetDeltaTime();
+		if (m_fHitFlashTimer <= 0.0f)
+		{
+			m_fHitFlashTimer = 0.0f;
+			m_bIsFlashing = false;
+		}
+
+		// hitFlashAmount는 1 → 0 으로 감소
+		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
+
+		auto root = GetOwner()->GetMeshComponent();
+		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
+	}
+}
+void BettyMovement::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetHitFlashTime(value); // CB에 g_fHitFlashTime 전달
+	}
+
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
+	}
 }

@@ -105,6 +105,10 @@
     <ClInclude Include="BettyMovement.h">
       <Filter>Script</Filter>
     </ClInclude>
+    <ClInclude Include="EnemyCollisionManager.h" />
+    <ClInclude Include="GameDefine.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -182,6 +186,7 @@
     <ClCompile Include="BettyMovement.cpp">
       <Filter>Script</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyCollisionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

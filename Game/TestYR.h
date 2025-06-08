@@ -12,6 +12,7 @@ class TestYR : public IExecute
 {
 	shared_ptr <MeshLoader> meshLoader;
 	shared_ptr<AActor> player;
+	shared_ptr<AActor> boss_betty;
 	vector<shared_ptr<AActor>> enemyList;
 	shared_ptr<APawn> projectile;
 	vector<shared_ptr<UMeshComponent>> meshList;
@@ -26,6 +27,8 @@ class TestYR : public IExecute
 	shared_ptr<UStaticMeshComponent> handSocketComp;
 	shared_ptr<UMeshComponent> currentSwordParent;
 
+	shared_ptr<AActor> plain;
+	vector<shared_ptr<AActor>> m_vObjectList;
 
 	bool m_bEnginCamera = true;
 	int animIndex;

@@ -29,7 +29,8 @@ protected:
 public:
 	UShapeComponent() = default;
 	virtual ~UShapeComponent() = default;
-
+public:
+	bool m_bVisible = true;
 public:
 	virtual void UpdateBounds() abstract;
 

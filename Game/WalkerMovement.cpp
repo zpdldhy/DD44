@@ -6,6 +6,7 @@
 
 #include "Input.h"
 #include "Timer.h"
+#include "ObjectManager.h"
 
 #include "PlayerMoveScript.h"
 
@@ -13,7 +14,6 @@
 void WalkerMovement::Init()
 {
 	// position
-
 	m_bWait = true;
 	m_vPos[0] = GetOwner()->GetPosition() - m_half * Vec3(1, 0, 1);
 	m_vPos[1] = GetOwner()->GetPosition() - m_half * Vec3(1, 0, -1);
@@ -116,49 +116,58 @@ void WalkerMovement::Tick()
 		}
 
 	}
-
-	Vec3 distance = player.lock()->GetPosition() - GetOwner()->GetPosition();
-
-	if (distance.Length() < 4.0f && INPUT->GetButton(LCLICK))
+	// HIT
+	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
 	{
-		auto pScript = dynamic_pointer_cast<PlayerMoveScript>(player.lock()->GetScriptList()[0]);
-		if (pScript->CanAttack())
+		// 충돌 확인
+		if (GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
 		{
-			// Blood FX
-			Vec3 basePos = GetOwner()->GetPosition();
-			basePos.y += RandomRange(0.5, 2);
-			Vec3 look = GetOwner()->GetLook();
-			velocity = -look;
-			PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
-
-			// Flash FX
-			m_fHitFlashTimer = 1.f;  // 1초 동안
-			m_bIsFlashing = true;
-
-			// 회전 
-			Vec3 direction = GetOwner()->GetPosition() - player.lock()->GetPosition();
-			direction.y = 0;
-			direction.Normalize();
-			Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
-			Vec3 moveDir = tempUp.Cross(direction); // 반시계 방향
-			float targetYaw = atan2f(moveDir.x, moveDir.z);
-			Vec3 currentRot = GetOwner()->GetRotation();
-			currentRot.y = targetYaw;
-			GetOwner()->SetRotation(currentRot);
-			m_rotate = false;
-
-			// Status
-			m_hp--;
-			if (m_hp <= 0)
+			// Melee 인지
+			auto list = GetOwner()->GetShapeComponent()->GetCollisionList();
+			bool isCol = false;
+			for (auto& index : list)
 			{
-				ChangeState(death);
-				GetOwner()->AddPosition(Vec3(0.0f, -0.8f, 0.0f));
-				return;
+				if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
+					isCol = true;
 			}
 
-			// Anim State
-			ChangeState(hit);
+			if (isCol)
+			{
+				// Blood FX
+				Vec3 basePos = GetOwner()->GetPosition();
+				basePos.y += RandomRange(3, 4);
+				Vec3 look = GetOwner()->GetLook();
+				velocity = -look;
+				PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 
+				m_fHitFlashTimer = 1.f;  // 1초 동안
+				m_bIsFlashing = true;
+
+				// Anim
+				// 회전 
+				Vec3 direction = GetOwner()->GetPosition() - player.lock()->GetPosition();
+				direction.y = 0;
+				direction.Normalize();
+				Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
+				Vec3 moveDir = tempUp.Cross(direction); // 반시계 방향
+				float targetYaw = atan2f(moveDir.x, moveDir.z);
+				Vec3 currentRot = GetOwner()->GetRotation();
+				currentRot.y = targetYaw;
+				GetOwner()->SetRotation(currentRot);
+				m_rotate = false;
+
+				// Status
+				m_hp--;
+				if (m_hp <= 0)
+				{
+					ChangeState(death);
+					GetOwner()->AddPosition(Vec3(0.0f, -0.8f, 0.0f));
+					return;
+				}
+
+				// Anim State
+				ChangeState(hit);
+			}
 		}
 	}
 

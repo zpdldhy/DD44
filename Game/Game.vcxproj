@@ -145,10 +145,12 @@
     <ClInclude Include="BettyMovement.h" />
     <ClInclude Include="BettyStates.h" />
     <ClInclude Include="Editor.h" />
+    <ClInclude Include="EnemyCollisionManager.h" />
     <ClInclude Include="EnemyState.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCameraMove.h" />
+    <ClInclude Include="GameDefine.h" />
     <ClInclude Include="IntroScene.h" />
     <ClInclude Include="HeadRollerStates.h" />
     <ClInclude Include="kkongchiMoveScript.h" />
@@ -173,6 +175,7 @@
     <ClCompile Include="BettyMovement.cpp" />
     <ClCompile Include="BettyStates.cpp" />
     <ClCompile Include="Editor.cpp" />
+    <ClCompile Include="EnemyCollisionManager.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCameraMove.cpp" />

@@ -167,8 +167,8 @@ bool Collision::CheckCollision(shared_ptr<class AActor> _p1, shared_ptr<class AA
 {
 	if (_p1 == _p2) return false;
 
-	_p1->m_bCollision = true;      // 임시
-	_p2->m_bCollision = true;
+	//_p1->m_bCollision = true;      // 임시
+	//_p2->m_bCollision = true;
 
 	if (_p1->m_bCollision == false) return false;
 	if (_p2->m_bCollision == false) return false;

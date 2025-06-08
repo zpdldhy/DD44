@@ -15,8 +15,8 @@ protected:
 	shared_ptr<class AActor> m_pDownRange = nullptr;
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
 
-public:
-	bool m_bVisible = true;
+//public:
+//	bool m_bVisible = true;
 
 public:
 	UBoxComponent() { m_ShapeType = ShapeType::ST_BOX; }

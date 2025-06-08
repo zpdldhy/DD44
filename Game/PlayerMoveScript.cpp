@@ -14,6 +14,7 @@
 #include "EffectManager.h"
 #include "UPhysicsComponent.h"
 #include "ObjectManager.h"
+#include "EnemyCollisionManager.h"
 
 void PlayerMoveScript::Init()
 {
@@ -37,16 +38,49 @@ void PlayerMoveScript::Init()
 
 	m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetChildByName(L"Slash")->GetMaterial();
 
-	body->GetChildByName(L"Body");
+	//body->GetChildByName(L"Body");
 	backSword = body->GetChildByName(L"Sword");
 	handSword = body->GetChildByName(L"Sword2");
 	// SetPhysics
 	auto pPhysics = GetOwner()->GetPhysics();
 	pPhysics->SetWeight(1.f);
+
+	// AttackRange
+	attackRangeActor = make_shared<AActor>();
+	attackRangeActor->m_bCollision = false;
+
+	auto collider = make_shared<UBoxComponent>();
+	collider->m_bVisible = true;
+	collider->SetName(L"Melee");
+
+	collider->SetLocalScale(Vec3(3.0f, 1.0f, 2.0f));
+	float targetYaw = atan2f(GetOwner()->GetLook().x, GetOwner()->GetLook().z);
+	Vec3 currentRot = GetOwner()->GetRotation();
+	currentRot.y = targetYaw;
+	attackRangeActor->SetRotation(currentRot);
+	
+	//collider->SetLocalRotation()
+	collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	attackRangeActor->SetShapeComponent(collider);
+
+	colOffset = Vec3(3.0f, 0.0f, 3.0f);
+	attackRangeActor->SetPosition(GetOwner()->GetPosition() + colOffset * GetOwner()->GetLook());
+	attackRangeActor->m_szName = L"Melee";
+
+	OBJECT->AddActor(attackRangeActor);
+	ENEMYCOLLIDER->Add(attackRangeActor);
+	collider->m_bVisible = false;
 }
 
 void PlayerMoveScript::Tick()
 {
+	auto pos = GetOwner()->GetPosition();
+	attackRangeActor->SetPosition(pos + colOffset * GetOwner()->GetLook() + Vec3(0.0f, 2.0f, 0.0f));
+	float targetYaw = atan2f(GetOwner()->GetLook().x, GetOwner()->GetLook().z);
+	Vec3 currentRot = GetOwner()->GetRotation();
+	currentRot.y = targetYaw;
+	attackRangeActor->SetRotation(currentRot);
+
 	// Test
 	if (INPUT->GetButton(L))
 	{
@@ -140,6 +174,9 @@ void PlayerMoveScript::Tick()
 			{
 				handSword.lock()->SetVisible(false);
 				backSword.lock()->SetVisible(true);
+
+				attackRangeActor->m_bCollision = false;
+				attackRangeActor->GetShapeComponent()->m_bVisible = false;
 			}
 			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
 			{
@@ -323,6 +360,10 @@ void PlayerMoveScript::Tick()
 		ChangetState(attack);
 		m_bSlashPlaying = true;
 		m_fSlashTime = 0.0f;
+
+		//
+		attackRangeActor->m_bCollision = true;
+		attackRangeActor->GetShapeComponent()->m_bVisible = true;
 	}
 
 

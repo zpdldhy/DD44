@@ -11,6 +11,12 @@
 // temp
 #include "PlayerMoveScript.h"
 
+// for collider
+#include "AActor.h"
+#include "UBoxComponent.h"
+#include "ObjectManager.h"
+#include "EnemyCollisionManager.h"
+
 void BatMovement::Init()
 {
 	m_vCenter = GetOwner()->GetPosition();
@@ -24,12 +30,40 @@ void BatMovement::Init()
 	currentState = idle;
 	currentState->Enter();
 
-	m_bClockWise = (RandomRange(0, 10) > 5.0f) ? true: false;
+	// Random movement
+	m_bClockWise = (RandomRange(0, 10) > 5.0f) ? true : false;
+
+	// Collider
+	attackRangeActor = make_shared<AActor>();
+	attackRangeActor->m_bCollision = false;
+
+	auto collider = make_shared<UBoxComponent>();
+	collider->m_bVisible = true;
+	collider->SetName(L"Enemy");
+	collider->SetLocalScale(Vec3(2.0f, 2.0f, 2.0f));
+	collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	attackRangeActor->SetShapeComponent(collider);
+
+	colOffset = Vec3(1.0f, 1.0f, 1.0f);
+	attackRangeActor->SetPosition(m_vCenter + colOffset * GetOwner()->GetLook() + Vec3(0.0f, 2.0f, 0.0f));
+	attackRangeActor->m_szName = L"Enemy";
+
+	OBJECT->AddActor(attackRangeActor);
+	ENEMYCOLLIDER->Add(attackRangeActor);
+
+	collider->m_bVisible = false;
+
+	// Body
+	GetOwner()->m_bCollision = true;
 }
 
 
 void BatMovement::Tick()
 {
+	auto pos = GetOwner()->GetPosition();
+	attackRangeActor->SetPosition(pos + colOffset * GetOwner()->GetLook() + Vec3(0.0f, 2.0f, 0.0f));
+
+	// 
 	Flashing();
 
 	currentState->Tick();
@@ -40,17 +74,27 @@ void BatMovement::Tick()
 			// bat 죽음
 			GetOwner()->m_bDelete = true;
 			//GetOwner()->GetMeshComponent()->SetVisible(false);
+			attackRangeActor->m_bDelete = true;
 		}
 		return;
 	}
 
+	// HIT
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
 	{
-		auto pScript = dynamic_pointer_cast<PlayerMoveScript>(player.lock()->GetScriptList()[0]);
-		if (pScript->CanAttack())
+		// 충돌 확인
+		if (GetOwner()->GetShapeComponent()->GetCollisionCount() > 0)
 		{
-			Vec3 distance = player.lock()->GetPosition() - GetOwner()->GetPosition();
-			if (distance.Length() < 4.0f && INPUT->GetButton(LCLICK))
+			// Melee 인지
+			auto list = GetOwner()->GetShapeComponent()->GetCollisionList();
+			bool isCol = false;
+			for (auto& index : list)
+			{
+				if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
+					isCol = true;
+			}
+
+			if (isCol)
 			{
 				// Blood FX
 				Vec3 basePos = GetOwner()->GetPosition();
@@ -58,22 +102,22 @@ void BatMovement::Tick()
 				Vec3 look = GetOwner()->GetLook();
 				velocity = -look;
 				PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
-
-
+				
 				m_fHitFlashTimer = 1.f;  // 1초 동안
 				m_bIsFlashing = true;
 
+				// Anim
 				ChangetState(death);
-				return;
 			}
 		}
 	}
+
 	if (m_bReturn)
 	{
 		ReturningToPos();
 		return;
 	}
-	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_ATTACK)
+	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_ATTACK && currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
 	{
 		float deltaTime = TIMER->GetDeltaTime();
 		{
@@ -97,6 +141,7 @@ void BatMovement::Tick()
 		Vec3 pos;
 		pos.x = m_vCenter.x + m_fRadius * std::cos(angle);
 		pos.z = m_vCenter.z + m_fRadius * std::sin(angle);
+
 		GetOwner()->SetPosition(pos);
 
 		Vec3 direction = m_vCenter - GetOwner()->GetPosition();
@@ -142,29 +187,29 @@ void BatMovement::Tick()
 
 		GetOwner()->AddPosition(pos);
 
-		if (!currentState->IsPlaying())
+		if (currentState->GetId() == ENEMY_S_ATTACK && !currentState->IsPlaying())
 		{
 			// ReturnPos 찾기
 			// 시도 1 : 가장 가까운 원 위의 한 점으로 이동
 			{
-				//Vec3 dir = m_vCenter - GetOwner()->GetPosition();
-				//Vec3 rDir = dir;
-				//rDir.Normalize();
-				//Vec3 temp = rDir * m_fRadius;
+				Vec3 dir = m_vCenter - GetOwner()->GetPosition();
+				Vec3 rDir = dir;
+				rDir.Normalize();
+				Vec3 temp = rDir * m_fRadius;
 
-				//Vec3 diff = dir - temp;
-				//m_vReturnPos = GetOwner()->GetPosition() + diff;
+				Vec3 diff = dir - temp;
+				m_vReturnPos = GetOwner()->GetPosition() + diff;
 			}
 			// 시도 2 : 다른 접점으로 이동
 			{
-				Vec3 d = GetOwner()->GetPosition() - m_vCenter;
-				float dLength = d.Length();
-				Vec3 d_norm = d / dLength;
+				//Vec3 d = GetOwner()->GetPosition() - m_vCenter;
+				//float dLength = d.Length();
+				//Vec3 d_norm = d / dLength;
 
-				Vec3 tempUp = Vec3(0, 1, 0);
-				Vec3 t1 = d_norm.Cross(tempUp);
+				//Vec3 tempUp = Vec3(0, 1, 0);
+				//Vec3 t1 = d_norm.Cross(tempUp);
 
-				m_vReturnPos = m_vCenter + t1 * m_fRadius;
+				//m_vReturnPos = m_vCenter + t1 * m_fRadius;
 			}
 
 			// 
@@ -179,7 +224,16 @@ void BatMovement::Tick()
 
 void BatMovement::ChangetState(shared_ptr<StateBase> _state)
 {
+	if (_state->GetId() == ENEMY_S_DEATH)
+	{
+		if (currentState)
+			currentState->End();
 
+		currentState = _state;
+
+		if (currentState)
+			currentState->Enter();
+	}
 	if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
 		if (!_state->GetId() == ENEMY_S_DEATH)
@@ -201,8 +255,10 @@ void BatMovement::ReturningToPos()
 {
 	Vec3 ownerPos = GetOwner()->GetPosition();
 	Vec3 diff = m_vReturnPos - ownerPos;
-	if (abs(diff.x) <= 0.5f || abs(diff.z) <= 0.5f)
+	if (abs(diff.x) <= 0.7f || abs(diff.z) <= 0.7f)
 	{
+		attackRangeActor->m_bCollision = false;
+		attackRangeActor->GetShapeComponent()->m_bVisible = false;
 		m_bReturn = false;
 	}
 
@@ -301,6 +357,8 @@ void BatMovement::Attack()
 {
 	if (m_bCanStartAttack) // 실제 로직에선 플레이어 인식 후 targetPos 업데이트
 	{
+		attackRangeActor->m_bCollision = true;
+		attackRangeActor->GetShapeComponent()->m_bVisible = true;
 		// 이 부분 처리 개선 필요
 		if (!currentState->IsInterruptible() && currentState->IsPlaying())
 		{

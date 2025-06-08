@@ -36,6 +36,7 @@ void TestYR2::Init()
 #pragma endregion
 
 	loader = make_shared<ActorLoader>();
+	loader->ConvertObjToAsset();
 	loader->LoadAllAsset();
 	meshResMap = loader->LoadMeshMap();
 	animList = loader->LoadAnim();
@@ -44,14 +45,14 @@ void TestYR2::Init()
 	meshLoader.SetAnim(loader->LoadAnimMap());
 
 
-	m_pActor = make_shared<APawn>();
-	auto meshComponent = meshLoader.Make("../Resources/Asset/player.mesh.json");
-	m_pActor->SetMeshComponent(meshComponent);
+	//m_pActor = make_shared<APawn>();
+	//auto meshComponent = meshLoader.Make("../Resources/Asset/player.mesh.json");
+	//m_pActor->SetMeshComponent(meshComponent);
 
-	m_pActor->SetPosition(Vec3(10, 10, 10));
+	//m_pActor->SetPosition(Vec3(10, 10, 10));
 
-	//player->AddScript(movement);
-	OBJECT->AddActor(m_pActor);
+	////player->AddScript(movement);
+	//OBJECT->AddActor(m_pActor);
 
 
 	auto meshEditor = GUI->GetMeshEditorUI();

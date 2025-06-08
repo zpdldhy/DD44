@@ -45,6 +45,7 @@ public:
 	int GetAnimIndex(wstring _animName);
 	Matrix GetBoneAnim(int _boneIndex);
 	void SetKeyFrame(int _trackIndex, UINT _key);
+	int GetTotalFrame() { return animTrackList[currentAnimTrackIndex].animList[0].size(); }
 public:
 	const std::vector<AnimList>& GetAnimTrackList() const { return animTrackList; }
 };

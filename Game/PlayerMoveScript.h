@@ -25,6 +25,10 @@ public:
 	float m_fRollCoolTime = 0.3f;
 	bool m_bCanRoll = true;
 
+	// Attack
+	shared_ptr<AActor> attackRangeActor;
+	Vec3 colOffset;
+
 	Vec3 m_vLook;
 	Vec3 m_vRight;
 	Vec3 m_vLastMoveDir;
