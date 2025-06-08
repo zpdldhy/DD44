@@ -1,8 +1,7 @@
 #include "pch.h"
-#include "ADustActor.h"
-#include "CameraManager.h"
+#include "APoppingDust.h"
 
-Vec3 ADustActor::Prepare(const Vec3& pos, const Vec3& baseVelocity, float _scale)
+Vec3 APoppingDust::Prepare(const Vec3& pos, const Vec3& baseVelocity, float scale)
 {
     // 방향은 baseVelocity 기반으로 약간 랜덤 회전
     Vec3 dir = baseVelocity;
@@ -21,11 +20,11 @@ Vec3 ADustActor::Prepare(const Vec3& pos, const Vec3& baseVelocity, float _scale
     Vec3 finalVelocity = finalDir * baseVelocity.Length() * speedFactor;
 
     // 약한 gravity
-    SetGravity(1.0f);
+    SetGravity(3.0f);
 
     // 작게 시작해서 부드럽게 사라짐
-    SetStartScale(Vec3(0.5f));
-    SetEndScale(Vec3(1.2f)); // 아주 부드럽게 퍼지게
+    SetStartScale(Vec3(5.5f));
+    SetEndScale(Vec3(8.5f)); // 아주 부드럽게 퍼지게
 
     InitSpriteAnimation(4, 0.5f);
 

@@ -52,9 +52,9 @@ void AEffectActor::Tick()
     }
 }
 
-Vec3 AEffectActor::Prepare(const Vec3& pos, const Vec3& baseVelocity)
+Vec3 AEffectActor::Prepare(const Vec3& _pos, const Vec3& _baseVelocity, float _scale)
 {
-    return baseVelocity;
+    return _baseVelocity;
 }
 
 

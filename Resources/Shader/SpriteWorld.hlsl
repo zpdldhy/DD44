@@ -1,37 +1,39 @@
 #include "Header.hlsli"
 
-struct PS_OUT_DUAL
-{
-    float4 c0 : SV_Target0;
-    float4 c1 : SV_Target1;
-};
-
 VS_OUT VS(VS_IN input)
 {
-    VS_OUT output = (VS_OUT) 0;
-    float4 worldPos = mul(float4(input.p, 1.0f), g_matWorld);
-    output.p = mul(mul(worldPos, g_matView), g_matProj);
+    VS_OUT output;
 
-    output.c = input.c;
-    output.n = input.n;
+    float4 worldPos = mul(float4(input.p, 1.0f), g_matWorld);
+    float4 viewPos = mul(worldPos, g_matView);
+    output.p = mul(viewPos, g_matProj);
     output.t = input.t;
 
     return output;
 }
 
-PS_OUT_DUAL PS(VS_OUT input)
+float4 PS(VS_OUT input) : SV_Target
 {
-    PS_OUT_DUAL psOut = (PS_OUT_DUAL) 0;
+    float2 uv = input.t;
+    float4 texColor = g_txDiffuseA.Sample(sample, uv);
 
-    float4 texColor = g_txDiffuseA.Sample(sample, remapUV(input.t));
-    
-    if (texColor.a < 0.1)
+    if (texColor.a < 0.1f)
         discard;
 
-    float alpha = max(max(texColor.r, texColor.g), texColor.b);
+    // 중심으로부터 거리 계산 (0 = 중심, 1 = 바깥)
+    float distFromCenter = distance(uv, float2(0.5f, 0.5f));
+    float edgeFactor = saturate(distFromCenter * 2.0f);
 
-    psOut.c0 = float4(texColor.rgb, 1.0f); // 원본 색상 출력
-    psOut.c1 = float4(1.0f - alpha, 1.0f - alpha, 1.0f - alpha, alpha); // 보조 블렌딩 채널
+    //// 중심은 흰색, 외곽은 연한 푸른색 보간
+    //float3 centerColor = float3(1.0f, 1.0f, 1.0f);
+    //float3 outerTint = float3(0.6f, 0.8f, 1.0f); // 연한 파랑
 
-    return psOut;
+    //float3 finalColor = lerp(centerColor, outerTint, edgeFactor);
+    //texColor.rgb *= finalColor;
+
+    // 알파 점점 줄이기
+    float alphaFalloff = 1.0f - edgeFactor * 0.5f;
+    texColor.a *= alphaFalloff;
+
+    return texColor;
 }

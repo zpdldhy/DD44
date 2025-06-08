@@ -161,3 +161,11 @@ void ViewPortTexture::ClearViewPort()
 	DC->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0, 0);
 	DC->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_STENCIL, 1.0, 0);
 }
+
+
+void ViewPortTexture::ClearViewPortTransparent()
+{
+	const FLOAT color[] = { 0, 0, 0, 0 };
+	DC->ClearRenderTargetView(m_pRenderTargetView.Get(), color);
+	DC->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+}

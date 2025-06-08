@@ -46,5 +46,13 @@ public:
 	shared_ptr<class UCameraComponent> GetUICameraComponent();
 	Matrix GetUIView();
 	Matrix GetUIProjection();
+
+private:
+	Vec3 m_vPrevCameraPos = Vec3::Zero; // 이전 프레임 위치
+	Vec3 m_vCurrentCameraPos = Vec3::Zero; // 이번 프레임 위치
+
+public:
+	Vec3 GetCameraDelta() const { return m_vCurrentCameraPos - m_vPrevCameraPos; }
+
 };
 

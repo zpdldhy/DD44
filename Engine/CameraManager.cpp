@@ -24,6 +24,12 @@ void CameraManager::Init()
 
 void CameraManager::Tick()
 {
+	if (m_p3DCameraActor)
+	{
+		m_vPrevCameraPos = m_vCurrentCameraPos;
+		m_vCurrentCameraPos = m_p3DCameraActor->GetPosition();
+	}
+
 	m_pUICameraActor->Tick();
 	m_p3DCameraActor->GetCameraComponent()->SetFrustumVisible(false);
 }

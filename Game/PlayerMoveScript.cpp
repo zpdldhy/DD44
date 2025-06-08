@@ -56,29 +56,8 @@ void PlayerMoveScript::Tick()
 		}
 	}
 
-	if (INPUT->GetButton(H))
-	{
-		Vec3 pos = GetOwner()->GetPosition();
-		Vec3 dir = GetOwner()->GetLook();
 
-		// 살짝 위로 뜨고 살짝 퍼지게 만들기
-		pos.y += 0.3f;
 
-		Vec3 dustVelocity = dir * 20.0f + Vec3(0, 5.0f, 0); // 약간 위로 퍼지게
-		EFFECT->PlayEffect(EEffectType::Dust, pos, 10.0f, dustVelocity);
-	}
-
-	if (INPUT->GetButton(J))
-	{
-		Vec3 pos = GetOwner()->GetPosition();
-		Vec3 dir = GetOwner()->GetLook();
-
-		// 살짝 위로 뜨고 살짝 퍼지게 만들기
-		pos.y += 0.3f;
-
-		Vec3 dustVelocity = dir * 20.0f + Vec3(0, 5.0f, 0); // 약간 위로 퍼지게
-		EFFECT->PlayEffect(EEffectType::Feather, pos, 10.0f, dustVelocity);
-	}
 
 #pragma region EFFECT
 	Slash();
@@ -216,6 +195,7 @@ void PlayerMoveScript::Tick()
 			// 구르기
 			m_vRollLook = GetOwner()->GetLook();
 			ChangetState(roll);
+
 			m_bCanRoll = false;
 		}
 	}
