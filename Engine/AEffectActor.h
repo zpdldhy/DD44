@@ -21,10 +21,10 @@ public:
     void SetEndScale(const Vec3& scale) { m_vEndScale = scale; }
 
     virtual Vec3 Prepare(const Vec3& pos, const Vec3& baseVelocity);
-    
+    float m_fRemainTime = 0.0f;
+
 private:
     EEffectType m_eType;
-    float m_fRemainTime = 0.0f;
     Vec3 m_vVelocity = Vec3(0, 0, 0);
 
     float m_fStartScale = 0.2f;

@@ -57,6 +57,8 @@ void PlayerMoveScript::Tick()
 	}
 
 
+
+
 #pragma region EFFECT
 	Slash();
 	if (m_bIsFlashing)
