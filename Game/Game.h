@@ -16,6 +16,7 @@ public:
 	shared_ptr<class ALight> m_pSunLight;
 
 	bool m_bEnginCamera = false;
+	bool m_bWind = false;
 
 	float time;
 
@@ -39,6 +40,7 @@ protected:
 	void SetupGameCamera();
 	void SetupSkybox();
 	void SetupSunLight();
+	void CreateWind();
 
 protected:
 	void SetEnemyScript();

@@ -86,6 +86,7 @@ public:
 
 	Vec3 GetCameraLook() { return m_vLookTo; }
 
+
 public:
 	UCameraComponent(ProjectionType _projectionType = ProjectionType::PT_PERSPECTIVE) : m_ProjectionType(_projectionType) {}
 	virtual ~UCameraComponent() {}

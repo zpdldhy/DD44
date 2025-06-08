@@ -172,6 +172,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="ASky.h" />
     <ClInclude Include="AssimpLoader.h" />
     <ClInclude Include="AUIActor.h" />
+    <ClInclude Include="AWindActor.h" />
     <ClInclude Include="CharacterEditorUI.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="EditorData.h" />
@@ -257,6 +258,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="UTerrainMeshComponent.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="ViewPortTexture.h" />
+    <ClInclude Include="WindManager.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -276,6 +278,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="ASky.cpp" />
     <ClCompile Include="AssimpLoader.cpp" />
     <ClCompile Include="AUIActor.cpp" />
+    <ClCompile Include="AWindActor.cpp" />
     <ClCompile Include="CharacterEditorUI.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="EffectEditorUI.cpp" />
@@ -368,6 +371,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="UTerrainMeshComponent.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="ViewPortTexture.cpp" />
+    <ClCompile Include="WindManager.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
