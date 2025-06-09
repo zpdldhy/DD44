@@ -15,6 +15,7 @@ class Engine : public Singleton<Engine>
 
 	// 3D World View Æò¸é
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
+	bool m_bGamePaused = false;
 
 public:
 	void Init();

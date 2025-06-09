@@ -30,7 +30,6 @@ void ObjectManager::Tick()
 		else
 		{
 			pActor->second->Tick();
-			m_vRenderActorList.emplace_back(pActor->second);	// 임시 사용.
 			pActor++;
 		}		
 	}
@@ -195,8 +194,9 @@ void ObjectManager::CollisionStabilization()
 
 void ObjectManager::CheckStencilList()
 {
-	for (auto& pActor : m_vRenderActorList)
+	for (auto& iter : m_vActorList)
 	{
+		auto pActor = iter.second;
 		if (pActor->m_bRender == false) continue;
 
 		if (pActor->m_bUseStencil == false)
@@ -208,7 +208,6 @@ void ObjectManager::CheckStencilList()
 
 void ObjectManager::ClearRenderList()
 {
-	m_vRenderActorList.clear();
 	m_vPreRenderActorList.clear();
 	m_vPostRenderActorList.clear();
 	//m_vActorIndexList.clear();	// 임시 사용

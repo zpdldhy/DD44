@@ -75,18 +75,26 @@ void Engine::Frame()
 	INPUT->Tick();
 	TIMER->Update();
 
+	if(INPUT->GetButton(GameKey::ESC))
+		m_bGamePaused = !m_bGamePaused;
+	
 	// Object Tick
 	{
-		OBJECT->ObjectMove();			// 1. Move
+		if (!m_bGamePaused)
+			OBJECT->ObjectMove();			// 1. Move
 		LIGHTMANAGER->UpdateLightCB();
 
 		UI->Tick();
-		PARTICLE->Tick();
+		if (!m_bGamePaused)
+			PARTICLE->Tick();
 	}
-
 	_app->Tick();						// 2. 충돌
-	OBJECT->CollisionStabilization();	// 3. 보정
-	OBJECT->Tick();
+
+	if (!m_bGamePaused)
+	{
+		OBJECT->CollisionStabilization();	// 3. 보정
+		OBJECT->Tick();
+	}
 
 	// Manager Tick
 	{
