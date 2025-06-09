@@ -11,14 +11,11 @@ void Collision::Init()
 		auto boxA = static_pointer_cast<UBoxComponent>(a->GetShapeComponent());
 		auto boxB = static_pointer_cast<UBoxComponent>(b->GetShapeComponent());
 
-		Vec3 output;
 		//충돌 검사 로직
 		if (Collision::CheckOBBToOBB(boxA->GetBounds(), boxB->GetBounds()))
 		{
 			// 충돌 처리
 			CollisionData data;
-			data.box = boxB->GetBounds();
-			data.ColNormal = output;
 			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
 				a->GetPhysicsComponent()->m_bColGrounded = true;
 
@@ -40,15 +37,11 @@ void Collision::Init()
 		auto Sphere = static_pointer_cast<USphereComponent>(a->GetShapeComponent());
 		auto Box = static_pointer_cast<UBoxComponent>(b->GetShapeComponent());
 
-		if (a->m_szName == L"MyCharacter")
-			int i = 0;
-
 		Vec3 Inter;
 		if (Collision::CheckSphereToOBB(Sphere->GetBounds(), Box->GetBounds(), Inter))
 		{
 			// 충돌 처리
 			CollisionData data;
-			data.box = Box->GetBounds();
 			data.Inter = Inter;
 			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
 				a->GetPhysicsComponent()->m_bColGrounded = true;
@@ -59,7 +52,20 @@ void Collision::Init()
 		};
 
 	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_SPHERE}] = [](auto a, auto b) {
-		// ...
+		auto Sphere0 = static_pointer_cast<USphereComponent>(a->GetShapeComponent());
+		auto Sphere1 = static_pointer_cast<USphereComponent>(b->GetShapeComponent());
+
+		Vec3 Inter;
+		if (Collision::CheckSphereToSphere(Sphere0->GetBounds(), Sphere1->GetBounds(), Inter))
+		{
+			// 충돌 처리
+			CollisionData data;
+			data.Inter = Inter;
+			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
+				a->GetPhysicsComponent()->m_bColGrounded = true;
+
+			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
+		}
 		};
 
 	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_CAPSULE}] = [](auto a, auto b) {
@@ -91,35 +97,36 @@ void Collision::CheckCollision(vector<UINT> _vActorIndex)
 	for (auto index : _vActorIndex)
 		vActorList.emplace_back(OBJECT->GetActor(index));
 
-	for (auto& pObj : vActorList)
+	for (auto& pSub : vActorList)
 	{
-		pObj->m_bCollision = true;      // 임시
-		if (pObj->m_bCollision == false) continue;
+		pSub->m_bCollision = true;      // 임시, Quad 구현시 제거 예정
+		if (pSub->m_bCollision == false) continue;
 
-		auto objShape = pObj->GetShapeComponent();
-		if (objShape == nullptr ||
-			objShape->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) continue;
+		auto subShape = pSub->GetShapeComponent();
+		if (subShape == nullptr ||
+			subShape->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) continue;
 
-		for (auto& pSub : vActorList)
+		for (auto& pObj : vActorList)
 		{
-			// 임시?
-			if (pObj->m_szName == L"Object" && pSub->m_szName == L"Object") continue;
+			// 벽끼리 충돌을 제외하기 위한 로직.
+			// 충돌이 필요한 Object가 있으면 다른 이름으로 지어야 함.
+			if (pSub->m_szName == L"Object" && pObj->m_szName == L"Object") continue;
 
-			if (pSub->m_bCollision == false) continue;
-			if (pObj == pSub) continue;
-			auto subShape = pSub->GetShapeComponent();
-			if (subShape == nullptr ||
-				subShape->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) continue;
+			if (pObj->m_bCollision == false) continue;
+			if (pSub == pObj) continue;
+			auto objShape = pObj->GetShapeComponent();
+			if (objShape == nullptr ||
+				objShape->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) continue;
 
-			auto objType = objShape->GetShapeType();
 			auto subType = subShape->GetShapeType();
+			auto objType = objShape->GetShapeType();
 
-			auto key = make_pair(objType, subType);
+			auto key = make_pair(subType, objType);
 			auto iter = collisionMap.find(key);
 
 			if (iter != collisionMap.end())
 			{
-				iter->second(pObj, pSub);
+				iter->second(pSub, pObj);
 			}
 		}
 	}
@@ -136,32 +143,36 @@ void Collision::CheckCollision(vector<shared_ptr<class AActor>> _vActorIist)
 	// Collision이 있는 Actor의 List를 가져온다.
 	vector<shared_ptr<AActor>> vActorList = _vActorIist;
 
-	for (auto& pObj : vActorList)
+	for (auto& pSub : vActorList)
 	{
-		pObj->m_bCollision = true;      // 임시
-		if (pObj->m_bCollision == false) continue;
+		pSub->m_bCollision = true;      // 임시, Quad 구현시 제거 예정
+		if (pSub->m_bCollision == false) continue;
 
-		auto objShape = pObj->GetShapeComponent();
-		if (objShape == nullptr ||
-			objShape->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) continue;
+		auto subShape = pSub->GetShapeComponent();
+		if (subShape == nullptr ||
+			subShape->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) continue;
 
-		for (auto& pSub : vActorList)
+		for (auto& pObj : vActorList)
 		{
-			if (pSub->m_bCollision == false) continue;
-			if (pObj == pSub) continue;
-			auto subShape = pSub->GetShapeComponent();
-			if (subShape == nullptr ||
-				subShape->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) continue;
+			// 벽끼리 충돌을 제외하기 위한 로직.
+			// 충돌이 필요한 Object가 있으면 다른 이름으로 지어야 함.
+			if (pSub->m_szName == L"Object" && pObj->m_szName == L"Object") continue;
 
-			auto objType = objShape->GetShapeType();
+			if (pObj->m_bCollision == false) continue;
+			if (pSub == pObj) continue;
+			auto objShape = pObj->GetShapeComponent();
+			if (objShape == nullptr ||
+				objShape->GetCollisionType() == CollisionEnabled::CE_NOCOLLISION) continue;
+
 			auto subType = subShape->GetShapeType();
+			auto objType = objShape->GetShapeType();
 
-			auto key = make_pair(objType, subType);
+			auto key = make_pair(subType, objType);
 			auto iter = collisionMap.find(key);
 
 			if (iter != collisionMap.end())
 			{
-				iter->second(pObj, pSub);
+				iter->second(pSub, pObj);
 			}
 		}
 	}
@@ -571,7 +582,7 @@ bool Collision::CheckOBBToOBB(const Box& _box0, const Box& _box1)
 	return true;
 }
 
-bool Collision::CheckSphereToSphere(const Sphere& _Sphere0, const Sphere& _Sphere1, Vec3& _normal)
+bool Collision::CheckSphereToSphere(const Sphere& _Sphere0, const Sphere& _Sphere1, Vec3& _inter)
 {
 	float Dis = (_Sphere0.vCenter - _Sphere1.vCenter).Length();
 	float totalRadius = _Sphere0.fRadius + _Sphere1.fRadius;
@@ -580,8 +591,10 @@ bool Collision::CheckSphereToSphere(const Sphere& _Sphere0, const Sphere& _Spher
 		return false;
 
 	// normal은 Sphere0 기준의 normal 벡터
-	_normal = _Sphere1.vCenter - _Sphere0.vCenter;
-	_normal.Normalize();
+	auto normal = _Sphere0.vCenter - _Sphere1.vCenter;
+	normal.Normalize();
+
+	_inter = _Sphere1.vCenter + normal * _Sphere1.fRadius;
 
 	return true;
 }
