@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "AUIActor.h"
 #include "UMaterial.h"
+#include "DxWrite.h"
 
 ComPtr<ID3D11Buffer> AUIActor::m_pUISliceCB = nullptr;
 
@@ -96,6 +97,9 @@ void AUIActor::CreateText()
 
 void AUIActor::UpdateText()
 {	
+	if (!DXWRITE->m_pDxWrite)
+		return;
+
 	m_pFont->SetPath(m_szFontPath);
 	m_pFont->SetSize(m_fFontSize);
 	m_pFont->SetColor(m_tUISliceData.vColor);

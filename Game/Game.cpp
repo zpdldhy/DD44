@@ -13,6 +13,7 @@
 #include "EffectManager.h"
 #include "Sound.h"
 #include "WindManager.h"
+#include "Engine.h"
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -72,6 +73,9 @@ void Game::Init()
 
 void Game::Tick()
 {
+	if (INPUT->GetButton(GameKey::ESC))
+		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
+
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
 	//bgm

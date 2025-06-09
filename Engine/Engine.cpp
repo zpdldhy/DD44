@@ -74,9 +74,6 @@ void Engine::Frame()
 {
 	INPUT->Tick();
 	TIMER->Update();
-
-	if(INPUT->GetButton(GameKey::ESC))
-		m_bGamePaused = !m_bGamePaused;
 	
 	// Object Tick
 	{
@@ -174,7 +171,8 @@ void Engine::Release()
 void Engine::Run()
 {
 	_window.SetWindowClass(_hInstance);	
-	_window.SetWindowFullScreen();
+	_window.SetWindow();
+	//_window.SetWindowFullScreen();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 		GUI->CreateImGuiWindow(_hInstance);
