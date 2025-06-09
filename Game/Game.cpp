@@ -68,15 +68,6 @@ void Game::Init()
 	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
-
-
-	//{
-	//	auto wind = std::make_shared<AWindActor>();
-	//	wind->SetPosition(Vec3(0.f, 0.f, 0.95f));     // 살짝 앞쪽 Z (카메라 무시 대상)
-	//	wind->SetScale(Vec3(0.5f, 0.05f, 1.f));      // 바람 길이, 너비 조절
-	//	wind->SetRotation(Vec3(0, 0, 3));
-	//	WIND->AddWind(wind);
-	//}
 }
 
 void Game::Tick()
@@ -87,14 +78,17 @@ void Game::Tick()
 	{
 		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
 	}
-	
-	if (INPUT->GetButton(L))
+	//wind	
 	{
-		m_bWind = !m_bWind;
-	}
+		if (INPUT->GetButton(M))
+		{
+			m_bWind = !m_bWind;
+		}
 
-	if(m_bWind)
-	CreateWind();
+		if (m_bWind)
+			CreateWind();
+
+	}
 	
 	if (INPUT->GetButton(O))
 	{
