@@ -169,19 +169,25 @@ void ObjectManager::CollisionStabilization()
 		if (pActor->m_vCollisionList.empty()) continue;
 		auto pShape = pActor->GetShapeComponent();
 		if (pShape == nullptr) continue;
-
-		auto pSphere = dynamic_pointer_cast<USphereComponent>(pShape);
-
+		
 		for (auto& ColData : pActor->m_vCollisionList)
 		{
+			auto pObj = GetActor(ColData.first);
+			auto ObjShape = pObj->GetShapeComponent();
+			if (ObjShape->GetCollisionType() == CollisionEnabled::CE_QUERYONLY) continue;
+
 			auto inter = ColData.second.Inter;
 			auto diff = pShape->GetCenter() - inter;
 			auto normal = diff;
 			normal.Normalize();
 
-			auto radius = pSphere->GetBounds().fRadius;
+			float len = 0.f;
 
-			auto len = pSphere->GetBounds().fRadius - diff.Length();
+			if (pShape->GetShapeType() == ShapeType::ST_SPHERE) 
+			{
+				auto pSphere = dynamic_pointer_cast<USphereComponent>(pShape);				
+				len = pSphere->GetBounds().fRadius - diff.Length();
+			}
 
 			pActor->AddPosition(normal * len);
 			if (pActor->GetShapeComponent())
