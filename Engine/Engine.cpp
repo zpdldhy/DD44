@@ -23,6 +23,7 @@
 #include "EffectManager.h"
 #include "Sound.h"
 #include "WindManager.h"
+#include "GSParticleManager.h"
 
 bool g_bRangeVisibleMode;
 
@@ -121,6 +122,7 @@ void Engine::Render()
 		OBJECT->Render();	// ObjectList Render
 		PARTICLE->Render();
 		WIND->Render();
+		GSMANAGER->Render();
 		POSTPROCESS->SetSRVToSlot(7, WIND->GetSRV());
 		POSTPROCESS->PostRender();
 		

@@ -25,6 +25,7 @@
 #define EFFECT		GET_SINGLE(EffectManager)
 #define ACTORLOADER GET_SINGLE(ActorLoader)
 #define WIND		GET_SINGLE(WindManager)
+#define GSMANAGER   GET_SINGLE(GSParticleManager)
 
 
 #define DD_PI		3.1415926f

@@ -26,6 +26,9 @@ void ParticleManager::Render()
 	for (auto& pParticleActor : m_vRenderParticleList)
 		pParticleActor->Render();
 
+	for (auto& gs : m_vGSParticles)
+		gs->Render();
+
 	m_vRenderParticleList.clear();
 	PostRender();
 }
@@ -96,4 +99,9 @@ void ParticleManager::AddUI(shared_ptr<AParticleActor> _vParticleActor)
 {
 	_vParticleActor->Init();
 	m_vParticleList.emplace_back(_vParticleActor);
+}
+
+void ParticleManager::AddGSParticle(shared_ptr<UGSParticleComponent> _gsParticle)
+{
+	m_vGSParticles.push_back(_gsParticle);
 }

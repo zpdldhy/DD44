@@ -13,6 +13,8 @@
 #include "EffectManager.h"
 #include "Sound.h"
 #include "WindManager.h"
+#include "ParticleManager.h"
+#include "GSParticleManager.h"
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -24,6 +26,7 @@
 
 // Component
 #include "UStaticMeshComponent.h"
+
 
 // Script
 #include "EngineCameraMoveScript.h"
@@ -68,6 +71,10 @@ void Game::Init()
 	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
+
+	m_pGSParticle = make_shared<UGSParticleComponent>();
+	m_pGSParticle->Init();
+	GSMANAGER->Add(m_pGSParticle);
 }
 
 void Game::Tick()
@@ -89,7 +96,7 @@ void Game::Tick()
 			CreateWind();
 
 	}
-	
+	//m_pTestParticle->Tick();
 	if (INPUT->GetButton(O))
 	{
 		if (m_bEnginCamera)
@@ -109,6 +116,8 @@ void Game::Tick()
 
 void Game::Render()
 {
+	//if (m_pTestParticle)
+	//	m_pTestParticle->Render();
 }
 
 void Game::Destroy()

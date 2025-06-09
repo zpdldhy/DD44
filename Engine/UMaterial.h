@@ -26,7 +26,7 @@ struct CB_MaterialEffect
 	float  g_fDiffusePower = 1.0f;
 
 	Vec3   g_vSpecularCoeff = Vec3(1,1,1);   
-	float  g_fShininess = 32.0f;
+	float  g_fShininess = 5.0f;
 
 	Vec4 TintColor = Vec4(1, 1, 1, 1);
 };
@@ -79,7 +79,7 @@ class UMaterial
 	CB_Slash m_tSlashData;
 
 public:
-	virtual void Load(wstring _textureFileName, wstring _shaderFileName);
+	virtual void Load(wstring _textureFileName, wstring _shaderFileName, bool bUseGeometryShader=false);
 	virtual void Bind();
 
 	void CreateEffectCB();

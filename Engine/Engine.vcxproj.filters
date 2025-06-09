@@ -418,6 +418,12 @@
       <Filter>Object\Particle</Filter>
     </ClInclude>
     <ClInclude Include="USphereComponent.h" />
+    <ClInclude Include="UGSParticleComponent.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="GSParticleManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -705,6 +711,12 @@
       <Filter>Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="USphereComponent.cpp" />
+    <ClCompile Include="UGSParticleComponent.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="GSParticleManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

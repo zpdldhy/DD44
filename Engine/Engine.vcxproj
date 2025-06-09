@@ -185,6 +185,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="EffectType.h" />
     <ClInclude Include="FbxLoader.h" />
     <ClInclude Include="CameraManager.h" />
+    <ClInclude Include="GSParticleManager.h" />
     <ClInclude Include="LightData.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="ActorListUI.h" />
@@ -210,6 +211,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="Text.h" />
     <ClInclude Include="UAnimInstance.h" />
     <ClInclude Include="UBoxComponent.h" />
+    <ClInclude Include="UGSParticleComponent.h" />
     <ClInclude Include="UIEditorUI.h" />
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="UIState.h" />
@@ -293,6 +295,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="EffectManager.cpp" />
     <ClCompile Include="FbxLoader.cpp" />
     <ClCompile Include="CameraManager.cpp" />
+    <ClCompile Include="GSParticleManager.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="ActorListUI.cpp" />
     <ClCompile Include="MeshEditorUI.cpp" />
@@ -315,6 +318,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="UAnimInstance.cpp" />
     <ClCompile Include="UBoxComponent.cpp" />
+    <ClCompile Include="UGSParticleComponent.cpp" />
     <ClCompile Include="UIEditorUI.cpp" />
     <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="UIState.cpp" />

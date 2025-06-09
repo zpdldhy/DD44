@@ -3,7 +3,7 @@
 #include "IExecute.h"
 #include "ActorLoader.h"
 #include "MeshLoader.h"
-
+#include "UGSParticleComponent.h" 
 class Game : public IExecute
 {
 public:
@@ -29,6 +29,7 @@ public:
 	vector<shared_ptr<AActor>> m_vObjectList;
 	vector<shared_ptr<AActor>> m_vMapList;
 
+
 public:
 	void Init() override;
 	void Tick() override;
@@ -47,4 +48,6 @@ protected:
 	void CheckEnemyCollision();
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }
+
+	shared_ptr<UGSParticleComponent> m_pGSParticle;
 };

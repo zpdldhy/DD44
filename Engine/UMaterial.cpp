@@ -2,12 +2,12 @@
 #include "UMaterial.h"
 #include "Device.h"
 
-void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
+void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName, bool bUseGeometryShader)
 {
     m_TexturePath = _textureFileName;
     m_ShaderPath = _shaderFileName;
 
-	m_pShader = SHADER->Get(_shaderFileName);
+	m_pShader = SHADER->Get(_shaderFileName, bUseGeometryShader);
     if (_textureFileName != L"")
         m_pTexture = TEXTURE->Get(_textureFileName);
 	m_pInputlayout = INPUTLAYOUT->Get();
@@ -26,6 +26,10 @@ void UMaterial::Bind()
 	if (m_pShader)
 	{
         DC->VSSetShader(m_pShader->m_pVertexShader.Get(), nullptr, 0);
+        if (m_pShader->m_pGeometryShader)
+            DC->GSSetShader(m_pShader->m_pGeometryShader.Get(), nullptr, 0);
+        else
+            DC->GSSetShader(nullptr, nullptr, 0);
         DC->PSSetShader(m_pShader->m_pPixelShader.Get(), nullptr, 0);
 	}
 
@@ -76,10 +80,6 @@ void UMaterial::CreateSlashCB()
     desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
     HRESULT hr = DEVICE->CreateBuffer(&desc, nullptr, m_pCB_Slash.GetAddressOf());
-    if (FAILED(hr))
-    {
-        int a = 0;
-    }
 }
 
 void UMaterial::SetGlowParams(float _glowPower, const Vec3 _glowColor)

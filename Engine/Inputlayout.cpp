@@ -88,6 +88,27 @@ bool InputlayoutManager::CreateIW(ComPtr<ID3DBlob> _pCode)
 	return true;
 }
 
+bool InputlayoutManager::CreateParticle(ComPtr<ID3DBlob> _pCode)
+{
+	if (Get(L"Particle") != nullptr)
+		return true;
+
+	D3D11_INPUT_ELEMENT_DESC layout[] =
+	{
+		{ "POSITION",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR",     0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD",  0, DXGI_FORMAT_R32_FLOAT,          0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	UINT count = sizeof(layout) / sizeof(layout[0]);
+	shared_ptr<Inputlayout> inputlayout = make_shared<Inputlayout>();
+	inputlayout->Load(_pCode, layout, count);
+	inputlayout->m_szName = L"Particle";
+	m_mList.insert(make_pair(L"Particle", inputlayout));
+
+	return true;
+}
+
 shared_ptr<Inputlayout> InputlayoutManager::Get(wstring _name)
 {
 	auto target = m_mList.find(_name);
