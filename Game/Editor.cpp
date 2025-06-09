@@ -671,7 +671,7 @@ void Editor::CreateObjectAtMousePick()
 	Box box = static_pointer_cast<UBoxComponent>(terrain->GetShapeComponent())->GetBounds();
 	Vec3 hitPos;
 
-	if (!Collision::CheckOBBToRay(ray, box, hitPos))
+	if (!Collision::CheckRayToOBB(ray, box, hitPos))
 		return;
 
 	float x = hitPos.x;

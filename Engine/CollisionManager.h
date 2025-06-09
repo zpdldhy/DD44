@@ -26,12 +26,14 @@ public:
     // Ray
     static bool CheckRayToPlane(const Ray& _ray, const Plane& _plane);
     static bool CheckMousePicking(const Ray& _ray, const Vec3& _v0, const Vec3& _v1, const Vec3& _v2, const Vec3& _normal, Vec3& _inter);
+    static bool CheckRayToAABB(const Ray& _ray, const Box& _box, Vec3& _inter);
+    static bool CheckRayToOBB(const Ray& _ray, const Box& _box, Vec3& inter);
+
     // Box
-    static bool CheckAABBToRay(const Ray& _ray, const Box& _box, Vec3& _inter);
-    static bool CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter);
     static bool CheckOBBToOBB(const Box& _box0, const Box& _box1);
+
     // Sphere
-    static bool CheckSphereToSphere(const Sphere& _Sphere0, const Sphere& _Sphere1, Vec3& _normal);
+    static bool CheckSphereToSphere(const Sphere& _Sphere0, const Sphere& _Sphere1, Vec3& _inter);
     static bool CheckSphereToOBB(const Sphere& _Sphere, const Box& _Box, Vec3& _Inter);
 
     static bool GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& _inter);

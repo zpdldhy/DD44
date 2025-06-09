@@ -29,6 +29,11 @@ enum class ActorType
 	AT_COUNT,
 };
 
+struct CollisionData
+{
+	Vec3 Inter = { 0.f, 0.f, 0.f };
+};
+
 class AActor : public enable_shared_from_this<AActor>
 {
 public:

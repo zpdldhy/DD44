@@ -201,12 +201,14 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 
 			if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
 				shapeComp = std::make_shared<UBoxComponent>();
+			else if(objData.ShapeData.eShapeType == ShapeType::ST_SPHERE)
+				shapeComp = std::make_shared<USphereComponent>();
 			// else if (...) // 다른 타입 추가 가능
 
 			shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));
 			shapeComp->SetLocalPosition(Vec3(objData.ShapeData.Position));
 			shapeComp->SetLocalRotation(Vec3(objData.ShapeData.Rotation));
-			shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+			shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 
 			obj->SetShapeComponent(shapeComp);
 		}
@@ -252,7 +254,7 @@ vector<shared_ptr<APawn>> PrefabToActor::MakeObjects(const string& _file)
 				shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));
 				shapeComp->SetLocalPosition(Vec3(objData.ShapeData.Position));
 				shapeComp->SetLocalRotation(Vec3(objData.ShapeData.Rotation));
-				shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+				shapeComp->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 
 				obj->SetShapeComponent(shapeComp);
 			}
