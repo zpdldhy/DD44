@@ -209,7 +209,7 @@ void PlayerMoveScript::Tick()
 
 	m_vLook.Normalize();
 	m_vRight.Normalize();
-		
+
 	Vec3 moveDir;
 	if (INPUT->GetButtonDown(W))
 	{
@@ -339,7 +339,7 @@ void PlayerMoveScript::Slash()
 
 void PlayerMoveScript::SetUI()
 {
-	m_vHPUI= PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
+	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
 	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
 	UI->AddUIList(m_vHPUI);
 	UI->AddUIList(m_vArrowUI);
@@ -349,7 +349,14 @@ void PlayerMoveScript::UpdateHPUI()
 {
 	Color RestColor;
 
-	if (m_vHP == 4)
+	static float currentTime = 0.0f;
+	static float damageTime = 0.0f;
+
+	damageTime += currentTime = TIMER->GetDeltaTime();
+
+	switch (m_vHP)
+	{
+	case 4:
 	{
 		RestColor = fullHP;
 		RestColor.w = -0.5f;
@@ -358,56 +365,52 @@ void PlayerMoveScript::UpdateHPUI()
 		m_vHPUI[1]->SetColor(RestColor);
 		m_vHPUI[2]->SetColor(RestColor);
 		m_vHPUI[3]->SetColor(fullHP);
-
-		m_vHPUI[0]->m_bRender = true;
-		m_vHPUI[1]->m_bRender = true;
-		m_vHPUI[2]->m_bRender = true;
-		m_vHPUI[3]->m_bRender = true;
 	}
+	break;
 
-	// 데미지를 입었을 시, UI Animation
-	if (m_bHPUIChange)
+	case 3:
 	{
-		static float currentTime = 0.0f;
-		static float damageTime = 0.0f;
-
-		damageTime += currentTime = TIMER->GetDeltaTime();
-
-		if (m_vHP == 3)
+		if (m_vHPUI[2]->GetColor().w < 0.f && m_bHPUIChange)
 		{
-			if (m_vHPUI[2]->GetColor().w < 0.f)
-				m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-			else
-				m_bHPUIChange = false;
-
-			m_vHPUI[3]->m_bRender = false;
+			m_vHPUI[3]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
 		}
-		else if (m_vHP == 2)
-		{
-			if (m_vHPUI[1]->GetColor().w < 0.f)
-				m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-			else
-				m_bHPUIChange = false;
-
-			m_vHPUI[2]->m_bRender = false;
-		}
-		else if (m_vHP == 1)
-		{
-			if (m_vHPUI[0]->GetColor().w < 0.f)
-				m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-			else
-				m_bHPUIChange = false;
-
-			m_vHPUI[1]->m_bRender = false;
-		}
-		else if (m_vHP == 0)
-		{
-			m_vHPUI[0]->m_bRender = false;
-			m_vHPUI[1]->m_bRender = false;
-			m_vHPUI[2]->m_bRender = false;
-			m_vHPUI[3]->m_bRender = false;
-		}
+		else
+			m_bHPUIChange = false;
 	}
+	break;
+
+	case 2:
+	{
+		if (m_vHPUI[1]->GetColor().w < 0.f && m_bHPUIChange)
+		{
+			m_vHPUI[2]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+		}
+		else
+			m_bHPUIChange = false;
+	}
+	break;
+
+	case 1:
+	{
+		if (m_vHPUI[0]->GetColor().w < 0.f && m_bHPUIChange)
+		{
+			m_vHPUI[1]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+		}
+		else
+			m_bHPUIChange = false;
+	}
+	break;
+
+	case 0:
+	{
+		m_vHPUI[0]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+	}
+	break;
+	}
+
 
 	if (m_vHP > 4)
 		m_vHP = 4;

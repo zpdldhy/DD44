@@ -6,8 +6,6 @@
 
 struct UIData
 {
-	// x는 left, y는 right, z는 top, w는 bottom
-	Vec4 vSlice;
 	Color vColor;
 };
 
@@ -26,7 +24,8 @@ public:
 
 private:
 	void TextRender();
-	void CreateUISlice();
+	void CreateUIData();
+	void CreateUVSlice();
 	void CreateText();
 	void UpdateText();
 
@@ -41,7 +40,7 @@ public:
 	void SetSelectTexture(shared_ptr<Texture> _pTexture) { m_pSelectTexture = _pTexture; }
 
 	// 9-slice
-	void SetSliceData(const Vec4& _vSlice) { m_tUISliceData.vSlice = _vSlice; }
+	void SetSliceData(const Vec4& _vSlice) { m_vSlice = _vSlice; }
 	void SetColor(const Color& _vColor) { m_tUISliceData.vColor = _vColor; }
 	void AddColor(const Color& _vColor){ m_tUISliceData.vColor += _vColor; }
 	Color GetColor() { return m_tUISliceData.vColor; }
@@ -63,8 +62,8 @@ public:
 
 protected:
 	// Constants
-	UIData m_tUISliceData = { {0.5f, 0.5f, 0.5f, 0.5f}, {0.f, 0.f, 0.f, 0.f} };
-	static ComPtr<ID3D11Buffer> m_pUISliceCB;
+	UIData m_tUISliceData = { {0.f, 0.f, 0.f, 0.f} };
+	static ComPtr<ID3D11Buffer> m_pUICB;
 
 	// State
 	shared_ptr<UIState> m_pState = nullptr;
@@ -75,6 +74,13 @@ protected:
 	shared_ptr<Texture> m_pHoverTexture = nullptr;
 	shared_ptr<Texture> m_pActiveTexture = nullptr;
 	shared_ptr<Texture> m_pSelectTexture = nullptr;
+
+	// Slice-9
+	// x는 left, y는 right, z는 top, w는 bottom
+	// 픽셀 단위로 생각 할 것.
+	bool m_bSliceActor = false;
+	vector<shared_ptr<AUIActor>> m_vSliceActor;
+	Vec4 m_vSlice = { 0.5f, 0.5f, 0.5f, 0.5f };
 
 	// Font
 	wstring m_szFontPath = L"../Resources/Font/LibreBaskerville-Regular.ttf";

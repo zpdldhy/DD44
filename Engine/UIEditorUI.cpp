@@ -71,6 +71,7 @@ void UIEditorUI::DrawUI()
         }
 
 		m_vSelectedIndex.clear();
+        m_pUIActor = nullptr;
         ResetData();
 
         return;
@@ -312,7 +313,10 @@ void UIEditorUI::UpdateUIActorList()
             if(INPUT->GetButtonDown(LSHIFT))
 				m_vSelectedIndex.insert(index);
             else
-				m_vSelectedIndex.clear();
+            {
+                m_vSelectedIndex.clear();
+                m_vSelectedIndex.insert(index);
+            }
 
             m_CurrentPrefab = pUI->GetPrefabData();
             ResolvePrefabData(m_CurrentPrefab);

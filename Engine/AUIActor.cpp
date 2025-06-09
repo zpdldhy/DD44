@@ -3,12 +3,16 @@
 #include "UMaterial.h"
 #include "DxWrite.h"
 
-ComPtr<ID3D11Buffer> AUIActor::m_pUISliceCB = nullptr;
+ComPtr<ID3D11Buffer> AUIActor::m_pUICB = nullptr;
 
 void AUIActor::Init()
 {
+	//if (m_bSliceActor == false)
+		//m_bRender = false;
+
 	AActor::Init();
-	CreateUISlice();
+	CreateUIData();
+	CreateUVSlice();
 	CreateText();
 }
 
@@ -47,10 +51,10 @@ void AUIActor::Render()
 		return;
 	}
 
-	if (m_pUISliceCB)
+	if (m_pUICB)
 	{
-		DC->UpdateSubresource(m_pUISliceCB.Get(), 0, nullptr, &m_tUISliceData, 0, 0);
-		DC->PSSetConstantBuffers(3, 1, m_pUISliceCB.GetAddressOf());
+		DC->UpdateSubresource(m_pUICB.Get(), 0, nullptr, &m_tUISliceData, 0, 0);
+		DC->PSSetConstantBuffers(3, 1, m_pUICB.GetAddressOf());
 	}
 
 	AActor::Render();
@@ -64,9 +68,9 @@ void AUIActor::TextRender()
 	m_pText->Draw(pos);
 }
 
-void AUIActor::CreateUISlice()
+void AUIActor::CreateUIData()
 {
-	if (m_pUISliceCB != nullptr)
+	if (m_pUICB != nullptr)
 		return;
 
 	D3D11_BUFFER_DESC bd;
@@ -79,11 +83,27 @@ void AUIActor::CreateUISlice()
 	ZeroMemory(&sd, sizeof(sd));
 	sd.pSysMem = &m_tUISliceData;
 
-	HRESULT hr = DEVICE->CreateBuffer(&bd, &sd, m_pUISliceCB.GetAddressOf());
+	HRESULT hr = DEVICE->CreateBuffer(&bd, &sd, m_pUICB.GetAddressOf());
 
 	if (FAILED(hr))
 	{
 		DX_CHECK(hr, _T("CreateUISliceBuffer Failed"));
+	}
+}
+
+void AUIActor::CreateUVSlice()
+{
+	// SliceActor면 생성하지 말것
+	if (m_bSliceActor == true)
+		return;
+
+	// 9개의 Mesh를 생성
+	m_vSliceActor.resize(9);
+
+	for (int i = 0; i < 9; i++)
+	{
+		m_vSliceActor[i] = make_shared<AUIActor>();
+		m_vSliceActor[i]->m_bSliceActor = true;
 	}
 }
 

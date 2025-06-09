@@ -3,9 +3,6 @@
 
 DWORD Input::CheckKey(DWORD _dwKey)
 {
-	if (GetForegroundWindow() != g_hWnd)
-		return KEY_FREE;
-
 	SHORT sKey = GetAsyncKeyState(_dwKey);
 	if (sKey & 0x8000 || sKey & 0x8001)
 	{
