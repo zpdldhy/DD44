@@ -2,11 +2,6 @@
 #include "UPrimitiveComponent.h"
 #include <set>
 
-struct CollisionData
-{
-	Vec3 Inter = { 0.f, 0.f, 0.f };
-};
-
 enum class CollisionEnabled
 {
 	CE_NOCOLLISION,

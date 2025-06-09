@@ -340,7 +340,7 @@ void TestYoooooon::CreateCollisionObject()
 		pCube->SetMaterial(pMaterial);
 
 		auto boxCol = make_shared<UBoxComponent>();
-		boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 		m_pBox->SetShapeComponent(boxCol);
 
 		m_pBox->SetScale(Vec3(30.f, 30.f, 30.f));
@@ -362,7 +362,7 @@ void TestYoooooon::CreateCollisionObject()
 		pCube->SetMaterial(pMaterial);
 
 		auto boxCol = make_shared<USphereComponent>();
-		boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 		m_pSphere->SetShapeComponent(boxCol);
 
 		m_pSphere->SetScale(Vec3(30.f, 30.f, 30.f));
@@ -381,7 +381,7 @@ void TestYoooooon::ClickMouse()
 
 	Vec3 vinter;
 
-	if (Collision::CheckOBBToRay(m_Cursor, boxCom->GetBounds(), vinter))
+	if (Collision::CheckRayToOBB(m_Cursor, boxCom->GetBounds(), vinter))
 	{
 		int a = 0;
 	}

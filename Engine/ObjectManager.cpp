@@ -172,6 +172,10 @@ void ObjectManager::CollisionStabilization()
 		
 		for (auto& ColData : pActor->m_vCollisionList)
 		{
+			auto pObj = GetActor(ColData.first);
+			auto ObjShape = pObj->GetShapeComponent();
+			if (ObjShape->GetCollisionType() == CollisionEnabled::CE_QUERYONLY) continue;
+
 			auto inter = ColData.second.Inter;
 			auto diff = pShape->GetCenter() - inter;
 			auto normal = diff;

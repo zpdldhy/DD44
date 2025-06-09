@@ -240,7 +240,7 @@ bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, sh
 		{
 			auto box = static_pointer_cast<UBoxComponent>(pObj->GetShapeComponent());
 
-			if (CheckOBBToRay(_ray, box->GetBounds(), inter))
+			if (CheckRayToOBB(_ray, box->GetBounds(), inter))
 			{
 				float interdis = Vec3::Distance(inter, _ray.position);
 				if (dis < interdis)continue;
@@ -297,7 +297,7 @@ bool Collision::CheckMousePicking(const Ray& _ray, const Vec3& _v0, const Vec3& 
 	return PointInPolygon(_inter, _normal, _v0, _v1, _v2);
 }
 
-bool Collision::CheckAABBToRay(const Ray& _ray, const Box& _box, Vec3& _inter)
+bool Collision::CheckRayToAABB(const Ray& _ray, const Box& _box, Vec3& _inter)
 {
 	float fMin = 0.f;
 	float fMax = 999999.f;
@@ -374,7 +374,7 @@ bool Collision::CheckAABBToRay(const Ray& _ray, const Box& _box, Vec3& _inter)
 	return true;
 }
 
-bool Collision::CheckOBBToRay(const Ray& _ray, const Box& _box, Vec3& inter)
+bool Collision::CheckRayToOBB(const Ray& _ray, const Box& _box, Vec3& inter)
 {
 	float fMin = -999999.f;
 	float fMax = +999999.f;

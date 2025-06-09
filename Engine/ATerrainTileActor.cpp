@@ -39,7 +39,7 @@ bool ATerrainTileActor::CreateTerrain(const wstring& _texturePath, const wstring
 	float depth = m_iNumRows * m_fCellSize;
 	box->SetLocalScale(Vec3(width, 1.0f, depth));
 	box->SetLocalPosition(Vec3(0, -0.5f, 0));
-	box->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	box->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 	SetShapeComponent(box);
 
 	SetMeshComponent(m_pTerrainMeshComponent);
