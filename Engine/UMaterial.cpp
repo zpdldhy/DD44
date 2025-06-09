@@ -47,7 +47,7 @@ void UMaterial::Bind()
 
     if (m_CB_SpriteUV)
     {
-        m_CB_SpriteUV->Push();  // b4 register에 UV 범위 바인딩
+        m_CB_SpriteUV->Push();  
     }
 }
 
