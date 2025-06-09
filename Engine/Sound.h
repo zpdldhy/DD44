@@ -13,7 +13,6 @@ enum class ESoundType
 	Stage1,
 	Boss2,
 	STage2,
-	Die,
 	Ending,
 
 	//Charactor
@@ -21,6 +20,7 @@ enum class ESoundType
 	Dash,
 	Walk,
 	Hit,
+	Die,
 
 	//Bat
 	Attack_Bat,
@@ -47,7 +47,6 @@ private:
 
 	// BGM용 채널
 	FMOD::Channel* m_pChannel = nullptr;
-
 	// 효과음용 채널리스트
 	std::vector<FMOD::Channel*> m_pEffectChannels;
 
