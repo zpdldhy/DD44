@@ -171,8 +171,8 @@ void Engine::Release()
 void Engine::Run()
 {
 	_window.SetWindowClass(_hInstance);	
-	_window.SetWindow();
-	//_window.SetWindowFullScreen();
+	//_window.SetWindow();
+	_window.SetWindowFullScreen();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 		GUI->CreateImGuiWindow(_hInstance);
