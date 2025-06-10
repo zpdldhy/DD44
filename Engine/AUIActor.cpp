@@ -191,12 +191,12 @@ void AUIActor::UpdateUVSlice()
 	float SlicePosY[3];
 
 	SlicePosX[0] = pos.x - scale.x * (0.5f - (m_vSlice.x / 2.f));
-	SlicePosX[1] = pos.x;
 	SlicePosX[2] = pos.x + scale.x * (0.5f - (m_vSlice.y / 2.f));
+	SlicePosX[1] = ((SlicePosX[0] + (SliceScaleX[0] / 2.f)) + (SlicePosX[2] - (SliceScaleX[2] / 2.f))) / 2.f;
 
 	SlicePosY[0] = pos.y + scale.y * (0.5f - (m_vSlice.z / 2.f));
-	SlicePosY[1] = pos.y;
 	SlicePosY[2] = pos.y - scale.y * (0.5f - (m_vSlice.w / 2.f));
+	SlicePosY[1] = ((SlicePosY[0] - (SliceScaleY[0] / 2.f)) + (SlicePosY[2] + (SliceScaleY[2] / 2.f))) / 2.f;
 
 	for (int iRow = 0; iRow < 3; iRow++)
 	{
@@ -205,6 +205,11 @@ void AUIActor::UpdateUVSlice()
 			m_vSliceActor[3 * iRow + iCol]->SetScale(Vec3(SliceScaleX[iCol], SliceScaleY[iRow], 1.f));
 			m_vSliceActor[3 * iRow + iCol]->SetPosition(Vec3(SlicePosX[iCol], SlicePosY[iRow], pos.z));
 			m_vSliceActor[3 * iRow + iCol]->SetStateType(m_eStateType);
+
+			m_vSliceActor[3 * iRow + iCol]->SetIdleTexture(m_pIdleTexture);
+			m_vSliceActor[3 * iRow + iCol]->SetHoverTexture(m_pHoverTexture);
+			m_vSliceActor[3 * iRow + iCol]->SetActiveTexture(m_pActiveTexture);
+			m_vSliceActor[3 * iRow + iCol]->SetSelectTexture(m_pSelectTexture);
 		}
 	}
 	
