@@ -132,6 +132,18 @@ void UMaterial::SetEmissiveParams(const Vec3& _color, float _power)
 }
 
 
+void UMaterial::SetIsMetal(bool _bMetal, float _shininess)
+{
+    if (_bMetal)
+    {
+        m_tEffectData.g_vSpecularCoeff = { 1,1,1 };
+        m_tEffectData.g_fShininess = _shininess;
+    }
+    
+    UpdateEffectBuffer();
+}
+
+
 void UMaterial::SetTintColor(const Vec4& color)
 {
     m_tEffectData.TintColor = color;
