@@ -8,8 +8,8 @@ Vec3 ABeamActor::Prepare(const Vec3& _pos, const Vec3& baseVelocity, float _scal
     //pos.y += 5.f;
     SetPosition(pos);
     SetGravity(0.0f);
-    SetStartScale(Vec3(5.0f, 1.0f, 0.5f));
-    SetEndScale(Vec3(13.0f, 1.0f, 3.5f));
+    SetStartScale(Vec3(5.0f, 1.0f, 0.5f) * _scale);
+    SetEndScale(Vec3(13.0f, 1.0f, 3.5f) * _scale);
 
     // 방향 벡터 기준 회전 적용
     Vec3 dir = baseVelocity;
