@@ -23,8 +23,8 @@ Vec3 APoppingDust::Prepare(const Vec3& pos, const Vec3& baseVelocity, float scal
     SetGravity(3.0f);
 
     // 작게 시작해서 부드럽게 사라짐
-    SetStartScale(Vec3(5.5f));
-    SetEndScale(Vec3(8.5f)); // 아주 부드럽게 퍼지게
+    SetStartScale(Vec3(5.5f) * scale);
+    SetEndScale(Vec3(8.5f) * scale); // 아주 부드럽게 퍼지게
 
     InitSpriteAnimation(4, 0.5f);
 

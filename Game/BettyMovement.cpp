@@ -38,9 +38,9 @@ void BettyMovement::Tick()
 	if (INPUT->GetButton(K))
 	{
 		Vec3 pos = GetOwner()->GetPosition();
-		EFFECT->PlayDustBurst(pos, 10.f);
-		EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero);
-		EFFECT->PlayBeamBurst(pos, 20);
+		EFFECT->PlayDustBurst(pos, 10.f, .5f);
+		EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .5f);
+		EFFECT->PlayBeamBurst(pos, 20, .5f);
 	}
 
 	//// 1회성 Intro 재생
