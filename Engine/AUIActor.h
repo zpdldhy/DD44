@@ -24,8 +24,9 @@ public:
 
 private:
 	void TextRender();
-	void CreateUIData();
+	void CreateUIData();	
 	void CreateUVSlice();
+	void UpdateUVSlice();
 	void CreateText();
 	void UpdateText();
 
@@ -76,10 +77,11 @@ protected:
 	shared_ptr<Texture> m_pSelectTexture = nullptr;
 
 	// Slice-9
-	// x는 left, y는 right, z는 top, w는 bottom
-	// 픽셀 단위로 생각 할 것.
+	bool m_bUseSliceActor = false;
 	bool m_bSliceActor = false;
 	vector<shared_ptr<AUIActor>> m_vSliceActor;
+	// 픽셀 단위로 생각 할 것.
+	// x는 left, y는 right, z는 top, w는 bottom
 	Vec4 m_vSlice = { 0.5f, 0.5f, 0.5f, 0.5f };
 
 	// Font
