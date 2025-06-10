@@ -2,30 +2,38 @@
 #include "Singleton.h"
 #include "DxState.h"
 
-enum class BlendType{
+enum class BlendType
+{
     Opaque,
     AlphaBlend,
     Additive,
     Multiply,
     Premultiplied,
-    DualSource };
+    DualSource 
+};
 
-enum class DepthType { 
+enum class DepthType 
+{ 
     ZTestOn_ZWriteOn,
     ZTestOn_ZWriteOff,
-    ZTestOff };
+    ZTestOff 
+};
 
-enum class CullType {
+enum class CullType 
+{
     Back,
     Front,
-    None };
+    None
+};
 
-enum class SamplerType { 
+enum class SamplerType 
+{ 
     Linear,
     Point,
     Clamp,
     Mirror,
-    Border };
+    Border
+};
 
 struct RenderOption
 {

@@ -25,8 +25,8 @@ struct CB_MaterialEffect
 	Vec3   g_vDiffuseCoeff = Vec3(1, 1, 1);
 	float  g_fDiffusePower = 1.0f;
 
-	Vec3   g_vSpecularCoeff = Vec3(1,1,1);   
-	float  g_fShininess = 32.0f;
+	Vec3   g_vSpecularCoeff = Vec3(0,0,0);   
+	float  g_fShininess = 10.0f;
 
 	Vec4 TintColor = Vec4(1, 1, 1, 1);
 };
@@ -35,7 +35,7 @@ struct CB_Material
 {
 	Vec4 vAmbient;
 	Vec4 vDiffuse;
-	Vec4 vSpecular; // a = shininess
+	Vec4 vSpecular;
 	Vec4 vEmissive;
 };
 
@@ -94,8 +94,9 @@ public:
 	void SetUVDistortionParams(float _strength, float _speed, float _frequency);
 	void SetAmbientParams(const Vec3& _coeff, float _power);
 	void SetDiffuseParams(const Vec3& _coeff, float _power);
-	void SetSpecularParams(const Vec3& _coeff, float _shininess);
+	void SetSpecularParams(const Vec3& _coeff, float _shininess = 10.f);
 	void SetUseEffect(bool _bUseEffect) { m_bUseEffect = _bUseEffect; }
+	void SetIsMetal(bool _bMetal, float _shininess);
 	bool IsUseEffect() { return m_bUseEffect; }
 	void SetUVRange(Vec2 start, Vec2 end);
 	void SetTintColor(const Vec4& color);

@@ -171,8 +171,6 @@ void SoundManager::LoadAllSounds()
 	//UI
 	Load(ESoundType::Hover, L"../Resources/Sound/ui_hover.wav");
 	Load(ESoundType::Click, L"../Resources/Sound/ui_save.wav");
-
-	
 }
 
 Sound* SoundManager::GetPtr(ESoundType type)

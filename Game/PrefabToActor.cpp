@@ -209,6 +209,8 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 
 			if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
 				shapeComp = std::make_shared<UBoxComponent>();
+			else if(objData.ShapeData.eShapeType == ShapeType::ST_SPHERE)
+				shapeComp = std::make_shared<USphereComponent>();
 			// else if (...) // 다른 타입 추가 가능
 
 			shapeComp->SetLocalScale(Vec3(objData.ShapeData.Scale));

@@ -1,27 +1,34 @@
 #include "pch.h"
 #include "TestYoooooon.h"
+
+// Manager
+#include "Input.h"
 #include "ImGuiCore.h"
 #include "ObjectManager.h"
 #include "CameraManager.h"
-#include "ACameraActor.h"
-#include "ASky.h"
+#include "LightManager.h"
+#include "CollisionManager.h"
+#include "UIManager.h"
+#include "MeshLoader.h"
+#include "AssimpLoader.h"
+#include "DxWrite.h"
+#include "PrefabToActor.h"
+
+// Actor
 #include "ATerrainTileActor.h"
+#include "ACameraActor.h"
+#include "ALight.h"
+#include "ASky.h"
+#include "AUIActor.h"
+
+// Component
 #include "UStaticMeshComponent.h"
+#include "UBoxComponent.h"
+#include "USphereComponent.h"
+
+// Script
 #include "EngineCameraMoveScript.h"
 #include "PlayerMoveScript.h"
-#include "AssimpLoader.h"
-#include "LightManager.h"
-#include "ALight.h"
-#include "MeshLoader.h"
-#include "Input.h"
-#include "UBoxComponent.h"
-#include "AUIActor.h"
-#include "UIManager.h"
-#include "ShapeData.h"
-#include "CollisionManager.h"
-#include "DxWrite.h"
-
-#include "PrefabToActor.h"
 
 void TestYoooooon::Init()
 {
@@ -321,23 +328,49 @@ void TestYoooooon::SetupUIEditorCallback()
 
 void TestYoooooon::CreateCollisionObject()
 {
-	m_pBox = make_shared<AActor>();
+	{
+		m_pBox = make_shared<AActor>();
 
-	auto pCube = UStaticMeshComponent::CreateCube();
-	m_pBox->SetMeshComponent(pCube);
+		auto pCube = UStaticMeshComponent::CreateCube();
+		m_pBox->SetMeshComponent(pCube);
+		m_pBox->m_szName = L"Stair";
 
-	auto pMaterial = make_shared<UMaterial>();
-	pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
-	pCube->SetMaterial(pMaterial);
+		auto pMaterial = make_shared<UMaterial>();
+		pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		pCube->SetMaterial(pMaterial);
 
-	auto boxCol = make_shared<UBoxComponent>();
-	boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
-	m_pBox->SetShapeComponent(boxCol);
+		auto boxCol = make_shared<UBoxComponent>();
+		boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
+		m_pBox->SetShapeComponent(boxCol);
 
-	m_pBox->SetScale(Vec3(30.f, 30.f, 30.f));
-	m_pBox->SetPosition(Vec3(0.f, 10.f, 0.f));
+		m_pBox->SetScale(Vec3(30.f, 30.f, 30.f));
+		m_pBox->SetRotation(Vec3(0.f, 0.f, DD_PI / 8.f));
+		m_pBox->SetPosition(Vec3(0.f, -10.f, 0.f));
 
-	OBJECT->AddActor(m_pBox);
+		OBJECT->AddActor(m_pBox);
+	}
+
+	{
+		m_pSphere = make_shared<AActor>();
+
+		auto pCube = UStaticMeshComponent::CreateSphere(20.f, 20.f);
+		m_pSphere->SetMeshComponent(pCube);
+		m_pSphere->m_szName = L"Stair";
+
+		auto pMaterial = make_shared<UMaterial>();
+		pMaterial->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		pCube->SetMaterial(pMaterial);
+
+		auto boxCol = make_shared<USphereComponent>();
+		boxCol->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
+		m_pSphere->SetShapeComponent(boxCol);
+
+		m_pSphere->SetScale(Vec3(30.f, 30.f, 30.f));
+		m_pSphere->SetRotation(Vec3(0.f, 0.f, 0.f));
+		m_pSphere->SetPosition(Vec3(-50.f, -10.f, -50.f));
+
+		OBJECT->AddActor(m_pSphere);
+	}
 }
 
 void TestYoooooon::ClickMouse()
@@ -348,7 +381,7 @@ void TestYoooooon::ClickMouse()
 
 	Vec3 vinter;
 
-	if (Collision::CheckOBBToRay(m_Cursor, boxCom->GetBounds(), vinter))
+	if (Collision::CheckRayToOBB(m_Cursor, boxCom->GetBounds(), vinter))
 	{
 		int a = 0;
 	}
@@ -357,6 +390,7 @@ void TestYoooooon::ClickMouse()
 void TestYoooooon::CheckCollision()
 {
 	COLLITION->CheckCollision(m_pPlayer, m_pBox);
+	COLLITION->CheckCollision(m_pPlayer, m_pSphere);
 
 	for (auto& ground : m_vGround)
 		COLLITION->CheckCollision(m_pPlayer, ground);

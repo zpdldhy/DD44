@@ -69,11 +69,11 @@ void PlayerWalkState::Tick()
 	if (m_fDustTimer >= 0.5f)
 	{
 		Vec3 pos = owner->GetPosition();
-		Vec3 dir = owner->GetLook();
+		Vec3 dir = owner->GetLook() * -1.f;
 		pos.y += 0.3f;
 
-		Vec3 dustVelocity = dir * 20.0f + Vec3(0, 5.0f, 0);
-		EFFECT->PlayEffect(EEffectType::Dust, pos, 10.0f, dustVelocity);
+		Vec3 dustVelocity = dir * 0.0f + Vec3(0, 3.0f, 0);
+		EFFECT->PlayEffect(EEffectType::Dust, pos, 0.0f, dustVelocity);
 
 		m_fDustTimer = 0.0f;
 	}
@@ -251,10 +251,10 @@ void PlayerRollState::Tick()
 	// 먼지 반복 생성
 	m_fDustSpawnTimer += TIMER->GetDeltaTime();
 
-	if (m_iDustSpawnCount < 3 && m_fDustSpawnTimer >= 0.15f)
+	if (m_iDustSpawnCount < 3 && m_fDustSpawnTimer >= 0.17f)
 	{
 		Vec3 pos = owner->GetPosition();
-		Vec3 dir = owner->GetLook();
+		Vec3 dir = owner->GetLook() * -1.f;
 		pos.y += 0.3f;
 
 		Vec3 dustVelocity = dir * 20.0f + Vec3(0, 5.0f, 0);

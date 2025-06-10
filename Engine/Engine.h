@@ -17,6 +17,9 @@ class Engine : public Singleton<Engine>
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
 
 public:
+	bool m_bGamePaused = false;
+
+public:
 	void Init();
 	void Frame();
 	void Render();

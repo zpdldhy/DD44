@@ -17,7 +17,6 @@ class ObjectManager : public Singleton<ObjectManager>
 {
 	static UINT ActorCount;
 	map<UINT, shared_ptr<class AActor>> m_vActorList;
-	vector<shared_ptr<class AActor>> m_vRenderActorList;	// Render 이후 Clear
 	vector<UINT> m_vActorIndexList;		// 임시 사용
 
 	// Stencil Check용

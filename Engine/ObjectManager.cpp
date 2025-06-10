@@ -30,7 +30,6 @@ void ObjectManager::Tick()
 		else
 		{
 			pActor->second->Tick();
-			m_vRenderActorList.emplace_back(pActor->second);	// 임시 사용.
 			pActor++;
 		}		
 	}
@@ -171,23 +170,25 @@ void ObjectManager::CollisionStabilization()
 		if (pActor->m_vCollisionList.empty()) continue;
 		auto pShape = pActor->GetShapeComponent();
 		if (pShape == nullptr) continue;
-
-		auto pSphere = dynamic_pointer_cast<USphereComponent>(pShape);
-		if (!pSphere)
-		{
-			continue;
-		}
-
+		
 		for (auto& ColData : pActor->m_vCollisionList)
 		{
+			auto pObj = GetActor(ColData.first);
+			auto ObjShape = pObj->GetShapeComponent();
+			if (ObjShape->GetCollisionType() == CollisionEnabled::CE_QUERYONLY) continue;
+
 			auto inter = ColData.second.Inter;
 			auto diff = pShape->GetCenter() - inter;
 			auto normal = diff;
 			normal.Normalize();
 
-			auto radius = pSphere->GetBounds().fRadius;
+			float len = 0.f;
 
-			auto len = pSphere->GetBounds().fRadius - diff.Length();
+			if (pShape->GetShapeType() == ShapeType::ST_SPHERE) 
+			{
+				auto pSphere = dynamic_pointer_cast<USphereComponent>(pShape);				
+				len = pSphere->GetBounds().fRadius - diff.Length();
+			}
 
 			pActor->AddPosition(normal * len);
 			if (pActor->GetShapeComponent())
@@ -201,8 +202,9 @@ void ObjectManager::CollisionStabilization()
 
 void ObjectManager::CheckStencilList()
 {
-	for (auto& pActor : m_vRenderActorList)
+	for (auto& iter : m_vActorList)
 	{
+		auto pActor = iter.second;
 		if (pActor->m_bRender == false) continue;
 
 		if (pActor->m_bUseStencil == false)
@@ -214,7 +216,6 @@ void ObjectManager::CheckStencilList()
 
 void ObjectManager::ClearRenderList()
 {
-	m_vRenderActorList.clear();
 	m_vPreRenderActorList.clear();
 	m_vPostRenderActorList.clear();
 	//m_vActorIndexList.clear();	// 임시 사용

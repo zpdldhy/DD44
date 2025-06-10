@@ -13,6 +13,7 @@
 #include "EffectManager.h"
 #include "Sound.h"
 #include "WindManager.h"
+#include "Engine.h"
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -76,31 +77,30 @@ void Game::Init()
 
 	PROJECTILE->Init();
 
-	//{
-	//	auto wind = std::make_shared<AWindActor>();
-	//	wind->SetPosition(Vec3(0.f, 0.f, 0.95f));     // 살짝 앞쪽 Z (카메라 무시 대상)
-	//	wind->SetScale(Vec3(0.5f, 0.05f, 1.f));      // 바람 길이, 너비 조절
-	//	wind->SetRotation(Vec3(0, 0, 3));
-	//	WIND->AddWind(wind);
-	//}
 }
 
 void Game::Tick()
 {
+	if (INPUT->GetButton(GameKey::ESC))
+		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
+
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
 	//bgm
 	{
 		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
 	}
-	
-	if (INPUT->GetButton(L))
+	//wind	
 	{
-		m_bWind = !m_bWind;
-	}
+		if (INPUT->GetButton(M))
+		{
+			m_bWind = !m_bWind;
+		}
 
-	if(m_bWind)
-	CreateWind();
+		if (m_bWind)
+			CreateWind();
+
+	}
 	
 	if (INPUT->GetButton(O))
 	{

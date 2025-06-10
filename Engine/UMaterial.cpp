@@ -47,7 +47,7 @@ void UMaterial::Bind()
 
     if (m_CB_SpriteUV)
     {
-        m_CB_SpriteUV->Push();  // b4 register에 UV 범위 바인딩
+        m_CB_SpriteUV->Push();  
     }
 }
 
@@ -128,6 +128,18 @@ void UMaterial::SetEmissiveParams(const Vec3& _color, float _power)
 {
     m_tEffectData.g_vEmissiveColor = _color;
     m_tEffectData.g_fEmissivePower = _power;
+    UpdateEffectBuffer();
+}
+
+
+void UMaterial::SetIsMetal(bool _bMetal, float _shininess)
+{
+    if (_bMetal)
+    {
+        m_tEffectData.g_vSpecularCoeff = { 1,1,1 };
+        m_tEffectData.g_fShininess = _shininess;
+    }
+    
     UpdateEffectBuffer();
 }
 

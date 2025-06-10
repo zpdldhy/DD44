@@ -4,6 +4,9 @@
 
 HRESULT Font::Create(const wstring& _szFontPath, float _fFontSize, Color _color)
 {
+	if (!DXWRITE->m_pDxWrite)
+		return false;
+
 	DXWRITE->LoadFontResources(_szFontPath);
 
 	wstring name = m_szFontPath = _szFontPath;
@@ -32,6 +35,9 @@ HRESULT Font::Create(const wstring& _szFontPath, float _fFontSize, Color _color)
 
 HRESULT Font::CreateTextFormat(const wstring& _szFontName, float _fFontSize)
 {
+	if (!DXWRITE->m_pDxWrite)
+		return false;
+
 	if (m_pTextFormat)
 	{
 		m_pTextFormat.Reset();
