@@ -4,6 +4,8 @@
 #include <algorithm>
 #include "EffectManager.h"
 #include "UMeshComponent.h"
+#include "TCharacter.h"
+
 // temp
 #include "Input.h"
 #include "Sound.h"
@@ -55,6 +57,9 @@ void BatMovement::Init()
 
 	// Body
 	GetOwner()->m_bCollision = true;
+
+	//// 
+	//dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(1);
 }
 
 
@@ -80,37 +85,7 @@ void BatMovement::Tick()
 	}
 
 	// HIT
-	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
-	{
-		// 충돌 확인
-		if (GetOwner()->m_vCollisionList.size() > 0)
-		{
-			// Melee 인지
-			auto list = GetOwner()->m_vCollisionList;
-			bool isCol = false;
-			for (auto& index : list)
-			{
-				if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
-					isCol = true;
-			}
-
-			if (isCol)
-			{
-				// Blood FX
-				Vec3 basePos = GetOwner()->GetPosition();
-				basePos.y += RandomRange(3, 4);
-				Vec3 look = GetOwner()->GetLook();
-				velocity = -look;
-				PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
-				
-				m_fHitFlashTimer = 1.f;  // 1초 동안
-				m_bIsFlashing = true;
-
-				// Anim
-				ChangetState(death);
-			}
-		}
-	}
+	CheckHit();
 
 	if (m_bReturn)
 	{
@@ -376,5 +351,42 @@ void BatMovement::Attack()
 
 		ChangetState(attack);
 		m_bCanStartAttack = false;
+	}
+}
+
+void BatMovement::CheckHit()
+{
+	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
+	{
+		// 투사체 충돌 확인
+		auto healthComp = dynamic_pointer_cast<TCharacter>(GetOwner());
+
+		// 충돌 확인
+		bool isCol = false;
+		if (GetOwner()->m_vCollisionList.size() > 0)
+		{
+			// Melee 인지
+			auto list = GetOwner()->m_vCollisionList;
+			for (auto& index : list)
+			{
+				if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
+					isCol = true;
+			}
+		}
+		if (isCol || healthComp->IsHitByProjectile())
+		{
+			// Blood FX
+			Vec3 basePos = GetOwner()->GetPosition();
+			basePos.y += RandomRange(3, 4);
+			Vec3 look = GetOwner()->GetLook();
+			velocity = -look;
+			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
+
+			m_fHitFlashTimer = 1.f;  // 1초 동안
+			m_bIsFlashing = true;
+
+			// Anim
+			ChangetState(death);
+		}
 	}
 }

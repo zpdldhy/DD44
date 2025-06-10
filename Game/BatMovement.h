@@ -62,4 +62,5 @@ public:
 	void Flashing();
 	void Attack();
 	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
+	void CheckHit();
 };

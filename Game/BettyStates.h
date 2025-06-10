@@ -31,6 +31,7 @@ public:
 private:
 	Vec3 start;
 	Vec3 end;
+	Vec3 prevPos;
 	Vec3 velocity;
 	float height;
 	float gravity;
@@ -87,6 +88,9 @@ private:
 	JumpMotionHandler jumpHandler;
 	//// Rotate
 	float targetYaw;
+	//// Anim
+	bool bControlOnce = true;
+	float originAnimSpeed;
 public:
 	BettyJumpAttack(weak_ptr<AActor> _pOwner);
 	~BettyJumpAttack() {}
@@ -96,6 +100,9 @@ public:
 	virtual void End() override;
 public:
 	void SetTargetPos(Vec3 _pos) { targetPos = _pos; }
+public:
+	void SlowAnimSpeed();
+	void NormalizeAnimSpeed();
 };
 
 class BettyTwoHandAttack : public StateBase

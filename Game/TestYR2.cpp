@@ -36,7 +36,7 @@ void TestYR2::Init()
 #pragma endregion
 
 	loader = make_shared<ActorLoader>();
-	loader->ConvertObjToAsset();
+	//loader->ConvertObjToAsset("../Resources/Obj/Test/*.obj");
 	loader->LoadAllAsset();
 	meshResMap = loader->LoadMeshMap();
 	animList = loader->LoadAnim();

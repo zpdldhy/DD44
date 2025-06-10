@@ -4,6 +4,7 @@
 #include "Timer.h"
 #include "APawn.h"
 #include "AActor.h"
+#include "TCharacter.h"
 #include "UStaticMeshComponent.h"
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
@@ -16,6 +17,8 @@
 #include "ObjectManager.h"
 #include "EnemyCollisionManager.h"
 
+#include "ProjectileManager.h"
+
 void PlayerMoveScript::Init()
 {
 	m_fCurrentSpeed = m_fSpeed;
@@ -27,6 +30,7 @@ void PlayerMoveScript::Init()
 	roll = make_shared<PlayerRollState>(m_pOwner);
 	attack = make_shared<PlayerAttackState>(m_pOwner);
 	hit = make_shared<PlayerHitState>(m_pOwner);
+	shoot = make_shared<PlayerShootState>(m_pOwner);
 	die = make_shared<PlayerDieState>(m_pOwner);
 
 	SetUI();
@@ -58,7 +62,7 @@ void PlayerMoveScript::Init()
 	Vec3 currentRot = GetOwner()->GetRotation();
 	currentRot.y = targetYaw;
 	attackRangeActor->SetRotation(currentRot);
-	
+
 	//collider->SetLocalRotation()
 	collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 	attackRangeActor->SetShapeComponent(collider);
@@ -70,6 +74,12 @@ void PlayerMoveScript::Init()
 	OBJECT->AddActor(attackRangeActor);
 	ENEMYCOLLIDER->Add(attackRangeActor);
 	collider->m_bVisible = false;
+
+	// 
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(4);
+
+	// Texture
+
 }
 
 void PlayerMoveScript::Tick()
@@ -84,16 +94,13 @@ void PlayerMoveScript::Tick()
 	// Test
 	if (INPUT->GetButton(L))
 	{
-		m_vHP++;
+		dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(4);
 		if (currentState->GetId() == PLAYER_S_DEATH)
 		{
 			currentState->End();
 			ChangetState(idle);
 		}
 	}
-
-
-
 
 #pragma region EFFECT
 	Slash();
@@ -180,62 +187,17 @@ void PlayerMoveScript::Tick()
 	{
 		if (m_bCanBeHit)
 		{
-			// 여기 있어야 중복 안남
 			// HIT
-#pragma region TEMP_COLLISION
-			if (GetOwner()->m_vCollisionList.size() > 0)
+			CheckHit();
+
+			if (INPUT->GetButton(SPACE) && m_bCanRoll)
 			{
-				// Enemy 인지
-				auto list = GetOwner()->m_vCollisionList;
-				bool isCol = false;
-				for (auto& index : list)
-				{
-					if (OBJECT->GetActor(index.first)->m_szName == L"Enemy")
-						isCol = true;
-				}
+				// 구르기
+				m_vRollLook = GetOwner()->GetLook();
+				ChangetState(roll);
 
-				if (isCol)
-				{
-					m_bHPUIChange = true;
-					//if (INPUT->GetButton(J))
-					{
-						// Blood FX
-						Vec3 basePos = GetOwner()->GetPosition();
-						basePos.y += RandomRange(0.5, 2);
-						Vec3 look = GetOwner()->GetLook();
-						velocity = -look;
-						PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
-
-						m_fHitFlashTimer = 1.f;  // 1초 동안
-						m_bIsFlashing = true;
-
-						// Anim
-						// HP 
-						if (m_vHP != 0)
-							m_vHP -= 1;
-
-						if (m_vHP > 0)
-						{
-							ChangetState(hit);
-							m_bCanBeHit = false;
-						}
-						else
-						{
-							ChangetState(die);
-						}
-					}
-				}
+				m_bCanRoll = false;
 			}
-		}
-#pragma endregion
-
-		if (INPUT->GetButton(SPACE) && m_bCanRoll)
-		{
-			// 구르기
-			m_vRollLook = GetOwner()->GetLook();
-			ChangetState(roll);
-
-			m_bCanRoll = false;
 		}
 	}
 #pragma endregion
@@ -248,7 +210,7 @@ void PlayerMoveScript::Tick()
 
 	m_vLook.Normalize();
 	m_vRight.Normalize();
-		
+
 	Vec3 moveDir;
 	if (INPUT->GetButtonDown(W))
 	{
@@ -324,7 +286,15 @@ void PlayerMoveScript::Tick()
 		attackRangeActor->m_bCollision = true;
 		attackRangeActor->GetShapeComponent()->m_bVisible = true;
 	}
-
+	if (INPUT->GetButton(RCLICK))
+	{
+		// 단순확인용
+		ChangetState(shoot);
+		Vec3 pos = GetOwner()->GetPosition();
+		pos.y = 3.0f;
+		Vec3 look = GetOwner()->GetLook();
+		PROJECTILE->ActivateOne(ProjectileType::PlayerArrow, pos, look);
+	}
 
 }
 
@@ -347,6 +317,57 @@ void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
 
 	if (currentState)
 		currentState->Enter();
+}
+
+void PlayerMoveScript::CheckHit()
+{
+	// 투사체 충돌 확인
+	auto healthComp = dynamic_pointer_cast<TCharacter>(GetOwner());
+
+	// 충돌 확인
+	if (m_bCanBeHit)
+	{
+		// 근접 공격 확인
+		bool isCol = false;
+		if (GetOwner()->m_vCollisionList.size() > 0)
+		{
+			auto list = GetOwner()->m_vCollisionList;
+			for (auto& index : list)
+			{
+				if (OBJECT->GetActor(index.first)->m_szName == L"Enemy")
+					isCol = true;
+			}
+		}
+
+		if (isCol || healthComp->IsHitByProjectile())
+		{
+			m_bHPUIChange = true;
+			{
+				// Blood FX
+				Vec3 basePos = GetOwner()->GetPosition();
+				basePos.y += RandomRange(0.5, 2);
+				Vec3 look = GetOwner()->GetLook();
+				velocity = -look;
+				PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+
+				m_fHitFlashTimer = 1.f;  // 1초 동안
+				m_bIsFlashing = true;
+
+				// Anim - HP 
+				dynamic_pointer_cast<TCharacter>(GetOwner())->TakeDamage(1);
+
+				if (!dynamic_pointer_cast<TCharacter>(GetOwner())->IsDead())
+				{
+					ChangetState(hit);
+					m_bCanBeHit = false;
+				}
+				else
+				{
+					ChangetState(die);
+				}
+			}
+		}
+	}
 }
 
 void PlayerMoveScript::Slash()
@@ -382,7 +403,7 @@ void PlayerMoveScript::Slash()
 
 void PlayerMoveScript::SetUI()
 {
-	m_vHPUI= PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
+	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
 	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
 	UI->AddUIList(m_vHPUI);
 	UI->AddUIList(m_vArrowUI);
@@ -391,8 +412,8 @@ void PlayerMoveScript::SetUI()
 void PlayerMoveScript::UpdateHPUI()
 {
 	Color RestColor;
-
-	if (m_vHP == 4)
+	auto hp = dynamic_pointer_cast<TCharacter>(GetOwner())->GetHp();
+	if (hp == 4)
 	{
 		RestColor = fullHP;
 		RestColor.w = -0.5f;
@@ -416,7 +437,7 @@ void PlayerMoveScript::UpdateHPUI()
 
 		damageTime += currentTime = TIMER->GetDeltaTime();
 
-		if (m_vHP == 3)
+		if (hp == 3)
 		{
 			if (m_vHPUI[2]->GetColor().w < 0.f)
 				m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
@@ -425,7 +446,7 @@ void PlayerMoveScript::UpdateHPUI()
 
 			m_vHPUI[3]->m_bRender = false;
 		}
-		else if (m_vHP == 2)
+		else if (hp == 2)
 		{
 			if (m_vHPUI[1]->GetColor().w < 0.f)
 				m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
@@ -434,7 +455,7 @@ void PlayerMoveScript::UpdateHPUI()
 
 			m_vHPUI[2]->m_bRender = false;
 		}
-		else if (m_vHP == 1)
+		else if (hp == 1)
 		{
 			if (m_vHPUI[0]->GetColor().w < 0.f)
 				m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
@@ -443,7 +464,7 @@ void PlayerMoveScript::UpdateHPUI()
 
 			m_vHPUI[1]->m_bRender = false;
 		}
-		else if (m_vHP == 0)
+		else if (hp == 0)
 		{
 			m_vHPUI[0]->m_bRender = false;
 			m_vHPUI[1]->m_bRender = false;
@@ -452,8 +473,8 @@ void PlayerMoveScript::UpdateHPUI()
 		}
 	}
 
-	if (m_vHP > 4)
-		m_vHP = 4;
+	if (hp > 4)
+		hp = 4;
 }
 
 void PlayerMoveScript::UpdateArrowUI()

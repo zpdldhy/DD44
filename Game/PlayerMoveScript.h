@@ -36,7 +36,7 @@ public:
 	Vec3 m_vRollLook;
 
 	// 상호작용
-	UINT m_vHP = 4;
+	//UINT m_vHP = 4;
 	UINT m_vArrowCount = 4;
 
 	// UI Actor
@@ -56,6 +56,7 @@ public:
 	shared_ptr<StateBase> roll;
 	shared_ptr<StateBase> attack;
 	shared_ptr<StateBase> hit;
+	shared_ptr<StateBase> shoot;
 	shared_ptr<StateBase> die;
 	shared_ptr<StateBase> currentState;
 
@@ -78,6 +79,7 @@ private:
 	void UpdateArrowUI();
 public:
 	void ChangetState(shared_ptr<StateBase> _state);
+	void CheckHit();
 public:
 	void Slash();
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);

@@ -45,6 +45,7 @@ public:
 	void ChangeState(shared_ptr<StateBase> _state);
 public:
 	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
+
 public:
 	// FX
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
@@ -53,5 +54,6 @@ public:
 	void Flashing();
 	// Movement
 	void LerpRotate();
+	void CheckHit();
 };
 

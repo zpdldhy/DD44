@@ -26,14 +26,17 @@
 #include "BatMovement.h"
 #include "WalkerMovement.h"
 #include "BettyMovement.h"
+#include "MageMovement.h"
 #include "CollisionManager.h"
 #include "UBoxComponent.h"
 #include "EnemyCollisionManager.h"
 #include "EffectManager.h"
+#include "ProjectileManager.h"
 
 void TestYR::Init()
 {
 #pragma region Set Character
+	PToA->Init();
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	player = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	player->SetPosition(Vec3(0.0f, 0.0f, 0.0f));
@@ -64,6 +67,11 @@ void TestYR::Init()
 		if (betty)
 		{
 			betty->SetPlayer(player);
+		}
+		auto mage = dynamic_pointer_cast<MageMovement>(enemy->GetScriptList()[0]);
+		if (mage)
+		{
+			mage->SetPlayer(player);
 		}
 	}
 	OBJECT->AddActorList(vlist);
@@ -120,7 +128,7 @@ void TestYR::Init()
 	mat->Load(L"../Resources/Texture/Stone_SmoothGreenish_Tile.png", L"../Resources/Shader/Default.hlsl");
 	plain->GetMeshComponent()->SetMaterial(mat);
 	auto collider = make_shared<UBoxComponent>();
-	collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 	plain->m_szName = L"Object";
 	plain->SetShapeComponent(collider);
 	m_vObjectList.emplace_back(plain);
@@ -136,7 +144,7 @@ void TestYR::Init()
 		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 		wall->GetMeshComponent()->SetMaterial(mat2);
 		auto collider2 = make_shared<UBoxComponent>();
-		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 		wall->m_szName = L"Object";
 		wall->SetShapeComponent(collider2);
 		m_vObjectList.emplace_back(wall);
@@ -152,7 +160,7 @@ void TestYR::Init()
 		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 		wall->GetMeshComponent()->SetMaterial(mat2);
 		auto collider2 = make_shared<UBoxComponent>();
-		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 		wall->m_szName = L"Object";
 		wall->SetShapeComponent(collider2);
 		m_vObjectList.emplace_back(wall);
@@ -168,7 +176,7 @@ void TestYR::Init()
 		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 		wall->GetMeshComponent()->SetMaterial(mat2);
 		auto collider2 = make_shared<UBoxComponent>();
-		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 		wall->m_szName = L"Object";
 		wall->SetShapeComponent(collider2);
 		m_vObjectList.emplace_back(wall);
@@ -185,7 +193,7 @@ void TestYR::Init()
 		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
 		wall->GetMeshComponent()->SetMaterial(mat2);
 		auto collider2 = make_shared<UBoxComponent>();
-		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 		wall->m_szName = L"Object";
 		wall->SetShapeComponent(collider2);
 		m_vObjectList.emplace_back(wall);
@@ -194,6 +202,8 @@ void TestYR::Init()
 
 	
 #pragma endregion
+
+	PROJECTILE->Init();
 }
 void TestYR::Tick()
 {
@@ -212,6 +222,7 @@ void TestYR::Tick()
 	}
 
 	CheckEnemyCollision();
+	PROJECTILE->Tick();
 }
 
 void TestYR::Render()
@@ -321,5 +332,35 @@ void TestYR::CheckEnemyCollision()
 		COLLITION->CheckCollision(player, *iter);
 		COLLITION->CheckCollision(boss_betty, *iter);
 		iter++;
+	}
+
+	auto list = PROJECTILE->GetActorList();
+	for (auto proj = list.begin(); proj != list.end(); )
+	{
+		// box to sphere°¡ ¾ø¾î¼­ player¶ûÀº ¾ÈµÊ
+		COLLITION->CheckCollision(*proj, player);
+
+		for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = m_vObjectList.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*proj, *iter);
+			iter++;
+		}
+
+		for (auto iter = enemyList.begin(); iter != enemyList.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = enemyList.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*proj, *iter);
+			iter++;
+		}
+		proj++;
 	}
 }

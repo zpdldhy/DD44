@@ -60,6 +60,7 @@ Vec3 JumpMotionHandler::Update()
 		if (hangElapsed >= hangDuration)
 		{
 			phase = JumpPhase::Falling;
+			prevPos = pos;
 			elapsed = 0.0f; // 낙하 시간 초기화
 		}
 		break;
@@ -68,8 +69,9 @@ Vec3 JumpMotionHandler::Update()
 	{
 		elapsed += TIMER->GetDeltaTime();
 		float fallGravity = gravity * fall; // 가속
-		pos.x = end.x;
-		pos.z = end.z;
+		
+		pos.x = prevPos.x + (end.x - prevPos.x) * elapsed;
+		pos.z = prevPos.z + (end.z - prevPos.z) * elapsed;
 		pos.y = start.y + height - 0.5f * fallGravity * elapsed * elapsed;
 
 		if (pos.y <= start.y)
@@ -161,6 +163,15 @@ void BettyJumpAttack::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|Punch_double");
 	animInstance->PlayOnce(index);
+	
+	animInstance->AddEvent(index, 25, [this]() {
+		this->SlowAnimSpeed();
+		});
+
+	animInstance->AddEvent(index, 35, [this]() {
+		this->NormalizeAnimSpeed();
+		});
+
 	// 사운드
 	SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
 
@@ -171,8 +182,8 @@ void BettyJumpAttack::Enter()
 	Vec3 startPos = m_pOwner.lock()->GetPosition();
 	Vec3 endPos = targetPos;
 	//Vec3 endPos = startPos + posOffset * look;
-	float totalTime = animInstance->GetTotalFrame() / TIMER->GetFPS();
-	jumpHandler.Init(startPos, endPos, 8.0f, totalTime, 0.4f);
+	float totalTime = (animInstance->GetTotalFrame()) / TIMER->GetFPS();
+	jumpHandler.Init(startPos, endPos, 8.0f, totalTime, 0.1f, 2.0f);
 
 	// 회전
 	Vec3 dir = endPos - startPos;
@@ -182,7 +193,7 @@ void BettyJumpAttack::Tick()
 {
 	// Anim
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	if (!animInstance->m_bOnPlayOnce)
+	if (!animInstance->m_bOnPlayOnce && jumpHandler.IsDone())
 	{
 		End();
 	}
@@ -209,6 +220,25 @@ void BettyJumpAttack::End()
 	// 기본 state 세팅
 	//phase = JumpPhase::Ascending;
 	m_bOnPlaying = false;
+
+	bControlOnce = true;
+}
+
+void BettyJumpAttack::SlowAnimSpeed()
+{
+	if (bControlOnce)
+	{
+		auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+		originAnimSpeed = animInstance->m_fAnimPlayRate;
+		animInstance->m_fAnimPlayRate -= 5.0f;
+		bControlOnce = false;
+	}
+}
+
+void BettyJumpAttack::NormalizeAnimSpeed()
+{
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+ 	animInstance->m_fAnimPlayRate = originAnimSpeed;
 }
 
 BettyTwoHandAttack::BettyTwoHandAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_TWOHAND)
@@ -363,7 +393,6 @@ bool BettyOneHandDownAttack::CheckDirection(Vec3 _targetPos)
 	{
 		bRight = true;
 	}
-	//else if (cross.y < 0.0f)
 	else
 	{
 		bRight = false;
@@ -390,7 +419,7 @@ void BettyRollAttack::Enter()
 	m_bOnPlaying = true;
 
 	start->SetDirection(dir);
-	middle->SetDirection(dir);
+	//middle->SetDirection(dir);
 	end->SetDirection(dir);
 	start->Enter();
 	rollCount--;
@@ -469,13 +498,6 @@ void BettyRollAttack::SetTarget(weak_ptr<AActor> _target)
 	dir.y = 0;
 	dir.Normalize();
 }
-//void BettyRollAttack::CheckHitWall(bool _hitWall)
-//{
-//	if (currentPhase == RollPhase::Middle)
-//	{
-//		bHitWall = _hitWall;
-//	}
-//}
 #pragma region roll_subState
 BettyRollStart::BettyRollStart(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_ROLL)
 {
@@ -508,7 +530,7 @@ void BettyRollStart::Tick()
 {
 	// Anim
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	if (!animInstance->m_bOnPlayOnce)
+	if (!animInstance->m_bOnPlayOnce && jumpHandler.IsDone())
 	{
 		End();
 	}
@@ -563,7 +585,7 @@ void BettyRollMiddle::Tick()
 	// 충돌 확인 후 End ( 밖에서 ) 
 	dir.y = 0;
 	dir.Normalize();
-	m_pOwner.lock()->AddPosition(dir * 1.2f);
+	m_pOwner.lock()->AddPosition(dir * 1.0f);
 	CheckWallCollision();
 }
 void BettyRollMiddle::End()
@@ -585,6 +607,7 @@ bool BettyRollMiddle::CheckWallCollision()
 
 	for (const auto& colData : m_pOwner.lock()->m_vCollisionList)
 	{
+		// 여기 ray로 안해도 작동하려나 ? 
 		Vec3 normal = colData.second.ColNormal;
 		normal.Normalize();
 
@@ -651,7 +674,7 @@ void BettyRollEnd::Enter()
 	startPos.y = 0;
 	Vec3 endPos = startPos + posOffset * look;
 	float totalTime = animInstance->GetTotalFrame() / TIMER->GetFPS();
-	jumpHandler.Init(startPos, endPos, 12.0f, totalTime, 0.1f, 3.0f);
+	jumpHandler.Init(startPos, endPos, 8.0f, totalTime, 0.1f, 3.0f);
 
 	// 회전
 	dir = -dir;

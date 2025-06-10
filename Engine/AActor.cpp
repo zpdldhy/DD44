@@ -36,6 +36,11 @@ void AActor::Tick()
 {
 	m_pTransform->Tick();
 
+	for (auto& script : m_vScript)
+	{
+		script->Tick();
+	}
+
 	// Component
 	for (auto& component : m_arrComponent)
 	{
@@ -43,11 +48,6 @@ void AActor::Tick()
 		{
 			component->Tick();
 		}
-	}
-
-	for (auto& script : m_vScript)
-	{
-		script->Tick();
 	}
 
 	m_vCollisionList.clear();

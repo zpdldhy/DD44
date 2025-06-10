@@ -39,9 +39,6 @@ private:
 	bool bDropping;
 	bool bSnowControl = false;
 
-	// HP
-	int hp = 20;
-
 	// FX
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
