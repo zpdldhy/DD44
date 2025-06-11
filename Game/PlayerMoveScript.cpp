@@ -2,9 +2,7 @@
 #include "PlayerMoveScript.h"
 #include "Input.h"
 #include "Timer.h"
-#include "APawn.h"
-#include "AActor.h"
-#include "TCharacter.h"
+#include "TPlayer.h"
 #include "UStaticMeshComponent.h"
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
@@ -147,6 +145,20 @@ void PlayerMoveScript::Tick()
 			m_bCanRoll = true;
 		}
 	}
+
+	// 순서 중요
+	if (currentState->GetId() == PLAYER_S_SHOOT)
+	{
+		if (INPUT->GetButtonUp(RCLICK) || INPUT->GetButtonFree(RCLICK))
+		{
+			// 끝내라 신호를 줘야함. 
+			dynamic_pointer_cast<PlayerShootState>(currentState)->CheckEnd(true);
+		}
+	}
+
+	// 순서 중요
+	CheckHit();
+
 	currentState->Tick();
 	if (currentState->GetId() == PLAYER_STATE::PLAYER_S_DEATH)
 	{
@@ -183,6 +195,10 @@ void PlayerMoveScript::Tick()
 		}
 		else
 		{
+			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK)
+			{
+				return;
+			}
 			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
 			{
 				RollMove();
@@ -201,7 +217,6 @@ void PlayerMoveScript::Tick()
 		}
 	}
 #pragma endregion
-	CheckHit();
 	Move();
 
 	if (INPUT->GetButton(SPACE) && m_bCanRoll)
@@ -228,13 +243,20 @@ void PlayerMoveScript::Tick()
 	}
 	if (INPUT->GetButton(RCLICK))
 	{
-		// 단순확인용
+		// TPlayer의 arrowCount 확인해서 bool 세팅하기 
+		int aCount = dynamic_pointer_cast<TPlayer>(GetOwner())->GetArrowCount();
+		if (aCount > 0)
+		{
+			dynamic_pointer_cast<PlayerShootState>(shoot)->CheckShootCount(true);
+		}
+		else
+		{
+			dynamic_pointer_cast<PlayerShootState>(shoot)->CheckShootCount(false);
+		}
 		ChangetState(shoot);
-		Vec3 pos = GetOwner()->GetPosition();
-		pos.y = 3.0f;
-		Vec3 look = GetOwner()->GetLook();
-		PROJECTILE->ActivateOne(ProjectileType::PlayerArrow, pos, look);
 	}
+
+
 
 }
 

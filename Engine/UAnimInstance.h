@@ -43,6 +43,7 @@ public:
 public:
 	void CreateConstantBuffer();
 	void PlayOnce(int _index);
+	void SetCurrentAnimTrack(int _index);
 public:
 	void Tick();
 	shared_ptr<UAnimInstance> Clone();
@@ -50,15 +51,19 @@ public:
 	void AddTrack(AnimList _animTrack);
 	void SetName(wstring _name) { m_modelName = _name; }
 	wstring GetName() { return m_modelName; }
+	 //
 	void CheckInPlace(bool _inPlace) { m_bInPlace = _inPlace; }
  	void SetRootIndex(int _index) { rootIndex = _index; }
 	int GetRootIndex() { return rootIndex; }
-	void SetCurrentAnimTrack(int _index);
+	//
 	int GetAnimIndex(wstring _animName);
 	Matrix GetBoneAnim(int _boneIndex);
-	void SetKeyFrame(int _trackIndex, UINT _key);
 	int GetTotalFrame() { return animTrackList[currentAnimTrackIndex].animList[0].size(); }
+	int GetCurrentIndex() { return currentAnimTrackIndex; }
+public:
+	void SetKeyFrame(int _trackIndex, UINT _key);
 	void AddEvent(int _trackIndex, UINT _keyFrame, function<void()> _func);
+	void DeleteEvent(int _trackIndex, UINT _keyFrame);
 	void TriggetEvent(int _trackIndex, UINT currentFrame);
 public:
 	const std::vector<AnimList>& GetAnimTrackList() const { return animTrackList; }

@@ -47,7 +47,6 @@ public:
 	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
 
 	// Child Mesh Components
-	// 어떻게 관리해야 좋을지 모르겟음
 	weak_ptr<UMeshComponent> backSword;
 	weak_ptr<UMeshComponent> handSword;
 
@@ -68,7 +67,9 @@ public:
 	 
 	// Camera Offset
 	Vec3 m_vCameraOffset = { 20.0f, 30.0f, -20.0f };
+	// temp
 	int animIndex = 0;
+
 public:
 	void Init() override;
 	void Tick() override;

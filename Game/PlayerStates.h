@@ -99,7 +99,16 @@ class PlayerShootState : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
-
+	weak_ptr<AActor> m_pTarget;
+	//
+	Vec3 dir;
+	// sub-state
+	bool bEnd = false;
+	bool bCanShoot = true;
+	enum ShootPhase { Start, Aiming, Shoot, Done };
+	ShootPhase currentPhase = ShootPhase::Start;
+	shared_ptr<class PlayerShootStart> start;
+	shared_ptr<class PlayerShoot> shoot;
 public:
 	PlayerShootState(weak_ptr<AActor> _pOwner);
 	~PlayerShootState() {}
@@ -107,7 +116,48 @@ public:
 	virtual void Enter() override;
 	virtual void Tick() override;
 	virtual void End() override;
+public:
+	void SetTarget(weak_ptr<AActor> _pTarget) { m_pTarget = _pTarget; }
+	void Rotate();
+	void CheckMouse();
+	void CheckEnd(bool _end) { bEnd = _end; }
+	void CheckShootCount(bool _able);
 };
+
+#pragma region shoot-substate
+class PlayerShootStart : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+public:
+	float elapsed = 0.0f;
+public:
+	PlayerShootStart(weak_ptr<AActor> _pOwner);
+	~PlayerShootStart() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+};
+
+class PlayerShoot : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+	bool bCanShoot; 
+public:
+	PlayerShoot(weak_ptr<AActor> _pOwner);
+	~PlayerShoot() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+	void CheckShootCount(bool _able);
+	void CanShoot();
+};
+
+#pragma endregion
 
 class PlayerHitState : public StateBase
 {

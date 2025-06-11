@@ -3,12 +3,16 @@
 #include "BettyStates.h"
 
 class AActor;
+class TEnemy;
 
 class BettyMovement : public UScriptComponent
 {
 public:
 	BettyMovement() = default;
 	virtual ~BettyMovement() = default;
+private:
+	weak_ptr<AActor> player;
+	shared_ptr<TEnemy> owner;
 private:
 	// Phase
 	enum BettyAction { Intro = 0, Attack, Die };
@@ -64,8 +68,6 @@ private:
 	bool bCanStart2 = true;
 	bool bCanStart3 = true;
 
-	weak_ptr<AActor> player;
-	
 public:
 	void Init();
 	void Tick();

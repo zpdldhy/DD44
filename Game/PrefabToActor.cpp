@@ -13,7 +13,8 @@
 #include "AParticleActor.h"
 #include "AFireParticleActor.h"
 // Game Actor
-#include "TCharacter.h"
+#include "TPlayer.h"
+#include "TEnemy.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -113,7 +114,14 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 	PrefabCharacterData characterData;
 	if (PREFAB->LoadCharacter(_file, characterData))
 	{
-		actor = std::make_shared<TCharacter>(); // 필요에 따라 캐릭터 타입으로 변경
+		if (characterData.ScriptName == "PlayerMoveScript")
+		{
+			actor = std::make_shared<TPlayer>();
+		}
+		else
+		{
+			actor = std::make_shared<TEnemy>();
+		}
 
 		shared_ptr<UMeshComponent> meshComponent = MESHLOADER->Make(characterData.MeshPath.c_str());
 

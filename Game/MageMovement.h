@@ -2,12 +2,15 @@
 #include "UScriptComponent.h"
 #include "MageStates.h"
 
+class TEnemy;
+
 class MageMovement : public UScriptComponent
 {
 public:
 	MageMovement() = default;
 	~MageMovement() = default;
 private:
+	shared_ptr<TEnemy> owner;
 	weak_ptr<AActor> player;
 
 	// States

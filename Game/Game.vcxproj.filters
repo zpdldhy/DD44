@@ -141,6 +141,11 @@
     <ClInclude Include="TCharacter.h">
       <Filter>GameActor</Filter>
     </ClInclude>
+    <ClInclude Include="StateInterface.h" />
+    <ClInclude Include="TPlayer.h">
+      <Filter>GameActor</Filter>
+    </ClInclude>
+    <ClInclude Include="TEnemy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -236,6 +241,11 @@
     <ClCompile Include="TCharacter.cpp">
       <Filter>GameActor</Filter>
     </ClCompile>
+    <ClCompile Include="StateInterface.cpp" />
+    <ClCompile Include="TPlayer.cpp">
+      <Filter>GameActor</Filter>
+    </ClCompile>
+    <ClCompile Include="TEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
