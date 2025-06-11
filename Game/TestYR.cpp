@@ -129,7 +129,7 @@ void TestYR::Init()
 	plain->GetMeshComponent()->SetMaterial(mat);
 	auto collider = make_shared<UBoxComponent>();
 	collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
-	plain->m_szName = L"Object";
+	plain->m_szName = L"Stair";
 	plain->SetShapeComponent(collider);
 	m_vObjectList.emplace_back(plain);
 	OBJECT->AddActor(plain);

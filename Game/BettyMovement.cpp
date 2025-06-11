@@ -77,6 +77,7 @@ void BettyMovement::Tick()
 			// 거리 확인
 			distance = (player.lock()->GetPosition() - GetOwner()->GetPosition());
 			GetOwner()->m_szName = L"Object";
+			GetOwner()->GetShapeComponent()->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 			rightRange->m_bCollision = false;
 			rightRange->GetShapeComponent()->m_bVisible = false;
 			leftRange->m_bCollision = false;
@@ -331,11 +332,11 @@ void BettyMovement::HandleAttack(float _delta)
 	{
 		// 원거리 공격
 		auto nextIndex = (int)RandomRange(0.0f, rangedState.size());
-		//// 중복 방지
-		//while (nextIndex == rangedIndex)
-		//{
-		//	nextIndex = (int)RandomRange(0.0f, rangedState.size());
-		//}
+		// 중복 방지
+		while (nextIndex == rangedIndex)
+		{
+			nextIndex = (int)RandomRange(0.0f, rangedState.size());
+		}
 		rangedIndex = nextIndex;
 		auto next = rangedState[rangedIndex];
 		if (next->GetId() == BETTY_S_A_ROLL)
@@ -346,6 +347,7 @@ void BettyMovement::HandleAttack(float _delta)
 		if (next->GetId() == BETTY_S_A_JUMPHIGH)
 		{
 			dynamic_pointer_cast<BettyJumpAttack>(next)->SetTargetPos(player.lock()->GetPosition());
+			GetOwner()->GetShapeComponent()->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 			GetOwner()->m_szName = L"Enemy";
 			rightRange->m_bCollision = true;
 			rightRange->GetShapeComponent()->m_bVisible = true;

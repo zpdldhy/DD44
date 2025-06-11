@@ -84,12 +84,7 @@ void PlayerMoveScript::Init()
 
 void PlayerMoveScript::Tick()
 {
-	auto pos = GetOwner()->GetPosition();
-	attackRangeActor->SetPosition(pos + colOffset * GetOwner()->GetLook() + Vec3(0.0f, 2.0f, 0.0f));
-	float targetYaw = atan2f(GetOwner()->GetLook().x, GetOwner()->GetLook().z);
-	Vec3 currentRot = GetOwner()->GetRotation();
-	currentRot.y = targetYaw;
-	attackRangeActor->SetRotation(currentRot);
+	UpdateCollider();
 
 	// Test
 	if (INPUT->GetButton(L))
@@ -102,7 +97,7 @@ void PlayerMoveScript::Tick()
 		}
 	}
 
-#pragma region EFFECT
+#pragma region FX
 	Slash();
 	if (m_bIsFlashing)
 	{
@@ -152,7 +147,8 @@ void PlayerMoveScript::Tick()
 		return;
 	}
 
-	if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK || currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT || currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
+	// 이걸 왜 이렇게 했던 거지 ?
+	//if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK || currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT || currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
 	{
 		if (!currentState->IsPlaying())
 		{
@@ -163,115 +159,53 @@ void PlayerMoveScript::Tick()
 
 				attackRangeActor->m_bCollision = false;
 				attackRangeActor->GetShapeComponent()->m_bVisible = false;
+				ChangetState(idle);
+
 			}
 			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
 			{
 				m_bDamageCoolTime = true;
+				ChangetState(idle);
+
 			}
 			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
 			{
 				m_bRollCoolTime = true;
+				ChangetState(idle);
+
 			}
-			ChangetState(idle);
 		}
 		else
 		{
 			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
 			{
 				RollMove();
+				return;
 			}
-			return;
-		}
-	}
-	else
-	{
-		if (m_bCanBeHit)
-		{
-			// HIT
-			CheckHit();
 
-			if (INPUT->GetButton(SPACE) && m_bCanRoll)
+			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
 			{
-				// 구르기
-				m_vRollLook = GetOwner()->GetLook();
-				ChangetState(roll);
+				return;
+			}
 
-				m_bCanRoll = false;
+			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_SHOOT)
+			{
+				return;
 			}
 		}
 	}
 #pragma endregion
-#pragma region MOVEMENT
-	float deltaTime = TIMER->GetDeltaTime();
-	Vec3 up = { 0, 1, 0 };
-	m_vRight = up.Cross(m_vLook);
-	m_vLook.y = 0.0f;
-	m_vRight.y = 0.0f;
+	CheckHit();
+	Move();
 
-	m_vLook.Normalize();
-	m_vRight.Normalize();
-
-	Vec3 moveDir;
-	if (INPUT->GetButtonDown(W))
+	if (INPUT->GetButton(SPACE) && m_bCanRoll)
 	{
-		moveDir += m_vLook;
+		// 구르기
+		m_vRollLook = GetOwner()->GetLook();
+		ChangetState(roll);
+
+		m_bCanRoll = false;
 	}
-
-	if (INPUT->GetButtonDown(A))
-	{
-		moveDir += -m_vRight;
-	}
-
-	if (INPUT->GetButtonDown(S))
-	{
-		moveDir += -m_vLook;
-	}
-
-	if (INPUT->GetButtonDown(D))
-	{
-		moveDir += m_vRight;
-	}
-
-	if (moveDir.Length() > 0)// && !m_pAnimInstance->m_bOnPlayOnce)
-	{
-		// 애님 ( 추후 처리 로직 업데이트 필요 )
-		{
-			ChangetState(walk);
-		}
-
-		// 이동
-		{
-			moveDir.Normalize();
-			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->SetMove(moveDir, 0.25f);
-		}
-
-		// 회전		
-		{
-			float targetYaw = atan2f(moveDir.x, moveDir.z);
-			Vec3 currentRot = GetOwner()->GetRotation();
-			float currentYaw = currentRot.y;
-
-			// 각도 차이 계산
-			float angleDiff = targetYaw - currentYaw;
-			while (angleDiff > DD_PI)  angleDiff -= DD_PI * 2;
-			while (angleDiff < -DD_PI) angleDiff += DD_PI * 2;
-
-			// Lerp 계산
-			float smoothedYaw = currentRot.y + angleDiff * m_fRotationSpeed * deltaTime;
-
-			currentRot.y = smoothedYaw;
-			GetOwner()->SetRotation(currentRot);
-		}
-
-		m_vLastMoveDir = moveDir;
-
-	}
-	else
-	{
-		ChangetState(idle);
-	}
-#pragma endregion
 
 	// ATTACK
 	if (INPUT->GetButton(LCLICK))
@@ -529,6 +463,79 @@ void PlayerMoveScript::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> co
 	}
 }
 
+void PlayerMoveScript::Move()
+{
+	float deltaTime = TIMER->GetDeltaTime();
+	Vec3 up = { 0, 1, 0 };
+	m_vRight = up.Cross(m_vLook);
+	m_vLook.y = 0.0f;
+	m_vRight.y = 0.0f;
+
+	m_vLook.Normalize();
+	m_vRight.Normalize();
+
+	Vec3 moveDir;
+	if (INPUT->GetButtonDown(W))
+	{
+		moveDir += m_vLook;
+	}
+
+	if (INPUT->GetButtonDown(A))
+	{
+		moveDir += -m_vRight;
+	}
+
+	if (INPUT->GetButtonDown(S))
+	{
+		moveDir += -m_vLook;
+	}
+
+	if (INPUT->GetButtonDown(D))
+	{
+		moveDir += m_vRight;
+	}
+
+	if (moveDir.Length() > 0)// && !m_pAnimInstance->m_bOnPlayOnce)
+	{
+		// 애님
+		{
+			ChangetState(walk);
+		}
+
+		// 이동
+		{
+			moveDir.Normalize();
+			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
+			GetOwner()->SetMove(moveDir, 0.25f);
+		}
+
+		// 회전		
+		{
+			float targetYaw = atan2f(moveDir.x, moveDir.z);
+			Vec3 currentRot = GetOwner()->GetRotation();
+			float currentYaw = currentRot.y;
+
+			// 각도 차이 계산
+			float angleDiff = targetYaw - currentYaw;
+			while (angleDiff > DD_PI)  angleDiff -= DD_PI * 2;
+			while (angleDiff < -DD_PI) angleDiff += DD_PI * 2;
+
+			// Lerp 계산
+			float smoothedYaw = currentRot.y + angleDiff * m_fRotationSpeed * deltaTime;
+
+			currentRot.y = smoothedYaw;
+			GetOwner()->SetRotation(currentRot);
+		}
+
+		m_vLastMoveDir = moveDir;
+
+	}
+	else
+	{
+		ChangetState(idle);
+	}
+}
+
 void PlayerMoveScript::RollMove()
 {
 	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
@@ -542,4 +549,14 @@ bool PlayerMoveScript::CanAttack()
 		return false;
 	}
 	return true;
+}
+
+void PlayerMoveScript::UpdateCollider()
+{
+	auto pos = GetOwner()->GetPosition();
+	attackRangeActor->SetPosition(pos + colOffset * GetOwner()->GetLook() + Vec3(0.0f, 2.0f, 0.0f));
+	float targetYaw = atan2f(GetOwner()->GetLook().x, GetOwner()->GetLook().z);
+	Vec3 currentRot = GetOwner()->GetRotation();
+	currentRot.y = targetYaw;
+	attackRangeActor->SetRotation(currentRot);
 }

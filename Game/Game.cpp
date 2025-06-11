@@ -154,7 +154,6 @@ void Game::SetupGameCamera()
 
 	CAMERA->Set3DCameraActor(m_pGameCameraActor);
 	OBJECT->AddActor(m_pGameCameraActor);
-
 }
 
 void Game::SetupSkybox()

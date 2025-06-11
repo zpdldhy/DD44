@@ -79,7 +79,6 @@ private:
 	void UpdateArrowUI();
 public:
 	void ChangetState(shared_ptr<StateBase> _state);
-	void CheckHit();
 public:
 	void Slash();
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
@@ -88,7 +87,10 @@ public:
 	bool m_bIsFlashing = false;
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
 public:
+	void Move();
+	void CheckHit();
 	void RollMove();
 	bool CanAttack();
+	void UpdateCollider();
 };
 

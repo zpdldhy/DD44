@@ -8,7 +8,10 @@
 #include "Sound.h"
 #include "Timer.h"
 
+#include "UBoxComponent.h"
 #include "CollisionManager.h"
+#include "ObjectManager.h"
+#include "EffectManager.h"
 
 void JumpMotionHandler::Init(Vec3 _start, Vec3 _end, float _height, float _total, float _hangDuration, float _fall)
 {
@@ -69,7 +72,7 @@ Vec3 JumpMotionHandler::Update()
 	{
 		elapsed += TIMER->GetDeltaTime();
 		float fallGravity = gravity * fall; // 가속
-		
+
 		pos.x = prevPos.x + (end.x - prevPos.x) * elapsed;
 		pos.z = prevPos.z + (end.z - prevPos.z) * elapsed;
 		pos.y = start.y + height - 0.5f * fallGravity * elapsed * elapsed;
@@ -105,7 +108,7 @@ void BettyIdleState::Enter()
 }
 void BettyIdleState::Tick()
 {
-	
+
 }
 void BettyIdleState::End()
 {
@@ -136,6 +139,9 @@ void BettyIntroState::Tick()
 		{
 			int index = animInstance->GetAnimIndex(L"Armature|FistSlam");
 			animInstance->PlayOnce(index);
+			animInstance->AddEvent(index, 24, [this]() {
+				this->PlayFx();
+				});
 			m_bNextAnim = false;
 		}
 		else
@@ -148,6 +154,18 @@ void BettyIntroState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+}
+void BettyIntroState::PlayFx()
+{
+	auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftHand");
+	auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightHand");
+
+	Vec3 temp = left->GetWorldPosition() + right->GetWorldPosition();
+	Vec3 pos = (temp) / 2.0f;
+	pos.y = m_pOwner.lock()->GetPosition().y;
+	EFFECT->PlayDustBurst(pos, 10.f, .8f);
+	EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .8f);
+	EFFECT->PlayBeamBurst(pos, 20, .7f);
 }
 
 BettyJumpAttack::BettyJumpAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_JUMPHIGH)
@@ -163,17 +181,22 @@ void BettyJumpAttack::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|Punch_double");
 	animInstance->PlayOnce(index);
-	
+
 	animInstance->AddEvent(index, 25, [this]() {
 		this->SlowAnimSpeed();
 		});
-
+	animInstance->AddEvent(index, 26, [this]() {
+		this->PlayBodyFx();
+		});
 	animInstance->AddEvent(index, 35, [this]() {
 		this->NormalizeAnimSpeed();
 		});
+	animInstance->AddEvent(index, 31, [this]() {
+		this->PlayHandFx();
+		});
 
-	// 사운드
-	SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
+	//// 사운드
+	//SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
 
 	// 이동
 	auto look = m_pOwner.lock()->GetLook();
@@ -223,7 +246,6 @@ void BettyJumpAttack::End()
 
 	bControlOnce = true;
 }
-
 void BettyJumpAttack::SlowAnimSpeed()
 {
 	if (bControlOnce)
@@ -234,11 +256,35 @@ void BettyJumpAttack::SlowAnimSpeed()
 		bControlOnce = false;
 	}
 }
-
 void BettyJumpAttack::NormalizeAnimSpeed()
 {
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
- 	animInstance->m_fAnimPlayRate = originAnimSpeed;
+	animInstance->m_fAnimPlayRate = originAnimSpeed;
+}
+void BettyJumpAttack::PlayHandFx()
+{
+	// 사운드 ( 소스 변경 필요 ) 
+	SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
+
+	auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftHand");
+	auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightHand");
+
+	Vec3 temp = left->GetWorldPosition() + right->GetWorldPosition();
+	Vec3 pos = (temp) / 2.0f;
+	pos.y = m_pOwner.lock()->GetPosition().y;
+	EFFECT->PlayDustBurst(pos, 10.f, .5f);
+	EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .5f);
+	EFFECT->PlayBeamBurst(pos, 20, .5f);
+}
+void BettyJumpAttack::PlayBodyFx()
+{
+	// 사운드 ( 소스 변경 필요 )
+	SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
+
+	Vec3 pos = m_pOwner.lock()->GetPosition();
+	EFFECT->PlayDustBurst(pos, 10.f, .8f);
+	EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .5f);
+	//EFFECT->PlayBeamBurst(pos, 20, .5f);
 }
 
 BettyTwoHandAttack::BettyTwoHandAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_TWOHAND)
@@ -336,7 +382,6 @@ bool BettyOneHandBackAttack::CheckDirection(Vec3 _targetPos)
 	return bRight;
 }
 
-
 BettyOneHandDownAttack::BettyOneHandDownAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_HANDDOWN)
 {
 	m_pOwner = _pOwner;
@@ -402,7 +447,6 @@ bool BettyOneHandDownAttack::CheckDirection(Vec3 _targetPos)
 	return bRight;
 }
 
-
 BettyRollAttack::BettyRollAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_ROLL)
 {
 	m_pOwner = _pOwner;
@@ -450,6 +494,8 @@ void BettyRollAttack::Tick()
 		bHitWall = middle->CheckWallCollision();
 		if (bHitWall)
 		{
+			// FX
+			PlayFx();
 			middle->End(); // 얘는 end 꼭 여기서.
 			end->Enter();
 			currentPhase = RollPhase::Final;
@@ -497,6 +543,16 @@ void BettyRollAttack::SetTarget(weak_ptr<AActor> _target)
 	dir = m_pTarget.lock()->GetPosition() - m_pOwner.lock()->GetPosition();
 	dir.y = 0;
 	dir.Normalize();
+}
+void BettyRollAttack::PlayFx()
+{
+	// 사운드 ( 소스 변경 필요 )
+	SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
+
+	Vec3 pos = m_pOwner.lock()->GetPosition();
+	EFFECT->PlayDustBurst(pos, 10.f, .8f);
+	EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .5f);
+	//EFFECT->PlayBeamBurst(pos, 20, .5f);
 }
 #pragma region roll_subState
 BettyRollStart::BettyRollStart(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_ROLL)
@@ -605,17 +661,17 @@ bool BettyRollMiddle::CheckWallCollision()
 	Ray rightRay(pos + (right * offset), look);
 	Ray middleRay(pos, look);
 
+	auto box = dynamic_pointer_cast<UBoxComponent>(m_pOwner.lock()->GetShapeComponent());
+	auto ray = box->GetLookRay();
+	Vec3 range(5.0f, 0.0f, 5.0f);
+
 	for (const auto& colData : m_pOwner.lock()->m_vCollisionList)
 	{
-		// 여기 ray로 안해도 작동하려나 ? 
-		Vec3 normal = colData.second.ColNormal;
-		normal.Normalize();
+		auto targetShape = OBJECT->GetActor(colData.first)->GetShapeComponent();
+		auto targetBox = dynamic_pointer_cast<UBoxComponent>(targetShape);
 
-		auto box = colData.second.box;
-		Vec3 inter;
-		Vec3 range(5.0f, 0.0f, 5.0f);
-
-		if (Collision::CheckOBBToRay(middleRay, box, inter))
+		Vec3 inter; 
+		if (Collision::CheckRayToOBB(middleRay, targetBox->GetBounds(), inter))
 		{
 			// 
 			Vec3 dis = pos - inter;
@@ -626,7 +682,7 @@ bool BettyRollMiddle::CheckWallCollision()
 			}
 		}
 
-		if (Collision::CheckOBBToRay(leftRay, box, inter))
+		if (Collision::CheckRayToOBB(leftRay, targetBox->GetBounds(), inter))
 		{
 			// 
 			Vec3 dis = pos - inter;
@@ -637,7 +693,7 @@ bool BettyRollMiddle::CheckWallCollision()
 			}
 		}
 
-		if (Collision::CheckOBBToRay(rightRay, box, inter))
+		if (Collision::CheckRayToOBB(rightRay, targetBox->GetBounds(), inter))
 		{
 			// 
 			Vec3 dis = pos - inter;
@@ -719,7 +775,6 @@ BettyDropAttack::BettyDropAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
 }
-
 void BettyDropAttack::Enter()
 {
 	// 기본 state 세팅
@@ -729,7 +784,6 @@ void BettyDropAttack::Enter()
 	int index = animInstance->GetAnimIndex(L"Armature|FistSlam_anger");
 	animInstance->PlayOnce(index);
 }
-
 void BettyDropAttack::Tick()
 {
 	// Anim
@@ -739,7 +793,6 @@ void BettyDropAttack::Tick()
 		End();
 	}
 }
-
 void BettyDropAttack::End()
 {
 	// 기본 state 세팅
@@ -751,7 +804,6 @@ BettyRoarAttack::BettyRoarAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
 }
-
 void BettyRoarAttack::Enter()
 {
 	// 기본 state 세팅
@@ -761,7 +813,6 @@ void BettyRoarAttack::Enter()
 	int index = animInstance->GetAnimIndex(L"Armature|Roar");
 	animInstance->PlayOnce(index);
 }
-
 void BettyRoarAttack::Tick()
 {
 	// Anim
@@ -771,7 +822,6 @@ void BettyRoarAttack::Tick()
 		End();
 	}
 }
-
 void BettyRoarAttack::End()
 {
 	// 기본 state 세팅
@@ -779,11 +829,10 @@ void BettyRoarAttack::End()
 }
 
 BettyDeathState::BettyDeathState(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_DEATH)
-{	
+{
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
 }
-
 void BettyDeathState::Enter()
 {
 	// 기본 state 세팅
@@ -794,12 +843,10 @@ void BettyDeathState::Enter()
 	animInstance->SetKeyFrame(index, 15);
 	animInstance->PlayOnce(index);
 }
-
 void BettyDeathState::Tick()
 {
-	
-}
 
+}
 void BettyDeathState::End()
 {
 }

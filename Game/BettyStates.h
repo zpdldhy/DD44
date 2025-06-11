@@ -74,6 +74,8 @@ public:
 	virtual void Enter() override;
 	virtual void Tick() override;
 	virtual void End() override;
+public:
+	void PlayFx();
 };
 
 class BettyJumpAttack : public StateBase
@@ -103,6 +105,8 @@ public:
 public:
 	void SlowAnimSpeed();
 	void NormalizeAnimSpeed();
+	void PlayHandFx();
+	void PlayBodyFx();
 };
 
 class BettyTwoHandAttack : public StateBase
@@ -181,6 +185,7 @@ public:
 	virtual void End() override;
 public:
 	void SetTarget(weak_ptr<AActor> _target);
+	void PlayFx();
 };
 #pragma region RollSubState
 class BettyRollStart : public StateBase
