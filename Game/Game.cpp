@@ -39,7 +39,7 @@
 
 void Game::Init()
 {
-	// Asset 로딩
+	// Asset 로딩			
 
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
@@ -55,14 +55,24 @@ void Game::Init()
 
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	OBJECT->AddActorList(vlist);
+
+	// InGame UI
+	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
+
+	// Paused UI
+	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
+	UI->AddUIList(m_vPausedBackGround);
+	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
+	UI->AddUIList(m_vUpgradeBackGround);
+	m_vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
+	UI->AddUIList(m_vUpgradeState);
+	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
+	UI->AddUIList(m_vCoins);
+	UI->DoFadeOut();
 	
 	// Temp
 	enemyList = vlist;
 	SetEnemyScript();
-
-	// UI
-	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
-	UI->DoFadeOut();
 
 	EFFECT->Init();
 	SetupEngineCamera();
@@ -75,6 +85,29 @@ void Game::Tick()
 {
 	if (INPUT->GetButton(GameKey::ESC))
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
+
+	if (ENGINE->m_bGamePaused == true)
+	{
+		for (auto& pUI : m_vPausedBackGround)
+			pUI->m_bRender = true;
+
+		for(auto& pUI : m_vUpgradeBackGround)
+			pUI->m_bRender = true;
+
+		for (auto& pUI : m_vUpgradeState)
+			pUI->m_bRender = true;
+	}
+	else
+	{
+		for (auto& pUI : m_vPausedBackGround)
+			pUI->m_bRender = false;
+
+		for (auto& pUI : m_vUpgradeBackGround)
+			pUI->m_bRender = false;
+
+		for (auto& pUI : m_vUpgradeState)
+			pUI->m_bRender = false;
+	}
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
@@ -118,10 +151,20 @@ void Game::Render()
 void Game::Destroy()
 {
 	m_pCameraActor = nullptr;
+	m_pGameCameraActor = nullptr;
 	m_pPlayer = nullptr;
 	m_pSkyMesh = nullptr;
 	m_pSky = nullptr;
 	m_pSunLight = nullptr;
+
+	m_vPausedBackGround.clear();
+	m_vUpgradeBackGround.clear();
+	m_vUpgradeState.clear();
+	m_vCoins.clear();
+
+	enemyList.clear();
+	m_vObjectList.clear();
+	m_vMapList.clear();
 }
 
 void Game::SetupEngineCamera()

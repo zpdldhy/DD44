@@ -21,8 +21,10 @@ public:
 	float time;
 
 	// UI
-	vector<shared_ptr<class AUIActor>> m_vHP;
-	vector<shared_ptr<class AUIActor>> m_vArrow;
+	vector<shared_ptr<class AUIActor>> m_vPausedBackGround;
+	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
+	vector<shared_ptr<class AUIActor>> m_vUpgradeState;
+	vector<shared_ptr<class AUIActor>> m_vCoins;
 
 	// TEMP
 	vector<shared_ptr<AActor>> enemyList; 
