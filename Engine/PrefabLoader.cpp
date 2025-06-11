@@ -113,6 +113,7 @@ bool PrefabLoader::SaveCharacter(const PrefabCharacterData& data, const std::str
     j["ShaderPath"] = data.ShaderPath;
     j["TexturePath"] = data.TexturePath;
     j["ScriptType"] = data.ScriptType;
+    j["ScriptName"] = data.ScriptName;
     j["AnimIndex"] = data.AnimIndex;
     j["AnimSpeed"] = data.AnimSpeed;
 
@@ -166,6 +167,7 @@ bool PrefabLoader::LoadCharacter(const std::string& filePath, PrefabCharacterDat
     data.ShaderPath = j["ShaderPath"];
     data.TexturePath = j["TexturePath"];
     data.ScriptType = j["ScriptType"];
+    data.ScriptName = j["ScriptName"];
     data.AnimIndex = j["AnimIndex"];
     data.AnimSpeed = j["AnimSpeed"];
 

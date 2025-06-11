@@ -69,6 +69,7 @@ private:
 public:
 	void Init();
 	void Tick();
+	virtual shared_ptr<UScriptComponent> Clone() override;
 public:
 	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
 	void SetSnowBall();

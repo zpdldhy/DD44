@@ -118,6 +118,12 @@ void BettyMovement::Tick()
 
 }
 
+shared_ptr<UScriptComponent> BettyMovement::Clone()
+{
+	auto script = make_shared<BettyMovement>();
+	return script;
+}
+
 #pragma region Snowball
 void BettyMovement::SetSnowBall()
 {

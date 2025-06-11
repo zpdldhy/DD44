@@ -197,6 +197,12 @@ void BatMovement::Tick()
 
 }
 
+shared_ptr<UScriptComponent> BatMovement::Clone()
+{
+	auto script = make_shared<BatMovement>();
+	return script;
+}
+
 void BatMovement::ChangetState(shared_ptr<StateBase> _state)
 {
 	if (_state->GetId() == ENEMY_S_DEATH)

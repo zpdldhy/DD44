@@ -27,6 +27,7 @@
 #include "UStaticMeshComponent.h"
 
 // Script
+#include "ScriptManager.h"
 #include "EngineCameraMoveScript.h"
 #include "GameCameraMove.h"
 #include "MageMovement.h"
@@ -43,6 +44,7 @@
 
 void Game::Init()
 {
+	SCRIPT->Init();
 	// Asset ·Îµù
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");

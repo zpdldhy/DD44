@@ -125,6 +125,12 @@ void WalkerMovement::Tick()
 
 }
 
+shared_ptr<UScriptComponent> WalkerMovement::Clone()
+{
+	auto script = make_shared<WalkerMovement>();
+	return script;
+}
+
 void WalkerMovement::ChangeState(shared_ptr<StateBase> _state)
 {
 	if (!currentState->IsInterruptible() && currentState->IsPlaying())

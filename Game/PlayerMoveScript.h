@@ -72,7 +72,7 @@ public:
 public:
 	void Init() override;
 	void Tick() override;
-
+	virtual shared_ptr<UScriptComponent> Clone() override;
 private:
 	void SetUI();
 	void UpdateHPUI();

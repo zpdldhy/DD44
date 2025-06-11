@@ -37,6 +37,9 @@
     <Filter Include="FSM\EnemyStates">
       <UniqueIdentifier>{7d236e65-09df-4359-ae64-7c25373f037c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameActor">
+      <UniqueIdentifier>{01263189-9556-4f9c-bb51-c081d8fa20b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -132,7 +135,12 @@
     <ClInclude Include="ProjectileManager.h">
       <Filter>GameManagers</Filter>
     </ClInclude>
-    <ClInclude Include="TCharacter.h" />
+    <ClInclude Include="ScriptManager.h">
+      <Filter>GameManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="TCharacter.h">
+      <Filter>GameActor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -222,7 +230,12 @@
     <ClCompile Include="ProjectileManager.cpp">
       <Filter>GameManagers</Filter>
     </ClCompile>
-    <ClCompile Include="TCharacter.cpp" />
+    <ClCompile Include="ScriptManager.cpp">
+      <Filter>GameManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="TCharacter.cpp">
+      <Filter>GameActor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

@@ -163,6 +163,7 @@
     <ClInclude Include="PlayerStates.h" />
     <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="Sample.h" />
+    <ClInclude Include="ScriptManager.h" />
     <ClInclude Include="TCharacter.h" />
     <ClInclude Include="TestPlayer.h" />
     <ClInclude Include="TestSJ.h" />
@@ -197,6 +198,7 @@
     <ClCompile Include="PrefabToActor.cpp" />
     <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="ScriptManager.cpp" />
     <ClCompile Include="TCharacter.cpp" />
     <ClCompile Include="TestPlayer.cpp" />
     <ClCompile Include="TestSJ.cpp" />

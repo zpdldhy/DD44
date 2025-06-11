@@ -19,6 +19,12 @@
 
 #include "ProjectileManager.h"
 
+shared_ptr<UScriptComponent> PlayerMoveScript::Clone()
+{
+	auto script = make_shared<PlayerMoveScript>();
+	return script;
+}
+
 void PlayerMoveScript::Init()
 {
 	m_fCurrentSpeed = m_fSpeed;

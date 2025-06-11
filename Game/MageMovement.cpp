@@ -93,6 +93,12 @@ void MageMovement::Tick()
 	CheckHit();
 }
 
+shared_ptr<UScriptComponent> MageMovement::Clone()
+{
+	auto script = make_shared<MageMovement>();
+	return script;
+}
+
 void MageMovement::ChangeState(shared_ptr<StateBase> _state)
 {
 	// 아래랑 중복되는 내용 아니야 ? ( 확인 필요 ) 

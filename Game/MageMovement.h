@@ -30,6 +30,7 @@ private:
 public:
 	virtual void Init() override;
 	virtual void Tick() override;
+	virtual shared_ptr<UScriptComponent> Clone() override;
 public:
 	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
 	void ChangeState(shared_ptr<StateBase> _state);

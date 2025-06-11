@@ -21,12 +21,13 @@
 #include "UBoxComponent.h"
 #include "USphereComponent.h"
 
-// Script
-#include "PlayerMoveScript.h"
-#include "BatMovement.h"
-#include "WalkerMovement.h"
-#include "BettyMovement.h"
-#include "MageMovement.h"
+//// Script
+//#include "PlayerMoveScript.h"
+//#include "BatMovement.h"
+//#include "WalkerMovement.h"
+//#include "BettyMovement.h"
+//#include "MageMovement.h"
+#include "ScriptManager.h"
 
 //unique_ptr<ActorLoader> PrefabToActor::actorLoader = nullptr;
 //unique_ptr<MeshLoader> PrefabToActor::meshLoader = nullptr;
@@ -124,12 +125,8 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 		actor->SetRotation(Vec3(characterData.transform.Rotation));
 		actor->SetScale(Vec3(characterData.transform.Scale));
 
-		// 추후 script manager 만들어 수정할 예정
-		if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
-		if (characterData.ScriptType == 2) { actor->AddScript(std::make_shared<BatMovement>()); }
-		if (characterData.ScriptType == 3) { actor->AddScript(std::make_shared<WalkerMovement>()); }
-		if (characterData.ScriptType == 4) { actor->AddScript(std::make_shared<BettyMovement>()); }
-		if (characterData.ScriptType == 5) { actor->AddScript(std::make_shared<MageMovement>()); }
+		auto script = SCRIPT->GetScript(to_mw(characterData.ScriptName));
+		actor->AddScript(script);
 
 		if (characterData.camera.isUse)
 		{
@@ -195,7 +192,7 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 		material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
 		meshComp->SetMaterial(material);
 
-		obj= make_shared<APawn>();
+		obj = make_shared<APawn>();
 		obj->SetPrefabPath(_file);
 		obj->m_szName = L"Object";
 		obj->SetMeshComponent(meshComp);
@@ -209,7 +206,7 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 
 			if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
 				shapeComp = std::make_shared<UBoxComponent>();
-			else if(objData.ShapeData.eShapeType == ShapeType::ST_SPHERE)
+			else if (objData.ShapeData.eShapeType == ShapeType::ST_SPHERE)
 				shapeComp = std::make_shared<USphereComponent>();
 			// else if (...) // 다른 타입 추가 가능
 

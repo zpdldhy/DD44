@@ -41,6 +41,7 @@ private:
 public:
 	void Init() override;
 	void Tick() override;
+	virtual shared_ptr<UScriptComponent> Clone() override;
 public:
 	void ChangeState(shared_ptr<StateBase> _state);
 public:
