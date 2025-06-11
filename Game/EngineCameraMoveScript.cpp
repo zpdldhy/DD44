@@ -32,22 +32,22 @@ void EngineCameraMoveScript::Tick()
 	if(INPUT->GetButtonDown(LSHIFT) || INPUT->GetButtonDown(RSHIFT))
 		deltaTime *= 10.f;
 
-	if (INPUT->GetButtonDown(U))
+	if (INPUT->GetButtonDown(UP))
 		GetOwner()->AddPosition(GetOwner()->GetLook() * deltaTime);
 
-	if (INPUT->GetButtonDown(H))
+	if (INPUT->GetButtonDown(LEFT))
 		GetOwner()->AddPosition(-GetOwner()->GetRight() * deltaTime);
 
-	if (INPUT->GetButtonDown(J))
+	if (INPUT->GetButtonDown(DOWN))
 		GetOwner()->AddPosition(-GetOwner()->GetLook() * deltaTime);
 
-	if (INPUT->GetButtonDown(K))
+	if (INPUT->GetButtonDown(RIGHT))
 		GetOwner()->AddPosition(GetOwner()->GetRight() * deltaTime);
 
-	if (INPUT->GetButtonDown(Y))
+	if (INPUT->GetButtonDown(Q))
 		GetOwner()->AddPosition(Vec3(0.0f, -1.0f, 0.0f) * deltaTime);
 
-	if (INPUT->GetButtonDown(I))
+	if (INPUT->GetButtonDown(E))
 		GetOwner()->AddPosition(Vec3(0.0f, 1.0f, 0.0f) * deltaTime);
 
 	auto camera = GetOwner()->GetCameraComponent();
