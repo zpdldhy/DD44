@@ -6,7 +6,7 @@
 #include "Timer.h"
 #include "CollisionManager.h"
 #include "ObjectManager.h"
-#include "AActor.h"
+#include "TEnemy.h"
 #include "TCharacter.h"
 #include "UStaticMeshComponent.h"
 #include "UBoxComponent.h"
@@ -17,6 +17,9 @@
 
 void BettyMovement::Init()
 {
+	owner = dynamic_pointer_cast<TEnemy>(GetOwner());
+	SetPlayer(owner->GetPlayer());
+
 	// state
 	idle = make_shared<BettyIdleState>(m_pOwner);
 	intro = make_shared<BettyIntroState>(m_pOwner);
@@ -116,6 +119,12 @@ void BettyMovement::Tick()
 		EFFECT->PlayBeamBurst(pos, 20, .5f);
 	}
 
+}
+
+shared_ptr<UScriptComponent> BettyMovement::Clone()
+{
+	auto script = make_shared<BettyMovement>();
+	return script;
 }
 
 #pragma region Snowball
@@ -382,42 +391,55 @@ void BettyMovement::HandleAttack(float _delta)
 }
 void BettyMovement::CheckHit()
 {
-	// 투사체 충돌 확인
-	auto healthComp = dynamic_pointer_cast<TCharacter>(GetOwner());
+	// HP
+	auto comp = dynamic_pointer_cast<TEnemy>(GetOwner());
+	bool isHit = comp->CheckHit();
+	// hit event 없음. 경직 뭐 아무것도.
 
-	hitElapsed += TIMER->GetDeltaTime();
-	// 충돌 확인
-	if (hitElapsed > 1.0f) //&& GetOwner()->m_vCollisionList.size() > 0)
+	if (comp->IsDead())
 	{
-		// 근접 공격 확인
-		bool isCol = false;
-		if (GetOwner()->m_vCollisionList.size() > 0)
-		{
-			auto list = GetOwner()->m_vCollisionList;
-			for (auto& index : list)
-			{
-				if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
-					isCol = true;
-			}
-		}
-
-		if (isCol || healthComp->IsHitByProjectile())
-		{
-			hitElapsed = 0.0f;
-			// 피격 시 경직 없고, flashing 뿐
-			m_fHitFlashTimer = 1.f;  // 1초 동안
-			m_bIsFlashing = true;
-
-			// Anim
-			healthComp->TakeDamage(1);
-
-			if (healthComp->IsDead())
-			{
-				currentAction = BettyAction::Die;
-				ChangeState(death);
-			}
-		}
+		ChangeState(death);
 	}
+
+	#pragma region Old
+				// 투사체 충돌 확인
+	//auto healthComp = dynamic_pointer_cast<TCharacter>(GetOwner());
+
+	//hitElapsed += TIMER->GetDeltaTime();
+	//// 충돌 확인
+	//if (hitElapsed > 1.0f) //&& GetOwner()->m_vCollisionList.size() > 0)
+	//{
+	//	// 근접 공격 확인
+	//	bool isCol = false;
+	//	if (GetOwner()->m_vCollisionList.size() > 0)
+	//	{
+	//		auto list = GetOwner()->m_vCollisionList;
+	//		for (auto& index : list)
+	//		{
+	//			if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
+	//				isCol = true;
+	//		}
+	//	}
+
+	//	if (isCol || healthComp->IsHitByProjectile())
+	//	{
+	//		hitElapsed = 0.0f;
+	//		// 피격 시 경직 없고, flashing 뿐
+	//		m_fHitFlashTimer = 1.f;  // 1초 동안
+	//		m_bIsFlashing = true;
+
+	//		// Anim
+	//		healthComp->TakeDamage(1);
+
+	//		if (healthComp->IsDead())
+	//		{
+	//			currentAction = BettyAction::Die;
+	//			ChangeState(death);
+	//		}
+	//	}
+	//}  
+#pragma endregion
+
 }
 void BettyMovement::AddColliderActor()
 {

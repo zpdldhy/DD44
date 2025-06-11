@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "WalkerMovement.h"
 
-#include "AActor.h"
-#include "TCharacter.h"
+#include "TEnemy.h"
+#include "TPlayer.h"
 #include "EffectManager.h"
 
 #include "Input.h"
@@ -14,6 +14,10 @@
 
 void WalkerMovement::Init()
 {
+	owner = dynamic_pointer_cast<TEnemy>(GetOwner());
+	auto player = dynamic_pointer_cast<TPlayer>(owner->GetPlayer().lock());
+	SetPlayer(player);
+
 	// position
 	m_bWait = true;
 	m_vPos[0] = GetOwner()->GetPosition() - m_half * Vec3(1, 0, 1);
@@ -51,7 +55,6 @@ void WalkerMovement::Init()
 
 void WalkerMovement::Tick()
 {
-	Flashing();
 	LerpRotate();
 	if (m_bWait)
 	{
@@ -121,8 +124,35 @@ void WalkerMovement::Tick()
 
 	}
 	// HIT
-	CheckHit();
+	auto comp = dynamic_pointer_cast<TEnemy>(GetOwner());
+	bool isHit = comp->CheckHit();
+	if (isHit && !comp->IsDead())
+	{
+		// 회전 
+		Vec3 direction = GetOwner()->GetPosition() - player.lock()->GetPosition();
+		direction.y = 0;
+		direction.Normalize();
+		Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
+		Vec3 moveDir = tempUp.Cross(direction); // 반시계 방향
+		float targetYaw = atan2f(moveDir.x, moveDir.z);
+		Vec3 currentRot = GetOwner()->GetRotation();
+		currentRot.y = targetYaw;
+		GetOwner()->SetRotation(currentRot);
+		m_rotate = false;
 
+		ChangeState(hit);
+	}
+	if (comp->IsDead())
+	{
+		ChangeState(death);
+	}
+
+}
+
+shared_ptr<UScriptComponent> WalkerMovement::Clone()
+{
+	auto script = make_shared<WalkerMovement>();
+	return script;
 }
 
 void WalkerMovement::ChangeState(shared_ptr<StateBase> _state)
@@ -142,70 +172,6 @@ void WalkerMovement::ChangeState(shared_ptr<StateBase> _state)
 
 	if (currentState)
 		currentState->Enter();
-}
-
-void WalkerMovement::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)
-{
-	int count = RandomRange(_minCount, _maxCount);
-	for (int i = 0; i < count; ++i)
-	{
-		Vec3 offset = Vec3(RandomRange(-0.3f, 0.3f), RandomRange(-0.3f, 0.3f), RandomRange(-0.3f, 0.3f));
-		Vec3 pos = _origin + offset;
-
-		Vec3 baseVelocity = _direction * _speed;
-		EFFECT->PlayEffect(EEffectType::Blood, pos, _spreadAngleDeg, baseVelocity);
-	}
-}
-// 빈 함수, 기능 필요하면 넣기용.
-void WalkerMovement::VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp)
-{
-	if (!comp) return;
-
-	shared_ptr<UMaterial> mat = comp->GetMaterial();
-	if (mat)
-	{
-
-	}
-
-	for (int i = 0; i < comp->GetChildCount(); ++i)
-	{
-		VisitAllMeshMaterials(comp->GetChild(i));
-	}
-}
-
-void WalkerMovement::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value)
-{
-	if (!comp) return;
-
-	shared_ptr<UMaterial> mat = comp->GetMaterial();
-	if (mat)
-	{
-		mat->SetHitFlashTime(value); // CB에 g_fHitFlashTime 전달
-	}
-
-	for (int i = 0; i < comp->GetChildCount(); ++i)
-	{
-		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
-	}
-}
-
-void WalkerMovement::Flashing()
-{
-	if (m_bIsFlashing)
-	{
-		m_fHitFlashTimer -= TIMER->GetDeltaTime();
-		if (m_fHitFlashTimer <= 0.0f)
-		{
-			m_fHitFlashTimer = 0.0f;
-			m_bIsFlashing = false;
-		}
-
-		// hitFlashAmount는 1 → 0 으로 감소
-		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
-
-		auto root = GetOwner()->GetMeshComponent();
-		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
-	}
 }
 
 void WalkerMovement::LerpRotate()
@@ -250,16 +216,6 @@ void WalkerMovement::CheckHit()
 
 	if (isCol || healthComp->IsHitByProjectile())
 	{
-		// Blood FX
-		Vec3 basePos = GetOwner()->GetPosition();
-		basePos.y += RandomRange(3, 4);
-		Vec3 look = GetOwner()->GetLook();
-		velocity = -look;
-		PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
-
-		m_fHitFlashTimer = 1.f;  // 1초 동안
-		m_bIsFlashing = true;
-
 		// Anim
 		// 회전 
 		Vec3 direction = GetOwner()->GetPosition() - player.lock()->GetPosition();

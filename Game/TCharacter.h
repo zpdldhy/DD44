@@ -1,7 +1,10 @@
 #pragma once
 #include "AActor.h"
+
 class TCharacter : public AActor
 {
+public:
+	virtual ~TCharacter() = default;
 private:
 	int hp;
 	bool bDead = false;

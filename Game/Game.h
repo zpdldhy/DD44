@@ -44,7 +44,7 @@ protected:
 	void CreateWind();
 
 protected:
-	void SetEnemyScript();
+	void SetEnemy();
 	void CheckEnemyCollision();
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }

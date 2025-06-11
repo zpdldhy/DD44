@@ -50,7 +50,7 @@ void TestYR::Init()
 
 	vlist.emplace_back(boss_betty);
 	enemyList = vlist;
-	for (auto& enemy : vlist)
+	/*for (auto& enemy : vlist)
 	{
 		if (enemy->GetScriptList().size() <= 0) { continue; }
 		auto bat = dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0]);
@@ -73,7 +73,7 @@ void TestYR::Init()
 		{
 			mage->SetPlayer(player);
 		}
-	}
+	}*/
 	OBJECT->AddActorList(vlist);
 
 #pragma endregion

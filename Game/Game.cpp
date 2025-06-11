@@ -22,11 +22,13 @@
 #include "ALight.h"
 #include "AUIActor.h"
 #include "AWindActor.h"
+#include "TEnemy.h"
 
 // Component
 #include "UStaticMeshComponent.h"
 
 // Script
+#include "ScriptManager.h"
 #include "EngineCameraMoveScript.h"
 #include "GameCameraMove.h"
 #include "MageMovement.h"
@@ -43,6 +45,7 @@
 
 void Game::Init()
 {
+	SCRIPT->Init();
 	// Asset 로딩
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
@@ -56,14 +59,14 @@ void Game::Init()
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
 	OBJECT->AddActor(m_pPlayer);
+	//m_pPlayer->SetPosition(Vec3(0.0f, 0.0f, 0.0f));
 	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	vlist.emplace_back(m_pBetty);
-	OBJECT->AddActorList(vlist);
-	
 	// Temp
 	enemyList = vlist;
-	SetEnemyScript();
+	SetEnemy();
+	OBJECT->AddActorList(vlist);
 
 	// UI
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
@@ -101,7 +104,7 @@ void Game::Tick()
 			CreateWind();
 
 	}
-	
+
 	if (INPUT->GetButton(O))
 	{
 		if (m_bEnginCamera)
@@ -147,7 +150,7 @@ void Game::SetupEngineCamera()
 void Game::SetupGameCamera()
 {
 	m_pGameCameraActor = make_shared<ACameraActor>();
-	
+
 	auto script = make_shared<GameCameraMove>(m_pPlayer);
 	m_pGameCameraActor->AddScript(script);
 	m_pGameCameraActor->m_szName = L"GameCamera";
@@ -218,44 +221,24 @@ void Game::CreateWind()
 			wind->SetRotation(Vec3(0, 0, randomAngle));     // ↘ 방향
 			float speed = RandomRange(0.35f, 0.45f);     // 바람 세기
 
-			Vec3 velocity = Vec3(1,-1,0) * speed;
+			Vec3 velocity = Vec3(1, -1, 0) * speed;
 			wind->SetVelocity(velocity);
 
 
 			WIND->AddWind(wind);
 		}
-		
+
 	}
 }
 
-void Game::SetEnemyScript()
+void Game::SetEnemy()
 {
 	for (auto& enemy : enemyList)
 	{
-		// 
-		if (enemy->GetScriptList().size() <= 0) { continue; }
-		// bat
+		auto e = dynamic_pointer_cast<TEnemy>(enemy);
+		if (e)
 		{
-			auto script = dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0]);
-			if (script) { script->SetPlayer(m_pPlayer); }
-		}
-
-		// walker
-		{
-			auto script = dynamic_pointer_cast<WalkerMovement>(enemy->GetScriptList()[0]);
-			if (script) { script->SetPlayer(m_pPlayer); }
-		}
-
-		// betty
-		{
-			auto script = dynamic_pointer_cast<BettyMovement>(enemy->GetScriptList()[0]);
-			if (script) { script->SetPlayer(m_pPlayer); }
-		}
-		 
-		auto mage = dynamic_pointer_cast<MageMovement>(enemy->GetScriptList()[0]);
-		if (mage)
-		{
-			mage->SetPlayer(m_pPlayer);
+			e->SetPlayer(m_pPlayer);
 		}
 	}
 }

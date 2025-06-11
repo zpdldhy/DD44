@@ -1,15 +1,19 @@
 #include "pch.h"
 #include "MageMovement.h"
-#include "TCharacter.h"
+#include "TEnemy.h"
 
 #include "Timer.h"
 #include "ObjectManager.h"
-
+#include "TPlayer.h"
 // temp temp temp !!!!!
 #include "Input.h"
 
 void MageMovement::Init()
 {
+	owner = dynamic_pointer_cast<TEnemy>(GetOwner());
+	SetPlayer(owner->GetPlayer());
+
+
 	idle = make_shared<MageIdleState>(m_pOwner);
 	appear = make_shared<MageAppearState>(m_pOwner);
 	disappear = make_shared<MageDisappearState>(m_pOwner);
@@ -20,8 +24,6 @@ void MageMovement::Init()
 
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(6);
-
-	// Colllider
 
 
 }
@@ -59,13 +61,14 @@ void MageMovement::Tick()
 	//}
 
 #pragma endregion
-	// FX
-	Flashing();
 	// State
 	currentState->Tick();
-	if (currentStateId == ENEMY_S_DEATH && !currentState->IsPlaying())
+	if (currentStateId == ENEMY_S_DEATH)
 	{
-		GetOwner()->m_bDelete = true;
+		if (!currentState->IsPlaying())
+		{
+			GetOwner()->m_bDelete = true;
+		}
 		return;
 	}
 
@@ -79,7 +82,7 @@ void MageMovement::Tick()
 	if (distance.Length() < findDistance)
 	{
 		// 공격 가능 확인 
-		if (currentStateId != ENEMY_S_ATTACK)
+		if (currentStateId != ENEMY_S_ATTACK && currentStateId != ENEMY_S_DEATH)
 		{
 			dynamic_pointer_cast<MageAttackState>(attack)->SetTarget(player);
 			ChangeState(attack);
@@ -89,8 +92,13 @@ void MageMovement::Tick()
 	//
 	Rotate();
 
-	// HP
 	CheckHit();
+}
+
+shared_ptr<UScriptComponent> MageMovement::Clone()
+{
+	auto script = make_shared<MageMovement>();
+	return script;
 }
 
 void MageMovement::ChangeState(shared_ptr<StateBase> _state)
@@ -152,47 +160,16 @@ void MageMovement::Rotate()
 
 void MageMovement::CheckHit()
 {
-	// 투사체 충돌 확인
-	auto healthComp = dynamic_pointer_cast<TCharacter>(GetOwner());
-
-	hitElapsed += TIMER->GetDeltaTime();
-	// 충돌 확인
-	if (hitElapsed > 1.0f) //&& GetOwner()->m_vCollisionList.size() > 0)
+	// HP
+	auto comp = dynamic_pointer_cast<TEnemy>(GetOwner());
+	bool isHit = comp->CheckHit();
+	if (isHit && !comp->IsDead())
 	{
-		// 근접 공격 확인
-		bool isCol = false;
-		if (GetOwner()->m_vCollisionList.size() > 0)
-		{
-			auto list = GetOwner()->m_vCollisionList;
-			for (auto& index : list)
-			{
-				if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
-				{
-					isCol = true;
-				}
-			}
-		}
-
-		if (isCol || healthComp->IsHitByProjectile())
-		{
-			hitElapsed = 0.0f;
-			// FX
-			m_fHitFlashTimer = 1.f;  // 1초 동안
-			m_bIsFlashing = true;
-			// HP
-			healthComp->TakeDamage(1);
-			// State
-			// Anim
-			if (healthComp->IsDead())
-			{
-				ChangeState(death);
-			}
-			else
-			{
-				// Attack일 때 어짜피 못들어감. 추가 로직 필요
-				//ChangeState(hit);
-			}
-		}
+		//ChangeState(hit);
+	}
+	if (comp->IsDead())
+	{
+		ChangeState(death);
 	}
 }
 

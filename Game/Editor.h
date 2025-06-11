@@ -75,7 +75,7 @@ protected:
 	void CreateObjectAtMousePick();
 
 protected:
-	void SetEnemyScript();
 	void CheckEnemyCollision();
+	void SetEnemy();
 };
 

@@ -2,12 +2,15 @@
 #include "UScriptComponent.h"
 #include "MageStates.h"
 
+class TEnemy;
+
 class MageMovement : public UScriptComponent
 {
 public:
 	MageMovement() = default;
 	~MageMovement() = default;
 private:
+	shared_ptr<TEnemy> owner;
 	weak_ptr<AActor> player;
 
 	// States
@@ -30,6 +33,7 @@ private:
 public:
 	virtual void Init() override;
 	virtual void Tick() override;
+	virtual shared_ptr<UScriptComponent> Clone() override;
 public:
 	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
 	void ChangeState(shared_ptr<StateBase> _state);
