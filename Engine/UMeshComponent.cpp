@@ -17,11 +17,6 @@ void UMeshComponent::Render()
 	}
 }
 
-void UMeshComponent::AddChild(shared_ptr<UMeshComponent> _child)
-{
-	m_vChild.push_back(_child);
-}
-
 void UMeshComponent::RemoveChild(int _index)
 {
 	auto child = GetChild(_index);
@@ -60,16 +55,16 @@ int UMeshComponent::GetChildIndex(shared_ptr<UMeshComponent> _child)
 	return -1;
 }
 
-shared_ptr<UMeshComponent> UMeshComponent::GetMeshByName(const wstring& _name)
+shared_ptr<UMeshComponent> UMeshComponent::GetChildByName(const wstring& _name)
 {
 	for (auto& child : m_vChild)
 	{
 		if (child->GetName() == _name)
-		{
+	{
 			return child;
-		}
+	}
 
-		auto found = child->GetMeshByName(_name);
+		auto found = child->GetChildByName(_name);
 		if (found)
 		{
 			return found;

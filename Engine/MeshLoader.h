@@ -1,11 +1,12 @@
 #pragma once
 #include "SkeletalMeshData.h"
+#include "Singleton.h"
 
 class UMeshResources;
 class UMeshComponent;
 class UAnimInstance;
 
-class MeshLoader
+class MeshLoader : public Singleton<MeshLoader>
 {
 	map<wstring, shared_ptr<UMeshResources>> m_mMeshMap;
 	map<wstring, shared_ptr<UAnimInstance>> m_mAnimMap;

@@ -25,6 +25,10 @@ public:
 	float m_fRollCoolTime = 0.3f;
 	bool m_bCanRoll = true;
 
+	// Attack
+	shared_ptr<AActor> attackRangeActor;
+	Vec3 colOffset;
+
 	Vec3 m_vLook;
 	Vec3 m_vRight;
 	Vec3 m_vLastMoveDir;
@@ -32,7 +36,7 @@ public:
 	Vec3 m_vRollLook;
 
 	// 상호작용
-	UINT m_vHP = 4;
+	//UINT m_vHP = 4;
 	UINT m_vArrowCount = 4;
 
 	// UI Actor
@@ -52,6 +56,7 @@ public:
 	shared_ptr<StateBase> roll;
 	shared_ptr<StateBase> attack;
 	shared_ptr<StateBase> hit;
+	shared_ptr<StateBase> shoot;
 	shared_ptr<StateBase> die;
 	shared_ptr<StateBase> currentState;
 
@@ -82,7 +87,10 @@ public:
 	bool m_bIsFlashing = false;
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
 public:
+	void Move();
+	void CheckHit();
 	void RollMove();
 	bool CanAttack();
+	void UpdateCollider();
 };
 

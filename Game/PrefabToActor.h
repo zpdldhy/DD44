@@ -8,6 +8,8 @@ class AActor;
 class PrefabToActor : public Singleton<PrefabToActor>
 {
 public:
+    void Init();
+public:
     vector<shared_ptr<AActor>> LoadAllPrefabs(const std::string& extension);
 
 public:
@@ -22,8 +24,8 @@ public:
 private:
     void MakeLoader();
 
-private:
-    static unique_ptr<class ActorLoader> actorLoader;
-    static unique_ptr<class MeshLoader> meshLoader;
+//private:
+//    static unique_ptr<class ActorLoader> actorLoader;
+//    static unique_ptr<class MeshLoader> meshLoader;
 };
 

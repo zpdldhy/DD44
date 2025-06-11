@@ -4,6 +4,7 @@
 #include "BatStates.h"
 
 class UMeshComponent;
+class AActor;
 
 class BatMovement : public UScriptComponent
 {
@@ -31,6 +32,14 @@ public:
 	// 
 	bool m_bReturn;
 	Vec3 m_vReturnPos;
+	bool m_bStopAllMove = false;
+	//
+	shared_ptr<AActor> attackRangeActor;
+	Vec3 colOffset;
+
+	// TEMP
+	bool m_bMove = false;
+
 	// States 
 	shared_ptr<StateBase> idle;
 	shared_ptr<StateBase> walk;
@@ -53,4 +62,5 @@ public:
 	void Flashing();
 	void Attack();
 	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
+	void CheckHit();
 };

@@ -78,11 +78,12 @@ void ObjectManager::Destroy()
 void ObjectManager::AddActor(shared_ptr<class AActor> _pActor)
 {
 	_pActor->m_Index = ActorCount;
-	_pActor->Init();
 	m_vActorList.insert(make_pair(ActorCount, _pActor));
 	m_vActorIndexList.emplace_back(ActorCount);		// 임시 사용
-
 	ActorCount++;
+	
+	_pActor->Init();
+
 }
 
 void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
@@ -90,11 +91,12 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 	for (auto& pActor : _vActorList)
 	{
 		pActor->m_Index = ActorCount;
-		pActor->Init();
 		m_vActorList.insert(make_pair(ActorCount, pActor));
 
 		m_vActorIndexList.emplace_back(ActorCount);	// 임시 사용
 		ActorCount++;
+
+		pActor->Init();
 	}
 }
 

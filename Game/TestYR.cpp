@@ -24,19 +24,55 @@
 #include "GameCameraMove.h"
 
 #include "BatMovement.h"
+#include "WalkerMovement.h"
+#include "BettyMovement.h"
+#include "MageMovement.h"
 #include "CollisionManager.h"
+#include "UBoxComponent.h"
+#include "EnemyCollisionManager.h"
+#include "EffectManager.h"
+#include "ProjectileManager.h"
 
 void TestYR::Init()
 {
 #pragma region Set Character
+	PToA->Init();
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	player = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
+	player->SetPosition(Vec3(0.0f, 0.0f, 0.0f));
 	OBJECT->AddActor(player);
+
+	//m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
+	//OBJECT->AddActorList(m_vObjectList);
+
+	boss_betty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
+	//OBJECT->AddActor(boss_betty);
+
+	vlist.emplace_back(boss_betty);
 	enemyList = vlist;
 	for (auto& enemy : vlist)
 	{
 		if (enemy->GetScriptList().size() <= 0) { continue; }
-		dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0])->SetPlayer(player);
+		auto bat = dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0]);
+		if (bat)
+		{
+			bat->SetPlayer(player);
+		}
+		auto walker = dynamic_pointer_cast<WalkerMovement>(enemy->GetScriptList()[0]);
+		if (walker)
+		{
+			walker->SetPlayer(player);
+		}
+		auto betty = dynamic_pointer_cast<BettyMovement>(enemy->GetScriptList()[0]);
+		if (betty)
+		{
+			betty->SetPlayer(player);
+		}
+		auto mage = dynamic_pointer_cast<MageMovement>(enemy->GetScriptList()[0]);
+		if (mage)
+		{
+			mage->SetPlayer(player);
+		}
 	}
 	OBJECT->AddActorList(vlist);
 
@@ -82,7 +118,92 @@ void TestYR::Init()
 		gizmo.emplace_back(object2);
 		gizmo.emplace_back(object3);
 	}
+	EFFECT->Init();
 #pragma endregion
+#pragma region plain
+	plain = make_shared<AActor>();
+	plain->SetMeshComponent(UStaticMeshComponent::CreateCube());
+	plain->SetScale(Vec3(500.f, 0.5f, 500.0f));
+	auto mat = make_shared<UMaterial>();
+	mat->Load(L"../Resources/Texture/Stone_SmoothGreenish_Tile.png", L"../Resources/Shader/Default.hlsl");
+	plain->GetMeshComponent()->SetMaterial(mat);
+	auto collider = make_shared<UBoxComponent>();
+	collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
+	plain->m_szName = L"Stair";
+	plain->SetShapeComponent(collider);
+	m_vObjectList.emplace_back(plain);
+	OBJECT->AddActor(plain);
+#pragma endregion
+#pragma region wall
+	{
+		auto wall = make_shared<AActor>();
+		wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
+		wall->SetPosition(Vec3(0.0f, 5.0f, -35.0f));
+		wall->SetScale(Vec3(70.f, 20.0f, 5.0f));
+		auto mat2 = make_shared<UMaterial>();
+		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		wall->GetMeshComponent()->SetMaterial(mat2);
+		auto collider2 = make_shared<UBoxComponent>();
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
+		wall->m_szName = L"Object";
+		wall->SetShapeComponent(collider2);
+		m_vObjectList.emplace_back(wall);
+		OBJECT->AddActor(wall); 
+	}
+
+	{
+		auto wall = make_shared<AActor>();
+		wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
+		wall->SetPosition(Vec3(0.0f, 5.0f, 35.0f));
+		wall->SetScale(Vec3(70.f, 20.0f, 5.0f));
+		auto mat2 = make_shared<UMaterial>();
+		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		wall->GetMeshComponent()->SetMaterial(mat2);
+		auto collider2 = make_shared<UBoxComponent>();
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
+		wall->m_szName = L"Object";
+		wall->SetShapeComponent(collider2);
+		m_vObjectList.emplace_back(wall);
+		OBJECT->AddActor(wall);
+	}
+
+	{
+		auto wall = make_shared<AActor>();
+		wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
+		wall->SetPosition(Vec3(30.0f, 5.0f, 0.0f));
+		wall->SetScale(Vec3(5.f, 20.0f, 70.0f));
+		auto mat2 = make_shared<UMaterial>();
+		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		wall->GetMeshComponent()->SetMaterial(mat2);
+		auto collider2 = make_shared<UBoxComponent>();
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
+		wall->m_szName = L"Object";
+		wall->SetShapeComponent(collider2);
+		m_vObjectList.emplace_back(wall);
+		OBJECT->AddActor(wall);
+	}
+
+	{
+		auto wall = make_shared<AActor>();
+		wall->SetMeshComponent(UStaticMeshComponent::CreateCube());
+		wall->SetPosition(Vec3(-30.0f, 5.0f, 0.0f));
+		wall->SetScale(Vec3(70.f, 20.0f, 5.0f));
+		wall->SetRotation(Vec3(0.0f, DD_PI/2, 0.0f));
+		auto mat2 = make_shared<UMaterial>();
+		mat2->Load(L"../Resources/Texture/kkongchi.jpg", L"../Resources/Shader/Default.hlsl");
+		wall->GetMeshComponent()->SetMaterial(mat2);
+		auto collider2 = make_shared<UBoxComponent>();
+		collider2->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
+		wall->m_szName = L"Object";
+		wall->SetShapeComponent(collider2);
+		m_vObjectList.emplace_back(wall);
+		OBJECT->AddActor(wall);
+	}
+
+	
+#pragma endregion
+
+	PROJECTILE->Init();
 }
 void TestYR::Tick()
 {
@@ -101,6 +222,7 @@ void TestYR::Tick()
 	}
 
 	CheckEnemyCollision();
+	PROJECTILE->Tick();
 }
 
 void TestYR::Render()
@@ -154,6 +276,41 @@ void TestYR::SetupGameCamera()
 
 void TestYR::CheckEnemyCollision()
 {
+	shared_ptr<AActor> melee;
+	for (auto iter = ENEMYCOLLIDER->enemyList.begin(); iter != ENEMYCOLLIDER->enemyList.end();)
+	{
+		auto size = ENEMYCOLLIDER->enemyList.size();
+		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+		{
+			iter = ENEMYCOLLIDER->enemyList.erase(iter);
+			continue;
+		}
+		COLLITION->CheckCollision(player, *iter);
+		if ((*iter)->m_szName == L"Melee")
+		{
+			if ((*iter)->m_bCollision)
+			{
+				melee = (*iter);
+			}
+		}
+		// player melee¶û enemy È®ÀÎ
+		iter++;
+	}
+
+	if (melee)
+	{
+		for (auto iter = enemyList.begin(); iter != enemyList.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = enemyList.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*iter, melee);
+			iter++;
+		}
+	}
+
 	for (auto iter = enemyList.begin(); iter != enemyList.end();)
 	{
 		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
@@ -163,5 +320,47 @@ void TestYR::CheckEnemyCollision()
 		}
 		COLLITION->CheckCollision(player, *iter);
 		iter++;
+	}
+
+	for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
+	{
+		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+		{
+			iter = m_vObjectList.erase(iter);
+			continue;
+		}
+		COLLITION->CheckCollision(player, *iter);
+		COLLITION->CheckCollision(boss_betty, *iter);
+		iter++;
+	}
+
+	auto list = PROJECTILE->GetActorList();
+	for (auto proj = list.begin(); proj != list.end(); )
+	{
+		// box to sphere°¡ ¾ø¾î¼­ player¶ûÀº ¾ÈµÊ
+		COLLITION->CheckCollision(*proj, player);
+
+		for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = m_vObjectList.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*proj, *iter);
+			iter++;
+		}
+
+		for (auto iter = enemyList.begin(); iter != enemyList.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = enemyList.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*proj, *iter);
+			iter++;
+		}
+		proj++;
 	}
 }

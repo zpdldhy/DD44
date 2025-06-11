@@ -29,7 +29,11 @@
 // Script
 #include "EngineCameraMoveScript.h"
 #include "GameCameraMove.h"
+#include "MageMovement.h"
 
+// Game
+#include "ProjectileManager.h"
+#include "EnemyCollisionManager.h"
 
 // TEMP
 #include "BatMovement.h"
@@ -40,7 +44,7 @@
 void Game::Init()
 {
 	// Asset ·Îµù
-
+	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 
@@ -52,8 +56,9 @@ void Game::Init()
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
 	OBJECT->AddActor(m_pPlayer);
-
+	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
+	vlist.emplace_back(m_pBetty);
 	OBJECT->AddActorList(vlist);
 	
 	// Temp
@@ -69,6 +74,9 @@ void Game::Init()
 	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
+
+	PROJECTILE->Init();
+
 }
 
 void Game::Tick()
@@ -109,6 +117,7 @@ void Game::Tick()
 	}
 
 	CheckEnemyCollision();
+	PROJECTILE->Tick();
 }
 
 void Game::Render()
@@ -145,7 +154,6 @@ void Game::SetupGameCamera()
 
 	CAMERA->Set3DCameraActor(m_pGameCameraActor);
 	OBJECT->AddActor(m_pGameCameraActor);
-
 }
 
 void Game::SetupSkybox()
@@ -243,12 +251,52 @@ void Game::SetEnemyScript()
 			auto script = dynamic_pointer_cast<BettyMovement>(enemy->GetScriptList()[0]);
 			if (script) { script->SetPlayer(m_pPlayer); }
 		}
-
+		 
+		auto mage = dynamic_pointer_cast<MageMovement>(enemy->GetScriptList()[0]);
+		if (mage)
+		{
+			mage->SetPlayer(m_pPlayer);
+		}
 	}
 }
 
 void Game::CheckEnemyCollision()
 {
+	shared_ptr<AActor> melee;
+	for (auto iter = ENEMYCOLLIDER->enemyList.begin(); iter != ENEMYCOLLIDER->enemyList.end();)
+	{
+		auto size = ENEMYCOLLIDER->enemyList.size();
+		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+		{
+			iter = ENEMYCOLLIDER->enemyList.erase(iter);
+			continue;
+		}
+		COLLITION->CheckCollision(m_pPlayer, *iter);
+		if ((*iter)->m_szName == L"Melee")
+		{
+			if ((*iter)->m_bCollision)
+			{
+				melee = (*iter);
+			}
+		}
+		// player melee¶û enemy È®ÀÎ
+		iter++;
+	}
+
+	if (melee)
+	{
+		for (auto iter = enemyList.begin(); iter != enemyList.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = enemyList.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*iter, melee);
+			iter++;
+		}
+	}
+
 	for (auto iter = enemyList.begin(); iter != enemyList.end();)
 	{
 		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
@@ -268,6 +316,7 @@ void Game::CheckEnemyCollision()
 			continue;
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
+		COLLITION->CheckCollision(m_pBetty, *iter);
 		iter++;
 	}
 
@@ -280,5 +329,34 @@ void Game::CheckEnemyCollision()
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
 		iter++;
+	}
+
+	auto list = PROJECTILE->GetActorList();
+	for (auto proj = list.begin(); proj != list.end(); )
+	{
+		COLLITION->CheckCollision(*proj, m_pPlayer);
+
+		for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = m_vObjectList.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*proj, *iter);
+			iter++;
+		}
+
+		for (auto iter = enemyList.begin(); iter != enemyList.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = enemyList.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*proj, *iter);
+			iter++;
+		}
+		proj++;
 	}
 }

@@ -4,6 +4,7 @@
 #include "Timer.h"
 #include "APawn.h"
 #include "AActor.h"
+#include "TCharacter.h"
 #include "UStaticMeshComponent.h"
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
@@ -14,6 +15,9 @@
 #include "EffectManager.h"
 #include "UPhysicsComponent.h"
 #include "ObjectManager.h"
+#include "EnemyCollisionManager.h"
+
+#include "ProjectileManager.h"
 
 void PlayerMoveScript::Init()
 {
@@ -26,6 +30,7 @@ void PlayerMoveScript::Init()
 	roll = make_shared<PlayerRollState>(m_pOwner);
 	attack = make_shared<PlayerAttackState>(m_pOwner);
 	hit = make_shared<PlayerHitState>(m_pOwner);
+	shoot = make_shared<PlayerShootState>(m_pOwner);
 	die = make_shared<PlayerDieState>(m_pOwner);
 
 	SetUI();
@@ -33,22 +38,58 @@ void PlayerMoveScript::Init()
 	currentState = idle;
 	currentState->Enter();
 
-	m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetMeshByName(L"Slash")->GetMaterial();
+	auto body = dynamic_pointer_cast<UMeshComponent>(GetOwner()->GetMeshComponent());
 
-	backSword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword");
-	handSword = GetOwner()->GetMeshComponent()->GetMeshByName(L"Sword2");
+	m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetChildByName(L"Slash")->GetMaterial();
 
+	//body->GetChildByName(L"Body");
+	backSword = body->GetChildByName(L"Sword");
+	handSword = body->GetChildByName(L"Sword2");
 	// SetPhysics
 	auto pPhysics = GetOwner()->GetPhysicsComponent();
 	pPhysics->SetWeight(1.f);
+
+	// AttackRange
+	attackRangeActor = make_shared<AActor>();
+	attackRangeActor->m_bCollision = false;
+
+	auto collider = make_shared<UBoxComponent>();
+	collider->m_bVisible = true;
+	collider->SetName(L"Melee");
+
+	collider->SetLocalScale(Vec3(3.0f, 1.0f, 2.0f));
+	float targetYaw = atan2f(GetOwner()->GetLook().x, GetOwner()->GetLook().z);
+	Vec3 currentRot = GetOwner()->GetRotation();
+	currentRot.y = targetYaw;
+	attackRangeActor->SetRotation(currentRot);
+
+	//collider->SetLocalRotation()
+	collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	attackRangeActor->SetShapeComponent(collider);
+
+	colOffset = Vec3(3.0f, 0.0f, 3.0f);
+	attackRangeActor->SetPosition(GetOwner()->GetPosition() + colOffset * GetOwner()->GetLook());
+	attackRangeActor->m_szName = L"Melee";
+
+	OBJECT->AddActor(attackRangeActor);
+	ENEMYCOLLIDER->Add(attackRangeActor);
+	collider->m_bVisible = false;
+
+	// 
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(4);
+
+	// Texture
+
 }
 
 void PlayerMoveScript::Tick()
 {
+	UpdateCollider();
+
 	// Test
 	if (INPUT->GetButton(L))
 	{
-		m_vHP++;
+		dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(4);
 		if (currentState->GetId() == PLAYER_S_DEATH)
 		{
 			currentState->End();
@@ -56,10 +97,7 @@ void PlayerMoveScript::Tick()
 		}
 	}
 
-
-
-
-#pragma region EFFECT
+#pragma region FX
 	Slash();
 	if (m_bIsFlashing)
 	{
@@ -109,7 +147,8 @@ void PlayerMoveScript::Tick()
 		return;
 	}
 
-	if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK || currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT || currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
+	// 이걸 왜 이렇게 했던 거지 ?
+	//if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK || currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT || currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
 	{
 		if (!currentState->IsPlaying())
 		{
@@ -117,160 +156,56 @@ void PlayerMoveScript::Tick()
 			{
 				handSword.lock()->SetVisible(false);
 				backSword.lock()->SetVisible(true);
+
+				attackRangeActor->m_bCollision = false;
+				attackRangeActor->GetShapeComponent()->m_bVisible = false;
+				ChangetState(idle);
+
 			}
 			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
 			{
 				m_bDamageCoolTime = true;
+				ChangetState(idle);
+
 			}
 			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
 			{
 				m_bRollCoolTime = true;
+				ChangetState(idle);
+
 			}
-			ChangetState(idle);
 		}
 		else
 		{
 			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
 			{
 				RollMove();
+				return;
 			}
-			return;
-		}
-	}
-	else
-	{
-		if (m_bCanBeHit)
-		{
-			// 여기 있어야 중복 안남
-			// HIT
-#pragma region TEMP_COLLISION
-			if (GetOwner()->m_vCollisionList.size() > 0)
+
+			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
 			{
-				// Enemy 인지
-				auto list = GetOwner()->m_vCollisionList;
-				bool isCol = false;
-				for (auto& index : list)
-				{
-					if (OBJECT->GetActor(index.first)->m_szName == L"Enemy")
-						isCol = true;
-				}
+				return;
+			}
 
-				if (isCol)
-				{
-					m_bHPUIChange = true;
-					//if (INPUT->GetButton(J))
-					{
-						// Blood FX
-						Vec3 basePos = GetOwner()->GetPosition();
-						basePos.y += RandomRange(0.5, 2);
-						Vec3 look = GetOwner()->GetLook();
-						velocity = -look;
-						PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
-
-						m_fHitFlashTimer = 1.f;  // 1초 동안
-						m_bIsFlashing = true;
-
-						// Anim
-						// HP 
-						if (m_vHP != 0)
-							m_vHP -= 1;
-
-						if (m_vHP > 0)
-						{
-							ChangetState(hit);
-							m_bCanBeHit = false;
-						}
-						else
-						{
-							ChangetState(die);
-						}
-					}
-				}
+			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_SHOOT)
+			{
+				return;
 			}
 		}
-#pragma endregion
-
-		if (INPUT->GetButton(SPACE) && m_bCanRoll)
-		{
-			// 구르기
-			m_vRollLook = GetOwner()->GetLook();
-			ChangetState(roll);
-
-			m_bCanRoll = false;
-		}
 	}
 #pragma endregion
-#pragma region MOVEMENT
-	float deltaTime = TIMER->GetDeltaTime();
-	Vec3 up = { 0, 1, 0 };
-	m_vRight = up.Cross(m_vLook);
-	m_vLook.y = 0.0f;
-	m_vRight.y = 0.0f;
+	CheckHit();
+	Move();
 
-	m_vLook.Normalize();
-	m_vRight.Normalize();
-		
-	Vec3 moveDir;
-	if (INPUT->GetButtonDown(W))
+	if (INPUT->GetButton(SPACE) && m_bCanRoll)
 	{
-		moveDir += m_vLook;
+		// 구르기
+		m_vRollLook = GetOwner()->GetLook();
+		ChangetState(roll);
+
+		m_bCanRoll = false;
 	}
-
-	if (INPUT->GetButtonDown(A))
-	{
-		moveDir += -m_vRight;
-	}
-
-	if (INPUT->GetButtonDown(S))
-	{
-		moveDir += -m_vLook;
-	}
-
-	if (INPUT->GetButtonDown(D))
-	{
-		moveDir += m_vRight;
-	}
-
-	if (moveDir.Length() > 0)// && !m_pAnimInstance->m_bOnPlayOnce)
-	{
-		// 애님 ( 추후 처리 로직 업데이트 필요 )
-		{
-			ChangetState(walk);
-		}
-
-		// 이동
-		{
-			moveDir.Normalize();
-			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->SetMove(moveDir, 0.25f);
-		}
-
-		// 회전		
-		{
-			float targetYaw = atan2f(moveDir.x, moveDir.z);
-			Vec3 currentRot = GetOwner()->GetRotation();
-			float currentYaw = currentRot.y;
-
-			// 각도 차이 계산
-			float angleDiff = targetYaw - currentYaw;
-			while (angleDiff > DD_PI)  angleDiff -= DD_PI * 2;
-			while (angleDiff < -DD_PI) angleDiff += DD_PI * 2;
-
-			// Lerp 계산
-			float smoothedYaw = currentRot.y + angleDiff * m_fRotationSpeed * deltaTime;
-
-			currentRot.y = smoothedYaw;
-			GetOwner()->SetRotation(currentRot);
-		}
-
-		m_vLastMoveDir = moveDir;
-
-	}
-	else
-	{
-		ChangetState(idle);
-	}
-#pragma endregion
 
 	// ATTACK
 	if (INPUT->GetButton(LCLICK))
@@ -280,8 +215,20 @@ void PlayerMoveScript::Tick()
 		ChangetState(attack);
 		m_bSlashPlaying = true;
 		m_fSlashTime = 0.0f;
-	}
 
+		//
+		attackRangeActor->m_bCollision = true;
+		attackRangeActor->GetShapeComponent()->m_bVisible = true;
+	}
+	if (INPUT->GetButton(RCLICK))
+	{
+		// 단순확인용
+		ChangetState(shoot);
+		Vec3 pos = GetOwner()->GetPosition();
+		pos.y = 3.0f;
+		Vec3 look = GetOwner()->GetLook();
+		PROJECTILE->ActivateOne(ProjectileType::PlayerArrow, pos, look);
+	}
 
 }
 
@@ -304,6 +251,57 @@ void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
 
 	if (currentState)
 		currentState->Enter();
+}
+
+void PlayerMoveScript::CheckHit()
+{
+	// 투사체 충돌 확인
+	auto healthComp = dynamic_pointer_cast<TCharacter>(GetOwner());
+
+	// 충돌 확인
+	if (m_bCanBeHit)
+	{
+		// 근접 공격 확인
+		bool isCol = false;
+		if (GetOwner()->m_vCollisionList.size() > 0)
+		{
+			auto list = GetOwner()->m_vCollisionList;
+			for (auto& index : list)
+			{
+				if (OBJECT->GetActor(index.first)->m_szName == L"Enemy")
+					isCol = true;
+			}
+		}
+
+		if (isCol || healthComp->IsHitByProjectile())
+		{
+			m_bHPUIChange = true;
+			{
+				// Blood FX
+				Vec3 basePos = GetOwner()->GetPosition();
+				basePos.y += RandomRange(0.5, 2);
+				Vec3 look = GetOwner()->GetLook();
+				velocity = -look;
+				PlayBloodBurst(basePos, velocity, 50.0f, 90.0f);
+
+				m_fHitFlashTimer = 1.f;  // 1초 동안
+				m_bIsFlashing = true;
+
+				// Anim - HP 
+				dynamic_pointer_cast<TCharacter>(GetOwner())->TakeDamage(1);
+
+				if (!dynamic_pointer_cast<TCharacter>(GetOwner())->IsDead())
+				{
+					ChangetState(hit);
+					m_bCanBeHit = false;
+				}
+				else
+				{
+					ChangetState(die);
+				}
+			}
+		}
+	}
 }
 
 void PlayerMoveScript::Slash()
@@ -339,7 +337,7 @@ void PlayerMoveScript::Slash()
 
 void PlayerMoveScript::SetUI()
 {
-	m_vHPUI= PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
+	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
 	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
 	UI->AddUIList(m_vHPUI);
 	UI->AddUIList(m_vArrowUI);
@@ -348,8 +346,8 @@ void PlayerMoveScript::SetUI()
 void PlayerMoveScript::UpdateHPUI()
 {
 	Color RestColor;
-
-	if (m_vHP == 4)
+	auto hp = dynamic_pointer_cast<TCharacter>(GetOwner())->GetHp();
+	if (hp == 4)
 	{
 		RestColor = fullHP;
 		RestColor.w = -0.5f;
@@ -373,7 +371,7 @@ void PlayerMoveScript::UpdateHPUI()
 
 		damageTime += currentTime = TIMER->GetDeltaTime();
 
-		if (m_vHP == 3)
+		if (hp == 3)
 		{
 			if (m_vHPUI[2]->GetColor().w < 0.f)
 				m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
@@ -382,7 +380,7 @@ void PlayerMoveScript::UpdateHPUI()
 
 			m_vHPUI[3]->m_bRender = false;
 		}
-		else if (m_vHP == 2)
+		else if (hp == 2)
 		{
 			if (m_vHPUI[1]->GetColor().w < 0.f)
 				m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
@@ -391,7 +389,7 @@ void PlayerMoveScript::UpdateHPUI()
 
 			m_vHPUI[2]->m_bRender = false;
 		}
-		else if (m_vHP == 1)
+		else if (hp == 1)
 		{
 			if (m_vHPUI[0]->GetColor().w < 0.f)
 				m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
@@ -400,7 +398,7 @@ void PlayerMoveScript::UpdateHPUI()
 
 			m_vHPUI[1]->m_bRender = false;
 		}
-		else if (m_vHP == 0)
+		else if (hp == 0)
 		{
 			m_vHPUI[0]->m_bRender = false;
 			m_vHPUI[1]->m_bRender = false;
@@ -409,8 +407,8 @@ void PlayerMoveScript::UpdateHPUI()
 		}
 	}
 
-	if (m_vHP > 4)
-		m_vHP = 4;
+	if (hp > 4)
+		hp = 4;
 }
 
 void PlayerMoveScript::UpdateArrowUI()
@@ -465,6 +463,79 @@ void PlayerMoveScript::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> co
 	}
 }
 
+void PlayerMoveScript::Move()
+{
+	float deltaTime = TIMER->GetDeltaTime();
+	Vec3 up = { 0, 1, 0 };
+	m_vRight = up.Cross(m_vLook);
+	m_vLook.y = 0.0f;
+	m_vRight.y = 0.0f;
+
+	m_vLook.Normalize();
+	m_vRight.Normalize();
+
+	Vec3 moveDir;
+	if (INPUT->GetButtonDown(W))
+	{
+		moveDir += m_vLook;
+	}
+
+	if (INPUT->GetButtonDown(A))
+	{
+		moveDir += -m_vRight;
+	}
+
+	if (INPUT->GetButtonDown(S))
+	{
+		moveDir += -m_vLook;
+	}
+
+	if (INPUT->GetButtonDown(D))
+	{
+		moveDir += m_vRight;
+	}
+
+	if (moveDir.Length() > 0)// && !m_pAnimInstance->m_bOnPlayOnce)
+	{
+		// 애님
+		{
+			ChangetState(walk);
+		}
+
+		// 이동
+		{
+			moveDir.Normalize();
+			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
+			GetOwner()->SetMove(moveDir, 0.25f);
+		}
+
+		// 회전		
+		{
+			float targetYaw = atan2f(moveDir.x, moveDir.z);
+			Vec3 currentRot = GetOwner()->GetRotation();
+			float currentYaw = currentRot.y;
+
+			// 각도 차이 계산
+			float angleDiff = targetYaw - currentYaw;
+			while (angleDiff > DD_PI)  angleDiff -= DD_PI * 2;
+			while (angleDiff < -DD_PI) angleDiff += DD_PI * 2;
+
+			// Lerp 계산
+			float smoothedYaw = currentRot.y + angleDiff * m_fRotationSpeed * deltaTime;
+
+			currentRot.y = smoothedYaw;
+			GetOwner()->SetRotation(currentRot);
+		}
+
+		m_vLastMoveDir = moveDir;
+
+	}
+	else
+	{
+		ChangetState(idle);
+	}
+}
+
 void PlayerMoveScript::RollMove()
 {
 	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
@@ -478,4 +549,14 @@ bool PlayerMoveScript::CanAttack()
 		return false;
 	}
 	return true;
+}
+
+void PlayerMoveScript::UpdateCollider()
+{
+	auto pos = GetOwner()->GetPosition();
+	attackRangeActor->SetPosition(pos + colOffset * GetOwner()->GetLook() + Vec3(0.0f, 2.0f, 0.0f));
+	float targetYaw = atan2f(GetOwner()->GetLook().x, GetOwner()->GetLook().z);
+	Vec3 currentRot = GetOwner()->GetRotation();
+	currentRot.y = targetYaw;
+	attackRangeActor->SetRotation(currentRot);
 }

@@ -25,13 +25,22 @@
     <Filter Include="Prefab\data">
       <UniqueIdentifier>{4cee819a-7ec6-48b4-9bb3-a7d2a0faf294}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameManagers">
+      <UniqueIdentifier>{47f1dfe0-aed6-4f63-b21c-2ff3793073b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script\Camera">
+      <UniqueIdentifier>{5b7d8c63-fc2a-4970-ae3e-79468a1e3e97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script\Enemy">
+      <UniqueIdentifier>{00baeb28-949e-4128-afd6-d07444996a91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FSM\EnemyStates">
+      <UniqueIdentifier>{7d236e65-09df-4359-ae64-7c25373f037c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineCameraMoveScript.h">
-      <Filter>Script</Filter>
     </ClInclude>
     <ClInclude Include="kkongchiMoveScript.h">
       <Filter>Script</Filter>
@@ -78,41 +87,56 @@
     <ClInclude Include="PlayerStates.h">
       <Filter>FSM</Filter>
     </ClInclude>
-    <ClInclude Include="HeadRollerStates.h">
-      <Filter>FSM</Filter>
+    <ClInclude Include="GameDefine.h">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="EnemyState.h">
-      <Filter>FSM</Filter>
+    <ClInclude Include="EnemyCollisionManager.h">
+      <Filter>GameManagers</Filter>
     </ClInclude>
-    <ClInclude Include="BatStates.h">
-      <Filter>FSM</Filter>
-    </ClInclude>
-    <ClInclude Include="BatMovement.h">
-      <Filter>Script</Filter>
+    <ClInclude Include="EngineCameraMoveScript.h">
+      <Filter>Script\Camera</Filter>
     </ClInclude>
     <ClInclude Include="GameCameraMove.h">
-      <Filter>Script</Filter>
+      <Filter>Script\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="WalkerStates.h">
-      <Filter>FSM</Filter>
-    </ClInclude>
-    <ClInclude Include="WalkerMovement.h">
-      <Filter>Script</Filter>
-    </ClInclude>
-    <ClInclude Include="BettyStates.h">
-      <Filter>FSM</Filter>
+    <ClInclude Include="BatMovement.h">
+      <Filter>Script\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="BettyMovement.h">
-      <Filter>Script</Filter>
+      <Filter>Script\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="TempBossCamera.h" />
+    <ClInclude Include="WalkerMovement.h">
+      <Filter>Script\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="BatStates.h">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClInclude>
+    <ClInclude Include="BettyStates.h">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyState.h">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadRollerStates.h">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClInclude>
+    <ClInclude Include="WalkerStates.h">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClInclude>
+    <ClInclude Include="MageMovement.h">
+      <Filter>Script\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="MageStates.h">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectileManager.h">
+      <Filter>GameManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="TCharacter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
       <Filter>Headers</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineCameraMoveScript.cpp">
-      <Filter>Script</Filter>
     </ClCompile>
     <ClCompile Include="kkongchiMoveScript.cpp">
       <Filter>Script</Filter>
@@ -159,31 +183,46 @@
     <ClCompile Include="PlayerStates.cpp">
       <Filter>FSM</Filter>
     </ClCompile>
-    <ClCompile Include="HeadRollerStates.cpp">
-      <Filter>FSM</Filter>
+    <ClCompile Include="EnemyCollisionManager.cpp">
+      <Filter>GameManagers</Filter>
     </ClCompile>
-    <ClCompile Include="BatStates.cpp">
-      <Filter>FSM</Filter>
-    </ClCompile>
-    <ClCompile Include="BatMovement.cpp">
-      <Filter>Script</Filter>
+    <ClCompile Include="EngineCameraMoveScript.cpp">
+      <Filter>Script\Camera</Filter>
     </ClCompile>
     <ClCompile Include="GameCameraMove.cpp">
-      <Filter>Script</Filter>
+      <Filter>Script\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="WalkerStates.cpp">
-      <Filter>FSM</Filter>
-    </ClCompile>
-    <ClCompile Include="WalkerMovement.cpp">
-      <Filter>Script</Filter>
-    </ClCompile>
-    <ClCompile Include="BettyStates.cpp">
-      <Filter>FSM</Filter>
+    <ClCompile Include="BatMovement.cpp">
+      <Filter>Script\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="BettyMovement.cpp">
-      <Filter>Script</Filter>
+      <Filter>Script\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="TempBossCamera.cpp" />
+    <ClCompile Include="WalkerMovement.cpp">
+      <Filter>Script\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="MageMovement.cpp">
+      <Filter>Script\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="BatStates.cpp">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClCompile>
+    <ClCompile Include="BettyStates.cpp">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClCompile>
+    <ClCompile Include="HeadRollerStates.cpp">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClCompile>
+    <ClCompile Include="WalkerStates.cpp">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClCompile>
+    <ClCompile Include="MageStates.cpp">
+      <Filter>FSM\EnemyStates</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectileManager.cpp">
+      <Filter>GameManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="TCharacter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
