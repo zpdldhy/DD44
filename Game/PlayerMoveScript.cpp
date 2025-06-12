@@ -378,6 +378,12 @@ void PlayerMoveScript::SetUI()
 	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
 	UI->AddUIList(m_vHPUI);
 	UI->AddUIList(m_vArrowUI);
+
+	m_pActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_active.png");
+	m_pInActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_inactive.png");
+
+	m_vActiveArrowScale = m_vArrowUI[3]->GetScale();
+	m_vInActiveArrowScale = m_vArrowUI[2]->GetScale();
 }
 
 void PlayerMoveScript::UpdateHPUI()
@@ -451,9 +457,71 @@ void PlayerMoveScript::UpdateHPUI()
 
 void PlayerMoveScript::UpdateArrowUI()
 {
+	switch (dynamic_pointer_cast<TPlayer>(GetOwner())->GetArrowCount())
+	{
+	case 4:
+		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[2]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[3]->SetAllTexture(m_pActiveArrowTexture);
 
-	if (m_vArrowCount > 4)
-		m_vArrowCount = 4;
+		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[2]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[3]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = true;
+		m_vArrowUI[2]->m_bRender = true;
+		m_vArrowUI[3]->m_bRender = true;
+		break;
+
+	case 3:
+		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[2]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[2]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = true;
+		m_vArrowUI[2]->m_bRender = true;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+
+	case 2:
+		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[1]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[1]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = true;
+		m_vArrowUI[2]->m_bRender = false;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+
+	case 1:
+		m_vArrowUI[0]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = false;
+		m_vArrowUI[2]->m_bRender = false;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+
+	case 0:
+		m_vArrowUI[0]->m_bRender = false;
+		m_vArrowUI[1]->m_bRender = false;
+		m_vArrowUI[2]->m_bRender = false;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+	}
 }
 
 void PlayerMoveScript::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)

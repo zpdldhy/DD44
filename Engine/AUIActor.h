@@ -39,6 +39,7 @@ public:
 	void SetHoverTexture(shared_ptr<Texture> _pTexture) { m_pHoverTexture = _pTexture; }
 	void SetActiveTexture(shared_ptr<Texture> _pTexture) { m_pActiveTexture = _pTexture; }
 	void SetSelectTexture(shared_ptr<Texture> _pTexture) { m_pSelectTexture = _pTexture; }
+	void SetAllTexture(shared_ptr<Texture> _pTexture) { m_pIdleTexture = m_pHoverTexture = m_pActiveTexture = m_pSelectTexture = _pTexture; }
 
 	// 9-slice
 	void SetSliceData(const Vec4& _vSlice) { m_vSlice = _vSlice; }

@@ -35,13 +35,13 @@ public:
 	Vec3 velocity;
 	Vec3 m_vRollLook;
 
-	// 상호작용
-	//UINT m_vHP = 4;
-	UINT m_vArrowCount = 4;
-
 	// UI Actor
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
 	vector<shared_ptr<class AUIActor>> m_vArrowUI;
+	shared_ptr<Texture> m_pActiveArrowTexture = nullptr;
+	shared_ptr<Texture> m_pInActiveArrowTexture = nullptr;
+	Vec3 m_vActiveArrowScale = { 0.f, 0.f, 0.f };
+	Vec3 m_vInActiveArrowScale = { 0.f, 0.f, 0.f };
 	bool m_bHPUIChange = false;
 	shared_ptr<Texture> m_pSubTexture;
 
