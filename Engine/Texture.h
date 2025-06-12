@@ -17,6 +17,9 @@ public:
 	void SetTextureSize();	
 	bool LoadTexture(std::wstring _filename);
 	Texture() = default;
+
+	ComPtr<ID3D11ShaderResourceView> GetSRV() { return m_pTexSRV; }
+	ID3D11ShaderResourceView* GetSRVRaw() { return m_pTexSRV.Get(); }
 };
 
 class TextureManager : public Singleton<TextureManager>

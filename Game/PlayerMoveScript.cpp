@@ -16,6 +16,7 @@
 #include "EnemyCollisionManager.h"
 
 #include "ProjectileManager.h"
+#include "Texture.h"
 
 shared_ptr<UScriptComponent> PlayerMoveScript::Clone()
 {
@@ -83,7 +84,12 @@ void PlayerMoveScript::Init()
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(4);
 
 	// Texture
+	m_pSubTexture = TEXTURE->Get(L"../Resources/Texture/cracks_generic 1.png");
 
+	{
+		auto root = GetOwner()->GetMeshComponent();
+		ApplyCrashToAllMaterials(root, false);
+	}
 }
 
 void PlayerMoveScript::Tick()
@@ -100,6 +106,9 @@ void PlayerMoveScript::Tick()
 			ChangetState(idle);
 		}
 	}
+
+	DC->PSSetShaderResources(1, 1, m_pSubTexture->GetSRV().GetAddressOf());
+	ApplyCrash();
 
 #pragma region FX
 	Slash();
@@ -587,4 +596,35 @@ void PlayerMoveScript::UpdateCollider()
 	Vec3 currentRot = GetOwner()->GetRotation();
 	currentRot.y = targetYaw;
 	attackRangeActor->SetRotation(currentRot);
+}
+
+void PlayerMoveScript::ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetCrash(enabled);
+	}
+
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		ApplyCrashToAllMaterials(comp->GetChild(i), enabled);
+	}
+}
+
+void PlayerMoveScript::ApplyCrash()
+{
+	auto root = GetOwner()->GetMeshComponent();
+	auto hp = dynamic_pointer_cast<TCharacter>(GetOwner())->GetHp();
+	if (hp < 3 && !m_bCrashSet)
+	{
+		m_bCrashSet = true;
+	}
+	else
+	{
+		m_bCrashSet = false;
+	}
+	ApplyCrashToAllMaterials(root, m_bCrashSet);
 }

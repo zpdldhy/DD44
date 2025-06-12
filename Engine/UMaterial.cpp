@@ -39,7 +39,7 @@ void UMaterial::Bind()
         DC->IASetInputLayout(m_pInputlayout->m_pInputLayout.Get());
 	}
 
-	if (m_pEffectCB && m_bUseEffect)
+	if (m_pEffectCB)
 	{
         DC->VSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
         DC->PSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
@@ -49,6 +49,7 @@ void UMaterial::Bind()
     {
         m_CB_SpriteUV->Push();  
     }
+
 }
 
 void UMaterial::CreateEffectCB()
@@ -147,6 +148,12 @@ void UMaterial::SetIsMetal(bool _bMetal, float _shininess)
 void UMaterial::SetTintColor(const Vec4& color)
 {
     m_tEffectData.TintColor = color;
+    UpdateEffectBuffer();
+}
+
+void UMaterial::SetCrash(bool _bCrash)
+{
+    m_tEffectData.g_bCrash = _bCrash;
     UpdateEffectBuffer();
 }
 
