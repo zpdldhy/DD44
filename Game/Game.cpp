@@ -92,6 +92,7 @@ void Game::Tick()
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
 
 	UpdateUI();
+	UpdateLight();
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
@@ -140,7 +141,6 @@ void Game::Destroy()
 	m_pPlayer = nullptr;
 	m_pSkyMesh = nullptr;
 	m_pSky = nullptr;
-	m_pSunLight = nullptr;
 
 	m_vPausedBackGround.clear();
 	m_vUpgradeBackGround.clear();
@@ -191,17 +191,26 @@ void Game::SetupSkybox()
 
 void Game::SetupSunLight()
 {
-	m_pSunLight = make_shared<ALight>();
-	m_pSunLight->m_szName = L"SunLight";
-	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
-	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
-	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
-	m_pSunLight->SetPosition(Vec3(0, 100.0f, 0));
-	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-	OBJECT->AddActor(m_pSunLight);
+	auto pSunLight = make_shared<ALight>();
+	pSunLight->m_szName = L"SunLight";
+	pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
+	pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
+
+	m_pLightCamera = make_shared<UCameraComponent>();
+	pSunLight->SetCameraComponent(m_pLightCamera);
+
+	pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+	OBJECT->AddActor(pSunLight);
 
 	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pSunLight);
+	LIGHTMANAGER->RegisterLight(pSunLight);
+}
+
+void Game::UpdateLight()
+{
+	m_pLightCamera->SetLocalPosition(m_pPlayer->GetPosition() + Vec3(100.f, 100.f, 0.f));
+	m_pLightCamera->SetLookAt(m_pPlayer->GetPosition());
 }
 
 void Game::CreateWind()

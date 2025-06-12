@@ -14,7 +14,7 @@ public:
 	shared_ptr<class AActor> m_pBetty;
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
-	shared_ptr<class ALight> m_pSunLight;
+	shared_ptr<class UCameraComponent> m_pLightCamera = nullptr;
 
 	bool m_bEnginCamera = false;
 	bool m_bWind = false;
@@ -59,6 +59,7 @@ protected:
 	void SetupGameCamera();
 	void SetupSkybox();
 	void SetupSunLight();
+	void UpdateLight();
 	void CreateWind();
 	void CreateUI();
 	void UpdateUI();
