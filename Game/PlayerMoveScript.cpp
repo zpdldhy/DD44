@@ -14,6 +14,7 @@
 #include "EffectManager.h"
 #include "UPhysicsComponent.h"
 #include "ObjectManager.h"
+#include "Texture.h"
 
 void PlayerMoveScript::Init()
 {
@@ -41,6 +42,13 @@ void PlayerMoveScript::Init()
 	// SetPhysics
 	auto pPhysics = GetOwner()->GetPhysicsComponent();
 	pPhysics->SetWeight(1.f);
+
+	m_pSubTexture = TEXTURE->Get(L"../Resources/Texture/cracks_generic 1.png");
+
+	{
+		auto root = GetOwner()->GetMeshComponent();
+		ApplyCrashToAllMaterials(root, false);
+	}
 }
 
 void PlayerMoveScript::Tick()
@@ -56,7 +64,9 @@ void PlayerMoveScript::Tick()
 		}
 	}
 
+	DC->PSSetShaderResources(1, 1, m_pSubTexture->GetSRV().GetAddressOf());
 
+	ApplyCrash();
 
 
 #pragma region EFFECT
@@ -478,4 +488,35 @@ bool PlayerMoveScript::CanAttack()
 		return false;
 	}
 	return true;
+}
+
+
+void PlayerMoveScript::ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetCrash(enabled);
+	}
+
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		ApplyCrashToAllMaterials(comp->GetChild(i), enabled);
+	}
+}
+
+void PlayerMoveScript::ApplyCrash()
+{
+	auto root = GetOwner()->GetMeshComponent();
+	if (m_vHP < 3 && !m_bCrashSet)
+	{
+		m_bCrashSet = true;
+	}
+	else
+	{
+		m_bCrashSet = false;
+	}
+	ApplyCrashToAllMaterials(root, m_bCrashSet);
 }

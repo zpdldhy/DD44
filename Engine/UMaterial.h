@@ -29,15 +29,18 @@ struct CB_MaterialEffect
 	float  g_fShininess = 10.0f;
 
 	Vec4 TintColor = Vec4(1, 1, 1, 1);
+
+	BOOL g_bCrash = false;
+	Vec3 padding_Crash;
 };
 
-struct CB_Material
-{
-	Vec4 vAmbient;
-	Vec4 vDiffuse;
-	Vec4 vSpecular;
-	Vec4 vEmissive;
-};
+//struct CB_Material
+//{
+//	Vec4 vAmbient;
+//	Vec4 vDiffuse;
+//	Vec4 vSpecular;
+//	Vec4 vEmissive;
+//};
 
 // 현재 dissolve기능 삭제
 //struct CB_DISSOLVE
@@ -100,6 +103,7 @@ public:
 	bool IsUseEffect() { return m_bUseEffect; }
 	void SetUVRange(Vec2 start, Vec2 end);
 	void SetTintColor(const Vec4& color);
+	void SetCrash(bool _bCrash);
 public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
 	virtual void SetTexture(shared_ptr<Texture> _texture) { m_pTexture = _texture; }

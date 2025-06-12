@@ -52,15 +52,6 @@ VS_OUT_RIM VS(PNCTIW_IN input)
     return output;
 }
 
-//PS_OUT PS(VS_OUT input)
-//{
-//    PS_OUT psOut = (PS_OUT) 0;
-//    float4 texColor = g_txDiffuseA.Sample(sample, input.t);
-//    texColor.a *= input.c.a;
-//    psOut.c = texColor;
-//    //psOut.c = float4(input.n, 1.0f);
-//    return psOut;
-//}
 
 PS_OUT PS(VS_OUT_RIM input) : SV_Target
 {
@@ -76,6 +67,12 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     }
 
     float4 texColor = g_txDiffuseA.Sample(sample, input.t);
+    float4 crashColor = g_txCrack.Sample(sample, input.t);
+
+    //float3 crackHighlightColor = float3(1.0f, 0.1f, 0.1f);
+    //float3 resultColor = lerp(texColor.rgb, crackHighlightColor, crashColor.a);
+
+    
     float3 emissive;
     float3 specular = ApplySpecular(input.n, input.wPos);
     float3 ambient = ApplyAmbient();
@@ -119,6 +116,13 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     float3 flashColor = float3(1.0f, 0.1f, 0.1f); // 강한 붉은색
 
     finalColor.rgb = lerp(finalColor.rgb, flashColor, strength);
+    if (g_bCrash)
+    {
+        float3 crackHighlightColor = float3(1.0f, 0.1f, 0.1f); // 강조 색상
+        finalColor.rgb = lerp(finalColor.rgb, crackHighlightColor, crashColor.a);
+    }
+    
+   
     output.c = float4(finalColor);
     output.c1 = float4(finalColor);
 

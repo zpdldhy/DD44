@@ -39,6 +39,7 @@ public:
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
 	vector<shared_ptr<class AUIActor>> m_vArrowUI;
 	bool m_bHPUIChange = false;
+	shared_ptr<Texture> m_pSubTexture;
 
 	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
 
@@ -64,6 +65,9 @@ public:
 	// Camera Offset
 	Vec3 m_vCameraOffset = { 20.0f, 30.0f, -20.0f };
 	int animIndex = 0;
+
+	//Crash
+	bool m_bCrashSet = false;
 public:
 	void Init() override;
 	void Tick() override;
@@ -81,6 +85,9 @@ public:
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
+	void ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled);
+	void ApplyCrash();
+
 public:
 	void RollMove();
 	bool CanAttack();
