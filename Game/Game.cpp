@@ -62,7 +62,12 @@ void Game::Init()
 	//m_pPlayer->SetPosition(Vec3(0.0f, 0.0f, 0.0f));
 	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	vlist.emplace_back(m_pBetty);
+	vlist.emplace_back(m_pBetty);	
+	enemyList = vlist;
+	SetEnemy();
+	OBJECT->AddActorList(vlist);
+
+	PROJECTILE->Init();
 
 	// InGame UI
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
@@ -77,20 +82,12 @@ void Game::Init()
 	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
 	UI->AddUIList(m_vCoins);
 	UI->DoFadeOut();
-	
-	// Temp
-	enemyList = vlist;
-	SetEnemy();
-	OBJECT->AddActorList(vlist);
 
 	EFFECT->Init();
 	SetupEngineCamera();
 	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
-
-	PROJECTILE->Init();
-
 
 	// Create Cursor
 	m_pCursor = PToA->MakeObject("../Resources/Prefab/Cursor.object.json");

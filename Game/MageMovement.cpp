@@ -10,8 +10,7 @@
 
 void MageMovement::Init()
 {
-	owner = dynamic_pointer_cast<TEnemy>(GetOwner());
-	SetPlayer(owner->GetPlayer());
+	SetPlayer(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer());
 
 
 	idle = make_shared<MageIdleState>(m_pOwner);
