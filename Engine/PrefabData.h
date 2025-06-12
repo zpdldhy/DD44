@@ -48,6 +48,7 @@ struct PrefabCharacterData
     std::string TexturePath;
 
     int ScriptType;
+    std::string ScriptName;
 
     int AnimIndex;
     float AnimSpeed;

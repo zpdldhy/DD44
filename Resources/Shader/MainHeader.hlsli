@@ -43,6 +43,9 @@ cbuffer CB_MaterialEffect : register(b2)
     float g_fShininess;
     
     float4 g_vTintColor;
+    
+    bool g_bCrash = false;
+    float3 padding_Crash;
 };
 
 struct VS_IN
@@ -74,7 +77,7 @@ struct PS_OUT
 };
 
 Texture2D g_txDiffuseA : register(t0);
-//Texture2D g_txNoise : register(t1); // 노이즈 텍스처
+Texture2D g_txCrack : register(t1);
 SamplerState sample : register(s0);
 
 ///funtion

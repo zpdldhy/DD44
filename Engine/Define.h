@@ -24,6 +24,7 @@
 #define COLLITION	GET_SINGLE(Collision)
 #define EFFECT		GET_SINGLE(EffectManager)
 #define ACTORLOADER GET_SINGLE(ActorLoader)
+#define MESHLOADER GET_SINGLE(MeshLoader)
 #define WIND		GET_SINGLE(WindManager)
 
 

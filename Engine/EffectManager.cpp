@@ -108,7 +108,7 @@ shared_ptr<AEffectActor> EffectManager::GetReusableActor(EEffectType type)
 }
 
 
-void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngleSpreadDeg, const Vec3& baseVelocity)
+void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngleSpreadDeg, const Vec3& baseVelocity, float _scale)
 {
     auto actor = GetReusableActor(type);
     if (!actor)
@@ -129,10 +129,10 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     default:                      duration = 1.0f; break;
     }
 
-    actor->Play(duration, actor->Prepare(pos, baseVelocity));
+    actor->Play(duration, actor->Prepare(pos, baseVelocity, _scale));
 }
 
-void EffectManager::PlayDustBurst(const Vec3& _origin, float _speed)
+void EffectManager::PlayDustBurst(const Vec3& _origin, float _speed, float _size)
 {
     static const Vec3 directions[8] =
     {
@@ -153,11 +153,11 @@ void EffectManager::PlayDustBurst(const Vec3& _origin, float _speed)
         
         Vec3 velocity = dir * (_speed * 1.8f); 
 
-        PlayEffect(EEffectType::PoppingDust, _origin, 0.f, velocity);
+        PlayEffect(EEffectType::PoppingDust, _origin, 0.f, velocity, _size);
     }
 }
 
-void EffectManager::PlayBeamBurst(const Vec3& origin, int count)
+void EffectManager::PlayBeamBurst(const Vec3& origin, int count, float _scale)
 {
     float angleStep = 2 * DD_PI / count;
 
@@ -170,7 +170,7 @@ void EffectManager::PlayBeamBurst(const Vec3& origin, int count)
         Vec3 dir = Vec3(sinf(angle), randomY, cosf(angle));
         dir.Normalize();
 
-        PlayEffect(EEffectType::Beam, origin, 0.0f, dir);
+        PlayEffect(EEffectType::Beam, origin, 0.0f, dir, _scale);
     }
 
   

@@ -36,6 +36,7 @@ void AActor::Tick()
 {
 	m_pTransform->Tick();
 
+
 	// Component
 	for (auto& component : m_arrComponent)
 	{
@@ -60,17 +61,17 @@ void AActor::Render()
 
 	m_pTransform->Render();
 
+	for (auto& script : m_vScript)
+	{
+		script->Render();
+	}
+
 	for (auto& component : m_arrComponent)
 	{
 		if (component)
 		{
 			component->Render();
 		}
-	}
-
-	for (auto& script : m_vScript)
-	{
-		script->Render();
 	}
 }
 

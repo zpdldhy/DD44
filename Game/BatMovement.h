@@ -4,12 +4,17 @@
 #include "BatStates.h"
 
 class UMeshComponent;
+class AActor;
+class TEnemy;
 
 class BatMovement : public UScriptComponent
 {
 public:
 	BatMovement() = default;
 	virtual ~BatMovement() = default;
+private:
+	shared_ptr<TEnemy> owner;
+	weak_ptr<AActor> player;
 public:
 	Vec3 m_vCenter;
 	Vec3 m_vTargetPos;
@@ -25,12 +30,17 @@ public:
 	bool m_bCanStartAttack = false;
 	//
 	bool m_bClockWise = false;
-	//
-	Vec3 m_vLastMoveDir;
-	Vec3 velocity;
 	// 
 	bool m_bReturn;
 	Vec3 m_vReturnPos;
+	bool m_bStopAllMove = false;
+	//
+	shared_ptr<AActor> attackRangeActor;
+	Vec3 colOffset;
+
+	// TEMP
+	bool m_bMove = false;
+
 	// States 
 	shared_ptr<StateBase> idle;
 	shared_ptr<StateBase> walk;
@@ -38,19 +48,14 @@ public:
 	shared_ptr<StateBase> death;
 	shared_ptr<StateBase> currentState;
 
-	weak_ptr<AActor> player;
 public:
 	void Init() override;
 	void Tick() override;
+	virtual shared_ptr<UScriptComponent> Clone() override;
+	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
 public:
 	void ChangetState(shared_ptr<StateBase> _state);
 	void ReturningToPos();
-	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
-	void VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp);
-	float m_fHitFlashTimer = 0.0f;
-	bool m_bIsFlashing = false;
-	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
-	void Flashing();
 	void Attack();
-	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
+	void CheckHit();
 };

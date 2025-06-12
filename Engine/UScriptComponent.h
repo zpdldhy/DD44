@@ -2,7 +2,7 @@
 #include "UActorComponent.h"
 #include "AActor.h"
 
-class UScriptComponent : public UActorComponent
+class UScriptComponent : public UActorComponent, enable_shared_from_this<UScriptComponent>
 {
 public:
 	UScriptComponent() = default;
@@ -13,5 +13,7 @@ public:
 	void Tick() override;
 	void Render() override;
 	void Destroy() override;
+public:
+	virtual shared_ptr<UScriptComponent> Clone();
 };
 

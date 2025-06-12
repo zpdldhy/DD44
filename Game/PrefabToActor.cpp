@@ -12,6 +12,9 @@
 #include "AUIActor.h"
 #include "AParticleActor.h"
 #include "AFireParticleActor.h"
+// Game Actor
+#include "TPlayer.h"
+#include "TEnemy.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -19,19 +22,25 @@
 #include "UBoxComponent.h"
 #include "USphereComponent.h"
 
-// Script
-#include "PlayerMoveScript.h"
-#include "BatMovement.h"
-#include "WalkerMovement.h"
-#include "BettyMovement.h"
+//// Script
+//#include "PlayerMoveScript.h"
+//#include "BatMovement.h"
+//#include "WalkerMovement.h"
+//#include "BettyMovement.h"
+//#include "MageMovement.h"
+#include "ScriptManager.h"
 
-unique_ptr<ActorLoader> PrefabToActor::actorLoader = nullptr;
-unique_ptr<MeshLoader> PrefabToActor::meshLoader = nullptr;
+//unique_ptr<ActorLoader> PrefabToActor::actorLoader = nullptr;
+//unique_ptr<MeshLoader> PrefabToActor::meshLoader = nullptr;
+
+void PrefabToActor::Init()
+{
+	MakeLoader();
+}
 
 vector<shared_ptr<class AActor>> PrefabToActor::LoadAllPrefabs(const std::string& extension)
 {
-	if (!actorLoader || !meshLoader)
-		MakeLoader();
+	//MakeLoader();
 
 	vector<shared_ptr<class AActor>> m_vActorList;
 
@@ -100,14 +109,21 @@ shared_ptr<ATerrainTileActor> PrefabToActor::MakeTileActor(const string& _file)
 
 shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 {
-	shared_ptr<AActor> actor = nullptr;
+	shared_ptr<TCharacter> actor = nullptr;
 
 	PrefabCharacterData characterData;
 	if (PREFAB->LoadCharacter(_file, characterData))
 	{
-		actor = std::make_shared<AActor>(); // 필요에 따라 캐릭터 타입으로 변경
+		if (characterData.ScriptName == "PlayerMoveScript")
+		{
+			actor = std::make_shared<TPlayer>();
+		}
+		else
+		{
+			actor = std::make_shared<TEnemy>();
+		}
 
-		shared_ptr<UMeshComponent> meshComponent = meshLoader->Make(characterData.MeshPath.c_str());
+		shared_ptr<UMeshComponent> meshComponent = MESHLOADER->Make(characterData.MeshPath.c_str());
 
 		actor->SetMeshComponent(meshComponent);
 
@@ -117,11 +133,8 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 		actor->SetRotation(Vec3(characterData.transform.Rotation));
 		actor->SetScale(Vec3(characterData.transform.Scale));
 
-		// 추후 script manager 만들어 수정할 예정
-		if (characterData.ScriptType == 1) actor->AddScript(std::make_shared<PlayerMoveScript>());
-		if (characterData.ScriptType == 2) { actor->AddScript(std::make_shared<BatMovement>()); }
-		if (characterData.ScriptType == 3) { actor->AddScript(std::make_shared<WalkerMovement>()); }
-		if (characterData.ScriptType == 4) { actor->AddScript(std::make_shared<BettyMovement>()); }
+		auto script = SCRIPT->GetScript(to_mw(characterData.ScriptName));
+		actor->AddScript(script);
 
 		if (characterData.camera.isUse)
 		{
@@ -143,7 +156,7 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 			shapeComponent->SetLocalScale(Vec3(characterData.shape.Scale));
 			shapeComponent->SetLocalPosition(Vec3(characterData.shape.Position));
 			shapeComponent->SetLocalRotation(Vec3(characterData.shape.Rotation));
-			shapeComponent->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+			shapeComponent->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 			actor->SetShapeComponent(shapeComponent);
 		}
 	}
@@ -178,7 +191,7 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 		else
 		{
 			//Profiler p("Mesh From Asset");
-			auto resources = actorLoader->LoadOneRes(objData.MeshPath);
+			auto resources = ACTORLOADER->LoadOneRes(objData.MeshPath);
 			meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 			meshComp->SetMeshPath(to_mw(objData.MeshPath));
 		}
@@ -187,7 +200,7 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 		material->Load(to_mw(objData.TexturePath), to_mw(objData.ShaderPath));
 		meshComp->SetMaterial(material);
 
-		obj= make_shared<APawn>();
+		obj = make_shared<APawn>();
 		obj->SetPrefabPath(_file);
 		obj->m_szName = L"Object";
 		obj->SetMeshComponent(meshComp);
@@ -201,7 +214,7 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 
 			if (objData.ShapeData.eShapeType == ShapeType::ST_BOX)
 				shapeComp = std::make_shared<UBoxComponent>();
-			else if(objData.ShapeData.eShapeType == ShapeType::ST_SPHERE)
+			else if (objData.ShapeData.eShapeType == ShapeType::ST_SPHERE)
 				shapeComp = std::make_shared<USphereComponent>();
 			// else if (...) // 다른 타입 추가 가능
 
@@ -229,7 +242,7 @@ vector<shared_ptr<APawn>> PrefabToActor::MakeObjects(const string& _file)
 			auto meshComp = make_shared<UStaticMeshComponent>();
 			meshComp->SetMeshPath(to_mw(objData.MeshPath));
 
-			auto resources = actorLoader->LoadOneRes(objData.MeshPath);
+			auto resources = ACTORLOADER->LoadOneRes(objData.MeshPath);
 			meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 
 			auto material = make_shared<UMaterial>();
@@ -403,10 +416,15 @@ vector<shared_ptr<class AParticleActor>> PrefabToActor::MakeParticleGroup(const 
 
 void PrefabToActor::MakeLoader()
 {
-	actorLoader = make_unique<ActorLoader>();
-	meshLoader = make_unique<MeshLoader>();
+	//actorLoader = make_unique<ActorLoader>();
+	//meshLoader = make_unique<MeshLoader>();
 
-	actorLoader->LoadAllAsset();
-	meshLoader->SetMesh(actorLoader->LoadMeshMap());
-	meshLoader->SetAnim(actorLoader->LoadAnimMap());
+	//actorLoader->LoadAllAsset();
+	//meshLoader->SetMesh(actorLoader->LoadMeshMap());
+	//meshLoader->SetAnim(actorLoader->LoadAnimMap());
+	ACTORLOADER->LoadAllAsset();
+	MESHLOADER->SetMesh(ACTORLOADER->LoadMeshMap());
+	MESHLOADER->SetAnim(ACTORLOADER->LoadAnimMap());
+
+
 }

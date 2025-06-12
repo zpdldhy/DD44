@@ -25,6 +25,10 @@ public:
 	float m_fRollCoolTime = 0.3f;
 	bool m_bCanRoll = true;
 
+	// Attack
+	shared_ptr<AActor> attackRangeActor;
+	Vec3 colOffset;
+
 	Vec3 m_vLook;
 	Vec3 m_vRight;
 	Vec3 m_vLastMoveDir;
@@ -32,18 +36,18 @@ public:
 	Vec3 m_vRollLook;
 
 	// 상호작용
-	UINT m_vHP = 4;
+	//UINT m_vHP = 4;
 	UINT m_vArrowCount = 4;
 
 	// UI Actor
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
 	vector<shared_ptr<class AUIActor>> m_vArrowUI;
 	bool m_bHPUIChange = false;
+	shared_ptr<Texture> m_pSubTexture;
 
 	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
 
 	// Child Mesh Components
-	// 어떻게 관리해야 좋을지 모르겟음
 	weak_ptr<UMeshComponent> backSword;
 	weak_ptr<UMeshComponent> handSword;
 
@@ -52,6 +56,7 @@ public:
 	shared_ptr<StateBase> roll;
 	shared_ptr<StateBase> attack;
 	shared_ptr<StateBase> hit;
+	shared_ptr<StateBase> shoot;
 	shared_ptr<StateBase> die;
 	shared_ptr<StateBase> currentState;
 
@@ -63,11 +68,15 @@ public:
 	 
 	// Camera Offset
 	Vec3 m_vCameraOffset = { 20.0f, 30.0f, -20.0f };
+	// temp
 	int animIndex = 0;
+
+	//Crash
+	bool m_bCrashSet = false;
 public:
 	void Init() override;
 	void Tick() override;
-
+	virtual shared_ptr<UScriptComponent> Clone() override;
 private:
 	void SetUI();
 	void UpdateHPUI();
@@ -81,8 +90,14 @@ public:
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
+	void ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled);
+	void ApplyCrash();
+
 public:
+	void Move();
+	void CheckHit();
 	void RollMove();
 	bool CanAttack();
+	void UpdateCollider();
 };
 

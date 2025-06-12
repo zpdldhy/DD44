@@ -26,21 +26,17 @@
 #include "PrefabToActor.h"
 #include "EffectManager.h"
 
-#include "BatMovement.h"
-#include "WalkerMovement.h"
-#include "BettyMovement.h"
+#include "TEnemy.h"
+
 #include "CollisionManager.h"
+#include "ScriptManager.h"
+#include "ProjectileManager.h"
 
 //#undef RUN_GAME
 void Editor::Init()
-{	
-	// Asset ·Îµù
-	actorLoader.LoadAllAsset();
-	meshLoader.SetMesh(actorLoader.LoadMeshMap());
-	meshLoader.SetAnim(actorLoader.LoadAnimMap());
-
-	//actorLoader.ConvertFbxToAsset("../Resources/Obj/*.fbx");
-	objectLoader.ConvertObjToAsset("../Resources/Obj/cursor/*.obj");
+{
+	SCRIPT->Init();
+	PToA->Init();
 
 	SetupEditorCallbacks();
 
@@ -49,26 +45,27 @@ void Editor::Init()
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 	OBJECT->AddActorList(m_vObjectList);
+	m_vMapList.push_back(m_pPlayer);
 
-	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	OBJECT->AddActorList(vlist);
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	OBJECT->AddActor(m_pPlayer);
 
-	m_vMapList.push_back(m_pPlayer);
-	// Temp
+	auto vlist = PToA->LoadAllPrefabs(".character.json");
 	enemyList = vlist;
-	SetEnemyScript();
+	SetEnemy();
+	OBJECT->AddActorList(vlist);
 
 	SetupGameCamera();
 	SetupEngineCamera();
 	SetupSkybox();
-	SetupSunLight();	
+	SetupSunLight();
+
+	PROJECTILE->Init();
 }
 
 void Editor::Tick()
-{	
+{
 	if (INPUT->GetButton(O))
 	{
 		if (m_bEnginCamera)
@@ -732,31 +729,6 @@ void Editor::SetupParticleEditorCallback()
 		});
 }
 
-void Editor::SetEnemyScript()
-{
-	for (auto& enemy : enemyList)
-	{
-		if (enemy->GetScriptList().size() <= 0) { continue; }
-		// bat
-		{
-			auto script = dynamic_pointer_cast<BatMovement>(enemy->GetScriptList()[0]);
-			if (script) { script->SetPlayer(m_pPlayer); }
-		}
-
-		// walker
-		{
-			auto script = dynamic_pointer_cast<WalkerMovement>(enemy->GetScriptList()[0]);
-			if (script) { script->SetPlayer(m_pPlayer); }
-		}
-
-		// betty
-		{
-			auto script = dynamic_pointer_cast<BettyMovement>(enemy->GetScriptList()[0]);
-			if (script) { script->SetPlayer(m_pPlayer); }
-		}
-	}
-}
-
 void Editor::CheckEnemyCollision()
 {
 	for (auto iter = enemyList.begin(); iter != enemyList.end();)
@@ -790,5 +762,18 @@ void Editor::CheckEnemyCollision()
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
 		iter++;
+	}
+}
+
+void Editor::SetEnemy()
+{
+
+	for (auto& enemy : enemyList)
+	{
+		auto e = dynamic_pointer_cast<TEnemy>(enemy);
+		if (e)
+		{
+			e->SetPlayer(m_pPlayer);
+		}
 	}
 }
