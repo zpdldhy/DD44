@@ -21,12 +21,27 @@ public:
 
 	float time;
 
-	// UI
+	// UIActor
+	shared_ptr<AActor> m_pCursor = nullptr;
+	// InGame
+	vector<shared_ptr<class AUIActor>> m_vHPUI;
+	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
+	int m_iPreHP = 0;
+	bool m_bHPUIChange = false;
+
+	vector<shared_ptr<class AUIActor>> m_vArrowUI;
+	shared_ptr<class Texture> m_pActiveArrowTexture = nullptr;
+	shared_ptr<class Texture> m_pInActiveArrowTexture = nullptr;
+	Vec3 m_vActiveArrowScale = { 0.f, 0.f, 0.f };
+	Vec3 m_vInActiveArrowScale = { 0.f, 0.f, 0.f };
+	// Paused
 	vector<shared_ptr<class AUIActor>> m_vPausedBackGround;
 	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
 	vector<shared_ptr<class AUIActor>> m_vUpgradeState;
 	vector<shared_ptr<class AUIActor>> m_vCoins;
-	shared_ptr<AActor> m_pCursor = nullptr;
+	// Dead
+	shared_ptr<class AUIActor> m_pDeadUI = nullptr;
+	float m_fDeadUIPopTime = 1.f;
 
 	// TEMP
 	vector<shared_ptr<AActor>> enemyList; 
@@ -45,11 +60,14 @@ protected:
 	void SetupSkybox();
 	void SetupSunLight();
 	void CreateWind();
+	void CreateUI();
+	void UpdateUI();
 	void UpdateCursor();
 
 protected:
 	void SetEnemy();
 	void CheckEnemyCollision();
+
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }
 };

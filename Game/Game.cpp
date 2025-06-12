@@ -23,6 +23,7 @@
 #include "AUIActor.h"
 #include "AWindActor.h"
 #include "TEnemy.h"
+#include "TPlayer.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -49,7 +50,7 @@ void Game::Init()
 	// Asset ·Îµù
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
-	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
+	//m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 
 	OBJECT->AddActorList(m_vMapList);
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
@@ -69,19 +70,7 @@ void Game::Init()
 
 	PROJECTILE->Init();
 
-	// InGame UI
-	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
-
-	// Paused UI
-	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
-	UI->AddUIList(m_vPausedBackGround);
-	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
-	UI->AddUIList(m_vUpgradeBackGround);
-	m_vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
-	UI->AddUIList(m_vUpgradeState);
-	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
-	UI->AddUIList(m_vCoins);
-	UI->DoFadeOut();
+	CreateUI();
 
 	EFFECT->Init();
 	SetupEngineCamera();
@@ -102,32 +91,7 @@ void Game::Tick()
 	if (INPUT->GetButton(GameKey::ESC))
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
 
-	if (ENGINE->m_bGamePaused == true)
-	{
-		for (auto& pUI : m_vPausedBackGround)
-			pUI->m_bRender = true;
-
-		for(auto& pUI : m_vUpgradeBackGround)
-			pUI->m_bRender = true;
-
-		for (auto& pUI : m_vUpgradeState)
-			pUI->m_bRender = true;
-
-		OBJECT->SetCursorActor(nullptr);
-	}
-	else
-	{
-		for (auto& pUI : m_vPausedBackGround)
-			pUI->m_bRender = false;
-
-		for (auto& pUI : m_vUpgradeBackGround)
-			pUI->m_bRender = false;
-
-		for (auto& pUI : m_vUpgradeState)
-			pUI->m_bRender = false;
-
-		OBJECT->SetCursorActor(m_pCursor);
-	}
+	UpdateUI();
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
@@ -280,6 +244,241 @@ void Game::CreateWind()
 			WIND->AddWind(wind);
 		}
 
+	}
+}
+
+void Game::CreateUI()
+{
+	// InGame UI
+	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
+
+	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
+	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
+	UI->AddUIList(m_vHPUI);
+	UI->AddUIList(m_vArrowUI);
+
+	m_pActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_active.png");
+	m_pInActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_inactive.png");
+
+	m_vActiveArrowScale = m_vArrowUI[3]->GetScale();
+	m_vInActiveArrowScale = m_vArrowUI[2]->GetScale();
+
+	// Paused UI
+	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
+	UI->AddUIList(m_vPausedBackGround);
+	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
+	UI->AddUIList(m_vUpgradeBackGround);
+	m_vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
+	UI->AddUIList(m_vUpgradeState);
+	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
+	UI->AddUIList(m_vCoins);
+
+	// Dead
+	m_pDeadUI = PToA->MakeUI("../Resources/Prefab/UI_Dead.ui.json");
+	UI->AddUI(m_pDeadUI);
+
+	UI->DoFadeOut();
+}
+
+void Game::UpdateUI()
+{
+	// HP
+	Color RestColor;
+	RestColor = fullHP;
+	RestColor.w = -0.5f;
+
+	static float currentTime = 0.0f;
+	currentTime = TIMER->GetDeltaTime();
+
+	auto currentHP = dynamic_pointer_cast<TCharacter>(m_pPlayer)->GetHp();	
+
+	if(currentHP!= m_iPreHP)
+		m_bHPUIChange = true;
+
+	switch (currentHP)
+	{
+	case 4:
+	{
+		m_vHPUI[0]->SetColor(RestColor);
+		m_vHPUI[1]->SetColor(RestColor);
+		m_vHPUI[2]->SetColor(RestColor);
+		m_vHPUI[3]->SetColor(fullHP);
+	}
+	break;
+
+	case 3:
+	{
+		if (m_vHPUI[2]->GetColor().w < 0.f && m_bHPUIChange)
+		{
+			m_vHPUI[3]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+		}
+		else if (m_bHPUIChange == true)
+			m_bHPUIChange = false;
+		else
+		{
+			m_vHPUI[0]->SetColor(RestColor);
+			m_vHPUI[1]->SetColor(RestColor);
+			m_vHPUI[2]->SetColor(fullHP);
+		}
+	}
+	break;
+
+	case 2:
+	{
+		if (m_vHPUI[1]->GetColor().w < 0.f && m_bHPUIChange)
+		{
+			m_vHPUI[2]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+		}
+		else if (m_bHPUIChange == true)
+			m_bHPUIChange = false;
+		else
+		{
+			m_vHPUI[0]->SetColor(RestColor);
+			m_vHPUI[1]->SetColor(fullHP);
+		}
+	}
+	break;
+
+	case 1:
+	{
+		if (m_vHPUI[0]->GetColor().w < 0.f && m_bHPUIChange)
+		{
+			m_vHPUI[1]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+		}
+		else if (m_bHPUIChange == true)
+			m_bHPUIChange = false;
+		else
+			m_vHPUI[0]->SetColor(fullHP);
+
+	}
+	break;
+
+	case 0:
+	{
+		m_vHPUI[0]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+	}
+	break;
+	}
+
+	m_iPreHP = currentHP;
+
+	// Arrow
+	switch (dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount())
+	{
+	case 4:
+		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[2]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[3]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[2]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[3]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = true;
+		m_vArrowUI[2]->m_bRender = true;
+		m_vArrowUI[3]->m_bRender = true;
+		break;
+
+	case 3:
+		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[2]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[2]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = true;
+		m_vArrowUI[2]->m_bRender = true;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+
+	case 2:
+		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[1]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[1]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = true;
+		m_vArrowUI[2]->m_bRender = false;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+
+	case 1:
+		m_vArrowUI[0]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = false;
+		m_vArrowUI[2]->m_bRender = false;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+
+	case 0:
+		m_vArrowUI[0]->m_bRender = false;
+		m_vArrowUI[1]->m_bRender = false;
+		m_vArrowUI[2]->m_bRender = false;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+	}
+
+	// Paused
+	if (ENGINE->m_bGamePaused == true)
+	{
+		for (auto& pUI : m_vPausedBackGround)
+			pUI->m_bRender = true;
+
+		for (auto& pUI : m_vUpgradeBackGround)
+			pUI->m_bRender = true;
+
+		for (auto& pUI : m_vUpgradeState)
+			pUI->m_bRender = true;
+
+		OBJECT->SetCursorActor(nullptr);
+	}
+	else
+	{
+		for (auto& pUI : m_vPausedBackGround)
+			pUI->m_bRender = false;
+
+		for (auto& pUI : m_vUpgradeBackGround)
+			pUI->m_bRender = false;
+
+		for (auto& pUI : m_vUpgradeState)
+			pUI->m_bRender = false;
+
+		OBJECT->SetCursorActor(m_pCursor);
+	}	
+
+	// End
+	static float tempTime = 0;
+	if (dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead())
+	{
+		tempTime += TIMER->GetDeltaTime();
+
+		if (tempTime > m_fDeadUIPopTime)
+		{
+			m_pDeadUI->m_bRender = true;
+			m_vCoins[1]->m_bRender = false;
+			m_vCoins[3]->m_bRender = false;
+		}
+	}
+	else
+	{
+		m_pDeadUI->m_bRender = false;
+		tempTime = 0.f;
+		m_vCoins[1]->m_bRender = true;
+		m_vCoins[3]->m_bRender = true;
 	}
 }
 
