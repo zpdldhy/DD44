@@ -624,7 +624,8 @@ bool Collision::CheckSphereToOBB(const Sphere& _Sphere, const Box& _Box, Vec3& _
 bool Collision::GetIntersection(const Ray& _ray, const Vec3& _point, const Vec3& _normal, Vec3& _inter)
 {
 	float dot1 = _normal.Dot(_ray.direction);
-	float dot2 = _normal.Dot(_point - _ray.position);
+	Vec3 temp = _point - _ray.position;
+	float dot2 = _normal.Dot(temp);
 
 	float Dt = dot2 / dot1;
 

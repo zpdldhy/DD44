@@ -25,6 +25,7 @@ public:
 	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
 	vector<shared_ptr<class AUIActor>> m_vUpgradeState;
 	vector<shared_ptr<class AUIActor>> m_vCoins;
+	shared_ptr<AActor> m_pCursor = nullptr;
 
 	// TEMP
 	vector<shared_ptr<AActor>> enemyList; 
@@ -43,6 +44,7 @@ protected:
 	void SetupSkybox();
 	void SetupSunLight();
 	void CreateWind();
+	void UpdateCursor();
 
 protected:
 	void SetEnemyScript();

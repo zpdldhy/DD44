@@ -40,13 +40,13 @@ void Editor::Init()
 	meshLoader.SetAnim(actorLoader.LoadAnimMap());
 
 	//actorLoader.ConvertFbxToAsset("../Resources/Obj/*.fbx");
-	//objectLoader.ConvertObjToAsset("../Resources/Obj/*.obj");
+	objectLoader.ConvertObjToAsset("../Resources/Obj/cursor/*.obj");
 
 	SetupEditorCallbacks();
 
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
 	OBJECT->AddActorList(m_vMapList);
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 	OBJECT->AddActorList(m_vObjectList);
 

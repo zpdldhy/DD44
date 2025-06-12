@@ -45,7 +45,7 @@ void Game::Init()
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 
 	OBJECT->AddActorList(m_vMapList);
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
@@ -79,10 +79,16 @@ void Game::Init()
 	SetupGameCamera();
 	SetupSkybox();
 	SetupSunLight();
+
+	// Create Cursor
+	m_pCursor = PToA->MakeObject("../Resources/Prefab/Cursor.object.json");
+	OBJECT->AddActor(m_pCursor);
 }
 
 void Game::Tick()
 {
+	UpdateCursor();
+
 	if (INPUT->GetButton(GameKey::ESC))
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
 
@@ -261,6 +267,44 @@ void Game::CreateWind()
 		}
 		
 	}
+}
+
+void Game::UpdateCursor()
+{
+	// 위치
+	// 마우스 Ray로 Character와 동일한 z값을 가진 평면의 Intersection을 구함
+	MouseRay ray;
+	ray.Click();
+
+	auto playerPos = m_pPlayer->GetPosition();
+	playerPos.y += 1.f;
+	Vec3 inter;
+
+	Collision::GetIntersection(ray, playerPos, Vec3(0.f, 1.f, 0.f), inter);
+
+	auto rotDir = inter - playerPos;
+	auto rotVec = rotDir;
+	rotVec.Normalize();
+
+	// 특정 거리를 넘어가지 않도록 반지름 지정
+	float radius = 7.5f;
+	if (rotDir.Length() > radius)
+		inter = playerPos + rotVec * radius;
+
+	m_pCursor->SetPosition(inter);
+
+	// 회전
+	// 캐릭터 -> 마우스 벡터와 Vec3(1, 0, 0)을 내적하여 각을 구한다.
+	float angle;
+	float fDot = rotVec.Dot(Vec3(1.f, 0.f, 0.f));
+
+	if (rotVec.z > 0.f)
+		angle = -(acosf(fDot) - DD_PI / 2.f);
+	else
+		angle = (acosf(fDot) + DD_PI / 2.f);
+
+	m_pCursor->SetRotation(Vec3(DD_PI / 2.f, angle, 0.f));
+
 }
 
 void Game::SetEnemyScript()
