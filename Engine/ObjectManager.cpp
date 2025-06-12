@@ -33,6 +33,9 @@ void ObjectManager::Tick()
 			pActor++;
 		}		
 	}
+
+	if (m_pCursor)
+		m_pCursor->Tick();
 }
 
 void ObjectManager::Render()
@@ -63,6 +66,12 @@ void ObjectManager::Render()
 		SetRenderMode(ERenderMode::Default);
 		DC->OMSetDepthStencilState(STATE->m_pDSSDepthEnable.Get(), 0);
 		pRenderActor->Render();
+	}
+
+	if (m_pCursor)
+	{
+		DC->OMSetDepthStencilState(STATE->m_pDSSDepthDisableZero.Get(), 0);
+		m_pCursor->Render();
 	}
 
 	ClearRenderList();
@@ -208,6 +217,21 @@ void ObjectManager::CollisionStabilization()
 				pActor->GetShapeComponent()->UpdateBounds();
 			}
 		}
+	}
+}
+
+void ObjectManager::SetCursorActor(shared_ptr<AActor> _pCursor)
+{
+	m_pCursor = _pCursor;
+
+	if (_pCursor)
+	{
+		HCURSOR hCursor = LoadCursorFromFile(L"../Resources/Texture/UI/Empty.cur");
+		SetCursor(hCursor);
+	}
+	else
+	{
+		SetCursor(LoadCursor(nullptr, IDC_ARROW));
 	}
 }
 

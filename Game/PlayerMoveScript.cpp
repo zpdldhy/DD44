@@ -38,8 +38,6 @@ void PlayerMoveScript::Init()
 	shoot = make_shared<PlayerShootState>(m_pOwner);
 	die = make_shared<PlayerDieState>(m_pOwner);
 
-	SetUI();
-
 	currentState = idle;
 	currentState->Enter();
 
@@ -128,10 +126,6 @@ void PlayerMoveScript::Tick()
 		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
 #pragma endregion
-
-	// UI 
-	UpdateHPUI();
-	UpdateArrowUI();
 
 #pragma region STATE_ANIM
 	if (m_bDamageCoolTime)
@@ -312,7 +306,6 @@ void PlayerMoveScript::CheckHit()
 
 		if (isCol || healthComp->IsHitByProjectile())
 		{
-			m_bHPUIChange = true;
 			{
 				// Blood FX
 				Vec3 basePos = GetOwner()->GetPosition();
@@ -370,89 +363,6 @@ void PlayerMoveScript::Slash()
 		}
 	}
 
-}
-
-void PlayerMoveScript::SetUI()
-{
-	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
-	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
-	UI->AddUIList(m_vHPUI);
-	UI->AddUIList(m_vArrowUI);
-}
-
-void PlayerMoveScript::UpdateHPUI()
-{
-	Color RestColor;
-	auto hp = dynamic_pointer_cast<TCharacter>(GetOwner())->GetHp();
-	if (hp == 4)
-	{
-		RestColor = fullHP;
-		RestColor.w = -0.5f;
-
-		m_vHPUI[0]->SetColor(RestColor);
-		m_vHPUI[1]->SetColor(RestColor);
-		m_vHPUI[2]->SetColor(RestColor);
-		m_vHPUI[3]->SetColor(fullHP);
-
-		m_vHPUI[0]->m_bRender = true;
-		m_vHPUI[1]->m_bRender = true;
-		m_vHPUI[2]->m_bRender = true;
-		m_vHPUI[3]->m_bRender = true;
-	}
-
-	// 데미지를 입었을 시, UI Animation
-	if (m_bHPUIChange)
-	{
-		static float currentTime = 0.0f;
-		static float damageTime = 0.0f;
-
-		damageTime += currentTime = TIMER->GetDeltaTime();
-
-		if (hp == 3)
-		{
-			if (m_vHPUI[2]->GetColor().w < 0.f)
-				m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-			else
-				m_bHPUIChange = false;
-
-			m_vHPUI[3]->m_bRender = false;
-		}
-		else if (hp == 2)
-		{
-			if (m_vHPUI[1]->GetColor().w < 0.f)
-				m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-			else
-				m_bHPUIChange = false;
-
-			m_vHPUI[2]->m_bRender = false;
-		}
-		else if (hp == 1)
-		{
-			if (m_vHPUI[0]->GetColor().w < 0.f)
-				m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-			else
-				m_bHPUIChange = false;
-
-			m_vHPUI[1]->m_bRender = false;
-		}
-		else if (hp == 0)
-		{
-			m_vHPUI[0]->m_bRender = false;
-			m_vHPUI[1]->m_bRender = false;
-			m_vHPUI[2]->m_bRender = false;
-			m_vHPUI[3]->m_bRender = false;
-		}
-	}
-
-	if (hp > 4)
-		hp = 4;
-}
-
-void PlayerMoveScript::UpdateArrowUI()
-{
-
-	if (m_vArrowCount > 4)
-		m_vArrowCount = 4;
 }
 
 void PlayerMoveScript::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)

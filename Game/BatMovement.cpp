@@ -22,8 +22,7 @@
 
 void BatMovement::Init()
 {
-	owner = dynamic_pointer_cast<TEnemy>(GetOwner());
-	SetPlayer(owner->GetPlayer());
+	SetPlayer(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer());
 
 	m_vCenter = GetOwner()->GetPosition();
 

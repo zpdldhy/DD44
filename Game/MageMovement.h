@@ -10,7 +10,6 @@ public:
 	MageMovement() = default;
 	~MageMovement() = default;
 private:
-	shared_ptr<TEnemy> owner;
 	weak_ptr<AActor> player;
 
 	// States

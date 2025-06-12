@@ -25,6 +25,9 @@ void TCharacter::SetHp(int _hp)
 {
 	hp = _hp;
 	m_iMax_Hp = _hp;
+
+	if (hp > 0)
+		bDead = false;
 }
 
 void TCharacter::TakeDamage(int _damage)

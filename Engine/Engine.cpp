@@ -72,32 +72,31 @@ void Engine::Init()
 
 void Engine::Frame()
 {
+	// Manager Tick
 	INPUT->Tick();
 	TIMER->Update();
-	
-	// Object Tick
-	{
-		if (!m_bGamePaused)
-			OBJECT->ObjectMove();			// 1. Move
-		LIGHTMANAGER->UpdateLightCB();
-
-		UI->Tick();
-		if (!m_bGamePaused)
-			PARTICLE->Tick();
-	}
-	_app->Tick();						// 2. 충돌
+	LIGHTMANAGER->UpdateLightCB();
 
 	if (!m_bGamePaused)
 	{
-		OBJECT->CollisionStabilization();	// 3. 보정
-		OBJECT->Tick();
+		OBJECT->ObjectMove();				// 1. Move
 	}
 
-	// Manager Tick
-	{
-		CAMERA->Tick();
-		WIND->Tick();
+	_app->Tick();							// 2. 충돌
+
+	if (!m_bGamePaused)
+	{		
+		OBJECT->CollisionStabilization();	// 3. 보정
+		OBJECT->Tick();
+
+		{
+			CAMERA->Tick();		// Fructum Range Render 때문에 Object 뒤에서 Render
+			PARTICLE->Tick();
+			WIND->Tick();
+		}
 	}
+
+	UI->Tick();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 	{
@@ -128,7 +127,7 @@ void Engine::Render()
 		WIND->Render();
 		POSTPROCESS->SetSRVToSlot(7, WIND->GetSRV());
 		POSTPROCESS->PostRender();
-		
+
 		if (m_pCurrentRasterizer)
 			m_pCurrentRasterizer.Reset();
 
@@ -136,7 +135,7 @@ void Engine::Render()
 		DC->RSSetState(STATE->m_pRSSolidNone.Get());
 
 		{
-			CAMERA->Render(CameraViewType::CVT_UI);		
+			CAMERA->Render(CameraViewType::CVT_UI);
 			POSTPROCESS->Present();
 		}
 
@@ -155,7 +154,7 @@ void Engine::Render()
 
 void Engine::Release()
 {
-	UI->Destroy();	
+	UI->Destroy();
 	PARTICLE->Destroy();
 	_app->Destroy();
 
@@ -170,7 +169,7 @@ void Engine::Release()
 
 void Engine::Run()
 {
-	_window.SetWindowClass(_hInstance);	
+	_window.SetWindowClass(_hInstance);
 	//_window.SetWindow();
 	_window.SetWindowFullScreen();
 
