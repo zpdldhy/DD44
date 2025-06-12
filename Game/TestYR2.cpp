@@ -36,9 +36,7 @@ void TestYR2::Init()
 #pragma endregion
 
 	loader = make_shared<ActorLoader>();
-	//loader->ConvertFbxToAsset();
-	//loader->ConvertObjToAsset("../Resources/Obj/*.obj");
-
+	//loader->ConvertObjToAsset("../Resources/Obj/Test/*.obj");
 	loader->LoadAllAsset();
 	meshResMap = loader->LoadMeshMap();
 	animList = loader->LoadAnim();
@@ -47,14 +45,14 @@ void TestYR2::Init()
 	meshLoader.SetAnim(loader->LoadAnimMap());
 
 
-	m_pActor = make_shared<APawn>();
-	auto meshComponent = meshLoader.Make("../Resources/Asset/player.mesh.json");
-	m_pActor->SetMeshComponent(meshComponent);
+	//m_pActor = make_shared<APawn>();
+	//auto meshComponent = meshLoader.Make("../Resources/Asset/player.mesh.json");
+	//m_pActor->SetMeshComponent(meshComponent);
 
-	m_pActor->SetPosition(Vec3(10, 10, 10));
+	//m_pActor->SetPosition(Vec3(10, 10, 10));
 
-	//player->AddScript(movement);
-	OBJECT->AddActor(m_pActor);
+	////player->AddScript(movement);
+	//OBJECT->AddActor(m_pActor);
 
 
 	auto meshEditor = GUI->GetMeshEditorUI();
@@ -76,9 +74,9 @@ void TestYR2::Init()
 			{
 				rootMesh = make_shared <USkinnedMeshComponent>();
 				rootMesh->SetName(data.compName);
-				auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(rootMesh);
-				skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(iter->second));
+				rootMesh->SetMesh(iter->second);
 				// ANIM
+				auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(rootMesh);
 				auto animInstance = animList[data.animIndex];
 				skinnedRoot->SetBaseAnim(animInstance);
 				shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
@@ -126,9 +124,7 @@ void TestYR2::Init()
 			{
 				rootMesh = make_shared <UStaticMeshComponent>();
 				rootMesh->SetName(data.compName);
-				auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(rootMesh);
-
-				staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(iter->second));
+				rootMesh->SetMesh((iter->second));
 
 				// MATERIAL
 				shared_ptr<UMaterial> mat = make_shared<UMaterial>();
@@ -169,19 +165,19 @@ void TestYR2::Init()
 	meshEditor->MoveMesh([this](string compName, Vec3 position)
 		{
 			auto mesh = m_vActorList[0]->GetMeshComponent();
-			auto child = mesh->GetMeshByName(to_mw(compName));
+			auto child = mesh->GetChildByName(to_mw(compName));
 			child->SetLocalPosition(position);
 		});
 	meshEditor->ScaleMesh([this](string compName, Vec3 scale)
 		{
 			auto mesh = m_vActorList[0]->GetMeshComponent();
-			auto child = mesh->GetMeshByName(to_mw(compName));
+			auto child = mesh->GetChildByName(to_mw(compName));
 			child->SetLocalScale(scale);
 		});
 	meshEditor->RotateMesh([this](string compName, Vec3 rot)
 		{
 			auto mesh = m_vActorList[0]->GetMeshComponent();
-			auto child = mesh->GetMeshByName(to_mw(compName));
+			auto child = mesh->GetChildByName(to_mw(compName));
 			child->SetLocalRotation(rot);
 		});
 	meshEditor->StopAnim([this](bool stop)
@@ -198,7 +194,7 @@ void TestYR2::Init()
 		{
 			auto mesh = dynamic_pointer_cast<USkinnedMeshComponent>(m_vActorList[0]->GetMeshComponent());
 			auto animInstance = mesh->GetAnimInstance();
-			auto child = mesh->GetMeshByName(to_mw(compName));
+			auto child = mesh->GetChildByName(to_mw(compName));
 			int parentBone = mesh->GetMesh()->GetBoneIndex(to_mw(bone));
 			Matrix matBone = animInstance->GetBoneAnim(parentBone);
 			if (inverse)
@@ -215,7 +211,7 @@ void TestYR2::Init()
 	meshEditor->ChangeVisible([this](string compName, bool b)
 		{
 			auto mesh = m_vActorList[0]->GetMeshComponent();
-			auto child = mesh->GetMeshByName(to_mw(compName));
+			auto child = mesh->GetChildByName(to_mw(compName));
 			child->SetVisible(b);
 		});
 	meshEditor->RemoveMesh([this](string _name)
@@ -257,7 +253,7 @@ void TestYR2::AddChild(PreMeshData data)
 		child->SetName(data.compName);
 		auto iter = meshResMap.find(data.meshName);
 		if (iter == meshResMap.end()) { assert(false); }
-		dynamic_pointer_cast<USkinnedMeshComponent>(child)->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(iter->second));
+		child->SetMesh((iter->second));
 		// ANIM
 		// static 아래에 skinned가 들어갈 수도 있음
 		shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
@@ -277,7 +273,7 @@ void TestYR2::AddChild(PreMeshData data)
 		// ROOT
 		if (data.parentCompName != rootMesh->GetName())
 		{
-			auto parentComp = rootMesh->GetMeshByName(data.parentCompName);
+			auto parentComp = rootMesh->GetChildByName(data.parentCompName);
 			parentComp->AddChild(child);
 			child->SetParentTransform(dynamic_pointer_cast<USceneComponent>(parentComp).get());
 
@@ -293,13 +289,13 @@ void TestYR2::AddChild(PreMeshData data)
 	{
 		child = make_shared<UStaticMeshComponent>();
 		child->SetName(data.compName);
-		auto sChild = dynamic_pointer_cast<UStaticMeshComponent>(child);
 		auto iter = meshResMap.find(data.meshName);
 		if (iter == meshResMap.end()) { assert(false); }
-		sChild->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(iter->second));
+		child->SetMesh((iter->second));
 		// ANIM
 		if (data.bAnimatedStatic)
 		{
+			auto sChild = dynamic_pointer_cast<UStaticMeshComponent>(child);
 			sChild->SetAnimInstance(animInstance);
 			if (!data.parentBoneName.empty())
 			{
@@ -328,10 +324,9 @@ void TestYR2::AddChild(PreMeshData data)
 
 		if (data.parentCompName != rootMesh->GetName())
 		{
-			auto parentComp = rootMesh->GetMeshByName(data.parentCompName);
+			auto parentComp = rootMesh->GetChildByName(data.parentCompName);
 			parentComp->AddChild(child);
 			child->SetParentTransform(dynamic_pointer_cast<USceneComponent>(parentComp).get());
-
 		}
 		else
 		{

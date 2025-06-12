@@ -117,7 +117,7 @@ void AAsset::Export(TFbxResource _result, string filepath)
 TFbxResource AAsset::Load(const char* fileName)
 {
 	string file = fileName;
-	Profiler p("Asset::Load" + file);
+	/*Profiler p("Asset::Load" + file);*/
 	FILE* pFile;
 
 	errno_t err = fopen_s(&pFile, fileName, "rb");
@@ -519,7 +519,7 @@ MeshComponentData AAsset::LoadJsonMesh(const char* filepath)
 
 MeshComponentData AAsset::LoadOneJsonMeshRecursive(string idx, const nlohmann::ordered_json& j)
 {
-	Profiler p("LoadOneJsonMeshRecursive");
+	/*Profiler p("LoadOneJsonMeshRecursive");*/
 	// Load One
 	MeshComponentData parent = LoadOneJsonMesh(idx, j);
 

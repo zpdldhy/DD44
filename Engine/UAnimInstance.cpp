@@ -31,8 +31,11 @@ void UAnimInstance::Tick()
 				currentAnimTrackIndex = prevIndex;
 				m_bOnPlayOnce = false;
 			}
-
 			animFrame = 0;
+		}
+		else
+		{
+			animFrame = lastFrame;
 		}
 	}
 
@@ -40,11 +43,9 @@ void UAnimInstance::Tick()
 	if (m_bInPlace)
 	{
 		rootPos.x = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._41;
-		//rootPos.y = animTrackList[currentAnimTrackIndex].animList[4][animFrame]._42;
+		rootPos.y = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._42;
 		rootPos.z = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._43;
-
 	}
-
 
 	// 애니메이션 파싱 확인 용
 	/*if (INPUT->GetButton(R))
@@ -56,6 +57,9 @@ void UAnimInstance::Tick()
 			currentAnimTrackIndex = 0;
 		}
 	}*/
+
+	// Event
+	TriggetEvent(currentAnimTrackIndex, animFrame);
 }
 
 shared_ptr<UAnimInstance> UAnimInstance::Clone()
@@ -163,4 +167,17 @@ void UAnimInstance::SetKeyFrame(int _trackIndex, UINT _key)
 
 	m_mKeyFrameMap.insert(make_pair(_trackIndex, _key));
 
+}
+
+void UAnimInstance::AddEvent(int _trackIndex, UINT _keyFrame, function<void()> _func)
+{
+	eventMap[{_trackIndex, _keyFrame}] = _func;
+}
+
+void UAnimInstance::TriggetEvent(int _trackIndex, UINT _currentFrame)
+{
+	auto it = eventMap.find({ _trackIndex, _currentFrame });
+	if (it != eventMap.end()) {
+		it->second();
+	}
 }

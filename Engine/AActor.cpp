@@ -36,6 +36,7 @@ void AActor::Tick()
 {
 	m_pTransform->Tick();
 
+
 	// Component
 	for (auto& component : m_arrComponent)
 	{
