@@ -12,6 +12,7 @@ private:
 	bool m_bIsFlashing = false;
 	Vec3 m_vLastMoveDir;
 	Vec3 velocity;
+	bool m_bCrashSet = false;
 public:
 	void Tick() override;
 public:
@@ -23,6 +24,9 @@ public:
 	//FX
 	void Flashing();
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
+	void ApplyCrash();
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
+	void ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled);
+
 };
 
