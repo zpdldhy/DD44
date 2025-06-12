@@ -389,7 +389,9 @@ void PlayerMoveScript::UpdateHPUI()
 
 	damageTime += currentTime = TIMER->GetDeltaTime();
 
-	switch (m_vHP)
+	auto currentHP = dynamic_pointer_cast<TCharacter>(GetOwner())->GetHp();
+
+	switch (currentHP)
 	{
 	case 4:
 	{
@@ -445,10 +447,6 @@ void PlayerMoveScript::UpdateHPUI()
 	}
 	break;
 	}
-
-
-	if (m_vHP > 4)
-		m_vHP = 4;
 }
 
 void PlayerMoveScript::UpdateArrowUI()
