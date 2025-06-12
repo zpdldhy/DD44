@@ -82,7 +82,8 @@ void Game::Init()
 
 	// Create Cursor
 	m_pCursor = PToA->MakeObject("../Resources/Prefab/Cursor.object.json");
-	OBJECT->AddActor(m_pCursor);
+	m_pCursor->Init();
+	OBJECT->SetCursorActor(m_pCursor);
 }
 
 void Game::Tick()
@@ -102,6 +103,8 @@ void Game::Tick()
 
 		for (auto& pUI : m_vUpgradeState)
 			pUI->m_bRender = true;
+
+		OBJECT->SetCursorActor(nullptr);
 	}
 	else
 	{
@@ -113,6 +116,8 @@ void Game::Tick()
 
 		for (auto& pUI : m_vUpgradeState)
 			pUI->m_bRender = false;
+
+		OBJECT->SetCursorActor(m_pCursor);
 	}
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
@@ -304,7 +309,6 @@ void Game::UpdateCursor()
 		angle = (acosf(fDot) + DD_PI / 2.f);
 
 	m_pCursor->SetRotation(Vec3(DD_PI / 2.f, angle, 0.f));
-
 }
 
 void Game::SetEnemyScript()
