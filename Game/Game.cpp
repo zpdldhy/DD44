@@ -50,7 +50,7 @@ void Game::Init()
 	// Asset ·Îµù
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
-	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
+	//m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 
 	OBJECT->AddActorList(m_vMapList);
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
@@ -273,6 +273,10 @@ void Game::CreateUI()
 	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
 	UI->AddUIList(m_vCoins);
 
+	// Dead
+	m_pDeadUI = PToA->MakeUI("../Resources/Prefab/UI_Dead.ui.json");
+	UI->AddUI(m_pDeadUI);
+
 	UI->DoFadeOut();
 }
 
@@ -455,6 +459,27 @@ void Game::UpdateUI()
 
 		OBJECT->SetCursorActor(m_pCursor);
 	}	
+
+	// End
+	static float tempTime = 0;
+	if (dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead())
+	{
+		tempTime += TIMER->GetDeltaTime();
+
+		if (tempTime > m_fDeadUIPopTime)
+		{
+			m_pDeadUI->m_bRender = true;
+			m_vCoins[1]->m_bRender = false;
+			m_vCoins[3]->m_bRender = false;
+		}
+	}
+	else
+	{
+		m_pDeadUI->m_bRender = false;
+		tempTime = 0.f;
+		m_vCoins[1]->m_bRender = true;
+		m_vCoins[3]->m_bRender = true;
+	}
 }
 
 void Game::UpdateCursor()

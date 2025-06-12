@@ -39,6 +39,9 @@ public:
 	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
 	vector<shared_ptr<class AUIActor>> m_vUpgradeState;
 	vector<shared_ptr<class AUIActor>> m_vCoins;
+	// Dead
+	shared_ptr<class AUIActor> m_pDeadUI = nullptr;
+	float m_fDeadUIPopTime = 1.f;
 
 	// TEMP
 	vector<shared_ptr<AActor>> enemyList; 
