@@ -49,6 +49,7 @@ public:
 	const map<UINT, shared_ptr<class AActor>>& GetActorList() const;
 
 	vector<UINT> GetActorIndexList() { return m_vActorIndexList; }	// 임시 사용
+	void RenderShadow();
 
 private:
 	void CheckStencilList();

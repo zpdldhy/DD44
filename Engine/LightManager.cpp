@@ -15,7 +15,6 @@ void LightManager::Init()
     bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
     HRESULT hr = DEVICE->CreateBuffer(&bd, nullptr, m_pCBLightArray.GetAddressOf());
-    assert(SUCCEEDED(hr)); // 실패 시 로그 찍기
 }
 
 void LightManager::RegisterLight(shared_ptr<ALight> light)

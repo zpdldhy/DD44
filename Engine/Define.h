@@ -26,7 +26,7 @@
 #define ACTORLOADER GET_SINGLE(ActorLoader)
 #define MESHLOADER GET_SINGLE(MeshLoader)
 #define WIND		GET_SINGLE(WindManager)
-
+#define SHADOWMANAGER GET_SINGLE(ShadowManager)
 
 #define DD_PI		3.1415926f
 #define DD_2PI		6.2831852f	

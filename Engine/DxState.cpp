@@ -288,6 +288,18 @@ void DxState::CreateRasterizerStates()
 			DX_CHECK(hr, _T(__FUNCTION__));
 		}
 	}
+
+	{
+		// - Shadow
+		D3D11_RASTERIZER_DESC rsDesc;
+		rsDesc.FillMode = D3D11_FILL_SOLID;
+		rsDesc.CullMode = D3D11_CULL_FRONT;
+		rsDesc.DepthBias = 5000;
+		rsDesc.SlopeScaledDepthBias = 1.0f;
+		rsDesc.DepthBiasClamp = 0.0f;
+		rsDesc.DepthClipEnable = true;
+		HRESULT hr = DEVICE->CreateRasterizerState(&rsDesc, m_pRSShadowBias.GetAddressOf());
+	}
 }
 
 void DxState::CreateDepthStencilStates()

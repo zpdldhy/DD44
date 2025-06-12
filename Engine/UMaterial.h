@@ -106,6 +106,7 @@ public:
 	void SetCrash(bool _bCrash);
 public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
+	void SetShader(const std::wstring& path);
 	virtual void SetTexture(shared_ptr<Texture> _texture) { m_pTexture = _texture; }
 	void SetTexture(ID3D11ShaderResourceView* srv) { m_pTexSRV = srv; }
 	virtual void SetInputlayout(shared_ptr<Inputlayout> _inputlayout) { m_pInputlayout = _inputlayout; }

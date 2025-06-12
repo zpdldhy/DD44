@@ -147,6 +147,17 @@ const map<UINT, shared_ptr<AActor>>& ObjectManager::GetActorList() const
 	return m_vActorList;
 }
 
+void ObjectManager::RenderShadow()
+{
+	for (auto& pair : m_vActorList)
+	{
+		auto& actor = pair.second;
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
+}
+
 void ObjectManager::ObjectMove()
 {
 	for (auto iter : m_vActorList)

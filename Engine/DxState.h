@@ -22,6 +22,7 @@ public:
 	ComPtr<ID3D11RasterizerState> m_pRSSolid;
 	ComPtr<ID3D11RasterizerState> m_pRSSolidNone;
 	ComPtr<ID3D11RasterizerState> m_pRSWireFrame;
+	ComPtr<ID3D11RasterizerState> m_pRSShadowBias;
 
 	// DepthStencilState
 	ComPtr<ID3D11DepthStencilState> m_pDSSDepthEnable;

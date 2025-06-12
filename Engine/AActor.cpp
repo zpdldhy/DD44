@@ -75,6 +75,16 @@ void AActor::Render()
 	}
 }
 
+void AActor::RenderShadow()
+{
+	if (!m_bRender || !m_bCastShadow)
+		return;
+
+	auto meshComponent = GetMeshComponent();
+	if (meshComponent)
+		meshComponent->RenderShadow();
+}
+
 void AActor::Destroy()
 {
 	m_pPhysics->Destroy();

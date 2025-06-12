@@ -203,6 +203,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="RenderStateManager.h" />
     <ClInclude Include="SceneState.h" />
+    <ClInclude Include="ShadowManager.h" />
     <ClInclude Include="ShapeData.h" />
     <ClInclude Include="SkeletalMeshData.h" />
     <ClInclude Include="StateBase.h" />
@@ -310,6 +311,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="RenderStateManager.cpp" />
     <ClCompile Include="SceneState.cpp" />
+    <ClCompile Include="ShadowManager.cpp" />
     <ClCompile Include="ShapeData.cpp" />
     <ClCompile Include="SkeletalMeshData.cpp" />
     <ClCompile Include="Text.cpp" />

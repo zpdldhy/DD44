@@ -16,6 +16,7 @@ protected:
 
 public:
 	void Render() override;
+	void RenderShadow();
 
 public:
 	void SetMeshPath(const std::wstring& path) { m_MeshPath = path; }

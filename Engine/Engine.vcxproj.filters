@@ -418,6 +418,9 @@
       <Filter>Object\Particle</Filter>
     </ClInclude>
     <ClInclude Include="USphereComponent.h" />
+    <ClInclude Include="ShadowManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -705,6 +708,9 @@
       <Filter>Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="USphereComponent.cpp" />
+    <ClCompile Include="ShadowManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
