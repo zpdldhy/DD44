@@ -63,7 +63,7 @@ void BatMovement::Init()
 	GetOwner()->m_bCollision = true;
 
 	//// 
-	//dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(1);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(1);
 }
 
 
