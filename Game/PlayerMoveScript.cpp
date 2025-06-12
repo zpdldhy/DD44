@@ -617,7 +617,8 @@ void PlayerMoveScript::ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp,
 void PlayerMoveScript::ApplyCrash()
 {
 	auto root = GetOwner()->GetMeshComponent();
-	if (m_vHP < 3 && !m_bCrashSet)
+	auto hp = dynamic_pointer_cast<TCharacter>(GetOwner())->GetHp();
+	if (hp < 3 && !m_bCrashSet)
 	{
 		m_bCrashSet = true;
 	}
