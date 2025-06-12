@@ -383,8 +383,17 @@ void PlayerMoveScript::SetUI()
 void PlayerMoveScript::UpdateHPUI()
 {
 	Color RestColor;
-	auto hp = dynamic_pointer_cast<TCharacter>(GetOwner())->GetHp();
-	if (hp == 4)
+
+	static float currentTime = 0.0f;
+	static float damageTime = 0.0f;
+
+	damageTime += currentTime = TIMER->GetDeltaTime();
+
+	auto currentHP = dynamic_pointer_cast<TCharacter>(GetOwner())->GetHp();
+
+	switch (currentHP)
+	{
+	case 4:
 	{
 		RestColor = fullHP;
 		RestColor.w = -0.5f;
@@ -393,59 +402,51 @@ void PlayerMoveScript::UpdateHPUI()
 		m_vHPUI[1]->SetColor(RestColor);
 		m_vHPUI[2]->SetColor(RestColor);
 		m_vHPUI[3]->SetColor(fullHP);
-
-		m_vHPUI[0]->m_bRender = true;
-		m_vHPUI[1]->m_bRender = true;
-		m_vHPUI[2]->m_bRender = true;
-		m_vHPUI[3]->m_bRender = true;
 	}
+	break;
 
-	// 데미지를 입었을 시, UI Animation
-	if (m_bHPUIChange)
+	case 3:
 	{
-		static float currentTime = 0.0f;
-		static float damageTime = 0.0f;
-
-		damageTime += currentTime = TIMER->GetDeltaTime();
-
-		if (hp == 3)
+		if (m_vHPUI[2]->GetColor().w < 0.f && m_bHPUIChange)
 		{
-			if (m_vHPUI[2]->GetColor().w < 0.f)
-				m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-			else
-				m_bHPUIChange = false;
-
-			m_vHPUI[3]->m_bRender = false;
+			m_vHPUI[3]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
 		}
-		else if (hp == 2)
-		{
-			if (m_vHPUI[1]->GetColor().w < 0.f)
-				m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-			else
-				m_bHPUIChange = false;
-
-			m_vHPUI[2]->m_bRender = false;
-		}
-		else if (hp == 1)
-		{
-			if (m_vHPUI[0]->GetColor().w < 0.f)
-				m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-			else
-				m_bHPUIChange = false;
-
-			m_vHPUI[1]->m_bRender = false;
-		}
-		else if (hp == 0)
-		{
-			m_vHPUI[0]->m_bRender = false;
-			m_vHPUI[1]->m_bRender = false;
-			m_vHPUI[2]->m_bRender = false;
-			m_vHPUI[3]->m_bRender = false;
-		}
+		else
+			m_bHPUIChange = false;
 	}
+	break;
 
-	if (hp > 4)
-		hp = 4;
+	case 2:
+	{
+		if (m_vHPUI[1]->GetColor().w < 0.f && m_bHPUIChange)
+		{
+			m_vHPUI[2]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+		}
+		else
+			m_bHPUIChange = false;
+	}
+	break;
+
+	case 1:
+	{
+		if (m_vHPUI[0]->GetColor().w < 0.f && m_bHPUIChange)
+		{
+			m_vHPUI[1]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+		}
+		else
+			m_bHPUIChange = false;
+	}
+	break;
+
+	case 0:
+	{
+		m_vHPUI[0]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+	}
+	break;
+	}
 }
 
 void PlayerMoveScript::UpdateArrowUI()

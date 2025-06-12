@@ -52,7 +52,7 @@ void Game::Init()
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 
 	OBJECT->AddActorList(m_vMapList);
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
@@ -62,14 +62,25 @@ void Game::Init()
 	//m_pPlayer->SetPosition(Vec3(0.0f, 0.0f, 0.0f));
 	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	vlist.emplace_back(m_pBetty);
-	// Temp
+	vlist.emplace_back(m_pBetty);	
 	enemyList = vlist;
 	SetEnemy();
 	OBJECT->AddActorList(vlist);
 
-	// UI
+	PROJECTILE->Init();
+
+	// InGame UI
 	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
+
+	// Paused UI
+	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
+	UI->AddUIList(m_vPausedBackGround);
+	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
+	UI->AddUIList(m_vUpgradeBackGround);
+	m_vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
+	UI->AddUIList(m_vUpgradeState);
+	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
+	UI->AddUIList(m_vCoins);
 	UI->DoFadeOut();
 
 	EFFECT->Init();
@@ -78,14 +89,45 @@ void Game::Init()
 	SetupSkybox();
 	SetupSunLight();
 
-	PROJECTILE->Init();
-
+	// Create Cursor
+	m_pCursor = PToA->MakeObject("../Resources/Prefab/Cursor.object.json");
+	m_pCursor->Init();
+	OBJECT->SetCursorActor(m_pCursor);
 }
 
 void Game::Tick()
 {
+	UpdateCursor();
+
 	if (INPUT->GetButton(GameKey::ESC))
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
+
+	if (ENGINE->m_bGamePaused == true)
+	{
+		for (auto& pUI : m_vPausedBackGround)
+			pUI->m_bRender = true;
+
+		for(auto& pUI : m_vUpgradeBackGround)
+			pUI->m_bRender = true;
+
+		for (auto& pUI : m_vUpgradeState)
+			pUI->m_bRender = true;
+
+		OBJECT->SetCursorActor(nullptr);
+	}
+	else
+	{
+		for (auto& pUI : m_vPausedBackGround)
+			pUI->m_bRender = false;
+
+		for (auto& pUI : m_vUpgradeBackGround)
+			pUI->m_bRender = false;
+
+		for (auto& pUI : m_vUpgradeState)
+			pUI->m_bRender = false;
+
+		OBJECT->SetCursorActor(m_pCursor);
+	}
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
@@ -130,10 +172,20 @@ void Game::Render()
 void Game::Destroy()
 {
 	m_pCameraActor = nullptr;
+	m_pGameCameraActor = nullptr;
 	m_pPlayer = nullptr;
 	m_pSkyMesh = nullptr;
 	m_pSky = nullptr;
 	m_pSunLight = nullptr;
+
+	m_vPausedBackGround.clear();
+	m_vUpgradeBackGround.clear();
+	m_vUpgradeState.clear();
+	m_vCoins.clear();
+
+	enemyList.clear();
+	m_vObjectList.clear();
+	m_vMapList.clear();
 }
 
 void Game::SetupEngineCamera()
@@ -229,6 +281,43 @@ void Game::CreateWind()
 		}
 
 	}
+}
+
+void Game::UpdateCursor()
+{
+	// 위치
+	// 마우스 Ray로 Character와 동일한 z값을 가진 평면의 Intersection을 구함
+	MouseRay ray;
+	ray.Click();
+
+	auto playerPos = m_pPlayer->GetPosition();
+	playerPos.y += 1.f;
+	Vec3 inter;
+
+	Collision::GetIntersection(ray, playerPos, Vec3(0.f, 1.f, 0.f), inter);
+
+	auto rotDir = inter - playerPos;
+	auto rotVec = rotDir;
+	rotVec.Normalize();
+
+	// 특정 거리를 넘어가지 않도록 반지름 지정
+	float radius = 7.5f;
+	if (rotDir.Length() > radius)
+		inter = playerPos + rotVec * radius;
+
+	m_pCursor->SetPosition(inter);
+
+	// 회전
+	// 캐릭터 -> 마우스 벡터와 Vec3(1, 0, 0)을 내적하여 각을 구한다.
+	float angle;
+	float fDot = rotVec.Dot(Vec3(1.f, 0.f, 0.f));
+
+	if (rotVec.z > 0.f)
+		angle = -(acosf(fDot) - DD_PI / 2.f);
+	else
+		angle = (acosf(fDot) + DD_PI / 2.f);
+
+	m_pCursor->SetRotation(Vec3(DD_PI / 2.f, angle, 0.f));
 }
 
 void Game::SetEnemy()

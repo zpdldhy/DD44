@@ -47,6 +47,7 @@ bool Window::SetWindowClass(HINSTANCE _hInstance)
 	wcex.lpfnWndProc = WndProc;
 	wcex.hInstance = m_hInstance;
 	wcex.lpszClassName = L"DD44";
+	//wcex.hCursor = LoadCursorFromFile(L"../Resources/Texture/UI/Empty.cur");
 	RegisterClassExW(&wcex);
 	return true;
 }

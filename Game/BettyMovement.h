@@ -12,7 +12,6 @@ public:
 	virtual ~BettyMovement() = default;
 private:
 	weak_ptr<AActor> player;
-	shared_ptr<TEnemy> owner;
 private:
 	// Phase
 	enum BettyAction { Intro = 0, Attack, Die };
