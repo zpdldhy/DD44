@@ -35,17 +35,7 @@ public:
 	Vec3 velocity;
 	Vec3 m_vRollLook;
 
-	// UI Actor
-	vector<shared_ptr<class AUIActor>> m_vHPUI;
-	vector<shared_ptr<class AUIActor>> m_vArrowUI;
-	shared_ptr<Texture> m_pActiveArrowTexture = nullptr;
-	shared_ptr<Texture> m_pInActiveArrowTexture = nullptr;
-	Vec3 m_vActiveArrowScale = { 0.f, 0.f, 0.f };
-	Vec3 m_vInActiveArrowScale = { 0.f, 0.f, 0.f };
-	bool m_bHPUIChange = false;
 	shared_ptr<Texture> m_pSubTexture;
-
-	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
 
 	// Child Mesh Components
 	weak_ptr<UMeshComponent> backSword;
@@ -77,10 +67,6 @@ public:
 	void Init() override;
 	void Tick() override;
 	virtual shared_ptr<UScriptComponent> Clone() override;
-private:
-	void SetUI();
-	void UpdateHPUI();
-	void UpdateArrowUI();
 public:
 	void ChangetState(shared_ptr<StateBase> _state);
 public:
