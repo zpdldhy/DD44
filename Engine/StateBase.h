@@ -6,6 +6,7 @@ protected:
 	UINT m_iStateId;
 	bool m_bOnPlaying;
 	bool m_bCanInterrupt;
+	float m_fDissolveTimer = 0.0f;
 public:
 	StateBase(UINT _iStateId) { m_iStateId = _iStateId; }
 	virtual ~StateBase() {};
