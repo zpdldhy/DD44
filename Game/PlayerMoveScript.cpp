@@ -83,11 +83,7 @@ void PlayerMoveScript::Init()
 
 	// Texture
 	m_pSubTexture = TEXTURE->Get(L"../Resources/Texture/cracks_generic 1.png");
-
-	{
-		auto root = GetOwner()->GetMeshComponent();
-		ApplyCrashToAllMaterials(root, false);
-	}
+	m_pNoiesTexture = TEXTURE->Get(L"../Resources/Texture/Noise.png");
 }
 
 void PlayerMoveScript::Tick()
@@ -106,6 +102,7 @@ void PlayerMoveScript::Tick()
 	}
 
 	DC->PSSetShaderResources(1, 1, m_pSubTexture->GetSRV().GetAddressOf());
+	DC->PSSetShaderResources(2, 1, m_pNoiesTexture->GetSRV().GetAddressOf());
 	ApplyCrash();
 
 #pragma region FX
@@ -523,6 +520,23 @@ void PlayerMoveScript::ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp,
 		ApplyCrashToAllMaterials(comp->GetChild(i), enabled);
 	}
 }
+
+void PlayerMoveScript::ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> comp, float _time)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetDissolve(_time);
+	}
+
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		ApplyDissolveToAllMaterials(comp->GetChild(i), _time);
+	}
+}
+
 
 void PlayerMoveScript::ApplyCrash()
 {

@@ -46,6 +46,12 @@ cbuffer CB_MaterialEffect : register(b2)
     
     bool g_bCrash = false;
     float3 padding_Crash;
+    //dissolve
+    float g_fDissolveAmount;
+    float g_fDissolveEdgeWidth;
+    float3 g_vDissolveColor;
+    float3 padding_Dissolve;
+ 
 };
 
 struct VS_IN
@@ -78,6 +84,7 @@ struct PS_OUT
 
 Texture2D g_txDiffuseA : register(t0);
 Texture2D g_txCrack : register(t1);
+Texture2D g_txNoise : register(t2);
 SamplerState sample : register(s0);
 
 ///funtion
