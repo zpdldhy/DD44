@@ -178,6 +178,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="AWindActor.h" />
     <ClInclude Include="CharacterEditorUI.h" />
     <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="ConstantData.h" />
     <ClInclude Include="EditorData.h" />
     <ClInclude Include="EffectEditorUI.h" />
     <ClInclude Include="CollisionManager.h" />

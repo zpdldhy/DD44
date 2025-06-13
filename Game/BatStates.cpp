@@ -72,7 +72,7 @@ void BatAttackState::Enter()
 	int index = animInstance->GetAnimIndex(L"Bite");
 	animInstance->PlayOnce(index);
 	// 사운드
-	SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
 }
 
 void BatAttackState::Tick()
@@ -107,7 +107,7 @@ void BatDieState::Enter()
 	int index = animInstance->GetAnimIndex(L"Shock");
 	animInstance->PlayOnce(index);
 	// 사운드
-	SOUNDMANAGER->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
 }
 
 void BatDieState::Tick()

@@ -4,8 +4,6 @@
 #include "ALight.h"
 #include "ULightComponent.h"
 
-
-
 void LightManager::Init()
 {
     D3D11_BUFFER_DESC bd = {};
@@ -17,15 +15,48 @@ void LightManager::Init()
     HRESULT hr = DEVICE->CreateBuffer(&bd, nullptr, m_pCBLightArray.GetAddressOf());
 }
 
+void LightManager::Tick()
+{
+    for (auto& pLight : m_vLights)
+    {
+        pLight.second->Tick();
+    }
+
+    UpdateLightCB();
+}
+
+void LightManager::Render()
+{
+    for (auto& pLight : m_vLights)
+    {
+        pLight.second->Render();
+    }
+}
+
 void LightManager::RegisterLight(shared_ptr<ALight> light)
 {
     if (m_vLights.size() >= 4) return; // MAX_LIGHTS
-    m_vLights.push_back(light);
+
+    light->Init();
+    light->m_Index = m_iIndex;
+    m_vLights.insert(make_pair(m_iIndex, light));
+
+    m_iIndex++;
 }
 
 void LightManager::Clear()
 {
     m_vLights.clear();
+    m_iIndex = 0;
+}
+
+const shared_ptr<ALight>& LightManager::GetLight(UINT _iIndex) const
+{
+    auto inter= m_vLights.find(_iIndex);
+    if (inter == m_vLights.end())
+        return nullptr;
+
+    return inter->second;
 }
 
 void LightManager::UpdateLightCB()

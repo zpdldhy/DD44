@@ -412,8 +412,8 @@ void TestSY::Init()
 	OBJECT->AddActor(m_pCameraActor);
 	OBJECT->AddActor(m_pSky);	
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pLight);
+	LIGHT->Clear();
+	LIGHT->RegisterLight(m_pLight);
 }
 
 void TestSY::Tick()

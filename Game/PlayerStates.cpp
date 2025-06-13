@@ -49,7 +49,7 @@ void PlayerWalkState::Enter()
 	int idleIndex = animInstance->GetAnimIndex(L"Run");
 	animInstance->SetCurrentAnimTrack(idleIndex);
 
-	SOUNDMANAGER->GetPtr(ESoundType::Walk)->Play2D();
+	SOUND->GetPtr(ESoundType::Walk)->Play2D();
 
 	m_fDustTimer = 0.0f;
 }
@@ -79,7 +79,7 @@ void PlayerWalkState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
-	SOUNDMANAGER->GetPtr(ESoundType::Walk)->Stop();
+	SOUND->GetPtr(ESoundType::Walk)->Stop();
 	m_fDustTimer = 0.0f;
 }
 
@@ -92,7 +92,7 @@ void PlayerAttackState::Enter()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = true;
-	SOUNDMANAGER->GetPtr(ESoundType::Slash)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Slash)->PlayEffect2D();
 
 	// 애니메이션 Attack 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
@@ -137,7 +137,7 @@ void PlayerHitState::Enter()
 	animInstance->PlayOnce(index);
 
 	//Sound
-	SOUNDMANAGER->GetPtr(ESoundType::Hit)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Hit)->PlayEffect2D();
 
 }
 void PlayerHitState::Tick()
@@ -181,7 +181,7 @@ void PlayerDieState::Enter()
 	animInstance->PlayOnce(index);
 
 	// 사운드
-	SOUNDMANAGER->GetPtr(ESoundType::Die)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Die)->PlayEffect2D();
 }
 void PlayerDieState::Tick()
 {
@@ -223,7 +223,7 @@ void PlayerRollState::Enter()
 	animInstance->PlayOnce(index);
 
 	// 사운드
-	SOUNDMANAGER->GetPtr(ESoundType::Dash)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Dash)->PlayEffect2D();
 
 }
 void PlayerRollState::Tick()

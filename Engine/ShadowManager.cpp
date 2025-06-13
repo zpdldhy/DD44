@@ -1,41 +1,16 @@
 #include "pch.h"
 #include "ShadowManager.h"
 #include "Device.h"
+#include "ViewPortTexture.h"
+#include "ObjectManager.h"
+#include "LightManager.h"
+#include "ALight.h"
+#include "Timer.h"
 
 void ShadowManager::Init()
 {
-	// 텍스처 생성
-	D3D11_TEXTURE2D_DESC texDesc = {};
-	texDesc.Width = m_iWidth;
-	texDesc.Height = m_iHeight;
-	texDesc.MipLevels = 1;
-	texDesc.ArraySize = 1;
-	texDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.Usage = D3D11_USAGE_DEFAULT;
-	texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-	DEVICE->CreateTexture2D(&texDesc, nullptr, m_pShadowMap.GetAddressOf());
-
-	// DSV
-	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	DEVICE->CreateDepthStencilView(m_pShadowMap.Get(), &dsvDesc, m_pDSV.GetAddressOf());
-
-	// SRV
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = 1;
-	DEVICE->CreateShaderResourceView(m_pShadowMap.Get(), &srvDesc, m_pSRV.GetAddressOf());
-
-	// Viewport
-	m_viewport.TopLeftX = 0;
-	m_viewport.TopLeftY = 0;
-	m_viewport.Width = static_cast<float>(m_iWidth);
-	m_viewport.Height = static_cast<float>(m_iHeight);
-	m_viewport.MinDepth = 0.0f;
-	m_viewport.MaxDepth = 1.0f;
+	m_pShadowTexture = make_shared<ViewPortTexture>();
+	m_pShadowTexture->CreateViewPortTexture(2048, 2048);
 
 	// Rasterizer (Depth Bias)
 	D3D11_RASTERIZER_DESC rsDesc = {};
@@ -46,28 +21,89 @@ void ShadowManager::Init()
 	rsDesc.SlopeScaledDepthBias = 1.0f;
 	rsDesc.DepthClipEnable = true;
 	DEVICE->CreateRasterizerState(&rsDesc, m_pRSShadowBias.GetAddressOf());
+
+	D3D11_BUFFER_DESC pDesc;
+	ZeroMemory(&pDesc, sizeof(pDesc));
+	pDesc.ByteWidth = sizeof(CameraConstantData);
+	pDesc.Usage = D3D11_USAGE_DEFAULT;
+	pDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	HRESULT hr = DEVICE->CreateBuffer(&pDesc, nullptr, m_pCameraCB.GetAddressOf());
+
+	if (FAILED(hr))
+	{
+		DX_CHECK(hr, _T("CreateCameraBuffer Failed"));
+		assert(false);
+	}
 }
 
-void ShadowManager::UpdateLightViewProj(const Vec3& lightPos, const Vec3& targetPos)
+void ShadowManager::Render()
 {
-	m_matView = XMMatrixLookAtLH(lightPos, targetPos, Vec3(0, 1, 0));
+	BeginShadowPass();
+	UpdateCameraCB();
 
-	float orthoSize = 50.0f;
-	m_matProj = DirectX::XMMatrixOrthographicLH(orthoSize, orthoSize, 1.0f, 200.0f);
+	OBJECT->Render();
 
-	m_matViewProj = m_matView * m_matProj;
+	EndShadowPass();
 }
 
 void ShadowManager::BeginShadowPass()
 {
-	DC->RSSetState(m_pRSShadowBias.Get());
+	m_iPrevViewPorts = 1;
+	// Get
+	DC->OMGetRenderTargets(m_iPrevViewPorts, &m_pPrevRTV, &m_pPrevDSV);
 
-	DC->OMSetRenderTargets(0, nullptr, m_pDSV.Get());
-	DC->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-	DC->RSSetViewports(1, &m_viewport);
+	// Set Null
+	ID3D11ShaderResourceView* pNullSRV = nullptr;
+	DC->PSSetShaderResources(0, 1, &pNullSRV);
+
+	ID3D11RenderTargetView* pNullRTV = nullptr;
+	DC->OMSetRenderTargets(1, &pNullRTV, NULL);
+
+	// Set
+	DC->RSSetState(m_pRSShadowBias.Get());
+	auto pRTV = m_pShadowTexture->GetRTV();
+	DC->OMSetRenderTargets(1, &pRTV, m_pShadowTexture->GetDSV());
+
+	DC->RSGetViewports(&m_iPrevViewPorts, &m_PrevVP);
+	DC->RSSetViewports(1, &m_pShadowTexture->GetVP());
+
+	m_pShadowTexture->ClearViewPortTransparent();
 }
 
 void ShadowManager::EndShadowPass()
 {
 	DC->RSSetState(nullptr);
+
+	ID3D11ShaderResourceView* pNullSRV = nullptr;
+	DC->PSSetShaderResources(0, 1, &pNullSRV);
+
+	vector<ID3D11RenderTargetView*> pNullRTV;
+	pNullRTV.resize(1);
+	for (int i = 0; i < pNullRTV.size(); i++)
+		pNullRTV[i] = nullptr;
+	DC->OMSetRenderTargets(1, pNullRTV.data(), NULL);
+
+	DC->RSSetViewports(m_iPrevViewPorts, &m_PrevVP);
+	DC->OMSetRenderTargets(1, &m_pPrevRTV, m_pPrevDSV);
+	m_pPrevRTV->Release(); m_pPrevRTV = nullptr;
+	m_pPrevDSV->Release(); m_pPrevDSV = nullptr;
+}
+
+void ShadowManager::UpdateCameraCB()
+{
+	auto pCameraComponent = LIGHT->GetLight(0)->GetCameraComponent();
+
+	m_CameraData.matView = pCameraComponent->GetView();
+	m_CameraData.matProjection = pCameraComponent->GetProjection();
+	m_CameraData.g_vCameraPos = pCameraComponent->GetWorldPosition();
+	m_CameraData.GameTime = TIMER->GetGameTime();
+
+	DC->UpdateSubresource(m_pCameraCB.Get(), 0, nullptr, &m_CameraData, 0, 0);
+	DC->VSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
+	DC->PSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
+}
+
+ID3D11ShaderResourceView* ShadowManager::GetSRV() const
+{
+	return m_pShadowTexture->GetSRV();
 }

@@ -1,27 +1,33 @@
 #pragma once
 #include "Singleton.h"
+#include "ConstantData.h"
 
 class ShadowManager : public Singleton<ShadowManager>
 {
 public:
     void Init();
-    void UpdateLightViewProj(const Vec3& lightPos, const Vec3& targetPos);
-    void BeginShadowPass();
-    void EndShadowPass();
-
-    ID3D11ShaderResourceView* GetSRV() const { return m_pSRV.Get(); }
-    const Matrix& GetLightViewProj() const { return m_matViewProj; }
+    void Render();
 
 private:
-    ComPtr<ID3D11Texture2D>             m_pShadowMap;
-    ComPtr<ID3D11DepthStencilView>      m_pDSV;
-    ComPtr<ID3D11ShaderResourceView>    m_pSRV;
+    void BeginShadowPass();
+    void EndShadowPass();
+    void UpdateCameraCB();
+
+    ID3D11ShaderResourceView* GetSRV() const;
+
+private:
+    shared_ptr<class ViewPortTexture>   m_pShadowTexture;
     ComPtr<ID3D11RasterizerState>       m_pRSShadowBias;
 
-    D3D11_VIEWPORT                      m_viewport;
+    // Get Prev Viewport
+    D3D11_VIEWPORT m_PrevVP;
+    UINT m_iPrevViewPorts = 0;
+    ID3D11RenderTargetView* m_pPrevRTV = nullptr;
+    ID3D11DepthStencilView* m_pPrevDSV = nullptr;
 
-    Matrix m_matView;
-    Matrix m_matProj;
+    // Camera
+    ComPtr<ID3D11Buffer> m_pCameraCB;
+    CameraConstantData m_CameraData;
     Matrix m_matViewProj;
 
     UINT m_iWidth = 2048;

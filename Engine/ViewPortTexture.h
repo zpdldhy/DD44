@@ -13,16 +13,14 @@ protected:
 	ComPtr<ID3D11ShaderResourceView> m_pDsvSRV = nullptr;// ±Ì¿Ãπˆ∆€ ∏Æº“Ω∫∫‰
 
 public:
-	ID3D11ShaderResourceView* GetSRV() const { return m_pTexSRV.Get(); }
-	ID3D11RenderTargetView* GetRTV() const { return m_pRenderTargetView.Get(); }
-	ID3D11DepthStencilView* GetDSV() const { return m_pDepthStencilView.Get(); }
-	D3D11_VIEWPORT GetVP() const { return m_CurrentVP; }
+	ID3D11ShaderResourceView* GetSRV() { return m_pTexSRV.Get(); }
+	ID3D11RenderTargetView* GetRTV() { return m_pRenderTargetView.Get(); }
+	ID3D11DepthStencilView* GetDSV() { return m_pDepthStencilView.Get(); }
+	D3D11_VIEWPORT& GetVP() { return m_CurrentVP; }
 
 public:
 	void CreateViewPortTexture(FLOAT _fWidth, FLOAT _fHeight);
 	void ClearViewPortTransparent();
-	//void BeginViewPort();
-	//void EndViewPort();
 
 private:
 	void SetViewPort(FLOAT _fWidth, FLOAT _fHeight);
