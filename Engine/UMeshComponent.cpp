@@ -20,6 +20,21 @@ void UMeshComponent::Render()
 
 void UMeshComponent::RenderShadow()
 {
+	if (bRender)
+	{
+		PreRender();
+		// Shader¸¸ ¹Ù²ã ÁØ´Ù.		
+		auto pShader = SHADER->Get(L"../Resources/Shader/DepthOnly.hlsl")->m_pVertexShader.Get();
+		DC->VSSetShader(pShader, nullptr, 0);
+		PostRender();
+
+	}
+
+	for (auto& child : m_vChild)
+	{
+		child->Render();
+	}
+
 	//// 1. ±íÀÌ Àü¿ë ¼ÎÀÌ´õ ¼³Á¤
 	//m_pMaterial->SetShader(L"../Resources/Shader/DepthOnly.hlsl");
 

@@ -41,7 +41,7 @@ void ShadowManager::Render()
 	BeginShadowPass();
 	UpdateCameraCB();
 
-	OBJECT->Render();
+	OBJECT->RenderShadow();
 
 	EndShadowPass();
 }
