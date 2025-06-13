@@ -36,6 +36,7 @@ public:
 	Vec3 m_vRollLook;
 
 	shared_ptr<Texture> m_pSubTexture;
+	shared_ptr<Texture> m_pNoiesTexture;
 
 	// Child Mesh Components
 	weak_ptr<UMeshComponent> backSword;
@@ -63,6 +64,10 @@ public:
 
 	//Crash
 	bool m_bCrashSet = false;
+
+	//Dissolve
+	float m_fDissolveTimer = 0.0f;
+	bool m_bDissolving = false;
 public:
 	void Init() override;
 	void Tick() override;
@@ -75,8 +80,9 @@ public:
 	void VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp);
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
-	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
-	void ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled);
+	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> _comp, float _value);
+	void ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> _comp, bool _enabled);
+	void ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> _comp, float _time);
 	void ApplyCrash();
 
 public:
