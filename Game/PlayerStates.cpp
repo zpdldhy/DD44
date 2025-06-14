@@ -353,18 +353,16 @@ void PlayerShootState::Rotate()
 }
 void PlayerShootState::CheckMouse()
 {
-	MouseRay m_vRay;
+	MouseRay ray;
+	ray.Click();
 
-	m_vRay.Click();
+	auto playerPos = m_pOwner.lock()->GetPosition();
+	playerPos.y += 1.f;
+	Vec3 inter;
 
-	shared_ptr<AActor> pActor = nullptr;
-	Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
+	Collision::GetIntersection(ray, playerPos, Vec3(0.f, 1.f, 0.f), inter);
+	dir = inter - m_pOwner.lock()->GetPosition();
 
-	if (pActor)
-	{
-		dir = pActor->GetPosition() - m_pOwner.lock()->GetPosition();
-		// ¹Ù´ÚÀº ¾ÈÂïÇô ? 
-	}
 }
 void PlayerShootState::CheckShootCount(bool _able)
 {

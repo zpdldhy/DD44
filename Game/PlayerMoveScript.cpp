@@ -41,6 +41,7 @@ void PlayerMoveScript::Init()
 
 	currentState = idle;
 	currentState->Enter();
+	currentStateId = PLAYER_S_IDLE;
 
 	auto body = dynamic_pointer_cast<UMeshComponent>(GetOwner()->GetMeshComponent());
 
@@ -89,32 +90,96 @@ void PlayerMoveScript::Init()
 
 void PlayerMoveScript::Tick()
 {
-	if (m_bCanClimb && currentState->GetId() != PLAYER_S_CLIMB && INPUT->GetButton(E))
-	{
-		auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
-		player->SetPosition(m_vLadder);
-		player->StartClimbing();
-		dynamic_pointer_cast<PlayerClimbState>(climb)->SetLadderDir(m_vDirToLadder);
-		ChangetState(climb);
-	}
+	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
+	auto playerPos = player->GetPosition();
 
-	if (currentState->GetId() == PLAYER_S_CLIMB)
+	// 모든 로직 공통
+	PlayFX();
+	CheckCoolTIme();
+	CheckClimb();
+	CheckRoll();
+	CheckCollision();
+
+	currentState->Tick();
+	bool currentStateEnd = !currentState->IsPlaying();
+	
+	// state별 추가 처리
+	switch (currentStateId)
 	{
-		auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
-		auto playerPos = player->GetPosition();
-		if (playerPos.y > m_vLadderEnd.y)
+	case PLAYER_S_IDLE:
+		CheckMove();
+		CheckAttack();
+		break;
+	case PLAYER_S_WALK:
+		CheckMove();
+		CheckAttack();
+		break;
+	case PLAYER_S_ATTACK:
+		if (currentStateEnd)
 		{
-			dynamic_pointer_cast<PlayerClimbState>(currentState)->CheckClimbFinish(true);
-		}
+			handSword.lock()->SetVisible(false);
+			backSword.lock()->SetVisible(true);
 
-		if (!currentState->IsPlaying())
+			attackRangeActor->m_bCollision = false;
+			attackRangeActor->GetShapeComponent()->m_bVisible = false;
+			ChangeState(idle);
+		}
+		break;
+	case PLAYER_S_CLIMB:
+		if (currentStateEnd)
 		{
 			player->StopClimbing();
 			m_bCanClimb = true;
 		}
+		if (playerPos.y > m_vLadderEnd.y)
+		{
+			dynamic_pointer_cast<PlayerClimbState>(currentState)->CheckClimbFinish(true);
+		}
+		CheckMove();
+		break;
+	case PLAYER_S_SHOOT:
+		if (INPUT->GetButtonUp(RCLICK) || INPUT->GetButtonFree(RCLICK))
+		{
+			// 끝내라 신호 주기
+			dynamic_pointer_cast<PlayerShootState>(currentState)->CheckEnd(true);
+		}
+		else
+		{
+			return;
+		}
+
+		if (currentStateEnd)
+		{
+			ChangeState(idle);
+		}
+		break;
+	case PLAYER_S_DEATH:
+		return;
+		break;
+	case PLAYER_S_HIT:
+		if (currentStateEnd)
+		{
+			m_bDamageCoolTime = true;
+			ChangeState(idle);
+		}
+		break;
+	case PLAYER_S_ROLL:
+		if (currentStateEnd)
+		{
+			m_bRollCoolTime = true;
+			ChangeState(idle);
+		}
+		else
+		{
+			RollMove();
+			return;
+		}
+		break;
+	default:
+		break;
 	}
 
-#pragma region not related with state
+#pragma region TEMP
 	// Test
 	if (INPUT->GetButton(L))
 	{
@@ -122,186 +187,14 @@ void PlayerMoveScript::Tick()
 		if (currentState->GetId() == PLAYER_S_DEATH)
 		{
 			currentState->End();
-			ChangetState(idle);
-		}
-	}
-
-
-	DC->PSSetShaderResources(1, 1, m_pSubTexture->GetSRV().GetAddressOf());
-	DC->PSSetShaderResources(2, 1, m_pNoiesTexture->GetSRV().GetAddressOf());
-	ApplyCrash();
-
-#pragma region FX
-	Slash();
-	if (m_bIsFlashing)
-	{
-		m_fHitFlashTimer -= TIMER->GetDeltaTime();
-		if (m_fHitFlashTimer <= 0.0f)
-		{
-			m_fHitFlashTimer = 0.0f;
-			m_bIsFlashing = false;
-		}
-
-		// hitFlashAmount는 1 → 0 으로 감소
-		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
-
-		auto root = GetOwner()->GetMeshComponent();
-		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
-	}
-#pragma endregion
-
-#pragma region STATE_ANIM
-	if (m_bDamageCoolTime)
-	{
-		m_fDamageCoolTime -= TIMER->GetDeltaTime();
-		if (m_fDamageCoolTime < 0)
-		{
-			m_bDamageCoolTime = false;
-			m_fDamageCoolTime = 1.0f;
-			m_bCanBeHit = true;
-		}
-	}
-	if (m_bRollCoolTime)
-	{
-		m_fRollCoolTime -= TIMER->GetDeltaTime();
-		if (m_fRollCoolTime < 0)
-		{
-			m_bRollCoolTime = false;
-			m_fRollCoolTime = 0.5f;
-			m_bCanRoll = true;
-		}
-	}
-
-	// 순서 중요
-	if (currentState->GetId() == PLAYER_S_SHOOT)
-	{
-		if (INPUT->GetButtonUp(RCLICK) || INPUT->GetButtonFree(RCLICK))
-		{
-			// 끝내라 신호 주기
-			dynamic_pointer_cast<PlayerShootState>(currentState)->CheckEnd(true);
-		}
-	}
-
-	// 순서 중요
-	CheckCollision();
-
-	currentState->Tick();
-	if (currentState->GetId() == PLAYER_STATE::PLAYER_S_DEATH)
-	{
-		return;
-	}
-
-	// 이걸 왜 이렇게 했던 거지 ?
-	//if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK || currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT || currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
-	{
-		if (!currentState->IsPlaying())
-		{
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK)
-			{
-				handSword.lock()->SetVisible(false);
-				backSword.lock()->SetVisible(true);
-
-				attackRangeActor->m_bCollision = false;
-				attackRangeActor->GetShapeComponent()->m_bVisible = false;
-				ChangetState(idle);
-
-				m_bCanClimb = true;
-
-			}
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
-			{
-				m_bDamageCoolTime = true;
-				ChangetState(idle);
-
-			}
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
-			{
-				m_bRollCoolTime = true;
-				ChangetState(idle);
-
-			}
-		}
-		else
-		{
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK)
-			{
-				m_bCanClimb = false;
-				return;
-			}
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
-			{
-				RollMove();
-				return;
-			}
-
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
-			{
-				return;
-			}
-
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_SHOOT)
-			{
-				return;
-			}
+			ChangeState(idle);
 		}
 	}
 #pragma endregion
-	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
-	if (player->IsClimbing())
-	{
-		Climb();
-	}
-	else
-	{
-		Move();
-
-	}
-
-	if (INPUT->GetButton(SPACE) && m_bCanRoll)
-	{
-		// 구르기
-		m_vRollLook = GetOwner()->GetLook();
-		ChangetState(roll);
-
-		m_bCanRoll = false;
-	}
-
-	// ATTACK
-	if (INPUT->GetButton(LCLICK))
-	{
-		if (currentState->GetId() != PLAYER_S_ATTACK)
-		{
-			ChangetState(attack);
-
-			UpdateCollider();
-			handSword.lock()->SetVisible(true);
-			backSword.lock()->SetVisible(false);
-			m_bSlashPlaying = true;
-			m_fSlashTime = 0.0f;
-
-			//
-			attackRangeActor->m_bCollision = true;
-			attackRangeActor->GetShapeComponent()->m_bVisible = true;
-		}
-	}
-	if (INPUT->GetButton(RCLICK))
-	{
-		// TPlayer의 arrowCount 확인해서 bool 세팅하기 
-		int aCount = dynamic_pointer_cast<TPlayer>(GetOwner())->GetArrowCount();
-		if (aCount > 0)
-		{
-			dynamic_pointer_cast<PlayerShootState>(shoot)->CheckShootCount(true);
-		}
-		else
-		{
-			dynamic_pointer_cast<PlayerShootState>(shoot)->CheckShootCount(false);
-		}
-		ChangetState(shoot);
-	}
 
 }
 
-void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
+void PlayerMoveScript::ChangeState(shared_ptr<StateBase> _state)
 {
 	if (_state == currentState)
 	{
@@ -321,9 +214,7 @@ void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
 	if (currentState)
 	{
 		currentState->Enter();
-		// 이거 어디 좋은 위치 없니 
-		auto anim = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-		anim->m_bPlay = true;
+		currentStateId = (PLAYER_STATE)currentState->GetId();
 	}
 }
 
@@ -378,15 +269,39 @@ void PlayerMoveScript::CheckCollision()
 
 				if (!dynamic_pointer_cast<TCharacter>(GetOwner())->IsDead())
 				{
-					ChangetState(hit);
+					ChangeState(hit);
 					m_bCanBeHit = false;
 				}
 				else
 				{
-					ChangetState(die);
+					ChangeState(die);
 				}
 			}
 		}
+	}
+}
+
+void PlayerMoveScript::PlayFX()
+{
+	DC->PSSetShaderResources(1, 1, m_pSubTexture->GetSRV().GetAddressOf());
+	DC->PSSetShaderResources(2, 1, m_pNoiesTexture->GetSRV().GetAddressOf());
+	ApplyCrash();
+
+	Slash();
+	if (m_bIsFlashing)
+	{
+		m_fHitFlashTimer -= TIMER->GetDeltaTime();
+		if (m_fHitFlashTimer <= 0.0f)
+		{
+			m_fHitFlashTimer = 0.0f;
+			m_bIsFlashing = false;
+		}
+
+		// hitFlashAmount는 1 → 0 으로 감소
+		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
+
+		auto root = GetOwner()->GetMeshComponent();
+		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
 }
 
@@ -502,7 +417,7 @@ void PlayerMoveScript::Move()
 	{
 		// 애님
 		{
-			ChangetState(walk);
+			ChangeState(walk);
 		}
 
 		// 이동
@@ -535,7 +450,7 @@ void PlayerMoveScript::Move()
 	}
 	else
 	{
-		ChangetState(idle);
+		ChangeState(idle);
 	}
 }
 
@@ -600,6 +515,103 @@ void PlayerMoveScript::UpdateCollider()
 	Vec3 currentRot = GetOwner()->GetRotation();
 	currentRot.y = targetYaw;
 	attackRangeActor->SetRotation(currentRot);
+}
+
+void PlayerMoveScript::CheckCoolTIme()
+{
+	if (m_bDamageCoolTime)
+	{
+		m_fDamageCoolTime -= TIMER->GetDeltaTime();
+		if (m_fDamageCoolTime < 0)
+		{
+			m_bDamageCoolTime = false;
+			m_fDamageCoolTime = 1.0f;
+			m_bCanBeHit = true;
+		}
+	}
+	if (m_bRollCoolTime)
+	{
+		m_fRollCoolTime -= TIMER->GetDeltaTime();
+		if (m_fRollCoolTime < 0)
+		{
+			m_bRollCoolTime = false;
+			m_fRollCoolTime = 0.5f;
+			m_bCanRoll = true;
+		}
+	}
+}
+
+void PlayerMoveScript::CheckClimb()
+{
+	if (m_bCanClimb && INPUT->GetButton(E))
+	{
+		GetOwner()->SetPosition(m_vLadder);
+		dynamic_pointer_cast<TPlayer>(GetOwner())->StartClimbing();
+		dynamic_pointer_cast<PlayerClimbState>(climb)->SetLadderDir(m_vDirToLadder);
+		ChangeState(climb);
+	}
+}
+
+void PlayerMoveScript::CheckRoll()
+{
+	if (INPUT->GetButton(SPACE) && m_bCanRoll)
+	{
+		// 구르기
+		m_vRollLook = GetOwner()->GetLook();
+		ChangeState(roll);
+
+		m_bCanRoll = false;
+	}
+}
+
+void PlayerMoveScript::CheckAttack()
+{
+	// ATTACK
+	if (INPUT->GetButton(LCLICK))
+	{
+		if (currentState->GetId() != PLAYER_S_ATTACK)
+		{
+			ChangeState(attack);
+
+			UpdateCollider();
+			handSword.lock()->SetVisible(true);
+			backSword.lock()->SetVisible(false);
+			m_bSlashPlaying = true;
+			m_fSlashTime = 0.0f;
+
+			//
+			attackRangeActor->m_bCollision = true;
+			attackRangeActor->GetShapeComponent()->m_bVisible = true;
+		}
+	}
+	if (INPUT->GetButton(RCLICK))
+	{
+		// TPlayer의 arrowCount 확인해서 bool 세팅하기 
+		int aCount = dynamic_pointer_cast<TPlayer>(GetOwner())->GetArrowCount();
+		if (aCount > 0)
+		{
+			dynamic_pointer_cast<PlayerShootState>(shoot)->CheckShootCount(true);
+		}
+		else
+		{
+			dynamic_pointer_cast<PlayerShootState>(shoot)->CheckShootCount(false);
+		}
+		ChangeState(shoot);
+	}
+}
+
+void PlayerMoveScript::CheckMove()
+{
+	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
+	if (player->IsClimbing())
+	{
+		Climb();
+	}
+	else
+	{
+		Move();
+
+	}
 }
 
 void PlayerMoveScript::ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled)

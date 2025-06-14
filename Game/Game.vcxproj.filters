@@ -166,6 +166,7 @@
     <ClInclude Include="EventManager.h">
       <Filter>GameManagers</Filter>
     </ClInclude>
+    <ClInclude Include="FenceScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -280,6 +281,7 @@
     <ClCompile Include="EventManager.cpp">
       <Filter>GameManagers</Filter>
     </ClCompile>
+    <ClCompile Include="FenceScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

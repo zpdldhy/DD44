@@ -5,16 +5,40 @@ EventManager::~EventManager()
 {
 }
 
-void EventManager::AddLadderEvent(int _idx, function<void()> _func)
+void EventManager::AddLadderEvent(wstring _name, function<void()> _func)
 {
-	ladderEvent.insert(make_pair(_idx, _func));
+	ladderEvent.insert(make_pair(_name, _func));
 }
 
-void EventManager::TriggerLadderEvent(int _idx)
+void EventManager::AddFenceEvent(wstring _name, function<void()> _func)
 {
-	auto event = ladderEvent.find(_idx);
-	if (event != ladderEvent.end())
+	fenceEvent.insert(make_pair(_name, _func));
+}
+
+void EventManager::TriggerEvent(EventType _type, wstring _name)
+{
+	switch (_type)
 	{
-		event->second();
+	case EventType::EVENT_LADDER:
+	{
+		auto event = ladderEvent.find(_name);
+		if (event != ladderEvent.end())
+		{
+			event->second();
+		}
 	}
+		break;
+	case EventType::EVENT_FENCE:
+	{
+		auto event = fenceEvent.find(_name);
+		if (event != fenceEvent.end())
+		{
+			event->second();
+		}
+	}
+		break;
+	default:
+		break;
+	}
+
 }

@@ -89,7 +89,8 @@ void Game::Tick()
 {
 	if (INPUT->GetButton(G))
 	{
-		EVENT->TriggerLadderEvent(0);
+		EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder");
+		EVENT->TriggerEvent(EventType::EVENT_FENCE, L"Fence1");
 	}
 
 	UpdateCursor();

@@ -51,6 +51,13 @@ public:
 	shared_ptr<StateBase> shoot;
 	shared_ptr<StateBase> die;
 	shared_ptr<StateBase> currentState;
+	PLAYER_STATE currentStateId;
+
+	// Cilmb
+	bool m_bCanClimb = false;
+	Vec3 m_vLadder;
+	Vec3 m_vDirToLadder;
+	Vec3 m_vLadderEnd;
 
 	// Slash 
 	shared_ptr<UMaterial> m_pSlashMaterial = nullptr;
@@ -74,8 +81,9 @@ public:
 	void Tick() override;
 	virtual shared_ptr<UScriptComponent> Clone() override;
 public:
-	void ChangetState(shared_ptr<StateBase> _state);
+	void ChangeState(shared_ptr<StateBase> _state);
 public:
+	void PlayFX();
 	void Slash();
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
 	void VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp);
@@ -93,5 +101,11 @@ public:
 	void RollMove();
 	bool CanAttack();
 	void UpdateCollider();
+	void CheckCoolTIme();
+public:
+	void CheckClimb();
+	void CheckRoll();
+	void CheckAttack();
+	void CheckMove();
 };
 

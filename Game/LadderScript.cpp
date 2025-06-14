@@ -9,11 +9,12 @@ void LadderScript::Init()
 	// 콜라이더 설정
 	GetOwner()->GetShapeComponent()->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 
-	if (GetOwner()->m_szName == L"I_Ladder")
+	auto name = GetOwner()->m_szName;
+	if (name == L"I_Ladder")
 	{
 		GetOwner()->m_bCollision = false;
 		GetOwner()->m_bRender = false;
-		EVENT->AddLadderEvent(0, [this]() {
+		EVENT->AddLadderEvent(name, [this]() {
 			this->Interact();
 			});
 		auto triggerMesh = GetOwner()->GetMeshComponent();
