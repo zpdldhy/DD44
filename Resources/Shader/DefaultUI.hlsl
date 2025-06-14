@@ -7,7 +7,6 @@ struct PS_OUT_UI
 
 cbuffer CB_UVSlice : register(b3)
 {
-    float4 g_vUVSlice;
     float4 g_Color;
 }
 
@@ -30,45 +29,8 @@ VS_OUT VS(VS_IN input)
 
 PS_OUT_UI PS(VS_OUT input)
 {     
-    PS_OUT_UI psOut = (PS_OUT_UI) 0;
-    
-    float left = g_vUVSlice.x;
-    float right = 1 - g_vUVSlice.y;
-     
-    float tiledX = input.t.x;
-    
-    // 왼쪽 경계를 반복하는 로직
-    if (input.t.x > left && input.t.x < right)
-    {
-        float tileRegionWidth = right - left;
-        float fracX = (input.t.x - left) / tileRegionWidth;
-        
-        if (fracX > 0.f &&fracX < 1.f)
-            fracX = 0.f;
-        
-        tiledX = (fracX * tileRegionWidth) + left;
-    }
-    
-    float top = g_vUVSlice.z;
-    float bottom = 1 - g_vUVSlice.w;
-    
-    float tiledY = input.t.y;
-    
-    // 왼쪽 경계를 반복하는 로직
-    if (input.t.y > top && input.t.y < bottom)
-    {
-        float tileRegionHieght = bottom - top;
-        float fracY = (input.t.y - top) / tileRegionHieght;
-        
-        if (fracY > 0.f && fracY < 1.f)
-            fracY = 0.f;
-        
-        tiledY = (fracY * tileRegionHieght) + top;
-    }
-    
-    float2 tiledUV = float2(tiledX, tiledY);
-    
-    float4 texColor = g_txDiffuseA.Sample(sample, tiledUV);
+    PS_OUT_UI psOut = (PS_OUT_UI) 0;    
+    float4 texColor = g_txDiffuseA.Sample(sample, input.t);
     
     texColor += g_Color;    
     texColor = float4(ApplyGlow(texColor.rgb), texColor.a);

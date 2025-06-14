@@ -17,8 +17,7 @@
 
 void BettyMovement::Init()
 {
-	owner = dynamic_pointer_cast<TEnemy>(GetOwner());
-	SetPlayer(owner->GetPlayer());
+	SetPlayer(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer());
 
 	// state
 	idle = make_shared<BettyIdleState>(m_pOwner);

@@ -2,8 +2,10 @@
 #include "BatStates.h"
 #include "AActor.h"
 #include "USkinnedMeshComponent.h"
+#include "UMeshComponent.h"
 #include "UAnimInstance.h"
 #include "Sound.h"
+#include "Timer.h"
 
 BatIdleState::BatIdleState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_IDLE)
 {
@@ -106,6 +108,7 @@ void BatDieState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Shock");
 	animInstance->PlayOnce(index);
+
 	// »ç¿îµå
 	SOUNDMANAGER->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
 }
@@ -119,6 +122,30 @@ void BatDieState::Tick()
 		End();
 	}
 	
+	//Dissolve
+	float frameTime = animInstance->GetTotalFrame();
+	frameTime /= 30;
+	m_fDissolveTimer += TIMER->GetDeltaTime();
+	float t = m_fDissolveTimer / frameTime; 
+	auto comp = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>();
+	ApplyDissolveToAllMaterials(comp, t);
+}
+
+
+void BatDieState::ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> _comp, float _time)
+{
+	if (!_comp) return;
+
+	shared_ptr<UMaterial> mat = _comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetDissolve(_time);
+	}
+
+	for (int i = 0; i < _comp->GetChildCount(); ++i)
+	{
+		ApplyDissolveToAllMaterials(_comp->GetChild(i), _time);
+	}
 }
 
 void BatDieState::End()

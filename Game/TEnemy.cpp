@@ -8,9 +8,10 @@
 void TEnemy::Tick()
 {
 	TCharacter::Tick();
-
+	
 	// FX
 	Flashing();
+	ApplyCrash();
 }
 
 bool TEnemy::CheckHit()
@@ -88,6 +89,16 @@ void TEnemy::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float 
 		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
 	}
 }
+void TEnemy::ApplyCrash()
+{
+	if (!m_bCrashSet && GetHp() <= (GetMaxHp() * 0.5f))
+	{
+		m_bCrashSet = true;
+
+		auto root = GetMeshComponent();
+		ApplyCrashToAllMaterials(root, true);
+	}
+}
 void TEnemy::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)
 {
 	int count = RandomRange(_minCount, _maxCount);
@@ -98,5 +109,19 @@ void TEnemy::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _
 
 		Vec3 baseVelocity = _direction * _speed;
 		EFFECT->PlayEffect(EEffectType::Blood, pos, _spreadAngleDeg, baseVelocity);
+	}
+}
+
+void TEnemy::ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled)
+{
+	if (!comp) return;
+
+	shared_ptr<UMaterial> mat = comp->GetMaterial();
+	if (mat)
+		mat->SetCrash(enabled); // 내부에서 PushData()
+
+	for (int i = 0; i < comp->GetChildCount(); ++i)
+	{
+		ApplyCrashToAllMaterials(comp->GetChild(i), enabled);
 	}
 }

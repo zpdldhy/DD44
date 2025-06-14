@@ -11,7 +11,6 @@ public:
 	WalkerMovement() = default;
 	virtual ~WalkerMovement() = default;
 private:
-	shared_ptr<TEnemy> owner;
 	weak_ptr<TPlayer> player;
 	// States 
 	shared_ptr<StateBase> idle;

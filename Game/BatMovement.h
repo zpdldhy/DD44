@@ -13,7 +13,6 @@ public:
 	BatMovement() = default;
 	virtual ~BatMovement() = default;
 private:
-	shared_ptr<TEnemy> owner;
 	weak_ptr<AActor> player;
 public:
 	Vec3 m_vCenter;

@@ -23,6 +23,7 @@
 #include "AUIActor.h"
 #include "AWindActor.h"
 #include "TEnemy.h"
+#include "TPlayer.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -63,15 +64,14 @@ void Game::Init()
 	//m_pPlayer->SetPosition(Vec3(0.0f, 0.0f, 0.0f));
 	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
 	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	vlist.emplace_back(m_pBetty);
-	// Temp
+	vlist.emplace_back(m_pBetty);	
 	enemyList = vlist;
 	SetEnemy();
 	OBJECT->AddActorList(vlist);
 
-	// UI
-	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
-	UI->DoFadeOut();
+	PROJECTILE->Init();
+
+	CreateUI();
 
 	EFFECT->Init();
 	SetupEngineCamera();
@@ -79,7 +79,10 @@ void Game::Init()
 	SetupSkybox();
 	SetupSunLight();
 
-	PROJECTILE->Init();
+	// Create Cursor
+	m_pCursor = PToA->MakeObject("../Resources/Prefab/Cursor.object.json");
+	m_pCursor->Init();
+	OBJECT->SetCursorActor(m_pCursor);
 }
 
 void Game::Tick()
@@ -89,8 +92,12 @@ void Game::Tick()
 		EVENT->TriggerLadderEvent(0);
 	}
 
+	UpdateCursor();
+
 	if (INPUT->GetButton(GameKey::ESC))
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
+
+	UpdateUI();
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
@@ -135,10 +142,20 @@ void Game::Render()
 void Game::Destroy()
 {
 	m_pCameraActor = nullptr;
+	m_pGameCameraActor = nullptr;
 	m_pPlayer = nullptr;
 	m_pSkyMesh = nullptr;
 	m_pSky = nullptr;
 	m_pSunLight = nullptr;
+
+	m_vPausedBackGround.clear();
+	m_vUpgradeBackGround.clear();
+	m_vUpgradeState.clear();
+	m_vCoins.clear();
+
+	enemyList.clear();
+	m_vObjectList.clear();
+	m_vMapList.clear();
 }
 
 void Game::SetupEngineCamera()
@@ -234,6 +251,278 @@ void Game::CreateWind()
 		}
 
 	}
+}
+
+void Game::CreateUI()
+{
+	// InGame UI
+	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
+
+	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
+	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
+	UI->AddUIList(m_vHPUI);
+	UI->AddUIList(m_vArrowUI);
+
+	m_pActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_active.png");
+	m_pInActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_inactive.png");
+
+	m_vActiveArrowScale = m_vArrowUI[3]->GetScale();
+	m_vInActiveArrowScale = m_vArrowUI[2]->GetScale();
+
+	// Paused UI
+	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
+	UI->AddUIList(m_vPausedBackGround);
+	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
+	UI->AddUIList(m_vUpgradeBackGround);
+	m_vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
+	UI->AddUIList(m_vUpgradeState);
+	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
+	UI->AddUIList(m_vCoins);
+
+	// Dead
+	m_pDeadUI = PToA->MakeUI("../Resources/Prefab/UI_Dead.ui.json");
+	UI->AddUI(m_pDeadUI);
+
+	UI->DoFadeOut();
+}
+
+void Game::UpdateUI()
+{
+	// HP
+	Color RestColor;
+	RestColor = fullHP;
+	RestColor.w = -0.5f;
+
+	static float currentTime = 0.0f;
+	currentTime = TIMER->GetDeltaTime();
+
+	auto currentHP = dynamic_pointer_cast<TCharacter>(m_pPlayer)->GetHp();	
+
+	if(currentHP!= m_iPreHP)
+		m_bHPUIChange = true;
+
+	switch (currentHP)
+	{
+	case 4:
+	{
+		m_vHPUI[0]->SetColor(RestColor);
+		m_vHPUI[1]->SetColor(RestColor);
+		m_vHPUI[2]->SetColor(RestColor);
+		m_vHPUI[3]->SetColor(fullHP);
+	}
+	break;
+
+	case 3:
+	{
+		if (m_vHPUI[2]->GetColor().w < 0.f && m_bHPUIChange)
+		{
+			m_vHPUI[3]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+		}
+		else if (m_bHPUIChange == true)
+			m_bHPUIChange = false;
+		else
+		{
+			m_vHPUI[0]->SetColor(RestColor);
+			m_vHPUI[1]->SetColor(RestColor);
+			m_vHPUI[2]->SetColor(fullHP);
+		}
+	}
+	break;
+
+	case 2:
+	{
+		if (m_vHPUI[1]->GetColor().w < 0.f && m_bHPUIChange)
+		{
+			m_vHPUI[2]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+		}
+		else if (m_bHPUIChange == true)
+			m_bHPUIChange = false;
+		else
+		{
+			m_vHPUI[0]->SetColor(RestColor);
+			m_vHPUI[1]->SetColor(fullHP);
+		}
+	}
+	break;
+
+	case 1:
+	{
+		if (m_vHPUI[0]->GetColor().w < 0.f && m_bHPUIChange)
+		{
+			m_vHPUI[1]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+			m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+		}
+		else if (m_bHPUIChange == true)
+			m_bHPUIChange = false;
+		else
+			m_vHPUI[0]->SetColor(fullHP);
+
+	}
+	break;
+
+	case 0:
+	{
+		m_vHPUI[0]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
+	}
+	break;
+	}
+
+	m_iPreHP = currentHP;
+
+	// Arrow
+	switch (dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount())
+	{
+	case 4:
+		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[2]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[3]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[2]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[3]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = true;
+		m_vArrowUI[2]->m_bRender = true;
+		m_vArrowUI[3]->m_bRender = true;
+		break;
+
+	case 3:
+		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[2]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[2]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = true;
+		m_vArrowUI[2]->m_bRender = true;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+
+	case 2:
+		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
+		m_vArrowUI[1]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[1]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = true;
+		m_vArrowUI[2]->m_bRender = false;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+
+	case 1:
+		m_vArrowUI[0]->SetAllTexture(m_pActiveArrowTexture);
+
+		m_vArrowUI[0]->SetScale(m_vActiveArrowScale);
+
+		m_vArrowUI[0]->m_bRender = true;
+		m_vArrowUI[1]->m_bRender = false;
+		m_vArrowUI[2]->m_bRender = false;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+
+	case 0:
+		m_vArrowUI[0]->m_bRender = false;
+		m_vArrowUI[1]->m_bRender = false;
+		m_vArrowUI[2]->m_bRender = false;
+		m_vArrowUI[3]->m_bRender = false;
+		break;
+	}
+
+	// Paused
+	if (ENGINE->m_bGamePaused == true)
+	{
+		for (auto& pUI : m_vPausedBackGround)
+			pUI->m_bRender = true;
+
+		for (auto& pUI : m_vUpgradeBackGround)
+			pUI->m_bRender = true;
+
+		for (auto& pUI : m_vUpgradeState)
+			pUI->m_bRender = true;
+
+		OBJECT->SetCursorActor(nullptr);
+	}
+	else
+	{
+		for (auto& pUI : m_vPausedBackGround)
+			pUI->m_bRender = false;
+
+		for (auto& pUI : m_vUpgradeBackGround)
+			pUI->m_bRender = false;
+
+		for (auto& pUI : m_vUpgradeState)
+			pUI->m_bRender = false;
+
+		OBJECT->SetCursorActor(m_pCursor);
+	}	
+
+	// End
+	static float tempTime = 0;
+	if (dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead())
+	{
+		tempTime += TIMER->GetDeltaTime();
+
+		if (tempTime > m_fDeadUIPopTime)
+		{
+			m_pDeadUI->m_bRender = true;
+			m_vCoins[1]->m_bRender = false;
+			m_vCoins[3]->m_bRender = false;
+		}
+	}
+	else
+	{
+		m_pDeadUI->m_bRender = false;
+		tempTime = 0.f;
+		m_vCoins[1]->m_bRender = true;
+		m_vCoins[3]->m_bRender = true;
+	}
+}
+
+void Game::UpdateCursor()
+{
+	// 위치
+	// 마우스 Ray로 Character와 동일한 z값을 가진 평면의 Intersection을 구함
+	MouseRay ray;
+	ray.Click();
+
+	auto playerPos = m_pPlayer->GetPosition();
+	playerPos.y += 1.f;
+	Vec3 inter;
+
+	Collision::GetIntersection(ray, playerPos, Vec3(0.f, 1.f, 0.f), inter);
+
+	auto rotDir = inter - playerPos;
+	auto rotVec = rotDir;
+	rotVec.Normalize();
+
+	// 특정 거리를 넘어가지 않도록 반지름 지정
+	float radius = 7.5f;
+	if (rotDir.Length() > radius)
+		inter = playerPos + rotVec * radius;
+
+	m_pCursor->SetPosition(inter);
+
+	// 회전
+	// 캐릭터 -> 마우스 벡터와 Vec3(1, 0, 0)을 내적하여 각을 구한다.
+	float angle;
+	float fDot = rotVec.Dot(Vec3(1.f, 0.f, 0.f));
+
+	if (rotVec.z > 0.f)
+		angle = -(acosf(fDot) - DD_PI / 2.f);
+	else
+		angle = (acosf(fDot) + DD_PI / 2.f);
+
+	m_pCursor->SetRotation(Vec3(DD_PI / 2.f, angle, 0.f));
 }
 
 void Game::SetEnemy()

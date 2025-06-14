@@ -35,20 +35,8 @@ public:
 	Vec3 velocity;
 	Vec3 m_vRollLook;
 
-	// 상호작용
-	UINT m_vArrowCount = 4;
-	bool m_bCanClimb = false; 
-	Vec3 m_vDirToLadder;
-	Vec3 m_vLadder;
-	Vec3 m_vLadderEnd;
-
-	// UI Actor
-	vector<shared_ptr<class AUIActor>> m_vHPUI;
-	vector<shared_ptr<class AUIActor>> m_vArrowUI;
-	bool m_bHPUIChange = false;
 	shared_ptr<Texture> m_pSubTexture;
-
-	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
+	shared_ptr<Texture> m_pNoiesTexture;
 
 	// Child Mesh Components
 	weak_ptr<UMeshComponent> backSword;
@@ -77,14 +65,14 @@ public:
 
 	//Crash
 	bool m_bCrashSet = false;
+
+	//Dissolve
+	float m_fDissolveTimer = 0.0f;
+	bool m_bDissolving = false;
 public:
 	void Init() override;
 	void Tick() override;
 	virtual shared_ptr<UScriptComponent> Clone() override;
-private:
-	void SetUI();
-	void UpdateHPUI();
-	void UpdateArrowUI();
 public:
 	void ChangetState(shared_ptr<StateBase> _state);
 public:
@@ -93,8 +81,9 @@ public:
 	void VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp);
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
-	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
-	void ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled);
+	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> _comp, float _value);
+	void ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> _comp, bool _enabled);
+	void ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> _comp, float _time);
 	void ApplyCrash();
 
 public:

@@ -14,8 +14,7 @@
 
 void WalkerMovement::Init()
 {
-	owner = dynamic_pointer_cast<TEnemy>(GetOwner());
-	auto player = dynamic_pointer_cast<TPlayer>(owner->GetPlayer().lock());
+	auto player = dynamic_pointer_cast<TPlayer>(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer().lock());
 	SetPlayer(player);
 
 	// position

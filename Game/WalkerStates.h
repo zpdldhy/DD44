@@ -51,8 +51,11 @@ private:
 public:
 	WalkerDieState(weak_ptr<AActor> _pOwner);
 	~WalkerDieState() {}
+	
 public:
 	virtual void Enter() override;
 	virtual void Tick() override;
+	void ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time);
 	virtual void End() override;
+
 };
