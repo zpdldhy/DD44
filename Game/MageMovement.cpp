@@ -7,6 +7,7 @@
 #include "TPlayer.h"
 // temp temp temp !!!!!
 #include "Input.h"
+#include "EffectManager.h"
 
 void MageMovement::Init()
 {
@@ -93,6 +94,11 @@ void MageMovement::Tick()
 	Rotate();
 
 	CheckHit();
+
+	//auto hand = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightHandSocket");
+	//Vec3 pos = hand->GetWorldPosition();
+	////EFFECT->PlayDustBurst(pos, 10.f, .1f);
+	//EFFECT->PlayEffect(EEffectType::Dust, pos, 0, Vec3(0.0f, 0.0f, 0.0f), 1.5f);
 }
 
 shared_ptr<UScriptComponent> MageMovement::Clone()

@@ -463,3 +463,138 @@ void PlayerShoot::CanShoot()
 
 	dynamic_pointer_cast<TPlayer>(m_pOwner.lock())->DecArrowCount();
 }
+
+PlayerClimbState::PlayerClimbState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_CLIMB)
+{
+	m_pOwner = _pOwner;
+	// 사다리 오를 때 공격당하면 어떻게 되지 ? 
+	m_bCanInterrupt = false;
+
+	finish = make_shared<PlayerClimbFinish>(m_pOwner);
+}
+void PlayerClimbState::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+
+	// 애니메이션 Attack 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int attackIndex = animInstance->GetAnimIndex(L"Climbing_ladder");
+	animInstance->SetCurrentAnimTrack(attackIndex);
+
+	// 중력 적용
+	m_pOwner.lock()->GetPhysicsComponent()->SetWeight(0.f);
+}
+void PlayerClimbState::Tick()
+{
+	float targetYaw = atan2f(ladderDir.x, ladderDir.z);
+	Vec3 currentRot = m_pOwner.lock()->GetRotation();
+	currentRot.y = targetYaw;
+	m_pOwner.lock()->SetRotation(currentRot);
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	switch (currentPhase)
+	{
+	case ClimbPhase::Playing:
+	{
+		if (isMoving)
+		{
+			animInstance->m_bPlay = true;
+		}
+		else
+		{
+			animInstance->m_bPlay = false;
+		}
+
+		if (isFinish)
+		{
+			currentPhase = ClimbPhase::Finish;
+			finish->SetLadderDir(ladderDir);
+			finish->Enter();
+		}
+	}
+	break;
+	case ClimbPhase::Finish:
+	{
+		finish->Tick();
+		if (!finish->IsPlaying())
+		{
+			currentPhase = ClimbPhase::Done;
+			End();
+		}
+	}
+	break;
+	case ClimbPhase::Done:
+		End();
+		break;
+	}
+
+}
+void PlayerClimbState::End()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = false;
+	isFinish = false;
+	currentPhase = ClimbPhase::Playing;
+}
+void PlayerClimbState::CheckMove(bool _isMoving)
+{
+	isMoving = _isMoving;
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	animInstance->m_bPlay = isMoving;
+}
+
+void PlayerClimbState::SetLadderDir(Vec3 _dir)
+{
+	ladderDir = _dir;
+}
+
+PlayerClimbFinish::PlayerClimbFinish(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_CLIMB)
+{
+	m_pOwner = _pOwner;
+	m_bCanInterrupt = false;
+}
+void PlayerClimbFinish::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+
+	// 애니메이션 Attack 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int index = animInstance->GetAnimIndex(L"Climbing_off_ladder_top");
+	animInstance->m_bPlay = true;
+	animInstance->PlayOnce(index);
+}
+void PlayerClimbFinish::Tick()
+{
+	// AddPosition 조금
+	ladderDir.Normalize();
+	Vec3 look = ladderDir;
+	Vec3 up = m_pOwner.lock()->GetUp();
+
+	float offset = 1.0f;
+	Vec3 moveDir = look * 1.0f + up * 0.5f;
+
+	moveDir.Normalize();
+
+	m_pOwner.lock()->AddPosition(moveDir * 0.05);
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	if (!animInstance->m_bOnPlayOnce)
+	{
+		// 애니메이션 종료
+		m_pOwner.lock()->GetPhysicsComponent()->SetWeight(1.f);
+		dynamic_pointer_cast<TPlayer>(m_pOwner.lock())->StopClimbing();
+		End();
+	}
+}
+void PlayerClimbFinish::End()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = false;
+}
+
+void PlayerClimbFinish::SetLadderDir(Vec3 _dir)
+{
+	ladderDir = _dir;
+}

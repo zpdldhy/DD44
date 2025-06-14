@@ -36,8 +36,11 @@ public:
 	Vec3 m_vRollLook;
 
 	// 상호작용
-	//UINT m_vHP = 4;
 	UINT m_vArrowCount = 4;
+	bool m_bCanClimb = false; 
+	Vec3 m_vDirToLadder;
+	Vec3 m_vLadder;
+	Vec3 m_vLadderEnd;
 
 	// UI Actor
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
@@ -53,6 +56,7 @@ public:
 
 	shared_ptr<StateBase> idle;
 	shared_ptr<StateBase> walk;
+	shared_ptr<StateBase> climb;
 	shared_ptr<StateBase> roll;
 	shared_ptr<StateBase> attack;
 	shared_ptr<StateBase> hit;
@@ -95,7 +99,8 @@ public:
 
 public:
 	void Move();
-	void CheckHit();
+	void Climb();
+	void CheckCollision();
 	void RollMove();
 	bool CanAttack();
 	void UpdateCollider();

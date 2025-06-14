@@ -15,6 +15,7 @@
 // Game Actor
 #include "TPlayer.h"
 #include "TEnemy.h"
+#include "TInteractable.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -23,11 +24,6 @@
 #include "USphereComponent.h"
 
 //// Script
-//#include "PlayerMoveScript.h"
-//#include "BatMovement.h"
-//#include "WalkerMovement.h"
-//#include "BettyMovement.h"
-//#include "MageMovement.h"
 #include "ScriptManager.h"
 
 //unique_ptr<ActorLoader> PrefabToActor::actorLoader = nullptr;
@@ -117,6 +113,10 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 		if (characterData.ScriptName == "PlayerMoveScript")
 		{
 			actor = std::make_shared<TPlayer>();
+		}
+		else if (characterData.m_eActorType == 7)
+		{
+			actor = std::make_shared<TInteractable>();
 		}
 		else
 		{

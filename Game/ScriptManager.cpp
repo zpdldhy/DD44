@@ -7,6 +7,8 @@
 #include "BettyMovement.h"
 #include "WalkerMovement.h"
 #include "MageMovement.h"
+// Interaction Script
+#include "LadderScript.h"
 
 void ScriptManager::Init()
 {
@@ -16,7 +18,8 @@ void ScriptManager::Init()
 	m_vScriptList.insert(make_pair(L"BettyMovement", make_shared<BettyMovement>()));
 	m_vScriptList.insert(make_pair(L"WalkerMovement", make_shared<WalkerMovement>()));
 	m_vScriptList.insert(make_pair(L"MageMovement", make_shared<MageMovement>()));
-
+	m_vScriptList.insert(make_pair(L"LadderScript", make_shared<LadderScript>()));
+	
 }
 
 shared_ptr<UScriptComponent> ScriptManager::GetScript(wstring _name)

@@ -7,6 +7,7 @@ enum PLAYER_STATE
 {
 	PLAYER_S_IDLE = 0,
 	PLAYER_S_WALK,
+	PLAYER_S_CLIMB,
 	PLAYER_S_ROLL,
 	PLAYER_S_ATTACK,
 	PLAYER_S_SHOOT,
@@ -181,7 +182,6 @@ private:
 	weak_ptr<AActor> m_pOwner;
 	bool m_bPlayNext = true;
 	int animIndex;
-
 public:
 	PlayerDieState(weak_ptr<AActor> _pOwner);
 	~PlayerDieState() {}
@@ -191,3 +191,47 @@ public:
 	virtual void Tick() override;
 	virtual void End() override;
 };
+
+class PlayerClimbState : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+	enum ClimbPhase { Playing, Finish, Done };
+	ClimbPhase currentPhase = ClimbPhase::Playing;
+	// move랑 stop은 phase 안에서만 해도 조절 가능
+	shared_ptr<class PlayerClimbFinish> finish;
+	bool isFinish = false;
+	bool isMoving = true;
+	Vec3 ladderDir;
+public:
+	PlayerClimbState(weak_ptr<AActor> _pOwner);
+	~PlayerClimbState() {}
+
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+	void CheckClimbFinish(bool _finish) { isFinish = _finish; }
+	void CheckMove(bool _isMoving);
+	void SetLadderDir(Vec3 _dir);
+	void CheckIsMoving(bool _moving) { isMoving = _moving; }
+};
+
+class PlayerClimbFinish : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+public:
+	PlayerClimbFinish(weak_ptr<AActor> _pOwner);
+	~PlayerClimbFinish() {}
+public:
+	Vec3 ladderDir;
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+	void SetLadderDir(Vec3 _dir);
+};
+

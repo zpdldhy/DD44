@@ -36,6 +36,7 @@
 // Game
 #include "ProjectileManager.h"
 #include "EnemyCollisionManager.h"
+#include "EventManager.h"
 
 // TEMP
 #include "BatMovement.h"
@@ -79,11 +80,15 @@ void Game::Init()
 	SetupSunLight();
 
 	PROJECTILE->Init();
-
 }
 
 void Game::Tick()
 {
+	if (INPUT->GetButton(G))
+	{
+		EVENT->TriggerLadderEvent(0);
+	}
+
 	if (INPUT->GetButton(GameKey::ESC))
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
 
