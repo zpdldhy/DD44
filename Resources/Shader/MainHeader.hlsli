@@ -12,6 +12,8 @@ cbuffer CameraBuffer : register(b1)
     row_major matrix g_matProj;
     float3 g_vCameraPos;
     float g_fGameTime;
+    row_major matrix g_matShadowView;
+    row_major matrix g_matShadowProj;
 };
 
 cbuffer CB_MaterialEffect : register(b2)

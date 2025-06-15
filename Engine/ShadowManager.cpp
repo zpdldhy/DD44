@@ -15,7 +15,7 @@ void ShadowManager::Init()
 	// Rasterizer (Depth Bias)
 	D3D11_RASTERIZER_DESC rsDesc = {};
 	rsDesc.FillMode = D3D11_FILL_SOLID;
-	rsDesc.CullMode = D3D11_CULL_BACK;
+	rsDesc.CullMode = D3D11_CULL_NONE;
 	rsDesc.DepthBias = 1000;
 	rsDesc.DepthBiasClamp = 0.0f;
 	rsDesc.SlopeScaledDepthBias = 1.0f;
@@ -40,6 +40,8 @@ void ShadowManager::Render()
 {
 	BeginShadowPass();
 	UpdateCameraCB();
+
+
 
 	OBJECT->RenderShadow();
 
@@ -91,10 +93,9 @@ void ShadowManager::EndShadowPass()
 
 void ShadowManager::UpdateCameraCB()
 {
-	auto pCameraComponent = LIGHT->GetLight(0)->GetCameraComponent();
-
-	m_CameraData.matView = pCameraComponent->GetView();
-	m_CameraData.matProjection = pCameraComponent->GetProjection();
+	auto pCameraComponent = LIGHT->GetLight(0)->GetCameraComponent();;
+	m_CameraData.matShadowView = m_CameraData.matView = pCameraComponent->GetView();
+	m_CameraData.matShadowProj = m_CameraData.matProjection = pCameraComponent->GetProjection();
 	m_CameraData.g_vCameraPos = pCameraComponent->GetWorldPosition();
 	m_CameraData.GameTime = TIMER->GetGameTime();
 

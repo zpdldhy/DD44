@@ -23,16 +23,16 @@ void UMeshComponent::RenderShadow()
 	if (bRender)
 	{
 		PreRender();
-		// Shader만 바꿔 준다.		
-		auto pShader = SHADER->Get(L"../Resources/Shader/DepthOnly.hlsl")->m_pVertexShader.Get();
-		DC->VSSetShader(pShader, nullptr, 0);
+		auto shadowShader = SHADER->Get(L"../Resources/Shader/Shadow.hlsl");
+		DC->VSSetShader(shadowShader->GetVS().Get(), nullptr, 0);
+		DC->PSSetShader(shadowShader->GetPS().Get(), nullptr, 0);
 		PostRender();
 
 	}
 
 	for (auto& child : m_vChild)
 	{
-		child->Render();
+		child->RenderShadow();
 	}
 
 	//// 1. 깊이 전용 셰이더 설정
