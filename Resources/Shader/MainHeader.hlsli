@@ -54,6 +54,12 @@ cbuffer CB_MaterialEffect : register(b2)
  
 };
 
+cbuffer CB_RenderMode : register(b7)
+{
+    int g_iRenderMode;
+    float3 padding_rendermode;
+};
+
 struct VS_IN
 {
     float3 p : POSITION;

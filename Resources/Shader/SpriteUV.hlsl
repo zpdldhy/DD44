@@ -6,30 +6,24 @@ struct PS_OUT_DUAL
     float4 c1 : SV_Target1;
 };
 
+cbuffer CB_SpriteUV : register(b4)
+{
+    float2 g_uvStart;
+    float2 g_uvEnd;
+}
 
-//VS_OUT VS(VS_IN input)
-//{
-//    VS_OUT output = (VS_OUT) 0;
+cbuffer CB_Billboard : register(b6)
+{
+    float3 g_vBillboardCenter;
+    float g_fBillboardRotation;
+    float2 g_vBillboardSize;
+    float2 padding_size;
+};
 
-
-//    float3 right = float3(g_matView._11, g_matView._21, g_matView._31);
-//    float3 up = float3(g_matView._12, g_matView._22, g_matView._32);
-
-    
-//    float3 offset = (input.p.x * right * g_vBillboardSize.x) +
-//                (input.p.y * up * g_vBillboardSize.y);
-
-//    float3 worldPos = g_vBillboardCenter + offset;
-
-//    float4 viewPos = mul(float4(worldPos, 1.0f), g_matView);
-//    output.p = mul(viewPos, g_matProj);
-
-//    output.c = input.c;
-//    output.n = input.n;
-//    output.t = input.t;
-
-//    return output;
-//}
+float2 remapUV(float2 uv)
+{
+    return lerp(g_uvStart, g_uvEnd, uv);
+}
 
 VS_OUT VS(VS_IN input)
 {
