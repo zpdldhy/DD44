@@ -18,6 +18,9 @@ protected:
 public:
 	void Render() override;
 
+protected:
+	virtual void ClearBind();
+
 public:
 	void SetMeshPath(const std::wstring& path) { m_MeshPath = path; }
 	const std::wstring& GetMeshPath() const { return m_MeshPath; }

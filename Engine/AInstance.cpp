@@ -13,12 +13,12 @@ void AInstance::Tick()
 
 void AInstance::Render()
 {
-	for (auto& pMesh : m_vActorTransformList)
+	for (UINT iMeshIndex = 0;iMeshIndex< m_vTransformList.size();iMeshIndex++)
 	{
 		vector<INSTANCE_VERTEX> vInstanceList;
 
 		// Transform을 모아요
-		for (auto& pTransform : pMesh)
+		for (auto& pTransform : m_vTransformList[iMeshIndex])
 		{
 			INSTANCE_VERTEX world;
 			world.matWorld = pTransform->GetWorld();
@@ -28,13 +28,13 @@ void AInstance::Render()
 		}
 
 		// Mesh를 Binding 해요
-		auto pFirstMesh = pMesh[0]->GetMesh();
+		auto pFirstMesh = m_vTransformList[iMeshIndex][0]->GetMesh();
 		pFirstMesh->UpdateInstanceList(vInstanceList);
 		pFirstMesh->Bind();
 
-		pMesh[0]->GetMaterial()->Bind();
+		m_vTransformList[iMeshIndex][0]->GetMaterial()->Bind();
 		
-		auto shaderPath = pMesh[0]->GetMaterial()->GetShader()->m_szPath;
+		auto shaderPath = m_vTransformList[iMeshIndex][0]->GetMaterial()->GetShader()->m_szPath;
 		m_pShader = SHADER->Get(shaderPath, L"VS_INSTANCE");
 
 		if (pFirstMesh->GetType() == 0)
@@ -46,15 +46,15 @@ void AInstance::Render()
 				m_pInputLayout = INPUTLAYOUT->Get(L"Instance");
 			}
 		}
-		else if (pFirstMesh->GetType() == 1)
-		{
-			m_pInputLayout = INPUTLAYOUT->Get(L"InstanceIW");
-			if (m_pInputLayout == nullptr)
-			{
-				INPUTLAYOUT->CreateInstanceIW(m_pShader->m_pCode);
-				m_pInputLayout = INPUTLAYOUT->Get(L"InstanceIW");
-			}
-		}
+		//else if (pFirstMesh->GetType() == 1)
+		//{
+		//	m_pInputLayout = INPUTLAYOUT->Get(L"InstanceIW");
+		//	if (m_pInputLayout == nullptr)
+		//	{
+		//		INPUTLAYOUT->CreateInstanceIW(m_pShader->m_pCode);
+		//		m_pInputLayout = INPUTLAYOUT->Get(L"InstanceIW");
+		//	}
+		//}
 
 		DC->IASetInputLayout(m_pInputLayout->m_pInputLayout.Get());
 		DC->VSSetShader(m_pShader->m_pVertexShader.Get(), nullptr, 0);
@@ -69,7 +69,9 @@ void AInstance::Render()
 
 void AInstance::Destroy()
 {
-	m_vActorTransformList.clear();
+	m_vTransformList.clear();
+	m_vColorList.clear();
+	m_vUVList.clear();
 }
 
 void AInstance::SetInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
@@ -79,7 +81,7 @@ void AInstance::SetInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
 	{
 		vector<shared_ptr<UMeshComponent>> vTransformList;
 		vTransformList.emplace_back(_pMeshCom);
-		m_vActorTransformList.emplace_back(vTransformList);
+		m_vTransformList.emplace_back(vTransformList);
 		_pMeshCom->SetUseInstance(true);
 	}
 
@@ -94,7 +96,7 @@ void AInstance::AddInstanceTransform(shared_ptr<UMeshComponent> _pMeshCom)
 	// 제일 상단에 MeshResource가 있다면
 	if (_pMeshCom->GetMesh())
 	{
-		m_vActorTransformList[iMeshCount++].emplace_back(_pMeshCom);
+		m_vTransformList[iMeshCount++].emplace_back(_pMeshCom);
 		_pMeshCom->SetUseInstance(true);
 	}
 
@@ -110,7 +112,7 @@ void AInstance::InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList
 		{
 			vector<shared_ptr<UMeshComponent>> vTransformList;
 			vTransformList.emplace_back(pChildCom);
-			m_vActorTransformList.emplace_back(vTransformList);
+			m_vTransformList.emplace_back(vTransformList);
 			pChildCom->SetUseInstance(true);
 		}
 
@@ -124,7 +126,7 @@ void AInstance::InsertChildsTransform(vector<shared_ptr<UMeshComponent>> _vChild
 	{
 		if (pChildCom->GetMesh())
 		{
-			m_vActorTransformList[_iMeshCount++].emplace_back(pChildCom);
+			m_vTransformList[_iMeshCount++].emplace_back(pChildCom);
 			pChildCom->SetUseInstance(true);
 		}
 

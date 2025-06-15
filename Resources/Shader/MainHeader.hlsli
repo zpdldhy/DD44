@@ -101,8 +101,6 @@ struct PS_OUT
 };
 
 Texture2D g_txDiffuseA : register(t0);
-Texture2D g_txCrack : register(t1);
-Texture2D g_txNoise : register(t2);
 SamplerState sample : register(s0);
 
 ///funtion

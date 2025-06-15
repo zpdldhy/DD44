@@ -13,8 +13,8 @@ public:
 	virtual void Destroy() override;
 
 public:
-	wstring GetMeshPath() { return m_vActorTransformList[0][0]->GetMeshPath(); }
-	wstring GetTexturePath() { return m_vActorTransformList[0][0]->GetMaterial()->GetTexturePath(); }
+	wstring GetMeshPath() { return m_vTransformList[0][0]->GetMeshPath(); }
+	wstring GetTexturePath() { return m_vTransformList[0][0]->GetMaterial()->GetTexturePath(); }
 
 	void SetInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom);
 	void AddInstanceTransform(shared_ptr<UMeshComponent> _pMeshCom);
@@ -25,8 +25,11 @@ private:
 
 protected:
 	// 1번째, Mesh 종류별 분류
-	// 2번째, Mesh Transform별 분류
-	vector<vector<shared_ptr<UMeshComponent>>> m_vActorTransformList;	
+	// 2번째, Actor당 분류(Transform, Color, UVList)
+	vector<vector<shared_ptr<UMeshComponent>>> m_vTransformList;	
+	vector<vector<Color>> m_vColorList;
+	vector<vector<Vec4>> m_vUVList;
+
 	shared_ptr<Inputlayout> m_pInputLayout = nullptr;
 	shared_ptr<Shader> m_pShader = nullptr;
 };

@@ -1,6 +1,9 @@
 #include "MainHeader.hlsli"
 #define MAX_LIGHTS 4
 
+Texture2D g_txCrack : register(t1);
+Texture2D g_txNoise : register(t2);
+
 struct LightData
 {
     float4 vLightColor_Intensity; // (RGB, Intensity)

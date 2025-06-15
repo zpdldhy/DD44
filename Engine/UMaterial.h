@@ -79,7 +79,7 @@ class UMaterial
 	shared_ptr<Inputlayout> m_pInputlayout = nullptr;
 	ComPtr<ID3D11ShaderResourceView> m_pTexSRV;
 	
-	ComPtr<ID3D11Buffer> m_pEffectCB; // 통합 CB
+	static ComPtr<ID3D11Buffer> m_pEffectCB; // 통합 CB
 	ComPtr<ID3D11Buffer> m_pCB_Slash;
 	shared_ptr<class ConstantBuffer<CB_SpriteUV>> m_CB_SpriteUV;
 
