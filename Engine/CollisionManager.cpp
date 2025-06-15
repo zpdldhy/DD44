@@ -43,7 +43,7 @@ void Collision::Init()
 			// 충돌 처리
 			CollisionData data;
 			data.Inter = Inter;
-			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
+			if(Collision::CheckRayToOBB(Sphere->GetGroundRay(), Box->GetBounds(), Inter))
 				a->GetPhysicsComponent()->m_bColGrounded = true;
 
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));

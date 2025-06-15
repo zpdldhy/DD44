@@ -18,6 +18,9 @@ protected:
 
 	// 범위 표기
 	shared_ptr<class AActor> m_pCollisionRange = nullptr;
+
+	Ray m_LookRay;
+	Ray m_GroundRay;
 	shared_ptr<class AActor> m_pLookRange = nullptr;
 	shared_ptr<class AActor> m_pDownRange = nullptr;
 	ComPtr<ID3D11RasterizerState> m_pCurrentRasterizer = nullptr;
@@ -47,5 +50,8 @@ public:
 
 	const ShapeType& const GetShapeType() { return m_ShapeType; }
 	const CollisionEnabled& const GetCollisionType() { return m_CollisionEnabled; }
+
+	const Ray& GetLookRay() { return m_LookRay; }
+	const Ray& GetGroundRay() { return m_GroundRay; }
 };
 

@@ -36,6 +36,9 @@ void UPhysicsComponent::Tick()
 	m_vCurrentDir.Normalize();
 	m_vVelocity = m_vCurrentDir * m_fCurrentSpeed + Vec3(0.f, -m_vCurrentGravity, 0.f);
 
+	//auto tempTime = TIMER->GetDeltaTime() / 0.016667f;
+	//m_vVelocity *= tempTime;
+
 	GetOwner()->AddPosition(m_vVelocity);
 
 	// reset
