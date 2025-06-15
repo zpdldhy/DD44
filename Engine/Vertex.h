@@ -27,3 +27,8 @@ struct IW_VERTEX
 		w2[3] = w2[2] = w2[1] = w2[0] = 0.0f;
 	}
 };
+
+struct INSTANCE_VERTEX
+{
+	Matrix matWorld;
+};

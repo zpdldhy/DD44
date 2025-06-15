@@ -17,7 +17,9 @@ private:
 public:
 	bool CreateInputLayout(wstring layoutName, ComPtr<ID3DBlob> _pCode, D3D11_INPUT_ELEMENT_DESC layout[], UINT numElements);
 	bool CreateDefault();
+	bool CreateInstance(ComPtr<ID3DBlob> _pCode);
 	bool CreateIW(ComPtr<ID3DBlob> _pCode);
+	bool CreateInstanceIW(ComPtr<ID3DBlob> _pCode);
 	shared_ptr<Inputlayout> Get(wstring _name = L"Default");
 	void Init(ComPtr<ID3DBlob> _pCode);
 	virtual ~InputlayoutManager();

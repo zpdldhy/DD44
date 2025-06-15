@@ -57,9 +57,19 @@ cbuffer CB_MaterialEffect : register(b2)
 struct VS_IN
 {
     float3 p : POSITION;
-    float4 c : COLOR;
     float3 n : NORMAL;
+    float4 c : COLOR;
     float2 t : TEXCOORD;
+};
+
+struct VS_INSTANCE_IN
+{
+    float3 p : POSITION;
+    float3 n : NORMAL;
+    float4 c : COLOR;
+    float2 t : TEXCOORD;
+    
+    row_major float4x4 matWorld : TRANSFORM;
 };
 
 struct VS_OUT

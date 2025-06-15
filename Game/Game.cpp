@@ -50,7 +50,7 @@ void Game::Init()
 	// Asset ·Îµù
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
-	//m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
+	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 
 	OBJECT->AddActorList(m_vMapList);
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));

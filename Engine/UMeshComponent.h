@@ -13,6 +13,7 @@ protected:
 	vector<shared_ptr<UMeshComponent>>	m_vChild;
 	shared_ptr<UMeshResources> m_pMesh = nullptr;
 	bool bRender = true;
+	bool bUseInstance = false;
 
 public:
 	void Render() override;
@@ -37,5 +38,7 @@ public:
 public:
 	void SetVisible(bool _visible) { bRender = _visible; }
 	const bool& GetVisible() { return bRender; }
+	void SetUseInstance(bool _bUse) { bUseInstance = _bUse; }
+	bool IsUseInstance() { return bUseInstance; }
 };
 
