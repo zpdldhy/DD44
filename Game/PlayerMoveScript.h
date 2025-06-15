@@ -27,6 +27,7 @@ public:
 
 	// Attack
 	shared_ptr<AActor> attackRangeActor;
+	shared_ptr<AActor> bow;
 	Vec3 colOffset;
 
 	Vec3 m_vLook;
@@ -59,11 +60,12 @@ public:
 	Vec3 m_vDirToLadder;
 	Vec3 m_vLadderEnd;
 
-	// Slash 
-	shared_ptr<UMaterial> m_pSlashMaterial = nullptr;
-	float m_fSlashTime = 0.0f;
-	bool m_bSlashPlaying = false;
-	float m_fSlashDuration = 0.5f;
+	// state·Î ÀÌ°ü
+	//// Slash 
+	//shared_ptr<UMaterial> m_pSlashMaterial = nullptr;
+	//float m_fSlashTime = 0.0f;
+	//bool m_bSlashPlaying = false;
+	//float m_fSlashDuration = 0.3f;
 	 
 	// Camera Offset
 	Vec3 m_vCameraOffset = { 20.0f, 30.0f, -20.0f };
@@ -76,6 +78,9 @@ public:
 	//Dissolve
 	float m_fDissolveTimer = 0.0f;
 	bool m_bDissolving = false;
+
+	// Combo
+	int maxComboCount = 3;
 public:
 	void Init() override;
 	void Tick() override;
@@ -84,7 +89,7 @@ public:
 	void ChangeState(shared_ptr<StateBase> _state);
 public:
 	void PlayFX();
-	void Slash();
+	//void Slash();
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
 	void VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp);
 	float m_fHitFlashTimer = 0.0f;
@@ -101,11 +106,13 @@ public:
 	void RollMove();
 	bool CanAttack();
 	void UpdateCollider();
+	void UpdateBow();
 	void CheckCoolTIme();
 public:
 	void CheckClimb();
 	void CheckRoll();
 	void CheckAttack();
+	void CheckComboAttack();
 	void CheckMove();
 };
 

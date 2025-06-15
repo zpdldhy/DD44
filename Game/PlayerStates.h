@@ -9,7 +9,8 @@ enum PLAYER_STATE
 	PLAYER_S_WALK,
 	PLAYER_S_CLIMB,
 	PLAYER_S_ROLL,
-	PLAYER_S_ATTACK,
+	PLAYER_S_LATTACK,
+	PLAYER_S_RATTACK,
 	PLAYER_S_SHOOT,
 	PLAYER_S_HIT,
 	PLAYER_S_DEATH,
@@ -69,18 +70,20 @@ class PlayerAttackState : public StateBase
 private:
 	weak_ptr<AActor> m_pOwner;
 
-	shared_ptr<StateBase>* m_pCurrentState = nullptr;
-	shared_ptr<StateBase> m_pPrevState;
+	enum AttackCombo { OnFirst = 0, OnSecond, OnThird, Done};
+	AttackCombo currentPhase = OnFirst;
 
-	shared_ptr<UMeshComponent> m_pSword;
-	shared_ptr<UMeshComponent> m_pBackSocket;
-	shared_ptr<UMeshComponent> m_pHandSocket;
+	bool m_bOnCombo = false;
 
-	Vec3 handSwordRot = Vec3(0.0f, 0.0f, DD_PI / 2);
-	Vec3 handSwordPos = Vec3(1.0f, 0.0f, 0.0f);
+	Vec3 dir;
 
-	Vec3 backSwordRot = Vec3(0.0f, 0.3f, -DD_PI / 2);
-	Vec3 backSwordPos = Vec3(-0.5f, 0.0f, 0.0f);
+	// FX
+	// Slash 
+	shared_ptr<class UMaterial> m_pSlashMaterial = nullptr;
+	float m_fSlashTime = 0.0f;
+	bool m_bSlashPlaying = false;
+	float m_fSlashDuration = 0.3f;
+	bool reverse = false;
 
 public:
 	PlayerAttackState(weak_ptr<AActor> _pOwner);
@@ -90,10 +93,11 @@ public:
 	virtual void Tick() override;
 	virtual void End() override;
 public:
-	void SetPrevState(const shared_ptr<StateBase>& _prevState) { m_pPrevState = _prevState; }
-	void SetCurrentState(shared_ptr<StateBase>* _currentState) { m_pCurrentState = _currentState; }
-	// sword, hand, back ¼ø¼­
-	void SetComponent(shared_ptr<UMeshComponent> _sword, shared_ptr<UMeshComponent> _hand, shared_ptr<UMeshComponent> _back);
+	void CheckAttackCombo(bool _onCombo) { m_bOnCombo = _onCombo; }
+	void CheckMouse();
+	void Rotate();
+	void Move();
+	void Slash();
 };
 
 class PlayerShootState : public StateBase

@@ -183,9 +183,10 @@ void UMaterial::SetUVRange(Vec2 start, Vec2 end)
     m_CB_SpriteUV->Push();
 }
 
-void UMaterial::SetSlashProgress(float _progress)
+void UMaterial::SetSlashProgress(float _progress, bool _reverse)
 {
     m_tSlashData.g_fProgress = _progress;
+    m_tSlashData.reverse = _reverse;
 
     D3D11_MAPPED_SUBRESOURCE mapped = {};
     DC->Map(m_pCB_Slash.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);

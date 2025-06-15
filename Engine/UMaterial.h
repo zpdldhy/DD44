@@ -64,7 +64,8 @@ struct CB_SpriteUV
 struct CB_Slash
 {
 	float g_fProgress = 0.0f;
-	Vec3 paading;
+	BOOL reverse = false;
+	Vec2 paading;
 };
 
 class UMaterial
@@ -95,7 +96,7 @@ public:
 	void CreateSlashCB();
 
 	void UpdateEffectBuffer();
-	void SetSlashProgress(float _progress);
+	void SetSlashProgress(float _progress, bool _reverse);
 
 	void SetEmissiveParams(const Vec3& _color, float _power);
 	void SetGlowParams(float _glowPower, const Vec3 _glowColor);

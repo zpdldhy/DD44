@@ -17,6 +17,7 @@
 
 #include "ProjectileManager.h"
 #include "Texture.h"
+#include "MeshLoader.h"
 
 shared_ptr<UScriptComponent> PlayerMoveScript::Clone()
 {
@@ -45,7 +46,7 @@ void PlayerMoveScript::Init()
 
 	auto body = dynamic_pointer_cast<UMeshComponent>(GetOwner()->GetMeshComponent());
 
-	m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetChildByName(L"Slash")->GetMaterial();
+	/*m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetChildByName(L"Slash")->GetMaterial();*/
 
 	//body->GetChildByName(L"Body");
 	backSword = body->GetChildByName(L"Sword");
@@ -86,6 +87,13 @@ void PlayerMoveScript::Init()
 	// Texture
 	m_pSubTexture = TEXTURE->Get(L"../Resources/Texture/cracks_generic 1.png");
 	m_pNoiesTexture = TEXTURE->Get(L"../Resources/Texture/Noise.png");
+
+	// Bow
+	bow = make_shared<AActor>();
+	auto meshComp = MESHLOADER->Make("../Resources/Asset/bow.mesh.json");
+	bow->SetMeshComponent(meshComp);
+	OBJECT->AddActor(bow);
+	bow->m_bRender = false;
 }
 
 void PlayerMoveScript::Tick()
@@ -93,7 +101,7 @@ void PlayerMoveScript::Tick()
 	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
 	auto playerPos = player->GetPosition();
 
-	// 모든 로직 공통
+	// 모든 state 공통
 	PlayFX();
 	CheckCoolTIme();
 	CheckClimb();
@@ -114,7 +122,8 @@ void PlayerMoveScript::Tick()
 		CheckMove();
 		CheckAttack();
 		break;
-	case PLAYER_S_ATTACK:
+	case PLAYER_S_LATTACK:
+		CheckComboAttack();
 		if (currentStateEnd)
 		{
 			handSword.lock()->SetVisible(false);
@@ -138,6 +147,7 @@ void PlayerMoveScript::Tick()
 		CheckMove();
 		break;
 	case PLAYER_S_SHOOT:
+		UpdateBow();
 		if (INPUT->GetButtonUp(RCLICK) || INPUT->GetButtonFree(RCLICK))
 		{
 			// 끝내라 신호 주기
@@ -150,6 +160,7 @@ void PlayerMoveScript::Tick()
 
 		if (currentStateEnd)
 		{
+			bow->m_bRender = false;
 			ChangeState(idle);
 		}
 		break;
@@ -287,7 +298,7 @@ void PlayerMoveScript::PlayFX()
 	DC->PSSetShaderResources(2, 1, m_pNoiesTexture->GetSRV().GetAddressOf());
 	ApplyCrash();
 
-	Slash();
+	//Slash();
 	if (m_bIsFlashing)
 	{
 		m_fHitFlashTimer -= TIMER->GetDeltaTime();
@@ -304,37 +315,37 @@ void PlayerMoveScript::PlayFX()
 		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
 }
-
-void PlayerMoveScript::Slash()
-{
-	if (m_bSlashPlaying)
-	{
-		m_fSlashTime += TIMER->GetDeltaTime();
-
-		float t = m_fSlashTime;
-		float progress = 0.0f;
-
-
-		if (t <= 0.3f)
-		{
-			float ratio = t / 0.3f;
-			progress = pow(ratio, 2.0f);
-		}
-		else
-		{
-			progress = -1.0f;
-		}
-
-		if (m_pSlashMaterial)
-			m_pSlashMaterial->SetSlashProgress(progress);
-
-		if (t >= m_fSlashDuration)
-		{
-			m_bSlashPlaying = false;
-		}
-	}
-
-}
+//
+//void PlayerMoveScript::Slash()
+//{
+//	if (m_bSlashPlaying)
+//	{
+//		m_fSlashTime += TIMER->GetDeltaTime();
+//
+//		float t = m_fSlashTime;
+//		float progress = 0.0f;
+//
+//
+//		if (t <= 0.3f)
+//		{
+//			float ratio = t / 0.3f;
+//			progress = pow(ratio, 2.0f);
+//		}
+//		else
+//		{
+//			progress = -1.0f;
+//		}
+//
+//		if (m_pSlashMaterial)
+//			m_pSlashMaterial->SetSlashProgress(progress);
+//
+//		if (t >= m_fSlashDuration)
+//		{
+//			m_bSlashPlaying = false;
+//		}
+//	}
+//
+//}
 
 void PlayerMoveScript::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)
 {
@@ -517,6 +528,16 @@ void PlayerMoveScript::UpdateCollider()
 	attackRangeActor->SetRotation(currentRot);
 }
 
+void PlayerMoveScript::UpdateBow()
+{
+	Vec3 bowPos = GetOwner()->GetMeshComponent()->GetChildByName(L"LeftHandSocket")->GetWorldPosition();
+	bow->SetPosition(bowPos);
+	float targetYaw = atan2f(GetOwner()->GetLook().x, GetOwner()->GetLook().z);
+	Vec3 currentRot = GetOwner()->GetRotation();
+	currentRot.y = targetYaw;
+	bow->SetRotation(currentRot);
+}
+
 void PlayerMoveScript::CheckCoolTIme()
 {
 	if (m_bDamageCoolTime)
@@ -569,15 +590,15 @@ void PlayerMoveScript::CheckAttack()
 	// ATTACK
 	if (INPUT->GetButton(LCLICK))
 	{
-		if (currentState->GetId() != PLAYER_S_ATTACK)
+		if (currentState->GetId() != PLAYER_S_LATTACK)
 		{
 			ChangeState(attack);
 
 			UpdateCollider();
 			handSword.lock()->SetVisible(true);
 			backSword.lock()->SetVisible(false);
-			m_bSlashPlaying = true;
-			m_fSlashTime = 0.0f;
+			//m_bSlashPlaying = true;
+			//m_fSlashTime = 0.0f;
 
 			//
 			attackRangeActor->m_bCollision = true;
@@ -586,6 +607,7 @@ void PlayerMoveScript::CheckAttack()
 	}
 	if (INPUT->GetButton(RCLICK))
 	{
+		bow->m_bRender = true;
 		// TPlayer의 arrowCount 확인해서 bool 세팅하기 
 		int aCount = dynamic_pointer_cast<TPlayer>(GetOwner())->GetArrowCount();
 		if (aCount > 0)
@@ -598,6 +620,19 @@ void PlayerMoveScript::CheckAttack()
 		}
 		ChangeState(shoot);
 	}
+}
+
+void PlayerMoveScript::CheckComboAttack()
+{
+	// 입력 확인하고
+	if (INPUT->GetButton(LCLICK))
+	{
+		dynamic_pointer_cast<PlayerAttackState>(currentState)->CheckAttackCombo(true);
+	}
+
+	// state로 정보 넘기고 
+	
+
 }
 
 void PlayerMoveScript::CheckMove()
@@ -645,7 +680,6 @@ void PlayerMoveScript::ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> co
 		ApplyDissolveToAllMaterials(comp->GetChild(i), _time);
 	}
 }
-
 
 void PlayerMoveScript::ApplyCrash()
 {
