@@ -17,6 +17,23 @@ VS_OUT VS(VS_IN input)
     return output;
 }
 
+VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
+{
+    VS_OUT output;
+    
+    float4 vLocal = float4(input.p, 1.0f);
+    float4 vWorld = mul(vLocal, input.matWorld);
+    float4 vView = mul(vWorld, g_matView);
+    float4 vProj = mul(vView, g_matProj);
+    
+    output.p = vProj;
+    output.c = input.c;
+    output.n = input.n;
+    output.t = input.t;
+    
+    return output;
+}
+
 PS_OUT PS(VS_OUT input)
 {
      

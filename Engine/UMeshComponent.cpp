@@ -4,11 +4,10 @@
 
 void UMeshComponent::Render()
 {
-	if (bRender)
+	if (bRender && bUseInstance == false)
 	{
 		PreRender();
 		PostRender();
-
 	}
 
 	for (auto& child : m_vChild)

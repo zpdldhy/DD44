@@ -1,4 +1,5 @@
 #include "Header.hlsli"
+#include "SkinningHeader.hlsli"
 
 VS_OUT_RIM VS(PNCTIW_IN input)
 {

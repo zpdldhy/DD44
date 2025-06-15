@@ -22,6 +22,9 @@ class ObjectManager : public Singleton<ObjectManager>
 	vector<UINT> m_vActorIndexList;		// 임시 사용	
 	shared_ptr<AActor> m_pCursor = nullptr;
 
+	// InstanceActor
+	vector<shared_ptr<class AInstance>> m_vInstanceList;
+
 	// Stencil Check용
 	vector<shared_ptr<AActor>> m_vPreRenderActorList;		// stencil 미사용
 	vector<shared_ptr<AActor>> m_vPostRenderActorList;	// stencil 사용
@@ -63,7 +66,10 @@ private:
 	void CreateRenderModeCB();
 	void SetRenderMode(ERenderMode _eMode);
 
-	// 충돌
-
+private:
+	// Actor와 동일한 Mesh를 가지고 있다면 Instance에 추가해준다.
+	// 만들어진 Instance가 없다면 생성한다.
+	void SetInstance(shared_ptr<AActor> _pActor);
+	void MakeInstance(shared_ptr<AActor> _pActor);
 };
 
