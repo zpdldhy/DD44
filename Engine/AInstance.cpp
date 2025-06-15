@@ -22,6 +22,8 @@ void AInstance::Render()
 		{
 			INSTANCE_VERTEX world;
 			world.matWorld = pTransform->GetWorld();
+			world.color = Color();
+			world.uv = Vec4();
 			vInstanceList.emplace_back(world);
 		}
 

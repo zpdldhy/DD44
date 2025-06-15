@@ -31,4 +31,6 @@ struct IW_VERTEX
 struct INSTANCE_VERTEX
 {
 	Matrix matWorld;
+	Color color;
+	Vec4 uv;
 };

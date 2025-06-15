@@ -377,10 +377,6 @@ vector<shared_ptr<class AParticleActor>> PrefabToActor::MakeParticleGroup(const 
 			if (p.Type == EParticleType::Fire)
 			{
 				auto fire = make_shared<AFireParticleActor>();
-				fire->SetAmplitude(p.Amplitude);
-				fire->SetRandomFreq(p.RandomFreq);
-				fire->SetRandomOffset(p.RandomOffset);
-				fire->SetTimeOffset(p.TimeOffset);
 				newParticle = fire;
 			}
 			else
