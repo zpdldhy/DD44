@@ -2,8 +2,6 @@
 #include "UMaterial.h"
 #include "Device.h"
 
-ComPtr<ID3D11Buffer> UMaterial::m_pEffectCB = nullptr;
-
 void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
 {
     m_TexturePath = _textureFileName;
