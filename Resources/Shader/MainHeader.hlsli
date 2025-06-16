@@ -10,10 +10,10 @@ cbuffer CameraBuffer : register(b1)
 {
     row_major matrix g_matView;
     row_major matrix g_matProj;
+    matrix g_matShadowView;
+    matrix g_matShadowProj;
     float3 g_vCameraPos;
     float g_fGameTime;
-    row_major matrix g_matShadowView;
-    row_major matrix g_matShadowProj;
 };
 
 cbuffer CB_MaterialEffect : register(b2)
@@ -81,6 +81,9 @@ struct PS_OUT
 Texture2D g_txDiffuseA : register(t0);
 Texture2D g_txCrack : register(t1);
 SamplerState sample : register(s0);
+// 그림자용
+Texture2D<float> g_txShadow : register(t10); 
+SamplerComparisonState g_samShadow : register(s1); 
 
 ///funtion
 //==============================

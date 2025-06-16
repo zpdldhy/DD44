@@ -7,18 +7,19 @@ class ShadowManager : public Singleton<ShadowManager>
 public:
     void Init();
     void Render();
-
+    ID3D11ShaderResourceView* GetSRV() const;
+    ComPtr<ID3D11SamplerState> GetShadowSampler() const { return m_pShadowSampler; }
 private:
     void BeginShadowPass();
     void EndShadowPass();
     void UpdateCameraCB();
 
-    ID3D11ShaderResourceView* GetSRV() const;
+    
 
 private:
     shared_ptr<class ViewPortTexture>   m_pShadowTexture;
     ComPtr<ID3D11RasterizerState>       m_pRSShadowBias;
-
+    ComPtr<ID3D11SamplerState>          m_pShadowSampler;
     // Get Prev Viewport
     D3D11_VIEWPORT m_PrevVP;
     UINT m_iPrevViewPorts = 0;

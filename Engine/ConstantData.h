@@ -21,9 +21,9 @@ struct CameraConstantData
 {
     Matrix matView;
     Matrix matProjection;
-    Vec3   g_vCameraPos;
-    float  GameTime;
     Matrix matShadowView;
     Matrix matShadowProj;
-
+    Vec3   g_vCameraPos;
+    float  GameTime;
+    
 };

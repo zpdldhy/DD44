@@ -34,6 +34,24 @@ void ShadowManager::Init()
 		DX_CHECK(hr, _T("CreateCameraBuffer Failed"));
 		assert(false);
 	}
+
+	D3D11_SAMPLER_DESC sampDesc = {};
+	sampDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+	sampDesc.BorderColor[0] = 1.0f;
+	sampDesc.BorderColor[1] = 1.0f;
+	sampDesc.BorderColor[2] = 1.0f;
+	sampDesc.BorderColor[3] = 1.0f;
+
+	hr = DEVICE->CreateSamplerState(&sampDesc, m_pShadowSampler.GetAddressOf());
+	if (FAILED(hr))
+	{
+		DX_CHECK(hr, _T("CreateShadowSampler Failed"));
+		assert(false);
+	}
 }
 
 void ShadowManager::Render()
@@ -94,8 +112,12 @@ void ShadowManager::EndShadowPass()
 void ShadowManager::UpdateCameraCB()
 {
 	auto pCameraComponent = LIGHT->GetLight(0)->GetCameraComponent();;
-	m_CameraData.matShadowView = m_CameraData.matView = pCameraComponent->GetView();
-	m_CameraData.matShadowProj = m_CameraData.matProjection = pCameraComponent->GetProjection();
+	pCameraComponent->SetFar(500.f);
+	pCameraComponent->SetNear(100.f);
+	m_CameraData.matShadowView = XMMatrixTranspose(pCameraComponent->GetView());
+	m_CameraData.matShadowProj = XMMatrixTranspose(pCameraComponent->GetProjection());
+	m_CameraData.matView = pCameraComponent->GetView();
+	m_CameraData.matProjection = pCameraComponent->GetProjection();
 	m_CameraData.g_vCameraPos = pCameraComponent->GetWorldPosition();
 	m_CameraData.GameTime = TIMER->GetGameTime();
 

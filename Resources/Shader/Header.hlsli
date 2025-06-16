@@ -92,6 +92,7 @@ struct VS_OUT_RIM
     float3 n : NORMAL;
     float2 t : TEXCOORD;
     float3 wPos : POSITIONWS;
+    float4 shadowCoord : TEXCOORD1;
 };
 
 ///funtion

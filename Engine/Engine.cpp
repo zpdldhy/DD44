@@ -119,13 +119,16 @@ void Engine::Render()
 #endif // DEBUG
 
 	_app->Render();
-	SHADOW->Render(
-	);
+	SHADOW->Render();
 	CAMERA->Render(CameraViewType::CVT_ACTOR);
 
 	// 3D World -> Texture Render
 	{
 		POSTPROCESS->PreRender();
+		ID3D11ShaderResourceView* shadowSRV = SHADOW->GetSRV();
+		DC->PSSetShaderResources(3, 1, &shadowSRV);
+		auto sampler = SHADOW->GetShadowSampler();
+		DC->PSSetSamplers(1, 1, sampler.GetAddressOf());
 		OBJECT->Render();	// ObjectList Render
 		LIGHT->Render();
 		PARTICLE->Render();
