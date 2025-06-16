@@ -417,9 +417,11 @@
     <ClInclude Include="APoppingDust.h">
       <Filter>Object\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="USphereComponent.h" />
     <ClInclude Include="AInstance.h">
       <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="USphereComponent.h">
+      <Filter>Component\Collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -707,9 +709,11 @@
     <ClCompile Include="APoppingDust.cpp">
       <Filter>Object\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="USphereComponent.cpp" />
     <ClCompile Include="AInstance.cpp">
       <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="USphereComponent.cpp">
+      <Filter>Component\Collision</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

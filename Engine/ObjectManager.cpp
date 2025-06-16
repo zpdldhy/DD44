@@ -30,7 +30,12 @@ void ObjectManager::Tick()
 		}
 		else
 		{
-			pActor->second->Tick();
+			if (pActor->second->m_bUpdateQuadTree != false) 
+			{
+				pActor->second->Tick();
+				if (pActor->second->m_szName == L"Object")
+					pActor->second->m_bUpdateQuadTree = false;
+			}
 			pActor++;
 		}		
 	}
@@ -310,7 +315,7 @@ void ObjectManager::SetInstance(shared_ptr<AActor> _pActor)
 		}
 		else
 		{
-			pInstance->AddInstanceTransform(meshCom);
+			pInstance->AddInstanceMesh(meshCom);
 			return;
 		}
 	}

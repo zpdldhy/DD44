@@ -22,8 +22,8 @@ void AInstance::Render()
 		{
 			INSTANCE_VERTEX world;
 			world.matWorld = pTransform->GetWorld();
-			world.color = Color();
-			world.uv = Vec4();
+			world.color = pTransform->GetInstanceColor();
+			world.uv = pTransform->GetInstanceUV();
 			vInstanceList.emplace_back(world);
 		}
 
@@ -80,8 +80,17 @@ void AInstance::SetInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
 	if (_pMeshCom->GetMesh())
 	{
 		vector<shared_ptr<UMeshComponent>> vTransformList;
+		vector<Color> vColorList;
+		vector<Vec4> vUVList;
+
 		vTransformList.emplace_back(_pMeshCom);
+		vColorList.emplace_back(_pMeshCom->GetInstanceColor());
+		vUVList.emplace_back(_pMeshCom->GetInstanceUV());
+
 		m_vTransformList.emplace_back(vTransformList);
+		m_vColorList.emplace_back(vColorList);
+		m_vUVList.emplace_back(vUVList);
+
 		_pMeshCom->SetUseInstance(true);
 	}
 
@@ -89,19 +98,22 @@ void AInstance::SetInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
 	InsertChildsMesh(_pMeshCom->GetChildren());
 }
 
-void AInstance::AddInstanceTransform(shared_ptr<UMeshComponent> _pMeshCom)
+void AInstance::AddInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
 {
 	UINT iMeshCount = 0;
 
 	// 제일 상단에 MeshResource가 있다면
 	if (_pMeshCom->GetMesh())
 	{
-		m_vTransformList[iMeshCount++].emplace_back(_pMeshCom);
+		m_vTransformList[iMeshCount].emplace_back(_pMeshCom);
+		m_vColorList[iMeshCount].emplace_back(_pMeshCom->GetInstanceColor());
+		m_vUVList[iMeshCount++].emplace_back(_pMeshCom->GetInstanceUV());
+
 		_pMeshCom->SetUseInstance(true);
 	}
 
 	// 자식 Mesh들 재귀 시작
-	InsertChildsTransform(_pMeshCom->GetChildren(), iMeshCount);
+	InsertChildsMesh(_pMeshCom->GetChildren(), iMeshCount);
 }
 
 void AInstance::InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList)
@@ -111,8 +123,17 @@ void AInstance::InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList
 		if (pChildCom->GetMesh())
 		{
 			vector<shared_ptr<UMeshComponent>> vTransformList;
+			vector<Color> vColorList;
+			vector<Vec4> vUVList;
+
 			vTransformList.emplace_back(pChildCom);
+			vColorList.emplace_back(pChildCom->GetInstanceColor());
+			vUVList.emplace_back(pChildCom->GetInstanceUV());
+
 			m_vTransformList.emplace_back(vTransformList);
+			m_vColorList.emplace_back(vColorList);
+			m_vUVList.emplace_back(vUVList);
+
 			pChildCom->SetUseInstance(true);
 		}
 
@@ -120,16 +141,19 @@ void AInstance::InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList
 	}
 }
 
-void AInstance::InsertChildsTransform(vector<shared_ptr<UMeshComponent>> _vChildsList, UINT& _iMeshCount)
+void AInstance::InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList, UINT& _iMeshCount)
 {
 	for (auto& pChildCom : _vChildsList)
 	{
 		if (pChildCom->GetMesh())
 		{
-			m_vTransformList[_iMeshCount++].emplace_back(pChildCom);
+			m_vTransformList[_iMeshCount].emplace_back(pChildCom);
+			m_vColorList[_iMeshCount].emplace_back(pChildCom->GetInstanceColor());
+			m_vUVList[_iMeshCount++].emplace_back(pChildCom->GetInstanceUV());
+
 			pChildCom->SetUseInstance(true);
 		}
 
-		InsertChildsTransform(pChildCom->GetChildren(), _iMeshCount);
+		InsertChildsMesh(pChildCom->GetChildren(), _iMeshCount);
 	}
 }

@@ -17,11 +17,11 @@ public:
 	wstring GetTexturePath() { return m_vTransformList[0][0]->GetMaterial()->GetTexturePath(); }
 
 	void SetInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom);
-	void AddInstanceTransform(shared_ptr<UMeshComponent> _pMeshCom);
+	void AddInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom);
 
 private:
 	void InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList);
-	void InsertChildsTransform(vector<shared_ptr<UMeshComponent>> _vChildsList, UINT& _iMeshCount);
+	void InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList, UINT& _iMeshCount);
 
 protected:
 	// 1번째, Mesh 종류별 분류
