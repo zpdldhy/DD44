@@ -50,7 +50,7 @@ public:
 	bool IsUseInstance() { return bUseInstance; }
 	void SetInstanceColor(Color _color) { m_InstanceColor = _color; }
 	void SetInstanceStartUV(Vec2 _uv) { m_InstanceStartUV = _uv; }
-	void SetInstanceEndUV(Vec2 _uv) { m_InstanceEndUV = _uv; }
+	void SetInstanceEndUV(Vec2 _uv) { m_InstanceEndUV = _uv; }	
 	Color GetInstanceColor() { return m_InstanceColor; }
 	Vec2 GetInstanceStartUV() { return m_InstanceStartUV; }
 	Vec2 GetInstanceEndUV() { return m_InstanceEndUV; }

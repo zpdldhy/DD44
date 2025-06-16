@@ -12,42 +12,41 @@ cbuffer CB_SpriteUV : register(b4)
     float2 g_uvEnd;
 }
 
-cbuffer CB_Billboard : register(b6)
-{
-    float3 g_vBillboardCenter;
-    float g_fBillboardRotation;
-    float2 g_vBillboardSize;
-    float2 padding_size;
-};
-
 float2 remapUV(float2 uv)
 {
     return lerp(g_uvStart, g_uvEnd, uv);
 }
 
+float3 ExtractScale(float4x4 m)
+{
+    float3 scale;
+    scale.x = length(float3(m._11, m._12, m._13));
+    scale.y = length(float3(m._21, m._22, m._23));
+    scale.z = length(float3(m._31, m._32, m._33));
+    return scale;
+}
+
 VS_OUT VS(VS_IN input)
 {
     VS_OUT output = (VS_OUT) 0;
-
+    
+    // Camera 방향 추출 (ViewMatrix의 컬럼벡터)
     float3 right = float3(g_matView._11, g_matView._21, g_matView._31);
     float3 up = float3(g_matView._12, g_matView._22, g_matView._32);
+    
+    float3 scale = ExtractScale(g_matWorld);
 
-    // 회전 적용
-    float s = sin(g_fBillboardRotation);
-    float c = cos(g_fBillboardRotation);
+    // 사각형 내 정점 위치 (-0.5 ~ +0.5 기준)
+    float3 offset = input.p.x * right * scale.x + input.p.y * up * scale.y;
 
-    float2 rotated = float2(
-        input.p.x * c - input.p.y * s,
-        input.p.x * s + input.p.y * c
-    );
+    // 최종 월드 위치
+    float3 instanceCenter = { g_matWorld._41, g_matWorld._42, g_matWorld._43 };
+    float3 worldPos = instanceCenter + offset;
 
-    float3 offset = (rotated.x * right * g_vBillboardSize.x) +
-                    (rotated.y * up * g_vBillboardSize.y);
-
-    float3 worldPos = g_vBillboardCenter + offset;
-
-    float4 viewPos = mul(float4(worldPos, 1.0f), g_matView);
-    output.p = mul(viewPos, g_matProj);
+    // 변환
+    float4 viewPos = mul(float4(worldPos, 1), g_matView);
+    float4 projPos = mul(viewPos, g_matProj);
+    output.p = projPos; 
 
     output.c = input.c;
     output.n = input.n;

@@ -1,14 +1,5 @@
 #pragma once
 #include "AActor.h"
-struct CB_Billboard
-{
-	Vec3 center;
-	float Rotation;
-	Vec2 size;
-	Vec2  padding_size;
-};
-
-
 
 class AParticleActor :  public AActor
 {
@@ -37,7 +28,6 @@ protected:
 	bool m_bPlaying = false;
 	Vec2 m_uvStart = { 0.0f, 0.0f };
 	Vec2 m_uvEnd = { 1.0f, 1.0f };
-	shared_ptr<ConstantBuffer<CB_Billboard>> m_CB_Billboard;
 	bool m_bReversePlay = false;
 
 public:
