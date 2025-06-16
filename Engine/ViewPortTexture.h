@@ -16,6 +16,7 @@ public:
 	ID3D11ShaderResourceView* GetSRV() { return m_pTexSRV.Get(); }
 	ID3D11RenderTargetView* GetRTV() { return m_pRenderTargetView.Get(); }
 	ID3D11DepthStencilView* GetDSV() { return m_pDepthStencilView.Get(); }
+	ID3D11ShaderResourceView* GetDepthSRV() { return m_pDsvSRV.Get(); }
 	D3D11_VIEWPORT& GetVP() { return m_CurrentVP; }
 
 public:

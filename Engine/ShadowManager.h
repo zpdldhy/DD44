@@ -2,8 +2,16 @@
 #include "Singleton.h"
 #include "ConstantData.h"
 
+struct CBShadow
+{
+    Matrix View;
+    Matrix Proj;
+};
+
 class ShadowManager : public Singleton<ShadowManager>
 {
+    ComPtr<ID3D11Buffer> m_pShadowCB;
+    CBShadow m_tShadowCB;
 public:
     void Init();
     void Render();

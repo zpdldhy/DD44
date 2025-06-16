@@ -71,6 +71,13 @@ cbuffer CB_Blur : register(b11)
     float2 g_vDirection; // (1, 0): 가로 블러 / (0, 1): 세로 블러
 };
 
+cbuffer CB_Shadow : register(b12)
+{
+    matrix g_matShadowView;
+    matrix g_matShadowProj;
+};
+
+
 
 struct PNCTIW_IN
 {

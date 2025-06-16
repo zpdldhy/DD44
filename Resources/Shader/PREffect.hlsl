@@ -47,8 +47,7 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     }
     else
     {
-        shadow = 0.0f;
-        //shadow = g_txShadow.SampleCmpLevelZero(g_samShadow, shadowTexCoord.xy, shadowTexCoord.z - 0.005f);
+        shadow = g_txShadow.SampleCmpLevelZero(g_samShadow, shadowTexCoord.xy, shadowTexCoord.z - 0.001f);
     }
     
     float3 ambient = ApplyAmbient();
@@ -66,9 +65,9 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     // output.c : 최종 결과
     output.c = float4(finalColor, texColor.a);
 
-    shadowTexCoord = input.shadowCoord.xyz / input.shadowCoord.w;
-    output.c = float4(shadowTexCoord.xy, shadowTexCoord.z, 1);
-    
+    //shadowTexCoord = input.shadowCoord.xyz / input.shadowCoord.w;
+    //output.c = float4(shadowTexCoord.xy, shadowTexCoord.z, 1);
+
     // output.c1 : Blur 대상용 (보통 최종 결과와 동일하게 해도 무방)
     output.c1 = float4(finalColor, texColor.a);
 
@@ -83,4 +82,4 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     output.c6 = float4(input.p.z / input.p.w, 0.0f, 0.0f, 1.0f); // R 채널에만 깊이
     
     return output;
-    }
+}

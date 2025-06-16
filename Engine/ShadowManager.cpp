@@ -52,6 +52,18 @@ void ShadowManager::Init()
 		DX_CHECK(hr, _T("CreateShadowSampler Failed"));
 		assert(false);
 	}
+
+	D3D11_BUFFER_DESC sbDesc = {};
+	sbDesc.ByteWidth = sizeof(Matrix) * 2; // View + Proj
+	sbDesc.Usage = D3D11_USAGE_DEFAULT;
+	sbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	hr = DEVICE->CreateBuffer(&sbDesc, nullptr, m_pShadowCB.GetAddressOf());
+	if (FAILED(hr))
+	{
+		DX_CHECK(hr, _T("CreateShadowConstantBuffer Failed"));
+		assert(false);
+	}
 }
 
 void ShadowManager::Render()
@@ -114,19 +126,19 @@ void ShadowManager::UpdateCameraCB()
 	auto pCameraComponent = LIGHT->GetLight(0)->GetCameraComponent();;
 	pCameraComponent->SetFar(500.f);
 	pCameraComponent->SetNear(100.f);
-	m_CameraData.matShadowView = XMMatrixTranspose(pCameraComponent->GetView());
-	m_CameraData.matShadowProj = XMMatrixTranspose(pCameraComponent->GetProjection());
-	m_CameraData.matView = pCameraComponent->GetView();
-	m_CameraData.matProjection = pCameraComponent->GetProjection();
-	m_CameraData.g_vCameraPos = pCameraComponent->GetWorldPosition();
-	m_CameraData.GameTime = TIMER->GetGameTime();
 
-	DC->UpdateSubresource(m_pCameraCB.Get(), 0, nullptr, &m_CameraData, 0, 0);
-	DC->VSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
-	DC->PSSetConstantBuffers(1, 1, m_pCameraCB.GetAddressOf());
+	Matrix shadowView = XMMatrixTranspose(pCameraComponent->GetView());
+	Matrix shadowProj = XMMatrixTranspose(pCameraComponent->GetProjection());
+
+	m_tShadowCB.View = shadowView;
+	m_tShadowCB.Proj = shadowProj;
+
+	DC->UpdateSubresource(m_pShadowCB.Get(), 0, nullptr, &m_tShadowCB, 0, 0);
+	DC->VSSetConstantBuffers(12, 1, m_pShadowCB.GetAddressOf());
+	DC->PSSetConstantBuffers(12, 1, m_pShadowCB.GetAddressOf());
 }
 
 ID3D11ShaderResourceView* ShadowManager::GetSRV() const
 {
-	return m_pShadowTexture->GetSRV();
+	return m_pShadowTexture->GetDepthSRV();
 }
