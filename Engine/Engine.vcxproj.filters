@@ -714,9 +714,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
-    <None Include="..\Resources\Shader\PRHeader.hlsli">
-      <Filter>Shader</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\PRDefault.hlsl">

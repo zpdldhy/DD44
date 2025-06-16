@@ -90,7 +90,7 @@ void UMeshResources::UpdateInstanceList(vector<INSTANCE_VERTEX>& _InstanceList)
 
 	if (SUCCEEDED(DC->Map(m_pInstansBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 	{
-		memcpy(mappedResource.pData, m_vInstaceList.data(), sizeof(DirectX::XMMATRIX) * m_vInstaceList.size());
+		memcpy(mappedResource.pData, m_vInstaceList.data(), sizeof(INSTANCE_VERTEX) * m_vInstaceList.size());
 		DC->Unmap(m_pInstansBuffer.Get(), 0);
 	}
 }

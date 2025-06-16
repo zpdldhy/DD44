@@ -386,7 +386,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
-    <None Include="..\Resources\Shader\PRHeader.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\PRDefault.hlsl">
