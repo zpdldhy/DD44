@@ -131,7 +131,7 @@ void Game::Tick()
 
 void Game::Render()
 {
-	m_pSunLight->UpdateLightLookAt(m_pPlayer->GetPosition() + Vec3(100.f, 100.f, 100.f), m_pPlayer->GetPosition());
+
 }
 
 void Game::Destroy()
@@ -195,11 +195,14 @@ void Game::SetupSunLight()
 
 	m_pSunLight = make_shared<ALight>();
 	m_pSunLight->m_szName = L"SunLight";
-	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	m_pSunLight->GetLightComponent()->SetDirection({ -1.f, -1.f, -1.f });
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
 	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
 
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+	m_pSunLight->SetPosition(Vec3(100.f, 100.f, 100.f));
+
+	m_pSunLight->GetCameraComponent()->SetLookTo(Vec3(-1.f, -1.f, -1.f));
 
 	LIGHT->RegisterLight(m_pSunLight);
 }

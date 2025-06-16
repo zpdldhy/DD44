@@ -124,8 +124,9 @@ void ShadowManager::EndShadowPass()
 void ShadowManager::UpdateCameraCB()
 {
 	auto pCameraComponent = LIGHT->GetLight(0)->GetCameraComponent();;
-	pCameraComponent->SetFar(500.f);
-	pCameraComponent->SetNear(100.f);
+	pCameraComponent->SetNear(1.f);
+	pCameraComponent->SetFar(2000.f);
+//	pCameraComponent->SetOrthographic(200.f, 200.f);
 
 	Matrix shadowView = XMMatrixTranspose(pCameraComponent->GetView());
 	Matrix shadowProj = XMMatrixTranspose(pCameraComponent->GetProjection());

@@ -16,6 +16,7 @@ VS_OUT_RIM VS(VS_IN input)
     output.t = input.t;
 
     float4 shadowCoord = mul(mul(worldPos, g_matShadowView), g_matShadowProj);
+    shadowCoord.y = -shadowCoord.y;
     output.shadowCoord = shadowCoord;
     
     return output;
@@ -43,12 +44,14 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     float shadow = 1.0f;
     if (shadowTexCoord.x < 0 || shadowTexCoord.x > 1 || shadowTexCoord.y < 0 || shadowTexCoord.y > 1)
     {
-        shadow = 1.0f;
+        shadow = 0.0f;
     }
     else
     {
         shadow = g_txShadow.SampleCmpLevelZero(g_samShadow, shadowTexCoord.xy, shadowTexCoord.z - 0.001f);
+        shadow += 0.5f;
     }
+    
     
     float3 ambient = ApplyAmbient();
     float3 diffuse = ApplyLambertLighting(input.n, input.wPos);
