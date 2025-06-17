@@ -664,14 +664,6 @@ bool PrefabLoader::SaveParticle(const PrefabParticleData& data, const std::strin
 
     j["Type"] = static_cast<int>(data.Type);
 
-    if (data.Type == EParticleType::Fire)
-    {
-        j["Amplitude"] = { data.Amplitude.x, data.Amplitude.y, data.Amplitude.z };
-        j["RandomFreq"] = { data.RandomFreq.x, data.RandomFreq.y, data.RandomFreq.z };
-        j["RandomOffset"] = { data.RandomOffset.x, data.RandomOffset.y, data.RandomOffset.z };
-        j["TimeOffset"] = data.TimeOffset;
-    }
-
     std::ofstream file(filePath);
     if (!file.is_open())
         return false;
@@ -720,17 +712,6 @@ bool PrefabLoader::LoadParticle(PrefabParticleData& outData, const std::string& 
 
     outData.Type = static_cast<EParticleType>(j.value("Type", 0)); // ±âº» Default
 
-    if (outData.Type == EParticleType::Fire)
-    {
-        auto a = j["Amplitude"];
-        auto f = j["RandomFreq"];
-        auto o = j["RandomOffset"];
-        outData.Amplitude = Vec3(a[0], a[1], a[2]);
-        outData.RandomFreq = Vec3(f[0], f[1], f[2]);
-        outData.RandomOffset = Vec3(o[0], o[1], o[2]);
-        outData.TimeOffset = j["TimeOffset"];
-    }
-
     return true;
 }
 
@@ -766,14 +747,6 @@ bool PrefabLoader::SaveParticleGroup(const PrefabParticleGroupData& data, const 
 
         p["Type"] = static_cast<int>(particle.Type);
 
-        if (particle.Type == EParticleType::Fire)
-        {
-            p["Amplitude"] = { particle.Amplitude.x, particle.Amplitude.y, particle.Amplitude.z };
-            p["RandomFreq"] = { particle.RandomFreq.x, particle.RandomFreq.y, particle.RandomFreq.z };
-            p["RandomOffset"] = { particle.RandomOffset.x, particle.RandomOffset.y, particle.RandomOffset.z };
-            p["TimeOffset"] = particle.TimeOffset;
-        }
-
         j["Particles"].push_back(p);
     }
 
@@ -792,16 +765,16 @@ bool PrefabLoader::LoadParticleGroup(PrefabParticleGroupData& out, const std::st
     nlohmann::json j;
     file >> j;
 
-    out.GroupName = j.value("GroupName", "");
+    out.GroupName = j["GroupName"];//j.value("GroupName", "");
 
-    const auto& jParticles = j["Particles"];
-    for (const auto& p : jParticles)
+    auto& jParticles = j["Particles"];
+    for (auto& p : jParticles)
     {
         PrefabParticleData particle;
 
-        particle.Name = p.value("Name", "");
-        particle.ShaderPath = p.value("ShaderPath", "");
-        particle.TexturePath = p.value("TexturePath", "");
+        particle.Name = p["Name"];
+        particle.ShaderPath = p["ShaderPath"];
+        particle.TexturePath = p["TexturePath"];
 
         auto s = p["Scale"];
         particle.Scale = Vec3(s[0], s[1], s[2]);
@@ -812,34 +785,23 @@ bool PrefabLoader::LoadParticleGroup(PrefabParticleGroupData& out, const std::st
         auto t = p["Translation"];
         particle.Translation = Vec3(t[0], t[1], t[2]);
 
-        particle.Divisions = p.value("Divisions", 4);
-        particle.Row = p.value("Row", 0);
-        particle.Col = p.value("Col", 0);
+        particle.Divisions = p["Divisions"];
+        particle.Row = p["Row"];
+        particle.Col = p["Col"];
 
         auto uv0 = p["UVStart"];
         auto uv1 = p["UVEnd"];
         particle.UVStart = Vec2(uv0[0], uv0[1]);
         particle.UVEnd = Vec2(uv1[0], uv1[1]);
 
-        particle.BillboardSizeX = p.value("BillboardSizeX", 100.0f);
-        particle.BillboardSizeY = p.value("BillboardSizeY", 100.0f);
+        particle.BillboardSizeX = p["BillboardSizeX"];
+        particle.BillboardSizeY = p["BillboardSizeY"];
 
-        particle.Duration = p.value("Duration", 1.0f);
-        particle.bLoop = p.value("bLoop", true);
-        particle.bAutoDestroy = p.value("bAutoDestroy", false);
+        particle.Duration = p["Duration"];
+        particle.bLoop = p["bLoop"];
+        particle.bAutoDestroy = p["bAutoDestroy"];
 
-        particle.Type = static_cast<EParticleType>(p.value("Type", 0));
-
-        if (particle.Type == EParticleType::Fire)
-        {
-            auto a = p["Amplitude"];
-            auto f = p["RandomFreq"];
-            auto o = p["RandomOffset"];
-            particle.Amplitude = Vec3(a[0], a[1], a[2]);
-            particle.RandomFreq = Vec3(f[0], f[1], f[2]);
-            particle.RandomOffset = Vec3(o[0], o[1], o[2]);
-            particle.TimeOffset = p["TimeOffset"];
-        }
+        particle.Type = static_cast<EParticleType>(p["Type"]);
 
         out.Particles.push_back(particle);
     }

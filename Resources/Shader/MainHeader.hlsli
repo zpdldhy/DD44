@@ -54,12 +54,30 @@ cbuffer CB_MaterialEffect : register(b2)
  
 };
 
+cbuffer CB_RenderMode : register(b7)
+{
+    int g_iRenderMode;
+    float3 padding_rendermode;
+};
+
 struct VS_IN
 {
     float3 p : POSITION;
-    float4 c : COLOR;
     float3 n : NORMAL;
+    float4 c : COLOR;
     float2 t : TEXCOORD;
+};
+
+struct VS_INSTANCE_IN
+{
+    float3 p : POSITION;
+    float3 n : NORMAL;
+    float4 c : COLOR;
+    float2 t : TEXCOORD;
+    
+    row_major float4x4 matWorld : TRANSFORM;
+    float4 color : INSTANCE_COLOR;
+    float4 uv : INSTANCE_UV;
 };
 
 struct VS_OUT
@@ -83,8 +101,6 @@ struct PS_OUT
 };
 
 Texture2D g_txDiffuseA : register(t0);
-Texture2D g_txCrack : register(t1);
-Texture2D g_txNoise : register(t2);
 SamplerState sample : register(s0);
 
 ///funtion

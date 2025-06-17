@@ -323,6 +323,7 @@
     <None Include="..\Resources\Prefab\Stage_0.objects.json" />
     <None Include="..\Resources\Shader\Header.hlsli" />
     <None Include="..\Resources\Shader\MainHeader.hlsli" />
+    <None Include="..\Resources\Shader\SkinningHeader.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -352,5 +352,8 @@
     <None Include="..\Resources\Prefab\Stage_0.objects.json">
       <Filter>Prefab\data</Filter>
     </None>
+    <None Include="..\Resources\Shader\SkinningHeader.hlsli">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

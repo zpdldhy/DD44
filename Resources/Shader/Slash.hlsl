@@ -1,5 +1,11 @@
 #include "Header.hlsli"
 
+cbuffer CB_Slash : register(b10)
+{
+    float g_fProgress;
+    float3 padding_slash;
+}
+
 VS_OUT VS(VS_IN input)
 {
     VS_OUT output;
@@ -15,8 +21,6 @@ VS_OUT VS(VS_IN input)
 
     return output;
 }
-
-
 
 float4 PS(VS_OUT input) : SV_Target
 {

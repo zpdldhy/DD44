@@ -1,4 +1,31 @@
-#include "PRHeader.hlsli"
+#include "MainHeader.hlsli"
+
+struct PS_PROCESS_OUT
+{
+    float4 c : SV_Target;
+};
+
+cbuffer CB_Debug : register(b3)
+{
+    int g_iDebugMode;
+    float3 padding_Debug;
+}
+
+cbuffer CB_Blur : register(b11)
+{
+    float2 g_vTexelSize; // (1 / 화면 너비, 1 / 화면 높이)
+    float2 g_vDirection; // (1, 0): 가로 블러 / (0, 1): 세로 블러
+    float g_fBlurScale;
+    float3 padding_blur;
+};
+
+Texture2D g_txBlur : register(t1); // Blur
+Texture2D g_txMask : register(t2); // Mask
+Texture2D g_txBloom : register(t3); // Bloom
+Texture2D g_txLight : register(t4); // Light
+Texture2D g_txNormal : register(t5); // Normal
+Texture2D g_txDepth : register(t6); // Depth
+Texture2D g_txTemp : register(t7); // Temp
 
 VS_OUT VS(VS_IN input)
 {
@@ -17,14 +44,13 @@ VS_OUT VS(VS_IN input)
     return output;
 }
 
-PS_OUT PS(VS_OUT input)
-{
-     
-    PS_OUT psOut = (PS_OUT) 0;
+PS_PROCESS_OUT PS(VS_OUT input)
+{     
+    PS_PROCESS_OUT psOut = (PS_PROCESS_OUT) 0;
     
     float2 uv = input.t;
     
-    float4 original = g_txDefault.Sample(sample, input.t);
+    float4 original = g_txDiffuseA.Sample(sample, input.t);
     float blurMask = g_txMask.Sample(sample, input.t).r;
     float bloomMask = g_txMask.Sample(sample, input.t).g;
     float4 bloom = g_txBloom.Sample(sample, input.t);
