@@ -84,7 +84,7 @@ void PlayerWalkState::End()
 	m_fDustTimer = 0.0f;
 }
 
-PlayerAttackState::PlayerAttackState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_LATTACK)
+PlayerAttackState::PlayerAttackState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_ATTACK)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -104,6 +104,13 @@ void PlayerAttackState::Enter()
 	int attackIndex = animInstance->GetAnimIndex(L"Slash_Light_R_new");
 	animInstance->m_fAnimPlayRate = 30.0f;
 	animInstance->PlayOnce(attackIndex);
+
+	// Sword
+	auto back = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"BackSword");
+	back->SetVisible(false);
+	auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftSword");
+	left->SetVisible(true);
+
 
 	// FX ¼¼ÆÃ
 	m_pSlashMaterial = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->GetMaterial();
@@ -142,6 +149,13 @@ void PlayerAttackState::Tick()
 		Move();
 		nextAnim = animInstance->GetAnimIndex(L"Slash_Light_L_new");
 		animInstance->PlayOnce(nextAnim);
+
+		// Sword
+		auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftSword");
+		left->SetVisible(false);
+		auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightSword");
+		right->SetVisible(true);
+
 		currentPhase = OnSecond;
 		m_bOnCombo = false;
 	}
@@ -156,6 +170,13 @@ void PlayerAttackState::Tick()
 		Move();
 		nextAnim = animInstance->GetAnimIndex(L"Slash_Light_R_new");
 		animInstance->PlayOnce(nextAnim);
+		
+		// Sword
+		auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftSword");
+		left->SetVisible(true);
+		auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightSword");
+		right->SetVisible(false);
+		
 		currentPhase = OnThird;
 		m_bOnCombo = false;
 	}
@@ -184,6 +205,16 @@ void PlayerAttackState::End()
 
 	currentPhase = AttackCombo::OnFirst;
 	reverse = false;
+
+	// Sword
+	auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftSword");
+	left->SetVisible(false);
+	auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightSword");
+	right->SetVisible(false);
+	auto back = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"BackSword");
+	back->SetVisible(true);
+	
+
 }
 
 void PlayerAttackState::CheckMouse()

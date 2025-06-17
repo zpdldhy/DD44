@@ -9,8 +9,7 @@ enum PLAYER_STATE
 	PLAYER_S_WALK,
 	PLAYER_S_CLIMB,
 	PLAYER_S_ROLL,
-	PLAYER_S_LATTACK,
-	PLAYER_S_RATTACK,
+	PLAYER_S_ATTACK,
 	PLAYER_S_SHOOT,
 	PLAYER_S_HIT,
 	PLAYER_S_DEATH,
@@ -72,9 +71,7 @@ private:
 
 	enum AttackCombo { OnFirst = 0, OnSecond, OnThird, Done};
 	AttackCombo currentPhase = OnFirst;
-
 	bool m_bOnCombo = false;
-
 	Vec3 dir;
 
 	// FX

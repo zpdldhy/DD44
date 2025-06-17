@@ -34,13 +34,13 @@ void PrefabToActor::Init()
 	MakeLoader();
 }
 
-vector<shared_ptr<class AActor>> PrefabToActor::LoadAllPrefabs(const std::string& extension)
+vector<shared_ptr<class AActor>> PrefabToActor::LoadAllPrefabs(const std::string& extension, const std::string& directiry)
 {
 	//MakeLoader();
 
 	vector<shared_ptr<class AActor>> m_vActorList;
 
-	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
+	auto files = PREFAB->GetPrefabFileList(directiry, extension);
 
 	for (const auto& file : files)
 	{

@@ -44,7 +44,8 @@ public:
 	float m_fDeadUIPopTime = 1.f;
 
 	// TEMP
-	vector<shared_ptr<AActor>> enemyList; 
+	vector<shared_ptr<AActor>> enemyList1;
+	vector<shared_ptr<AActor>> enemyList2;
 	vector<shared_ptr<AActor>> m_vObjectList;
 	vector<shared_ptr<AActor>> m_vMapList;
 
@@ -65,7 +66,7 @@ protected:
 	void UpdateCursor();
 
 protected:
-	void SetEnemy();
+	void SetEnemy(vector<shared_ptr<AActor>>& _enemyList);
 	void CheckEnemyCollision();
 
 public:

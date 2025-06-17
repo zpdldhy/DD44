@@ -44,13 +44,6 @@ void PlayerMoveScript::Init()
 	currentState->Enter();
 	currentStateId = PLAYER_S_IDLE;
 
-	auto body = dynamic_pointer_cast<UMeshComponent>(GetOwner()->GetMeshComponent());
-
-	/*m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetChildByName(L"Slash")->GetMaterial();*/
-
-	//body->GetChildByName(L"Body");
-	backSword = body->GetChildByName(L"Sword");
-	handSword = body->GetChildByName(L"Sword2");
 	// SetPhysics
 	auto pPhysics = GetOwner()->GetPhysicsComponent();
 	pPhysics->SetWeight(1.f);
@@ -122,13 +115,10 @@ void PlayerMoveScript::Tick()
 		CheckMove();
 		CheckAttack();
 		break;
-	case PLAYER_S_LATTACK:
+	case PLAYER_S_ATTACK:
 		CheckComboAttack();
 		if (currentStateEnd)
 		{
-			handSword.lock()->SetVisible(false);
-			backSword.lock()->SetVisible(true);
-
 			attackRangeActor->m_bCollision = false;
 			attackRangeActor->GetShapeComponent()->m_bVisible = false;
 			ChangeState(idle);
@@ -315,37 +305,6 @@ void PlayerMoveScript::PlayFX()
 		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
 }
-//
-//void PlayerMoveScript::Slash()
-//{
-//	if (m_bSlashPlaying)
-//	{
-//		m_fSlashTime += TIMER->GetDeltaTime();
-//
-//		float t = m_fSlashTime;
-//		float progress = 0.0f;
-//
-//
-//		if (t <= 0.3f)
-//		{
-//			float ratio = t / 0.3f;
-//			progress = pow(ratio, 2.0f);
-//		}
-//		else
-//		{
-//			progress = -1.0f;
-//		}
-//
-//		if (m_pSlashMaterial)
-//			m_pSlashMaterial->SetSlashProgress(progress);
-//
-//		if (t >= m_fSlashDuration)
-//		{
-//			m_bSlashPlaying = false;
-//		}
-//	}
-//
-//}
 
 void PlayerMoveScript::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)
 {
@@ -590,13 +549,13 @@ void PlayerMoveScript::CheckAttack()
 	// ATTACK
 	if (INPUT->GetButton(LCLICK))
 	{
-		if (currentState->GetId() != PLAYER_S_LATTACK)
+		if (currentState->GetId() != PLAYER_S_ATTACK)
 		{
 			ChangeState(attack);
 
 			UpdateCollider();
-			handSword.lock()->SetVisible(true);
-			backSword.lock()->SetVisible(false);
+			//leftHandSword.lock()->SetVisible(true);
+			//backSword.lock()->SetVisible(false);
 			//m_bSlashPlaying = true;
 			//m_fSlashTime = 0.0f;
 

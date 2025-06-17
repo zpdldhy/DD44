@@ -28,6 +28,7 @@ public:
 	// Attack
 	shared_ptr<AActor> attackRangeActor;
 	shared_ptr<AActor> bow;
+	shared_ptr<AActor> sword;
 	Vec3 colOffset;
 
 	Vec3 m_vLook;
@@ -38,10 +39,6 @@ public:
 
 	shared_ptr<Texture> m_pSubTexture;
 	shared_ptr<Texture> m_pNoiesTexture;
-
-	// Child Mesh Components
-	weak_ptr<UMeshComponent> backSword;
-	weak_ptr<UMeshComponent> handSword;
 
 	shared_ptr<StateBase> idle;
 	shared_ptr<StateBase> walk;
