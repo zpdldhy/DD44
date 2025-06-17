@@ -222,7 +222,8 @@ void PlayerAttackState::End()
 	auto back = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"BackSword");
 	back->SetVisible(true);
 	
-
+	// 
+	m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(false);
 }
 
 void PlayerAttackState::CheckMouse()
