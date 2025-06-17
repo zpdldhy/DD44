@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "TCharacter.h"
 #include "UScriptComponent.h"
+#include "ProjectileManager.h"
 
 void TCharacter::Tick()
 {
@@ -36,5 +37,13 @@ void TCharacter::TakeDamage(int _damage)
 	if (hp <= 0)
 	{
 		bDead = true;
+	}
+}
+
+void TCharacter::CheckHitByProjectile(int type, bool _hit)
+{
+	if (type == (int)ProjectileType::MagicBall)
+	{
+		bHitByProjectile = _hit;
 	}
 }
