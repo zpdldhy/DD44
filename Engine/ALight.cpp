@@ -17,7 +17,7 @@ ALight::ALight()
 
     // CameraComponent 생성
     // Shadow를 만들 때 Texture를 찍기 위함
-    auto pCamera = make_shared<UCameraComponent>();
+    auto pCamera = make_shared<UCameraComponent>(ProjectionType::PT_ORTHOGRAPHIC);
     SetCameraComponent(pCamera);
 
     auto mesh = UStaticMeshComponent::CreateSphere(10, 10);

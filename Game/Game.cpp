@@ -205,9 +205,10 @@ void Game::SetupSunLight()
 
 	Vec3 dir = Vec3(-1.f, -1.f, -1.f);
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-	m_pSunLight->SetPosition(dir * -260.f);
+	m_pSunLight->SetPosition(dir * -300.f);
 	dir.Normalize();
 	m_pSunLight->GetCameraComponent()->SetLookTo(dir);
+	m_pSunLight->m_bCastShadow = false;
 
 	LIGHT->RegisterLight(m_pSunLight);
 }
