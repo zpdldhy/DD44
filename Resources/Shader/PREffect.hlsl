@@ -49,7 +49,6 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     else
     {
         shadow = g_txShadow.SampleCmpLevelZero(g_samShadow, shadowTexCoord.xy, shadowTexCoord.z - 0.001f);
-        //shadow += 0.5f;
     }
     
     

@@ -205,7 +205,7 @@ void Game::SetupSunLight()
 
 	Vec3 dir = Vec3(-1.f, -1.f, -1.f);
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-	m_pSunLight->SetPosition(dir * -300.f);
+	m_pSunLight->SetPosition(dir * -260.f);
 	dir.Normalize();
 	m_pSunLight->GetCameraComponent()->SetLookTo(dir);
 
