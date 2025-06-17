@@ -136,3 +136,59 @@ void USceneComponent::UpdateWorldMatrix()
 	m_vWorldRight.Normalize();
 	m_vWorldUp.Normalize();
 }
+
+void USceneComponent::UpdateWordlMatrixwithoutRotation()
+{
+	// Set World
+// No Parent(Transform)
+	if (m_pParentTransform == nullptr)
+	{
+		m_matWorld = m_matLocal * m_matAnim;
+	}
+	// Actor - Actor && Actor - Component
+	else
+	{
+		// Parent의 SRT가 바뀐게 있으면 여기로 들어온다.
+		m_matParent = m_pParentTransform->GetWorld();
+		m_matWorld = m_matLocal * m_matAnim * m_matParent;
+	}
+
+	Quaternion qRot;
+	bool success = m_matWorld.Decompose(m_vWorldScale, qRot, m_vWorldPosition);
+
+	if (success)
+	{
+		// Quaternion → Euler로 변환 (선택)
+		m_vWorldRotation = Vec3(0, 0, 0); // 이 함수는 직접 구현하거나 XMQuaternionToEulerAngles 등 사용
+	}
+
+	m_matWorldScale = Matrix::CreateScale(m_vWorldScale);
+
+	m_matWorldTranslation = Matrix::CreateTranslation(m_vWorldPosition);
+
+	m_matWorld = m_matWorldScale * m_matWorldTranslation;
+
+	m_vWorldLook = Vec3(m_matWorld._31, m_matWorld._32, m_matWorld._33);
+	m_vWorldRight = Vec3(m_matWorld._11, m_matWorld._12, m_matWorld._13);
+	m_vWorldUp = Vec3(m_matWorld._21, m_matWorld._22, m_matWorld._23);
+
+	m_vWorldLook.Normalize();
+	m_vWorldRight.Normalize();
+	m_vWorldUp.Normalize();
+}
+
+Matrix USceneComponent::GetWorldMatrixWithoutRotation() const
+{
+	return Matrix::CreateScale(m_vWorldScale) * Matrix::CreateTranslation(m_vWorldPosition);
+}
+
+void USceneComponent::RenderForShadow()
+{
+	if (m_pWorldCB)
+	{
+		m_cbData.matWorld = GetWorldMatrixWithoutRotation();
+
+		DC->UpdateSubresource(m_pWorldCB.Get(), 0, NULL, &m_cbData, 0, 0);
+		DC->VSSetConstantBuffers(0, 1, m_pWorldCB.GetAddressOf());
+	}
+}

@@ -64,14 +64,25 @@ void ShadowManager::Init()
 		DX_CHECK(hr, _T("CreateShadowConstantBuffer Failed"));
 		assert(false);
 	}
+
+	{
+		D3D11_BUFFER_DESC bd = {};
+		bd.ByteWidth = sizeof(Matrix); // 단일 행렬
+		bd.Usage = D3D11_USAGE_DEFAULT;
+		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+		HRESULT hr = DEVICE->CreateBuffer(&bd, nullptr, m_pCBShadowWorld.GetAddressOf());
+		if (FAILED(hr))
+		{
+			DX_CHECK(hr, _T("CreateShadowWorldBuffer Failed"));
+		}
+	}
 }
 
 void ShadowManager::Render()
 {
 	BeginShadowPass();
 	UpdateCameraCB();
-
-
 
 	OBJECT->RenderShadow();
 
@@ -126,13 +137,14 @@ void ShadowManager::UpdateCameraCB()
 	auto pCameraComponent = LIGHT->GetLight(0)->GetCameraComponent();;
 	pCameraComponent->SetNear(1.f);
 	pCameraComponent->SetFar(2000.f);
-//	pCameraComponent->SetOrthographic(200.f, 200.f);
+	//pCameraComponent->SetOrthographic(200.f, 200.f);
 
 	Matrix shadowView = XMMatrixTranspose(pCameraComponent->GetView());
 	Matrix shadowProj = XMMatrixTranspose(pCameraComponent->GetProjection());
 
 	m_tShadowCB.View = shadowView;
 	m_tShadowCB.Proj = shadowProj;
+
 
 	DC->UpdateSubresource(m_pShadowCB.Get(), 0, nullptr, &m_tShadowCB, 0, 0);
 	DC->VSSetConstantBuffers(12, 1, m_pShadowCB.GetAddressOf());

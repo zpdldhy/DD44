@@ -3,6 +3,7 @@
 #include "Device.h"
 #include "UScriptComponent.h"
 #include "ObjectManager.h"
+#include "ShadowManager.h"
 
 AActor::AActor()
 {
@@ -79,6 +80,12 @@ void AActor::RenderShadow()
 {
 	if (!m_bRender || !m_bCastShadow)
 		return;
+
+	Matrix matNoRot = m_pTransform->GetWorldMatrixWithoutRotation();
+	matNoRot = XMMatrixTranspose(matNoRot);
+
+	DC->UpdateSubresource(SHADOW->m_pCBShadowWorld.Get(), 0, nullptr, &matNoRot, 0, 0);
+	DC->VSSetConstantBuffers(13, 1, SHADOW->m_pCBShadowWorld.GetAddressOf());
 
 	auto meshComponent = GetMeshComponent();
 	if (meshComponent)

@@ -77,6 +77,10 @@ cbuffer CB_Shadow : register(b12)
     matrix g_matShadowProj;
 };
 
+cbuffer CB_ShadowG : register(b13)
+{
+    matrix g_matShadowWorld;
+}
 
 
 struct PNCTIW_IN

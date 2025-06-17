@@ -123,7 +123,7 @@ public:
 	void SetCastShadow(bool b) { m_bCastShadow = b; }
 	bool IsCastShadow() const { return m_bCastShadow; }
 
-private:
+public:
 	bool m_bCastShadow = true;
 
 };

@@ -51,6 +51,10 @@ void Game::Init()
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
 	//m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
+	for (auto map : m_vMapList)
+	{
+		map->m_bCastShadow = false;
+	}
 
 	OBJECT->AddActorList(m_vMapList);
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
@@ -199,10 +203,11 @@ void Game::SetupSunLight()
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
 	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
 
+	Vec3 dir = Vec3(-1.f, -1.f, -1.f);
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-	m_pSunLight->SetPosition(Vec3(100.f, 100.f, 100.f));
-
-	m_pSunLight->GetCameraComponent()->SetLookTo(Vec3(-1.f, -1.f, -1.f));
+	m_pSunLight->SetPosition(dir * -300.f);
+	dir.Normalize();
+	m_pSunLight->GetCameraComponent()->SetLookTo(dir);
 
 	LIGHT->RegisterLight(m_pSunLight);
 }
