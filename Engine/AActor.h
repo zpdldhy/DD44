@@ -26,6 +26,7 @@ enum class ActorType
 	AT_GROUND,
 	AT_STAIR,
 	AT_PROJECTILE,
+	AT_INTERACTABLE,
 	AT_COUNT,
 };
 

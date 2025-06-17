@@ -419,7 +419,7 @@ void FbxLoader::ParseAnimation()
 
 	// ONLY FOR crow_final ( 애니메이션 많음. 추려서 파싱 ) 
 	{
-		//vector<int> targetAnimList = { 50, 29, 5, 44, 45, 46, 47, 0, 15, 23, 25};
+		//vector<int> targetAnimList = { 50, 29, 5, 44, 45, 46, 47, 0, 15, 23, 25, 6, 7, 8};
 		//int size = targetAnimList.size();
 		//if (m_result.m_iAnimTrackCount > 50)
 		//{

@@ -15,3 +15,13 @@ void TPlayer::DecArrowCount(int _count)
 	// ÃÖ¼Ú°ª 0
 	arrowCount = arrowCount <= 0 ? 0 : arrowCount;
 }
+
+void TPlayer::StartClimbing()
+{
+	isClimbing = true;
+}
+
+void TPlayer::StopClimbing()
+{
+	isClimbing = false;
+}

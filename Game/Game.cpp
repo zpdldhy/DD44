@@ -37,6 +37,7 @@
 // Game
 #include "ProjectileManager.h"
 #include "EnemyCollisionManager.h"
+#include "EventManager.h"
 
 // TEMP
 #include "BatMovement.h"
@@ -53,21 +54,27 @@ void Game::Init()
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 
 	OBJECT->AddActorList(m_vMapList);
-	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
 	OBJECT->AddActor(m_pPlayer);
-	//m_pPlayer->SetPosition(Vec3(0.0f, 0.0f, 0.0f));
-	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
-	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	vlist.emplace_back(m_pBetty);	
-	enemyList = vlist;
-	SetEnemy();
-	OBJECT->AddActorList(vlist);
 
+	auto objectList = PToA->LoadAllPrefabs(".character.json");
+	OBJECT->AddActorList(objectList);
+	for (auto interactable : objectList)
+	{
+		m_vObjectList.push_back(interactable);
+	}
+
+	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
+	
+	enemyList1 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
+	enemyList1.emplace_back(m_pBetty);
+	SetEnemy(enemyList1);
+	OBJECT->AddActorList(enemyList1);
+	
 	PROJECTILE->Init();
 
 	CreateUI();
@@ -86,6 +93,12 @@ void Game::Init()
 
 void Game::Tick()
 {
+	if (INPUT->GetButton(G))
+	{
+		EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder");
+		EVENT->TriggerEvent(EventType::EVENT_FENCE, L"Fence1");
+	}
+
 	UpdateCursor();
 
 	if (INPUT->GetButton(GameKey::ESC))
@@ -147,7 +160,7 @@ void Game::Destroy()
 	m_vUpgradeState.clear();
 	m_vCoins.clear();
 
-	enemyList.clear();
+	enemyList1.clear();
 	m_vObjectList.clear();
 	m_vMapList.clear();
 }
@@ -519,9 +532,9 @@ void Game::UpdateCursor()
 	m_pCursor->SetRotation(Vec3(DD_PI / 2.f, angle, 0.f));
 }
 
-void Game::SetEnemy()
+void Game::SetEnemy(vector<shared_ptr<AActor>>& _enemyList)
 {
-	for (auto& enemy : enemyList)
+	for (auto& enemy : _enemyList)
 	{
 		auto e = dynamic_pointer_cast<TEnemy>(enemy);
 		if (e)
@@ -554,13 +567,14 @@ void Game::CheckEnemyCollision()
 		iter++;
 	}
 
+	// 이걸 또 영역 별로 넣어야하네 
 	if (melee)
 	{
-		for (auto iter = enemyList.begin(); iter != enemyList.end();)
+		for (auto iter = enemyList1.begin(); iter != enemyList1.end();)
 		{
 			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 			{
-				iter = enemyList.erase(iter);
+				iter = enemyList1.erase(iter);
 				continue;
 			}
 			COLLITION->CheckCollision(*iter, melee);
@@ -568,11 +582,11 @@ void Game::CheckEnemyCollision()
 		}
 	}
 
-	for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	for (auto iter = enemyList1.begin(); iter != enemyList1.end();)
 	{
 		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 		{
-			iter = enemyList.erase(iter);
+			iter = enemyList1.erase(iter);
 			continue;
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
@@ -618,11 +632,11 @@ void Game::CheckEnemyCollision()
 			iter++;
 		}
 
-		for (auto iter = enemyList.begin(); iter != enemyList.end();)
+		for (auto iter = enemyList1.begin(); iter != enemyList1.end();)
 		{
 			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 			{
-				iter = enemyList.erase(iter);
+				iter = enemyList1.erase(iter);
 				continue;
 			}
 			COLLITION->CheckCollision(*proj, *iter);

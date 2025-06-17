@@ -8,7 +8,7 @@
 void TEnemy::Tick()
 {
 	TCharacter::Tick();
-	
+
 	// FX
 	Flashing();
 	ApplyCrash();
@@ -33,7 +33,8 @@ bool TEnemy::CheckHit()
 			}
 		}
 
-		if (isCol || IsHitByProjectile())
+		bool isHitByP = IsHitByProjectile();
+		if (isCol || isHitByP)
 		{
 			hitElapsed = 0.0f;
 			// FX
@@ -48,7 +49,10 @@ bool TEnemy::CheckHit()
 			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 			// HP
 			TakeDamage(1);
-			dynamic_pointer_cast<TPlayer>(player.lock())->IncArrowCount();
+			if (!isHitByP)
+			{
+				dynamic_pointer_cast<TPlayer>(player.lock())->IncArrowCount();
+			}
 
 			return true;
 		}
