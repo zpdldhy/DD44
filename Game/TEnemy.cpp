@@ -4,6 +4,7 @@
 #include "Timer.h"
 #include "ObjectManager.h"
 #include "EffectManager.h"
+#include "ProjectileManager.h"
 
 void TEnemy::Tick()
 {
@@ -58,6 +59,14 @@ bool TEnemy::CheckHit()
 		}
 	}
 	return false;
+}
+
+void TEnemy::CheckHitByProjectile(int type, bool _hit)
+{
+	if (type == (int)ProjectileType::PlayerArrow)
+	{
+		bHitByProjectile = _hit;
+	}
 }
 
 void TEnemy::Flashing()

@@ -20,6 +20,7 @@ public:
 	const weak_ptr<AActor>& GetPlayer() { return player; }
 
 	bool CheckHit();
+	virtual void CheckHitByProjectile(int type, bool _hit);
 public:
 	//FX
 	void Flashing();
