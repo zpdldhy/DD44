@@ -54,7 +54,7 @@ void Game::Init()
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 
 	OBJECT->AddActorList(m_vMapList);
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
@@ -62,15 +62,17 @@ void Game::Init()
 	m_pPlayer->SetUseStencil(true);
 	OBJECT->AddActor(m_pPlayer);
 	//m_pPlayer->SetPosition(Vec3(0.0f, 0.0f, 0.0f));
+	auto objectList = PToA->LoadAllPrefabs(".character.json");
+
+	//m_vObjectList.push_back(objectList);
+	OBJECT->AddActorList(objectList);
+
 	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
 	enemyList1 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
-	enemyList2 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage02/");
-	enemyList2.emplace_back(m_pBetty);
+	enemyList1.emplace_back(m_pBetty);
 	
 	SetEnemy(enemyList1);
-	SetEnemy(enemyList2);
 	OBJECT->AddActorList(enemyList1);
-	OBJECT->AddActorList(enemyList2);
 
 	PROJECTILE->Init();
 

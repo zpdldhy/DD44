@@ -97,22 +97,24 @@ void PlayerMoveScript::Tick()
 	// 모든 state 공통
 	PlayFX();
 	CheckCoolTIme();
-	CheckClimb();
-	CheckRoll();
 	CheckCollision();
 
 	currentState->Tick();
 	bool currentStateEnd = !currentState->IsPlaying();
-	
+
 	// state별 추가 처리
 	switch (currentStateId)
 	{
 	case PLAYER_S_IDLE:
+		CheckRoll();
 		CheckMove();
+		CheckClimb();
 		CheckAttack();
 		break;
 	case PLAYER_S_WALK:
+		CheckRoll();
 		CheckMove();
+		CheckClimb();
 		CheckAttack();
 		break;
 	case PLAYER_S_ATTACK:
@@ -202,7 +204,18 @@ void PlayerMoveScript::ChangeState(shared_ptr<StateBase> _state)
 		return;
 	}
 
-	if (!currentState->IsInterruptible() && currentState->IsPlaying())
+	if (_state->GetId() == PLAYER_S_HIT)
+	{
+		if (currentStateId == PLAYER_S_ROLL)
+		{
+			m_bCanRoll = true;
+		}
+		else if (currentStateId == PLAYER_S_SHOOT)
+		{
+			bow->m_bRender = false;
+		}
+	}
+	else if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
 		return;
 	}
@@ -590,7 +603,7 @@ void PlayerMoveScript::CheckComboAttack()
 	}
 
 	// state로 정보 넘기고 
-	
+
 
 }
 

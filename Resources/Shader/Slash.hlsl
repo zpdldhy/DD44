@@ -3,7 +3,8 @@
 cbuffer CB_Slash : register(b10)
 {
     float g_fProgress;
-    float3 padding_slash;
+    bool reverse;
+    float2 padding_slash;
 }
 
 VS_OUT VS(VS_IN input)

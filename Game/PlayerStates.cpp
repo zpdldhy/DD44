@@ -87,7 +87,7 @@ void PlayerWalkState::End()
 PlayerAttackState::PlayerAttackState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_ATTACK)
 {
 	m_pOwner = _pOwner;
-	m_bCanInterrupt = false;
+	m_bCanInterrupt = true;
 }
 void PlayerAttackState::Enter()
 {
@@ -111,6 +111,8 @@ void PlayerAttackState::Enter()
 	auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftSword");
 	left->SetVisible(true);
 
+	// Slash
+	m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(true);
 
 	// FX 세팅
 	m_pSlashMaterial = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->GetMaterial();
@@ -156,6 +158,9 @@ void PlayerAttackState::Tick()
 		auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightSword");
 		right->SetVisible(true);
 
+		//
+		m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(true);
+
 		currentPhase = OnSecond;
 		m_bOnCombo = false;
 	}
@@ -176,6 +181,9 @@ void PlayerAttackState::Tick()
 		left->SetVisible(true);
 		auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightSword");
 		right->SetVisible(false);
+
+		//
+		m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(true);
 		
 		currentPhase = OnThird;
 		m_bOnCombo = false;
@@ -269,6 +277,8 @@ void PlayerAttackState::Slash()
 		if (t >= m_fSlashDuration)
 		{
 			m_bSlashPlaying = false;
+			m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(false);
+
 		}
 	}
 }
@@ -566,10 +576,6 @@ PlayerShoot::PlayerShoot(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_SHOOT)
 	// AnimSetting
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Arrow");
-
-	// 공격 가능 여부에 따라 다른 이벤트 추가
-	// Anim에 key 넣는 거 좀 생각을 더 해봐야할 듯 Enter가 계속 들어오자나 
-	// 그리고 계속 있고. 
 	animInstance->AddEvent(index, 22, [this]() {
 		this->CanShoot();
 		});

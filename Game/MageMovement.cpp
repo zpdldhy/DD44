@@ -24,8 +24,6 @@ void MageMovement::Init()
 
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(6);
-
-
 }
 
 void MageMovement::Tick()
@@ -175,39 +173,5 @@ void MageMovement::CheckHit()
 	if (comp->IsDead())
 	{
 		ChangeState(death);
-	}
-}
-
-void MageMovement::Flashing()
-{
-	if (m_bIsFlashing)
-	{
-		m_fHitFlashTimer -= TIMER->GetDeltaTime();
-		if (m_fHitFlashTimer <= 0.0f)
-		{
-			m_fHitFlashTimer = 0.0f;
-			m_bIsFlashing = false;
-		}
-
-		// hitFlashAmount는 1 → 0 으로 감소
-		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
-
-		auto root = GetOwner()->GetMeshComponent();
-		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
-	}
-}
-void MageMovement::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value)
-{
-	if (!comp) return;
-
-	shared_ptr<UMaterial> mat = comp->GetMaterial();
-	if (mat)
-	{
-		mat->SetHitFlashTime(value); // CB에 g_fHitFlashTime 전달
-	}
-
-	for (int i = 0; i < comp->GetChildCount(); ++i)
-	{
-		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
 	}
 }
