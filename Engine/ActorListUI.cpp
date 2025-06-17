@@ -708,7 +708,9 @@ void ActorListUI::SaveAllObjectsInScene(const std::string& fileName)
 	for (const auto& pair : OBJECT->GetActorList())
 	{
 		auto actor = pair.second;
-		if (!actor || actor->m_szName != L"Object") continue;
+		if (!actor || actor->m_szName != L"Object")
+			//|| actor->GetPosition().x < 0.0f || actor->GetPosition().z > 0.0f)
+			continue;
 
 		PrefabObjectData data;
 		data.Name = to_wm(actor->m_szName);

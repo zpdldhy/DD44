@@ -21,6 +21,22 @@ VS_OUT_RIM VS(VS_IN input)
     return output;
 }
 
+VS_OUT_RIM VS_INSTANCE(VS_INSTANCE_IN input)
+{
+    VS_OUT_RIM output = (VS_OUT_RIM) 0;
+
+    float4 worldPos = mul(float4(input.p, 1.0f), input.matWorld);
+    output.wPos = worldPos.xyz;
+    
+    float3x3 worldMat3 = (float3x3) input.matWorld;
+    output.n = normalize(mul(input.n, worldMat3));
+    output.p = mul(mul(worldPos, g_matView), g_matProj);
+    output.c = input.c;
+    output.t = input.t;
+
+    return output;
+}
+
 PS_OUT PS(VS_OUT_RIM input) : SV_Target
 {
     PS_OUT output = (PS_OUT) 0;

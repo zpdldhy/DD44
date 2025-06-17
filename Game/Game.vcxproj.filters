@@ -296,6 +296,9 @@
     <FxCompile Include="..\Resources\Shader\Wind.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\Resources\Shader\Weapon.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
     <FxCompile Include="..\Resources\Shader\Shadow.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
@@ -315,6 +318,9 @@
     </None>
     <None Include="..\Resources\Prefab\Stage_0.objects.json">
       <Filter>Prefab\data</Filter>
+    </None>
+    <None Include="..\Resources\Shader\SkinningHeader.hlsli">
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
 </Project>

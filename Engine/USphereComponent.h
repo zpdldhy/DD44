@@ -6,8 +6,6 @@ class USphereComponent : public UShapeComponent
 protected:
 	// 실제 연산
 	Sphere m_Sphere;
-	Ray m_LookRay;
-	Ray m_GroundRay;
 
 public:
 	USphereComponent() { m_ShapeType = ShapeType::ST_SPHERE; }

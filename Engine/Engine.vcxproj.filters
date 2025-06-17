@@ -418,6 +418,9 @@
       <Filter>Object\Particle</Filter>
     </ClInclude>
     <ClInclude Include="USphereComponent.h" />
+    <ClInclude Include="AInstance.h">
+      <Filter>Object</Filter>
+    </ClInclude>
     <ClInclude Include="ShadowManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
@@ -711,15 +714,15 @@
       <Filter>Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="USphereComponent.cpp" />
+    <ClCompile Include="AInstance.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
     <ClCompile Include="ShadowManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
-    <None Include="..\Resources\Shader\PRHeader.hlsli">
-      <Filter>Shader</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\PRDefault.hlsl">

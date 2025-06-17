@@ -171,6 +171,7 @@ public:
 public:
 	virtual void Enter() override;
 	virtual void Tick() override;
+	void ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time);
 	virtual void End() override;
 
 };

@@ -108,19 +108,19 @@ void ParticleEditorUI::DrawUI()
 		shared_ptr<AParticleActor> newParticle;
 		if (PREFAB->LoadParticle(data, path))
 		{
-			if (data.Type == EParticleType::Fire)
-			{
-				auto fire = make_shared<AFireParticleActor>();
-				fire->SetAmplitude(data.Amplitude);
-				fire->SetRandomFreq(data.RandomFreq);
-				fire->SetRandomOffset(data.RandomOffset);
-				fire->SetTimeOffset(data.TimeOffset);
-				newParticle = fire;
-			}
-			else
-			{
+			//if (data.Type == EParticleType::Fire)
+			//{
+			//	auto fire = make_shared<AFireParticleActor>();
+			//	fire->SetAmplitude(data.Amplitude);
+			//	fire->SetRandomFreq(data.RandomFreq);
+			//	fire->SetRandomOffset(data.RandomOffset);
+			//	fire->SetTimeOffset(data.TimeOffset);
+			//	newParticle = fire;
+			//}
+			//else
+			//{
 				newParticle = make_shared<AParticleActor>();
-			}
+			//}
 
 			m_vCreatedParticles.push_back(newParticle);
 			m_vParticleData.push_back(m_Data);
@@ -206,10 +206,10 @@ void ParticleEditorUI::DrawUI()
 				if (p.Type == EParticleType::Fire)
 				{
 					auto fire = make_shared<AFireParticleActor>();
-					fire->SetAmplitude(p.Amplitude);
-					fire->SetRandomFreq(p.RandomFreq);
-					fire->SetRandomOffset(p.RandomOffset);
-					fire->SetTimeOffset(p.TimeOffset);
+					//fire->SetAmplitude(p.Amplitude);
+					//fire->SetRandomFreq(p.RandomFreq);
+					//fire->SetRandomOffset(p.RandomOffset);
+					//fire->SetTimeOffset(p.TimeOffset);
 					newParticle = fire;
 				}
 				else
@@ -452,14 +452,14 @@ void ParticleEditorUI::DrawUI()
 		{
 			data.Type = EParticleType::Fire;
 
-			auto actor = dynamic_pointer_cast<AFireParticleActor>(GetSelectedActor());
-			if (actor)
-			{
-				data.Amplitude = actor->GetAmplitude();
-				data.RandomFreq = actor->GetRandomFreq();
-				data.RandomOffset = actor->GetRandomOffset();
-				data.TimeOffset = actor->GetTimeOffset();
-			}
+			//auto actor = dynamic_pointer_cast<AFireParticleActor>(GetSelectedActor());
+			//if (actor)
+			//{
+			//	data.Amplitude = actor->GetAmplitude();
+			//	data.RandomFreq = actor->GetRandomFreq();
+			//	data.RandomOffset = actor->GetRandomOffset();
+			//	data.TimeOffset = actor->GetTimeOffset();
+			//}
 		}
 		else
 		{
@@ -508,14 +508,14 @@ void ParticleEditorUI::DrawUI()
 			{
 				data.Type = EParticleType::Fire;
 
-				auto fireActor = dynamic_pointer_cast<AFireParticleActor>(m_vCreatedParticles[i]);
-				if (fireActor)
-				{
-					data.Amplitude = fireActor->GetAmplitude();
-					data.RandomFreq = fireActor->GetRandomFreq();
-					data.RandomOffset = fireActor->GetRandomOffset();
-					data.TimeOffset = fireActor->GetTimeOffset();
-				}
+				//auto fireActor = dynamic_pointer_cast<AFireParticleActor>(m_vCreatedParticles[i]);
+				//if (fireActor)
+				//{
+				//	data.Amplitude = fireActor->GetAmplitude();
+				//	data.RandomFreq = fireActor->GetRandomFreq();
+				//	data.RandomOffset = fireActor->GetRandomOffset();
+				//	data.TimeOffset = fireActor->GetTimeOffset();
+				//}
 			}
 			else
 			{

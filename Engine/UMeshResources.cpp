@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "UMeshResources.h"
 
+ComPtr<ID3D11Buffer> UMeshResources::m_pInstansBuffer = nullptr;
+
 void UMeshResources::Init()
 {
 }
@@ -55,4 +57,40 @@ bool UMeshResources::CreateIndexBuffer()
 		return false;
 	}
 	return true;
+}
+
+bool UMeshResources::CreateInstanceBuffer()
+{
+	if (m_pInstansBuffer != nullptr) { return true; }
+
+	D3D11_BUFFER_DESC pDesc;
+	ZeroMemory(&pDesc, sizeof(pDesc));
+	pDesc.ByteWidth = sizeof(INSTANCE_VERTEX) * MAX_INSTANCE_COUNT;
+	pDesc.Usage = D3D11_USAGE_DYNAMIC;
+	pDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	pDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	pDesc.StructureByteStride = sizeof(INSTANCE_VERTEX);
+
+	// Map, UnMap으로 재사용하기 위해 D3D11_SUBRESOURCE_DATA 미설정
+
+	HRESULT hr = DEVICE->CreateBuffer(&pDesc, nullptr, m_pInstansBuffer.GetAddressOf());
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void UMeshResources::UpdateInstanceList(vector<INSTANCE_VERTEX>& _InstanceList)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+
+	m_vInstaceList = _InstanceList;
+
+	if (SUCCEEDED(DC->Map(m_pInstansBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+	{
+		memcpy(mappedResource.pData, m_vInstaceList.data(), sizeof(INSTANCE_VERTEX) * m_vInstaceList.size());
+		DC->Unmap(m_pInstansBuffer.Get(), 0);
+	}
 }

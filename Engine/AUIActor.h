@@ -81,6 +81,8 @@ protected:
 	bool m_bUseSliceActor = false;
 	bool m_bSliceActor = false;
 	vector<shared_ptr<AUIActor>> m_vSliceActor;
+	shared_ptr<class AInstance> m_pSliceActor = nullptr;
+
 	// 픽셀 단위로 생각 할 것.
 	// x는 left, y는 right, z는 top, w는 bottom
 	Vec4 m_vSlice = { 0.5f, 0.5f, 0.5f, 0.5f };

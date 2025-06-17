@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ObjectManager.h"
 #include "AActor.h"
+#include "AInstance.h"
 #include "UMeshComponent.h"
 #include "UMaterial.h"
 #include "DxState.h"
@@ -80,6 +81,7 @@ void ObjectManager::Render()
 void ObjectManager::Destroy()
 {
 	m_vActorList.clear();
+	m_vInstanceList.clear();
 	ClearRenderList();
 	ActorCount = 0;
 }
@@ -93,6 +95,7 @@ void ObjectManager::AddActor(shared_ptr<class AActor> _pActor)
 	
 	_pActor->Init();
 
+	SetInstance(_pActor);
 }
 
 void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
@@ -106,6 +109,7 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 		ActorCount++;
 
 		pActor->Init();
+		SetInstance(pActor);
 	}
 }
 
@@ -241,6 +245,17 @@ void ObjectManager::CheckStencilList()
 	{
 		auto pActor = iter.second;
 		if (pActor->m_bRender == false) continue;
+		if (pActor->GetMeshComponent() == nullptr || pActor->GetMeshComponent()->IsUseInstance()) continue;
+
+		if (pActor->m_bUseStencil == false)
+			m_vPreRenderActorList.emplace_back(pActor);
+		else
+			m_vPostRenderActorList.emplace_back(pActor);
+	}
+
+	for (auto& pActor : m_vInstanceList)
+	{
+		if (pActor->m_bRender == false) continue;
 
 		if (pActor->m_bUseStencil == false)
 			m_vPreRenderActorList.emplace_back(pActor);
@@ -283,4 +298,45 @@ void ObjectManager::SetRenderMode(ERenderMode _eMode)
 		DC->VSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
 		DC->PSSetConstantBuffers(7, 1, m_pRenderModeBuffer.GetAddressOf());
 	}
+}
+
+void ObjectManager::SetInstance(shared_ptr<AActor> _pActor)
+{
+	if (_pActor->m_szName != L"Object")
+		return;
+
+	auto meshCom = _pActor->GetMeshComponent();
+
+	for (auto& pInstance : m_vInstanceList)
+	{
+		// Mesh가 다르면 넘어가요
+		if (pInstance->GetMeshPath() != meshCom->GetMeshPath())
+			continue;
+
+		// Texture만 다르면 생성
+		if (pInstance->GetTexturePath() != meshCom->GetMaterial()->GetTexturePath())
+		{
+			MakeInstance(_pActor);
+			return;
+		}
+		else
+		{
+			pInstance->AddInstanceTransform(meshCom);
+			return;
+		}
+	}
+
+	// 다 찾아보고 없으면 생성
+	MakeInstance(_pActor);
+}
+
+void ObjectManager::MakeInstance(shared_ptr<AActor> _pActor)
+{
+	auto pInstance = make_shared<AInstance>();
+
+	pInstance->SetInstanceMesh(_pActor->GetMeshComponent());
+	pInstance->m_bUseStencil = _pActor->m_bUseStencil;
+	pInstance->Init();
+
+	m_vInstanceList.emplace_back(pInstance);
 }

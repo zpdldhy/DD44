@@ -1,4 +1,5 @@
 #include "Header.hlsli"
+#include "SkinningHeader.hlsli"
 
 VS_OUT_RIM VS(PNCTIW_IN input)
 {
@@ -68,10 +69,10 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
 
     float4 texColor = g_txDiffuseA.Sample(sample, input.t);
     float4 crashColor = g_txCrack.Sample(sample, input.t);
-
-    //float3 crackHighlightColor = float3(1.0f, 0.1f, 0.1f);
-    //float3 resultColor = lerp(texColor.rgb, crackHighlightColor, crashColor.a);
-
+    float dissolve = g_txNoise.Sample(sample, input.t).r;
+    
+    if (dissolve < g_fDissolveAmount)
+        discard;
     
     float3 emissive;
     float3 specular = ApplySpecular(input.n, input.wPos);

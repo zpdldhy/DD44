@@ -32,6 +32,12 @@ struct CB_MaterialEffect
 
 	BOOL g_bCrash = false;
 	Vec3 padding_Crash;
+
+	float g_fDissolveAmount = 0.0f;
+	float g_fDissolveEdgeWidth = 0.05f;
+	Vec3  g_vDissolveColor = Vec3(1, 0.4f, 0.0f);
+	Vec3  padding_Dissolve;
+
 };
 
 //struct CB_Material
@@ -104,6 +110,7 @@ public:
 	void SetUVRange(Vec2 start, Vec2 end);
 	void SetTintColor(const Vec4& color);
 	void SetCrash(bool _bCrash);
+	void SetDissolve(float _amount);
 public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
 	void SetShader(const std::wstring& path);

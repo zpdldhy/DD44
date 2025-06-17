@@ -2,6 +2,8 @@
 #include "UObject.h"
 #include "Device.h"
 
+#define MAX_INSTANCE_COUNT 1000;
+
 enum class MeshType
 {
 	M_STATIC = 0,
@@ -22,6 +24,10 @@ protected:
 	vector<DWORD> m_vIndexList;
 	D3D11_PRIMITIVE_TOPOLOGY m_Topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
+	// Instance
+	static ComPtr<ID3D11Buffer> m_pInstansBuffer;
+	vector<INSTANCE_VERTEX> m_vInstaceList;
+
 private:
 	void Init() override;
 	void Tick() override;
@@ -31,10 +37,12 @@ private:
 protected:
 	bool CreateVertexBuffer();
 	bool CreateIndexBuffer();
+	bool CreateInstanceBuffer();
 
 public:
 	virtual void Create() abstract;
 	virtual void Bind() abstract;
+	virtual void UpdateInstanceList(vector<INSTANCE_VERTEX>& _InstanceList);
 
 public:
 	ComPtr<ID3D11Buffer> GetVertexBuffer() { return m_pVertexBuffer; }

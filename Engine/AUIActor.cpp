@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "AUIActor.h"
+#include "AInstance.h"
 #include "UMaterial.h"
 #include "DxWrite.h"
 #include "UStaticMeshComponent.h"
@@ -110,6 +111,8 @@ void AUIActor::CreateUIData()
 
 void AUIActor::CreateUVSlice()
 {
+	m_pSliceActor = make_shared<AInstance>();
+
 	// 9개의 Mesh를 생성
 	m_vSliceActor.resize(9);
 

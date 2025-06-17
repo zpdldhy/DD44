@@ -167,6 +167,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="AEffectActor.h" />
     <ClInclude Include="AFeatherActor.h" />
     <ClInclude Include="AFireParticleActor.h" />
+    <ClInclude Include="AInstance.h" />
     <ClInclude Include="ALight.h" />
     <ClInclude Include="AParticleActor.h" />
     <ClInclude Include="APawn.h" />
@@ -279,6 +280,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="AEffectActor.cpp" />
     <ClCompile Include="AFeatherActor.cpp" />
     <ClCompile Include="AFireParticleActor.cpp" />
+    <ClCompile Include="AInstance.cpp" />
     <ClCompile Include="ALight.cpp" />
     <ClCompile Include="AParticleActor.cpp" />
     <ClCompile Include="APawn.cpp" />
@@ -387,7 +389,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
-    <None Include="..\Resources\Shader\PRHeader.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\PRDefault.hlsl">

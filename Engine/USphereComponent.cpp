@@ -69,6 +69,15 @@ void USphereComponent::UpdateBounds()
 
 	m_Sphere.vCenter = m_vWorldPosition;
 	m_Sphere.fRadius = 0.5f * m_vWorldScale.x;
+
+	auto look = m_vLocalLook;	look.Normalize();
+	auto down = -m_vLocalUp;	down.Normalize();
+
+	m_LookRay.position = m_vWorldPosition;
+	m_LookRay.direction = look * m_Sphere.fRadius;
+
+	m_GroundRay.position = m_vWorldPosition;
+	m_GroundRay.direction = down * m_Sphere.fRadius;
 }
 
 void USphereComponent::CreateCollisionRange()

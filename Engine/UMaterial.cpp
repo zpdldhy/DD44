@@ -160,6 +160,14 @@ void UMaterial::SetCrash(bool _bCrash)
     UpdateEffectBuffer();
 }
 
+void UMaterial::SetDissolve(float _amount)
+{
+    m_tEffectData.g_fDissolveAmount = _amount;
+    m_tEffectData.g_fDissolveEdgeWidth = 0.05f;
+    m_tEffectData.g_vDissolveColor = Vec3(1, 0.3f, 0.0f);
+    UpdateEffectBuffer();
+}
+
 void UMaterial::SetShader(const std::wstring& path)
 {
     m_pShader = make_shared<Shader>();

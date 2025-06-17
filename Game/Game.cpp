@@ -55,6 +55,7 @@ void Game::Init()
 	{
 		map->m_bCastShadow = false;
 	}
+	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 
 	OBJECT->AddActorList(m_vMapList);
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));

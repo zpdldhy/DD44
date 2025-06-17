@@ -1,41 +1,8 @@
 #include "MainHeader.hlsli"
-#define MAX_BONE 250
 #define MAX_LIGHTS 4
 
-//cbuffer cbDissolve : register(b3)
-//{
-//    float g_fDissolveThreshold;
-//}
-
-cbuffer CB_SpriteUV : register(b4)
-{
-    float2 g_uvStart;
-    float2 g_uvEnd;
-}
-
-cbuffer AnimationBuffer : register(b5)
-{
-    matrix obj_matAnim[MAX_BONE];
-}
-
-float2 remapUV(float2 uv)
-{
-    return lerp(g_uvStart, g_uvEnd, uv);
-}
-
-cbuffer CB_Billboard : register(b6)
-{
-    float3 g_vBillboardCenter;
-    float  g_fBillboardRotation;
-    float2 g_vBillboardSize;
-    float2 padding_size;
-};
-
-cbuffer CB_RenderMode : register(b7)
-{
-    int g_iRenderMode;
-    float3 padding_rendermode;
-};
+Texture2D g_txCrack : register(t1);
+Texture2D g_txNoise : register(t2);
 
 struct LightData
 {
@@ -53,22 +20,14 @@ cbuffer CB_LightArray : register(b8)
     float3 padding_light;
 }
 
-
-cbuffer InverseBoneBuffer : register(b9)
+struct VS_OUT_RIM
 {
-    matrix obj_matBone[MAX_BONE];
-}
-
-cbuffer CB_Slash : register(b10)
-{
-    float g_fProgress; 
-    float3 padding_slash;
-}
-
-cbuffer CB_Blur : register(b11)
-{
-    float2 g_vTexelSize; // (1 / 화면 너비, 1 / 화면 높이)
-    float2 g_vDirection; // (1, 0): 가로 블러 / (0, 1): 세로 블러
+    float4 p : SV_POSITION;
+    float4 c : COLOR;
+    float3 n : NORMAL;
+    float2 t : TEXCOORD;
+    float3 wPos : POSITIONWS;
+    float4 shadowCoord : TEXCOORD1;
 };
 
 cbuffer CB_Shadow : register(b12)
@@ -81,30 +40,6 @@ cbuffer CB_ShadowG : register(b13)
 {
     matrix g_matShadowWorld;
 }
-
-
-struct PNCTIW_IN
-{
-    float3 p : POSITION;
-    float4 c : COLOR;
-    float3 n : NORMAL;
-    float2 t : TEXCOORD;
-
-    float4 i : INDEX;
-    float4 i2 : SECONDI;
-    float4 w : WEIGHT;
-    float4 w2 : SECONDW;
-};
-
-struct VS_OUT_RIM
-{
-    float4 p : SV_POSITION;
-    float4 c : COLOR;
-    float3 n : NORMAL;
-    float2 t : TEXCOORD;
-    float3 wPos : POSITIONWS;
-    float4 shadowCoord : TEXCOORD1;
-};
 
 ///funtion
 //==============================
