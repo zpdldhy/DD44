@@ -168,12 +168,12 @@ void UMaterial::SetDissolve(float _amount)
     UpdateEffectBuffer();
 }
 
-void UMaterial::SetShader(const std::wstring& path)
-{
-    m_pShader = make_shared<Shader>();
-    m_pShader->CreateVertexShader(path);
-    m_pInputlayout = INPUTLAYOUT->Get(L"Default");
-}
+//void UMaterial::SetShader(const std::wstring& path)
+//{
+//    m_pShader = make_shared<Shader>();
+//    m_pShader->CreateVertexShader(path);
+//    m_pInputlayout = INPUTLAYOUT->Get(L"Default");
+//}
 
 
 void UMaterial::UpdateEffectBuffer()

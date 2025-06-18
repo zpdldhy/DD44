@@ -10,7 +10,7 @@
 void ShadowManager::Init()
 {
 	m_pShadowTexture = make_shared<ViewPortTexture>();
-	m_pShadowTexture->CreateViewPortTexture(2048, 2048);
+	m_pShadowTexture->CreateViewPortTexture(8192, 8192);
 
 	// Rasterizer (Depth Bias)
 	D3D11_RASTERIZER_DESC rsDesc = {};
@@ -65,18 +65,6 @@ void ShadowManager::Init()
 		assert(false);
 	}
 
-	{
-		D3D11_BUFFER_DESC bd = {};
-		bd.ByteWidth = sizeof(Matrix); // 단일 행렬
-		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-
-		HRESULT hr = DEVICE->CreateBuffer(&bd, nullptr, m_pCBShadowWorld.GetAddressOf());
-		if (FAILED(hr))
-		{
-			DX_CHECK(hr, _T("CreateShadowWorldBuffer Failed"));
-		}
-	}
 }
 
 void ShadowManager::Render()

@@ -23,7 +23,8 @@ void UMeshComponent::RenderShadow()
 	if (bRender)
 	{
 		PreRender();
-		auto shadowShader = SHADER->Get(L"../Resources/Shader/Shadow.hlsl");
+//		auto shadowShader = SHADER->Get(L"../Resources/Shader/Shadow.hlsl");
+		auto shadowShader = SHADER->Get(GetMaterial()->GetShaderPath(), L"VS_SHADOW", L"PS_SHADOW");
 		DC->VSSetShader(shadowShader->GetVS().Get(), nullptr, 0);
 		DC->PSSetShader(shadowShader->GetPS().Get(), nullptr, 0);
 		PostRender();

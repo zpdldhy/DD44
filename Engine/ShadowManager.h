@@ -17,7 +17,7 @@ public:
     void Render();
     ID3D11ShaderResourceView* GetSRV() const;
     ComPtr<ID3D11SamplerState> GetShadowSampler() const { return m_pShadowSampler; }
-    ComPtr<ID3D11Buffer> m_pCBShadowWorld;
+    
 private:
     void BeginShadowPass();
     void EndShadowPass();

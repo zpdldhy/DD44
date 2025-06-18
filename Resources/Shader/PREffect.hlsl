@@ -48,7 +48,20 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     }
     else
     {
-        shadow = g_txShadow.SampleCmpLevelZero(g_samShadow, shadowTexCoord.xy, shadowTexCoord.z - 0.001f);
+        float2 texelSize = float2(1.0f / 8192.0f, 1.0f / 8192.0f); // 
+        float result = 0.0f;
+        
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                float2 offset = float2(x, y) * texelSize;
+                result += g_txShadow.SampleCmpLevelZero(g_samShadow, shadowTexCoord.xy + offset, shadowTexCoord.z - 0.0001f);
+            }
+        }
+        shadow = result / 9.0f;
+        shadow = lerp(1.0f, shadow, 0.5f);
+        
     }
     
     

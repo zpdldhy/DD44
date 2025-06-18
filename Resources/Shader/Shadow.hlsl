@@ -1,4 +1,7 @@
 #include "Header.hlsli"
+#include "SkinningHeader.hlsli"
+
+
 
 VS_OUT VS(PNCTIW_IN input)
 {
@@ -41,7 +44,9 @@ VS_OUT VS(PNCTIW_IN input)
         vAnim += mul(vLocal, animMat) * fWeight;
     }
     
-    float4 vWorld = mul(vAnim, g_matShadowWorld);
+    
+    
+    float4 vWorld = mul(vAnim, g_matWorld);
     float4 vView = mul(vWorld, g_matShadowView);
     float4 vProj = mul(vView, g_matShadowProj);
         

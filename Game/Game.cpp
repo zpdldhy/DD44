@@ -50,15 +50,13 @@ void Game::Init()
 	// Asset ·Îµù
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
-	//m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 	for (auto map : m_vMapList)
 	{
 		map->m_bCastShadow = false;
 	}
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
-
 	OBJECT->AddActorList(m_vMapList);
-	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
@@ -186,6 +184,7 @@ void Game::SetupSkybox()
 	m_pSky->m_szName = L"Sky";
 	m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 	m_pSky->SetMeshComponent(m_pSkyMesh);
+	m_pSky->m_bCastShadow = false;
 
 	shared_ptr<UMaterial> material = make_shared<UMaterial>();
 	material->Load(L"../Resources/Texture/skypano.png", L"../Resources/Shader/Sky.hlsl");
