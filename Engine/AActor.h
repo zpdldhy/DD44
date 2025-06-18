@@ -57,7 +57,7 @@ public:
 	bool m_bCollision = true;	// 해당 Actor가 이번 Frame에 충돌을 하는지 확인하는 용도.
 	bool m_bRender = true;		// 해당 Actor가 이번 Render에 출력되는지 확인하는 용도.
 	bool m_bDelete = false;	
-	bool m_bUpdateQuadTree = false;
+	bool m_bUpdateQuadTree = true;
 	bool m_bUseStencil = false;
 	ActorType m_eActorType = ActorType::AT_NONE;
 

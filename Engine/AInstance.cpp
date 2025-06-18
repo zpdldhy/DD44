@@ -13,28 +13,42 @@ void AInstance::Tick()
 
 void AInstance::Render()
 {
-	for (UINT iMeshIndex = 0;iMeshIndex< m_vTransformList.size();iMeshIndex++)
+	for (UINT iMeshIndex = 0;iMeshIndex< m_vMeshList.size();iMeshIndex++)
 	{
 		vector<INSTANCE_VERTEX> vInstanceList;
 
 		// Transform을 모아요
-		for (auto& pTransform : m_vTransformList[iMeshIndex])
+		for (auto iter = m_vMeshList[iMeshIndex].begin(); iter!= m_vMeshList[iMeshIndex].end(); )
 		{
+			auto pTransform = *iter;
+			if (pTransform->GetOwner()->m_bDelete == true)
+			{
+				iter = m_vMeshList[iMeshIndex].erase(iter);
+				continue;
+			}
+
+			if (pTransform->GetOwner()->m_bRender == false)
+			{
+				iter++;
+				continue;
+			}
+
 			INSTANCE_VERTEX world;
 			world.matWorld = pTransform->GetWorld();
-			world.color = Color();
-			world.uv = Vec4();
+			world.color = pTransform->GetInstanceColor();
+			world.uv = pTransform->GetInstanceUV();
 			vInstanceList.emplace_back(world);
+			iter++;
 		}
 
 		// Mesh를 Binding 해요
-		auto pFirstMesh = m_vTransformList[iMeshIndex][0]->GetMesh();
+		auto pFirstMesh = m_vMeshList[iMeshIndex][0]->GetMesh();
 		pFirstMesh->UpdateInstanceList(vInstanceList);
 		pFirstMesh->Bind();
 
-		m_vTransformList[iMeshIndex][0]->GetMaterial()->Bind();
+		m_vMeshList[iMeshIndex][0]->GetMaterial()->Bind();
 		
-		auto shaderPath = m_vTransformList[iMeshIndex][0]->GetMaterial()->GetShader()->m_szPath;
+		auto shaderPath = m_vMeshList[iMeshIndex][0]->GetMaterial()->GetShader()->m_szPath;
 		m_pShader = SHADER->Get(shaderPath, L"VS_INSTANCE");
 
 		if (pFirstMesh->GetType() == 0)
@@ -69,9 +83,7 @@ void AInstance::Render()
 
 void AInstance::Destroy()
 {
-	m_vTransformList.clear();
-	m_vColorList.clear();
-	m_vUVList.clear();
+	m_vMeshList.clear();
 }
 
 void AInstance::SetInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
@@ -80,8 +92,11 @@ void AInstance::SetInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
 	if (_pMeshCom->GetMesh())
 	{
 		vector<shared_ptr<UMeshComponent>> vTransformList;
+
 		vTransformList.emplace_back(_pMeshCom);
-		m_vTransformList.emplace_back(vTransformList);
+
+		m_vMeshList.emplace_back(vTransformList);
+
 		_pMeshCom->SetUseInstance(true);
 	}
 
@@ -89,19 +104,26 @@ void AInstance::SetInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
 	InsertChildsMesh(_pMeshCom->GetChildren());
 }
 
-void AInstance::AddInstanceTransform(shared_ptr<UMeshComponent> _pMeshCom)
+void AInstance::AddInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
 {
 	UINT iMeshCount = 0;
+
+	if (m_vMeshList.size() <= 0)
+	{
+		SetInstanceMesh(_pMeshCom);
+		return;
+	}
 
 	// 제일 상단에 MeshResource가 있다면
 	if (_pMeshCom->GetMesh())
 	{
-		m_vTransformList[iMeshCount++].emplace_back(_pMeshCom);
+		m_vMeshList[iMeshCount].emplace_back(_pMeshCom);
+
 		_pMeshCom->SetUseInstance(true);
 	}
 
 	// 자식 Mesh들 재귀 시작
-	InsertChildsTransform(_pMeshCom->GetChildren(), iMeshCount);
+	InsertChildsMesh(_pMeshCom->GetChildren(), iMeshCount);
 }
 
 void AInstance::InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList)
@@ -111,8 +133,11 @@ void AInstance::InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList
 		if (pChildCom->GetMesh())
 		{
 			vector<shared_ptr<UMeshComponent>> vTransformList;
+
 			vTransformList.emplace_back(pChildCom);
-			m_vTransformList.emplace_back(vTransformList);
+
+			m_vMeshList.emplace_back(vTransformList);
+
 			pChildCom->SetUseInstance(true);
 		}
 
@@ -120,16 +145,17 @@ void AInstance::InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList
 	}
 }
 
-void AInstance::InsertChildsTransform(vector<shared_ptr<UMeshComponent>> _vChildsList, UINT& _iMeshCount)
+void AInstance::InsertChildsMesh(vector<shared_ptr<UMeshComponent>> _vChildsList, UINT& _iMeshCount)
 {
 	for (auto& pChildCom : _vChildsList)
 	{
 		if (pChildCom->GetMesh())
 		{
-			m_vTransformList[_iMeshCount++].emplace_back(pChildCom);
+			m_vMeshList[_iMeshCount].emplace_back(pChildCom);
+
 			pChildCom->SetUseInstance(true);
 		}
 
-		InsertChildsTransform(pChildCom->GetChildren(), _iMeshCount);
+		InsertChildsMesh(pChildCom->GetChildren(), _iMeshCount);
 	}
 }

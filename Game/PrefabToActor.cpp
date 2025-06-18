@@ -400,8 +400,8 @@ vector<shared_ptr<class AParticleActor>> PrefabToActor::MakeParticleGroup(const 
 			// 애니메이션 세팅
 			newParticle->SetUV(p.UVStart, p.UVEnd);
 			newParticle->InitSpriteAnimation(p.Divisions, p.Duration);
-			newParticle->SetLoop(p.bLoop);
-			newParticle->SetAutoDestroy(p.bAutoDestroy);
+			newParticle->m_bLoop=p.bLoop;
+			newParticle->m_bAutoDestroy= p.bAutoDestroy;
 
 			result.push_back(newParticle);
 		}

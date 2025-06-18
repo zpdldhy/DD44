@@ -9,7 +9,6 @@ void UMeshComponent::Render()
 	{
 		PreRender();
 		PostRender();
-		ClearBind();
 	}
 
 	for (auto& child : m_vChild)
@@ -46,17 +45,6 @@ void UMeshComponent::RenderShadow()
 	//// 3. ½ÇÁ¦ ·»´õ¸µ
 	//m_pMaterial->Apply(DC);
 	//m_pMesh->Draw();
-}
-
-void UMeshComponent::ClearBind()
-{
-	ID3D11Buffer* nullBuffers[1] = { nullptr };
-
-	DC->VSSetConstantBuffers(2, 1, nullBuffers);
-	DC->PSSetConstantBuffers(2, 1, nullBuffers);
-
-	DC->VSSetConstantBuffers(4, 1, nullBuffers);
-	DC->PSSetConstantBuffers(4, 1, nullBuffers);
 }
 
 void UMeshComponent::RemoveChild(int _index)

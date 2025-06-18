@@ -86,8 +86,8 @@ void ParticleEditorUI::DrawUI()
 		//}
 
 		newParticle->InitSpriteAnimation(m_iDivisions, m_AnimData.DurationSeconds);
-		newParticle->SetLoop(m_AnimData.bLoop);
-		newParticle->SetAutoDestroy(m_AnimData.bAutoDestroy);
+		newParticle->m_bLoop = m_AnimData.bLoop;
+		newParticle->m_bAutoDestroy = m_AnimData.bAutoDestroy;
 		newParticle->SetUV(m_UVStart, m_UVEnd);
 	}
 
@@ -295,13 +295,13 @@ void ParticleEditorUI::DrawUI()
 	if (ImGui::Checkbox("Loop", &m_AnimData.bLoop))
 	{
 		if (auto actor = GetSelectedActor())
-			actor->SetLoop(m_AnimData.bLoop);
+			actor->m_bLoop = m_AnimData.bLoop;
 	}
 
 	if (ImGui::Checkbox("Auto Destroy", &m_AnimData.bAutoDestroy))
 	{
 		if (auto actor = GetSelectedActor())
-			actor->SetAutoDestroy(m_AnimData.bAutoDestroy);
+			actor->m_bAutoDestroy = m_AnimData.bAutoDestroy;
 	}
 	ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing();
 	ImGui::Text("Batch Particle Spawn");
@@ -352,8 +352,8 @@ void ParticleEditorUI::DrawUI()
 			}
 
 			newParticle->InitSpriteAnimation(m_iDivisions, m_AnimData.DurationSeconds);
-			newParticle->SetLoop(m_AnimData.bLoop);
-			newParticle->SetAutoDestroy(m_AnimData.bAutoDestroy);
+			newParticle->m_bLoop = m_AnimData.bLoop;
+			newParticle->m_bAutoDestroy = m_AnimData.bAutoDestroy;
 			newParticle->SetUV(m_UVStart, m_UVEnd);
 			newParticle->SetPosition(randPos);
 			newParticle->SetRotation(Vec3(copy.Rotation));

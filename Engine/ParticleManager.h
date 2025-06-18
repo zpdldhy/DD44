@@ -19,11 +19,14 @@ public:
 	void Destroy();
 
 public:
-	void SetParticleList(vector<shared_ptr<AParticleActor>> _vParticleList);
 	void AddParticleList(vector<shared_ptr<AParticleActor>> _vParticleList);
 	void AddUI(shared_ptr<AParticleActor> _vParticleList);
+	void SetInstance(shared_ptr<AParticleActor> _pActor);
+	void MakeInstance(shared_ptr<AParticleActor> _pActor);
 
 private:
 	RenderOption m_sharedOption;
+	// InstanceActor
+	vector<shared_ptr<class AInstance>> m_vInstanceList;
 };
 
