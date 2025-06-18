@@ -75,7 +75,7 @@ void WalkerHitState::Enter()
 	int index = animInstance->GetAnimIndex(L"Armature|Stun");
 	animInstance->PlayOnce(index);
 	// »ç¿îµå
-	SOUNDMANAGER->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
 }
 
 void WalkerHitState::Tick()

@@ -26,6 +26,7 @@ class UAnimInstance : public enable_shared_from_this<UAnimInstance>
 	vector<AnimList> animTrackList;
 	float animFrame = 0.0f;
 	UINT currentAnimTrackIndex = 0;
+	UINT lastEventFrame = UINT_MAX;
 	Vec3 rootPos;
 	int rootIndex = 0;
 	int prevIndex;

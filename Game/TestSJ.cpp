@@ -34,7 +34,7 @@ void TestSJ::Init()
 	SetupObjectEditorCallback();
 	LoadAllPrefabs(".object.json");
 
-	SOUNDMANAGER->LoadAllSounds();
+	SOUND->LoadAllSounds();
 
 	m_pCameraActor = make_shared<ACameraActor>();
 	{
@@ -178,9 +178,9 @@ void TestSJ::Init()
 	OBJECT->AddActor(m_pSky);
 	//OBJECT->AddActor(m_pSwordActor);
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pLight);
-	LIGHTMANAGER->RegisterLight(m_pPointLight); 
+	LIGHT->Clear();
+	LIGHT->RegisterLight(m_pLight);
+	LIGHT->RegisterLight(m_pPointLight); 
 }
 
 void TestSJ::Tick()

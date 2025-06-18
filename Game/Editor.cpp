@@ -164,8 +164,8 @@ void Editor::SetupSunLight()
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	OBJECT->AddActor(m_pSunLight);
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pSunLight);
+	LIGHT->Clear();
+	LIGHT->RegisterLight(m_pSunLight);
 }
 
 void Editor::SetupGizmo()
@@ -173,7 +173,7 @@ void Editor::SetupGizmo()
 	m_pGizmoCore = make_shared<AActor>();
 	m_pGizmoCore->m_szName = L"Gizmo";
 	shared_ptr<UMeshComponent> meshComponent =
-		meshLoader.Make("../Resources/Asset/gizmo.mesh.json");
+		MESHLOADER->Make("../Resources/Asset/gizmo.mesh.json");
 	m_pGizmoCore->SetMeshComponent(meshComponent);
 	m_pGizmoCore->SetScale(Vec3(0.04f, 0.04f, 0.04f));
 	OBJECT->AddActor(m_pGizmoCore);
@@ -365,7 +365,7 @@ void Editor::SetupObjectEditorCallback()
 			else
 			{
 				//Profiler p("Mesh From Asset");
-				auto resources = actorLoader.LoadOneRes(objPath);
+				auto resources = ACTORLOADER->LoadOneRes(objPath);
 				meshComp->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(resources));
 				meshComp->SetMeshPath(to_mw(objPath));
 			}

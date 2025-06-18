@@ -98,7 +98,6 @@ void MageAppearState::End()
 	// 기본 state 세팅
 	m_bOnPlaying = false;
 }
-
 void MageAppearState::SetDirection(Vec3 _targetPos)
 {
 	dir = _targetPos - m_pOwner.lock()->GetPosition();
@@ -315,6 +314,12 @@ MageAttackStart::MageAttackStart(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_A
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int index = animInstance->GetAnimIndex(L"Shoot");
+	animInstance->AddEvent(index, 37, [this]() {
+		this->Throw();
+		});
 }
 void MageAttackStart::Enter()
 {
@@ -324,9 +329,6 @@ void MageAttackStart::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Shoot");
 	animInstance->PlayOnce(index);
-	animInstance->AddEvent(index, 37, [this]() {
-		this->Throw();
-		});
 	// 회전
 	//targetYaw = atan2f(dir.x, dir.z);
 }

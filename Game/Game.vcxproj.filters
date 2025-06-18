@@ -40,6 +40,12 @@
     <Filter Include="GameActor">
       <UniqueIdentifier>{01263189-9556-4f9c-bb51-c081d8fa20b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Script\Object">
+      <UniqueIdentifier>{133e12b2-926a-4d9e-a7f8-4e4152c2b88a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameActor\Component">
+      <UniqueIdentifier>{e4fc3738-3cca-48b9-a3d9-b93b3a31875c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -145,7 +151,22 @@
     <ClInclude Include="TPlayer.h">
       <Filter>GameActor</Filter>
     </ClInclude>
-    <ClInclude Include="TEnemy.h" />
+    <ClInclude Include="TInteractable.h">
+      <Filter>GameActor</Filter>
+    </ClInclude>
+    <ClInclude Include="TInteractScriptComponent.h">
+      <Filter>GameActor\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="TEnemy.h">
+      <Filter>GameActor</Filter>
+    </ClInclude>
+    <ClInclude Include="LadderScript.h">
+      <Filter>Script\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="EventManager.h">
+      <Filter>GameManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="FenceScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -245,7 +266,22 @@
     <ClCompile Include="TPlayer.cpp">
       <Filter>GameActor</Filter>
     </ClCompile>
-    <ClCompile Include="TEnemy.cpp" />
+    <ClCompile Include="TInteractable.cpp">
+      <Filter>GameActor</Filter>
+    </ClCompile>
+    <ClCompile Include="TInteractScriptComponent.cpp">
+      <Filter>GameActor\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="TEnemy.cpp">
+      <Filter>GameActor</Filter>
+    </ClCompile>
+    <ClCompile Include="LadderScript.cpp">
+      <Filter>Script\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="EventManager.cpp">
+      <Filter>GameManagers</Filter>
+    </ClCompile>
+    <ClCompile Include="FenceScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">
@@ -297,6 +333,9 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\Weapon.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Resources\Shader\Shadow.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

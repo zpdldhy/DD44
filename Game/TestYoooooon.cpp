@@ -119,8 +119,8 @@ void TestYoooooon::SetupSunLight()
 	pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	OBJECT->AddActor(pSunLight);
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(pSunLight);
+	LIGHT->Clear();
+	LIGHT->RegisterLight(pSunLight);
 }
 
 void TestYoooooon::SetupEditorCallbacks()

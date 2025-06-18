@@ -4,11 +4,12 @@
 #include "Timer.h"
 #include "ObjectManager.h"
 #include "EffectManager.h"
+#include "ProjectileManager.h"
 
 void TEnemy::Tick()
 {
 	TCharacter::Tick();
-	
+
 	// FX
 	Flashing();
 	ApplyCrash();
@@ -33,7 +34,8 @@ bool TEnemy::CheckHit()
 			}
 		}
 
-		if (isCol || IsHitByProjectile())
+		bool isHitByP = IsHitByProjectile();
+		if (isCol || isHitByP)
 		{
 			hitElapsed = 0.0f;
 			// FX
@@ -48,12 +50,23 @@ bool TEnemy::CheckHit()
 			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 			// HP
 			TakeDamage(1);
-			dynamic_pointer_cast<TPlayer>(player.lock())->IncArrowCount();
+			if (!isHitByP)
+			{
+				dynamic_pointer_cast<TPlayer>(player.lock())->IncArrowCount();
+			}
 
 			return true;
 		}
 	}
 	return false;
+}
+
+void TEnemy::CheckHitByProjectile(int type, bool _hit)
+{
+	if (type == (int)ProjectileType::PlayerArrow)
+	{
+		bHitByProjectile = _hit;
+	}
 }
 
 void TEnemy::Flashing()

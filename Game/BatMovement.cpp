@@ -150,7 +150,6 @@ void BatMovement::Tick()
 			m_vTargetPos = player.lock()->GetPosition();
 		}
 
-
 		Attack();
 	}
 	else

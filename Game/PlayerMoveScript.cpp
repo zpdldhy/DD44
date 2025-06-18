@@ -17,6 +17,7 @@
 
 #include "ProjectileManager.h"
 #include "Texture.h"
+#include "MeshLoader.h"
 
 shared_ptr<UScriptComponent> PlayerMoveScript::Clone()
 {
@@ -32,6 +33,7 @@ void PlayerMoveScript::Init()
 
 	idle = make_shared<PlayerIdleState>(m_pOwner);
 	walk = make_shared<PlayerWalkState>(m_pOwner);
+	climb = make_shared<PlayerClimbState>(m_pOwner);
 	roll = make_shared<PlayerRollState>(m_pOwner);
 	attack = make_shared<PlayerAttackState>(m_pOwner);
 	hit = make_shared<PlayerHitState>(m_pOwner);
@@ -40,14 +42,8 @@ void PlayerMoveScript::Init()
 
 	currentState = idle;
 	currentState->Enter();
+	currentStateId = PLAYER_S_IDLE;
 
-	auto body = dynamic_pointer_cast<UMeshComponent>(GetOwner()->GetMeshComponent());
-
-	m_pSlashMaterial = GetOwner()->GetMeshComponent()->GetChildByName(L"Slash")->GetMaterial();
-
-	//body->GetChildByName(L"Body");
-	backSword = body->GetChildByName(L"Sword");
-	handSword = body->GetChildByName(L"Sword2");
 	// SetPhysics
 	auto pPhysics = GetOwner()->GetPhysicsComponent();
 	pPhysics->SetWeight(1.f);
@@ -84,12 +80,109 @@ void PlayerMoveScript::Init()
 	// Texture
 	m_pSubTexture = TEXTURE->Get(L"../Resources/Texture/cracks_generic 1.png");
 	m_pNoiesTexture = TEXTURE->Get(L"../Resources/Texture/Noise.png");
+
+	// Bow
+	bow = make_shared<AActor>();
+	auto meshComp = MESHLOADER->Make("../Resources/Asset/bow.mesh.json");
+	bow->SetMeshComponent(meshComp);
+	OBJECT->AddActor(bow);
+	bow->m_bRender = false;
 }
 
 void PlayerMoveScript::Tick()
 {
-	UpdateCollider();
+	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
+	auto playerPos = player->GetPosition();
 
+	// 모든 state 공통
+	PlayFX();
+	CheckCoolTIme();
+	CheckCollision();
+
+	currentState->Tick();
+	bool currentStateEnd = !currentState->IsPlaying();
+
+	// state별 추가 처리
+	switch (currentStateId)
+	{
+	case PLAYER_S_IDLE:
+		CheckRoll();
+		CheckMove();
+		CheckClimb();
+		CheckAttack();
+		break;
+	case PLAYER_S_WALK:
+		CheckRoll();
+		CheckMove();
+		CheckClimb();
+		CheckAttack();
+		break;
+	case PLAYER_S_ATTACK:
+		CheckComboAttack();
+		if (currentStateEnd)
+		{
+			attackRangeActor->m_bCollision = false;
+			attackRangeActor->GetShapeComponent()->m_bVisible = false;
+			ChangeState(idle);
+		}
+		break;
+	case PLAYER_S_CLIMB:
+		if (currentStateEnd)
+		{
+			player->StopClimbing();
+			m_bCanClimb = true;
+		}
+		if (playerPos.y > m_vLadderEnd.y)
+		{
+			dynamic_pointer_cast<PlayerClimbState>(currentState)->CheckClimbFinish(true);
+		}
+		CheckMove();
+		break;
+	case PLAYER_S_SHOOT:
+		UpdateBow();
+		if (INPUT->GetButtonUp(RCLICK) || INPUT->GetButtonFree(RCLICK))
+		{
+			// 끝내라 신호 주기
+			dynamic_pointer_cast<PlayerShootState>(currentState)->CheckEnd(true);
+		}
+		else
+		{
+			return;
+		}
+
+		if (currentStateEnd)
+		{
+			bow->m_bRender = false;
+			ChangeState(idle);
+		}
+		break;
+	case PLAYER_S_DEATH:
+		return;
+		break;
+	case PLAYER_S_HIT:
+		if (currentStateEnd)
+		{
+			m_bDamageCoolTime = true;
+			ChangeState(idle);
+		}
+		break;
+	case PLAYER_S_ROLL:
+		if (currentStateEnd)
+		{
+			m_bRollCoolTime = true;
+			ChangeState(idle);
+		}
+		else
+		{
+			RollMove();
+			return;
+		}
+		break;
+	default:
+		break;
+	}
+
+#pragma region TEMP
 	// Test
 	if (INPUT->GetButton(L))
 	{
@@ -97,177 +190,32 @@ void PlayerMoveScript::Tick()
 		if (currentState->GetId() == PLAYER_S_DEATH)
 		{
 			currentState->End();
-			ChangetState(idle);
-		}
-	}
-
-	DC->PSSetShaderResources(1, 1, m_pSubTexture->GetSRV().GetAddressOf());
-	DC->PSSetShaderResources(2, 1, m_pNoiesTexture->GetSRV().GetAddressOf());
-	ApplyCrash();
-
-#pragma region FX
-	Slash();
-	if (m_bIsFlashing)
-	{
-		m_fHitFlashTimer -= TIMER->GetDeltaTime();
-		if (m_fHitFlashTimer <= 0.0f)
-		{
-			m_fHitFlashTimer = 0.0f;
-			m_bIsFlashing = false;
-		}
-
-		// hitFlashAmount는 1 → 0 으로 감소
-		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
-
-		auto root = GetOwner()->GetMeshComponent();
-		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
-	}
-#pragma endregion
-
-#pragma region STATE_ANIM
-	if (m_bDamageCoolTime)
-	{
-		m_fDamageCoolTime -= TIMER->GetDeltaTime();
-		if (m_fDamageCoolTime < 0)
-		{
-			m_bDamageCoolTime = false;
-			m_fDamageCoolTime = 1.0f;
-			m_bCanBeHit = true;
-		}
-	}
-	if (m_bRollCoolTime)
-	{
-		m_fRollCoolTime -= TIMER->GetDeltaTime();
-		if (m_fRollCoolTime < 0)
-		{
-			m_bRollCoolTime = false;
-			m_fRollCoolTime = 0.5f;
-			m_bCanRoll = true;
-		}
-	}
-
-	// 순서 중요
-	if (currentState->GetId() == PLAYER_S_SHOOT)
-	{
-		if (INPUT->GetButtonUp(RCLICK) || INPUT->GetButtonFree(RCLICK))
-		{
-			// 끝내라 신호를 줘야함. 
-			dynamic_pointer_cast<PlayerShootState>(currentState)->CheckEnd(true);
-		}
-	}
-
-	// 순서 중요
-	CheckHit();
-
-	currentState->Tick();
-	if (currentState->GetId() == PLAYER_STATE::PLAYER_S_DEATH)
-	{
-		return;
-	}
-
-	// 이걸 왜 이렇게 했던 거지 ?
-	//if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK || currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT || currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
-	{
-		if (!currentState->IsPlaying())
-		{
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK)
-			{
-				handSword.lock()->SetVisible(false);
-				backSword.lock()->SetVisible(true);
-
-				attackRangeActor->m_bCollision = false;
-				attackRangeActor->GetShapeComponent()->m_bVisible = false;
-				ChangetState(idle);
-
-			}
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
-			{
-				m_bDamageCoolTime = true;
-				ChangetState(idle);
-
-			}
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
-			{
-				m_bRollCoolTime = true;
-				ChangetState(idle);
-
-			}
-		}
-		else
-		{
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ATTACK)
-			{
-				return;
-			}
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_ROLL)
-			{
-				RollMove();
-				return;
-			}
-
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_HIT)
-			{
-				return;
-			}
-
-			if (currentState->GetId() == PLAYER_STATE::PLAYER_S_SHOOT)
-			{
-				return;
-			}
+			ChangeState(idle);
 		}
 	}
 #pragma endregion
-	Move();
-
-	if (INPUT->GetButton(SPACE) && m_bCanRoll)
-	{
-		// 구르기
-		m_vRollLook = GetOwner()->GetLook();
-		ChangetState(roll);
-
-		m_bCanRoll = false;
-	}
-
-	// ATTACK
-	if (INPUT->GetButton(LCLICK))
-	{
-		handSword.lock()->SetVisible(true);
-		backSword.lock()->SetVisible(false);
-		ChangetState(attack);
-		m_bSlashPlaying = true;
-		m_fSlashTime = 0.0f;
-
-		//
-		attackRangeActor->m_bCollision = true;
-		attackRangeActor->GetShapeComponent()->m_bVisible = true;
-	}
-	if (INPUT->GetButton(RCLICK))
-	{
-		// TPlayer의 arrowCount 확인해서 bool 세팅하기 
-		int aCount = dynamic_pointer_cast<TPlayer>(GetOwner())->GetArrowCount();
-		if (aCount > 0)
-		{
-			dynamic_pointer_cast<PlayerShootState>(shoot)->CheckShootCount(true);
-		}
-		else
-		{
-			dynamic_pointer_cast<PlayerShootState>(shoot)->CheckShootCount(false);
-		}
-		ChangetState(shoot);
-	}
-
-
 
 }
 
-void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
+void PlayerMoveScript::ChangeState(shared_ptr<StateBase> _state)
 {
 	if (_state == currentState)
 	{
 		return;
 	}
 
-	if (!currentState->IsInterruptible() && currentState->IsPlaying())
+	if (_state->GetId() == PLAYER_S_HIT)
+	{
+		if (currentStateId == PLAYER_S_ROLL)
+		{
+			m_bCanRoll = true;
+		}
+		else if (currentStateId == PLAYER_S_SHOOT)
+		{
+			bow->m_bRender = false;
+		}
+	}
+	else if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
 		return;
 	}
@@ -278,10 +226,13 @@ void PlayerMoveScript::ChangetState(shared_ptr<StateBase> _state)
 	currentState = _state;
 
 	if (currentState)
+	{
 		currentState->Enter();
+		currentStateId = (PLAYER_STATE)currentState->GetId();
+	}
 }
 
-void PlayerMoveScript::CheckHit()
+void PlayerMoveScript::CheckCollision()
 {
 	// 투사체 충돌 확인
 	auto healthComp = dynamic_pointer_cast<TCharacter>(GetOwner());
@@ -297,7 +248,20 @@ void PlayerMoveScript::CheckHit()
 			for (auto& index : list)
 			{
 				if (OBJECT->GetActor(index.first)->m_szName == L"Enemy")
+				{
 					isCol = true;
+				}
+				// CanBeHit 아래에 넣어도 되는 건지 확인 필요
+				if (OBJECT->GetActor(index.first)->m_szName == L"Ladder" || OBJECT->GetActor(index.first)->m_szName == L"I_Ladder")
+				{
+					auto ladderTrigger = OBJECT->GetActor(index.first);
+					m_vLadder = ladderTrigger->GetPosition();
+					m_vLadderEnd = ladderTrigger->GetMeshComponent()->GetChildByName(L"ladderEnd")->GetWorldPosition();
+					auto firstLadder = ladderTrigger->GetMeshComponent()->GetChildByName(L"ladder1");
+					m_vDirToLadder = firstLadder->GetWorldPosition() - m_vLadder;
+					m_vDirToLadder.Normalize();
+					m_bCanClimb = true;
+				}
 			}
 		}
 
@@ -319,47 +283,40 @@ void PlayerMoveScript::CheckHit()
 
 				if (!dynamic_pointer_cast<TCharacter>(GetOwner())->IsDead())
 				{
-					ChangetState(hit);
+					ChangeState(hit);
 					m_bCanBeHit = false;
 				}
 				else
 				{
-					ChangetState(die);
+					ChangeState(die);
 				}
 			}
 		}
 	}
 }
 
-void PlayerMoveScript::Slash()
+void PlayerMoveScript::PlayFX()
 {
-	if (m_bSlashPlaying)
+	DC->PSSetShaderResources(1, 1, m_pSubTexture->GetSRV().GetAddressOf());
+	DC->PSSetShaderResources(2, 1, m_pNoiesTexture->GetSRV().GetAddressOf());
+	ApplyCrash();
+
+	//Slash();
+	if (m_bIsFlashing)
 	{
-		m_fSlashTime += TIMER->GetDeltaTime();
-
-		float t = m_fSlashTime;
-		float progress = 0.0f;
-
-
-		if (t <= 0.3f)
+		m_fHitFlashTimer -= TIMER->GetDeltaTime();
+		if (m_fHitFlashTimer <= 0.0f)
 		{
-			float ratio = t / 0.3f;
-			progress = pow(ratio, 2.0f);
-		}
-		else
-		{
-			progress = -1.0f;
+			m_fHitFlashTimer = 0.0f;
+			m_bIsFlashing = false;
 		}
 
-		if (m_pSlashMaterial)
-			m_pSlashMaterial->SetSlashProgress(progress);
+		// hitFlashAmount는 1 → 0 으로 감소
+		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
 
-		if (t >= m_fSlashDuration)
-		{
-			m_bSlashPlaying = false;
-		}
+		auto root = GetOwner()->GetMeshComponent();
+		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
-
 }
 
 void PlayerMoveScript::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)
@@ -443,7 +400,7 @@ void PlayerMoveScript::Move()
 	{
 		// 애님
 		{
-			ChangetState(walk);
+			ChangeState(walk);
 		}
 
 		// 이동
@@ -476,7 +433,45 @@ void PlayerMoveScript::Move()
 	}
 	else
 	{
-		ChangetState(idle);
+		ChangeState(idle);
+	}
+}
+
+void PlayerMoveScript::Climb()
+{
+	float deltaTime = TIMER->GetDeltaTime();
+	Vec3 up = { 0, 1, 0 };
+	m_vRight = up.Cross(m_vLook);
+	m_vLook.y = 0.0f;
+	m_vRight.y = 0.0f;
+
+	m_vLook.Normalize();
+	m_vRight.Normalize();
+
+	Vec3 moveDir;
+	if (INPUT->GetButtonDown(W))
+	{
+		moveDir += up;
+	}
+
+	if (INPUT->GetButtonDown(S))
+	{
+		moveDir += -up;
+	}
+
+	if (moveDir.Length() > 0)
+	{
+		// 이동
+		{
+			// Anim control 을 state로 넣어버리자. flag 세팅을 해주는 방식으로 전달만 해 
+			dynamic_pointer_cast<PlayerClimbState>(climb)->CheckIsMoving(true);
+			Vec3 pos = moveDir * 0.2f;
+			GetOwner()->AddPosition(pos);
+		}
+	}
+	else
+	{
+		dynamic_pointer_cast<PlayerClimbState>(climb)->CheckIsMoving(false);
 	}
 }
 
@@ -503,6 +498,127 @@ void PlayerMoveScript::UpdateCollider()
 	Vec3 currentRot = GetOwner()->GetRotation();
 	currentRot.y = targetYaw;
 	attackRangeActor->SetRotation(currentRot);
+}
+
+void PlayerMoveScript::UpdateBow()
+{
+	Vec3 bowPos = GetOwner()->GetMeshComponent()->GetChildByName(L"LeftHandSocket")->GetWorldPosition();
+	bow->SetPosition(bowPos);
+	float targetYaw = atan2f(GetOwner()->GetLook().x, GetOwner()->GetLook().z);
+	Vec3 currentRot = GetOwner()->GetRotation();
+	currentRot.y = targetYaw;
+	bow->SetRotation(currentRot);
+}
+
+void PlayerMoveScript::CheckCoolTIme()
+{
+	if (m_bDamageCoolTime)
+	{
+		m_fDamageCoolTime -= TIMER->GetDeltaTime();
+		if (m_fDamageCoolTime < 0)
+		{
+			m_bDamageCoolTime = false;
+			m_fDamageCoolTime = 1.0f;
+			m_bCanBeHit = true;
+		}
+	}
+	if (m_bRollCoolTime)
+	{
+		m_fRollCoolTime -= TIMER->GetDeltaTime();
+		if (m_fRollCoolTime < 0)
+		{
+			m_bRollCoolTime = false;
+			m_fRollCoolTime = 0.5f;
+			m_bCanRoll = true;
+		}
+	}
+}
+
+void PlayerMoveScript::CheckClimb()
+{
+	if (m_bCanClimb && INPUT->GetButton(E))
+	{
+		GetOwner()->SetPosition(m_vLadder);
+		dynamic_pointer_cast<TPlayer>(GetOwner())->StartClimbing();
+		dynamic_pointer_cast<PlayerClimbState>(climb)->SetLadderDir(m_vDirToLadder);
+		ChangeState(climb);
+	}
+}
+
+void PlayerMoveScript::CheckRoll()
+{
+	if (INPUT->GetButton(SPACE) && m_bCanRoll)
+	{
+		// 구르기
+		m_vRollLook = GetOwner()->GetLook();
+		ChangeState(roll);
+
+		m_bCanRoll = false;
+	}
+}
+
+void PlayerMoveScript::CheckAttack()
+{
+	// ATTACK
+	if (INPUT->GetButton(LCLICK))
+	{
+		if (currentState->GetId() != PLAYER_S_ATTACK)
+		{
+			ChangeState(attack);
+
+			UpdateCollider();
+			//leftHandSword.lock()->SetVisible(true);
+			//backSword.lock()->SetVisible(false);
+			//m_bSlashPlaying = true;
+			//m_fSlashTime = 0.0f;
+
+			//
+			attackRangeActor->m_bCollision = true;
+			attackRangeActor->GetShapeComponent()->m_bVisible = true;
+		}
+	}
+	if (INPUT->GetButton(RCLICK))
+	{
+		bow->m_bRender = true;
+		// TPlayer의 arrowCount 확인해서 bool 세팅하기 
+		int aCount = dynamic_pointer_cast<TPlayer>(GetOwner())->GetArrowCount();
+		if (aCount > 0)
+		{
+			dynamic_pointer_cast<PlayerShootState>(shoot)->CheckShootCount(true);
+		}
+		else
+		{
+			dynamic_pointer_cast<PlayerShootState>(shoot)->CheckShootCount(false);
+		}
+		ChangeState(shoot);
+	}
+}
+
+void PlayerMoveScript::CheckComboAttack()
+{
+	// 입력 확인하고
+	if (INPUT->GetButton(LCLICK))
+	{
+		dynamic_pointer_cast<PlayerAttackState>(currentState)->CheckAttackCombo(true);
+	}
+
+	// state로 정보 넘기고 
+
+
+}
+
+void PlayerMoveScript::CheckMove()
+{
+	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
+	if (player->IsClimbing())
+	{
+		Climb();
+	}
+	else
+	{
+		Move();
+
+	}
 }
 
 void PlayerMoveScript::ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled)
@@ -536,7 +652,6 @@ void PlayerMoveScript::ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> co
 		ApplyDissolveToAllMaterials(comp->GetChild(i), _time);
 	}
 }
-
 
 void PlayerMoveScript::ApplyCrash()
 {

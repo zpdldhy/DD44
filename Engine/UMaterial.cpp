@@ -26,7 +26,10 @@ void UMaterial::Bind()
 	if (m_pShader)
 	{
         DC->VSSetShader(m_pShader->m_pVertexShader.Get(), nullptr, 0);
-        DC->PSSetShader(m_pShader->m_pPixelShader.Get(), nullptr, 0);
+        if (m_pShader->m_pPixelShader)
+            DC->PSSetShader(m_pShader->m_pPixelShader.Get(), nullptr, 0);
+        else
+            DC->PSSetShader(nullptr, nullptr, 0);
 	}
 
 	if (m_pTexture)
@@ -165,6 +168,14 @@ void UMaterial::SetDissolve(float _amount)
     UpdateEffectBuffer();
 }
 
+//void UMaterial::SetShader(const std::wstring& path)
+//{
+//    m_pShader = make_shared<Shader>();
+//    m_pShader->CreateVertexShader(path);
+//    m_pInputlayout = INPUTLAYOUT->Get(L"Default");
+//}
+
+
 void UMaterial::UpdateEffectBuffer()
 {
     if (!m_pEffectCB)
@@ -183,9 +194,10 @@ void UMaterial::SetUVRange(Vec2 start, Vec2 end)
     m_CB_SpriteUV->Push();
 }
 
-void UMaterial::SetSlashProgress(float _progress)
+void UMaterial::SetSlashProgress(float _progress, bool _reverse)
 {
     m_tSlashData.g_fProgress = _progress;
+    m_tSlashData.reverse = _reverse;
 
     D3D11_MAPPED_SUBRESOURCE mapped = {};
     DC->Map(m_pCB_Slash.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
