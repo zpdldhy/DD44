@@ -13,11 +13,13 @@ class UShapeComponent : public UPrimitiveComponent
 {
 protected:
 	CollisionEnabled m_CollisionEnabled = CollisionEnabled::CE_NOCOLLISION;
-	ShapeType m_ShapeType = ShapeType::ST_NONE;
+	ShapeType m_ShapeType = ShapeType::ST_COUNT;
 	DirectX::SimpleMath::Color m_pShapeColor = { 0.f, 0.f, 0.f, 0.f };
 
 	// 범위 표기
 	shared_ptr<class AActor> m_pCollisionRange = nullptr;
+	static vector<shared_ptr<class AInstance>> m_vInstanceList;
+	static bool isRendered;
 
 	Ray m_LookRay;
 	Ray m_GroundRay;
@@ -34,6 +36,7 @@ public:
 
 private:
 	void PreRender() override {}
+	void Render() override;
 	void PostRender() override {}
 
 public:
@@ -53,5 +56,9 @@ public:
 
 	const Ray& GetLookRay() { return m_LookRay; }
 	const Ray& GetGroundRay() { return m_GroundRay; }
+
+protected:
+	void SetInstance(shared_ptr<AActor> _pActor);
+	void MakeInstance(shared_ptr<AActor> _pActor);
 };
 

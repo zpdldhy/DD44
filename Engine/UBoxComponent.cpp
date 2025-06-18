@@ -6,6 +6,8 @@
 #include "Device.h"
 #include "DxState.h"
 
+array<shared_ptr<class AInstance>, static_cast<size_t>(RangeType::RT_COUNT)> m_pRangeInstance;
+
 void UBoxComponent::Init()
 {
 	UShapeComponent::Init();
@@ -32,37 +34,13 @@ void UBoxComponent::Tick()
 #endif // DEBUG
 }
 
-void UBoxComponent::Render()
-{
-	UShapeComponent::Render();
-
-#ifndef DEBUG
-	if (m_bVisible && g_bRangeVisibleMode)
-	{
-		if (m_pCurrentRasterizer)
-			m_pCurrentRasterizer.Reset();
-
-		DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
-		DC->RSSetState(STATE->m_pRSWireFrame.Get());
-
-		m_pCollisionRange->Render();
-
-		m_pLookRange->Render();
-		m_pDownRange->Render();
-
-		DC->RSSetState(m_pCurrentRasterizer.Get());
-
-		m_pCurrentRasterizer.Reset();
-	}
-#endif // DEBUG
-}
-
 void UBoxComponent::Destroy()
 {
 #ifndef DEBUG
 	if (m_pCollisionRange)
 	{
 		m_pCollisionRange->Destroy();
+		isRendered = false;
 	}
 #endif // DEBUG
 }
@@ -110,6 +88,7 @@ void UBoxComponent::CreateCollisionRange()
 		m_pCollisionRange->SetPosition(m_vWorldPosition);
 
 		m_pCollisionRange->Init();
+		SetInstance(m_pCollisionRange);
 	}
 	{
 		m_pLookRange = make_shared<AActor>();
@@ -126,6 +105,7 @@ void UBoxComponent::CreateCollisionRange()
 		m_pLookRange->SetPosition(m_vWorldPosition);
 
 		m_pLookRange->Init();
+		SetInstance(m_pLookRange);
 	}
 	{
 		m_pDownRange = make_shared<AActor>();
@@ -142,6 +122,7 @@ void UBoxComponent::CreateCollisionRange()
 		m_pDownRange->SetPosition(m_vWorldPosition);
 
 		m_pDownRange->Init();
+		SetInstance(m_pDownRange);
 	}
 }
 
