@@ -112,9 +112,6 @@ struct PrefabParticleData
     int Row = 0;
     int Col = 0;
 
-    Vec2 UVStart = { 0.0f, 0.0f };
-    Vec2 UVEnd = { 1.0f, 1.0f };
-
     float BillboardSizeX = 100.0f;
     float BillboardSizeY = 100.0f;
 

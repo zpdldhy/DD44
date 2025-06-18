@@ -55,12 +55,6 @@ struct CB_MaterialEffect
 //	float padding[3];
 //};
 
-struct CB_SpriteUV
-{
-	Vec2 uvStart = { 0.0f, 0.0f };
-	Vec2 uvEnd = { 1.0f, 1.0f };
-};
-
 struct CB_Slash
 {
 	float g_fProgress = 0.0f;
@@ -82,7 +76,6 @@ class UMaterial
 	
 	ComPtr<ID3D11Buffer> m_pEffectCB; // ХыЧе CB
 	ComPtr<ID3D11Buffer> m_pCB_Slash;
-	shared_ptr<class ConstantBuffer<CB_SpriteUV>> m_CB_SpriteUV;
 
 	CB_MaterialEffect m_tEffectData = {};
 
@@ -108,7 +101,6 @@ public:
 	void SetUseEffect(bool _bUseEffect) { m_bUseEffect = _bUseEffect; }
 	void SetIsMetal(bool _bMetal, float _shininess);
 	bool IsUseEffect() { return m_bUseEffect; }
-	void SetUVRange(Vec2 start, Vec2 end);
 	void SetTintColor(const Vec4& color);
 	void SetCrash(bool _bCrash);
 	void SetDissolve(float _amount);

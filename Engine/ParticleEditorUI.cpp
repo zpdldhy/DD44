@@ -69,8 +69,6 @@ void ParticleEditorUI::DrawUI()
 			m_vTextureList[0].c_str(),
 			m_szShaderPath,
 			m_Data,
-			m_UVStart,
-			m_UVEnd,
 			m_iDivisions,
 			m_AnimData.DurationSeconds,
 			m_AnimData.bLoop,
@@ -88,7 +86,6 @@ void ParticleEditorUI::DrawUI()
 		newParticle->InitSpriteAnimation(m_iDivisions, m_AnimData.DurationSeconds);
 		newParticle->m_bLoop = m_AnimData.bLoop;
 		newParticle->m_bAutoDestroy = m_AnimData.bAutoDestroy;
-		newParticle->SetUV(m_UVStart, m_UVEnd);
 	}
 
 	ImGui::Text("Load Prefab:");
@@ -139,8 +136,6 @@ void ParticleEditorUI::DrawUI()
 			m_Data.Scale[1] = data.Scale.y;
 			m_Data.Scale[2] = data.Scale.z;
 
-			m_UVStart = data.UVStart;
-			m_UVEnd = data.UVEnd;
 			m_iDivisions = data.Divisions;
 			m_iSelectedRow = data.Row;
 			m_iSelectedCol = data.Col;
@@ -166,8 +161,6 @@ void ParticleEditorUI::DrawUI()
 					m_vTextureList[0].c_str(),
 					m_szShaderPath,
 					m_Data,
-					m_UVStart,
-					m_UVEnd,
 					m_iDivisions,
 					m_AnimData.DurationSeconds,
 					m_AnimData.bLoop,
@@ -240,8 +233,6 @@ void ParticleEditorUI::DrawUI()
 						p.TexturePath.c_str(),
 						p.ShaderPath.c_str(),
 						tempData,
-						p.UVStart,
-						p.UVEnd,
 						p.Divisions,
 						p.Duration,
 						p.bLoop,
@@ -268,15 +259,8 @@ void ParticleEditorUI::DrawUI()
 	ImGui::InputInt("Divisions (NxN)", &m_iDivisions);
 	if (ImGui::Button("Apply UV Grid"))
 	{
-		float cellSize = 1.0f / (float)m_iDivisions;
-		m_UVStart.x = m_iSelectedCol * cellSize;
-		m_UVStart.y = m_iSelectedRow * cellSize;
-		m_UVEnd.x = (m_iSelectedCol + 1) * cellSize;
-		m_UVEnd.y = (m_iSelectedRow + 1) * cellSize;
 		if (auto actor = GetSelectedActor())
 		{
-			actor->SetUV(m_UVStart, m_UVEnd);
-
 			float duration = actor->GetDuration();
 			actor->InitSpriteAnimation(m_iDivisions, duration);
 		}
@@ -342,8 +326,6 @@ void ParticleEditorUI::DrawUI()
 					m_vTextureList[m_iSelectedTextureIndex].c_str(),
 					m_szShaderPath,
 					copy,
-					m_UVStart,
-					m_UVEnd,
 					m_iDivisions,
 					m_AnimData.DurationSeconds,
 					m_AnimData.bLoop,
@@ -354,7 +336,6 @@ void ParticleEditorUI::DrawUI()
 			newParticle->InitSpriteAnimation(m_iDivisions, m_AnimData.DurationSeconds);
 			newParticle->m_bLoop = m_AnimData.bLoop;
 			newParticle->m_bAutoDestroy = m_AnimData.bAutoDestroy;
-			newParticle->SetUV(m_UVStart, m_UVEnd);
 			newParticle->SetPosition(randPos);
 			newParticle->SetRotation(Vec3(copy.Rotation));
 			newParticle->SetScale(Vec3(copy.Scale));
@@ -441,8 +422,6 @@ void ParticleEditorUI::DrawUI()
 		data.Divisions = m_iDivisions;
 		data.Row = m_iSelectedRow;
 		data.Col = m_iSelectedCol;
-		data.UVStart = m_UVStart;
-		data.UVEnd = m_UVEnd;
 		data.BillboardSizeX = m_Data.Scale[0]; // 또는 따로 관리하는 값
 		data.BillboardSizeY = m_Data.Scale[1];
 		data.Duration = m_AnimData.DurationSeconds;
@@ -497,8 +476,6 @@ void ParticleEditorUI::DrawUI()
 			data.Divisions = m_iDivisions;
 			data.Row = m_iSelectedRow;
 			data.Col = m_iSelectedCol;
-			data.UVStart = m_UVStart;
-			data.UVEnd = m_UVEnd;
 
 			data.Duration = m_AnimData.DurationSeconds;
 			data.bLoop = m_AnimData.bLoop;
@@ -613,9 +590,6 @@ void ParticleEditorUI::ResetData()
 	m_Data.Scale[0] = 20.0f;
 	m_Data.Scale[1] = 20.0f;
 	m_Data.Scale[2] = 1.0f;
-
-	m_UVStart = { 0.0f, 0.0f };
-	m_UVEnd = { 1.0f, 1.0f };
 
 	if (m_vTextureList.empty())
 	{

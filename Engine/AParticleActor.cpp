@@ -73,23 +73,12 @@ void AParticleActor::Tick()
 
 		GetMeshComponent()->SetInstanceStartUV(uvStart);
 		GetMeshComponent()->SetInstanceEndUV(uvEnd);
-		SetUV(uvStart, uvEnd);
 	}
 }
 
 void AParticleActor::Render()
 {
 	AActor::Render();
-}
-
-void AParticleActor::SetUV(Vec2 start, Vec2 end)
-{
-	m_uvStart = start;
-	m_uvEnd = end;
-
-	auto mesh = GetMeshComponent();
-	auto mat = mesh->GetMaterial();
-	mat->SetUVRange(m_uvStart, m_uvEnd);
 }
 
 void AParticleActor::InitSpriteAnimation(int divisions, float duration)
