@@ -27,6 +27,8 @@ public:
 
 	// Attack
 	shared_ptr<AActor> attackRangeActor;
+	shared_ptr<AActor> bow;
+	shared_ptr<AActor> sword;
 	Vec3 colOffset;
 
 	Vec3 m_vLook;
@@ -38,24 +40,29 @@ public:
 	shared_ptr<Texture> m_pSubTexture;
 	shared_ptr<Texture> m_pNoiesTexture;
 
-	// Child Mesh Components
-	weak_ptr<UMeshComponent> backSword;
-	weak_ptr<UMeshComponent> handSword;
-
 	shared_ptr<StateBase> idle;
 	shared_ptr<StateBase> walk;
+	shared_ptr<StateBase> climb;
 	shared_ptr<StateBase> roll;
 	shared_ptr<StateBase> attack;
 	shared_ptr<StateBase> hit;
 	shared_ptr<StateBase> shoot;
 	shared_ptr<StateBase> die;
 	shared_ptr<StateBase> currentState;
+	PLAYER_STATE currentStateId;
 
-	// Slash 
-	shared_ptr<UMaterial> m_pSlashMaterial = nullptr;
-	float m_fSlashTime = 0.0f;
-	bool m_bSlashPlaying = false;
-	float m_fSlashDuration = 0.5f;
+	// Cilmb
+	bool m_bCanClimb = false;
+	Vec3 m_vLadder;
+	Vec3 m_vDirToLadder;
+	Vec3 m_vLadderEnd;
+
+	// state·Î ÀÌ°ü
+	//// Slash 
+	//shared_ptr<UMaterial> m_pSlashMaterial = nullptr;
+	//float m_fSlashTime = 0.0f;
+	//bool m_bSlashPlaying = false;
+	//float m_fSlashDuration = 0.3f;
 	 
 	// Camera Offset
 	Vec3 m_vCameraOffset = { 20.0f, 30.0f, -20.0f };
@@ -68,14 +75,18 @@ public:
 	//Dissolve
 	float m_fDissolveTimer = 0.0f;
 	bool m_bDissolving = false;
+
+	// Combo
+	int maxComboCount = 3;
 public:
 	void Init() override;
 	void Tick() override;
 	virtual shared_ptr<UScriptComponent> Clone() override;
 public:
-	void ChangetState(shared_ptr<StateBase> _state);
+	void ChangeState(shared_ptr<StateBase> _state);
 public:
-	void Slash();
+	void PlayFX();
+	//void Slash();
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
 	void VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp);
 	float m_fHitFlashTimer = 0.0f;
@@ -87,9 +98,18 @@ public:
 
 public:
 	void Move();
-	void CheckHit();
+	void Climb();
+	void CheckCollision();
 	void RollMove();
 	bool CanAttack();
 	void UpdateCollider();
+	void UpdateBow();
+	void CheckCoolTIme();
+public:
+	void CheckClimb();
+	void CheckRoll();
+	void CheckAttack();
+	void CheckComboAttack();
+	void CheckMove();
 };
 

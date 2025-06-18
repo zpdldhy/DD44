@@ -54,7 +54,7 @@ void ProjectileManager::Tick()
 				auto healthComp = dynamic_pointer_cast<TCharacter>(actor);
 				if (healthComp)
 				{
-					healthComp->CheckHitByProjectile(true);
+					healthComp->CheckHitByProjectile((int)(*iter).type, true);
 				}
 			}
 			

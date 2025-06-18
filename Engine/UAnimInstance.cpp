@@ -59,7 +59,13 @@ void UAnimInstance::Tick()
 	}*/
 
 	// Event
-	TriggetEvent(currentAnimTrackIndex, animFrame);
+	// should play event only once per frame
+	UINT currentFrame = static_cast<UINT>(animFrame);
+	if (currentFrame != lastEventFrame)
+	{
+		TriggetEvent(currentAnimTrackIndex, currentFrame);
+		lastEventFrame = currentFrame;
+	}
 }
 
 shared_ptr<UAnimInstance> UAnimInstance::Clone()

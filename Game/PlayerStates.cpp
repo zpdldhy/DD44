@@ -9,6 +9,7 @@
 #include "CollisionManager.h"
 #include "ObjectManager.h"
 #include "ProjectileManager.h"
+#include "UMaterial.h"
 
 PlayerIdleState::PlayerIdleState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_IDLE)
 {
@@ -86,7 +87,7 @@ void PlayerWalkState::End()
 PlayerAttackState::PlayerAttackState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_ATTACK)
 {
 	m_pOwner = _pOwner;
-	m_bCanInterrupt = false;
+	m_bCanInterrupt = true;
 }
 void PlayerAttackState::Enter()
 {
@@ -94,30 +95,193 @@ void PlayerAttackState::Enter()
 	m_bOnPlaying = true;
 	SOUND->GetPtr(ESoundType::Slash)->PlayEffect2D();
 
+	// Rotation
+	CheckMouse();
+	Rotate();
+
 	// 애니메이션 Attack 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int attackIndex = animInstance->GetAnimIndex(L"Slash_Light_R_new");
+	animInstance->m_fAnimPlayRate = 30.0f;
 	animInstance->PlayOnce(attackIndex);
+
+	// Sword
+	auto back = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"BackSword");
+	back->SetVisible(false);
+	auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftSword");
+	left->SetVisible(true);
+
+	// Slash
+	m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(true);
+
+	// FX 세팅
+	m_pSlashMaterial = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->GetMaterial();
+	m_bSlashPlaying = true;
+	m_fSlashTime = 0.0f;
 }
 void PlayerAttackState::Tick()
 {
+	// FX
+	Slash();
+
+	//
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int nextAnim;
+	bool oneEnd = false;
 	if (!animInstance->m_bOnPlayOnce)
 	{
-		// 애니메이션 종료
+		oneEnd = true;
+		if (!m_bOnCombo)
+		{
+			currentPhase = AttackCombo::Done;
+		}
+	}
+	if (!oneEnd) { return; }
+
+	switch (currentPhase)
+	{
+	case AttackCombo::OnFirst:
+	{
+		// 앞으로 조금 이동
+		reverse = true;
+		m_bSlashPlaying = true;
+		m_fSlashTime = 0.0f;
+		CheckMouse();
+		Rotate();
+		Move();
+		nextAnim = animInstance->GetAnimIndex(L"Slash_Light_L_new");
+		animInstance->PlayOnce(nextAnim);
+
+		// Sword
+		auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftSword");
+		left->SetVisible(false);
+		auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightSword");
+		right->SetVisible(true);
+
+		//
+		m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(true);
+
+		currentPhase = OnSecond;
+		m_bOnCombo = false;
+	}
+	break;
+	case AttackCombo::OnSecond:
+	{
+		reverse = false;
+		m_bSlashPlaying = true;
+		m_fSlashTime = 0.0f;
+		CheckMouse();
+		Rotate();
+		Move();
+		nextAnim = animInstance->GetAnimIndex(L"Slash_Light_R_new");
+		animInstance->PlayOnce(nextAnim);
+		
+		// Sword
+		auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftSword");
+		left->SetVisible(true);
+		auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightSword");
+		right->SetVisible(false);
+
+		//
+		m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(true);
+		
+		currentPhase = OnThird;
+		m_bOnCombo = false;
+	}
+	break;
+	case AttackCombo::OnThird:
+	{
 		End();
 	}
+	break;
+	case AttackCombo::Done:
+	{
+		End();
+	}
+	break;
+	default:
+		break;
+	}
+
 }
 void PlayerAttackState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	animInstance->m_fAnimPlayRate = 25.0f;
+
+	currentPhase = AttackCombo::OnFirst;
+	reverse = false;
+
+	// Sword
+	auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftSword");
+	left->SetVisible(false);
+	auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightSword");
+	right->SetVisible(false);
+	auto back = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"BackSword");
+	back->SetVisible(true);
+	
+	// 
+	m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(false);
 }
-void PlayerAttackState::SetComponent(shared_ptr<UMeshComponent> _sword, shared_ptr<UMeshComponent> _hand, shared_ptr<UMeshComponent> _back)
+
+void PlayerAttackState::CheckMouse()
 {
-	m_pSword = _sword;
-	m_pHandSocket = _hand;
-	m_pBackSocket = _back;
+	MouseRay ray;
+	ray.Click();
+
+	auto playerPos = m_pOwner.lock()->GetPosition();
+	playerPos.y += 1.f;
+	Vec3 inter;
+
+	Collision::GetIntersection(ray, playerPos, Vec3(0.f, 1.f, 0.f), inter);
+	dir = inter - m_pOwner.lock()->GetPosition();
+}
+
+void PlayerAttackState::Rotate()
+{
+	float targetYaw = atan2f(dir.x, dir.z);
+	Vec3 currentRot = m_pOwner.lock()->GetRotation();
+	currentRot.y = targetYaw;
+	m_pOwner.lock()->SetRotation(currentRot);
+}
+
+void PlayerAttackState::Move()
+{
+	m_pOwner.lock()->SetMove(dir, 0.5f);
+}
+
+void PlayerAttackState::Slash()
+{
+	if (m_bSlashPlaying)
+	{
+		m_fSlashTime += TIMER->GetDeltaTime();
+
+		float t = m_fSlashTime;
+		float progress = 0.0f;
+
+
+		if (t <= 0.3f)
+		{
+			float ratio = t / 0.3f;
+			progress = pow(ratio, 2.0f);
+		}
+		else
+		{
+			progress = -1.0f;
+		}
+
+		if (m_pSlashMaterial)
+			m_pSlashMaterial->SetSlashProgress(progress, reverse);
+
+		if (t >= m_fSlashDuration)
+		{
+			m_bSlashPlaying = false;
+			m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(false);
+
+		}
+	}
 }
 
 PlayerHitState::PlayerHitState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_HIT)
@@ -353,18 +517,16 @@ void PlayerShootState::Rotate()
 }
 void PlayerShootState::CheckMouse()
 {
-	MouseRay m_vRay;
+	MouseRay ray;
+	ray.Click();
 
-	m_vRay.Click();
+	auto playerPos = m_pOwner.lock()->GetPosition();
+	playerPos.y += 1.f;
+	Vec3 inter;
 
-	shared_ptr<AActor> pActor = nullptr;
-	Collision::CheckRayCollision(m_vRay, OBJECT->GetActorIndexList(), pActor);
+	Collision::GetIntersection(ray, playerPos, Vec3(0.f, 1.f, 0.f), inter);
+	dir = inter - m_pOwner.lock()->GetPosition();
 
-	if (pActor)
-	{
-		dir = pActor->GetPosition() - m_pOwner.lock()->GetPosition();
-		// 바닥은 안찍혀 ? 
-	}
 }
 void PlayerShootState::CheckShootCount(bool _able)
 {
@@ -415,10 +577,6 @@ PlayerShoot::PlayerShoot(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_SHOOT)
 	// AnimSetting
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Arrow");
-
-	// 공격 가능 여부에 따라 다른 이벤트 추가
-	// Anim에 key 넣는 거 좀 생각을 더 해봐야할 듯 Enter가 계속 들어오자나 
-	// 그리고 계속 있고. 
 	animInstance->AddEvent(index, 22, [this]() {
 		this->CanShoot();
 		});
@@ -462,4 +620,139 @@ void PlayerShoot::CanShoot()
 	PROJECTILE->ActivateOne(ProjectileType::PlayerArrow, pos, look);
 
 	dynamic_pointer_cast<TPlayer>(m_pOwner.lock())->DecArrowCount();
+}
+
+PlayerClimbState::PlayerClimbState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_CLIMB)
+{
+	m_pOwner = _pOwner;
+	// 사다리 오를 때 공격당하면 어떻게 되지 ? 
+	m_bCanInterrupt = false;
+
+	finish = make_shared<PlayerClimbFinish>(m_pOwner);
+}
+void PlayerClimbState::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+
+	// 애니메이션 Attack 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int attackIndex = animInstance->GetAnimIndex(L"Climbing_ladder");
+	animInstance->SetCurrentAnimTrack(attackIndex);
+
+	// 중력 적용
+	m_pOwner.lock()->GetPhysicsComponent()->SetWeight(0.f);
+}
+void PlayerClimbState::Tick()
+{
+	float targetYaw = atan2f(ladderDir.x, ladderDir.z);
+	Vec3 currentRot = m_pOwner.lock()->GetRotation();
+	currentRot.y = targetYaw;
+	m_pOwner.lock()->SetRotation(currentRot);
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	switch (currentPhase)
+	{
+	case ClimbPhase::Playing:
+	{
+		if (isMoving)
+		{
+			animInstance->m_bPlay = true;
+		}
+		else
+		{
+			animInstance->m_bPlay = false;
+		}
+
+		if (isFinish)
+		{
+			currentPhase = ClimbPhase::Finish;
+			finish->SetLadderDir(ladderDir);
+			finish->Enter();
+		}
+	}
+	break;
+	case ClimbPhase::Finish:
+	{
+		finish->Tick();
+		if (!finish->IsPlaying())
+		{
+			currentPhase = ClimbPhase::Done;
+			End();
+		}
+	}
+	break;
+	case ClimbPhase::Done:
+		End();
+		break;
+	}
+
+}
+void PlayerClimbState::End()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = false;
+	isFinish = false;
+	currentPhase = ClimbPhase::Playing;
+}
+void PlayerClimbState::CheckMove(bool _isMoving)
+{
+	isMoving = _isMoving;
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	animInstance->m_bPlay = isMoving;
+}
+
+void PlayerClimbState::SetLadderDir(Vec3 _dir)
+{
+	ladderDir = _dir;
+}
+
+PlayerClimbFinish::PlayerClimbFinish(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_CLIMB)
+{
+	m_pOwner = _pOwner;
+	m_bCanInterrupt = false;
+}
+void PlayerClimbFinish::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+
+	// 애니메이션 Attack 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int index = animInstance->GetAnimIndex(L"Climbing_off_ladder_top");
+	animInstance->m_bPlay = true;
+	animInstance->PlayOnce(index);
+}
+void PlayerClimbFinish::Tick()
+{
+	// AddPosition 조금
+	ladderDir.Normalize();
+	Vec3 look = ladderDir;
+	Vec3 up = m_pOwner.lock()->GetUp();
+
+	float offset = 1.0f;
+	Vec3 moveDir = look * 1.0f + up * 0.5f;
+
+	moveDir.Normalize();
+
+	m_pOwner.lock()->AddPosition(moveDir * 0.05);
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	if (!animInstance->m_bOnPlayOnce)
+	{
+		// 애니메이션 종료
+		m_pOwner.lock()->GetPhysicsComponent()->SetWeight(1.f);
+		dynamic_pointer_cast<TPlayer>(m_pOwner.lock())->StopClimbing();
+		End();
+	}
+}
+void PlayerClimbFinish::End()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = false;
+}
+
+void PlayerClimbFinish::SetLadderDir(Vec3 _dir)
+{
+	ladderDir = _dir;
 }

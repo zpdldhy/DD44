@@ -21,7 +21,6 @@
 void TestPlayer::Init()
 {
 #pragma region SetupScene
-
 	SetupSunLight();
 	//Gizmo ¼¼ÆÃ
 	{
@@ -62,8 +61,8 @@ void TestPlayer::Init()
 	}
 #pragma endregion
 #pragma region LOAD_ASSET
-
 	ACTORLOADER->LoadAllAsset();
+
 	meshLoader = make_shared<MeshLoader>();
 	meshLoader->SetMesh(ACTORLOADER->LoadMeshMap());
 	meshLoader->SetAnim(ACTORLOADER->LoadAnimMap());
