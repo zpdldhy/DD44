@@ -102,6 +102,9 @@ struct PS_OUT
 
 Texture2D g_txDiffuseA : register(t0);
 SamplerState sample : register(s0);
+// 그림자용
+Texture2D<float> g_txShadow : register(t3); 
+SamplerComparisonState g_samShadow : register(s1); 
 
 ///funtion
 //==============================

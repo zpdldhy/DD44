@@ -17,6 +17,7 @@ protected:
 
 public:
 	void Render() override;
+	void RenderShadow();
 
 protected:
 	virtual void ClearBind();

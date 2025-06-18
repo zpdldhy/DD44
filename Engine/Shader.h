@@ -11,10 +11,13 @@ public:
 
 public:
 	bool Load(wstring _filePath, string _VSEntry, string _PSEntry);
+	bool CreateVertexShader(wstring, string);
+	bool CreatePixelShader(wstring, string);
+	ComPtr<ID3D11VertexShader> GetVS() const { return m_pVertexShader; }
+	ComPtr<ID3D11PixelShader>  GetPS() const { return m_pPixelShader; }
+	ComPtr<ID3DBlob>           GetCode() const { return m_pCode; }
 
 private:
-	bool CreateVertexShader(wstring _filePath, string _VSEntry);
-	bool CreatePixelShader(wstring _filePath, string _PSEntry);
 	virtual void Release();
 };
 

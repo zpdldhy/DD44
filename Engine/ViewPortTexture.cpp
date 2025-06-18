@@ -114,35 +114,6 @@ void ViewPortTexture::CreateViewPortTexture(FLOAT _fWidth, FLOAT _fHeight)
 	}
 }
 
-//void ViewPortTexture::BeginViewPort()
-//{
-//	m_iViewPorts = 1;
-//	// Get Prev ViewPort
-//	DC->RSGetViewports(&m_iViewPorts, &m_PrevVP);
-//	DC->OMGetRenderTargets(1, &m_pPrevRTV, &m_pPrevDSV);
-//
-//	ID3D11ShaderResourceView* pNullSRV = nullptr;
-//	DC->PSSetShaderResources(0, 1, &pNullSRV);
-//
-//	ID3D11RenderTargetView* pNullRTV = nullptr;
-//	DC->OMSetRenderTargets(1, &pNullRTV, NULL);
-//
-//	DC->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
-//
-//	// Clear
-//	ClearViewPort();
-//
-//	DC->RSSetViewports(1, &m_CurrentVP);
-//}
-//
-//void ViewPortTexture::EndViewPort()
-//{
-//	DC->RSSetViewports(m_iViewPorts, &m_PrevVP);
-//	DC->OMSetRenderTargets(1, &m_pPrevRTV, m_pPrevDSV);
-//	m_pPrevRTV->Release(); m_pPrevRTV = nullptr;
-//	m_pPrevDSV->Release(); m_pPrevDSV = nullptr;
-//}
-
 void ViewPortTexture::SetViewPort(FLOAT _fWidth, FLOAT _fHeight)
 {
 	m_CurrentVP.TopLeftX = 0;

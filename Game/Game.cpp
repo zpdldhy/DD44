@@ -51,8 +51,11 @@ void Game::Init()
 	// Asset ·Îµù
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
+	for (auto map : m_vMapList)
+	{
+		map->m_bCastShadow = false;
+	}
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
-
 	OBJECT->AddActorList(m_vMapList);
 	OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
@@ -110,7 +113,7 @@ void Game::Tick()
 
 	//bgm
 	{
-		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
+		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
 	}
 	//wind	
 	{
@@ -144,6 +147,7 @@ void Game::Tick()
 
 void Game::Render()
 {
+
 }
 
 void Game::Destroy()
@@ -153,7 +157,6 @@ void Game::Destroy()
 	m_pPlayer = nullptr;
 	m_pSkyMesh = nullptr;
 	m_pSky = nullptr;
-	m_pSunLight = nullptr;
 
 	m_vPausedBackGround.clear();
 	m_vUpgradeBackGround.clear();
@@ -194,6 +197,7 @@ void Game::SetupSkybox()
 	m_pSky->m_szName = L"Sky";
 	m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 	m_pSky->SetMeshComponent(m_pSkyMesh);
+	m_pSky->m_bCastShadow = false;
 
 	shared_ptr<UMaterial> material = make_shared<UMaterial>();
 	material->Load(L"../Resources/Texture/skypano.png", L"../Resources/Shader/Sky.hlsl");
@@ -204,17 +208,22 @@ void Game::SetupSkybox()
 
 void Game::SetupSunLight()
 {
+	LIGHT->Clear();
+
 	m_pSunLight = make_shared<ALight>();
 	m_pSunLight->m_szName = L"SunLight";
-	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	m_pSunLight->GetLightComponent()->SetDirection({ -1.f, -1.f, -1.f });
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
 	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
-	m_pSunLight->SetPosition(Vec3(0, 100.0f, 0));
-	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-	OBJECT->AddActor(m_pSunLight);
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pSunLight);
+	Vec3 dir = Vec3(-1.f, -1.f, -1.f);
+	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+	m_pSunLight->SetPosition(dir * -300.f);
+	dir.Normalize();
+	m_pSunLight->GetCameraComponent()->SetLookTo(dir);
+	m_pSunLight->m_bCastShadow = false;
+
+	LIGHT->RegisterLight(m_pSunLight);
 }
 
 void Game::CreateWind()

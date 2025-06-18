@@ -3,6 +3,7 @@
 #include "Device.h"
 #include "UScriptComponent.h"
 #include "ObjectManager.h"
+#include "ShadowManager.h"
 
 AActor::AActor()
 {
@@ -73,6 +74,16 @@ void AActor::Render()
 			component->Render();
 		}
 	}
+}
+
+void AActor::RenderShadow()
+{
+	if (!m_bRender || !m_bCastShadow)
+		return;
+
+	auto meshComponent = GetMeshComponent();
+	if (meshComponent)
+		meshComponent->RenderShadow();
 }
 
 void AActor::Destroy()

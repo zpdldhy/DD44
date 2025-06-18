@@ -58,6 +58,10 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
         break;
     }
 
+    //그림자
+    actor->m_bCastShadow = false;
+
+
     // 메시
     auto mesh = UStaticMeshComponent::CreatePlane();
     actor->SetMeshComponent(mesh);

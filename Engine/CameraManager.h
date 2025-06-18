@@ -1,13 +1,6 @@
 #pragma once
 #include "Singleton.h"
-
-struct CameraConstantData
-{
-	Matrix matView;
-	Matrix matProjection;
-	Vec3   g_vCameraPos;
-	float  GameTime;
-};
+#include "ConstantData.h"
 
 enum class CameraViewType
 {

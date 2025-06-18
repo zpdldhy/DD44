@@ -26,7 +26,10 @@ void UMaterial::Bind()
 	if (m_pShader)
 	{
         DC->VSSetShader(m_pShader->m_pVertexShader.Get(), nullptr, 0);
-        DC->PSSetShader(m_pShader->m_pPixelShader.Get(), nullptr, 0);
+        if (m_pShader->m_pPixelShader)
+            DC->PSSetShader(m_pShader->m_pPixelShader.Get(), nullptr, 0);
+        else
+            DC->PSSetShader(nullptr, nullptr, 0);
 	}
 
 	if (m_pTexture)
@@ -164,6 +167,14 @@ void UMaterial::SetDissolve(float _amount)
     m_tEffectData.g_vDissolveColor = Vec3(1, 0.3f, 0.0f);
     UpdateEffectBuffer();
 }
+
+//void UMaterial::SetShader(const std::wstring& path)
+//{
+//    m_pShader = make_shared<Shader>();
+//    m_pShader->CreateVertexShader(path);
+//    m_pInputlayout = INPUTLAYOUT->Get(L"Default");
+//}
+
 
 void UMaterial::UpdateEffectBuffer()
 {

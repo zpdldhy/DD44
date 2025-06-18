@@ -27,7 +27,19 @@ struct VS_OUT_RIM
     float3 n : NORMAL;
     float2 t : TEXCOORD;
     float3 wPos : POSITIONWS;
+    float4 shadowCoord : TEXCOORD1;
 };
+
+cbuffer CB_Shadow : register(b12)
+{
+    matrix g_matShadowView;
+    matrix g_matShadowProj;
+};
+
+cbuffer CB_ShadowG : register(b13)
+{
+    matrix g_matShadowWorld;
+}
 
 ///funtion
 //==============================

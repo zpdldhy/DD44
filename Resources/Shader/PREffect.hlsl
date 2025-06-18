@@ -15,6 +15,10 @@ VS_OUT_RIM VS(VS_IN input)
     output.c = input.c;
     output.t = input.t;
 
+    float4 shadowCoord = mul(mul(worldPos, g_matShadowView), g_matShadowProj);
+    shadowCoord.y = -shadowCoord.y;
+    output.shadowCoord = shadowCoord;
+    
     return output;
 }
 
@@ -34,18 +38,50 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     float4 texColor = g_txDiffuseA.Sample(sample, input.t);
     float3 baseColor = texColor.rgb;
 
+    float3 shadowTexCoord = input.shadowCoord.xyz / input.shadowCoord.w;
+    shadowTexCoord.xy = shadowTexCoord.xy * 0.5f + 0.5f;
+
+    float shadow = 1.0f;
+    if (shadowTexCoord.x < 0 || shadowTexCoord.x > 1 || shadowTexCoord.y < 0 || shadowTexCoord.y > 1)
+    {
+        shadow = 0.0f;
+    }
+    else
+    {
+        float2 texelSize = float2(1.0f / 8192.0f, 1.0f / 8192.0f); // 
+        float result = 0.0f;
+        
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                float2 offset = float2(x, y) * texelSize;
+                result += g_txShadow.SampleCmpLevelZero(g_samShadow, shadowTexCoord.xy + offset, shadowTexCoord.z - 0.0001f);
+            }
+        }
+        shadow = result / 9.0f;
+        shadow = lerp(1.0f, shadow, 0.5f);
+        
+    }
+    
+    
     float3 ambient = ApplyAmbient();
     float3 diffuse = ApplyLambertLighting(input.n, input.wPos);
     float3 specular = ApplySpecular(input.n, input.wPos);
     float3 litColor = baseColor * (ambient + diffuse) + specular;
+    litColor *= shadow;
     float3 emissive = g_vEmissiveColor * g_fEmissivePower;
     // 최종 출력용은 모든 효과를 포함
     float3 finalColor = litColor + emissive;
     finalColor = ApplyGlow(finalColor);
     finalColor = ApplyHitFlash(finalColor);
-
+    
+    
     // output.c : 최종 결과
     output.c = float4(finalColor, texColor.a);
+
+    //shadowTexCoord = input.shadowCoord.xyz / input.shadowCoord.w;
+    //output.c = float4(shadowTexCoord.xy, shadowTexCoord.z, 1);
 
     // output.c1 : Blur 대상용 (보통 최종 결과와 동일하게 해도 무방)
     output.c1 = float4(finalColor, texColor.a);
@@ -61,4 +97,4 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     output.c6 = float4(input.p.z / input.p.w, 0.0f, 0.0f, 1.0f); // R 채널에만 깊이
     
     return output;
-    }
+}

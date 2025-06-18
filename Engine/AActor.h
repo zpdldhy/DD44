@@ -45,6 +45,7 @@ public:
 	virtual void Init();
 	virtual void Tick();
 	virtual void Render();
+	virtual void RenderShadow();
 	virtual void Destroy();
 
 	//--------------------------------------------------------------------------------------
@@ -117,4 +118,13 @@ public:
 
 public:	
 	void SetMove(const Vec3& _vDir, const float& _fMaxSpeed, const float& _fAccle = 1.0f) { m_pPhysics->SetMove(_vDir, _fMaxSpeed, _fAccle); }
+
+	//shadow
+public:
+	void SetCastShadow(bool b) { m_bCastShadow = b; }
+	bool IsCastShadow() const { return m_bCastShadow; }
+
+public:
+	bool m_bCastShadow = true;
+
 };

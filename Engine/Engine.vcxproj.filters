@@ -421,6 +421,12 @@
     <ClInclude Include="AInstance.h">
       <Filter>Object</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantData.h">
+      <Filter>Headers\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -710,6 +716,9 @@
     <ClCompile Include="USphereComponent.cpp" />
     <ClCompile Include="AInstance.cpp">
       <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowManager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

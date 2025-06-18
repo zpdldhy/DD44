@@ -89,7 +89,7 @@ void ProjectileManager::Create()
 		collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 		projectile->SetShapeComponent(collider);
 		projectile->m_szName = L"PlayerAttack";
-
+		projectile->m_bCastShadow = false;
 
 		OBJECT->AddActor(projectile);
 		ENEMYCOLLIDER->Add(projectile);
@@ -117,6 +117,7 @@ void ProjectileManager::Create()
 		collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 		ball->SetShapeComponent(collider);
 		ball->m_szName = L"MageSphere";
+		ball->m_bCastShadow = false;
 
 		OBJECT->AddActor(ball);
 		ENEMYCOLLIDER->Add(ball);

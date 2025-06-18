@@ -264,7 +264,7 @@ void BettyJumpAttack::NormalizeAnimSpeed()
 void BettyJumpAttack::PlayHandFx()
 {
 	// 사운드 ( 소스 변경 필요 ) 
-	SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
 
 	auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftHand");
 	auto right = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightHand");
@@ -279,7 +279,7 @@ void BettyJumpAttack::PlayHandFx()
 void BettyJumpAttack::PlayBodyFx()
 {
 	// 사운드 ( 소스 변경 필요 )
-	SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
 
 	Vec3 pos = m_pOwner.lock()->GetPosition();
 	EFFECT->PlayDustBurst(pos, 10.f, .8f);
@@ -547,7 +547,7 @@ void BettyRollAttack::SetTarget(weak_ptr<AActor> _target)
 void BettyRollAttack::PlayFx()
 {
 	// 사운드 ( 소스 변경 필요 )
-	SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
 
 	Vec3 pos = m_pOwner.lock()->GetPosition();
 	EFFECT->PlayDustBurst(pos, 10.f, .8f);

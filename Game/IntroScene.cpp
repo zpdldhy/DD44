@@ -52,7 +52,7 @@ void IntroScene::Init()
 
 void IntroScene::Tick()
 {
-	SOUNDMANAGER->GetPtr(ESoundType::Intro)->Play2D();
+	SOUND->GetPtr(ESoundType::Intro)->Play2D();
 	UpdateUIState();
 }
 
@@ -105,8 +105,8 @@ void IntroScene::SetupSunLight()
 	pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	OBJECT->AddActor(pSunLight);
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(pSunLight);
+	LIGHT->Clear();
+	LIGHT->RegisterLight(pSunLight);
 }
 
 void IntroScene::UpdateUIState()
@@ -114,7 +114,7 @@ void IntroScene::UpdateUIState()
 	if (m_iPrevMenu != m_vSelectMenu)
 	{
 		m_iPrevMenu = m_vSelectMenu;
-		SOUNDMANAGER->GetPtr(ESoundType::Hover)->PlayEffect2D();
+		SOUND->GetPtr(ESoundType::Hover)->PlayEffect2D();
 	}
 
 	if (!m_bSelectStartButton || !m_bSelectEndButton)
@@ -159,7 +159,7 @@ void IntroScene::UpdateUIState()
 				else if (iSelect == 2)
 					m_bSelectEndButton = true;
 
-				SOUNDMANAGER->GetPtr(ESoundType::Click)->PlayEffect2D();
+				SOUND->GetPtr(ESoundType::Click)->PlayEffect2D();
 			}		
 
 			menu->SetColor(Color(0.5f, 0.5f, 0.5f, 1.f));
@@ -182,7 +182,7 @@ void IntroScene::UpdateUIState()
 			if (INPUT->GetButton(ENTER))
 			{
 				m_bSelectStartButton = true;
-				SOUNDMANAGER->GetPtr(ESoundType::Click)->PlayEffect2D(); // 추가
+				SOUND->GetPtr(ESoundType::Click)->PlayEffect2D(); // 추가
 			}
 		}
 		break;
@@ -213,7 +213,7 @@ void IntroScene::UpdateUIState()
 			if (INPUT->GetButton(ENTER))
 			{
 				m_bSelectEndButton = true;
-				SOUNDMANAGER->GetPtr(ESoundType::Click)->PlayEffect2D(); // 추가
+				SOUND->GetPtr(ESoundType::Click)->PlayEffect2D(); // 추가
 			}
 		}
 		break;
@@ -261,6 +261,6 @@ void IntroScene::UpdateUIState()
 		auto game = make_shared<Game>();
 		game->Init();
 		Engine::GetInstance()->SetApp(game);
-		SOUNDMANAGER->GetPtr(ESoundType::Intro)->Stop();
+		SOUND->GetPtr(ESoundType::Intro)->Stop();
 	}
 }

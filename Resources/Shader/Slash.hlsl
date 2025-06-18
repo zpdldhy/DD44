@@ -23,6 +23,16 @@ VS_OUT VS(VS_IN input)
     return output;
 }
 
+VS_OUT VS_SHADOW(VS_IN input)
+{
+    VS_OUT output;
+    float4 worldPos = mul(float4(input.p, 1.0f), g_matShadowWorld);
+    worldPos = mul(worldPos, g_matShadowView);
+    output.p = mul(worldPos, g_matShadowProj);
+    
+    return output;
+}
+
 float4 PS(VS_OUT input) : SV_Target
 {
     float x = input.t.x;
@@ -67,4 +77,9 @@ float4 PS(VS_OUT input) : SV_Target
     float alpha = edgeMask;
     
     return float4(finalColor, alpha);
+}
+
+float PS_SHADOW(VS_OUT input) : SV_Depth
+{
+    return input.p.z / input.p.w;
 }

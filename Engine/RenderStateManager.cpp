@@ -93,6 +93,18 @@ void RenderStateManager::Apply(const RenderOption& option)
     case SamplerType::Border:
         DC->PSSetSamplers(0, 1, STATE->m_pBorderSS.GetAddressOf()); break;
     }
+
+    switch (option.rasterizer)
+    {
+    case RasterizerType::SolidBack:
+        DC->RSSetState(STATE->m_pRSSolid.Get()); break;
+    case RasterizerType::SolidNone:
+        DC->RSSetState(STATE->m_pRSSolidNone.Get()); break;
+    case RasterizerType::Wireframe:
+        DC->RSSetState(STATE->m_pRSWireFrame.Get()); break;
+    case RasterizerType::ShadowBias:
+        DC->RSSetState(STATE->m_pRSShadowBias.Get()); break;
+    }
 }
 
 void RenderStateManager::Restore()
