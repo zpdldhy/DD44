@@ -91,6 +91,7 @@ void Engine::Frame()
 
 		{
 			CAMERA->Tick();		// Fructum Range Render 때문에 Object 뒤에서 Render
+			EFFECT->Tick();
 			PARTICLE->Tick();
 			WIND->Tick();
 		}
@@ -123,6 +124,7 @@ void Engine::Render()
 	{
 		POSTPROCESS->PreRender();
 		OBJECT->Render();	// ObjectList Render
+		EFFECT->Render();
 		PARTICLE->Render();
 		WIND->Render();
 		POSTPROCESS->SetSRVToSlot(7, WIND->GetSRV());

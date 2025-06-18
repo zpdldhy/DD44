@@ -27,9 +27,39 @@ void EffectManager::Init()
             if (type == EEffectType::Dust || type == EEffectType::PoppingDust)
                 PARTICLE->AddUI(actor);
             else
-                OBJECT->AddActor(actor);
+            {
+                actor->Init();
+                m_vEffectList.emplace_back(actor);
+            }
         }
     }
+}
+
+void EffectManager::Tick()
+{
+    for(auto iter = m_vEffectList.begin();iter!= m_vEffectList.end();)
+    {
+        auto pEffect = *iter;
+        if (pEffect->m_bDelete == true)
+        {
+            iter = m_vEffectList.erase(iter);
+            continue;
+        }
+
+        pEffect->Tick();
+        iter++;
+    }
+}
+
+void EffectManager::Render()
+{
+    for(auto& pEffect : m_vEffectList)
+    {
+        if (pEffect->m_bRender==true)
+        {
+            pEffect->Render();
+        }
+	}
 }
 
 shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
