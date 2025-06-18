@@ -55,6 +55,7 @@ shared_ptr<UStaticMeshComponent> UStaticMeshComponent::CreateRay(Vec3 _vStart, V
 {
 	static shared_ptr<UStaticMeshResources> pMesh = nullptr;
 	auto pMeshComponent = make_shared<UStaticMeshComponent>();
+	pMeshComponent->SetMeshPath(L"Ray");
 
 	// Mesh Data Setting
 	vector<PNCT_VERTEX> vVertexList;

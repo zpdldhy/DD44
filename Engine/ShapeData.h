@@ -6,6 +6,16 @@ enum class ShapeType
 	ST_BOX,
 	ST_SPHERE,
 	ST_CAPSULE,
+	ST_COUNT,
+};
+
+enum class RangeType
+{
+	RT_BOX,
+	RT_SPHERE,
+	RT_LOOKRAY,
+	RT_DOWNRAY,
+	RT_COUNT,
 };
 
 struct MouseRay : public Ray

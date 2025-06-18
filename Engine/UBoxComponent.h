@@ -14,7 +14,6 @@ public:
 public:
 	void Init() override;
 	void Tick() override;
-	void Render() override;
 	void Destroy() override;
 
 	void UpdateBounds() override;

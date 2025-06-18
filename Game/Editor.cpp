@@ -41,6 +41,10 @@ void Editor::Init()
 	SetupEditorCallbacks();
 
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
+	for (auto map : m_vMapList)
+	{
+		map->m_bCastShadow = false;
+	}
 	OBJECT->AddActorList(m_vMapList);
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
@@ -62,6 +66,7 @@ void Editor::Init()
 	SetupSunLight();
 
 	PROJECTILE->Init();
+	EFFECT->Init();
 }
 
 void Editor::Tick()
@@ -144,6 +149,7 @@ void Editor::SetupSkybox()
 {
 	m_pSky = make_shared<ASky>();
 	m_pSky->m_szName = L"Sky";
+	m_pSky->m_bCastShadow = false;
 	m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 	m_pSky->SetMeshComponent(m_pSkyMesh);
 
