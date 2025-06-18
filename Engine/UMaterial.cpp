@@ -13,8 +13,6 @@ void UMaterial::Load(wstring _textureFileName, wstring _shaderFileName)
 	m_pInputlayout = INPUTLAYOUT->Get();
     
     CreateEffectCB();
-    m_CB_SpriteUV = make_shared<ConstantBuffer<CB_SpriteUV>>();
-    m_CB_SpriteUV->Create(4); 
     CreateSlashCB();
     
 }
@@ -47,12 +45,6 @@ void UMaterial::Bind()
         DC->VSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
         DC->PSSetConstantBuffers(2, 1, m_pEffectCB.GetAddressOf());
 	}
-
-    if (m_CB_SpriteUV)
-    {
-        m_CB_SpriteUV->Push();  
-    }
-
 }
 
 void UMaterial::CreateEffectCB()
@@ -182,16 +174,6 @@ void UMaterial::UpdateEffectBuffer()
         CreateEffectCB();
     else
     DC->UpdateSubresource(m_pEffectCB.Get(), 0, nullptr, &m_tEffectData, 0, 0);
-}
-
-void UMaterial::SetUVRange(Vec2 start, Vec2 end)
-{
-    if (!m_CB_SpriteUV) return;
-
-    m_CB_SpriteUV->data.uvStart = start;
-    m_CB_SpriteUV->data.uvEnd = end;
-    m_CB_SpriteUV->Update();
-    m_CB_SpriteUV->Push();
 }
 
 void UMaterial::SetSlashProgress(float _progress, bool _reverse)

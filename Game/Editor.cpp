@@ -695,8 +695,6 @@ void Editor::SetupParticleEditorCallback()
 		const char* texPath,
 		const char* shaderPath,
 		TransformData actorData,
-		Vec2 uvStart,
-		Vec2 uvEnd,
 		int divisions,
 		float duration,
 		bool loop,
@@ -716,7 +714,7 @@ void Editor::SetupParticleEditorCallback()
 			);
 
 			// 3. UV 설정 (셰이더에 넘기기 위함)
-			mat->SetUVRange(uvStart, uvEnd); // → SetUVRange() 함수 내부에서 CB 업데이트
+			//mat->SetUVRange(uvStart, uvEnd); // → SetUVRange() 함수 내부에서 CB 업데이트
 
 			// 4. 머티리얼, 트랜스폼 적용
 			meshComp->SetMaterial(mat);

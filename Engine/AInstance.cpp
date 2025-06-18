@@ -21,7 +21,8 @@ void AInstance::Render()
 		for (auto iter = m_vMeshList[iMeshIndex].begin(); iter!= m_vMeshList[iMeshIndex].end(); )
 		{
 			auto pTransform = *iter;
-			if (pTransform->GetOwner()->m_bDelete == true)
+			if (pTransform->GetOwner() == nullptr || 
+				pTransform->GetOwner()->m_bDelete == true)
 			{
 				iter = m_vMeshList[iMeshIndex].erase(iter);
 				continue;
