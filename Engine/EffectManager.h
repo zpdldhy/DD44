@@ -18,6 +18,7 @@ public:
 
 private:
 	unordered_map<EEffectType, vector<shared_ptr<AEffectActor>>> m_mEffectPool;
+	array<shared_ptr<class AInstance>, static_cast<size_t>(EEffectType::Count)> m_vInstanceEffect;
 	vector<shared_ptr<AEffectActor>> m_vEffectList;
 
 	shared_ptr<AEffectActor> CreateEffectActor(EEffectType type);

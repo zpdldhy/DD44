@@ -17,6 +17,18 @@ VS_OUT VS(VS_IN input)
     return output;
 }
 
+VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
+{
+    VS_OUT output = (VS_OUT) 0;
+
+    float4 local = float4(input.p, 1.0f);
+    float4 worldPos = mul(local, input.matWorld); // ← 수정
+    output.p = mul(mul(worldPos, g_matView), g_matProj); // 그대로 유지
+
+    output.t = input.t;
+    return output;
+}
+
 PS_OUT_DUAL PS(VS_OUT input)
 {
     PS_OUT_DUAL psOut = (PS_OUT_DUAL) 0;

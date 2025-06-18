@@ -7,5 +7,5 @@ enum class EEffectType
     Shockwave,
     Beam,
     PoppingDust,
-    MAX,
+    Count,
 };

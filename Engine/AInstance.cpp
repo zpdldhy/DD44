@@ -27,7 +27,11 @@ void AInstance::Render()
 				continue;
 			}
 
-			if (pTransform->GetOwner()->m_bRender == false)continue;			
+			if (pTransform->GetOwner()->m_bRender == false)
+			{
+				iter++;
+				continue;
+			}
 
 			INSTANCE_VERTEX world;
 			world.matWorld = pTransform->GetWorld();
@@ -103,6 +107,12 @@ void AInstance::SetInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
 void AInstance::AddInstanceMesh(shared_ptr<UMeshComponent> _pMeshCom)
 {
 	UINT iMeshCount = 0;
+
+	if (m_vMeshList.size() <= 0)
+	{
+		SetInstanceMesh(_pMeshCom);
+		return;
+	}
 
 	// 제일 상단에 MeshResource가 있다면
 	if (_pMeshCom->GetMesh())

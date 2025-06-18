@@ -2,7 +2,7 @@
 #include "ParticleManager.h"
 #include "AParticleActor.h"
 #include "CameraManager.h"
-
+#include "AInstance.h"
 
 void ParticleManager::Tick()
 {
@@ -23,7 +23,7 @@ void ParticleManager::Tick()
 void ParticleManager::Render()
 {
 	PreRender();
-	for (auto& pParticleActor : m_vRenderParticleList)
+	for (auto& pParticleActor : m_vInstanceList)
 		pParticleActor->Render();
 
 	m_vRenderParticleList.clear();
@@ -76,19 +76,13 @@ void ParticleManager::Destroy()
 	m_vRenderParticleList.clear();
 }
 
-void ParticleManager::SetParticleList(vector<shared_ptr<AParticleActor>> _vParticleList)
-{
-	for (auto& pParticle : _vParticleList)
-		pParticle->Init();
-	m_vParticleList = _vParticleList;
-}
-
 void ParticleManager::AddParticleList(vector<shared_ptr<AParticleActor>> _vParticleList)
 {
 	for (auto& pParticle : _vParticleList)
 	{
 		pParticle->Init();
 		m_vParticleList.emplace_back(pParticle);
+		SetInstance(pParticle);
 	}
 }
 
@@ -96,4 +90,44 @@ void ParticleManager::AddUI(shared_ptr<AParticleActor> _vParticleActor)
 {
 	_vParticleActor->Init();
 	m_vParticleList.emplace_back(_vParticleActor);
+
+	SetInstance(_vParticleActor);
+}
+
+void ParticleManager::SetInstance(shared_ptr<AParticleActor> _pActor)
+{
+	auto meshCom = _pActor->GetMeshComponent();
+
+	for (auto& pInstance : m_vInstanceList)
+	{
+		// Mesh가 다르면 넘어가요
+		if (pInstance->GetMeshPath() != meshCom->GetMeshPath())
+			continue;
+
+		// Texture만 다르면 생성
+		if (pInstance->GetTexturePath() != meshCom->GetMaterial()->GetTexturePath())
+		{
+			MakeInstance(_pActor);
+			return;
+		}
+		else
+		{
+			pInstance->AddInstanceMesh(meshCom);
+			return;
+		}
+	}
+
+	// 다 찾아보고 없으면 생성
+	MakeInstance(_pActor);
+}
+
+void ParticleManager::MakeInstance(shared_ptr<AParticleActor> _pActor)
+{
+	auto pInstance = make_shared<AInstance>();
+
+	pInstance->SetInstanceMesh(_pActor->GetMeshComponent());
+	pInstance->m_bUseStencil = _pActor->m_bUseStencil;
+	pInstance->Init();
+
+	m_vInstanceList.emplace_back(pInstance);
 }

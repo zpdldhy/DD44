@@ -11,18 +11,22 @@
 #include "AShockwaveActor.h"
 #include "ABeamActor.h"
 #include "APoppingDust.h"
-
+#include "AInstance.h"
 
 void EffectManager::Init()
 {
+    for (size_t index = 0; index < static_cast<size_t>(EEffectType::Count); ++index)
+    {
+        m_vInstanceEffect[index] = make_shared<AInstance>();
+    }
+
     for (int i = 0; i < 50; ++i)
     {
-        for (int t = 0; t < (int)EEffectType::MAX; ++t)
+        for (int t = 0; t < static_cast<size_t>(EEffectType::Count); ++t)
         {
-            EEffectType type = (EEffectType)t;
-            auto actor = CreateEffectActor((EEffectType)t);
-            actor->m_szName = L"Effect";
-            m_mEffectPool[(EEffectType)t].push_back(actor);
+            EEffectType type = static_cast<EEffectType>(t);
+            auto actor = CreateEffectActor(type);
+            m_mEffectPool[type].push_back(actor);
             
             if (type == EEffectType::Dust || type == EEffectType::PoppingDust)
                 PARTICLE->AddUI(actor);
@@ -53,7 +57,7 @@ void EffectManager::Tick()
 
 void EffectManager::Render()
 {
-    for(auto& pEffect : m_vEffectList)
+    for(auto& pEffect : m_vInstanceEffect)
     {
         if (pEffect->m_bRender==true)
         {
@@ -88,6 +92,8 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
         break;
     }
 
+    actor->m_szName = L"Effect";
+
     // 메시
     auto mesh = UStaticMeshComponent::CreatePlane();
     actor->SetMeshComponent(mesh);
@@ -98,30 +104,36 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     {
     case EEffectType::Blood:
         mat->Load(L"../Resources/Texture/Blood2.png", L"../Resources/Shader/blood.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Blood)]->AddInstanceMesh(mesh);
         break;
     case EEffectType::Dust:
         mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
+       // m_vInstanceEffect[static_cast<size_t>(EEffectType::Dust)]->AddInstanceMesh(mesh);
         break;
     case EEffectType::Feather:
         mat->Load(L"../Resources/Texture/feather.png", L"../Resources/Shader/SpriteUV.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Feather)]->AddInstanceMesh(mesh);
         break;
     case EEffectType::Shockwave:
         mat->Load(L"../Resources/Texture/circle.png", L"../Resources/Shader/SpriteWorld.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Shockwave)]->AddInstanceMesh(mesh);
         break;
     case EEffectType::Beam:
         mat->Load(L"../Resources/Texture/Wind.png", L"../Resources/Shader/SpriteWorld.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Beam)]->AddInstanceMesh(mesh);
         break;
     case EEffectType::PoppingDust:
         mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
+       // m_vInstanceEffect[static_cast<size_t>(EEffectType::PoppingDust)]->AddInstanceMesh(mesh);
         break;
     }
 
     mesh->SetMaterial(mat);
 
     // 공통 설정
-    actor->SetLoop(false);
-    actor->SetAutoDestroy(false);
-    actor->SetRender(false);
+    actor->m_bLoop = false;
+    actor->m_bAutoDestroy = false;
+    actor->m_bRender = false;
 
     return actor;
 }

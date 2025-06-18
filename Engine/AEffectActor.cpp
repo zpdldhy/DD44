@@ -8,7 +8,7 @@ void AEffectActor::Play(float duration, const Vec3& velocity)
 	InitSpriteAnimation(m_iDivisions, duration);
     m_fRemainTime = duration;
     m_vVelocity = velocity;
-    SetRender(true);
+    m_bRender = true;
 
     SetScale(m_vStartScale);
 }
@@ -48,7 +48,7 @@ void AEffectActor::Tick()
     m_fRemainTime -= TIMER->GetDeltaTime();
     if (m_fRemainTime <= 0.0f)
     {
-        SetRender(false);
+        m_bRender = false;
     }
 }
 

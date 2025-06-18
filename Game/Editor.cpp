@@ -720,8 +720,8 @@ void Editor::SetupParticleEditorCallback()
 			particleActor->SetRotation(Vec3(actorData.Rotation));
 			particleActor->SetScale(Vec3(actorData.Scale));
 			particleActor->InitSpriteAnimation(divisions, duration);
-			particleActor->SetLoop(loop);
-			particleActor->SetAutoDestroy(autoDestroy);
+			particleActor->m_bLoop = loop;
+			particleActor->m_bAutoDestroy=autoDestroy;
 
 			// 5. 화면에 등록
 			PARTICLE->AddUI(particleActor);

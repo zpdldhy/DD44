@@ -6,16 +6,16 @@ struct PS_OUT_DUAL
     float4 c1 : SV_Target1;
 };
 
-cbuffer CB_SpriteUV : register(b4)
-{
-    float2 g_uvStart;
-    float2 g_uvEnd;
-}
+//cbuffer CB_SpriteUV : register(b4)
+//{
+//    float2 g_uvStart;
+//    float2 g_uvEnd;
+//}
 
-float2 remapUV(float2 uv)
-{
-    return lerp(g_uvStart, g_uvEnd, uv);
-}
+//float2 remapUV(float2 uv)
+//{
+//    return lerp(g_uvStart, g_uvEnd, uv);
+//}
 
 float3 ExtractScale(float4x4 m)
 {
@@ -55,11 +55,40 @@ VS_OUT VS(VS_IN input)
     return output;
 }
 
+VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
+{
+    VS_OUT output = (VS_OUT) 0;
+    
+    // Camera 방향 추출 (ViewMatrix의 컬럼벡터)
+    float3 right = float3(g_matView._11, g_matView._21, g_matView._31);
+    float3 up = float3(g_matView._12, g_matView._22, g_matView._32);
+    
+    float3 scale = ExtractScale(input.matWorld);
+
+    // 사각형 내 정점 위치 (-0.5 ~ +0.5 기준)
+    float3 offset = input.p.x * right * scale.x + input.p.y * up * scale.y;
+
+    // 최종 월드 위치
+    float3 instanceCenter = { input.matWorld._41, input.matWorld._42, input.matWorld._43 };
+    float3 worldPos = instanceCenter + offset;
+
+    // 변환
+    float4 viewPos = mul(float4(worldPos, 1), g_matView);
+    float4 projPos = mul(viewPos, g_matProj);
+    output.p = projPos;
+
+    output.c = input.c;
+    output.n = input.n;
+    output.t = lerp(input.uv.xy, input.uv.zw, input.t);
+
+    return output;
+}
+
 PS_OUT_DUAL PS(VS_OUT input)
 {
     PS_OUT_DUAL psOut = (PS_OUT_DUAL) 0;
 
-    float2 uv = remapUV(input.t);
+    float2 uv = input.t;
     float4 texColor = g_txDiffuseA.Sample(sample, uv);
 
     if (texColor.a < 0.1)
