@@ -208,7 +208,7 @@ void Device::Render()
 
 void Device::PostRender()
 {
-    m_pSwapChain->Present(1, 0);
+    m_pSwapChain->Present(0, 0);
 }
 
 void Device::Release()

@@ -3,7 +3,8 @@
 cbuffer CB_Slash : register(b10)
 {
     float g_fProgress;
-    float3 padding_slash;
+    bool reverse;
+    float2 padding_slash;
 }
 
 VS_OUT VS(VS_IN input)
@@ -14,7 +15,21 @@ VS_OUT VS(VS_IN input)
     float4 viewPos = mul(worldPos, g_matView);
     output.p = mul(viewPos, g_matProj);
     output.t = input.t;
+    if (reverse)
+    {
+        output.t.x = 1.0f - input.t.x;
+    }
 
+    return output;
+}
+
+VS_OUT VS_SHADOW(VS_IN input)
+{
+    VS_OUT output;
+    float4 worldPos = mul(float4(input.p, 1.0f), g_matShadowWorld);
+    worldPos = mul(worldPos, g_matShadowView);
+    output.p = mul(worldPos, g_matShadowProj);
+    
     return output;
 }
 
@@ -47,7 +62,7 @@ float4 PS(VS_OUT input) : SV_Target
     float luminance = dot(color.rgb, float3(0.3, 0.59, 0.11));
 
     // 2. 날카로운 엣지 마스크 생성
-    float edgeMask = smoothstep(0.1, 0.2, luminance); 
+    float edgeMask = smoothstep(0.1, 0.2, luminance);
 
     // 3. Glow 색상 설정 (약간 붉은 백색빛)
     float3 glowColor = float3(1.0, 0.3, 0.2);
@@ -62,4 +77,9 @@ float4 PS(VS_OUT input) : SV_Target
     float alpha = edgeMask;
     
     return float4(finalColor, alpha);
+}
+
+float PS_SHADOW(VS_OUT input) : SV_Depth
+{
+    return input.p.z / input.p.w;
 }

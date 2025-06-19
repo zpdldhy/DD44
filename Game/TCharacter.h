@@ -5,7 +5,7 @@ class TCharacter : public AActor
 {
 public:
 	virtual ~TCharacter() = default;
-private:
+protected:
 	int hp;
 	int m_iMax_Hp;
 	bool bDead = false;
@@ -20,7 +20,7 @@ public:
 	bool IsDead() { return bDead; }
 public:
 	void TakeDamage(int _damage);
-	void CheckHitByProjectile(bool _hit) { bHitByProjectile = _hit; }
+	virtual void CheckHitByProjectile(int type, bool _hit);
 	bool IsHitByProjectile() { return bHitByProjectile; }
 };
 

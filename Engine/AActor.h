@@ -26,6 +26,7 @@ enum class ActorType
 	AT_GROUND,
 	AT_STAIR,
 	AT_PROJECTILE,
+	AT_INTERACTABLE,
 	AT_COUNT,
 };
 
@@ -44,6 +45,7 @@ public:
 	virtual void Init();
 	virtual void Tick();
 	virtual void Render();
+	virtual void RenderShadow();
 	virtual void Destroy();
 
 	//--------------------------------------------------------------------------------------
@@ -55,7 +57,7 @@ public:
 	bool m_bCollision = true;	// 해당 Actor가 이번 Frame에 충돌을 하는지 확인하는 용도.
 	bool m_bRender = true;		// 해당 Actor가 이번 Render에 출력되는지 확인하는 용도.
 	bool m_bDelete = false;	
-	bool m_bUpdateQuadTree = false;
+	bool m_bUpdateQuadTree = true;
 	bool m_bUseStencil = false;
 	ActorType m_eActorType = ActorType::AT_NONE;
 
@@ -116,4 +118,13 @@ public:
 
 public:	
 	void SetMove(const Vec3& _vDir, const float& _fMaxSpeed, const float& _fAccle = 1.0f) { m_pPhysics->SetMove(_vDir, _fMaxSpeed, _fAccle); }
+
+	//shadow
+public:
+	void SetCastShadow(bool b) { m_bCastShadow = b; }
+	bool IsCastShadow() const { return m_bCastShadow; }
+
+public:
+	bool m_bCastShadow = true;
+
 };

@@ -179,6 +179,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="AWindActor.h" />
     <ClInclude Include="CharacterEditorUI.h" />
     <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="ConstantData.h" />
     <ClInclude Include="EditorData.h" />
     <ClInclude Include="EffectEditorUI.h" />
     <ClInclude Include="CollisionManager.h" />
@@ -204,6 +205,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="RenderStateManager.h" />
     <ClInclude Include="SceneState.h" />
+    <ClInclude Include="ShadowManager.h" />
     <ClInclude Include="ShapeData.h" />
     <ClInclude Include="SkeletalMeshData.h" />
     <ClInclude Include="StateBase.h" />
@@ -312,6 +314,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="RenderStateManager.cpp" />
     <ClCompile Include="SceneState.cpp" />
+    <ClCompile Include="ShadowManager.cpp" />
     <ClCompile Include="ShapeData.cpp" />
     <ClCompile Include="SkeletalMeshData.cpp" />
     <ClCompile Include="Text.cpp" />
@@ -386,7 +389,6 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
-    <None Include="..\Resources\Shader\PRHeader.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\PRDefault.hlsl">

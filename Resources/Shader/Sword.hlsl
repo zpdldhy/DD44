@@ -14,6 +14,16 @@ VS_OUT_RIM VS(VS_IN input)
     return output;
 }
 
+VS_OUT VS_SHADOW(VS_IN input)
+{
+    VS_OUT output;
+    float4 worldPos = mul(float4(input.p, 1.0f), g_matWorld);
+    worldPos = mul(worldPos, g_matShadowView);
+    output.p = mul(worldPos, g_matShadowProj);
+    
+    return output;
+}
+
 PS_OUT PS(VS_OUT_RIM input) : SV_Target
 {
     PS_OUT output = (PS_OUT) 0;
@@ -84,4 +94,9 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     
 
     return output;
+}
+
+float PS_SHADOW(VS_OUT input) : SV_Depth
+{
+    return input.p.z / input.p.w;
 }

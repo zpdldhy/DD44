@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "UMeshComponent.h"
+#include "ShadowManager.h"
 
 
 void UMeshComponent::Render()
@@ -14,6 +15,36 @@ void UMeshComponent::Render()
 	{
 		child->Render();
 	}
+}
+
+void UMeshComponent::RenderShadow()
+{
+	if (bRender)
+	{
+		PreRender();
+//		auto shadowShader = SHADER->Get(L"../Resources/Shader/Shadow.hlsl");
+		auto shadowShader = SHADER->Get(GetMaterial()->GetShaderPath(), L"VS_SHADOW", L"PS_SHADOW");
+		DC->VSSetShader(shadowShader->GetVS().Get(), nullptr, 0);
+		DC->PSSetShader(shadowShader->GetPS().Get(), nullptr, 0);
+		PostRender();
+
+	}
+
+	for (auto& child : m_vChild)
+	{
+		child->RenderShadow();
+	}
+
+	//// 1. ±íÀÌ Àü¿ë ¼ÎÀÌ´õ ¼³Á¤
+	//m_pMaterial->SetShader(L"../Resources/Shader/DepthOnly.hlsl");
+
+	//// 2. Light ViewProj °öÇÑ Çà·Ä Àü´Þ
+	//Matrix matWVP = m_pOwner->GetWorld() * SHADOWMANAGER->GetLightViewProj();
+	//m_pMaterial->SetMatrix("g_matWVP", matWVP);
+
+	//// 3. ½ÇÁ¦ ·»´õ¸µ
+	//m_pMaterial->Apply(DC);
+	//m_pMesh->Draw();
 }
 
 void UMeshComponent::RemoveChild(int _index)

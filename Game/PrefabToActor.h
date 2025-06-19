@@ -10,7 +10,7 @@ class PrefabToActor : public Singleton<PrefabToActor>
 public:
     void Init();
 public:
-    vector<shared_ptr<AActor>> LoadAllPrefabs(const std::string& extension);
+    vector<shared_ptr<AActor>> LoadAllPrefabs(const std::string& extension, const std::string& directiry = "../Resources/Prefab/");
 
 public:
     shared_ptr<class ATerrainTileActor> MakeTileActor(const string& _file);

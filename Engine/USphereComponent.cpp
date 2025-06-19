@@ -26,28 +26,7 @@ void USphereComponent::Tick()
 	if (m_bVisible && g_bRangeVisibleMode)
 	{
 		UpdateCollisionRange();
-	}
-#endif // DEBUG
-}
-
-void USphereComponent::Render()
-{
-	UShapeComponent::Render();
-
-#ifndef DEBUG
-	if (m_bVisible && g_bRangeVisibleMode)
-	{
-		if (m_pCurrentRasterizer)
-			m_pCurrentRasterizer.Reset();
-
-		DC->RSGetState(m_pCurrentRasterizer.GetAddressOf());
-		DC->RSSetState(STATE->m_pRSWireFrame.Get());
-
-		m_pCollisionRange->Render();
-
-		DC->RSSetState(m_pCurrentRasterizer.Get());
-
-		m_pCurrentRasterizer.Reset();
+		isRendered = false;
 	}
 #endif // DEBUG
 }
@@ -97,6 +76,7 @@ void USphereComponent::CreateCollisionRange()
 		m_pCollisionRange->SetPosition(m_vWorldPosition);
 
 		m_pCollisionRange->Init();
+		SetInstance(m_pCollisionRange);
 	}
 }
 

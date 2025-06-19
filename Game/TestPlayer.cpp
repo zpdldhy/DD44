@@ -21,7 +21,6 @@
 void TestPlayer::Init()
 {
 #pragma region SetupScene
-
 	SetupSunLight();
 	//Gizmo ¼¼ÆÃ
 	{
@@ -62,8 +61,8 @@ void TestPlayer::Init()
 	}
 #pragma endregion
 #pragma region LOAD_ASSET
-
 	ACTORLOADER->LoadAllAsset();
+
 	meshLoader = make_shared<MeshLoader>();
 	meshLoader->SetMesh(ACTORLOADER->LoadMeshMap());
 	meshLoader->SetAnim(ACTORLOADER->LoadAnimMap());
@@ -163,8 +162,8 @@ void TestPlayer::SetupSunLight()
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	OBJECT->AddActor(m_pSunLight);
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pSunLight);
+	LIGHT->Clear();
+	LIGHT->RegisterLight(m_pSunLight);
 }
 
 void TestPlayer::SetupEngineCamera()

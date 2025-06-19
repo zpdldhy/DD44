@@ -108,14 +108,9 @@ struct PrefabParticleData
     Vec3 Rotation;
     Vec3 Translation;
 
-    TransformData actor;
-
     int Divisions = 4;     // NxN
     int Row = 0;
     int Col = 0;
-
-    Vec2 UVStart = { 0.0f, 0.0f };
-    Vec2 UVEnd = { 1.0f, 1.0f };
 
     float BillboardSizeX = 100.0f;
     float BillboardSizeY = 100.0f;
@@ -125,12 +120,6 @@ struct PrefabParticleData
     bool bAutoDestroy = false;
 
     EParticleType Type = EParticleType::Default;
-
-    //Fire 타입 전용 파라미터
-    Vec3 Amplitude = { 0.0f, 0.0f, 0.0f };
-    Vec3 RandomFreq = { 0.0f, 0.0f, 0.0f };
-    Vec3 RandomOffset = { 0.0f, 0.0f, 0.0f };
-    float TimeOffset = 0.0f;
 };
 
 struct PrefabParticleGroupData

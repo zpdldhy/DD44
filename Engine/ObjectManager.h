@@ -58,6 +58,7 @@ public:
 	const map<UINT, shared_ptr<AActor>>& GetActorList() const;
 
 	vector<UINT> GetActorIndexList() { return m_vActorIndexList; }	// 임시 사용
+	void RenderShadow();
 
 	QuadTree& GetQuadTree() { return m_QuadTree; }
 

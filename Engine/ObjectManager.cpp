@@ -34,10 +34,11 @@ void ObjectManager::Tick()
 			// 동적 액터만 쿼드트리 위치 갱신 - sy
 			if (pActor->second->m_bUpdateQuadTree)
 			{
+				pActor->second->Tick();
 				m_QuadTree.UpdateActor(pActor->second);
 			}
 
- 			pActor->second->Tick();
+ 			//pActor->second->Tick();
 			pActor++;
 		}		
 	}
@@ -177,6 +178,17 @@ shared_ptr<class AActor> ObjectManager::GetActor(UINT _iIndex)
 const map<UINT, shared_ptr<AActor>>& ObjectManager::GetActorList() const
 {
 	return m_vActorList;
+}
+
+void ObjectManager::RenderShadow()
+{
+	for (auto& pair : m_vActorList)
+	{
+		auto& actor = pair.second;
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
 }
 
 void ObjectManager::ObjectMove()
@@ -329,7 +341,7 @@ void ObjectManager::SetInstance(shared_ptr<AActor> _pActor)
 		}
 		else
 		{
-			pInstance->AddInstanceTransform(meshCom);
+			pInstance->AddInstanceMesh(meshCom);
 			return;
 		}
 	}

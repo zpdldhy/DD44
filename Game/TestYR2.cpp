@@ -36,6 +36,7 @@ void TestYR2::Init()
 #pragma endregion
 
 	loader = make_shared<ActorLoader>();
+	loader->ConvertObjToAsset("../Resources/Obj/Test/*.obj");
 	//loader->ConvertObjToAsset("../Resources/Obj/Test/*.obj");
 	loader->LoadAllAsset();
 	meshResMap = loader->LoadMeshMap();
@@ -347,8 +348,8 @@ void TestYR2::SetupLight()
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	OBJECT->AddActor(m_pSunLight);
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pSunLight);
+	LIGHT->Clear();
+	LIGHT->RegisterLight(m_pSunLight);
 }
 
 void TestYR2::SetupGizmo()

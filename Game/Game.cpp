@@ -37,6 +37,7 @@
 // Game
 #include "ProjectileManager.h"
 #include "EnemyCollisionManager.h"
+#include "EventManager.h"
 
 // TEMP
 #include "BatMovement.h"
@@ -50,24 +51,34 @@ void Game::Init()
 	// Asset ·Îµù
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
+	for (auto map : m_vMapList)
+	{
+		map->m_bCastShadow = false;
+	}
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
-
 	OBJECT->AddActorList(m_vMapList);
-	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
 	OBJECT->AddActor(m_pPlayer);
-	//m_pPlayer->SetPosition(Vec3(0.0f, 0.0f, 0.0f));
-	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
-	auto vlist = PToA->LoadAllPrefabs(".character.json");
-	vlist.emplace_back(m_pBetty);	
-	enemyList = vlist;
-	SetEnemy();
-	OBJECT->AddActorList(vlist);
 
+	auto objectList = PToA->LoadAllPrefabs(".character.json");
+	OBJECT->AddActorList(objectList);
+	for (auto interactable : objectList)
+	{
+		m_vObjectList.push_back(interactable);
+	}
+
+	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
+	
+	enemyList1 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
+	enemyList1.emplace_back(m_pBetty);
+	SetEnemy(enemyList1);
+	OBJECT->AddActorList(enemyList1);
+	
 	PROJECTILE->Init();
 
 	CreateUI();
@@ -86,6 +97,12 @@ void Game::Init()
 
 void Game::Tick()
 {
+	if (INPUT->GetButton(G))
+	{
+		EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder");
+		EVENT->TriggerEvent(EventType::EVENT_FENCE, L"Fence1");
+	}
+
 	UpdateCursor();
 
 	if (INPUT->GetButton(GameKey::ESC))
@@ -97,7 +114,7 @@ void Game::Tick()
 
 	//bgm
 	{
-		SOUNDMANAGER->GetPtr(ESoundType::Stage0)->Play2D();
+		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
 	}
 	//wind	
 	{
@@ -131,6 +148,7 @@ void Game::Tick()
 
 void Game::Render()
 {
+
 }
 
 void Game::Destroy()
@@ -140,14 +158,13 @@ void Game::Destroy()
 	m_pPlayer = nullptr;
 	m_pSkyMesh = nullptr;
 	m_pSky = nullptr;
-	m_pSunLight = nullptr;
 
 	m_vPausedBackGround.clear();
 	m_vUpgradeBackGround.clear();
 	m_vUpgradeState.clear();
 	m_vCoins.clear();
 
-	enemyList.clear();
+	enemyList1.clear();
 	m_vObjectList.clear();
 	m_vMapList.clear();
 }
@@ -181,6 +198,7 @@ void Game::SetupSkybox()
 	m_pSky->m_szName = L"Sky";
 	m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 	m_pSky->SetMeshComponent(m_pSkyMesh);
+	m_pSky->m_bCastShadow = false;
 
 	shared_ptr<UMaterial> material = make_shared<UMaterial>();
 	material->Load(L"../Resources/Texture/skypano.png", L"../Resources/Shader/Sky.hlsl");
@@ -191,17 +209,22 @@ void Game::SetupSkybox()
 
 void Game::SetupSunLight()
 {
+	LIGHT->Clear();
+
 	m_pSunLight = make_shared<ALight>();
 	m_pSunLight->m_szName = L"SunLight";
-	m_pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
+	m_pSunLight->GetLightComponent()->SetDirection({ -1.f, -1.f, -1.f });
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
 	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
-	m_pSunLight->SetPosition(Vec3(0, 100.0f, 0));
-	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-	OBJECT->AddActor(m_pSunLight);
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pSunLight);
+	Vec3 dir = Vec3(-1.f, -1.f, -1.f);
+	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
+	m_pSunLight->SetPosition(dir * -300.f);
+	dir.Normalize();
+	m_pSunLight->GetCameraComponent()->SetLookTo(dir);
+	m_pSunLight->m_bCastShadow = false;
+
+	LIGHT->RegisterLight(m_pSunLight);
 }
 
 void Game::CreateWind()
@@ -519,9 +542,9 @@ void Game::UpdateCursor()
 	m_pCursor->SetRotation(Vec3(DD_PI / 2.f, angle, 0.f));
 }
 
-void Game::SetEnemy()
+void Game::SetEnemy(vector<shared_ptr<AActor>>& _enemyList)
 {
-	for (auto& enemy : enemyList)
+	for (auto& enemy : _enemyList)
 	{
 		auto e = dynamic_pointer_cast<TEnemy>(enemy);
 		if (e)
@@ -556,7 +579,7 @@ void Game::CheckEnemyCollision()
 
 	//if (melee)
 	//{
-	//	for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	//	for (auto iter = enemyList1.begin(); iter != enemyList.end();)
 	//	{
 	//		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 	//		{
@@ -568,7 +591,7 @@ void Game::CheckEnemyCollision()
 	//	}
 	//}
 
-	//for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	//for (auto iter = enemyList1.begin(); iter != enemyList.end();)
 	//{
 	//	if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 	//	{

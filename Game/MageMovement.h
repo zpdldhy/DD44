@@ -39,10 +39,5 @@ public:
 	void Rotate();
 public:
 	void CheckHit();
-public:
-	//FX
-	void Flashing();
-	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
-
 };
 

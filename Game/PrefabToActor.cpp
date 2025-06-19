@@ -15,6 +15,7 @@
 // Game Actor
 #include "TPlayer.h"
 #include "TEnemy.h"
+#include "TInteractable.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -23,11 +24,6 @@
 #include "USphereComponent.h"
 
 //// Script
-//#include "PlayerMoveScript.h"
-//#include "BatMovement.h"
-//#include "WalkerMovement.h"
-//#include "BettyMovement.h"
-//#include "MageMovement.h"
 #include "ScriptManager.h"
 
 //unique_ptr<ActorLoader> PrefabToActor::actorLoader = nullptr;
@@ -38,13 +34,13 @@ void PrefabToActor::Init()
 	MakeLoader();
 }
 
-vector<shared_ptr<class AActor>> PrefabToActor::LoadAllPrefabs(const std::string& extension)
+vector<shared_ptr<class AActor>> PrefabToActor::LoadAllPrefabs(const std::string& extension, const std::string& directiry)
 {
 	//MakeLoader();
 
 	vector<shared_ptr<class AActor>> m_vActorList;
 
-	auto files = PREFAB->GetPrefabFileList("../Resources/Prefab/", extension);
+	auto files = PREFAB->GetPrefabFileList(directiry, extension);
 
 	for (const auto& file : files)
 	{
@@ -117,6 +113,10 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 		if (characterData.ScriptName == "PlayerMoveScript")
 		{
 			actor = std::make_shared<TPlayer>();
+		}
+		else if (characterData.m_eActorType == 7)
+		{
+			actor = std::make_shared<TInteractable>();
 		}
 		else
 		{
@@ -378,10 +378,6 @@ vector<shared_ptr<class AParticleActor>> PrefabToActor::MakeParticleGroup(const 
 			if (p.Type == EParticleType::Fire)
 			{
 				auto fire = make_shared<AFireParticleActor>();
-				fire->SetAmplitude(p.Amplitude);
-				fire->SetRandomFreq(p.RandomFreq);
-				fire->SetRandomOffset(p.RandomOffset);
-				fire->SetTimeOffset(p.TimeOffset);
 				newParticle = fire;
 			}
 			else
@@ -403,10 +399,9 @@ vector<shared_ptr<class AParticleActor>> PrefabToActor::MakeParticleGroup(const 
 			newParticle->SetMeshComponent(mesh);
 
 			// 애니메이션 세팅
-			newParticle->SetUV(p.UVStart, p.UVEnd);
 			newParticle->InitSpriteAnimation(p.Divisions, p.Duration);
-			newParticle->SetLoop(p.bLoop);
-			newParticle->SetAutoDestroy(p.bAutoDestroy);
+			newParticle->m_bLoop=p.bLoop;
+			newParticle->m_bAutoDestroy= p.bAutoDestroy;
 
 			result.push_back(newParticle);
 		}

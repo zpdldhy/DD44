@@ -7,10 +7,7 @@
 
 AParticleActor::AParticleActor()
 {
-	m_CB_Billboard = make_shared<ConstantBuffer<CB_Billboard>>();
-	m_CB_Billboard->Create(6); // b6 ½½·Ô
 }
-
 
 void AParticleActor::Tick()
 {
@@ -74,32 +71,14 @@ void AParticleActor::Tick()
 		Vec2 uvStart(col * cellSize, row * cellSize);
 		Vec2 uvEnd((col + 1) * cellSize, (row + 1) * cellSize);
 
-		SetUV(uvStart, uvEnd);
+		GetMeshComponent()->SetInstanceStartUV(uvStart);
+		GetMeshComponent()->SetInstanceEndUV(uvEnd);
 	}
 }
 
 void AParticleActor::Render()
 {
-	if (m_CB_Billboard)
-	{
-		Vec3 scale = GetScale();
-		m_CB_Billboard->data.center = GetPosition();
-		m_CB_Billboard->data.Rotation = GetRotation().z;
-		m_CB_Billboard->data.size = Vec2(scale.x, scale.y); // uniform scale
-		m_CB_Billboard->Update();
-		m_CB_Billboard->Push();
-	}
 	AActor::Render();
-}
-
-void AParticleActor::SetUV(Vec2 start, Vec2 end)
-{
-	m_uvStart = start;
-	m_uvEnd = end;
-
-	auto mesh = GetMeshComponent();
-	auto mat = mesh->GetMaterial();
-	mat->SetUVRange(m_uvStart, m_uvEnd);
 }
 
 void AParticleActor::InitSpriteAnimation(int divisions, float duration)

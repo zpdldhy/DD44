@@ -1,6 +1,6 @@
 #pragma once
 #include "USceneComponent.h"
-#include "LightData.h"
+#include "ConstantData.h"
 
 enum class ELightType
 {

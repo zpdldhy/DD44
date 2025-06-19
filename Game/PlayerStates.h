@@ -7,6 +7,7 @@ enum PLAYER_STATE
 {
 	PLAYER_S_IDLE = 0,
 	PLAYER_S_WALK,
+	PLAYER_S_CLIMB,
 	PLAYER_S_ROLL,
 	PLAYER_S_ATTACK,
 	PLAYER_S_SHOOT,
@@ -68,18 +69,18 @@ class PlayerAttackState : public StateBase
 private:
 	weak_ptr<AActor> m_pOwner;
 
-	shared_ptr<StateBase>* m_pCurrentState = nullptr;
-	shared_ptr<StateBase> m_pPrevState;
+	enum AttackCombo { OnFirst = 0, OnSecond, OnThird, Done};
+	AttackCombo currentPhase = OnFirst;
+	bool m_bOnCombo = false;
+	Vec3 dir;
 
-	shared_ptr<UMeshComponent> m_pSword;
-	shared_ptr<UMeshComponent> m_pBackSocket;
-	shared_ptr<UMeshComponent> m_pHandSocket;
-
-	Vec3 handSwordRot = Vec3(0.0f, 0.0f, DD_PI / 2);
-	Vec3 handSwordPos = Vec3(1.0f, 0.0f, 0.0f);
-
-	Vec3 backSwordRot = Vec3(0.0f, 0.3f, -DD_PI / 2);
-	Vec3 backSwordPos = Vec3(-0.5f, 0.0f, 0.0f);
+	// FX
+	// Slash 
+	shared_ptr<class UMaterial> m_pSlashMaterial = nullptr;
+	float m_fSlashTime = 0.0f;
+	bool m_bSlashPlaying = false;
+	float m_fSlashDuration = 0.3f;
+	bool reverse = false;
 
 public:
 	PlayerAttackState(weak_ptr<AActor> _pOwner);
@@ -89,10 +90,11 @@ public:
 	virtual void Tick() override;
 	virtual void End() override;
 public:
-	void SetPrevState(const shared_ptr<StateBase>& _prevState) { m_pPrevState = _prevState; }
-	void SetCurrentState(shared_ptr<StateBase>* _currentState) { m_pCurrentState = _currentState; }
-	// sword, hand, back 순서
-	void SetComponent(shared_ptr<UMeshComponent> _sword, shared_ptr<UMeshComponent> _hand, shared_ptr<UMeshComponent> _back);
+	void CheckAttackCombo(bool _onCombo) { m_bOnCombo = _onCombo; }
+	void CheckMouse();
+	void Rotate();
+	void Move();
+	void Slash();
 };
 
 class PlayerShootState : public StateBase
@@ -181,7 +183,6 @@ private:
 	weak_ptr<AActor> m_pOwner;
 	bool m_bPlayNext = true;
 	int animIndex;
-
 public:
 	PlayerDieState(weak_ptr<AActor> _pOwner);
 	~PlayerDieState() {}
@@ -191,3 +192,47 @@ public:
 	virtual void Tick() override;
 	virtual void End() override;
 };
+
+class PlayerClimbState : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+	enum ClimbPhase { Playing, Finish, Done };
+	ClimbPhase currentPhase = ClimbPhase::Playing;
+	// move랑 stop은 phase 안에서만 해도 조절 가능
+	shared_ptr<class PlayerClimbFinish> finish;
+	bool isFinish = false;
+	bool isMoving = true;
+	Vec3 ladderDir;
+public:
+	PlayerClimbState(weak_ptr<AActor> _pOwner);
+	~PlayerClimbState() {}
+
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+	void CheckClimbFinish(bool _finish) { isFinish = _finish; }
+	void CheckMove(bool _isMoving);
+	void SetLadderDir(Vec3 _dir);
+	void CheckIsMoving(bool _moving) { isMoving = _moving; }
+};
+
+class PlayerClimbFinish : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+public:
+	PlayerClimbFinish(weak_ptr<AActor> _pOwner);
+	~PlayerClimbFinish() {}
+public:
+	Vec3 ladderDir;
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+	void SetLadderDir(Vec3 _dir);
+};
+
