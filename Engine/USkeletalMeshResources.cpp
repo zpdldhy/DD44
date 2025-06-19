@@ -55,13 +55,14 @@ void USkeletalMeshResources::Bind()
 {
 	//CreateConstantBuffer();
 
-	UINT Strides[2] = { sizeof(PNCT_VERTEX), sizeof(IW_VERTEX) };
+	UINT Strides[2] = { sizeof(PNCT_VERTEX), sizeof(IW_VERTEX)};
 	UINT Offsets[2] = { 0, 0 };
-	ID3D11Buffer* pVB[2] = { m_pVertexBuffer.Get(), m_pIWBuffer.Get() };
+	ID3D11Buffer* pVB[2] = { m_pVertexBuffer.Get(), m_pIWBuffer.Get()};
 
 	DC->IASetVertexBuffers(0, 2, pVB, Strides, Offsets);
 	DC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
+
 
 void USkeletalMeshResources::UpdateBindPoseData()
 {

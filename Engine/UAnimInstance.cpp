@@ -10,7 +10,7 @@ void UAnimInstance::Tick()
 	if (!m_bPlay) { return; }
 	animFrame += TIMER->GetDeltaTime() * m_fAnimPlayRate;
 
-	UINT lastFrame = animTrackList[currentAnimTrackIndex].animList[0].size();
+	UINT lastFrame = animTrackList[currentAnimTrackIndex].endFrame;
 
 	auto iter = m_mKeyFrameMap.find(currentAnimTrackIndex);
 	bool hasEnd = false;
@@ -42,9 +42,10 @@ void UAnimInstance::Tick()
 	// ROOTMOTION
 	if (m_bInPlace)
 	{
-		rootPos.x = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._41;
-		rootPos.y = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._42;
-		rootPos.z = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._43;
+		// 이처리를 또 어디서 하냐 
+		//rootPos.x = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._41;
+		//rootPos.y = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._42;
+		//rootPos.z = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._43;
 	}
 
 	// 애니메이션 파싱 확인 용
@@ -68,11 +69,24 @@ void UAnimInstance::Tick()
 	}
 }
 
+void UAnimInstance::Render()
+{
+	// 객체별 데이터
+	cbData.frame = animFrame;
+	cbData.track = currentAnimTrackIndex;
+	DC->UpdateSubresource(_constantBuffer.Get(), 0, NULL, &cbData, 0, 0);
+	DC->VSSetConstantBuffers(5, 1, _constantBuffer.GetAddressOf());
+
+	// 한 모델 공용
+	DC->VSSetShaderResources(3, 1, m_pTexSRV.GetAddressOf());
+}
+
 shared_ptr<UAnimInstance> UAnimInstance::Clone()
 {
 	shared_ptr<UAnimInstance> newAnim = make_shared<UAnimInstance>();
 
 	newAnim->m_modelName = m_modelName;
+	newAnim->boneCount = boneCount;
 	newAnim->animTrackList = animTrackList;
 	newAnim->animFrame = animFrame;
 	newAnim->currentAnimTrackIndex = currentAnimTrackIndex;
@@ -83,8 +97,9 @@ shared_ptr<UAnimInstance> UAnimInstance::Clone()
 	newAnim->m_bInPlace = m_bInPlace;
 	newAnim->m_bPlay = m_bPlay;
 	newAnim->m_fAnimPlayRate = m_fAnimPlayRate;
-
+	newAnim->animTexData = animTexData;
 	newAnim->CreateConstantBuffer();
+	newAnim->CreateTex();
 
 	return newAnim;
 }
@@ -103,6 +118,50 @@ void UAnimInstance::CreateConstantBuffer()
 		return;
 	}
 	return;
+}
+
+void UAnimInstance::CreateTex()
+{
+	texWidth = boneCount;
+	texHeight = 150;
+	texDepth = animTrackList.size() * 4;
+
+	// Texture
+
+	D3D11_TEXTURE3D_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+	desc.Width = texWidth;
+	desc.Height = texHeight;
+	desc.Depth = texDepth;
+	desc.MipLevels = 1;
+	desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+	D3D11_SUBRESOURCE_DATA initData;
+	ZeroMemory(&initData, sizeof(initData));
+	initData.pSysMem = animTexData.data();
+	initData.SysMemPitch = texWidth * sizeof(XMFLOAT4);
+	initData.SysMemSlicePitch = texWidth * texHeight * sizeof(XMFLOAT4);
+
+	HRESULT hr = DEVICE->CreateTexture3D(&desc, &initData, m_pTex3D.GetAddressOf());
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
+
+	// SRV
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	ZeroMemory(&srvDesc, sizeof(srvDesc));
+	srvDesc.Format = desc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+	srvDesc.Texture3D.MipLevels = 1;
+
+	hr = DEVICE->CreateShaderResourceView(m_pTex3D.Get(), &srvDesc, m_pTexSRV.GetAddressOf());
+	if (FAILED(hr))
+	{
+		assert(false);
+	}
 }
 
 void UAnimInstance::AddTrack(AnimList _animTrack)
@@ -148,19 +207,45 @@ void UAnimInstance::PlayOnce(int _index)
 
 Matrix UAnimInstance::GetBoneAnim(int _boneIndex)
 {
-	Matrix ret = animTrackList[currentAnimTrackIndex].animList[_boneIndex][animFrame];
-	if (_boneIndex >= animTrackList[currentAnimTrackIndex].animList.size())
+	if (_boneIndex == 59 && animFrame > 47 && animFrame < 48)
+	{
+		int a = 0;
+	}
+	if (_boneIndex >= boneCount)
 	{
 		return Matrix();
 	}
 
+	Matrix ret;
+
+	for (int row = 0; row < 4; ++row)
+	{
+		int z = currentAnimTrackIndex * 4 + row;
+
+		size_t index = _boneIndex
+			+ static_cast<int>(animFrame) * texWidth
+			+ z * texWidth * texHeight;
+
+		const XMFLOAT4& rowData = animTexData[index];
+
+		ret.m[row][0] = rowData.x;
+		ret.m[row][1] = rowData.y;
+		ret.m[row][2] = rowData.z;
+		ret.m[row][3] = rowData.w;
+	}
+
 	if (m_bInPlace)
 	{
-		Matrix inverse = Matrix::CreateTranslation(-rootPos);
-		ret = ret * inverse;
+		//Matrix inverse = Matrix::CreateTranslation(-rootPos);
+		//ret = ret * inverse;
 	}
 
 	return ret;
+}
+
+void UAnimInstance::SetBoneCount(UINT _bone)
+{
+	boneCount = _bone;
 }
 
 // set end frame

@@ -34,3 +34,10 @@ struct INSTANCE_VERTEX
 	Color color;
 	Vec4 uv;
 };
+
+struct SKINNED
+{
+	UINT track;
+	UINT frame;
+	Vec3 rootPos;
+};

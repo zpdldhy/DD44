@@ -17,10 +17,35 @@ struct PNCTIW_IN
 // Constant
 cbuffer AnimationBuffer : register(b5)
 {
-    matrix obj_matAnim[MAX_BONE];
+    uint track;
+    uint frame;
+    uint p1;
+    uint p2;
 }
 
 cbuffer InverseBoneBuffer : register(b9)
 {
     matrix obj_matBone[MAX_BONE];
+}
+
+//
+Texture3D<float4> g_AnimTex : register(t3);
+
+// Helper Func
+float4x4 GetAnimMatrix(uint _track, uint _bone, uint _frame)
+{
+    // Texture3D (X: bone, Y: frame, Z: track * 4 + row index)
+    float4 row0 = g_AnimTex.Load(int4(_bone, _frame, _track * 4 + 0, 0));
+    float4 row1 = g_AnimTex.Load(int4(_bone, _frame, _track * 4 + 1, 0));
+    float4 row2 = g_AnimTex.Load(int4(_bone, _frame, _track * 4 + 2, 0));
+    float4 row3 = g_AnimTex.Load(int4(_bone, _frame, _track * 4 + 3, 0));
+
+    float4x4 mat = float4x4(
+        row0,
+        row1,
+        row2,
+        row3
+    );
+    
+    return transpose(mat);
 }

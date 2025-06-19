@@ -55,6 +55,8 @@ struct AnimTrackData
 	UINT m_iEndFrame;
 
 	vector<vector<Matrix>> m_vAnim;
+
+	vector<XMFLOAT4> m_vAnimList;
 };
 
 struct AnimSequence

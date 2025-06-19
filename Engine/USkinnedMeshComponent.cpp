@@ -33,7 +33,14 @@ void USkinnedMeshComponent::Tick()
 void USkinnedMeshComponent::PreRender()
 {
 	USceneComponent::Render();
-
+	
+	UINT track;
+	UINT frame;
+	Vec3 rootPos;
+	if (m_pBaseAnim) 
+	{
+		m_pBaseAnim->Render();
+	}
 	if (m_pMeshAnim) m_pMeshAnim->Render();
 
 	if (m_pMesh)

@@ -19,7 +19,7 @@ protected:
 	CBBindPoseData m_inverseBindPose;
 	ComPtr<ID3D11Buffer> m_pBindPoseCB;
 	map<wstring, BoneNode> m_vSkeletonList;
-	
+
 protected:
 	bool CreateIWBuffer();
 	void CreateConstantBuffer();
