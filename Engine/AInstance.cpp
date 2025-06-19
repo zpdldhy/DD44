@@ -44,6 +44,10 @@ void AInstance::Render()
 
 		// Mesh¸¦ Binding ÇØ¿ä
 		auto pFirstMesh = m_vMeshList[iMeshIndex][0]->GetMesh();
+
+		if(vInstanceList.size()<=0)
+			continue;
+
 		pFirstMesh->UpdateInstanceList(vInstanceList);
 		pFirstMesh->Bind();
 

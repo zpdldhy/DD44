@@ -72,6 +72,7 @@ void AParticleActor::Tick()
 		Vec2 uvEnd((col + 1) * cellSize, (row + 1) * cellSize);
 
 		GetMeshComponent()->SetInstanceStartUV(uvStart);
+		GetMeshComponent()->SetInstanceStartUV(uvStart);
 		GetMeshComponent()->SetInstanceEndUV(uvEnd);
 	}
 }
