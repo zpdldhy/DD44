@@ -70,5 +70,5 @@ protected:
 	void CheckEnemyCollision();
 
 public:
-	Game() { m_type = SCENE_TYPE::NON_GAME; }
+	Game() { m_type = SCENE_TYPE::GAME; }
 };
