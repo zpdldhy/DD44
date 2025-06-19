@@ -10,6 +10,7 @@ public:
 	virtual void Init() override;
 	virtual void Tick() override;
 	virtual void Render() override;
+	virtual void RenderShadow() override;
 	virtual void Destroy() override;
 
 public:
