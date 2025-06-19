@@ -24,6 +24,16 @@ VS_OUT VS_SHADOW(VS_IN input)
     return output;
 }
 
+VS_OUT VS_SHADOW_INSTANCE(VS_INSTANCE_IN input)
+{
+    VS_OUT output;
+    float4 worldPos = mul(float4(input.p, 1.0f), input.matWorld);
+    worldPos = mul(worldPos, g_matShadowView);
+    output.p = mul(worldPos, g_matShadowProj);
+    
+    return output;
+}
+
 PS_OUT PS(VS_OUT_RIM input) : SV_Target
 {
     PS_OUT output = (PS_OUT) 0;
