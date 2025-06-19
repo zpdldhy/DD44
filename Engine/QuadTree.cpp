@@ -82,24 +82,33 @@ void QuadTree::InsertActor(QuadTreeNode* node, std::shared_ptr<AActor> actor)
     if (node->pChildren[0] == nullptr)
     {
         node->vActorIndices.push_back(actor->m_Index);
+        actorCount++;
         return;
     }
 
-    // 자식 모두 재귀
+    // 자식 중 하나만 삽입
+    bool inserted = false;
     for (int i = 0; i < 4; ++i)
     {
-        InsertActor(node->pChildren[i].get(), actor);
+        if (node->pChildren[i]->bounds.Contains(pos))
+        {
+            InsertActor(node->pChildren[i].get(), actor);
+            inserted = true;
+            break;
+        }
     }
 
-    // 리프가 아니면 현재 노드에도 넣기 (모든 경로 포함)
-    node->vActorIndices.push_back(actor->m_Index);
+    // 어떤 자식에도 못 들어갔다면 현재 노드에 fallback 삽입
+    if (!inserted)
+    {
+        node->vActorIndices.push_back(actor->m_Index);
+        actorCount++;
+    }
 }
-
 
 void QuadTree::RemoveActorFromAllNodes(QuadTreeNode* node, UINT actorIndex)
 {
-    if (!node)
-        return;
+    if (!node) return;
 
     auto& indices = node->vActorIndices;
     indices.erase(std::remove(indices.begin(), indices.end(), actorIndex), indices.end());
@@ -114,38 +123,54 @@ std::vector<UINT> QuadTree::FindNearbyActorIndices(const AActor& _actor)
 {
     std::vector<UINT> result;
 
-    // 1. 액터가 포함된 리프 노드 찾기
-    QuadTreeNode* pCenterNode = nullptr;
+    //// 원래 3X3 근처 노드 순회하면서 actor들 체크하려고했는데,
+    //// actor index가 이상하게 넘어오는 버그가 발생...(왜인지모름 ㅅㅂ)
+
+
+    //// 1. 액터가 포함된 리프 노드 찾기
+    //QuadTreeNode* pCenterNode = nullptr;
+    //Vec3 actorPos = _actor.GetPosition();
+
+    //for (QuadTreeNode* pLeaf : m_pLeafs)
+    //{
+    //    if (pLeaf->bounds.Contains(actorPos))
+    //    {
+    //        pCenterNode = pLeaf;
+    //        break;
+    //    }
+    //}
+
+    //if (pCenterNode == nullptr)
+    //    return result; // 없으면
+
+    //// 2. 주변 3x3 노드 탐색
+    //for (QuadTreeNode* pLeaf : m_pLeafs)
+    //{
+    //    const Vec3& min = pLeaf->bounds.vMin;
+    //    const Vec3& max = pLeaf->bounds.vMax;
+
+    //    // 중심 노드 경계 확장 (한 칸 여유)
+    //    const Vec3& cMin = pCenterNode->bounds.vMin;
+    //    const Vec3& cMax = pCenterNode->bounds.vMax;
+
+    //    if (max.x >= cMin.x - (cMax.x - cMin.x) &&
+    //        min.x <= cMax.x + (cMax.x - cMin.x) &&
+    //        max.z >= cMin.z - (cMax.z - cMin.z) &&
+    //        min.z <= cMax.z + (cMax.z - cMin.z))
+    //    {
+    //        result.insert(result.end(), pLeaf->vActorIndices.begin(), pLeaf->vActorIndices.end());
+    //    }
+    //}
+
+    //// 그래서 일단 갸가 서있는 노드만 순회하기로
     Vec3 actorPos = _actor.GetPosition();
 
     for (QuadTreeNode* pLeaf : m_pLeafs)
     {
         if (pLeaf->bounds.Contains(actorPos))
         {
-            pCenterNode = pLeaf;
+            result = pLeaf->vActorIndices;  // 복사
             break;
-        }
-    }
-
-    if (pCenterNode == nullptr)
-        return result; // 없으면
-
-    // 2. 주변 3x3 노드 탐색
-    for (QuadTreeNode* pLeaf : m_pLeafs)
-    {
-        const Vec3& min = pLeaf->bounds.vMin;
-        const Vec3& max = pLeaf->bounds.vMax;
-
-        // 중심 노드 경계 확장 (한 칸 여유)
-        const Vec3& cMin = pCenterNode->bounds.vMin;
-        const Vec3& cMax = pCenterNode->bounds.vMax;
-
-        if (max.x >= cMin.x - (cMax.x - cMin.x) &&
-            min.x <= cMax.x + (cMax.x - cMin.x) &&
-            max.z >= cMin.z - (cMax.z - cMin.z) &&
-            min.z <= cMax.z + (cMax.z - cMin.z))
-        {
-            result.insert(result.end(), pLeaf->vActorIndices.begin(), pLeaf->vActorIndices.end());
         }
     }
 

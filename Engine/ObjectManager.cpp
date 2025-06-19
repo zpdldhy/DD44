@@ -17,6 +17,7 @@ ComPtr<ID3D11Buffer> ObjectManager::m_pRenderModeBuffer = nullptr;
 void ObjectManager::Init()
 {
 	CreateRenderModeCB();
+	m_QuadTree.Create(8, 8, 40.0f);
 }
 
 void ObjectManager::Tick()
@@ -30,7 +31,13 @@ void ObjectManager::Tick()
 		}
 		else
 		{
-			pActor->second->Tick();
+			// 동적 액터만 쿼드트리 위치 갱신 - sy
+			if (pActor->second->m_bUpdateQuadTree)
+			{
+				m_QuadTree.UpdateActor(pActor->second);
+			}
+
+ 			pActor->second->Tick();
 			pActor++;
 		}		
 	}
@@ -96,6 +103,12 @@ void ObjectManager::AddActor(shared_ptr<class AActor> _pActor)
 	_pActor->Init();
 
 	SetInstance(_pActor);
+
+	// 맵을 제외한 모든 액터를 쿼드트리에 최초 1회 등록 - sy
+	if (_pActor->m_szName != L"Terrain")
+	{
+		m_QuadTree.InsertActor(m_QuadTree.GetRoot(), _pActor);
+	}
 }
 
 void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
@@ -110,6 +123,12 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 
 		pActor->Init();
 		SetInstance(pActor);
+
+		// 맵을 제외한 모든 액터를 쿼드트리에 최초 1회 등록 - sy
+		if (pActor->m_szName != L"Terrain")
+		{
+			m_QuadTree.InsertActor(m_QuadTree.GetRoot(), pActor);
+		}
 	}
 }
 
@@ -179,7 +198,7 @@ void ObjectManager::CollisionStabilization()
 {
 	for (auto iter : m_vActorList)
 	{
-		auto pActor = iter.second;		
+		auto pActor = iter.second;
 		if (pActor->m_vCollisionList.empty()) continue;
 		auto pShape = pActor->GetShapeComponent();
 		if (pShape == nullptr) continue;

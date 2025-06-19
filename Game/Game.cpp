@@ -53,7 +53,7 @@ void Game::Init()
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 
 	OBJECT->AddActorList(m_vMapList);
-	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
+	OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
@@ -533,63 +533,63 @@ void Game::SetEnemy()
 
 void Game::CheckEnemyCollision()
 {
-	shared_ptr<AActor> melee;
-	for (auto iter = ENEMYCOLLIDER->enemyList.begin(); iter != ENEMYCOLLIDER->enemyList.end();)
-	{
-		auto size = ENEMYCOLLIDER->enemyList.size();
-		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
-		{
-			iter = ENEMYCOLLIDER->enemyList.erase(iter);
-			continue;
-		}
-		COLLITION->CheckCollision(m_pPlayer, *iter);
-		if ((*iter)->m_szName == L"Melee")
-		{
-			if ((*iter)->m_bCollision)
-			{
-				melee = (*iter);
-			}
-		}
-		// player melee랑 enemy 확인
-		iter++;
-	}
+	//shared_ptr<AActor> melee;
+	//for (auto iter = ENEMYCOLLIDER->enemyList.begin(); iter != ENEMYCOLLIDER->enemyList.end();)
+	//{
+	//	auto size = ENEMYCOLLIDER->enemyList.size();
+	//	if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+	//	{
+	//		iter = ENEMYCOLLIDER->enemyList.erase(iter);
+	//		continue;
+	//	}
+	//	COLLITION->CheckCollision(m_pPlayer, *iter);
+	//	if ((*iter)->m_szName == L"Melee")
+	//	{
+	//		if ((*iter)->m_bCollision)
+	//		{
+	//			melee = (*iter);
+	//		}
+	//	}
+	//	// player melee랑 enemy 확인
+	//	iter++;
+	//}
 
-	if (melee)
-	{
-		for (auto iter = enemyList.begin(); iter != enemyList.end();)
-		{
-			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
-			{
-				iter = enemyList.erase(iter);
-				continue;
-			}
-			COLLITION->CheckCollision(*iter, melee);
-			iter++;
-		}
-	}
+	//if (melee)
+	//{
+	//	for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	//	{
+	//		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+	//		{
+	//			iter = enemyList.erase(iter);
+	//			continue;
+	//		}
+	//		COLLITION->CheckCollision(*iter, melee);
+	//		iter++;
+	//	}
+	//}
 
-	for (auto iter = enemyList.begin(); iter != enemyList.end();)
-	{
-		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
-		{
-			iter = enemyList.erase(iter);
-			continue;
-		}
-		COLLITION->CheckCollision(m_pPlayer, *iter);
-		iter++;
-	}
+	//for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	//{
+	//	if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+	//	{
+	//		iter = enemyList.erase(iter);
+	//		continue;
+	//	}
+	//	COLLITION->CheckCollision(m_pPlayer, *iter);
+	//	iter++;
+	//}
 
-	for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
-	{
-		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
-		{
-			iter = m_vObjectList.erase(iter);
-			continue;
-		}
-		COLLITION->CheckCollision(m_pPlayer, *iter);
-		COLLITION->CheckCollision(m_pBetty, *iter);
-		iter++;
-	}
+	//for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
+	//{
+	//	if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+	//	{
+	//		iter = m_vObjectList.erase(iter);
+	//		continue;
+	//	}
+	//	COLLITION->CheckCollision(m_pPlayer, *iter);
+	//	COLLITION->CheckCollision(m_pBetty, *iter);
+	//	iter++;
+	//}
 
 	for (auto iter = m_vMapList.begin(); iter != m_vMapList.end();)
 	{
@@ -602,32 +602,70 @@ void Game::CheckEnemyCollision()
 		iter++;
 	}
 
-	auto list = PROJECTILE->GetActorList();
-	for (auto proj = list.begin(); proj != list.end(); )
+	//auto list = PROJECTILE->GetActorList();
+	//for (auto proj = list.begin(); proj != list.end(); )
+	//{
+	//	COLLITION->CheckCollision(*proj, m_pPlayer);
+
+	//	for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
+	//	{
+	//		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+	//		{
+	//			iter = m_vObjectList.erase(iter);
+	//			continue;
+	//		}
+	//		COLLITION->CheckCollision(*proj, *iter);
+	//		iter++;
+	//	}
+
+	//	for (auto iter = enemyList.begin(); iter != enemyList.end();)
+	//	{
+	//		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+	//		{
+	//			iter = enemyList.erase(iter);
+	//			continue;
+	//		}
+	//		COLLITION->CheckCollision(*proj, *iter);
+	//		iter++;
+	//	}
+	//	proj++;
+	//}
+
+
+	//// 기존 List 순회 방식이 아닌 쿼드트리 탐색 후 충돌 처리하는 방법으로 변경
+	if (m_pPlayer == nullptr || m_pPlayer->m_bDelete)
+		return;
+
+	// 1. 플레이어 주변 오브젝트 후보 추출
+	vector<UINT> nearbyIDs = OBJECT->GetQuadTree().FindNearbyActorIndices(*m_pPlayer);
+	int a = nearbyIDs.size();
+	vector<shared_ptr<AActor>> monsters;
+
+	// 2. 플레이어 충돌 처리 + 몬스터 필터링
+	for (UINT id : nearbyIDs)
 	{
-		COLLITION->CheckCollision(*proj, m_pPlayer);
+		auto actor = OBJECT->GetActor(id);
+		if (!actor || actor->m_bDelete || actor == m_pPlayer)
+			continue;
 
-		for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
-		{
-			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
-			{
-				iter = m_vObjectList.erase(iter);
-				continue;
-			}
-			COLLITION->CheckCollision(*proj, *iter);
-			iter++;
-		}
+		if (actor->m_szName == L"Monster")
+			monsters.push_back(actor);
 
-		for (auto iter = enemyList.begin(); iter != enemyList.end();)
+		COLLITION->CheckCollision(m_pPlayer, actor);
+	}
+
+	// 3. 몬스터 개별 충돌 처리 (각자 주변 오브젝트 기준)
+	for (auto& monster : monsters)
+	{
+		vector<UINT> monsterNearbyIDs = OBJECT->GetQuadTree().FindNearbyActorIndices(*monster);
+
+		for (UINT id : monsterNearbyIDs)
 		{
-			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
-			{
-				iter = enemyList.erase(iter);
+			auto actor = OBJECT->GetActor(id);
+			if (!actor || actor->m_bDelete || actor->m_Index > monster->m_Index)
 				continue;
-			}
-			COLLITION->CheckCollision(*proj, *iter);
-			iter++;
+
+			COLLITION->CheckCollision(monster, actor);
 		}
-		proj++;
 	}
 }

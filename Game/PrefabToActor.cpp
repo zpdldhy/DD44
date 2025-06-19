@@ -129,6 +129,7 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 
 		actor->m_szName = to_mw(characterData.Name);
 		actor->m_eActorType = static_cast<ActorType>(characterData.m_eActorType);
+		actor->m_bUpdateQuadTree = true;
 		actor->SetPosition(Vec3(characterData.transform.Position));
 		actor->SetRotation(Vec3(characterData.transform.Rotation));
 		actor->SetScale(Vec3(characterData.transform.Scale));

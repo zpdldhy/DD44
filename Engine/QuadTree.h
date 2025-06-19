@@ -41,5 +41,7 @@ public:
 private:
     std::unique_ptr<QuadTreeNode> m_pRoot;
     std::vector<QuadTreeNode*> m_pLeafs;
+
+    int actorCount = 0;
 };
 

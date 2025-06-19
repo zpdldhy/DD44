@@ -55,6 +55,7 @@ void PlayerMoveScript::Init()
 	// AttackRange
 	attackRangeActor = make_shared<AActor>();
 	attackRangeActor->m_bCollision = false;
+	attackRangeActor->m_bUpdateQuadTree = true;
 
 	auto collider = make_shared<UBoxComponent>();
 	collider->m_bVisible = true;

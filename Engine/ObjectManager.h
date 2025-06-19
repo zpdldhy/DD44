@@ -1,5 +1,6 @@
 #pragma once
 #include "Singleton.h"
+#include "QuadTree.h"
 
 enum class ERenderMode
 {
@@ -33,6 +34,8 @@ class ObjectManager : public Singleton<ObjectManager>
 	static ComPtr<ID3D11Buffer> m_pRenderModeBuffer;
 	RenderModeCB m_tRenderModeData;
 
+	QuadTree m_QuadTree;
+
 public:
 	void Init();
 	void Tick();
@@ -55,6 +58,8 @@ public:
 	const map<UINT, shared_ptr<AActor>>& GetActorList() const;
 
 	vector<UINT> GetActorIndexList() { return m_vActorIndexList; }	// 임시 사용
+
+	QuadTree& GetQuadTree() { return m_QuadTree; }
 
 	// Cursor
 	void SetCursorActor(shared_ptr<AActor> _pCursor);
