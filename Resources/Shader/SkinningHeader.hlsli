@@ -21,6 +21,7 @@ cbuffer AnimationBuffer : register(b5)
     uint frame;
     uint p1;
     uint p2;
+    float4 rootPos;
 }
 
 cbuffer InverseBoneBuffer : register(b9)
@@ -46,6 +47,12 @@ float4x4 GetAnimMatrix(uint _track, uint _bone, uint _frame)
         row2,
         row3
     );
-    
+    float4x4 root = float4x4(
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    -rootPos.x, -rootPos.y, -rootPos.z, 1);
+
+    mat = mul(mat, root);
     return transpose(mat);
 }

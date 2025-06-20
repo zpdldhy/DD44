@@ -43,9 +43,11 @@ void UAnimInstance::Tick()
 	if (m_bInPlace)
 	{
 		// 이처리를 또 어디서 하냐 
-		//rootPos.x = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._41;
-		//rootPos.y = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._42;
-		//rootPos.z = animTrackList[currentAnimTrackIndex].animList[rootIndex][animFrame]._43;
+		rootMat = GetMatrix(currentAnimTrackIndex, rootIndex, animFrame);
+
+		rootPos.x = rootMat._41;
+		rootPos.y = rootMat._42;
+		rootPos.z = rootMat._43;
 	}
 
 	// 애니메이션 파싱 확인 용
@@ -74,6 +76,7 @@ void UAnimInstance::Render()
 	// 객체별 데이터
 	cbData.frame = animFrame;
 	cbData.track = currentAnimTrackIndex;
+	cbData.rootPos = XMFLOAT4(rootPos.x, rootPos.y, rootPos.z, 0);
 	DC->UpdateSubresource(_constantBuffer.Get(), 0, NULL, &cbData, 0, 0);
 	DC->VSSetConstantBuffers(5, 1, _constantBuffer.GetAddressOf());
 
@@ -207,23 +210,37 @@ void UAnimInstance::PlayOnce(int _index)
 
 Matrix UAnimInstance::GetBoneAnim(int _boneIndex)
 {
-	if (_boneIndex == 59 && animFrame > 47 && animFrame < 48)
-	{
-		int a = 0;
-	}
 	if (_boneIndex >= boneCount)
 	{
 		return Matrix();
 	}
 
+	Matrix ret = GetMatrix(currentAnimTrackIndex, _boneIndex, animFrame);
+
+	if (m_bInPlace)
+	{
+		Matrix inverse = Matrix::CreateTranslation(-rootPos);
+		ret = ret * inverse;
+	}
+
+	return ret;
+}
+
+Matrix UAnimInstance::GetMatrix(int _track, int _bone, int _frame)
+{
 	Matrix ret;
+
+	if (_bone >= boneCount || _frame >= animTrackList[_track].endFrame)
+	{
+		return ret;
+	}
 
 	for (int row = 0; row < 4; ++row)
 	{
-		int z = currentAnimTrackIndex * 4 + row;
+		int z = _track * 4 + row;
 
-		size_t index = _boneIndex
-			+ static_cast<int>(animFrame) * texWidth
+		size_t index = _bone
+			+ _frame * texWidth
 			+ z * texWidth * texHeight;
 
 		const XMFLOAT4& rowData = animTexData[index];
@@ -232,12 +249,6 @@ Matrix UAnimInstance::GetBoneAnim(int _boneIndex)
 		ret.m[row][1] = rowData.y;
 		ret.m[row][2] = rowData.z;
 		ret.m[row][3] = rowData.w;
-	}
-
-	if (m_bInPlace)
-	{
-		//Matrix inverse = Matrix::CreateTranslation(-rootPos);
-		//ret = ret * inverse;
 	}
 
 	return ret;
@@ -251,7 +262,7 @@ void UAnimInstance::SetBoneCount(UINT _bone)
 // set end frame
 void UAnimInstance::SetKeyFrame(int _trackIndex, UINT _key)
 {
-	if (_key >= animTrackList[_trackIndex].animList[0].size() || _key < 0)
+	if (_key >= animTrackList[_trackIndex].endFrame || _key < 0)
 	{
 		return;
 	}
