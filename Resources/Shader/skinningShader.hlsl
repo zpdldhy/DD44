@@ -28,19 +28,7 @@ VS_OUT_RIM VS(PNCTIW_IN input)
         float fWeight = input.w2[j];
 
         matrix boneMat = obj_matBone[iBoneIndex];
-               
-        float4 row0 = g_AnimTex.Load(int4(iBoneIndex, frame, track * 4 + 0, 0));
-        float4 row1 = g_AnimTex.Load(int4(iBoneIndex, frame, track * 4 + 1, 0));
-        float4 row2 = g_AnimTex.Load(int4(iBoneIndex, frame, track * 4 + 2, 0));
-        float4 row3 = g_AnimTex.Load(int4(iBoneIndex, frame, track * 4 + 3, 0));
-
-        float4x4 mat = float4x4(
-        row0,
-        row1,
-        row2,
-        row3);
- 
-        matrix animMat = mat;
+        matrix animMat = GetAnimMatrix(track, iBoneIndex, frame);
         
         animMat = mul(animMat, boneMat);
         animMat = transpose(animMat);
@@ -83,7 +71,7 @@ VS_OUT VS_SHADOW(PNCTIW_IN input)
         float fWeight = input.w[i];
         
         matrix boneMat = obj_matBone[iBoneIndex];
-        matrix animMat = obj_matAnim[iBoneIndex];
+        matrix animMat = GetAnimMatrix(track, iBoneIndex, frame);
         
         animMat = mul(animMat, boneMat);
         animMat = transpose(animMat);
@@ -97,7 +85,7 @@ VS_OUT VS_SHADOW(PNCTIW_IN input)
         float fWeight = input.w2[j];
 
         matrix boneMat = obj_matBone[iBoneIndex];
-        matrix animMat = obj_matAnim[iBoneIndex];
+        matrix animMat = GetAnimMatrix(track, iBoneIndex, frame);
         
         animMat = mul(boneMat, animMat);
         animMat = transpose(animMat);

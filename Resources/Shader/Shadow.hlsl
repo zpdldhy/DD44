@@ -22,7 +22,7 @@ VS_OUT VS(PNCTIW_IN input)
         float fWeight = input.w[i];
         
         matrix boneMat = obj_matBone[iBoneIndex];
-        matrix animMat = obj_matAnim[iBoneIndex];
+        matrix animMat = GetAnimMatrix(track, iBoneIndex, frame);
         
         animMat = mul(animMat, boneMat);
         animMat = transpose(animMat);
@@ -36,7 +36,7 @@ VS_OUT VS(PNCTIW_IN input)
         float fWeight = input.w2[j];
 
         matrix boneMat = obj_matBone[iBoneIndex];
-        matrix animMat = obj_matAnim[iBoneIndex];
+        matrix animMat = GetAnimMatrix(track, iBoneIndex, frame);
         
         animMat = mul(boneMat, animMat);
         animMat = transpose(animMat);
