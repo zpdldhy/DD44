@@ -429,6 +429,9 @@
     <ClInclude Include="USphereComponent.h">
       <Filter>Component\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="ABloodDecalActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -723,6 +726,9 @@
     </ClCompile>
     <ClCompile Include="USphereComponent.cpp">
       <Filter>Component\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="ABloodDecalActor.cpp">
+      <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

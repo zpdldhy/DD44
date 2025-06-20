@@ -57,7 +57,7 @@ void Game::Init()
 	}
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 	OBJECT->AddActorList(m_vMapList);
-	OBJECT->AddActorList(m_vObjectList);
+	//OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
@@ -142,6 +142,7 @@ void Game::Tick()
 	}
 
 	CheckEnemyCollision();
+	CheckBloodCollision();
 	PROJECTILE->Tick();
 }
 
@@ -654,3 +655,33 @@ void Game::CheckEnemyCollision()
 		proj++;
 	}
 }
+
+void Game::CheckBloodCollision()
+{
+	auto& bloodList = EFFECT->GetBloodList();
+	for (auto blood = bloodList.begin(); blood != bloodList.end(); )
+	{
+		if (blood->get()->GetPosition().y <= 0.f)
+			int i = 0;
+
+		if (!(*blood)->IsActive() || (*blood)->m_bDelete)
+		{
+			blood = bloodList.erase(blood);
+			continue;
+		}
+
+		for (auto iter = m_vMapList.begin(); iter != m_vMapList.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = m_vMapList.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*blood, *iter);
+			iter++;
+		}
+
+		blood++;
+	}
+}
+

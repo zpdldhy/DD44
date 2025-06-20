@@ -24,4 +24,8 @@ private:
 	shared_ptr<AEffectActor> CreateEffectActor(EEffectType type);
 	shared_ptr<AEffectActor> GetReusableActor(EEffectType type);
 
+
+public:
+	std::vector<std::shared_ptr<AEffectActor>> m_vBloodActorList;
+	std::vector<std::shared_ptr<AEffectActor>>& GetBloodList() { return m_vBloodActorList; }
 };

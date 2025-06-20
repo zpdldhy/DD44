@@ -20,6 +20,7 @@ VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
     float4 viewPos = mul(worldPos, g_matView);
     output.p = mul(viewPos, g_matProj);
     output.t = input.t;
+    output.c = input.color;
 
     return output;
 }
@@ -27,7 +28,7 @@ VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
 float4 PS(VS_OUT input) : SV_Target
 {
     float2 uv = input.t;
-    float4 texColor = g_txDiffuseA.Sample(sample, uv);
+    float4 texColor = g_txDiffuseA.Sample(sample, uv) * input.c;
 
     if (texColor.a < 0.1f)
         discard;

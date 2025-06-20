@@ -80,9 +80,6 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     // output.c : 최종 결과
     output.c = float4(finalColor, texColor.a);
 
-    //shadowTexCoord = input.shadowCoord.xyz / input.shadowCoord.w;
-    //output.c = float4(shadowTexCoord.xy, shadowTexCoord.z, 1);
-
     // output.c1 : Blur 대상용 (보통 최종 결과와 동일하게 해도 무방)
     output.c1 = float4(finalColor, texColor.a);
 

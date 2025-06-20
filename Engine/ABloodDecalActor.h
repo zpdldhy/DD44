@@ -1,12 +1,10 @@
 #pragma once
 #include "AEffectActor.h"
-
-class ABloodActor : public AEffectActor
+class ABloodDecalActor : public AEffectActor
 {
 public:
-    ABloodActor() : AEffectActor(EEffectType::Blood) {}
+    ABloodDecalActor() : AEffectActor(EEffectType::BloodDecal) {}
 
     virtual Vec3 Prepare(const Vec3& pos, const Vec3& baseVelocity, float _scale) override;
-    virtual void Tick();
 };
 

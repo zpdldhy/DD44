@@ -11,7 +11,9 @@
 #include "AShockwaveActor.h"
 #include "ABeamActor.h"
 #include "APoppingDust.h"
+#include "ABloodDecalActor.h"
 #include "AInstance.h"
+#include "USphereComponent.h"
 
 void EffectManager::Init()
 {
@@ -33,6 +35,7 @@ void EffectManager::Init()
             else
             {
                 actor->Init();
+                OBJECT->AddActor(actor);
                 m_vEffectList.emplace_back(actor);
             }
         }
@@ -69,11 +72,17 @@ void EffectManager::Render()
 shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
 {
     shared_ptr<AEffectActor> actor;
+    auto collider = make_shared<USphereComponent>();
 
     switch (type)
     {
     case EEffectType::Blood:
         actor = make_shared<ABloodActor>();
+        collider->SetName(L"Blood");
+        collider->SetLocalScale(Vec3(1.f, 1.f, 1.f));
+        collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+        actor->SetShapeComponent(collider);
+
         break;
     case EEffectType::Dust:
         actor = make_shared<ADustActor>();
@@ -89,6 +98,9 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
         break;
     case EEffectType::PoppingDust:
         actor = make_shared<APoppingDust>();
+        break;
+    case EEffectType::BloodDecal:
+        actor = make_shared<ABloodDecalActor>();
         break;
     }
 
@@ -127,6 +139,10 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     case EEffectType::PoppingDust:
         mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
        // m_vInstanceEffect[static_cast<size_t>(EEffectType::PoppingDust)]->AddInstanceMesh(mesh);
+        break;
+    case EEffectType::BloodDecal:
+        mat->Load(L"../Resources/Texture/bloodspatter.png", L"../Resources/Shader/SpriteWorld.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::BloodDecal)]->AddInstanceMesh(mesh);
         break;
     }
 
@@ -169,11 +185,21 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
         duration = 0.8f;
         actor->SetRotation(Vec3(DD_PI/2, 0, 0));
         break;
-    case EEffectType::Beam:       duration = 0.8; break;
+    case EEffectType::Beam:       duration = 0.8f; break;
+    case EEffectType::BloodDecal: 
+        duration = 200.0f;
+        actor->SetRotation(Vec3(DD_PI / 2, 0, 0));
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(1, 0, 0, 1));        
+        break;
     default:                      duration = 1.0f; break;
     }
 
     actor->Play(duration, actor->Prepare(pos, baseVelocity, _scale));
+
+    if (type == EEffectType::Blood)
+    {
+        m_vBloodActorList.push_back(actor); 
+    }
 }
 
 void EffectManager::PlayDustBurst(const Vec3& _origin, float _speed, float _size)

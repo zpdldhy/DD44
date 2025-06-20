@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "ABloodActor.h"
 #include "CameraManager.h"
+#include "UStaticMeshComponent.h"
+#include "ObjectManager.h"
 
 Vec3 ABloodActor::Prepare(const Vec3& pos, const Vec3& baseVelocity, float _scale)
 {
@@ -37,7 +39,32 @@ Vec3 ABloodActor::Prepare(const Vec3& pos, const Vec3& baseVelocity, float _scal
 
     SetEndScale(endScale);
     SetPosition(pos);
-    SetGravity(-100.0f);
+    SetGravity(-10.0f);
 
     return velocity;
 }
+
+void ABloodActor::Tick()
+{
+    AEffectActor::Tick();
+
+    for (auto& index : m_vCollisionList)
+    {
+        auto other = OBJECT->GetActor(index.first);
+        if (!other) continue;
+
+        if (other->m_szName == L"Terrain")
+        {
+            // 디칼 찍기
+            //EFFECT->PlayEffect(EEffectType::Blood, GetPosition(), 0.f, Vec3(0, 0, 0)); // 이건 뿌리는 게 아니라 디칼용으로 새로 추가할 수도 있음
+
+            //// 바로 삭제
+            //m_bDelete = true;
+            break;
+        }
+    }
+
+}
+
+
+
