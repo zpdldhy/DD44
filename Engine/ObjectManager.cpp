@@ -30,7 +30,12 @@ void ObjectManager::Tick()
 		}
 		else
 		{
-			pActor->second->Tick();
+			if (pActor->second->m_bUpdateQuadTree != false) 
+			{
+				pActor->second->Tick();
+				if (pActor->second->m_szName == L"Object")
+					pActor->second->m_bUpdateQuadTree = false;
+			}
 			pActor++;
 		}		
 	}
@@ -41,8 +46,6 @@ void ObjectManager::Tick()
 
 void ObjectManager::Render()
 {
-	CheckStencilList();
-
 	for (auto& pRenderActor : m_vPreRenderActorList)
 	{
 		// [1] Actor1 먼저 정상 렌더링 (깊이, 스텐실 기록 X)
@@ -160,6 +163,32 @@ const map<UINT, shared_ptr<AActor>>& ObjectManager::GetActorList() const
 	return m_vActorList;
 }
 
+void ObjectManager::RenderShadow()
+{
+	CheckStencilList();
+
+	for (auto& actor : m_vPreRenderActorList)
+	{
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
+
+	for (auto& actor : m_vPostRenderActorList)
+	{
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
+
+	for (auto& actor : m_vInstanceList)
+	{
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
+}
+
 void ObjectManager::ObjectMove()
 {
 	for (auto iter : m_vActorList)
@@ -234,7 +263,7 @@ void ObjectManager::CheckStencilList()
 	{
 		auto pActor = iter.second;
 		if (pActor->m_bRender == false) continue;
-		if (pActor->GetMeshComponent() == nullptr || pActor->GetMeshComponent()->IsUseInstance()) continue;
+		if (pActor->GetMeshComponent() != nullptr && pActor->GetMeshComponent()->IsUseInstance()) continue;
 
 		if (pActor->m_bUseStencil == false)
 			m_vPreRenderActorList.emplace_back(pActor);
@@ -302,15 +331,27 @@ void ObjectManager::SetInstance(shared_ptr<AActor> _pActor)
 		if (pInstance->GetMeshPath() != meshCom->GetMeshPath())
 			continue;
 
+		if (pInstance->GetTexturePath() == L"../Resources/Obj/tower/tower.png")
+			int i = 0;
+
 		// Texture만 다르면 생성
 		if (pInstance->GetTexturePath() != meshCom->GetMaterial()->GetTexturePath())
 		{
+			if (pInstance->GetTexturePath() == L"../Resources/Obj/tower/tower.png")
+				int i = 0;
+
+			if (meshCom->GetMaterial()->GetTexturePath() == L"../Resources/Obj/tower/tower.png")
+				int i = 0;
+
+			auto InstanceTexturePath = pInstance->GetTexturePath();
+			auto ActorTexturePath = meshCom->GetMaterial()->GetTexturePath();
+
 			MakeInstance(_pActor);
 			return;
 		}
 		else
 		{
-			pInstance->AddInstanceTransform(meshCom);
+			pInstance->AddInstanceMesh(meshCom);
 			return;
 		}
 	}

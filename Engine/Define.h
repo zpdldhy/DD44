@@ -12,21 +12,21 @@
 #define DXWRITE     GET_SINGLE(DxWrite)
 #define TIMER		GET_SINGLE(Timer)
 #define GUI			GET_SINGLE(ImGuiCore)
-#define SOUNDMANAGER	GET_SINGLE(SoundManager)
+#define SOUND		GET_SINGLE(SoundManager)
 #define CAMERA		GET_SINGLE(CameraManager)
 #define UI			GET_SINGLE(UIManager)
 #define OBJECT		GET_SINGLE(ObjectManager)
 #define PARTICLE    GET_SINGLE(ParticleManager)
 #define PREFAB      GET_SINGLE(PrefabLoader)
-#define LIGHTMANAGER GET_SINGLE(LightManager)
+#define LIGHT		GET_SINGLE(LightManager)
 #define POSTPROCESS  GET_SINGLE(PostProcessManager)
 #define STATEMANAGER GET_SINGLE(RenderStateManager)
 #define COLLITION	GET_SINGLE(Collision)
 #define EFFECT		GET_SINGLE(EffectManager)
 #define ACTORLOADER GET_SINGLE(ActorLoader)
-#define MESHLOADER GET_SINGLE(MeshLoader)
+#define MESHLOADER	GET_SINGLE(MeshLoader)
 #define WIND		GET_SINGLE(WindManager)
-
+#define SHADOW		GET_SINGLE(ShadowManager)
 
 #define DD_PI		3.1415926f
 #define DD_2PI		6.2831852f	

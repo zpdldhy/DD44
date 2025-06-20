@@ -652,9 +652,6 @@ bool PrefabLoader::SaveParticle(const PrefabParticleData& data, const std::strin
     j["Row"] = data.Row;
     j["Col"] = data.Col;
 
-    j["UVStart"] = { data.UVStart.x, data.UVStart.y };
-    j["UVEnd"] = { data.UVEnd.x, data.UVEnd.y };
-
     j["BillboardSizeX"] = data.BillboardSizeX;
     j["BillboardSizeY"] = data.BillboardSizeY;
 
@@ -695,11 +692,6 @@ bool PrefabLoader::LoadParticle(PrefabParticleData& outData, const std::string& 
     auto s = j["Scale"];
     outData.Scale = Vec3(s[0], s[1], s[2]);
 
-    auto uvStart = j["UVStart"];
-    auto uvEnd = j["UVEnd"];
-    outData.UVStart = Vec2(uvStart[0], uvStart[1]);
-    outData.UVEnd = Vec2(uvEnd[0], uvEnd[1]);
-
     // ¼ýÀÚ
     outData.Divisions = j["Divisions"];
     outData.Row = j["Row"];
@@ -734,9 +726,6 @@ bool PrefabLoader::SaveParticleGroup(const PrefabParticleGroupData& data, const 
         p["Divisions"] = particle.Divisions;
         p["Row"] = particle.Row;
         p["Col"] = particle.Col;
-
-        p["UVStart"] = { particle.UVStart.x, particle.UVStart.y };
-        p["UVEnd"] = { particle.UVEnd.x, particle.UVEnd.y };
 
         p["BillboardSizeX"] = particle.BillboardSizeX;
         p["BillboardSizeY"] = particle.BillboardSizeY;
@@ -788,11 +777,6 @@ bool PrefabLoader::LoadParticleGroup(PrefabParticleGroupData& out, const std::st
         particle.Divisions = p["Divisions"];
         particle.Row = p["Row"];
         particle.Col = p["Col"];
-
-        auto uv0 = p["UVStart"];
-        auto uv1 = p["UVEnd"];
-        particle.UVStart = Vec2(uv0[0], uv0[1]);
-        particle.UVEnd = Vec2(uv1[0], uv1[1]);
 
         particle.BillboardSizeX = p["BillboardSizeX"];
         particle.BillboardSizeY = p["BillboardSizeY"];

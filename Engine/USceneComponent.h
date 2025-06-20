@@ -67,6 +67,7 @@ public:
 	void UpdateMatrix();
 	void UpdateLocalMatrix();
 	void UpdateWorldMatrix();
+	void UpdateWordlMatrixwithoutRotation();
 
 public:
 	// Local
@@ -93,6 +94,10 @@ public:
 	const Vec3& GetWorldLook() const { return m_vWorldLook; }
 	const Vec3& GetWorldRight() const { return m_vWorldRight; }
 	const Vec3& GetWorldUp() const { return m_vWorldUp; }
+	
+	//Shadow
+	Matrix GetWorldMatrixWithoutRotation() const;
+	void RenderForShadow();
 
 	// Matrix
 	const Matrix& GetWorld() const { return m_matWorld; }

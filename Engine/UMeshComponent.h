@@ -15,11 +15,14 @@ protected:
 	bool bRender = true;
 	bool bUseInstance = false;
 
+	// Instancing
+	Color m_InstanceColor = { 0.f, 0.f, 0.f, 0.f };
+	Vec2 m_InstanceStartUV = { 0.f, 0.f };
+	Vec2 m_InstanceEndUV = { 0.f, 0.f };
+
 public:
 	void Render() override;
-
-protected:
-	virtual void ClearBind();
+	void RenderShadow();
 
 public:
 	void SetMeshPath(const std::wstring& path) { m_MeshPath = path; }
@@ -38,10 +41,20 @@ public:
 	shared_ptr<UMeshComponent> GetChildByName(const wstring& _name);
 	vector<shared_ptr<UMeshComponent>> GetChildren() { return m_vChild; }
 	int GetChildCount() const { return static_cast<int>(m_vChild.size()); }
+
 public:
 	void SetVisible(bool _visible) { bRender = _visible; }
 	const bool& GetVisible() { return bRender; }
+
+	// Instance
 	void SetUseInstance(bool _bUse) { bUseInstance = _bUse; }
 	bool IsUseInstance() { return bUseInstance; }
+	void SetInstanceColor(Color _color) { m_InstanceColor = _color; }
+	void SetInstanceStartUV(Vec2 _uv) { m_InstanceStartUV = _uv; }
+	void SetInstanceEndUV(Vec2 _uv) { m_InstanceEndUV = _uv; }	
+	Color GetInstanceColor() { return m_InstanceColor; }
+	Vec2 GetInstanceStartUV() { return m_InstanceStartUV; }
+	Vec2 GetInstanceEndUV() { return m_InstanceEndUV; }
+	Vec4 GetInstanceUV() { return Vec4(m_InstanceStartUV.x, m_InstanceStartUV.y, m_InstanceEndUV.x, m_InstanceEndUV.y); }
 };
 

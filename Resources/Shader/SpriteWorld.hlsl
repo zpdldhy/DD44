@@ -12,6 +12,18 @@ VS_OUT VS(VS_IN input)
     return output;
 }
 
+VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
+{
+    VS_OUT output;
+
+    float4 worldPos = mul(float4(input.p, 1.0f), input.matWorld);
+    float4 viewPos = mul(worldPos, g_matView);
+    output.p = mul(viewPos, g_matProj);
+    output.t = input.t;
+
+    return output;
+}
+
 float4 PS(VS_OUT input) : SV_Target
 {
     float2 uv = input.t;

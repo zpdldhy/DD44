@@ -4,12 +4,8 @@
 #include "PrefabData.h"
 #include "Text.h"
 
-struct UIData
-{
-	Color vColor;
-};
-
 class Texture;
+class UStaticMeshComponent;
 
 class AUIActor : public AActor
 {
@@ -24,7 +20,6 @@ public:
 
 private:
 	void TextRender();
-	void CreateUIData();	
 	void CreateUVSlice();
 	void UpdateUVSlice();
 	void CreateText();
@@ -43,9 +38,9 @@ public:
 
 	// 9-slice
 	void SetSliceData(const Vec4& _vSlice) { m_vSlice = _vSlice; }
-	void SetColor(const Color& _vColor) { m_tUISliceData.vColor = _vColor; }
-	void AddColor(const Color& _vColor){ m_tUISliceData.vColor += _vColor; }
-	Color GetColor() { return m_tUISliceData.vColor; }
+	void SetColor(const Color& _vColor) { m_Color = _vColor; }
+	void AddColor(const Color& _vColor){ m_Color += _vColor; }
+	Color GetColor() { return m_Color; }
 
 	// Text
 	void SetFontSize(const float& _scale) { m_fFontSize = _scale; }
@@ -63,9 +58,7 @@ public:
 	bool m_bTextUI = false;
 
 protected:
-	// Constants
-	UIData m_tUISliceData = { {0.f, 0.f, 0.f, 0.f} };
-	static ComPtr<ID3D11Buffer> m_pUICB;
+	Color m_Color = { 0.f, 0.f, 0.f, 1.f };
 
 	// State
 	shared_ptr<UIState> m_pState = nullptr;
@@ -78,9 +71,7 @@ protected:
 	shared_ptr<Texture> m_pSelectTexture = nullptr;
 
 	// Slice-9
-	bool m_bUseSliceActor = false;
-	bool m_bSliceActor = false;
-	vector<shared_ptr<AUIActor>> m_vSliceActor;
+	vector<shared_ptr<UStaticMeshComponent>> m_vSliceMesh;
 	shared_ptr<class AInstance> m_pSliceActor = nullptr;
 
 	// 픽셀 단위로 생각 할 것.

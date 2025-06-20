@@ -162,8 +162,8 @@ void TestPlayer::SetupSunLight()
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	OBJECT->AddActor(m_pSunLight);
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pSunLight);
+	LIGHT->Clear();
+	LIGHT->RegisterLight(m_pSunLight);
 }
 
 void TestPlayer::SetupEngineCamera()

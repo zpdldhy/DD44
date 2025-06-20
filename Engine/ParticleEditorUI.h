@@ -11,7 +11,7 @@ public:
 	void DrawVec2(const char* label, float* values);
 
 
-	void SetOnCreateCallback(std::function<void(shared_ptr<class AParticleActor>, const char*, const char*, TransformData, Vec2, Vec2, int, float, bool, bool)> callback)
+	void SetOnCreateCallback(std::function<void(shared_ptr<class AParticleActor>, const char*, const char*, TransformData, int, float, bool, bool)> callback)
 	{
 		m_OnCreate = std::move(callback);
 	}
@@ -39,9 +39,6 @@ private:
 		{ 20.0f, 20.0f, 20.0f }  // Scale
 	};
 
-	Vec2 m_UVStart = { 0.0f, 0.0f };
-	Vec2 m_UVEnd = { 1.0f, 1.0f };
-
 	int m_iSelectedTextureIndex = 0;
 	vector<string> m_vTextureList;
 	vector<string> m_vTextureNameList;
@@ -63,6 +60,6 @@ private:
 	EParticleType m_eSelectedType = EParticleType::Default;
 
 	char m_szGroupName[64] = "MyParticleGroup";
-	std::function<void(shared_ptr<AParticleActor>, const char*, const char*, TransformData, Vec2, Vec2, int divisions, float duration, bool loop, bool autoDestroy)> m_OnCreate;
+	std::function<void(shared_ptr<AParticleActor>, const char*, const char*, TransformData, int divisions, float duration, bool loop, bool autoDestroy)> m_OnCreate;
 };
 

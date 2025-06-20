@@ -23,6 +23,7 @@
 #include "EffectManager.h"
 #include "Sound.h"
 #include "WindManager.h"
+#include "ShadowManager.h"
 
 bool g_bRangeVisibleMode;
 
@@ -41,10 +42,11 @@ void Engine::Init()
 	// 기타 기능 객체 초기화 ( input, )
 	{
 		TIMER->Init();
-		LIGHTMANAGER->Init();
+		LIGHT->Init();
+		SHADOW->Init();
 		INPUT->Init();
 		DXWRITE->Create();
-		SOUNDMANAGER->LoadAllSounds();
+		SOUND->LoadAllSounds();
 
 		if (_app->m_type != SCENE_TYPE::GAME)
 		{
@@ -75,7 +77,7 @@ void Engine::Frame()
 	// Manager Tick
 	INPUT->Tick();
 	TIMER->Update();
-	LIGHTMANAGER->UpdateLightCB();
+	LIGHT->Tick();
 
 	if (!m_bGamePaused)
 	{
@@ -91,6 +93,7 @@ void Engine::Frame()
 
 		{
 			CAMERA->Tick();		// Fructum Range Render 때문에 Object 뒤에서 Render
+			EFFECT->Tick();
 			PARTICLE->Tick();
 			WIND->Tick();
 		}
@@ -116,13 +119,20 @@ void Engine::Render()
 	DXWRITE->Draw(rt, TIMER->m_szTime);
 #endif // DEBUG
 
+	_app->Render();
+	SHADOW->Render();
 	CAMERA->Render(CameraViewType::CVT_ACTOR);
 
-	_app->Render();
 	// 3D World -> Texture Render
 	{
 		POSTPROCESS->PreRender();
+		ID3D11ShaderResourceView* shadowSRV = SHADOW->GetSRV();
+		DC->PSSetShaderResources(3, 1, &shadowSRV);
+		auto sampler = SHADOW->GetShadowSampler();
+		DC->PSSetSamplers(1, 1, sampler.GetAddressOf());
 		OBJECT->Render();	// ObjectList Render
+		LIGHT->Render();
+		EFFECT->Render();
 		PARTICLE->Render();
 		WIND->Render();
 		POSTPROCESS->SetSRVToSlot(7, WIND->GetSRV());

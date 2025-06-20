@@ -55,6 +55,7 @@ public:
 	const map<UINT, shared_ptr<AActor>>& GetActorList() const;
 
 	vector<UINT> GetActorIndexList() { return m_vActorIndexList; }	// 임시 사용
+	void RenderShadow();
 
 	// Cursor
 	void SetCursorActor(shared_ptr<AActor> _pCursor);

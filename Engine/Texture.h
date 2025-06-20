@@ -13,8 +13,10 @@ public:
 	UINT width = 0;
 	UINT height = 0;
 
-public:
+private:
 	void SetTextureSize();	
+
+public:
 	bool LoadTexture(std::wstring _filename);
 	Texture() = default;
 

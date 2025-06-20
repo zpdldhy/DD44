@@ -2,7 +2,7 @@
 #include "UObject.h"
 #include "Device.h"
 
-#define MAX_INSTANCE_COUNT 1000;
+#define MAX_INSTANCE_COUNT 5000;
 
 enum class MeshType
 {

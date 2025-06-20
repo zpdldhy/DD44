@@ -41,6 +41,10 @@ void Editor::Init()
 	SetupEditorCallbacks();
 
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
+	for (auto map : m_vMapList)
+	{
+		map->m_bCastShadow = false;
+	}
 	OBJECT->AddActorList(m_vMapList);
 	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".object.json"));
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
@@ -62,6 +66,7 @@ void Editor::Init()
 	SetupSunLight();
 
 	PROJECTILE->Init();
+	EFFECT->Init();
 }
 
 void Editor::Tick()
@@ -144,6 +149,7 @@ void Editor::SetupSkybox()
 {
 	m_pSky = make_shared<ASky>();
 	m_pSky->m_szName = L"Sky";
+	m_pSky->m_bCastShadow = false;
 	m_pSkyMesh = UStaticMeshComponent::CreateSphere(20, 20);
 	m_pSky->SetMeshComponent(m_pSkyMesh);
 
@@ -164,8 +170,8 @@ void Editor::SetupSunLight()
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	OBJECT->AddActor(m_pSunLight);
 
-	LIGHTMANAGER->Clear();
-	LIGHTMANAGER->RegisterLight(m_pSunLight);
+	LIGHT->Clear();
+	LIGHT->RegisterLight(m_pSunLight);
 }
 
 void Editor::SetupGizmo()
@@ -689,8 +695,6 @@ void Editor::SetupParticleEditorCallback()
 		const char* texPath,
 		const char* shaderPath,
 		TransformData actorData,
-		Vec2 uvStart,
-		Vec2 uvEnd,
 		int divisions,
 		float duration,
 		bool loop,
@@ -710,7 +714,7 @@ void Editor::SetupParticleEditorCallback()
 			);
 
 			// 3. UV 설정 (셰이더에 넘기기 위함)
-			mat->SetUVRange(uvStart, uvEnd); // → SetUVRange() 함수 내부에서 CB 업데이트
+			//mat->SetUVRange(uvStart, uvEnd); // → SetUVRange() 함수 내부에서 CB 업데이트
 
 			// 4. 머티리얼, 트랜스폼 적용
 			meshComp->SetMaterial(mat);
@@ -720,8 +724,8 @@ void Editor::SetupParticleEditorCallback()
 			particleActor->SetRotation(Vec3(actorData.Rotation));
 			particleActor->SetScale(Vec3(actorData.Scale));
 			particleActor->InitSpriteAnimation(divisions, duration);
-			particleActor->SetLoop(loop);
-			particleActor->SetAutoDestroy(autoDestroy);
+			particleActor->m_bLoop = loop;
+			particleActor->m_bAutoDestroy=autoDestroy;
 
 			// 5. 화면에 등록
 			PARTICLE->AddUI(particleActor);

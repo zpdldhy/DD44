@@ -58,9 +58,9 @@ bool InputlayoutManager::CreateDefault()
 	return true;
 }
 
-bool InputlayoutManager::CreateInstance(ComPtr<ID3DBlob> _pCode)
+bool InputlayoutManager::CreateInstance(ComPtr<ID3DBlob> _pCode, wstring _name)
 {
-	if (Get(L"Instance") != nullptr)
+	if (Get(_name) != nullptr)
 	{
 		return true;
 	}
@@ -81,7 +81,7 @@ bool InputlayoutManager::CreateInstance(ComPtr<ID3DBlob> _pCode)
 	UINT iNumCnt = sizeof(layout) / sizeof(layout[0]);
 	shared_ptr<Inputlayout> inputlayout = make_shared<Inputlayout>();
 	inputlayout->Load(_pCode, layout, iNumCnt);
-	m_mList.insert(make_pair(L"Instance", inputlayout));
+	m_mList.insert(make_pair(_name, inputlayout));
 
 	return true;
 }
