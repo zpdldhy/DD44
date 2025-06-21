@@ -11,6 +11,14 @@
 #include "ProjectileManager.h"
 #include "UMaterial.h"
 
+PlayerEmptyState::PlayerEmptyState() : StateBase(EMPTY_STATE)
+{
+	
+}
+void PlayerEmptyState::Enter() {}
+void PlayerEmptyState::Tick() {}
+void PlayerEmptyState::End() {}
+
 PlayerIdleState::PlayerIdleState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_IDLE)
 {
 	m_pOwner = _pOwner;
@@ -23,7 +31,7 @@ void PlayerIdleState::Enter()
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int idleIndex = animInstance->GetAnimIndex(L"Idle_0");
-	animInstance->SetCurrentAnimTrack(idleIndex);
+	animInstance->SetCurrentAnimTrack(idleIndex); 
 }
 void PlayerIdleState::Tick()
 {
@@ -175,7 +183,7 @@ void PlayerAttackState::Tick()
 		Move();
 		nextAnim = animInstance->GetAnimIndex(L"Slash_Light_R_new");
 		animInstance->PlayOnce(nextAnim);
-		
+
 		// Sword
 		auto left = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftSword");
 		left->SetVisible(true);
@@ -184,7 +192,7 @@ void PlayerAttackState::Tick()
 
 		//
 		m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(true);
-		
+
 		currentPhase = OnThird;
 		m_bOnCombo = false;
 	}
@@ -221,7 +229,7 @@ void PlayerAttackState::End()
 	right->SetVisible(false);
 	auto back = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"BackSword");
 	back->SetVisible(true);
-	
+
 	// 
 	m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(false);
 }

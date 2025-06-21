@@ -110,6 +110,7 @@ void WalkerDieState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|Stun");
 	animInstance->SetKeyFrame(index, 30);
+	animInstance->m_fAnimPlayRate = 20.0f;
 	animInstance->PlayOnce(index);
 
 }

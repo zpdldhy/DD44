@@ -23,18 +23,18 @@ void UAnimInstance::Tick()
 
 	if (animFrame >= lastFrame)
 	{
-		m_bOnPlayOnce = false;
 		if (!hasEnd)
 		{
 			if (m_bOnPlayOnce)
 			{
 				currentAnimTrackIndex = prevIndex;
 				m_bOnPlayOnce = false;
-			}
+			}				
 			animFrame = 0;
 		}
 		else
 		{
+			m_bOnPlayOnce = false;
 			animFrame = lastFrame;
 		}
 	}
@@ -134,6 +134,7 @@ void UAnimInstance::SetCurrentAnimTrack(int _index)
 		return;
 	}
 	animFrame = 0;
+	prevIndex = currentAnimTrackIndex;
 	currentAnimTrackIndex = _index;
 }
 

@@ -1,3 +1,4 @@
+
 #include "pch.h"
 #include "PlayerMoveScript.h"
 #include "Input.h"
@@ -30,7 +31,8 @@ void PlayerMoveScript::Init()
 	m_fCurrentSpeed = m_fSpeed;
 
 	m_vLook = -m_vCameraOffset;
-
+	
+	empty = make_shared<PlayerEmptyState>();
 	idle = make_shared<PlayerIdleState>(m_pOwner);
 	walk = make_shared<PlayerWalkState>(m_pOwner);
 	climb = make_shared<PlayerClimbState>(m_pOwner);
@@ -105,6 +107,12 @@ void PlayerMoveScript::Tick()
 	// state별 추가 처리
 	switch (currentStateId)
 	{
+	case EMPTY_STATE:
+		CheckRoll();
+		CheckMove();
+		CheckClimb();
+		CheckAttack();
+		break;
 	case PLAYER_S_IDLE:
 		CheckRoll();
 		CheckMove();
@@ -123,7 +131,7 @@ void PlayerMoveScript::Tick()
 		{
 			attackRangeActor->m_bCollision = false;
 			attackRangeActor->GetShapeComponent()->m_bVisible = false;
-			ChangeState(idle);
+			ChangeState(empty);
 		}
 		break;
 	case PLAYER_S_CLIMB:
@@ -139,6 +147,7 @@ void PlayerMoveScript::Tick()
 		CheckMove();
 		break;
 	case PLAYER_S_SHOOT:
+		CheckRoll();
 		UpdateBow();
 		if (INPUT->GetButtonUp(RCLICK) || INPUT->GetButtonFree(RCLICK))
 		{
@@ -153,7 +162,7 @@ void PlayerMoveScript::Tick()
 		if (currentStateEnd)
 		{
 			bow->m_bRender = false;
-			ChangeState(idle);
+			ChangeState(empty);
 		}
 		break;
 	case PLAYER_S_DEATH:
@@ -163,14 +172,14 @@ void PlayerMoveScript::Tick()
 		if (currentStateEnd)
 		{
 			m_bDamageCoolTime = true;
-			ChangeState(idle);
+			ChangeState(empty);
 		}
 		break;
 	case PLAYER_S_ROLL:
 		if (currentStateEnd)
 		{
 			m_bRollCoolTime = true;
-			ChangeState(idle);
+			ChangeState(empty);
 		}
 		else
 		{
@@ -210,10 +219,10 @@ void PlayerMoveScript::ChangeState(shared_ptr<StateBase> _state)
 		{
 			m_bCanRoll = true;
 		}
-		else if (currentStateId == PLAYER_S_SHOOT)
-		{
-			bow->m_bRender = false;
-		}
+	}
+	else if (currentStateId == PLAYER_S_SHOOT)
+	{
+		bow->m_bRender = false;
 	}
 	else if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
@@ -318,7 +327,6 @@ void PlayerMoveScript::PlayFX()
 		ApplyHitFlashToAllMaterials(root, hitFlashAmount);
 	}
 }
-
 void PlayerMoveScript::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount, int _maxCount)
 {
 	int count = RandomRange(_minCount, _maxCount);
@@ -347,7 +355,6 @@ void PlayerMoveScript::VisitAllMeshMaterials(shared_ptr<UMeshComponent> comp)
 		VisitAllMeshMaterials(comp->GetChild(i));
 	}
 }
-
 void PlayerMoveScript::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value)
 {
 	if (!comp) return;
@@ -436,7 +443,6 @@ void PlayerMoveScript::Move()
 		ChangeState(idle);
 	}
 }
-
 void PlayerMoveScript::Climb()
 {
 	float deltaTime = TIMER->GetDeltaTime();
@@ -567,18 +573,14 @@ void PlayerMoveScript::CheckAttack()
 			ChangeState(attack);
 
 			UpdateCollider();
-			//leftHandSword.lock()->SetVisible(true);
-			//backSword.lock()->SetVisible(false);
-			//m_bSlashPlaying = true;
-			//m_fSlashTime = 0.0f;
 
-			//
 			attackRangeActor->m_bCollision = true;
 			attackRangeActor->GetShapeComponent()->m_bVisible = true;
 		}
 	}
 	if (INPUT->GetButton(RCLICK))
 	{
+		UpdateBow();
 		bow->m_bRender = true;
 		// TPlayer의 arrowCount 확인해서 bool 세팅하기 
 		int aCount = dynamic_pointer_cast<TPlayer>(GetOwner())->GetArrowCount();
@@ -601,10 +603,6 @@ void PlayerMoveScript::CheckComboAttack()
 	{
 		dynamic_pointer_cast<PlayerAttackState>(currentState)->CheckAttackCombo(true);
 	}
-
-	// state로 정보 넘기고 
-
-
 }
 
 void PlayerMoveScript::CheckMove()
@@ -636,7 +634,6 @@ void PlayerMoveScript::ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp,
 		ApplyCrashToAllMaterials(comp->GetChild(i), enabled);
 	}
 }
-
 void PlayerMoveScript::ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> comp, float _time)
 {
 	if (!comp) return;
@@ -652,7 +649,6 @@ void PlayerMoveScript::ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> co
 		ApplyDissolveToAllMaterials(comp->GetChild(i), _time);
 	}
 }
-
 void PlayerMoveScript::ApplyCrash()
 {
 	auto root = GetOwner()->GetMeshComponent();
