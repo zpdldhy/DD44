@@ -1,22 +1,12 @@
 #pragma once
 #include <unordered_set>
+#include "AnimData.h"
 
 struct AnimList
 {
 	wstring m_szName;
-	vector<vector<Matrix>> animList; // w-d
 	int startFrame;
 	int endFrame;
-};
-
-struct CbAnimData
-{
-	//Matrix boneAnim[250];
-	UINT track;
-	UINT frame;
-	UINT pad0;       // offset 8 (패딩)
-	UINT pad1;
-	XMFLOAT4 rootPos;
 };
 
 struct AnimEventHash {
@@ -29,30 +19,23 @@ struct AnimEventHash {
 
 class UAnimInstance : public enable_shared_from_this<UAnimInstance>
 {
+	shared_ptr<AnimData> m_pData;
+
 	wstring m_modelName;
 	vector<AnimList> animTrackList;
+
 	float animFrame = 0.0f;
 	UINT currentAnimTrackIndex = 0;
 	UINT lastEventFrame = UINT_MAX;
+
 	Vec3 rootPos = { 0, 0, 0 };
 	Matrix rootMat;
 	int rootIndex = 0;
+	
 	int prevIndex;
-	CbAnimData cbData;
-	// GPU 와 
-	ComPtr<ID3D11Buffer> _constantBuffer;
-
-	// GPU용 데이터 저장 전용
-	vector<XMFLOAT4> animTexData;
-	ComPtr<ID3D11Texture3D> m_pTex3D;
-	ComPtr<ID3D11ShaderResourceView> m_pTexSRV;
 	UINT boneCount;
-	int texWidth;
-	int texHeight;
-	int texDepth;
 
 public:
-	friend class AnimTrack;
 	bool m_bOnPlayOnce;
 	bool m_bInPlace = false;
 	bool m_bPlay = true;
@@ -61,8 +44,6 @@ public:
 	unordered_map<pair<int, UINT>, function<void()>, AnimEventHash> eventMap;
 
 public:
-	void CreateConstantBuffer();
-	void CreateTex();
 	void PlayOnce(int _index);
 	void SetCurrentAnimTrack(int _index);
 public:
@@ -70,7 +51,9 @@ public:
 	void Render();
 	shared_ptr<UAnimInstance> Clone();
 public:
-	void Add1DArray(vector<XMFLOAT4> _data) { animTexData = _data; }
+	// AnimMap 만들 때 단 한 번 실행
+	void MakeAnimData(const vector<XMFLOAT4>& _data);
+	
 	void AddTrack(AnimList _animTrack);
 	void SetName(wstring _name) { m_modelName = _name; }
 	wstring GetName() { return m_modelName; }
@@ -82,7 +65,6 @@ public:
 	int GetAnimIndex(wstring _animName);
 	Matrix GetBoneAnim(int _boneIndex);
 	int GetTotalFrame() { return animTrackList[currentAnimTrackIndex].endFrame; }
-	
 	
 	int GetCurrentIndex() { return currentAnimTrackIndex; }
 	int GetCurrentFrame() { return animFrame; }

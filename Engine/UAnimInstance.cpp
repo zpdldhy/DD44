@@ -2,7 +2,7 @@
 #include "UAnimInstance.h"
 #include "Input.h"
 #include "Timer.h"
-#include "Device.h"
+
 
 
 void UAnimInstance::Tick()
@@ -72,15 +72,14 @@ void UAnimInstance::Tick()
 
 void UAnimInstance::Render()
 {
-	// 한 모델 공용
-	DC->VSSetShaderResources(3, 1, m_pTexSRV.GetAddressOf());
+	m_pData->Bind();
 }
 
 shared_ptr<UAnimInstance> UAnimInstance::Clone()
 {
-	// 프레임 하나때문에 공용으로 못쓰네. 
-	// 데이터랑 프레임 계산이랑 따로 나눠야되나
 	shared_ptr<UAnimInstance> newAnim = make_shared<UAnimInstance>();
+
+	newAnim->m_pData = m_pData;
 
 	newAnim->m_modelName = m_modelName;
 	newAnim->boneCount = boneCount;
@@ -94,71 +93,15 @@ shared_ptr<UAnimInstance> UAnimInstance::Clone()
 	newAnim->m_bInPlace = m_bInPlace;
 	newAnim->m_bPlay = m_bPlay;
 	newAnim->m_fAnimPlayRate = m_fAnimPlayRate;
-	newAnim->animTexData = animTexData;
-	newAnim->CreateConstantBuffer();
-	newAnim->CreateTex();
 
 	return newAnim;
 }
 
-void UAnimInstance::CreateConstantBuffer()
+void UAnimInstance::MakeAnimData(const vector<XMFLOAT4>& _data)
 {
-	D3D11_BUFFER_DESC pDesc;
-	ZeroMemory(&pDesc, sizeof(pDesc));
-	pDesc.ByteWidth = sizeof(CbAnimData);
-	pDesc.Usage = D3D11_USAGE_DEFAULT;
-	pDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-
-	HRESULT hr = DEVICE->CreateBuffer(&pDesc, NULL, _constantBuffer.GetAddressOf());
-	if (FAILED(hr))
-	{
-		return;
-	}
-	return;
-}
-
-void UAnimInstance::CreateTex()
-{
-	texWidth = boneCount;
-	texHeight = 150;
-	texDepth = animTrackList.size() * 4;
-
-	// Texture
-
-	D3D11_TEXTURE3D_DESC desc;
-	ZeroMemory(&desc, sizeof(desc));
-	desc.Width = texWidth;
-	desc.Height = texHeight;
-	desc.Depth = texDepth;
-	desc.MipLevels = 1;
-	desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-	D3D11_SUBRESOURCE_DATA initData;
-	ZeroMemory(&initData, sizeof(initData));
-	initData.pSysMem = animTexData.data();
-	initData.SysMemPitch = texWidth * sizeof(XMFLOAT4);
-	initData.SysMemSlicePitch = texWidth * texHeight * sizeof(XMFLOAT4);
-
-	HRESULT hr = DEVICE->CreateTexture3D(&desc, &initData, m_pTex3D.GetAddressOf());
-	if (FAILED(hr))
-	{
-		assert(false);
-	}
-
-	// SRV
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	ZeroMemory(&srvDesc, sizeof(srvDesc));
-	srvDesc.Format = desc.Format;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
-	srvDesc.Texture3D.MipLevels = 1;
-
-	hr = DEVICE->CreateShaderResourceView(m_pTex3D.Get(), &srvDesc, m_pTexSRV.GetAddressOf());
-	if (FAILED(hr))
-	{
-		assert(false);
-	}
+	m_pData = make_shared<AnimData>();
+	m_pData->AddData(_data);
+	m_pData->CreateTex(boneCount, animTrackList.size());
 }
 
 void UAnimInstance::AddTrack(AnimList _animTrack)
@@ -229,21 +172,7 @@ Matrix UAnimInstance::GetMatrix(int _track, int _bone, int _frame)
 		return ret;
 	}
 
-	for (int row = 0; row < 4; ++row)
-	{
-		int z = _track * 4 + row;
-
-		size_t index = _bone
-			+ _frame * texWidth
-			+ z * texWidth * texHeight;
-
-		const XMFLOAT4& rowData = animTexData[index];
-
-		ret.m[row][0] = rowData.x;
-		ret.m[row][1] = rowData.y;
-		ret.m[row][2] = rowData.z;
-		ret.m[row][3] = rowData.w;
-	}
+	ret = m_pData->GetMatrix(_track, _bone, _frame);
 
 	return ret;
 }

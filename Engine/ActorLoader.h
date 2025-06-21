@@ -16,6 +16,7 @@ public:
 	ActorLoader(){}
 	~ActorLoader() 
 	{
+		m_vFbxList.clear();
 		m_mMeshMap.clear();
 	}
 public:
@@ -24,7 +25,6 @@ public:
 
 	vector<TFbxResource> m_vFbxList;
 	map<wstring, shared_ptr<UMeshResources>> m_mMeshMap;
-	map<wstring, shared_ptr<UMeshComponent>> m_mMeshCompMap;
 
 public:
 	//Fbx Obj ÆÄ½Ì 
