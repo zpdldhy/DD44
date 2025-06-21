@@ -110,13 +110,13 @@ void QuadTree::RemoveActorFromAllNodes(QuadTreeNode* node, UINT actorIndex)
     }
 }
 
-std::vector<UINT> QuadTree::FindNearbyActorIndices(const AActor& _actor)
+std::vector<UINT> QuadTree::FindNearbyActorIndices(shared_ptr<AActor> _actor)
 {
     std::vector<UINT> result;
 
     // 1. 액터가 포함된 리프 노드 찾기
     QuadTreeNode* pCenterNode = nullptr;
-    Vec3 actorPos = _actor.GetPosition();
+    Vec3 actorPos = _actor->GetPosition();
 
     for (QuadTreeNode* pLeaf : m_pLeafs)
     {

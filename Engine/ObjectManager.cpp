@@ -6,6 +6,7 @@
 #include "UMaterial.h"
 #include "DxState.h"
 #include "ATerrainTileActor.h"
+#include "QuadTree.h"
 
 // Component
 #include "UBoxComponent.h"
@@ -17,6 +18,7 @@ ComPtr<ID3D11Buffer> ObjectManager::m_pRenderModeBuffer = nullptr;
 void ObjectManager::Init()
 {
 	CreateRenderModeCB();
+	CreateQuadTree();
 }
 
 void ObjectManager::Tick()
@@ -98,6 +100,7 @@ void ObjectManager::AddActor(shared_ptr<class AActor> _pActor)
 	
 	_pActor->Init();
 
+	m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), _pActor);	// 쿼드트리에 추가
 	SetInstance(_pActor);
 }
 
@@ -112,6 +115,8 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 		ActorCount++;
 
 		pActor->Init();
+
+		m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), pActor);	// 쿼드트리에 추가
 		SetInstance(pActor);
 	}
 }
@@ -369,4 +374,10 @@ void ObjectManager::MakeInstance(shared_ptr<AActor> _pActor)
 	pInstance->Init();
 
 	m_vInstanceList.emplace_back(pInstance);
+}
+
+void ObjectManager::CreateQuadTree()
+{
+	m_pQuadTree = make_shared<QuadTree>();
+	m_pQuadTree->Create(32, 32, 10.f);
 }
