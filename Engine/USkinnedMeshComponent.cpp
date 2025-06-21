@@ -13,7 +13,6 @@ void USkinnedMeshComponent::Init()
 		child->SetOwner(GetOwner());
 		child->Init();
 	}
-
 }
 
 void USkinnedMeshComponent::Tick()
@@ -41,7 +40,6 @@ void USkinnedMeshComponent::PreRender()
 
 	if (m_pMesh)
 	{
-		dynamic_pointer_cast<USkeletalMeshResources>(m_pMesh)->UpdateInstanceData();
 		m_pMesh->Bind();
 		// 성능에 영향이 있을까
 		static_pointer_cast<USkeletalMeshResources>(m_pMesh)->UpdateBindPoseData();
@@ -55,7 +53,7 @@ void USkinnedMeshComponent::PostRender()
 {
 	if (m_pMesh->GetIndexCount() <= 0)
 	{
-		DC->DrawInstanced(m_pMesh->GetVertexCount(), m_pMesh->GetInstanceCount(), 0, 0);
+		DC->Draw(m_pMesh->GetVertexCount(), 0);
 	}
 	else
 	{
