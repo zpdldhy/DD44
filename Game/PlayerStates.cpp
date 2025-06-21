@@ -611,7 +611,6 @@ void PlayerShoot::CheckShootCount(bool _able)
 void PlayerShoot::CanShoot()
 {
 	if (!bCanShoot) { return; }
-	Profiler p("CanShoot");
 	// 투사체 발사
 	auto  hand = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftHandSocket");
 	Vec3 pos = hand->GetWorldPosition();
