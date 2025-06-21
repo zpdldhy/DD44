@@ -7,7 +7,7 @@ VS_OUT_RIM VS(PNCTIW_IN input)
     output.p = float4(input.p, 1.0f);
     float4 vLocal = float4(input.p, 1.0f);
     
-    float4 vAnim;
+    float4 vAnim = float4(0.f, 0.f, 0.f, 0.f);
        
     for (int i = 0; i < 4; i++)
     {
@@ -64,7 +64,7 @@ VS_OUT VS_SHADOW(PNCTIW_IN input)
     output.p = float4(input.p, 1.0f);
     float4 vLocal = float4(input.p, 1.0f);
     
-    float4 vAnim;
+    float4 vAnim = float4(0.f, 0.f, 0.f, 0.f);
        
     for (int i = 0; i < 4; i++)
     {
