@@ -26,6 +26,7 @@ struct TFbxResource
 
 	// AnimData
 	vector<AnimTrackData> m_vAnimTrackList;
+	AnimTrackData m_vAnimArray;
 
 	// MESH DATA
 	vector<vector<Matrix>> m_vInverseBindPose;

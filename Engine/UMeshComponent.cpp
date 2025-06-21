@@ -47,6 +47,13 @@ void UMeshComponent::RenderShadow()
 	//m_pMesh->Draw();
 }
 
+void UMeshComponent::SetMesh(shared_ptr<UMeshResources> _mesh)
+{
+	m_pMesh = _mesh;
+	m_instanceId = m_pMesh->AddInstance();
+}
+
+
 void UMeshComponent::RemoveChild(int _index)
 {
 	auto child = GetChild(_index);

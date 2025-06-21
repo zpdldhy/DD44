@@ -1,9 +1,9 @@
 #include "Header.hlsli"
 #include "SkinningHeader.hlsli"
 
-VS_OUT_RIM VS(PNCTIW_IN input)
+VS_OUT_RIM_INSTANCE VS(INSTANCEIW_IN input)
 {
-    VS_OUT_RIM output;
+    VS_OUT_RIM_INSTANCE output;
     output.p = float4(input.p, 1.0f);
     float4 vLocal = float4(input.p, 1.0f);
     
@@ -15,7 +15,7 @@ VS_OUT_RIM VS(PNCTIW_IN input)
         float fWeight = input.w[i];
         
         matrix boneMat = obj_matBone[iBoneIndex];
-        matrix animMat = obj_matAnim[iBoneIndex];
+        matrix animMat = GetAnimMatrix(input.track, iBoneIndex, input.frame, input.rootPos);
         
         animMat = mul(animMat, boneMat);
         animMat = transpose(animMat);
@@ -29,15 +29,15 @@ VS_OUT_RIM VS(PNCTIW_IN input)
         float fWeight = input.w2[j];
 
         matrix boneMat = obj_matBone[iBoneIndex];
-        matrix animMat = obj_matAnim[iBoneIndex];
+        matrix animMat = GetAnimMatrix(input.track, iBoneIndex, input.frame, input.rootPos);
         
-        animMat = mul(boneMat, animMat);
+        animMat = mul(animMat, boneMat);
         animMat = transpose(animMat);
         
         vAnim += mul(vLocal, animMat) * fWeight;
     }
     
-    float4 vWorld = mul(vAnim, g_matWorld);
+    float4 vWorld = mul(vAnim, input.matWorld);
     float4 vView = mul(vWorld, g_matView);
     float4 vProj = mul(vView, g_matProj);
         
@@ -45,7 +45,7 @@ VS_OUT_RIM VS(PNCTIW_IN input)
     float4 worldPos = mul(float4(input.p, 1.0f), g_matWorld);
     output.wPos = worldPos.xyz;
     output.n = normalize(mul(float4(input.n, 0.0f), g_matWorld).xyz);
-    
+    output.color = input.color;
     output.c = input.c;
     //output.n = input.n;
     output.t = input.t;
@@ -53,7 +53,7 @@ VS_OUT_RIM VS(PNCTIW_IN input)
     return output;
 }
 
-VS_OUT VS_SHADOW(PNCTIW_IN input)
+VS_OUT VS_SHADOW(INSTANCEIW_IN input)
 {
     VS_OUT output;
     //float4 worldPos = mul(float4(input.p, 1.0f), g_matShadowWorld);
@@ -72,7 +72,7 @@ VS_OUT VS_SHADOW(PNCTIW_IN input)
         float fWeight = input.w[i];
         
         matrix boneMat = obj_matBone[iBoneIndex];
-        matrix animMat = obj_matAnim[iBoneIndex];
+        matrix animMat = GetAnimMatrix(input.track, iBoneIndex, input.frame, input.rootPos);
         
         animMat = mul(animMat, boneMat);
         animMat = transpose(animMat);
@@ -86,7 +86,7 @@ VS_OUT VS_SHADOW(PNCTIW_IN input)
         float fWeight = input.w2[j];
 
         matrix boneMat = obj_matBone[iBoneIndex];
-        matrix animMat = obj_matAnim[iBoneIndex];
+        matrix animMat = GetAnimMatrix(input.track, iBoneIndex, input.frame, input.rootPos);
         
         animMat = mul(boneMat, animMat);
         animMat = transpose(animMat);
@@ -94,9 +94,7 @@ VS_OUT VS_SHADOW(PNCTIW_IN input)
         vAnim += mul(vLocal, animMat) * fWeight;
     }
     
-    
-    
-    float4 vWorld = mul(vAnim, g_matWorld);
+    float4 vWorld = mul(vAnim, input.matWorld);
     float4 vView = mul(vWorld, g_matShadowView);
     float4 vProj = mul(vView, g_matShadowProj);
         
@@ -106,7 +104,7 @@ VS_OUT VS_SHADOW(PNCTIW_IN input)
 }
 
 
-PS_OUT PS(VS_OUT_RIM input) : SV_Target
+PS_OUT PS(VS_OUT_RIM_INSTANCE input) : SV_Target
 {
     PS_OUT output = (PS_OUT) 0;
     
@@ -123,7 +121,8 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     float4 crashColor = g_txCrack.Sample(sample, input.t);
     float dissolve = g_txNoise.Sample(sample, input.t).r;
     
-    if (dissolve < g_fDissolveAmount)
+    // input.color.z = dissolve
+    if (dissolve < input.color.z)
         discard;
     
     float3 emissive;
@@ -159,8 +158,8 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
 
     // output.c1 : Blur 대상용 (보통 최종 결과와 동일하게 해도 무방)
     
-
-    float t = 1.0f - g_fHitFlashTime; // 0 → 1 (시간 흐름 반전)
+    // input.color.x = flashTime
+    float t = 1.0f - input.color.x; // 0 → 1 (시간 흐름 반전)
 
     float wave = sin(t * 20.0f * 3.14159); // 10회 진동
     float decay = exp(-t * 4.0f); // 점점 감쇠 (조절 가능)
@@ -169,7 +168,9 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     float3 flashColor = float3(1.0f, 0.1f, 0.1f); // 강한 붉은색
 
     finalColor.rgb = lerp(finalColor.rgb, flashColor, strength);
-    if (g_bCrash)
+    
+    // input.color.y = isCrack
+    if (input.color.y)
     {
         float3 crackHighlightColor = float3(1.0f, 0.1f, 0.1f); // 강조 색상
         finalColor.rgb = lerp(finalColor.rgb, crackHighlightColor, crashColor.a);

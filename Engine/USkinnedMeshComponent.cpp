@@ -13,7 +13,6 @@ void USkinnedMeshComponent::Init()
 		child->SetOwner(GetOwner());
 		child->Init();
 	}
-
 }
 
 void USkinnedMeshComponent::Tick()
@@ -33,8 +32,11 @@ void USkinnedMeshComponent::Tick()
 void USkinnedMeshComponent::PreRender()
 {
 	USceneComponent::Render();
-
-	if (m_pMeshAnim) m_pMeshAnim->Render();
+	
+	if (m_pBaseAnim)
+	{
+		m_pBaseAnim->Render();
+	}
 
 	if (m_pMesh)
 	{
@@ -44,6 +46,7 @@ void USkinnedMeshComponent::PreRender()
 	}
 
 	if (m_pMaterial) { m_pMaterial->Bind(); }
+
 }
 
 void USkinnedMeshComponent::PostRender()

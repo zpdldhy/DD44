@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "MeshLoader.h"
-#include "USkinnedMeshComponent.h"
+#include "UInstanceSkinnedMeshComponent.h"
 #include "UStaticMeshComponent.h"
 #include "UMeshResources.h"
 #include "AnimTrack.h"
@@ -98,15 +98,10 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 
 	if (data.m_type == (int)MeshType::M_SKINNED)
 	{
-		//Profiler p("MeshLoader::MakeMeshSkinned");
-		mesh = make_shared<USkinnedMeshComponent>();
-		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
-		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
-		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
-		//mesh->SetMeshTransform(transform);
+		mesh = make_shared<UInstanceSkinnedMeshComponent>();
+		mesh->SetMesh(meshRes->second);
 		{
-			//Profiler p("Set Anim");
-
+			auto skinnedRoot = dynamic_pointer_cast<UInstanceSkinnedMeshComponent>(mesh);
 			if (bRoot) { skinnedRoot->SetBaseAnim(animInstance); }
 			shared_ptr<AnimTrack> animTrack = make_shared<AnimTrack>();
 			animTrack->SetBase(animInstance);
@@ -116,58 +111,31 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 				animInstance->m_bInPlace = true;
 				animInstance->SetRootIndex(data.m_rootIndex);
 			}
-
 		}
 
-		{
-			//Profiler p("Skinned : SetMat");
-			shared_ptr<UMaterial> mat = make_shared<UMaterial>();
-			{
-				//Profiler p("MatLoad");
-
-				mat->Load(data.m_szTex, data.m_szShader);
-
-			}
-			{
-				//Profiler p("Inputlayout");
-
-				mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
-
-			}
-			skinnedRoot->SetMaterial(mat);
-
-		}
-		int a = 0;
-
+		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
+		mat->Load(data.m_szTex, data.m_szShader);
+		mat->SetInputlayout(INPUTLAYOUT->Get(L"InstanceIW"));
+		mesh->SetMaterial(mat);
 	}
 	else
 	{
 		mesh = make_shared<UStaticMeshComponent>();
-		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
-		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(meshRes->second));
+		mesh->SetMesh(meshRes->second);
 
-		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
-		//mesh->SetMeshTransform(transform);
-		
 		if (data.m_bHasAnim)
 		{
+			auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
 			staticRoot->SetAnimInstance(animInstance);
 			staticRoot->SetMatBone(data.m_matBone);
 			staticRoot->SetTargetBoneIndex(data.m_targetBone);
 		}
+		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
 
-		{
-			//Profiler p("StaticMesh : SetMat");
-			shared_ptr<UMaterial> mat = make_shared<UMaterial>();
-			{
-				//Profiler p("MatLoad");
-
-				mat->Load(data.m_szTex, data.m_szShader);
-
-			}
-			staticRoot->SetMaterial(mat);
-		}
+		mat->Load(data.m_szTex, data.m_szShader);
+		mesh->SetMaterial(mat);
 	}
+
 	mesh->SetLocalPosition(data.m_pos);
 	mesh->SetLocalRotation(data.m_rot);
 	mesh->SetLocalScale(data.m_scale);
@@ -188,16 +156,17 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool _bR
 	if (data.m_type == (int)MeshType::M_SKINNED)
 	{
 		mesh = make_shared<USkinnedMeshComponent>();
-		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
-		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
+		//auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
+		mesh->SetMesh(meshRes->second);
+		//skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(meshRes->second));
 
 		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
 		//mesh->SetMeshTransform(transform);
 
 		shared_ptr<UMaterial> mat = make_shared<UMaterial>();
 		mat->Load(data.m_szTex, data.m_szShader);
-		mat->SetInputlayout(INPUTLAYOUT->Get(L"IW"));
-		skinnedRoot->SetMaterial(mat);
+		mat->SetInputlayout(INPUTLAYOUT->Get(L"InstanceIW"));
+		mesh->SetMaterial(mat);
 	}
 	else
 	{
@@ -234,8 +203,8 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(wstring _resName)
 	if (skinned)
 	{
 		mesh = make_shared<USkinnedMeshComponent>();
-		auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
-		skinnedRoot->SetMesh(dynamic_pointer_cast<USkeletalMeshResources>(iter->second));
+		//auto skinnedRoot = dynamic_pointer_cast<USkinnedMeshComponent>(mesh);
+		mesh->SetMesh(iter->second);
 
 		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
 		//mesh->SetMeshTransform(transform);
@@ -245,7 +214,7 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(wstring _resName)
 		mesh = make_shared<UStaticMeshComponent>();
 		auto staticRoot = dynamic_pointer_cast<UStaticMeshComponent>(mesh);
 		staticRoot->SetMesh(dynamic_pointer_cast<UStaticMeshResources>(iter->second));
-		
+
 		//shared_ptr<MeshTransform> transform = make_shared<MeshTransform>();
 		//mesh->SetMeshTransform(transform);
 	}
