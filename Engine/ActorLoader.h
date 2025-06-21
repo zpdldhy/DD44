@@ -24,6 +24,7 @@ public:
 
 	vector<TFbxResource> m_vFbxList;
 	map<wstring, shared_ptr<UMeshResources>> m_mMeshMap;
+	map<wstring, shared_ptr<UMeshComponent>> m_mMeshCompMap;
 
 public:
 	//Fbx Obj ÆÄ½Ì 
@@ -42,6 +43,7 @@ public:
 	map<wstring, shared_ptr<UMeshResources>> LoadMeshMap();
 	map < wstring, shared_ptr<UAnimInstance>> LoadAnimMap();
 	shared_ptr<UMeshResources> LoadOneRes(string _path);
+
 
 	////////////////////// WILL BE DEPRECATED ////////////////////////////////
 	void LoadOne(string _path);

@@ -610,7 +610,7 @@ void Game::CheckEnemyCollision()
 			continue;
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
-		COLLITION->CheckCollision(m_pBetty, *iter);
+		//COLLITION->CheckCollision(m_pBetty, *iter);
 		iter++;
 	}
 

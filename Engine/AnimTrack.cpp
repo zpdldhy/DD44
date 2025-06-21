@@ -4,11 +4,11 @@
 
 void AnimTrack::Render()
 {
-	animInstance->cbData.frame = animInstance->animFrame;
-	animInstance->cbData.track = animInstance->currentAnimTrackIndex;
-	animInstance->cbData.rootPos = XMFLOAT4(animInstance->rootPos.x, animInstance->rootPos.y, animInstance->rootPos.z, 0);
-	DC->UpdateSubresource(animInstance->_constantBuffer.Get(), 0, NULL, &animInstance->cbData, 0, 0);
-	DC->VSSetConstantBuffers(5, 1, animInstance->_constantBuffer.GetAddressOf());
+	//animInstance->cbData.frame = animInstance->animFrame;
+	//animInstance->cbData.track = animInstance->currentAnimTrackIndex;
+	//animInstance->cbData.rootPos = XMFLOAT4(animInstance->rootPos.x, animInstance->rootPos.y, animInstance->rootPos.z, 0);
+	//DC->UpdateSubresource(animInstance->_constantBuffer.Get(), 0, NULL, &animInstance->cbData, 0, 0);
+	//DC->VSSetConstantBuffers(5, 1, animInstance->_constantBuffer.GetAddressOf());
 	
 	//// 해당 프레임에 대한 MATRIX 수집
 	//for (int i = 0; i < animInstance->animTrackList[animInstance->currentAnimTrackIndex].animList.size(); i++)

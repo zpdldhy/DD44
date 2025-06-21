@@ -27,8 +27,9 @@ protected:
 	// Instance
 	static ComPtr<ID3D11Buffer> m_pInstansBuffer;
 	vector<INSTANCE_VERTEX> m_vInstaceList;
+	UINT m_instanceCount = 0;
 
-private:
+public:
 	void Init() override;
 	void Tick() override;
 	void Render() override;
@@ -44,6 +45,7 @@ public:
 	virtual void Bind() abstract;
 	virtual void UpdateInstanceList(vector<INSTANCE_VERTEX>& _InstanceList);
 
+
 public:
 	ComPtr<ID3D11Buffer> GetVertexBuffer() { return m_pVertexBuffer; }
 	ComPtr<ID3D11Buffer> GetIndexBuffer() { return m_pIndexBuffer; }
@@ -57,5 +59,8 @@ public:
 	int GetType() { return static_cast<int>(m_Type); }
 
 	void SetTopology(D3D11_PRIMITIVE_TOPOLOGY _type = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) { m_Topology = _type; }
+
+	UINT AddInstance(); 
+	UINT GetInstanceCount() { return m_instanceCount; }
 };
 

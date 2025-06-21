@@ -35,9 +35,9 @@ struct INSTANCE_VERTEX
 	Vec4 uv;
 };
 
-struct SKINNED
+struct ANIM_VERTEX
 {
 	UINT track;
 	UINT frame;
-	Vec3 rootPos;
+	XMFLOAT4 rootPos;
 };

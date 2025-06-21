@@ -42,7 +42,6 @@ void UAnimInstance::Tick()
 	// ROOTMOTION
 	if (m_bInPlace)
 	{
-		// 이처리를 또 어디서 하냐 
 		rootMat = GetMatrix(currentAnimTrackIndex, rootIndex, animFrame);
 
 		rootPos.x = rootMat._41;
@@ -73,19 +72,14 @@ void UAnimInstance::Tick()
 
 void UAnimInstance::Render()
 {
-	// 객체별 데이터
-	cbData.frame = animFrame;
-	cbData.track = currentAnimTrackIndex;
-	cbData.rootPos = XMFLOAT4(rootPos.x, rootPos.y, rootPos.z, 0);
-	DC->UpdateSubresource(_constantBuffer.Get(), 0, NULL, &cbData, 0, 0);
-	DC->VSSetConstantBuffers(5, 1, _constantBuffer.GetAddressOf());
-
 	// 한 모델 공용
 	DC->VSSetShaderResources(3, 1, m_pTexSRV.GetAddressOf());
 }
 
 shared_ptr<UAnimInstance> UAnimInstance::Clone()
 {
+	// 프레임 하나때문에 공용으로 못쓰네. 
+	// 데이터랑 프레임 계산이랑 따로 나눠야되나
 	shared_ptr<UAnimInstance> newAnim = make_shared<UAnimInstance>();
 
 	newAnim->m_modelName = m_modelName;

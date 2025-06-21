@@ -16,7 +16,6 @@
 #include "UAnimInstance.h"
 #include "AnimTrack.h"
 
-
 void ActorLoader::ConvertFbxToAsset(string _path)
 {
 	HANDLE hFind;

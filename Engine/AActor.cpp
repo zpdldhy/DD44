@@ -17,6 +17,12 @@ void AActor::Init()
 	m_pTransform->SetOwner(shared_from_this());
 	m_pTransform->Init();
 
+	for (auto& script : m_vScript)
+	{
+		script->SetOwner(shared_from_this());
+		script->Init();
+	}	
+
 	for (auto& component : m_arrComponent)
 	{
 		if (component)
@@ -25,18 +31,11 @@ void AActor::Init()
 			component->Init();
 		}
 	}
-
-	for (auto& script : m_vScript)
-	{
-		script->SetOwner(shared_from_this());
-		script->Init();
-	}	
 }
 
 void AActor::Tick()
 {
 	m_pTransform->Tick();
-
 
 	// Component
 	for (auto& component : m_arrComponent)

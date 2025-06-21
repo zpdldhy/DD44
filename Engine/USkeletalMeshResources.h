@@ -18,16 +18,29 @@ protected:
 	vector<IW_VERTEX> m_vIWList;
 	CBBindPoseData m_inverseBindPose;
 	ComPtr<ID3D11Buffer> m_pBindPoseCB;
+	ComPtr<ID3D11Buffer> m_pIWInstanceBuffer;
+	vector<ANIM_VERTEX> m_vIWInstanceList;
 	map<wstring, BoneNode> m_vSkeletonList;
+private:
+	queue<UINT> m_freeIndices;
 
 protected:
 	bool CreateIWBuffer();
+	bool CreateIWInstanceBuffer();
 	void CreateConstantBuffer();
 
+public:
+	virtual void Init() override;
 public:
 	void Create() override;
 	void Bind() override;
 	void UpdateBindPoseData();
+
+	// ¿ŒΩ∫≈œΩÃ
+	void UpdateInstanceData();
+	void AddInstanceData(UINT _index, INSTANCE_VERTEX _transform, ANIM_VERTEX _anim);
+	UINT AllocateInstanceIndex();
+	void FreeInstanceIndex(UINT index);
 
 public:
 	ComPtr<ID3D11Buffer> GetIwBuffer() { return m_pIWBuffer; }
