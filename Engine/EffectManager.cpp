@@ -184,8 +184,12 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     case EEffectType::Shockwave:  
         duration = 0.8f;
         actor->SetRotation(Vec3(DD_PI/2, 0, 0));
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(1, 1, 1, 1));
         break;
-    case EEffectType::Beam:       duration = 0.8f; break;
+    case EEffectType::Beam: 
+        duration = 0.8f;
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(1, 1, 1, 1));
+        break;
     case EEffectType::BloodDecal: 
         duration = 200.0f;
         actor->SetRotation(Vec3(DD_PI / 2, 0, 0));
