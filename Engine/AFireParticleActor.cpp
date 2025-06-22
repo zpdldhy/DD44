@@ -15,6 +15,7 @@ AFireParticleActor::AFireParticleActor()
 
 void AFireParticleActor::Tick()
 {
+    this->GetMeshComponent()->SetInstanceColor(Vec4(1, 1, 1, 1));
     AParticleActor::Tick(); // 기본 애니메이션 등 유지
     if (!m_bBaseInitialized)
     {
