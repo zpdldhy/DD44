@@ -12,6 +12,7 @@
 #include "ABeamActor.h"
 #include "APoppingDust.h"
 #include "AInstance.h"
+#include "APointEffectActor.h"
 
 constexpr int INITIAL_POOL_SIZE = 3;
 
@@ -93,6 +94,9 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
 	case EEffectType::PoppingDust:
 		actor = make_shared<APoppingDust>();
 		break;
+	case EEffectType::Point:
+		actor = make_shared<APointEffectActor>();
+		break;
 	}
 
 	//±×¸²ÀÚ
@@ -130,6 +134,10 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
 	case EEffectType::PoppingDust:
 		mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
 		// m_vInstanceEffect[static_cast<size_t>(EEffectType::PoppingDust)]->AddInstanceMesh(mesh);
+		break;
+	case EEffectType::Point:
+		mat->Load(L"../Resources/Texture/spark_particle.png", L"../Resources/Shader/SpriteWorld.hlsl");
+		m_vInstanceEffect[static_cast<size_t>(EEffectType::Point)]->AddInstanceMesh(mesh);
 		break;
 	}
 
@@ -183,6 +191,7 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
 		actor->SetRotation(Vec3(DD_PI / 2, 0, 0));
 		break;
 	case EEffectType::Beam:       duration = 0.8; break;
+	case EEffectType::Point:	  duration = 0.2; break;
 	default:                      duration = 1.0f; break;
 	}
 
@@ -240,5 +249,5 @@ void EffectManager::PlayInit()
 		PlayEffect(EEffectType::Feather, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
 	}
 	PlayEffect(EEffectType::Dust, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
-	//PlayEffect(EEffectType::Point, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
+	PlayEffect(EEffectType::Point, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
 }

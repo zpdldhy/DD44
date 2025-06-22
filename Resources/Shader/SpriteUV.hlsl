@@ -23,6 +23,7 @@ float3 ExtractScale(float4x4 m)
     scale.x = length(float3(m._11, m._12, m._13));
     scale.y = length(float3(m._21, m._22, m._23));
     scale.z = length(float3(m._31, m._32, m._33));
+
     return scale;
 }
 
@@ -83,6 +84,7 @@ VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
 
     return output;
 }
+
 
 PS_OUT_DUAL PS(VS_OUT input)
 {

@@ -49,5 +49,10 @@ public:
 	void DeactivateOne(ProjectileData _target);
 public:
 	vector<shared_ptr<AActor>> GetActorList();
+
+//Effect Time
+private:
+	float m_fMagicSpawnTimer = 0.0f;
+	float m_fMagicSpawnDelay = 0.05f;
 };
 

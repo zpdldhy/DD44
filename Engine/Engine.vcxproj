@@ -172,6 +172,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="AnimData.h" />
     <ClInclude Include="AParticleActor.h" />
     <ClInclude Include="APawn.h" />
+    <ClInclude Include="APointEffectActor.h" />
     <ClInclude Include="APoppingDust.h" />
     <ClInclude Include="AShockwaveActor.h" />
     <ClInclude Include="ASky.h" />
@@ -287,6 +288,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="AnimData.cpp" />
     <ClCompile Include="AParticleActor.cpp" />
     <ClCompile Include="APawn.cpp" />
+    <ClCompile Include="APointEffectActor.cpp" />
     <ClCompile Include="APoppingDust.cpp" />
     <ClCompile Include="AShockwaveActor.cpp" />
     <ClCompile Include="ASky.cpp" />
