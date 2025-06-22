@@ -53,7 +53,7 @@ void ProjectileManager::Tick()
 			if ((*iter).type == ProjectileType::MagicBall)
 			{
 				proj.projectile->GetMeshComponent()->SetInstanceColor(Vec4(1, 0, 0, 1));
-				//EFFECT->PlayEffect(EEffectType::Point, (*iter).projectile->GetPosition(), 0, Vec3(0, 0, 0));
+				EFFECT->PlayEffect(EEffectType::Point, (*iter).projectile->GetPosition(), 0, Vec3(0, 0, 0));
 			}
 			m_fMagicSpawnTimer -= m_fMagicSpawnDelay;
 		}

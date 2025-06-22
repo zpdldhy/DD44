@@ -30,7 +30,6 @@ VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
     output.c = input.c;
     output.n = input.n;
     output.t = input.t;
-    output.color = input.color;
     
     return output;
 }
@@ -71,7 +70,7 @@ PS_OUT PS(VS_OUT input)
     
     float4 texColor = g_txDiffuseA.Sample(sample, input.t);
     texColor.a *= input.c.a;
-    psOut.c = texColor * input.color;
+    psOut.c = texColor;
 
   
     return psOut;

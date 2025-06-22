@@ -136,7 +136,7 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
 		// m_vInstanceEffect[static_cast<size_t>(EEffectType::PoppingDust)]->AddInstanceMesh(mesh);
 		break;
 	case EEffectType::Point:
-		mat->Load(L"../Resources/Texture/spark_particle.png", L"../Resources/Shader/SpriteWorld.hlsl");
+		mat->Load(L"../Resources/Texture/spark_particle.png", L"../Resources/Shader/SpriteUV.hlsl");
 		m_vInstanceEffect[static_cast<size_t>(EEffectType::Point)]->AddInstanceMesh(mesh);
 		break;
 	}
@@ -181,7 +181,8 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
 
 
 	float duration = 1.0f;
-
+	actor->GetMeshComponent()->SetInstanceColor(Vec4(1.f, 1.f, 1.f, 1.f));
+	
 	switch (type)
 	{
 	case EEffectType::Dust:       duration = 1.0f; break;
@@ -190,8 +191,12 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
 		duration = 0.8f;
 		actor->SetRotation(Vec3(DD_PI / 2, 0, 0));
 		break;
-	case EEffectType::Beam:       duration = 0.8; break;
-	case EEffectType::Point:	  duration = 0.2; break;
+	case EEffectType::Beam:       duration = 0.8; 
+		break;
+	case EEffectType::Point:
+		duration = 0.2;
+		actor->GetMeshComponent()->SetInstanceColor(Vec4(0.7f, 0.9f, 0.95, 1.0f));
+		break;
 	default:                      duration = 1.0f; break;
 	}
 

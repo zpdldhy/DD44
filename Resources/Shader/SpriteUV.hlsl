@@ -78,7 +78,7 @@ VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
     float4 projPos = mul(viewPos, g_matProj);
     output.p = projPos;
 
-    output.c = input.c;
+    output.c = input.color;
     output.n = input.n;
     output.t = lerp(input.uv.xy, input.uv.zw, input.t);
 
@@ -91,7 +91,7 @@ PS_OUT_DUAL PS(VS_OUT input)
     PS_OUT_DUAL psOut = (PS_OUT_DUAL) 0;
 
     float2 uv = input.t;
-    float4 texColor = g_txDiffuseA.Sample(sample, uv);
+    float4 texColor = g_txDiffuseA.Sample(sample, uv) * input.c;
 
     if (texColor.a < 0.1)
         discard;
