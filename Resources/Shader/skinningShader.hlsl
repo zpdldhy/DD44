@@ -42,9 +42,9 @@ VS_OUT_RIM_INSTANCE VS(INSTANCEIW_IN input)
     float4 vProj = mul(vView, g_matProj);
         
     output.p = vProj;
-    float4 worldPos = mul(float4(input.p, 1.0f), g_matWorld);
+    float4 worldPos = mul(float4(input.p, 1.0f), input.matWorld);
     output.wPos = worldPos.xyz;
-    output.n = normalize(mul(float4(input.n, 0.0f), g_matWorld).xyz);
+    output.n = normalize(mul(float4(input.n, 0.0f), input.matWorld).xyz);
     output.color = input.color;
     output.c = input.c;
     //output.n = input.n;

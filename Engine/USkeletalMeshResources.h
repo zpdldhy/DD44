@@ -41,6 +41,7 @@ public:
 	void AddInstanceData(UINT _index, INSTANCE_VERTEX _transform, ANIM_VERTEX _anim);
 	UINT AllocateInstanceIndex();
 	void FreeInstanceIndex(UINT index);
+	void ClearList();
 
 public:
 	ComPtr<ID3D11Buffer> GetIwBuffer() { return m_pIWBuffer; }

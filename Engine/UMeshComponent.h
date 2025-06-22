@@ -19,6 +19,7 @@ protected:
 	Color m_InstanceColor = { 0.f, 0.f, 0.f, 0.f };
 	Vec2 m_InstanceStartUV = { 0.f, 0.f };
 	Vec2 m_InstanceEndUV = { 0.f, 0.f };
+public:
 	UINT m_instanceId = 0;
 
 public:

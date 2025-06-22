@@ -256,10 +256,10 @@ void PlayerMoveScript::CheckCollision()
 			auto list = GetOwner()->m_vCollisionList;
 			for (auto& index : list)
 			{
-				if (OBJECT->GetActor(index.first)->m_szName == L"Enemy")
+				/*if (OBJECT->GetActor(index.first)->m_szName == L"Enemy")
 				{
 					isCol = true;
-				}
+				}*/
 				// CanBeHit 아래에 넣어도 되는 건지 확인 필요
 				if (OBJECT->GetActor(index.first)->m_szName == L"Ladder" || OBJECT->GetActor(index.first)->m_szName == L"I_Ladder")
 				{

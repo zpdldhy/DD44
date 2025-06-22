@@ -114,6 +114,8 @@ void USkeletalMeshResources::UpdateInstanceData()
 			DC->Unmap(m_pIWInstanceBuffer.Get(), 0);
 		}
 	}
+
+
 }
 
 void USkeletalMeshResources::AddInstanceData(UINT _index, INSTANCE_VERTEX _transform, ANIM_VERTEX _anim)
@@ -133,10 +135,13 @@ UINT USkeletalMeshResources::AllocateInstanceIndex()
 	{
 		index = m_freeIndices.front();
 		m_freeIndices.pop();
+		if (index >= m_instanceCount)
+		{
+			assert(false);
+		}
 	}
 	else
 	{
-		// 여길 들어올 일이 없어야된느거 아닌가?
 		index = m_instanceCount++;
 		m_vInstaceList.resize(m_instanceCount);
 		m_vIWInstanceList.resize(m_instanceCount);
@@ -147,11 +152,22 @@ UINT USkeletalMeshResources::AllocateInstanceIndex()
 
 void USkeletalMeshResources::FreeInstanceIndex(UINT index)
 {
-	if (index < m_vInstaceList.size())
+	m_instanceCount--;
+	m_vInstaceList.resize(m_instanceCount);
+	m_vIWInstanceList.resize(m_instanceCount);
+	if (index < m_instanceCount)
 	{
 		m_freeIndices.push(index);
-		m_instanceCount--;
 	}
+}
+
+void USkeletalMeshResources::ClearList()
+{
+	m_vInstaceList.clear();
+	m_vIWInstanceList.clear();
+
+	m_vInstaceList.resize(m_instanceCount);
+	m_vIWInstanceList.resize(m_instanceCount);
 }
 
 void USkeletalMeshResources::SetInverseBindPose(vector<Matrix> _inverseBindPose)
