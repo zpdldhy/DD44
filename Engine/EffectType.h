@@ -7,5 +7,6 @@ enum class EEffectType
     Shockwave,
     Beam,
     PoppingDust,
+    Point,
     Count,
 };

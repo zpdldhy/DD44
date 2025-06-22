@@ -436,6 +436,9 @@
     <ClInclude Include="AnimData.h">
       <Filter>Core\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="APointEffectActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -734,6 +737,9 @@
     </ClCompile>
     <ClCompile Include="AnimData.cpp">
       <Filter>Core\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="APointEffectActor.cpp">
+      <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
