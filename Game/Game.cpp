@@ -77,9 +77,9 @@ void Game::Init()
 		m_vObjectList.push_back(interactable);
 	}
 
-	//m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
+	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty.character.json");
+	enemyList.emplace_back(m_pBetty);
 	//tempHeadRoller = PToA->MakeCharacter("../Resources/Prefab/Player/HeadRoller1.character.json");
-	//enemyList.emplace_back(m_pBetty);
 	//enemyList.emplace_back(tempHeadRoller);
 
 	auto enemy00 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage00/");
@@ -647,8 +647,7 @@ void Game::CheckEnemyCollision()
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
 		//COLLITION->CheckCollision(tempHeadRoller, *iter);
-
-		//COLLITION->CheckCollision(m_pBetty, *iter);
+		COLLITION->CheckCollision(m_pBetty, *iter);
 		iter++;
 	}
 

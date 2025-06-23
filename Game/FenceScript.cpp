@@ -61,7 +61,7 @@ void FenceScript::Tick()
 		GetOwner()->AddPosition(Vec3(0, 1, 0) * 0.1f);
 		bodyCollider->SetPosition(GetOwner()->GetPosition() + Vec3(0, 2, 0));
 
-		if (m_elapsed > 4.5f)
+		if (m_elapsed > 5.0f)
 		{
 			m_elapsed = 0.0f;
 			m_bClose = false;
