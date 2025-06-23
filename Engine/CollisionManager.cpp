@@ -49,6 +49,7 @@ void Collision::Init()
 			data.otherShape = b->GetShapeComponent();
 
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
+			b->m_vCollisionList.insert(make_pair(a->m_Index, data));
 		}
 
 		};

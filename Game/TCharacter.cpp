@@ -22,6 +22,11 @@ void TCharacter::Tick()
 
 }
 
+void TCharacter::Destroy()
+{
+	AActor::Destroy();
+}
+
 void TCharacter::SetHp(int _hp)
 {
 	hp = _hp;

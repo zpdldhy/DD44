@@ -8,23 +8,29 @@ void LadderScript::Init()
 {
 	// 콜라이더 설정
 	GetOwner()->GetShapeComponent()->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+	GetOwner()->GetShapeComponent()->SetName(L"Ladder");
 
-	auto name = GetOwner()->m_szName;
-	if (name == L"I_Ladder")
+	if (GetOwner()->m_eActorType == ActorType::AT_INTERACTABLE)
 	{
 		GetOwner()->m_bCollision = false;
-		GetOwner()->m_bRender = false;
+		GetOwner()->m_bRender = true;
+		auto name = GetOwner()->m_szName;
+
 		EVENT->AddLadderEvent(name, [this]() {
 			this->Interact();
 			});
 		auto triggerMesh = GetOwner()->GetMeshComponent();
 		auto children = triggerMesh->GetChildren();
-		for (int i = 0; i < children.size(); i++)
+		for (int i = children.size() - 2; i >= 0; i--)
 		{
 			children[i]->SetVisible(false);
 
 		}
 	}
+
+	auto triggerMesh = GetOwner()->GetMeshComponent();
+	auto children = triggerMesh->GetChildren();
+	activeChildNum = children.size() - 1;
 }
 
 void LadderScript::Tick()
@@ -36,13 +42,13 @@ void LadderScript::Tick()
 		{
 			auto triggerMesh = GetOwner()->GetMeshComponent();
 			auto children = triggerMesh->GetChildren();
-			if (activeChildNum >= children.size())
+			if (activeChildNum < 0)
 			{
 				activeChildNum = 0;
 				m_bAppear = false;
 				return;
 			}
-			children[activeChildNum++]->SetVisible(true);
+			children[activeChildNum--]->SetVisible(true);
 		}
 	}
 }

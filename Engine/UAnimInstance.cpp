@@ -10,7 +10,7 @@ void UAnimInstance::Tick()
 	if (!m_bPlay) { return; }
 	animFrame += TIMER->GetDeltaTime() * m_fAnimPlayRate;
 
-	UINT lastFrame = animTrackList[currentAnimTrackIndex].endFrame;
+	UINT lastFrame = animTrackList[currentAnimTrackIndex].endFrame - 1;
 
 	auto iter = m_mKeyFrameMap.find(currentAnimTrackIndex);
 	bool hasEnd = false;
@@ -27,10 +27,14 @@ void UAnimInstance::Tick()
 		{
 			if (m_bOnPlayOnce)
 			{
-				currentAnimTrackIndex = prevIndex;
+				//currentAnimTrackIndex = prevIndex;
 				m_bOnPlayOnce = false;
-			}				
-			animFrame = 0;
+				animFrame = lastFrame - 1;
+			}
+			else
+			{
+				animFrame = 0;
+			}
 		}
 		else
 		{

@@ -13,6 +13,7 @@ void MageMovement::Init()
 {
 	SetPlayer(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer());
 
+	dynamic_pointer_cast<TEnemy>(GetOwner())->SetBloodPos(Vec2(2.0f, 3.0f));
 
 	idle = make_shared<MageIdleState>(m_pOwner);
 	appear = make_shared<MageAppearState>(m_pOwner);

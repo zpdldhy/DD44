@@ -426,7 +426,6 @@
     <ClInclude Include="USphereComponent.h">
       <Filter>Component\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="UInstanceSkinnedMeshComponent.h" />
     <ClInclude Include="AnimTrack.h">
       <Filter>Core\Animation</Filter>
     </ClInclude>
@@ -435,6 +434,9 @@
     </ClInclude>
     <ClInclude Include="AnimData.h">
       <Filter>Core\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="UInstanceSkinnedMeshComponent.h">
+      <Filter>Component\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="APointEffectActor.h">
       <Filter>Object\Particle</Filter>
@@ -731,7 +733,6 @@
     <ClCompile Include="USphereComponent.cpp">
       <Filter>Component\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="UInstanceSkinnedMeshComponent.cpp" />
     <ClCompile Include="AnimTrack.cpp">
       <Filter>Core\Animation</Filter>
     </ClCompile>
@@ -740,6 +741,9 @@
     </ClCompile>
     <ClCompile Include="AnimData.cpp">
       <Filter>Core\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="UInstanceSkinnedMeshComponent.cpp">
+      <Filter>Component\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="APointEffectActor.cpp">
       <Filter>Object\Particle</Filter>

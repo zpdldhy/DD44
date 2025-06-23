@@ -179,7 +179,7 @@ void PlayerMoveScript::Tick()
 		if (currentStateEnd)
 		{
 			m_bRollCoolTime = true;
-			ChangeState(empty);
+			ChangeState(idle);
 		}
 		else
 		{
@@ -201,7 +201,8 @@ void PlayerMoveScript::Tick()
 
 			// 알잘딱 부탁합니다.
 			//col.second.otherShape->m_szName == L"~~~~~~"
-			if (pObj->m_szName == L"I_Ladder")
+
+			if (pObj->GetShapeComponent()->GetName() == L"Ladder")
 			{
 				TriggerData data;
 				data.eTriggerType = ETriggerType::TT_LADDER;
@@ -281,12 +282,15 @@ void PlayerMoveScript::CheckCollision()
 			auto list = GetOwner()->m_vCollisionList;
 			for (auto& index : list)
 			{
-				/*if (OBJECT->GetActor(index.first)->m_szName == L"Enemy")
+				if (OBJECT->GetActor(index.first)->m_szName == L"Enemy")
 				{
 					isCol = true;
-				}*/
+				}
 				// CanBeHit 아래에 넣어도 되는 건지 확인 필요
-				if (OBJECT->GetActor(index.first)->m_szName == L"Ladder" || OBJECT->GetActor(index.first)->m_szName == L"I_Ladder")
+				// ladder 처리 의문
+				auto actor = OBJECT->GetActor(index.first);
+				auto shape = actor->GetShapeComponent();
+				if (shape->GetName() == L"Ladder")
 				{
 					auto ladderTrigger = OBJECT->GetActor(index.first);
 					m_vLadder = ladderTrigger->GetPosition();
