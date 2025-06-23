@@ -55,6 +55,7 @@ public:
 	wstring m_szName;
 	UINT m_Index = 0;			// 고유 번호. 해당 Actor를 빠르게 찾는 로직에서 필요하다.
 	bool m_bCollision = true;	// 해당 Actor가 이번 Frame에 충돌을 하는지 확인하는 용도.
+	bool m_bRun = true;			// 해당 Actor가 Tick을 돌지 않도록 하는 용도.
 	bool m_bRender = true;		// 해당 Actor가 이번 Render에 출력되는지 확인하는 용도.
 	bool m_bDelete = false;	
 	bool m_bUpdateQuadTree = true;

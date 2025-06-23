@@ -69,12 +69,12 @@ void Game::Init()
 	}
 
 	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
-	
+
 	enemyList1 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
 	enemyList1.emplace_back(m_pBetty);
 	SetEnemy(enemyList1);
 	OBJECT->AddActorList(enemyList1);
-	
+
 	PROJECTILE->Init();
 
 	CreateUI();
@@ -285,10 +285,34 @@ void Game::CreateUI()
 	// Paused UI
 	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
 	UI->AddUIList(m_vPausedBackGround);
+	for (auto& pUI : m_vPausedBackGround)
+	{
+		pUI->m_bRender = false;
+		pUI->m_bRun = false;
+	}
+
 	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
 	UI->AddUIList(m_vUpgradeBackGround);
-	m_vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
-	UI->AddUIList(m_vUpgradeState);
+	for (auto& pUI : m_vUpgradeBackGround)
+	{
+		pUI->m_bRender = false;
+		pUI->m_bRun = false;
+	}
+
+	auto vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
+	UI->AddUIList(vUpgradeState);
+	for (int iRow = 0; iRow < 4; iRow++)
+	{
+		vector<shared_ptr<AUIActor>> vUI;
+		for (int iCol = 0; iCol < 8; iCol++)
+		{
+			vUpgradeState[iRow * 8 + iCol]->m_bRender = false;
+			vUpgradeState[iRow * 8 + iCol]->m_bRun = false;
+			vUI.emplace_back(vUpgradeState[iRow * 8 + iCol]);
+		}
+		m_vUpgradeState.emplace_back(vUI);
+	}
+
 	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
 	UI->AddUIList(m_vCoins);
 
@@ -309,9 +333,9 @@ void Game::UpdateUI()
 	static float currentTime = 0.0f;
 	currentTime = TIMER->GetDeltaTime();
 
-	auto currentHP = dynamic_pointer_cast<TCharacter>(m_pPlayer)->GetHp();	
+	auto currentHP = dynamic_pointer_cast<TCharacter>(m_pPlayer)->GetHp();
 
-	if(currentHP!= m_iPreHP)
+	if (currentHP != m_iPreHP)
 		m_bHPUIChange = true;
 
 	switch (currentHP)
@@ -452,32 +476,68 @@ void Game::UpdateUI()
 	}
 
 	// Paused
+
 	if (ENGINE->m_bGamePaused == true)
 	{
 		for (auto& pUI : m_vPausedBackGround)
+		{
+			pUI->m_bRun = true;
 			pUI->m_bRender = true;
+		}
 
 		for (auto& pUI : m_vUpgradeBackGround)
+		{
+			pUI->m_bRun = true;
 			pUI->m_bRender = true;
+		}
 
-		for (auto& pUI : m_vUpgradeState)
-			pUI->m_bRender = true;
+		UINT iSelect = 1;
+		for (auto& pUIList : m_vUpgradeState)
+		{
+			if (pUIList[0]->GetStateType() == UIStateType::ST_SELECT)
+			{
+				m_iSelectUI = iSelect;
+			}
+
+			if (iSelect == m_iSelectUI)
+				pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, 0.0f));
+			else
+				pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+
+			for (auto& pUI : pUIList)
+			{
+				pUI->m_bRun = true;
+				pUI->m_bRender = true;
+			}
+
+			iSelect++;
+		}
 
 		OBJECT->SetCursorActor(nullptr);
 	}
 	else
 	{
 		for (auto& pUI : m_vPausedBackGround)
+		{
+			pUI->m_bRun = false;
 			pUI->m_bRender = false;
+		}
 
 		for (auto& pUI : m_vUpgradeBackGround)
+		{
+			pUI->m_bRun = false;
 			pUI->m_bRender = false;
+		}
 
-		for (auto& pUI : m_vUpgradeState)
-			pUI->m_bRender = false;
+		for (auto& pUIList : m_vUpgradeState)
+			for (auto& pUI : pUIList)
+			{
+				pUI->m_bRun = false;
+				pUI->m_bRender = false;
+			}
 
 		OBJECT->SetCursorActor(m_pCursor);
-	}	
+	}
 
 	// End
 	static float tempTime = 0;

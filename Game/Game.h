@@ -35,9 +35,10 @@ public:
 	Vec3 m_vActiveArrowScale = { 0.f, 0.f, 0.f };
 	Vec3 m_vInActiveArrowScale = { 0.f, 0.f, 0.f };
 	// Paused
+	UINT m_iSelectUI = 0;	// 0ÀÌ None, 1 ~ 4 Àû¿כ
 	vector<shared_ptr<class AUIActor>> m_vPausedBackGround;
 	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
-	vector<shared_ptr<class AUIActor>> m_vUpgradeState;
+	vector<vector<shared_ptr<class AUIActor>>> m_vUpgradeState;
 	vector<shared_ptr<class AUIActor>> m_vCoins;
 	// Dead
 	shared_ptr<class AUIActor> m_pDeadUI = nullptr;
