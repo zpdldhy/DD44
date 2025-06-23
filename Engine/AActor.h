@@ -33,6 +33,7 @@ enum class ActorType
 struct CollisionData
 {
 	Vec3 Inter = { 0.f, 0.f, 0.f };
+	shared_ptr<UShapeComponent> otherShape;
 };
 
 class AActor : public enable_shared_from_this<AActor>

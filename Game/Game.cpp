@@ -273,8 +273,16 @@ void Game::CreateUI()
 
 	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
 	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
+	m_vInterActionUI = PToA->MakeUIs("../Resources/Prefab/UI_InterAction.uis.json");
 	UI->AddUIList(m_vHPUI);
 	UI->AddUIList(m_vArrowUI);
+	UI->AddUIList(m_vInterActionUI);
+
+	for (auto& pUI : m_vInterActionUI)
+	{
+		pUI->m_bRender = false;
+		pUI->m_bRun = false;
+	}
 
 	m_pActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_active.png");
 	m_pInActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_inactive.png");
@@ -285,19 +293,9 @@ void Game::CreateUI()
 	// Paused UI
 	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
 	UI->AddUIList(m_vPausedBackGround);
-	for (auto& pUI : m_vPausedBackGround)
-	{
-		pUI->m_bRender = false;
-		pUI->m_bRun = false;
-	}
 
 	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
 	UI->AddUIList(m_vUpgradeBackGround);
-	for (auto& pUI : m_vUpgradeBackGround)
-	{
-		pUI->m_bRender = false;
-		pUI->m_bRun = false;
-	}
 
 	auto vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
 	UI->AddUIList(vUpgradeState);
@@ -475,8 +473,40 @@ void Game::UpdateUI()
 		break;
 	}
 
-	// Paused
+	// InterAction, 상호작용 UI를 띄우는 구간
+	auto vTriggerList = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger();
+	if (vTriggerList.eTriggerType != ETriggerType::TT_NONE)
+	{
+		auto pos = CAMERA->GetScreenPos(vTriggerList.vPoint);
+		auto temp = pos - m_vInterActionUI[0]->GetPosition();
 
+		for (auto& pUI : m_vInterActionUI)
+		{
+			pUI->m_bRun = true;
+			pUI->m_bRender = true;
+
+			pUI->AddPosition(temp);
+
+			if (vTriggerList.eTriggerType == ETriggerType::TT_LADDER)
+			{
+
+			}
+			else if (vTriggerList.eTriggerType == ETriggerType::TT_HEALPOINT)
+			{
+
+			}
+		}		
+	}
+	else
+	{
+		for (auto& pUI : m_vInterActionUI)
+		{
+			pUI->m_bRun = false;
+			pUI->m_bRender = false;
+		}
+	}
+
+	// Paused
 	if (ENGINE->m_bGamePaused == true)
 	{
 		for (auto& pUI : m_vPausedBackGround)

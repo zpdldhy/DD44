@@ -47,6 +47,9 @@ public:
 	Matrix GetUIView();
 	Matrix GetUIProjection();
 
+	Vec3 GetNDCPos(Vec3 _vWorldPos);
+	Vec3 GetScreenPos(Vec3 _vWorldPos);
+
 private:
 	Vec3 m_vPrevCameraPos = Vec3::Zero; // 이전 프레임 위치
 	Vec3 m_vCurrentCameraPos = Vec3::Zero; // 이번 프레임 위치

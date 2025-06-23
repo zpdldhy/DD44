@@ -18,6 +18,7 @@ void Collision::Init()
 			CollisionData data;
 			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
 				a->GetPhysicsComponent()->m_bColGrounded = true;
+			data.otherShape = b->GetShapeComponent();
 
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
 		}
@@ -45,6 +46,7 @@ void Collision::Init()
 			data.Inter = Inter;
 			if(Collision::CheckRayToOBB(Sphere->GetGroundRay(), Box->GetBounds(), Inter))
 				a->GetPhysicsComponent()->m_bColGrounded = true;
+			data.otherShape = b->GetShapeComponent();
 
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
 		}
@@ -63,6 +65,7 @@ void Collision::Init()
 			data.Inter = Inter;
 			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
 				a->GetPhysicsComponent()->m_bColGrounded = true;
+			data.otherShape = b->GetShapeComponent();
 
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
 		}

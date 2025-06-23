@@ -110,8 +110,6 @@ void AUIActor::UpdateUVSlice()
 	SliceScaleY[1] = scale.y * (1.f - (m_vSlice.z + m_vSlice.w));
 	SliceScaleY[2] = scale.y * m_vSlice.w;
 
-	// Rotation 흑흑 -> 안할래^^
-
 	// Position, Rotation이 적용된 위치를 받아야 한다...ㅅㅂ
 	float SlicePosX[3];
 	float SlicePosY[3];
