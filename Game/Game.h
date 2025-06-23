@@ -73,6 +73,7 @@ protected:
 
 protected:
 	void SetEnemy(vector<shared_ptr<AActor>>& _enemyList);
+	void CheckFrustumCulling();
 	void CheckEnemyCollision();
 	//blood
 	void CheckBloodCollision();
