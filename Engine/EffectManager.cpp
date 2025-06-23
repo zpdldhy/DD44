@@ -79,7 +79,7 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     case EEffectType::Blood:
         actor = make_shared<ABloodActor>();
         collider->SetName(L"Blood");
-        collider->SetLocalScale(Vec3(1.f, 1.f, 1.f));
+        collider->SetLocalScale(Vec3(.1f, .1f, .1f));
         collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
         actor->SetShapeComponent(collider);
 
@@ -105,7 +105,6 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     }
 
     //그림자
-    actor->m_szName = L"Effect";
     actor->m_bCastShadow = false;
 
     // 메시
@@ -119,30 +118,37 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     case EEffectType::Blood:
         mat->Load(L"../Resources/Texture/Blood2.png", L"../Resources/Shader/blood.hlsl");
         m_vInstanceEffect[static_cast<size_t>(EEffectType::Blood)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"BloodEffect";
         break;
     case EEffectType::Dust:
         mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
+        actor->m_szName = L"DustEffect";
        // m_vInstanceEffect[static_cast<size_t>(EEffectType::Dust)]->AddInstanceMesh(mesh);
         break;
     case EEffectType::Feather:
         mat->Load(L"../Resources/Texture/feather.png", L"../Resources/Shader/SpriteUV.hlsl");
         m_vInstanceEffect[static_cast<size_t>(EEffectType::Feather)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"FeatherEffect";
         break;
     case EEffectType::Shockwave:
         mat->Load(L"../Resources/Texture/circle.png", L"../Resources/Shader/SpriteWorld.hlsl");
         m_vInstanceEffect[static_cast<size_t>(EEffectType::Shockwave)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"ShockEffect";
         break;
     case EEffectType::Beam:
         mat->Load(L"../Resources/Texture/Wind.png", L"../Resources/Shader/SpriteWorld.hlsl");
         m_vInstanceEffect[static_cast<size_t>(EEffectType::Beam)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"BeamEffect";
         break;
     case EEffectType::PoppingDust:
         mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
+        actor->m_szName = L"PopDustEffect";
        // m_vInstanceEffect[static_cast<size_t>(EEffectType::PoppingDust)]->AddInstanceMesh(mesh);
         break;
     case EEffectType::BloodDecal:
         mat->Load(L"../Resources/Texture/bloodspatter.png", L"../Resources/Shader/SpriteWorld.hlsl");
         m_vInstanceEffect[static_cast<size_t>(EEffectType::BloodDecal)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"DecalEffect";
         break;
     }
 
@@ -248,4 +254,17 @@ void EffectManager::PlayBeamBurst(const Vec3& origin, int count, float _scale)
     }
 
   
+}
+
+void EffectManager::EffectMove()
+{
+    for (auto pEffect : m_vEffectList)
+    {
+        pEffect->GetPhysicsComponent()->Tick();
+        if (pEffect->GetShapeComponent())
+        {
+            pEffect->GetShapeComponent()->UpdateMatrix();
+            pEffect->GetShapeComponent()->UpdateBounds();
+        }
+    }
 }

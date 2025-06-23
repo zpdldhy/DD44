@@ -16,6 +16,8 @@ public:
 	void PlayDustBurst(const Vec3& _origin, float _speed, float _scale);
 	void PlayBeamBurst(const Vec3& origin, int count, float _scale);
 
+	void EffectMove();
+
 private:
 	unordered_map<EEffectType, vector<shared_ptr<AEffectActor>>> m_mEffectPool;
 	array<shared_ptr<class AInstance>, static_cast<size_t>(EEffectType::Count)> m_vInstanceEffect;
