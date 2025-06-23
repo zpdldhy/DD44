@@ -16,6 +16,9 @@ private:
 	bool m_bCrashSet = false;
 	Vec2 m_bloodRange;
 
+	// Frustum 내부에 들어왔을 때 충돌 연산
+	bool m_bFrustumIn = false;
+
 	// 
 	UINT stageIndex = -1;
 public:
@@ -38,4 +41,7 @@ public:
 	void SetBloodPos(const Vec2& _range) { m_bloodRange = _range; }
 	void SetHitOffset(float _offset) { hitElapsed = _offset; }
 	void SetStageId(UINT _id) { stageIndex = _id; }
+
+	void SetFrustumIn(bool _isFrustumIn) { m_bFrustumIn = _isFrustumIn; }
+	bool IsFrustumIn() { return m_bFrustumIn; }
 };

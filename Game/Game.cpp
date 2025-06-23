@@ -28,6 +28,7 @@
 
 // Component
 #include "UStaticMeshComponent.h"
+#include "UBoxComponent.h"
 
 // Script
 #include "ScriptManager.h"
@@ -176,6 +177,7 @@ void Game::Tick()
 		}
 	}
 
+	CheckFrustumCulling();
 	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
@@ -681,6 +683,24 @@ void Game::SetEnemy(vector<shared_ptr<AActor>>& _enemyList)
 	}
 }
 
+void Game::CheckFrustumCulling()
+{
+	auto vFrustum = CAMERA->GetFrustum();
+
+	for (auto& pEnemy : enemyList)
+	{
+		if (Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[0]) < 0 ||
+			Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[1]) < 0 ||
+			Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[2]) < 0 ||
+			Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[3]) < 0 ||
+			Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[4]) < 0 ||
+			Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[5]) < 0)
+			continue;
+
+		dynamic_pointer_cast<TEnemy>(pEnemy)->SetFrustumIn(true);
+	}
+}
+
 void Game::CheckEnemyCollision()
 {
 	shared_ptr<AActor> melee;
@@ -709,6 +729,11 @@ void Game::CheckEnemyCollision()
 	{
 		for (auto iter = enemyList.begin(); iter != enemyList.end();)
 		{
+			if (dynamic_cast<TEnemy*>(iter->get())->IsFrustumIn() == false)
+			{
+				iter++;
+				continue;
+			}
 			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 			{
 				iter = enemyList.erase(iter);
@@ -721,6 +746,11 @@ void Game::CheckEnemyCollision()
 
 	for (auto iter = enemyList.begin(); iter != enemyList.end();)
 	{
+		if (dynamic_cast<TEnemy*>(iter->get())->IsFrustumIn() == false)
+		{
+			iter++;
+			continue;
+		}
 		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 		{
 			iter = enemyList.erase(iter);
@@ -772,6 +802,11 @@ void Game::CheckEnemyCollision()
 
 		for (auto iter = enemyList.begin(); iter != enemyList.end();)
 		{
+			if (dynamic_cast<TEnemy*>(iter->get())->IsFrustumIn() == false)
+			{
+				iter++;
+				continue;
+			}
 			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 			{
 				iter = enemyList.erase(iter);

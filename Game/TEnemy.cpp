@@ -15,6 +15,8 @@ void TEnemy::Tick()
 	// FX
 	Flashing();
 	ApplyCrash();
+
+	m_bFrustumIn = false;	// 매 프레임 초기화
 }
 
 void TEnemy::Destroy()

@@ -23,6 +23,7 @@ void CameraManager::Init()
 	}
 
 	CreateCameraBuffer();
+	m_FrustumPlanes.resize(6);
 }
 
 void CameraManager::Tick()
@@ -36,7 +37,7 @@ void CameraManager::Tick()
 	m_pUICameraActor->Tick();
 	m_p3DCameraActor->GetCameraComponent()->SetFrustumVisible(false);
 
-	//UpdateFrustumPlanes();
+	UpdateFrustumPlanes();
 
 	//auto QuadRoot = OBJECT->GetQuadTree()->GetRoot();
 	//FrustumCulling(QuadRoot);
