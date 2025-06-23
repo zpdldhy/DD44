@@ -140,7 +140,8 @@ void Game::Tick()
 
 	UpdateCursor();
 
-	if (INPUT->GetButton(GameKey::ESC))
+	if (ENGINE->m_bGamePaused == false &&
+		INPUT->GetButton(GameKey::ESC))
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
 
 	UpdateUI();
@@ -334,9 +335,28 @@ void Game::CreateUI()
 	// Paused UI
 	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
 	UI->AddUIList(m_vPausedBackGround);
+	for (auto& pUI : m_vPausedBackGround)
+	{
+		pUI->m_bRun = false;
+		pUI->m_bRender = false;
+	}
 
+	m_vPausedSelect = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Selection.uis.json");
+	UI->AddUIList(m_vPausedSelect);
+	for (auto& pUI : m_vPausedSelect)
+	{
+		pUI->m_bRun = false;
+		pUI->m_bRender = false;
+	}
+
+	// Paused Upgrade
 	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
 	UI->AddUIList(m_vUpgradeBackGround);
+	for (auto& pUI : m_vUpgradeBackGround)
+	{
+		pUI->m_bRun = false;
+		pUI->m_bRender = false;
+	}
 
 	auto vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
 	UI->AddUIList(vUpgradeState);
@@ -350,6 +370,23 @@ void Game::CreateUI()
 			vUI.emplace_back(vUpgradeState[iRow * 8 + iCol]);
 		}
 		m_vUpgradeState.emplace_back(vUI);
+	}
+
+	// Paused System
+	m_vSystemBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_System_BackGround.uis.json");
+	UI->AddUIList(m_vSystemBackGround);
+	for (auto& pUI : m_vSystemBackGround)
+	{
+		pUI->m_bRun = false;
+		pUI->m_bRender = false;
+	}
+
+	m_vSystemSelection = PToA->MakeUIs("../Resources/Prefab/UI_Paused_System_Selection.uis.json");
+	UI->AddUIList(m_vSystemSelection);
+	for (auto& pUI : m_vSystemSelection)
+	{
+		pUI->m_bRun = false;
+		pUI->m_bRender = false;
 	}
 
 	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
@@ -558,39 +595,148 @@ void Game::UpdateUI()
 			pUI->m_bRender = true;
 		}
 
-		for (auto& pUI : m_vUpgradeBackGround)
+		for(auto& pUI : m_vPausedSelect)
 		{
 			pUI->m_bRun = true;
 			pUI->m_bRender = true;
 		}
 
-		UINT iSelect = 1;
-		for (auto& pUIList : m_vUpgradeState)
+		// 0이 없그레이드, 1이 설정
+		if (m_vPausedSelect[0]->GetStateType() == UIStateType::ST_SELECT)
+			m_iSelectUI = 0;
+		else if(m_vPausedSelect[1]->GetStateType() == UIStateType::ST_SELECT)
+			m_iSelectUI = 1;
+		
+		switch (m_iSelectUI)
 		{
-			if (pUIList[0]->GetStateType() == UIStateType::ST_SELECT)
+			// Upgrade
+		case 0:
+		{
+			// 선택된 옵션 밝게
+			m_vPausedSelect[0]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
+			m_vPausedSelect[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+
+			// 꺼줄 UI
+			for (auto& pUI : m_vSystemBackGround)
 			{
-				m_iSelectUI = iSelect;
+				pUI->m_bRun = false;
+				pUI->m_bRender = false;
 			}
 
-			if (iSelect == m_iSelectUI)
-				pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, 0.0f));
-			else
-				pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+			for (auto& pUI : m_vSystemSelection)
+			{
+				pUI->m_bRun = false;
+				pUI->m_bRender = false;
+			}
 
-			for (auto& pUI : pUIList)
+			// 설정값
+			for (auto& pUI : m_vUpgradeBackGround)
 			{
 				pUI->m_bRun = true;
 				pUI->m_bRender = true;
 			}
 
-			iSelect++;
+			UINT iSelect = 1;
+			for (auto& pUIList : m_vUpgradeState)
+			{
+				// 해당 Upgrade 부분을 선택하면 색깔이 바뀌게 하는 로직
+				if (pUIList[0]->GetStateType() == UIStateType::ST_SELECT)
+				{
+					m_iSelectUpgradeUI = iSelect;
+				}
+
+				if (iSelect == m_iSelectUpgradeUI)
+					pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, 0.0f));
+				else
+					pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+
+				for (auto& pUI : pUIList)
+				{
+					pUI->m_bRun = true;
+					pUI->m_bRender = true;
+				}
+
+				iSelect++;
+			}
+
+			// 선택된 Upgrade의 설명이 적힌 부분을 Render한다.
+			switch (m_iSelectUpgradeUI)
+			{
+			case 1: 
+				break;
+
+			case 2:
+				break;
+
+			case 3:
+				break;
+
+			case 4:
+				break;
+			default:
+				break;
+			}
+
+			break;
+		}
+		// System
+		case 1:
+		{
+			// 선택된 옵션 밝게
+			m_vPausedSelect[0]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+			m_vPausedSelect[1]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
+
+			// 꺼줄 UI
+			for (auto& pUI : m_vUpgradeBackGround)
+			{
+				pUI->m_bRun = false;
+				pUI->m_bRender = false;
+			}
+
+			for (auto& pUIList : m_vUpgradeState)
+				for (auto& pUI : pUIList)
+				{
+					pUI->m_bRun = false;
+					pUI->m_bRender = false;
+				}
+
+			m_iSelectUpgradeUI = 0;
+
+			// 설정값
+			for (auto& pUI : m_vSystemBackGround)
+			{
+				pUI->m_bRun = true;
+				pUI->m_bRender = true;
+			}
+
+			for (auto& pUI : m_vSystemSelection)
+			{
+				pUI->m_bRun = true;
+				pUI->m_bRender = true;
+			}
+
+			if (m_vSystemSelection[0]->GetStateType() == UIStateType::ST_SELECT)
+				ENGINE->m_bGamePaused = false;
+
+			if (m_vSystemSelection[1]->GetStateType() == UIStateType::ST_SELECT)
+				ENGINE->m_bRun = false;
+
+			break;
+		}
 		}
 
 		OBJECT->SetCursorActor(nullptr);
 	}
+	// Paused 가 아닐 때
 	else
 	{
 		for (auto& pUI : m_vPausedBackGround)
+		{
+			pUI->m_bRun = false;
+			pUI->m_bRender = false;
+		}
+
+		for (auto& pUI : m_vPausedSelect)
 		{
 			pUI->m_bRun = false;
 			pUI->m_bRender = false;
@@ -608,6 +754,20 @@ void Game::UpdateUI()
 				pUI->m_bRun = false;
 				pUI->m_bRender = false;
 			}
+
+		for (auto& pUI : m_vSystemBackGround)
+		{
+			pUI->m_bRun = false;
+			pUI->m_bRender = false;
+		}
+
+		for (auto& pUI : m_vSystemSelection)
+		{
+			pUI->m_bRun = false;
+			pUI->m_bRender = false;
+		}
+
+		m_iSelectUpgradeUI = 0;
 
 		OBJECT->SetCursorActor(m_pCursor);
 	}
