@@ -261,7 +261,10 @@ void PlayerMoveScript::CheckCollision()
 					isCol = true;
 				}
 				// CanBeHit 아래에 넣어도 되는 건지 확인 필요
-				if (OBJECT->GetActor(index.first)->m_szName == L"Ladder" || OBJECT->GetActor(index.first)->m_szName == L"I_Ladder")
+				// ladder 처리 의문
+				auto actor = OBJECT->GetActor(index.first);
+				auto shape = actor->GetShapeComponent();
+				if (shape->GetName() == L"Ladder")
 				{
 					auto ladderTrigger = OBJECT->GetActor(index.first);
 					m_vLadder = ladderTrigger->GetPosition();

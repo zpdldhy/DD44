@@ -46,6 +46,9 @@
     <Filter Include="GameActor\Component">
       <UniqueIdentifier>{e4fc3738-3cca-48b9-a3d9-b93b3a31875c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FSM\Stage">
+      <UniqueIdentifier>{fa4864be-08e0-422c-967b-96e45d438dc7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -173,6 +176,7 @@
     <ClInclude Include="EnemyScriptBase.h">
       <Filter>Script\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="StageManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -294,6 +298,7 @@
     <ClCompile Include="EnemyScriptBase.cpp">
       <Filter>Script\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="StageManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

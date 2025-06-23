@@ -38,6 +38,7 @@
 #include "ProjectileManager.h"
 #include "EnemyCollisionManager.h"
 #include "EventManager.h"
+#include "StageManager.h"
 
 // TEMP
 #include "BatMovement.h"
@@ -48,6 +49,7 @@
 void Game::Init()
 {
 	SCRIPT->Init();
+	STAGE->Init();
 	// Asset 로딩
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
@@ -63,6 +65,9 @@ void Game::Init()
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
 	//m_pPlayer->SetPosition(Vec3(-90, 39, 100));
+	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
+	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
+	m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
 	OBJECT->AddActor(m_pPlayer);
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
@@ -72,14 +77,41 @@ void Game::Init()
 		m_vObjectList.push_back(interactable);
 	}
 
-	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
-	tempHeadRoller = PToA->MakeCharacter("../Resources/Prefab/Player/HeadRoller1.character.json");
+	//m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
+	//tempHeadRoller = PToA->MakeCharacter("../Resources/Prefab/Player/HeadRoller1.character.json");
+	//enemyList.emplace_back(m_pBetty);
+	//enemyList.emplace_back(tempHeadRoller);
 
-	enemyList1 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
-	enemyList1.emplace_back(m_pBetty);
-	enemyList1.emplace_back(tempHeadRoller);
-	SetEnemy(enemyList1);
-	OBJECT->AddActorList(enemyList1);
+	auto enemy00 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage00/");
+	auto enemy01 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
+	auto enemy10 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage10/");
+	auto otherEnemy = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Other/");
+
+	for (auto e : enemy00)
+	{
+		enemyList.emplace_back(e);
+	}
+
+	for (auto e : enemy01)
+	{
+		enemyList.emplace_back(e);
+	}
+
+	for (auto e : enemy10)
+	{
+		enemyList.emplace_back(e);
+	}
+
+	for (auto e : otherEnemy)
+	{
+		enemyList.emplace_back(e);
+	}
+
+	SetEnemy(enemyList);
+	OBJECT->AddActorList(enemyList);
+	STAGE->AddEnemiesInStage(0, enemy00);
+	STAGE->AddEnemiesInStage(1, enemy01);
+	STAGE->AddEnemiesInStage(2, enemy10);
 
 	PROJECTILE->Init();
 
@@ -99,9 +131,10 @@ void Game::Init()
 
 void Game::Tick()
 {
+	STAGE->Tick();
 	if (INPUT->GetButton(G))
 	{
-		EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder");
+		EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder1");
 		EVENT->TriggerEvent(EventType::EVENT_FENCE, L"Fence1");
 	}
 
@@ -166,7 +199,7 @@ void Game::Destroy()
 	m_vUpgradeState.clear();
 	m_vCoins.clear();
 
-	enemyList1.clear();
+	enemyList.clear();
 	m_vObjectList.clear();
 	m_vMapList.clear();
 }
@@ -582,11 +615,11 @@ void Game::CheckEnemyCollision()
 	// 이걸 또 영역 별로 넣어야하네 
 	if (melee)
 	{
-		for (auto iter = enemyList1.begin(); iter != enemyList1.end();)
+		for (auto iter = enemyList.begin(); iter != enemyList.end();)
 		{
 			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 			{
-				iter = enemyList1.erase(iter);
+				iter = enemyList.erase(iter);
 				continue;
 			}
 			COLLITION->CheckCollision(*iter, melee);
@@ -594,11 +627,11 @@ void Game::CheckEnemyCollision()
 		}
 	}
 
-	for (auto iter = enemyList1.begin(); iter != enemyList1.end();)
+	for (auto iter = enemyList.begin(); iter != enemyList.end();)
 	{
 		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 		{
-			iter = enemyList1.erase(iter);
+			iter = enemyList.erase(iter);
 			continue;
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
@@ -613,7 +646,7 @@ void Game::CheckEnemyCollision()
 			continue;
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
-		COLLITION->CheckCollision(tempHeadRoller, *iter);
+		//COLLITION->CheckCollision(tempHeadRoller, *iter);
 
 		//COLLITION->CheckCollision(m_pBetty, *iter);
 		iter++;
@@ -646,11 +679,11 @@ void Game::CheckEnemyCollision()
 			iter++;
 		}
 
-		for (auto iter = enemyList1.begin(); iter != enemyList1.end();)
+		for (auto iter = enemyList.begin(); iter != enemyList.end();)
 		{
 			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 			{
-				iter = enemyList1.erase(iter);
+				iter = enemyList.erase(iter);
 				continue;
 			}
 			COLLITION->CheckCollision(*proj, *iter);

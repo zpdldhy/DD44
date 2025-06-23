@@ -173,6 +173,7 @@
     <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="Sample.h" />
     <ClInclude Include="ScriptManager.h" />
+    <ClInclude Include="StageManager.h" />
     <ClInclude Include="StateInterface.h" />
     <ClInclude Include="TCharacter.h" />
     <ClInclude Include="TEnemy.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="ScriptManager.cpp" />
+    <ClCompile Include="StageManager.cpp" />
     <ClCompile Include="StateInterface.cpp" />
     <ClCompile Include="TCharacter.cpp" />
     <ClCompile Include="TEnemy.cpp" />

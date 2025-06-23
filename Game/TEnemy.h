@@ -15,8 +15,12 @@ private:
 	Vec3 velocity;
 	bool m_bCrashSet = false;
 	Vec2 m_bloodRange;
+
+	// 
+	UINT stageIndex = -1;
 public:
 	void Tick() override;
+	void Destroy() override;
 public:
 	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
 	const weak_ptr<AActor>& GetPlayer() { return player; }
@@ -33,5 +37,5 @@ public:
 
 	void SetBloodPos(const Vec2& _range) { m_bloodRange = _range; }
 	void SetHitOffset(float _offset) { hitElapsed = _offset; }
+	void SetStageId(UINT _id) { stageIndex = _id; }
 };
-

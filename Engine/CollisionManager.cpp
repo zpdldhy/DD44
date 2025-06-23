@@ -47,6 +47,7 @@ void Collision::Init()
 				a->GetPhysicsComponent()->m_bColGrounded = true;
 
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
+			b->m_vCollisionList.insert(make_pair(a->m_Index, data));
 		}
 
 		};

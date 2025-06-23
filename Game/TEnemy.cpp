@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "TEnemy.h"
+
 #include "TPlayer.h"
 #include "Timer.h"
 #include "ObjectManager.h"
 #include "EffectManager.h"
 #include "ProjectileManager.h"
+#include "StageManager.h"
 
 void TEnemy::Tick()
 {
@@ -13,6 +15,16 @@ void TEnemy::Tick()
 	// FX
 	Flashing();
 	ApplyCrash();
+}
+
+void TEnemy::Destroy()
+{
+	TCharacter::Destroy();
+	// StageManger에 알리기
+	if (stageIndex >= 0)
+	{
+		STAGE->DeleteEnemyInStage(stageIndex, m_Index);
+	}
 }
 
 bool TEnemy::CheckHit()
