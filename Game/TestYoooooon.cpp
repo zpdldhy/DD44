@@ -13,6 +13,8 @@
 #include "AssimpLoader.h"
 #include "DxWrite.h"
 #include "PrefabToActor.h"
+#include "ScriptManager.h"
+#include "EffectManager.h"
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -33,6 +35,10 @@
 void TestYoooooon::Init()
 {
 	SetupEditorCallbacks();
+
+	SCRIPT->Init();
+	PToA->Init();
+	EFFECT->Init();
 
 	m_vGround = PToA->LoadAllPrefabs(".map.json");
 	OBJECT->AddActorList(m_vGround);
