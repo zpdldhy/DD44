@@ -127,6 +127,11 @@ void WalkerMovement::Tick()
 	bool isHit = comp->CheckHit();
 	if (isHit && !comp->IsDead())
 	{
+
+		ChangeState(hit);
+	}
+	if (comp->IsDead())
+	{
 		// È¸Àü 
 		Vec3 direction = GetOwner()->GetPosition() - player.lock()->GetPosition();
 		direction.y = 0;
@@ -139,10 +144,6 @@ void WalkerMovement::Tick()
 		GetOwner()->SetRotation(currentRot);
 		m_rotate = false;
 
-		ChangeState(hit);
-	}
-	if (comp->IsDead())
-	{
 		ChangeState(death);
 	}
 

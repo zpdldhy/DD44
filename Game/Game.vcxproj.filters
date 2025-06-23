@@ -167,6 +167,12 @@
       <Filter>GameManagers</Filter>
     </ClInclude>
     <ClInclude Include="FenceScript.h" />
+    <ClInclude Include="HeadRollerMovement.h">
+      <Filter>Script\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyScriptBase.h">
+      <Filter>Script\Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -282,6 +288,12 @@
       <Filter>GameManagers</Filter>
     </ClCompile>
     <ClCompile Include="FenceScript.cpp" />
+    <ClCompile Include="HeadRollerMovement.cpp">
+      <Filter>Script\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyScriptBase.cpp">
+      <Filter>Script\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

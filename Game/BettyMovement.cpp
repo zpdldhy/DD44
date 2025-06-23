@@ -49,6 +49,7 @@ void BettyMovement::Init()
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(20);
 
+
 }
 
 void BettyMovement::Tick()
