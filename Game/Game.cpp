@@ -145,6 +145,7 @@ void Game::Tick()
 	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
+	CheckEnemyDeath(enemyList1);
 }
 
 void Game::Render()
@@ -588,7 +589,17 @@ void Game::CheckEnemyCollision()
 				iter = enemyList1.erase(iter);
 				continue;
 			}
-			COLLITION->CheckCollision(*iter, melee);
+			
+			if (COLLITION->CheckCollision(*iter, melee))
+			{
+				auto enemy = dynamic_pointer_cast<TEnemy>(*iter);
+				if (enemy)
+				{
+					float damage = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetMeleeDamage();
+					enemy->SetDamaged(damage);
+				}
+			}
+
 			iter++;
 		}
 	}
@@ -683,6 +694,23 @@ void Game::CheckBloodCollision()
 		}
 
 		blood++;
+	}
+}
+
+void Game::CheckEnemyDeath(const vector<shared_ptr<AActor>>& _enemyList)
+{
+	for (const auto& actor : _enemyList)
+	{
+		if (!actor) continue;
+
+		TCharacter* enemy = dynamic_cast<TCharacter*>(actor.get());
+		if (enemy && enemy->IsDead())
+		{
+			if (auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer))
+			{
+				player->AddSoul(enemy->GetSoul());
+			}
+		}
 	}
 }
 

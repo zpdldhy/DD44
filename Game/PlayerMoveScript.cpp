@@ -414,7 +414,8 @@ void PlayerMoveScript::Move()
 		{
 			moveDir.Normalize();
 			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->SetMove(moveDir, 0.25f);
+			auto maxSpeed = dynamic_pointer_cast<TPlayer>(GetOwner())->GetMoveSpeed();
+			GetOwner()->SetMove(moveDir, maxSpeed);
 		}
 
 		// È¸Àü		
@@ -483,8 +484,9 @@ void PlayerMoveScript::Climb()
 
 void PlayerMoveScript::RollMove()
 {
-	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
-	GetOwner()->SetMove(m_vRollLook, 0.5f);
+	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();
+	auto maxRollSpeed = dynamic_pointer_cast<TPlayer>(GetOwner())->GetRollSpeed();
+	GetOwner()->SetMove(m_vRollLook, maxRollSpeed);
 }
 
 bool PlayerMoveScript::CanAttack()

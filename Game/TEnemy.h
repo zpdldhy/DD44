@@ -13,6 +13,9 @@ private:
 	Vec3 m_vLastMoveDir;
 	Vec3 velocity;
 	bool m_bCrashSet = false;
+
+	int m_iDamaged = 1;
+
 public:
 	void Tick() override;
 public:
@@ -29,5 +32,7 @@ public:
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
 	void ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled);
 
+	float GetDamaged() const { return m_iDamaged; }
+	void SetDamaged(float _damage) { m_iDamaged = _damage; }
 };
 

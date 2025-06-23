@@ -50,6 +50,7 @@ void WalkerMovement::Init()
 
 	// 
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(3);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(15);
 }
 
 void WalkerMovement::Tick()

@@ -49,7 +49,7 @@ bool TEnemy::CheckHit()
 			velocity = -look;
 			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 			// HP
-			TakeDamage(1);
+			TakeDamage(m_iDamaged); // <-- Player 공격력 데미지 m_pPlayer->Attack
 			if (!isHitByP)
 			{
 				dynamic_pointer_cast<TPlayer>(player.lock())->IncArrowCount();
