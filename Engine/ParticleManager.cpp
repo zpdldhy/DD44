@@ -24,7 +24,10 @@ void ParticleManager::Render()
 {
 	PreRender();
 	for (auto& pParticleActor : m_vInstanceParticle)
+	{
+		if (pParticleActor == nullptr) continue;
 		pParticleActor->Render();
+	}
 
 	m_vRenderParticleList.clear();
 	PostRender();
