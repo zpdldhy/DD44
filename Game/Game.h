@@ -37,8 +37,12 @@ public:
 
 	vector<shared_ptr<class AUIActor>> m_vInterActionUI;
 	// Paused
-	UINT m_iSelectUI = 0;	// 0이 None, 1 ~ 4 적용
+	UINT m_iSelectUI = 0;
 	vector<shared_ptr<class AUIActor>> m_vPausedBackGround;
+	vector<shared_ptr<class AUIActor>> m_vPausedSelect;
+
+	// Paused Upgrade
+	UINT m_iSelectUpgradeUI = 0;	// 0이 None, 1 ~ 4 적용
 	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
 	vector<vector<shared_ptr<class AUIActor>>> m_vUpgradeState;
 	vector<shared_ptr<class AUIActor>> m_vCoins;

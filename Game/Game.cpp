@@ -296,9 +296,27 @@ void Game::CreateUI()
 	// Paused UI
 	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
 	UI->AddUIList(m_vPausedBackGround);
+	for (auto& pUI : m_vPausedBackGround)
+	{
+		pUI->m_bRun = false;
+		pUI->m_bRender = false;
+	}
+
+	m_vPausedSelect = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Selection.uis.json");
+	UI->AddUIList(m_vPausedSelect);
+	for (auto& pUI : m_vPausedSelect)
+	{
+		pUI->m_bRun = false;
+		pUI->m_bRender = false;
+	}
 
 	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
 	UI->AddUIList(m_vUpgradeBackGround);
+	for (auto& pUI : m_vUpgradeBackGround)
+	{
+		pUI->m_bRun = false;
+		pUI->m_bRender = false;
+	}
 
 	auto vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
 	UI->AddUIList(vUpgradeState);
@@ -520,39 +538,97 @@ void Game::UpdateUI()
 			pUI->m_bRender = true;
 		}
 
-		for (auto& pUI : m_vUpgradeBackGround)
+		for(auto& pUI : m_vPausedSelect)
 		{
 			pUI->m_bRun = true;
 			pUI->m_bRender = true;
 		}
 
-		UINT iSelect = 1;
-		for (auto& pUIList : m_vUpgradeState)
+		// 0이 없그레이드, 1이 설정
+		if (m_vPausedSelect[0]->GetStateType() == UIStateType::ST_SELECT)
+			m_iSelectUI = 0;
+		else if(m_vPausedSelect[1]->GetStateType() == UIStateType::ST_SELECT)
+			m_iSelectUI = 1;
+		
+		switch (m_iSelectUI)
 		{
-			if (pUIList[0]->GetStateType() == UIStateType::ST_SELECT)
-			{
-				m_iSelectUI = iSelect;
-			}
+		case 0:
+		{
+			// 선택된 옵션
+			m_vPausedSelect[0]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
+			m_vPausedSelect[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
 
-			if (iSelect == m_iSelectUI)
-				pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, 0.0f));
-			else
-				pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+			// 아닌 옵션은 꺼준다.
 
-			for (auto& pUI : pUIList)
+			// Upgrade의 설정값
+			for (auto& pUI : m_vUpgradeBackGround)
 			{
 				pUI->m_bRun = true;
 				pUI->m_bRender = true;
 			}
 
-			iSelect++;
+			UINT iSelect = 1;
+			for (auto& pUIList : m_vUpgradeState)
+			{
+				if (pUIList[0]->GetStateType() == UIStateType::ST_SELECT)
+				{
+					m_iSelectUpgradeUI = iSelect;
+				}
+
+				if (iSelect == m_iSelectUpgradeUI)
+					pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, 0.0f));
+				else
+					pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+
+				for (auto& pUI : pUIList)
+				{
+					pUI->m_bRun = true;
+					pUI->m_bRender = true;
+				}
+
+				iSelect++;
+			}
+
+			break;
+		}
+
+		case 1:
+		{
+			// 선택된 옵션
+			m_vPausedSelect[0]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+			m_vPausedSelect[1]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
+
+			// 아닌 옵션은 꺼준다.
+			for (auto& pUI : m_vUpgradeBackGround)
+			{
+				pUI->m_bRun = false;
+				pUI->m_bRender = false;
+			}
+
+			for (auto& pUIList : m_vUpgradeState)
+				for (auto& pUI : pUIList)
+				{
+					pUI->m_bRun = false;
+					pUI->m_bRender = false;
+				}
+
+			// Option의 설정값
+			break;
+		}
 		}
 
 		OBJECT->SetCursorActor(nullptr);
 	}
+	// Paused 가 아닐 때
 	else
 	{
 		for (auto& pUI : m_vPausedBackGround)
+		{
+			pUI->m_bRun = false;
+			pUI->m_bRender = false;
+		}
+
+		for (auto& pUI : m_vPausedSelect)
 		{
 			pUI->m_bRun = false;
 			pUI->m_bRender = false;
