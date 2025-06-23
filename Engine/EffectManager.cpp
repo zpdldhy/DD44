@@ -14,12 +14,14 @@
 #include "ABloodDecalActor.h"
 #include "AInstance.h"
 #include "USphereComponent.h"
+#include "RenderStateManager.h"
 
 void EffectManager::Init()
 {
     for (size_t index = 0; index < static_cast<size_t>(EEffectType::Count); ++index)
     {
         m_vInstanceEffect[index] = make_shared<AInstance>();
+        m_vInstanceEffect[index]->SetEffectType(static_cast<EEffectType>(index));
     }
 
     for (int i = 0; i < 50; ++i)
@@ -35,7 +37,6 @@ void EffectManager::Init()
             else
             {
                 actor->Init();
-                OBJECT->AddActor(actor);
                 m_vEffectList.emplace_back(actor);
             }
         }
@@ -64,7 +65,22 @@ void EffectManager::Render()
     {
         if (pEffect->m_bRender==true)
         {
+            if(pEffect->GetEffectType() == EEffectType::BloodDecal)
+            {
+                RenderOption opt;
+                opt.blend = BlendType::AlphaBlend;
+                opt.depth = DepthType::ZTestOn_ZWriteOff;
+                opt.cull = CullType::None;
+                opt.rasterizer = RasterizerType::SolidNone;
+                STATEMANAGER->Apply(opt);
+            }
             pEffect->Render();
+
+            if (pEffect->GetEffectType() == EEffectType::BloodDecal)
+            {
+                STATEMANAGER->Restore();
+            }
+
         }
 	}
 }
@@ -199,7 +215,7 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     case EEffectType::BloodDecal: 
         duration = 200.0f;
         actor->SetRotation(Vec3(DD_PI / 2, 0, 0));
-        actor->GetMeshComponent()->SetInstanceColor(Vec4(1, 0, 0, 1));        
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(0.6f, 0.05f, 0.05f, 1));        
         break;
     default:                      duration = 1.0f; break;
     }

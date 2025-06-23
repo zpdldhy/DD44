@@ -41,6 +41,7 @@ Vec3 ABloodActor::Prepare(const Vec3& pos, const Vec3& baseVelocity, float _scal
     SetEndScale(endScale);
     SetPosition(pos);
 
+
     // 임시 수정 : 중력 및 이동
     m_pPhysics->SetWeight(0.5f);
     SetMove(velocity, 1.f);
@@ -58,11 +59,13 @@ void ABloodActor::Tick()
 
         if (pActor->m_szName == L"Terrain")
         {
+            Vec3 pos = iter.second.Inter;
+            pos.y = pActor->GetPosition().y + 0.01f;
             // 디칼 찍기
-            EFFECT->PlayEffect(EEffectType::BloodDecal, iter.second.Inter, 0.f, Vec3(0, 0, 0)); // 이건 뿌리는 게 아니라 디칼용으로 새로 추가할 수도 있음
+            EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3(0, 0, 0)); // 이건 뿌리는 게 아니라 디칼용으로 새로 추가할 수도 있음
 
             // 바로 삭제
-            m_bDelete = true;
+            m_bRender = false;
             break;
         }
     }
