@@ -84,6 +84,7 @@ void Engine::Frame()
 	if (!m_bGamePaused)
 	{
 		OBJECT->ObjectMove();				// 1. Move
+		EFFECT->EffectMove();
 	}
 
 	_app->Tick();							// 2. Ãæµ¹

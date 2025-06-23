@@ -68,6 +68,8 @@ protected:
 protected:
 	void SetEnemy(vector<shared_ptr<AActor>>& _enemyList);
 	void CheckEnemyCollision();
+	//blood
+	void CheckBloodCollision();
 
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }
