@@ -89,6 +89,8 @@ void Game::Init()
 	m_pCursor = PToA->MakeObject("../Resources/Prefab/Cursor.object.json");
 	m_pCursor->Init();
 	OBJECT->SetCursorActor(m_pCursor);
+
+	UI->DoFadeOut();
 }
 
 void Game::Tick()
@@ -317,8 +319,6 @@ void Game::CreateUI()
 	// Dead
 	m_pDeadUI = PToA->MakeUI("../Resources/Prefab/UI_Dead.ui.json");
 	UI->AddUI(m_pDeadUI);
-
-	UI->DoFadeOut();
 }
 
 void Game::UpdateUI()
@@ -477,15 +477,19 @@ void Game::UpdateUI()
 	auto vTriggerList = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger();
 	if (vTriggerList.eTriggerType != ETriggerType::TT_NONE)
 	{
+		static Vec3 offsetPos1 = m_vInterActionUI[1]->GetPosition();
+		static Vec3 offsetPos2 = m_vInterActionUI[2]->GetPosition();
+
 		auto pos = CAMERA->GetScreenPos(vTriggerList.vPoint);
-		auto temp = pos - m_vInterActionUI[0]->GetPosition();
+
+		m_vInterActionUI[0]->SetPosition(pos);
+		m_vInterActionUI[1]->SetPosition(pos + offsetPos1);
+		m_vInterActionUI[2]->SetPosition(pos + offsetPos2);
 
 		for (auto& pUI : m_vInterActionUI)
 		{
 			pUI->m_bRun = true;
 			pUI->m_bRender = true;
-
-			pUI->AddPosition(temp);
 
 			if (vTriggerList.eTriggerType == ETriggerType::TT_LADDER)
 			{
