@@ -86,6 +86,7 @@ struct VS_OUT
     float4 c : COLOR;
     float3 n : NORMAL;
     float2 t : TEXCOORD;
+    float4 color : COLOR1;
 };
 
 struct PS_OUT

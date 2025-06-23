@@ -8,5 +8,6 @@ enum class EEffectType
     Beam,
     PoppingDust,
     BloodDecal,
+    Point,
     Count,
 };

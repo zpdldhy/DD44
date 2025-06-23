@@ -1,15 +1,12 @@
 #pragma once
 #include <unordered_set>
+#include "AnimData.h"
 
 struct AnimList
 {
-	vector<vector<Matrix>> animList;
 	wstring m_szName;
-};
-
-struct CbAnimData
-{
-	Matrix boneAnim[250];
+	int startFrame;
+	int endFrame;
 };
 
 struct AnimEventHash {
@@ -22,18 +19,23 @@ struct AnimEventHash {
 
 class UAnimInstance : public enable_shared_from_this<UAnimInstance>
 {
+	shared_ptr<AnimData> m_pData;
+
 	wstring m_modelName;
 	vector<AnimList> animTrackList;
+
 	float animFrame = 0.0f;
 	UINT currentAnimTrackIndex = 0;
 	UINT lastEventFrame = UINT_MAX;
-	Vec3 rootPos;
+
+	Vec3 rootPos = { 0, 0, 0 };
+	Matrix rootMat;
 	int rootIndex = 0;
-	int prevIndex;
 	
-	ComPtr<ID3D11Buffer> _constantBuffer;
+	int prevIndex;
+	UINT boneCount;
+
 public:
-	friend class AnimTrack;
 	bool m_bOnPlayOnce;
 	bool m_bInPlace = false;
 	bool m_bPlay = true;
@@ -42,13 +44,16 @@ public:
 	unordered_map<pair<int, UINT>, function<void()>, AnimEventHash> eventMap;
 
 public:
-	void CreateConstantBuffer();
 	void PlayOnce(int _index);
 	void SetCurrentAnimTrack(int _index);
 public:
 	void Tick();
+	void Render();
 	shared_ptr<UAnimInstance> Clone();
 public:
+	// AnimMap 만들 때 단 한 번 실행
+	void MakeAnimData(const vector<XMFLOAT4>& _data);
+	
 	void AddTrack(AnimList _animTrack);
 	void SetName(wstring _name) { m_modelName = _name; }
 	wstring GetName() { return m_modelName; }
@@ -59,8 +64,15 @@ public:
 	//
 	int GetAnimIndex(wstring _animName);
 	Matrix GetBoneAnim(int _boneIndex);
-	int GetTotalFrame() { return animTrackList[currentAnimTrackIndex].animList[0].size(); }
+	int GetTotalFrame() { return animTrackList[currentAnimTrackIndex].endFrame; }
+	
 	int GetCurrentIndex() { return currentAnimTrackIndex; }
+	int GetCurrentFrame() { return animFrame; }
+	Vec3 GetRootPos() { return rootPos; }
+
+	Matrix GetMatrix(int _track, int _bone, int _frame);
+	// temp ?
+	void SetBoneCount(UINT _bone);
 public:
 	void SetKeyFrame(int _trackIndex, UINT _key);
 	void AddEvent(int _trackIndex, UINT _keyFrame, function<void()> _func);

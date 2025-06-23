@@ -6,6 +6,7 @@
 #include "UMaterial.h"
 #include "DxState.h"
 #include "ATerrainTileActor.h"
+#include "QuadTree.h"
 
 // Component
 #include "UBoxComponent.h"
@@ -17,6 +18,7 @@ ComPtr<ID3D11Buffer> ObjectManager::m_pRenderModeBuffer = nullptr;
 void ObjectManager::Init()
 {
 	CreateRenderModeCB();
+	//CreateQuadTree();
 }
 
 void ObjectManager::Tick()
@@ -26,15 +28,15 @@ void ObjectManager::Tick()
 		// 죽는건가
 		if (pActor->second->m_bDelete == true)
 		{
+			pActor->second->Destroy();
 			pActor = m_vActorList.erase(pActor);
+
 		}
 		else
 		{
 			if (pActor->second->m_bUpdateQuadTree != false) 
 			{
 				pActor->second->Tick();
-				if (pActor->second->m_szName == L"Object")
-					pActor->second->m_bUpdateQuadTree = false;
 			}
 			pActor++;
 		}		
@@ -44,10 +46,34 @@ void ObjectManager::Tick()
 		m_pCursor->Tick();
 }
 
-void ObjectManager::Render()
+void ObjectManager::RenderShadow()
 {
 	CheckStencilList();
 
+	for (auto& actor : m_vPreRenderActorList)
+	{
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
+
+	for (auto& actor : m_vPostRenderActorList)
+	{
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
+
+	for (auto& actor : m_vInstanceList)
+	{
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
+}
+
+void ObjectManager::Render()
+{
 	for (auto& pRenderActor : m_vPreRenderActorList)
 	{
 		// [1] Actor1 먼저 정상 렌더링 (깊이, 스텐실 기록 X)
@@ -100,7 +126,14 @@ void ObjectManager::AddActor(shared_ptr<class AActor> _pActor)
 	
 	_pActor->Init();
 
-	SetInstance(_pActor);
+	if (_pActor->m_szName == L"Object")
+		_pActor->m_bUpdateQuadTree = false;
+
+	if (_pActor->m_szName != L"Sky")// && _pActor->m_szName != L"Terrain")
+	{
+		//m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), _pActor);	// 쿼드트리에 추가
+		SetInstance(_pActor);
+	}
 }
 
 void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
@@ -114,7 +147,15 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 		ActorCount++;
 
 		pActor->Init();
-		SetInstance(pActor);
+
+		if (pActor->m_szName == L"Object")
+			pActor->m_bUpdateQuadTree = false;
+
+		if (pActor->m_szName != L"Sky")// && pActor->m_szName != L"Terrain") 
+		{
+			//m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), pActor);	// 쿼드트리에 추가
+			SetInstance(pActor);
+		}
 	}
 }
 
@@ -163,17 +204,6 @@ shared_ptr<class AActor> ObjectManager::GetActor(UINT _iIndex)
 const map<UINT, shared_ptr<AActor>>& ObjectManager::GetActorList() const
 {
 	return m_vActorList;
-}
-
-void ObjectManager::RenderShadow()
-{
-	for (auto& pair : m_vActorList)
-	{
-		auto& actor = pair.second;
-		if (!actor || !actor->IsCastShadow()) continue;
-
-		actor->RenderShadow();
-	}
 }
 
 void ObjectManager::ObjectMove()
@@ -250,7 +280,7 @@ void ObjectManager::CheckStencilList()
 	{
 		auto pActor = iter.second;
 		if (pActor->m_bRender == false) continue;
-		if (pActor->GetMeshComponent() == nullptr || pActor->GetMeshComponent()->IsUseInstance()) continue;
+		if (pActor->GetMeshComponent() != nullptr && pActor->GetMeshComponent()->IsUseInstance()) continue;
 
 		if (pActor->m_bUseStencil == false)
 			m_vPreRenderActorList.emplace_back(pActor);
@@ -318,9 +348,21 @@ void ObjectManager::SetInstance(shared_ptr<AActor> _pActor)
 		if (pInstance->GetMeshPath() != meshCom->GetMeshPath())
 			continue;
 
+		if (pInstance->GetTexturePath() == L"../Resources/Obj/tower/tower.png")
+			int i = 0;
+
 		// Texture만 다르면 생성
 		if (pInstance->GetTexturePath() != meshCom->GetMaterial()->GetTexturePath())
 		{
+			if (pInstance->GetTexturePath() == L"../Resources/Obj/tower/tower.png")
+				int i = 0;
+
+			if (meshCom->GetMaterial()->GetTexturePath() == L"../Resources/Obj/tower/tower.png")
+				int i = 0;
+
+			auto InstanceTexturePath = pInstance->GetTexturePath();
+			auto ActorTexturePath = meshCom->GetMaterial()->GetTexturePath();
+
 			MakeInstance(_pActor);
 			return;
 		}
@@ -345,3 +387,9 @@ void ObjectManager::MakeInstance(shared_ptr<AActor> _pActor)
 
 	m_vInstanceList.emplace_back(pInstance);
 }
+
+//void ObjectManager::CreateQuadTree()
+//{
+//	m_pQuadTree = make_shared<QuadTree>();
+//	m_pQuadTree->Create(32, 32, 10.f);
+//}

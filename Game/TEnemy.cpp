@@ -68,7 +68,6 @@ void TEnemy::CheckHitByProjectile(int type, bool _hit)
 		bHitByProjectile = _hit;
 	}
 }
-
 void TEnemy::Flashing()
 {
 	if (m_bIsFlashing)
@@ -124,7 +123,6 @@ void TEnemy::PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _
 		EFFECT->PlayEffect(EEffectType::Blood, pos, _spreadAngleDeg, baseVelocity);
 	}
 }
-
 void TEnemy::ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled)
 {
 	if (!comp) return;

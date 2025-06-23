@@ -15,6 +15,9 @@
 #include "AInstance.h"
 #include "USphereComponent.h"
 #include "RenderStateManager.h"
+#include "APointEffectActor.h"
+
+constexpr int INITIAL_POOL_SIZE = 3;
 
 void EffectManager::Init()
 {
@@ -24,39 +27,40 @@ void EffectManager::Init()
         m_vInstanceEffect[index]->SetEffectType(static_cast<EEffectType>(index));
     }
 
-    for (int i = 0; i < 50; ++i)
-    {
-        for (int t = 0; t < static_cast<size_t>(EEffectType::Count); ++t)
-        {
-            EEffectType type = static_cast<EEffectType>(t);
-            auto actor = CreateEffectActor(type);
-            m_mEffectPool[type].push_back(actor);
-            
-            if (type == EEffectType::Dust || type == EEffectType::PoppingDust)
-                PARTICLE->AddUI(actor);
-            else
-            {
-                actor->Init();
-                m_vEffectList.emplace_back(actor);
-            }
-        }
-    }
+	for (int i = 0; i < INITIAL_POOL_SIZE; ++i)
+	{
+		for (int t = 0; t < static_cast<size_t>(EEffectType::Count); ++t)
+		{
+			EEffectType type = static_cast<EEffectType>(t);
+			auto actor = CreateEffectActor(type);
+			m_mEffectPool[type].push_back(actor);
+
+			if (type == EEffectType::Dust || type == EEffectType::PoppingDust)
+				PARTICLE->AddUI(actor);
+			else
+			{
+				actor->Init();
+				m_vEffectList.emplace_back(actor);
+			}
+		}
+	}
+	PlayInit();
 }
 
 void EffectManager::Tick()
 {
-    for(auto iter = m_vEffectList.begin();iter!= m_vEffectList.end();)
-    {
-        auto pEffect = *iter;
-        if (pEffect->m_bDelete == true)
-        {
-            iter = m_vEffectList.erase(iter);
-            continue;
-        }
+	for (auto iter = m_vEffectList.begin(); iter != m_vEffectList.end();)
+	{
+		auto pEffect = *iter;
+		if (pEffect->m_bDelete == true)
+		{
+			iter = m_vEffectList.erase(iter);
+			continue;
+		}
 
-        pEffect->Tick();
-        iter++;
-    }
+		pEffect->Tick();
+		iter++;
+	}
 }
 
 void EffectManager::Render()
@@ -118,14 +122,17 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     case EEffectType::BloodDecal:
         actor = make_shared<ABloodDecalActor>();
         break;
+    case EEffectType::Point:
+        actor = make_shared<APointEffectActor>();
+        break;
     }
 
     //그림자
     actor->m_bCastShadow = false;
 
-    // 메시
-    auto mesh = UStaticMeshComponent::CreatePlane();
-    actor->SetMeshComponent(mesh);
+	// 메시
+	auto mesh = UStaticMeshComponent::CreatePlane();
+	actor->SetMeshComponent(mesh);
 
     // 머티리얼
     auto mat = make_shared<UMaterial>();
@@ -166,38 +173,53 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
         m_vInstanceEffect[static_cast<size_t>(EEffectType::BloodDecal)]->AddInstanceMesh(mesh);
         actor->m_szName = L"DecalEffect";
         break;
+    case EEffectType::Point:
+        mat->Load(L"../Resources/Texture/spark_particle.png", L"../Resources/Shader/SpriteUV.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Point)]->AddInstanceMesh(mesh);
+        break;
     }
 
-    mesh->SetMaterial(mat);
+	mesh->SetMaterial(mat);
 
-    // 공통 설정
-    actor->m_bLoop = false;
-    actor->m_bAutoDestroy = false;
-    actor->m_bRender = false;
+	// 공통 설정
+	actor->m_bLoop = false;
+	actor->m_bAutoDestroy = false;
+	actor->m_bRender = false;
 
-    return actor;
+	return actor;
 }
 
 shared_ptr<AEffectActor> EffectManager::GetReusableActor(EEffectType type)
 {
-    for (auto& actor : m_mEffectPool[type])
-    {
-        if (!actor->IsActive())
-            return actor;
-    }
+	for (auto& actor : m_mEffectPool[type])
+	{
+		if (!actor->IsActive())
+			return actor;
+	}
 
-    return nullptr;
+	auto newActor = CreateEffectActor(type);
+	newActor->Init();
+	m_mEffectPool[type].push_back(newActor);
+
+	// UI 전용이면 등록
+	if (type == EEffectType::Dust || type == EEffectType::PoppingDust)
+		PARTICLE->AddUI(newActor);
+	else
+		m_vEffectList.emplace_back(newActor);
+
+	return newActor;
 }
 
 
 void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngleSpreadDeg, const Vec3& baseVelocity, float _scale)
 {
-    auto actor = GetReusableActor(type);
-    if (!actor)
-        return;
+	auto actor = GetReusableActor(type);
+	if (!actor)
+		return;
 
     
     float duration = 1.0f;
+    actor->GetMeshComponent()->SetInstanceColor(Vec4(1.f, 1.f, 1.f, 1.f));
     float angle = RandomRange(0.0f, DD_2PI);
     switch (type)
     {
@@ -217,6 +239,10 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
         actor->SetRotation(Vec3(DD_PI / 2, 0, angle));
         actor->GetMeshComponent()->SetInstanceColor(Vec4(0.6f, 0.05f, 0.05f, 1));        
         break;
+    case EEffectType::Point:
+        duration = 0.2;
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(0.7f, 0.9f, 0.95, 1.0f));
+        break;
     default:                      duration = 1.0f; break;
     }
 
@@ -230,44 +256,44 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
 
 void EffectManager::PlayDustBurst(const Vec3& _origin, float _speed, float _size)
 {
-    static const Vec3 directions[8] =
-    {
-        Vec3(1.0f, 0.0f, 0.0f),    
-        Vec3(-1.0f, 0.0f, 0.0f),   
-        Vec3(0.0f, 0.0f, 1.0f),    
-        Vec3(0.0f, 0.0f,-1.0f),    
-        Vec3(0.0f, 0.5f, 0.0f),    
-        Vec3(0.7071f, 0.0f, 0.7071f),   
-        Vec3(-0.7071f, 0.0f, 0.7071f),  
-        Vec3(0.0f, 0.0f, 0.0f)
-    };
+	static const Vec3 directions[8] =
+	{
+		Vec3(1.0f, 0.0f, 0.0f),
+		Vec3(-1.0f, 0.0f, 0.0f),
+		Vec3(0.0f, 0.0f, 1.0f),
+		Vec3(0.0f, 0.0f,-1.0f),
+		Vec3(0.0f, 0.5f, 0.0f),
+		Vec3(0.7071f, 0.0f, 0.7071f),
+		Vec3(-0.7071f, 0.0f, 0.7071f),
+		Vec3(0.0f, 0.0f, 0.0f)
+	};
 
-    for (int i = 0; i < 8; ++i)
-    {
-        Vec3 dir = directions[i];
-        dir.y = 0.5f; 
-        
-        Vec3 velocity = dir * (_speed * 1.8f); 
+	for (int i = 0; i < 8; ++i)
+	{
+		Vec3 dir = directions[i];
+		dir.y = 0.5f;
 
-        PlayEffect(EEffectType::PoppingDust, _origin, 0.f, velocity, _size);
-    }
+		Vec3 velocity = dir * (_speed * 1.8f);
+
+		PlayEffect(EEffectType::PoppingDust, _origin, 0.f, velocity, _size);
+	}
 }
 
 void EffectManager::PlayBeamBurst(const Vec3& origin, int count, float _scale)
 {
-    float angleStep = 2 * DD_PI / count;
+	float angleStep = 2 * DD_PI / count;
 
-    for (int i = 0; i < count; ++i)
-    {
-        float angle = i * angleStep;
+	for (int i = 0; i < count; ++i)
+	{
+		float angle = i * angleStep;
 
-        // 수평 방향 + 랜덤 위로 튐
-        float randomY = RandomRange(0.3f, 0.7f); // 위쪽 분산 (0이면 바닥, 1이면 수직)
-        Vec3 dir = Vec3(sinf(angle), randomY, cosf(angle));
-        dir.Normalize();
+		// 수평 방향 + 랜덤 위로 튐
+		float randomY = RandomRange(0.3f, 0.7f); // 위쪽 분산 (0이면 바닥, 1이면 수직)
+		Vec3 dir = Vec3(sinf(angle), randomY, cosf(angle));
+		dir.Normalize();
 
-        PlayEffect(EEffectType::Beam, origin, 0.0f, dir, _scale);
-    }
+		PlayEffect(EEffectType::Beam, origin, 0.0f, dir, _scale);
+	}
 
   
 }
@@ -283,4 +309,16 @@ void EffectManager::EffectMove()
             pEffect->GetShapeComponent()->UpdateBounds();
         }
     }
+}
+
+
+
+void EffectManager::PlayInit()
+{
+	for (int i = 0; i < INITIAL_POOL_SIZE; ++i)
+	{
+		PlayEffect(EEffectType::Feather, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
+	}
+	PlayEffect(EEffectType::Dust, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
+	PlayEffect(EEffectType::Point, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
 }

@@ -148,6 +148,13 @@ TFbxResource AAsset::Load(const char* fileName)
 
 	// ANIM DATA
 	result.m_vAnimTrackList.resize(result.m_iAnimTrackCount);
+	// 바로 animTexData 에 복사 (4행 × matCount 개)
+	UINT texWidth = result.m_iNodeCount;
+	UINT texHeight = 150; // 최대 프레임 수
+	UINT texDepth = result.m_iAnimTrackCount * 4;
+
+	result.m_vAnimArray.m_vAnimList.resize(texWidth * texHeight * texDepth);
+
 	for (int iAnimTrack = 0; iAnimTrack < result.m_iAnimTrackCount; iAnimTrack++)
 	{
 		// NODE NAME
@@ -159,16 +166,37 @@ TFbxResource AAsset::Load(const char* fileName)
 		fread(&result.m_vAnimTrackList[iAnimTrack].m_iStartFrame, sizeof(UINT), 1, pFile);
 		fread(&result.m_vAnimTrackList[iAnimTrack].m_iEndFrame, sizeof(UINT), 1, pFile);
 
-
 		UINT frameCount = 0;
 		fread(&frameCount, sizeof(UINT), 1, pFile);
 
-		result.m_vAnimTrackList[iAnimTrack].m_vAnim.resize(result.m_iNodeCount);
-		for (int iBone = 0; iBone < result.m_iNodeCount; iBone++)
+		size_t matCount = (size_t)result.m_iNodeCount * frameCount;
+		std::vector<Matrix> tempMatrices(matCount);
+		fread(tempMatrices.data(), sizeof(Matrix), matCount, pFile);
+
+	
+		for (size_t i = 0; i < matCount; ++i)
 		{
-			result.m_vAnimTrackList[iAnimTrack].m_vAnim[iBone].resize(frameCount);
-			fread(&result.m_vAnimTrackList[iAnimTrack].m_vAnim[iBone].at(0), sizeof(Matrix), frameCount, pFile);
+			const Matrix& mat = tempMatrices[i];
+
+			int bone = static_cast<int>((i / frameCount));
+			int frame = static_cast<int>(i % frameCount);
+			int track = iAnimTrack;
+
+			for (int row = 0; row < 4; ++row)
+			{
+				XMFLOAT4 rowData;
+				rowData.x = mat.m[row][0];
+				rowData.y = mat.m[row][1];
+				rowData.z = mat.m[row][2];
+				rowData.w = mat.m[row][3];
+
+				int z = track * 4 + row;
+				int index = bone + frame * result.m_iNodeCount + z * result.m_iNodeCount * texHeight;
+				result.m_vAnimArray.m_vAnimList[index] = rowData;
+			}
 		}
+		result.m_vAnimTrackList[iAnimTrack].m_iStartFrame = 0;
+		result.m_vAnimTrackList[iAnimTrack].m_iEndFrame = frameCount;
 	}
 
 	// BONE

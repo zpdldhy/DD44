@@ -18,6 +18,10 @@ class CameraManager : public Singleton<CameraManager>
 	shared_ptr<class UCameraComponent> m_p3DComponent = nullptr;
 	shared_ptr<class UCameraComponent> m_pUIComponent = nullptr;
 
+	// Frustum
+	Plane m_FrustumPlanes[6] = { Plane::Plane(), Plane::Plane(), Plane::Plane(), Plane::Plane(), Plane::Plane(), Plane::Plane() };
+	vector<class QuadTreeNode*> m_vCulledNodes;
+
 public:
 	void Init();
 	void Tick();
@@ -26,6 +30,9 @@ public:
 
 private:
 	void CreateCameraBuffer();
+	void UpdateFrustumPlanes();
+	void FrustumCulling(class QuadTreeNode* pNode);
+	bool CheckPointToPlane(const Vec3& _point) const;
 
 public:
 	void Set3DCameraActor(shared_ptr<class AActor> _cameraActor);	

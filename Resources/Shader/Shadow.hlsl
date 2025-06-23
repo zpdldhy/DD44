@@ -14,7 +14,7 @@ VS_OUT VS(PNCTIW_IN input)
     output.p = float4(input.p, 1.0f);
     float4 vLocal = float4(input.p, 1.0f);
     
-    float4 vAnim;
+    float4 vAnim = float4(0.f, 0.f, 0.f, 0.f);
        
     for (int i = 0; i < 4; i++)
     {
@@ -22,7 +22,8 @@ VS_OUT VS(PNCTIW_IN input)
         float fWeight = input.w[i];
         
         matrix boneMat = obj_matBone[iBoneIndex];
-        matrix animMat = obj_matAnim[iBoneIndex];
+        float4 tempRoot = { 0, 0, 0, 0 };
+        matrix animMat = GetAnimMatrix(track, iBoneIndex, frame, tempRoot);
         
         animMat = mul(animMat, boneMat);
         animMat = transpose(animMat);
@@ -35,8 +36,9 @@ VS_OUT VS(PNCTIW_IN input)
         int iBoneIndex = (int) input.i2[j];
         float fWeight = input.w2[j];
 
+        float4 tempRoot = { 0, 0, 0, 0 };
         matrix boneMat = obj_matBone[iBoneIndex];
-        matrix animMat = obj_matAnim[iBoneIndex];
+        matrix animMat = GetAnimMatrix(track, iBoneIndex, frame, tempRoot);
         
         animMat = mul(boneMat, animMat);
         animMat = transpose(animMat);

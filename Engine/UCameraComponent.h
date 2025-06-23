@@ -83,6 +83,7 @@ public:
 
 	Matrix GetView() { return m_matView; }
 	Matrix GetProjection() { return m_matProjection; }
+	Matrix GetViewProjection() { return m_matView * m_matProjection; }
 
 	Vec3 GetCameraLook() { return m_vLookTo; }
 

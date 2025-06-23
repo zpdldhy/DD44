@@ -35,15 +35,7 @@ void MageIdleState::Enter()
 }
 void MageIdleState::Tick()
 {
-	if (INPUT->GetButton(C))
-	{
-		auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-		if (++animIndex >= animInstance->GetAnimTrackList().size())
-		{
-			animIndex = 0;
-		}
-		animInstance->SetCurrentAnimTrack(animIndex);
-	}
+
 }
 void MageIdleState::End()
 {

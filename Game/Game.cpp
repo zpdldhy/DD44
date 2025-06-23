@@ -14,6 +14,7 @@
 #include "Sound.h"
 #include "WindManager.h"
 #include "Engine.h"
+#include "QuadTree.h"
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -611,7 +612,7 @@ void Game::CheckEnemyCollision()
 			continue;
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
-		COLLITION->CheckCollision(m_pBetty, *iter);
+		//COLLITION->CheckCollision(m_pBetty, *iter);
 		iter++;
 	}
 

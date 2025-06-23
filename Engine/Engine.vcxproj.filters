@@ -91,6 +91,9 @@
     <Filter Include="Component\Physics">
       <UniqueIdentifier>{5e1a85a4-856f-45a6-8f77-e5c8a688e237}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Animation">
+      <UniqueIdentifier>{011e8fcf-b9ab-4ef5-94dd-5bc3109b0fae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -363,17 +366,11 @@
     <ClInclude Include="StateMachine.h">
       <Filter>Headers\Template</Filter>
     </ClInclude>
-    <ClInclude Include="AnimTrack.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="MeshLoader.h">
       <Filter>Utils\ModelLoader</Filter>
     </ClInclude>
     <ClInclude Include="Profiler.h">
       <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="UAnimInstance.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Text.h">
       <Filter>Resources</Filter>
@@ -428,6 +425,19 @@
     </ClInclude>
     <ClInclude Include="USphereComponent.h">
       <Filter>Component\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="UInstanceSkinnedMeshComponent.h" />
+    <ClInclude Include="AnimTrack.h">
+      <Filter>Core\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="UAnimInstance.h">
+      <Filter>Core\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimData.h">
+      <Filter>Core\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="APointEffectActor.h">
+      <Filter>Object\Particle</Filter>
     </ClInclude>
     <ClInclude Include="ABloodDecalActor.h">
       <Filter>Object\Particle</Filter>
@@ -664,17 +674,11 @@
     <ClCompile Include="EffectManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="AnimTrack.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="MeshLoader.cpp">
       <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
     <ClCompile Include="Profiler.cpp">
       <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="UAnimInstance.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Resources</Filter>
@@ -726,6 +730,19 @@
     </ClCompile>
     <ClCompile Include="USphereComponent.cpp">
       <Filter>Component\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="UInstanceSkinnedMeshComponent.cpp" />
+    <ClCompile Include="AnimTrack.cpp">
+      <Filter>Core\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="UAnimInstance.cpp">
+      <Filter>Core\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimData.cpp">
+      <Filter>Core\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="APointEffectActor.cpp">
+      <Filter>Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="ABloodDecalActor.cpp">
       <Filter>Object\Particle</Filter>

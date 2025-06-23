@@ -39,6 +39,12 @@ struct Box : public Shape
 	// OBB
 	Vec3 vAxis[3] = { {0.f, 0.f, 0.f}, };
 	float vExtent[3] = {0.f, 0.f, 0.f};
+
+	bool Contains(const Vec3& pos) const
+	{
+		return (pos.x >= vMin.x && pos.x <= vMax.x &&
+			pos.z >= vMin.z && pos.z <= vMax.z);
+	}
 };
 
 struct Sphere : public Shape

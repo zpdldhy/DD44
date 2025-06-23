@@ -19,6 +19,8 @@ protected:
 	Color m_InstanceColor = { 0.f, 0.f, 0.f, 0.f };
 	Vec2 m_InstanceStartUV = { 0.f, 0.f };
 	Vec2 m_InstanceEndUV = { 0.f, 0.f };
+public:
+	UINT m_instanceId = 0;
 
 public:
 	void Render() override;
@@ -28,12 +30,12 @@ public:
 	void SetMeshPath(const std::wstring& path) { m_MeshPath = path; }
 	const std::wstring& GetMeshPath() const { return m_MeshPath; }
 
-	virtual void SetMesh(shared_ptr<UMeshResources> _mesh) { m_pMesh = _mesh; }
+	virtual void SetMesh(shared_ptr<UMeshResources> _mesh);
 	const shared_ptr<UMeshResources>& GetMesh() { return m_pMesh; }
 	int GetType() { return m_pMesh->GetType(); }
 
 	// child
-	void AddChild(shared_ptr<UMeshComponent> _child){ m_vChild.push_back(_child); }
+	void AddChild(shared_ptr<UMeshComponent> _child) { m_vChild.push_back(_child); }
 	void RemoveChild(int _index);
 	bool RemoveChild(const wstring& _name);
 	int GetChildIndex(shared_ptr<UMeshComponent> _child);
@@ -51,7 +53,7 @@ public:
 	bool IsUseInstance() { return bUseInstance; }
 	void SetInstanceColor(Color _color) { m_InstanceColor = _color; }
 	void SetInstanceStartUV(Vec2 _uv) { m_InstanceStartUV = _uv; }
-	void SetInstanceEndUV(Vec2 _uv) { m_InstanceEndUV = _uv; }	
+	void SetInstanceEndUV(Vec2 _uv) { m_InstanceEndUV = _uv; }
 	Color GetInstanceColor() { return m_InstanceColor; }
 	Vec2 GetInstanceStartUV() { return m_InstanceStartUV; }
 	Vec2 GetInstanceEndUV() { return m_InstanceEndUV; }

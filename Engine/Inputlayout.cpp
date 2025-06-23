@@ -58,9 +58,9 @@ bool InputlayoutManager::CreateDefault()
 	return true;
 }
 
-bool InputlayoutManager::CreateInstance(ComPtr<ID3DBlob> _pCode)
+bool InputlayoutManager::CreateInstance(ComPtr<ID3DBlob> _pCode, wstring _name)
 {
-	if (Get(L"Instance") != nullptr)
+	if (Get(_name) != nullptr)
 	{
 		return true;
 	}
@@ -81,7 +81,7 @@ bool InputlayoutManager::CreateInstance(ComPtr<ID3DBlob> _pCode)
 	UINT iNumCnt = sizeof(layout) / sizeof(layout[0]);
 	shared_ptr<Inputlayout> inputlayout = make_shared<Inputlayout>();
 	inputlayout->Load(_pCode, layout, iNumCnt);
-	m_mList.insert(make_pair(L"Instance", inputlayout));
+	m_mList.insert(make_pair(_name, inputlayout));
 
 	return true;
 }
@@ -136,11 +136,16 @@ bool InputlayoutManager::CreateInstanceIW(ComPtr<ID3DBlob> _pCode)
 		{ "WEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,	1, 32,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "SECONDW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,	1, 48,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 
-		{ "TRANSFORM", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,	2, 0,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-		{ "TRANSFORM", 1, DXGI_FORMAT_R32G32B32A32_FLOAT,	2, 16,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-		{ "TRANSFORM", 2, DXGI_FORMAT_R32G32B32A32_FLOAT,	2, 32,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-		{ "TRANSFORM", 3, DXGI_FORMAT_R32G32B32A32_FLOAT,	2, 48,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "TRANSFORM",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	2, 0,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "TRANSFORM",	1, DXGI_FORMAT_R32G32B32A32_FLOAT,	2, 16,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "TRANSFORM",	2, DXGI_FORMAT_R32G32B32A32_FLOAT,	2, 32,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "TRANSFORM",	3, DXGI_FORMAT_R32G32B32A32_FLOAT,	2, 48,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "INSTANCE_COLOR",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	2, 64,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "INSTANCE_UV",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	2, 80,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
 
+		{ "TRACK",	0,				DXGI_FORMAT_R32_UINT,	3, 0,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "FRAME",	0,				DXGI_FORMAT_R32_UINT,	3, 4,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "ROOTPOS",	0,	DXGI_FORMAT_R32G32B32A32_FLOAT,	3, 8,  D3D11_INPUT_PER_INSTANCE_DATA, 1 },
 	};
 	UINT iNumCnt = sizeof(layout) / sizeof(layout[0]);
 

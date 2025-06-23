@@ -30,6 +30,7 @@ public:
     static bool CheckRayToOBB(const Ray& _ray, const Box& _box, Vec3& inter);
 
     // Box
+    static int CheckAABBToPlane(const Box& _box, const Plane& _plane);
     static bool CheckOBBToOBB(const Box& _box0, const Box& _box1);
 
     // Sphere

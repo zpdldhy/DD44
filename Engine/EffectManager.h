@@ -15,6 +15,7 @@ public:
 	void PlayEffect(EEffectType type, const Vec3& pos, float angle, const Vec3& velocity, float _size = 1);
 	void PlayDustBurst(const Vec3& _origin, float _speed, float _scale);
 	void PlayBeamBurst(const Vec3& origin, int count, float _scale);
+	void PlayInit();
 
 	void EffectMove();
 
