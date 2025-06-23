@@ -16,7 +16,7 @@ struct Bounds
 struct QuadTreeNode
 {
     int iCellIndex = -1;
-    Bounds bounds;
+    Box bounds;
     std::vector<UINT> vActorIndices;
     std::unique_ptr<QuadTreeNode> pChildren[4];
 };

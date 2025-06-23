@@ -414,6 +414,26 @@ bool Collision::CheckRayToOBB(const Ray& _ray, const Box& _box, Vec3& inter)
 	return true;
 }
 
+int Collision::CheckAABBToPlane(const Box& _box, const Plane& _plane)
+{
+	Plane Plane = _plane;
+	Plane.Normalize();
+
+	Vec3 vNormal = Plane.Normal();
+	vNormal.Normalize();
+
+	float fMin = _box.vMin.Dot(vNormal);
+	fMin += Plane.w;
+	float fMax = _box.vMax.Dot(vNormal);
+	fMax += Plane.w;
+
+	if (fMin > 0.f && fMax > 0.f)
+		return 1; // Box가 Plane의 앞에 있음
+	if (fMin < 0.f && fMax < 0.f)
+		return -1; // Box가 Plane의 뒤에 있음
+	return 0; // Box가 Plane와 겹침
+}
+
 bool Collision::CheckOBBToOBB(const Box& _box0, const Box& _box1)
 {
 	Vec3 Distance = _box0.vCenter - _box1.vCenter;

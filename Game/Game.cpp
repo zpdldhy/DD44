@@ -97,8 +97,6 @@ void Game::Init()
 
 void Game::Tick()
 {
-	auto list = OBJECT->GetQuadTree()->FindNearbyActorIndices(m_pPlayer);
-
 	if (INPUT->GetButton(G))
 	{
 		EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder");

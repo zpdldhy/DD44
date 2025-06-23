@@ -18,7 +18,7 @@ ComPtr<ID3D11Buffer> ObjectManager::m_pRenderModeBuffer = nullptr;
 void ObjectManager::Init()
 {
 	CreateRenderModeCB();
-	CreateQuadTree();
+	//CreateQuadTree();
 }
 
 void ObjectManager::Tick()
@@ -35,8 +35,6 @@ void ObjectManager::Tick()
 			if (pActor->second->m_bUpdateQuadTree != false) 
 			{
 				pActor->second->Tick();
-				if (pActor->second->m_szName == L"Object")
-					pActor->second->m_bUpdateQuadTree = false;
 			}
 			pActor++;
 		}		
@@ -44,6 +42,32 @@ void ObjectManager::Tick()
 
 	if (m_pCursor)
 		m_pCursor->Tick();
+}
+
+void ObjectManager::RenderShadow()
+{
+	CheckStencilList();
+
+	for (auto& actor : m_vPreRenderActorList)
+	{
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
+
+	for (auto& actor : m_vPostRenderActorList)
+	{
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
+
+	for (auto& actor : m_vInstanceList)
+	{
+		if (!actor || !actor->IsCastShadow()) continue;
+
+		actor->RenderShadow();
+	}
 }
 
 void ObjectManager::Render()
@@ -100,8 +124,14 @@ void ObjectManager::AddActor(shared_ptr<class AActor> _pActor)
 	
 	_pActor->Init();
 
-	m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), _pActor);	// 쿼드트리에 추가
-	SetInstance(_pActor);
+	if (_pActor->m_szName == L"Object")
+		_pActor->m_bUpdateQuadTree = false;
+
+	if (_pActor->m_szName != L"Sky")// && _pActor->m_szName != L"Terrain")
+	{
+		//m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), _pActor);	// 쿼드트리에 추가
+		SetInstance(_pActor);
+	}
 }
 
 void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
@@ -116,8 +146,14 @@ void ObjectManager::AddActorList(vector<shared_ptr<class AActor>> _vActorList)
 
 		pActor->Init();
 
-		m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), pActor);	// 쿼드트리에 추가
-		SetInstance(pActor);
+		if (pActor->m_szName == L"Object")
+			pActor->m_bUpdateQuadTree = false;
+
+		if (pActor->m_szName != L"Sky")// && pActor->m_szName != L"Terrain") 
+		{
+			//m_pQuadTree->InsertActor(m_pQuadTree->GetRoot(), pActor);	// 쿼드트리에 추가
+			SetInstance(pActor);
+		}
 	}
 }
 
@@ -166,32 +202,6 @@ shared_ptr<class AActor> ObjectManager::GetActor(UINT _iIndex)
 const map<UINT, shared_ptr<AActor>>& ObjectManager::GetActorList() const
 {
 	return m_vActorList;
-}
-
-void ObjectManager::RenderShadow()
-{
-	CheckStencilList();
-
-	for (auto& actor : m_vPreRenderActorList)
-	{
-		if (!actor || !actor->IsCastShadow()) continue;
-
-		actor->RenderShadow();
-	}
-
-	for (auto& actor : m_vPostRenderActorList)
-	{
-		if (!actor || !actor->IsCastShadow()) continue;
-
-		actor->RenderShadow();
-	}
-
-	for (auto& actor : m_vInstanceList)
-	{
-		if (!actor || !actor->IsCastShadow()) continue;
-
-		actor->RenderShadow();
-	}
 }
 
 void ObjectManager::ObjectMove()
@@ -376,8 +386,8 @@ void ObjectManager::MakeInstance(shared_ptr<AActor> _pActor)
 	m_vInstanceList.emplace_back(pInstance);
 }
 
-void ObjectManager::CreateQuadTree()
-{
-	m_pQuadTree = make_shared<QuadTree>();
-	m_pQuadTree->Create(32, 32, 10.f);
-}
+//void ObjectManager::CreateQuadTree()
+//{
+//	m_pQuadTree = make_shared<QuadTree>();
+//	m_pQuadTree->Create(32, 32, 10.f);
+//}
