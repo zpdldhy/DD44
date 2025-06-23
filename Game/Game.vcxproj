@@ -159,6 +159,7 @@
     <ClInclude Include="BettyStates.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EnemyCollisionManager.h" />
+    <ClInclude Include="EnemyScriptBase.h" />
     <ClInclude Include="EnemyState.h" />
     <ClInclude Include="EngineCameraMoveScript.h" />
     <ClInclude Include="EventManager.h" />
@@ -166,6 +167,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCameraMove.h" />
     <ClInclude Include="GameDefine.h" />
+    <ClInclude Include="HeadRollerMovement.h" />
     <ClInclude Include="IntroScene.h" />
     <ClInclude Include="HeadRollerStates.h" />
     <ClInclude Include="kkongchiMoveScript.h" />
@@ -180,6 +182,7 @@
     <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="Sample.h" />
     <ClInclude Include="ScriptManager.h" />
+    <ClInclude Include="StageManager.h" />
     <ClInclude Include="StateInterface.h" />
     <ClInclude Include="TCharacter.h" />
     <ClInclude Include="TEnemy.h" />
@@ -202,11 +205,13 @@
     <ClCompile Include="BettyStates.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EnemyCollisionManager.cpp" />
+    <ClCompile Include="EnemyScriptBase.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
     <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="FenceScript.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCameraMove.cpp" />
+    <ClCompile Include="HeadRollerMovement.cpp" />
     <ClCompile Include="IntroScene.cpp" />
     <ClCompile Include="HeadRollerStates.cpp" />
     <ClCompile Include="kkongchiMoveScript.cpp" />
@@ -223,6 +228,7 @@
     <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="ScriptManager.cpp" />
+    <ClCompile Include="StageManager.cpp" />
     <ClCompile Include="StateInterface.cpp" />
     <ClCompile Include="TCharacter.cpp" />
     <ClCompile Include="TEnemy.cpp" />

@@ -12,6 +12,7 @@ public:
 	
 	shared_ptr<class AActor> m_pPlayer;
 	shared_ptr<class AActor> m_pBetty;
+	shared_ptr<class AActor> tempHeadRoller;
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
 	shared_ptr<class ALight> m_pSunLight;
@@ -56,8 +57,10 @@ public:
 	float m_fDeadUIPopTime = 1.f;
 
 	// TEMP
-	vector<shared_ptr<AActor>> enemyList1;
-	vector<shared_ptr<AActor>> enemyList2;
+	vector<shared_ptr<AActor>> enemyList;
+	//vector<shared_ptr<AActor>> enemyList0;
+	//vector<shared_ptr<AActor>> enemyList1;
+	//vector<shared_ptr<AActor>> enemyList2;
 	vector<shared_ptr<AActor>> m_vObjectList;
 	vector<shared_ptr<AActor>> m_vMapList;
 
@@ -79,6 +82,7 @@ protected:
 
 protected:
 	void SetEnemy(vector<shared_ptr<AActor>>& _enemyList);
+	void CheckFrustumCulling();
 	void CheckEnemyCollision();
 	//blood
 	void CheckBloodCollision();

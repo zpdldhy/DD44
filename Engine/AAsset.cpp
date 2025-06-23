@@ -150,7 +150,7 @@ TFbxResource AAsset::Load(const char* fileName)
 	result.m_vAnimTrackList.resize(result.m_iAnimTrackCount);
 	// 바로 animTexData 에 복사 (4행 × matCount 개)
 	UINT texWidth = result.m_iNodeCount;
-	UINT texHeight = 150; // 최대 프레임 수
+	UINT texHeight = 200; // 최대 프레임 수
 	UINT texDepth = result.m_iAnimTrackCount * 4;
 
 	result.m_vAnimArray.m_vAnimList.resize(texWidth * texHeight * texDepth);

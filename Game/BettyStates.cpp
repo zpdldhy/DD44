@@ -642,7 +642,8 @@ void BettyRollMiddle::Tick()
 	dir.y = 0;
 	dir.Normalize();
 	m_pOwner.lock()->AddPosition(dir * 1.0f);
-	CheckWallCollision();
+	// 이거 중복되는거같음 확인 필요
+	//CheckWallCollision();
 }
 void BettyRollMiddle::End()
 {
@@ -667,6 +668,11 @@ bool BettyRollMiddle::CheckWallCollision()
 
 	for (const auto& colData : m_pOwner.lock()->m_vCollisionList)
 	{
+		if (OBJECT->GetActor(colData.first)->m_szName == L"MyCharacter")
+		{
+			continue;
+		}
+		
 		auto targetShape = OBJECT->GetActor(colData.first)->GetShapeComponent();
 		auto targetBox = dynamic_pointer_cast<UBoxComponent>(targetShape);
 

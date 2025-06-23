@@ -10,7 +10,7 @@ void AnimData::AddData(const vector<XMFLOAT4>& _data)
 void AnimData::CreateTex(int _boneCount, int _trackCount)
 {
 	texWidth = _boneCount;
-	texHeight = 150;
+	texHeight = 200;
 	texDepth = _trackCount * 4;
 
 	// Texture

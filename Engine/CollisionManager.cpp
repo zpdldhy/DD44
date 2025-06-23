@@ -49,6 +49,7 @@ void Collision::Init()
 			data.otherShape = b->GetShapeComponent();
 
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
+			b->m_vCollisionList.insert(make_pair(a->m_Index, data));
 		}
 
 		};
@@ -435,6 +436,34 @@ int Collision::CheckAABBToPlane(const Box& _box, const Plane& _plane)
 		return 1; // Box가 Plane의 앞에 있음
 	if (fMin < 0.f && fMax < 0.f)
 		return -1; // Box가 Plane의 뒤에 있음
+	return 0; // Box가 Plane와 겹침
+}
+
+int Collision::CheckOBBToPlane(const Box& _box, const Plane& _plane)
+{
+	// 평면 노멀 단위화
+	Plane plane = _plane;
+	plane.Normalize();
+
+	Vec3 normal = plane.Normal();
+	normal.Normalize();
+
+	// Projection 반지름 계산
+	float radius = 0.f;
+	for (int i = 0; i < 3; ++i)
+	{
+		float proj = fabsf(_box.vAxis[i].Dot(normal));
+		radius += proj * _box.vExtent[i];
+	}
+
+	// 중심점의 평면 거리
+	float distance = _box.vCenter.Dot(normal) + plane.w; // plane.w == -d
+
+	if (distance > radius)
+		return 1; // Box가 Plane의 앞에 있음
+	if (distance < radius)
+		return -1; // Box가 Plane의 뒤에 있음
+
 	return 0; // Box가 Plane와 겹침
 }
 

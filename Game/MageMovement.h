@@ -23,7 +23,7 @@ private:
 	shared_ptr<StateBase> currentState;
 	UINT currentStateId;
 	// attackOffset
-	float findDistance = 10.0f;
+	float findDistance = 30.0f;
 	float hitElapsed = 0.0f;
 	// FX
 	float m_fHitFlashTimer = 0.0f;

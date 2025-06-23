@@ -134,8 +134,11 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 		actor->SetRotation(Vec3(characterData.transform.Rotation));
 		actor->SetScale(Vec3(characterData.transform.Scale));
 
-		auto script = SCRIPT->GetScript(to_mw(characterData.ScriptName));
-		actor->AddScript(script);
+		if (!characterData.ScriptName.empty())
+		{
+			auto script = SCRIPT->GetScript(to_mw(characterData.ScriptName));
+			actor->AddScript(script);
+		}
 
 		if (characterData.camera.isUse)
 		{
@@ -400,8 +403,8 @@ vector<shared_ptr<class AParticleActor>> PrefabToActor::MakeParticleGroup(const 
 
 			// 애니메이션 세팅
 			newParticle->InitSpriteAnimation(p.Divisions, p.Duration);
-			newParticle->m_bLoop=p.bLoop;
-			newParticle->m_bAutoDestroy= p.bAutoDestroy;
+			newParticle->m_bLoop = p.bLoop;
+			newParticle->m_bAutoDestroy = p.bAutoDestroy;
 
 			result.push_back(newParticle);
 		}

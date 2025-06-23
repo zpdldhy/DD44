@@ -18,8 +18,8 @@ class CameraManager : public Singleton<CameraManager>
 	shared_ptr<class UCameraComponent> m_p3DComponent = nullptr;
 	shared_ptr<class UCameraComponent> m_pUIComponent = nullptr;
 
-	// Frustum
-	Plane m_FrustumPlanes[6] = { Plane::Plane(), Plane::Plane(), Plane::Plane(), Plane::Plane(), Plane::Plane(), Plane::Plane() };
+	// Frustum	
+	vector<Plane> m_FrustumPlanes;
 	vector<class QuadTreeNode*> m_vCulledNodes;
 
 public:
@@ -49,6 +49,8 @@ public:
 
 	Vec3 GetNDCPos(Vec3 _vWorldPos);
 	Vec3 GetScreenPos(Vec3 _vWorldPos);
+
+	vector<Plane> GetFrustum() { return m_FrustumPlanes; }
 
 private:
 	Vec3 m_vPrevCameraPos = Vec3::Zero; // 이전 프레임 위치

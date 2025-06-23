@@ -31,6 +31,7 @@ public:
 
     // Box
     static int CheckAABBToPlane(const Box& _box, const Plane& _plane);
+    static int CheckOBBToPlane(const Box& _box, const Plane& _plane);
     static bool CheckOBBToOBB(const Box& _box0, const Box& _box1);
 
     // Sphere

@@ -17,11 +17,6 @@ void AActor::Init()
 	m_pTransform->SetOwner(shared_from_this());
 	m_pTransform->Init();
 
-	for (auto& script : m_vScript)
-	{
-		script->SetOwner(shared_from_this());
-		script->Init();
-	}	
 
 	for (auto& component : m_arrComponent)
 	{
@@ -31,6 +26,11 @@ void AActor::Init()
 			component->Init();
 		}
 	}
+	for (auto& script : m_vScript)
+	{
+		script->SetOwner(shared_from_this());
+		script->Init();
+	}	
 }
 
 void AActor::Tick()
@@ -40,12 +40,13 @@ void AActor::Tick()
 	{
 		int a = 0;
 	}
-	// Component
+
 	for (auto& script : m_vScript)
 	{
 		script->Tick();
 	}
 
+	// Component
 	for (auto& component : m_arrComponent)
 	{
 		if (component)
@@ -54,7 +55,6 @@ void AActor::Tick()
 		}
 	}
 
-
 	m_vCollisionList.clear();
 }
 
@@ -62,7 +62,7 @@ void AActor::Render()
 {
 	if (!m_bRender)
 		return;
-	if (m_szName == L"MyCharacter")
+	if (m_szName == L"HeadRoller")
 	{
 		int a = 0;
 	}

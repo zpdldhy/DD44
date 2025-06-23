@@ -49,6 +49,7 @@ void BettyMovement::Init()
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(20);
 
+
 }
 
 void BettyMovement::Tick()
@@ -78,7 +79,7 @@ void BettyMovement::Tick()
 			currentState->End();
 			// 거리 확인
 			distance = (player.lock()->GetPosition() - GetOwner()->GetPosition());
-			GetOwner()->m_szName = L"Object";
+			GetOwner()->m_szName = L"Betty";
 			GetOwner()->GetShapeComponent()->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 			rightRange->m_bCollision = false;
 			rightRange->GetShapeComponent()->m_bVisible = false;
