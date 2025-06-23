@@ -34,3 +34,10 @@ struct INSTANCE_VERTEX
 	Color color;
 	Vec4 uv;
 };
+
+struct ANIM_VERTEX
+{
+	UINT track;
+	UINT frame;
+	XMFLOAT4 rootPos;
+};

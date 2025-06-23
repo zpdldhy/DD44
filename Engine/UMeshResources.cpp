@@ -5,6 +5,7 @@ ComPtr<ID3D11Buffer> UMeshResources::m_pInstansBuffer = nullptr;
 
 void UMeshResources::Init()
 {
+
 }
 
 void UMeshResources::Tick()
@@ -93,4 +94,9 @@ void UMeshResources::UpdateInstanceList(vector<INSTANCE_VERTEX>& _InstanceList)
 		memcpy(mappedResource.pData, m_vInstaceList.data(), sizeof(INSTANCE_VERTEX) * m_vInstaceList.size());
 		DC->Unmap(m_pInstansBuffer.Get(), 0);
 	}
+}
+
+UINT UMeshResources::AddInstance()
+{
+	return m_instanceCount++;
 }

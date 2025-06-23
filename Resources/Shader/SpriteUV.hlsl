@@ -23,6 +23,7 @@ float3 ExtractScale(float4x4 m)
     scale.x = length(float3(m._11, m._12, m._13));
     scale.y = length(float3(m._21, m._22, m._23));
     scale.z = length(float3(m._31, m._32, m._33));
+
     return scale;
 }
 
@@ -77,19 +78,20 @@ VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
     float4 projPos = mul(viewPos, g_matProj);
     output.p = projPos;
 
-    output.c = input.c;
+    output.c = input.color;
     output.n = input.n;
     output.t = lerp(input.uv.xy, input.uv.zw, input.t);
 
     return output;
 }
 
+
 PS_OUT_DUAL PS(VS_OUT input)
 {
     PS_OUT_DUAL psOut = (PS_OUT_DUAL) 0;
 
     float2 uv = input.t;
-    float4 texColor = g_txDiffuseA.Sample(sample, uv);
+    float4 texColor = g_txDiffuseA.Sample(sample, uv) * input.c;
 
     if (texColor.a < 0.1)
         discard;

@@ -178,8 +178,10 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="AFireParticleActor.h" />
     <ClInclude Include="AInstance.h" />
     <ClInclude Include="ALight.h" />
+    <ClInclude Include="AnimData.h" />
     <ClInclude Include="AParticleActor.h" />
     <ClInclude Include="APawn.h" />
+    <ClInclude Include="APointEffectActor.h" />
     <ClInclude Include="APoppingDust.h" />
     <ClInclude Include="AShockwaveActor.h" />
     <ClInclude Include="ASky.h" />
@@ -224,6 +226,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="UBoxComponent.h" />
     <ClInclude Include="UIEditorUI.h" />
     <ClInclude Include="UIManager.h" />
+    <ClInclude Include="UInstanceSkinnedMeshComponent.h" />
     <ClInclude Include="UIState.h" />
     <ClInclude Include="ULightComponent.h" />
     <ClInclude Include="UPhysicsComponent.h" />
@@ -291,8 +294,10 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="AFireParticleActor.cpp" />
     <ClCompile Include="AInstance.cpp" />
     <ClCompile Include="ALight.cpp" />
+    <ClCompile Include="AnimData.cpp" />
     <ClCompile Include="AParticleActor.cpp" />
     <ClCompile Include="APawn.cpp" />
+    <ClCompile Include="APointEffectActor.cpp" />
     <ClCompile Include="APoppingDust.cpp" />
     <ClCompile Include="AShockwaveActor.cpp" />
     <ClCompile Include="ASky.cpp" />
@@ -331,6 +336,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="UBoxComponent.cpp" />
     <ClCompile Include="UIEditorUI.cpp" />
     <ClCompile Include="UIManager.cpp" />
+    <ClCompile Include="UInstanceSkinnedMeshComponent.cpp" />
     <ClCompile Include="UIState.cpp" />
     <ClCompile Include="ULightComponent.cpp" />
     <ClCompile Include="UPhysicsComponent.cpp" />

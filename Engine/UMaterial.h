@@ -104,6 +104,11 @@ public:
 	void SetTintColor(const Vec4& color);
 	void SetCrash(bool _bCrash);
 	void SetDissolve(float _amount);
+
+	// 캐릭터 인스턴싱을 위해
+	float GetFlashTIme() { return m_tEffectData.g_fHitFlashTime; }
+	bool GetCrack() { return  m_tEffectData.g_bCrash; }
+	float GetDissolve() { return m_tEffectData.g_fDissolveAmount; }
 public:
 	virtual void SetShader(shared_ptr<Shader> _shader) { m_pShader = _shader; }
 	//void SetShader(const std::wstring& path);

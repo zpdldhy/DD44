@@ -40,6 +40,7 @@ public:
 	shared_ptr<Texture> m_pSubTexture;
 	shared_ptr<Texture> m_pNoiesTexture;
 
+	shared_ptr<StateBase> empty;
 	shared_ptr<StateBase> idle;
 	shared_ptr<StateBase> walk;
 	shared_ptr<StateBase> climb;

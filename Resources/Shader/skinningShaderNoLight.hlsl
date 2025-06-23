@@ -7,7 +7,7 @@ VS_OUT_RIM_INSTANCE VS(INSTANCEIW_IN input)
     output.p = float4(input.p, 1.0f);
     float4 vLocal = float4(input.p, 1.0f);
     
-    float4 vAnim = float4(0.f, 0.f, 0.f, 0.f);
+    float4 vAnim;
        
     for (int i = 0; i < 4; i++)
     {
@@ -64,7 +64,7 @@ VS_OUT VS_SHADOW(INSTANCEIW_IN input)
     output.p = float4(input.p, 1.0f);
     float4 vLocal = float4(input.p, 1.0f);
     
-    float4 vAnim = float4(0.f, 0.f, 0.f, 0.f);
+    float4 vAnim;
        
     for (int i = 0; i < 4; i++)
     {
@@ -147,7 +147,7 @@ PS_OUT PS(VS_OUT_RIM_INSTANCE input) : SV_Target
     float3 diffuse = ApplyLambertLighting(input.n, input.wPos);
     
 
-    float3 litColor = baseColor * (ambient + diffuse) + specular;
+    float3 litColor = baseColor;// * (ambient + diffuse) + specular;
 
     
     float4 finalColor = float4(litColor + emissive, texColor.a);
@@ -184,9 +184,9 @@ PS_OUT PS(VS_OUT_RIM_INSTANCE input) : SV_Target
     
     output.c4.rgb = (ambient + diffuse) + specular;
     output.c4.a = 1.f;
-    output.c5.rgb = input.n;
-    output.c5.a = 1.f;
-    output.c6 = float4(input.p.z / input.p.w, 0.0f, 0.0f, 1.0f); // R 채널에만 깊이
+    //output.c5.rgb = input.n;
+    //output.c5.a = 1.f;
+    //output.c6 = float4(input.p.z / input.p.w, 0.0f, 0.0f, 1.0f); // R 채널에만 깊이
     
 
     return output;

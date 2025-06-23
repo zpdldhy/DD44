@@ -18,6 +18,7 @@ using namespace Microsoft::WRL;
 #include <vector>
 #include <map>
 #include <list>
+#include <queue>
 #include <array>
 #include <algorithm>
 using namespace std;

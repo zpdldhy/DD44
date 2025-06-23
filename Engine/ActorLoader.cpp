@@ -16,7 +16,6 @@
 #include "UAnimInstance.h"
 #include "AnimTrack.h"
 
-
 void ActorLoader::ConvertFbxToAsset(string _path)
 {
 	HANDLE hFind;
@@ -122,18 +121,38 @@ map<wstring, shared_ptr<UAnimInstance>> ActorLoader::LoadAnimMap()
 	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
 	{
 		// Animation
+		// Anim 없는 애들이면 걍 continue 시키자
+		if (m_vFbxList[iFbx].m_iAnimTrackCount <= 0)
+		{
+			continue;
+		}
 		wstring name = m_vFbxList[iFbx].name;
 		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
+		animInstance->SetBoneCount(m_vFbxList[iFbx].m_iNodeCount);
 		{
-			animInstance->SetName(name);
-			animInstance->CreateConstantBuffer();
+			// NEW ( WITH 1DARRAY )
 			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
 			{
 				AnimList animTrack;
 				animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
-				animTrack.animList = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_vAnim;
+				animTrack.startFrame = 0;
+				animTrack.endFrame = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_iEndFrame;
 				animInstance->AddTrack(animTrack);
 			}
+			animInstance->MakeAnimData(m_vFbxList[iFbx].m_vAnimArray.m_vAnimList);
+			//animInstance->CreateTex();
+		}
+		{
+			// ORIGIN
+			//animInstance->SetName(name);
+			//animInstance->CreateConstantBuffer();
+			//for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
+			//{
+			//	AnimList animTrack;
+			//	animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
+			//	animTrack.animList = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_vAnim;
+			//	animInstance->AddTrack(animTrack);
+			//}
 		}
 		m_vAnimInstanceMap.insert(make_pair(name, animInstance));
 	}
@@ -288,12 +307,10 @@ vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
 		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 		{
 			animInstance->SetName(name);
-			animInstance->CreateConstantBuffer();
 			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
 			{
 				AnimList animTrack;
 				animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
-				animTrack.animList = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_vAnim;
 				animInstance->AddTrack(animTrack);
 			}
 		}
@@ -339,12 +356,10 @@ shared_ptr<APawn> ActorLoader::LoadOneActor(string _path)
 	shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 	{
 		animInstance->SetName(SplitName(to_mw(_path)));
-		animInstance->CreateConstantBuffer();
 		for (int iAnim = 0; iAnim < resource.m_iAnimTrackCount; iAnim++)
 		{
 			AnimList animTrack;
 			animTrack.m_szName = resource.m_vAnimTrackList[iAnim].m_szName;
-			animTrack.animList = resource.m_vAnimTrackList[iAnim].m_vAnim;
 			animInstance->AddTrack(animTrack);
 		}
 		m_vAnimInstanceList.emplace_back(animInstance);
@@ -444,12 +459,10 @@ shared_ptr<APawn> ActorLoader::LoadRedeemer(string _path)
 	shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 	{
 		animInstance->SetName(SplitName(to_mw(_path)));
-		animInstance->CreateConstantBuffer();
 		for (int iAnim = 0; iAnim < resource.m_iAnimTrackCount; iAnim++)
 		{
 			AnimList animTrack;
 			animTrack.m_szName = resource.m_vAnimTrackList[iAnim].m_szName;
-			animTrack.animList = resource.m_vAnimTrackList[iAnim].m_vAnim;
 			animInstance->AddTrack(animTrack);
 		}
 		m_vAnimInstanceList.emplace_back(animInstance);

@@ -5,7 +5,8 @@ class UMeshComponent;
 
 enum PLAYER_STATE
 {
-	PLAYER_S_IDLE = 0,
+	EMPTY_STATE = 0,
+	PLAYER_S_IDLE,
 	PLAYER_S_WALK,
 	PLAYER_S_CLIMB,
 	PLAYER_S_ROLL,
@@ -15,6 +16,17 @@ enum PLAYER_STATE
 	PLAYER_S_DEATH,
 	PLAYER_S_GETITEM,
 	PLAYER_S_COUNT
+};
+class PlayerEmptyState : public StateBase
+{
+public:
+	PlayerEmptyState();
+	~PlayerEmptyState() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+
 };
 
 class PlayerIdleState : public StateBase

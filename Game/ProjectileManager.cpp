@@ -9,8 +9,10 @@
 #include "ObjectManager.h"
 #include "EnemyCollisionManager.h"
 #include "Timer.h"
+#include "EffectManager.h"
 
 #include "MeshLoader.h"
+
 
 void ProjectileManager::Init()
 {
@@ -35,6 +37,7 @@ void ProjectileManager::Tick()
 		//	continue;
 		//}
 
+
 		Vec3 dir = ((*iter).dir);
 		//dir.x *= (*iter).velocity;
 		//dir.y *= (*iter).velocity;
@@ -42,7 +45,22 @@ void ProjectileManager::Tick()
 		dir.y *= 0.7f;
 
 		(*iter).projectile->AddPosition(dir);
+
+		m_fMagicSpawnTimer += TIMER->GetDeltaTime();
+		// Effect
+		//if (m_fMagicSpawnTimer >= m_fMagicSpawnDelay)
+		{
+			if ((*iter).type == ProjectileType::MagicBall)
+			{
+				proj.projectile->GetMeshComponent()->SetInstanceColor(Vec4(1, 0, 0, 1));
+				EFFECT->PlayEffect(EEffectType::Point, (*iter).projectile->GetPosition(), 0, Vec3(0, 0, 0));
+			}
+			m_fMagicSpawnTimer -= m_fMagicSpawnDelay;
+		}
 		
+
+
+
 		// 어딘가에 충돌
 		// 충돌이 안됨 ..  
 		if ((*iter).projectile->m_vCollisionList.size() > 0)
@@ -57,14 +75,14 @@ void ProjectileManager::Tick()
 					healthComp->CheckHitByProjectile((int)(*iter).type, true);
 				}
 			}
-			
+
 			DeactivateOne(*iter);
 			iter = activeObjList.erase(iter);
 			continue;
 		}
 		iter++;
 	}
-	
+
 }
 
 void ProjectileManager::Destroy()
@@ -78,7 +96,7 @@ void ProjectileManager::Create()
 {
 	arrowList.resize(4);
 	for (int i = 0; i < 4; i++)
-	{	
+	{
 		auto projectile = make_shared<AActor>();
 		auto mesh = MESHLOADER->Make("../Resources/Asset/Arrow.mesh.json");
 		projectile->SetMeshComponent(mesh);
@@ -123,6 +141,7 @@ void ProjectileManager::Create()
 		ENEMYCOLLIDER->Add(ball);
 
 		ball->m_bCollision = false;
+		
 		collider->m_bVisible = false;
 		mesh->SetVisible(false);
 
@@ -169,7 +188,7 @@ void ProjectileManager::ActivateOne(ProjectileType _type, Vec3 _pos, Vec3 _dir)
 		// Add other
 		break;
 	}
-	case ProjectileType::MagicBall:{
+	case ProjectileType::MagicBall: {
 		for (auto& ball : magicList)
 		{
 			if (ball.projectile->m_bCollision == false)
@@ -182,11 +201,12 @@ void ProjectileManager::ActivateOne(ProjectileType _type, Vec3 _pos, Vec3 _dir)
 				ball.projectile->m_bCollision = true;
 				ball.projectile->GetShapeComponent()->m_bVisible = true;
 				ball.projectile->GetMeshComponent()->SetVisible(true);
-				
+
 				// T
 				ball.projectile->SetPosition(_pos);
-				
+
 				activeObjList.push_back(ball);
+
 
 				break;
 			}
@@ -209,7 +229,7 @@ void ProjectileManager::DeactivateOne(ProjectileData _target)
 }
 
 vector<shared_ptr<AActor>> ProjectileManager::GetActorList()
-{	
+{
 	// 매 프레임 되니까 괜찮나 ? 
 	vector<shared_ptr<AActor>> colList;
 	for (auto& obj : activeObjList)

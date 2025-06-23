@@ -16,6 +16,7 @@ public:
 	ActorLoader(){}
 	~ActorLoader() 
 	{
+		m_vFbxList.clear();
 		m_mMeshMap.clear();
 	}
 public:
@@ -42,6 +43,7 @@ public:
 	map<wstring, shared_ptr<UMeshResources>> LoadMeshMap();
 	map < wstring, shared_ptr<UAnimInstance>> LoadAnimMap();
 	shared_ptr<UMeshResources> LoadOneRes(string _path);
+
 
 	////////////////////// WILL BE DEPRECATED ////////////////////////////////
 	void LoadOne(string _path);

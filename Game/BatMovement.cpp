@@ -78,8 +78,7 @@ void BatMovement::Tick()
 		{
 			// bat 죽음
 			GetOwner()->m_bDelete = true;
-			//GetOwner()->GetMeshComponent()->SetVisible(false);
-			attackRangeActor->m_bDelete = true;
+			/*attackRangeActor->m_bDelete = true;*/
 		}
 		return;
 	}
@@ -150,7 +149,7 @@ void BatMovement::Tick()
 			m_vTargetPos = player.lock()->GetPosition();
 		}
 
-		Attack();
+		//Attack();
 	}
 	else
 	{
@@ -206,6 +205,10 @@ void BatMovement::ChangetState(shared_ptr<StateBase> _state)
 {
 	if (_state->GetId() == ENEMY_S_DEATH)
 	{
+		// 죽었을때 콜라이더 처리
+		attackRangeActor->m_bDelete = true;
+		attackRangeActor->m_bCollision = false;
+
 		if (currentState)
 			currentState->End();
 
