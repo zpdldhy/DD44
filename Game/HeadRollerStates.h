@@ -131,6 +131,11 @@ class HeadRollerDieState : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
+	// sub-state
+	enum DiePhase { PLAYANIM, STAYSTILL, };
+	DiePhase currentPhase = DiePhase::PLAYANIM;
+	float dissolveOffset = 2.0f;
+	float currentTime = 0.0f;
 public:
 	HeadRollerDieState(weak_ptr<AActor> _pOwner);
 	~HeadRollerDieState() {}
@@ -141,5 +146,4 @@ public:
 	virtual void End() override;
 	
 	void ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time);
-	void SetMeshInvisible();
 };

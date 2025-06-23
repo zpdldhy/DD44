@@ -358,23 +358,43 @@ void HeadRollerDieState::Enter()
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|Stun");
-	animInstance->SetKeyFrame(index, 30);
+	animInstance->SetKeyFrame(index, 29);
 	animInstance->m_fAnimPlayRate = 20.0f;
 	animInstance->PlayOnce(index);
+
+	// 눈을 먼저 지워버리자
+	auto eye1 = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Eye1");
+	auto eye2 = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Eye2");
+
+	eye1->SetVisible(false);
+	eye2->SetVisible(false);
+
+
 }
 
 void HeadRollerDieState::Tick()
 {
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	if (!animInstance->m_bOnPlayOnce)
+	switch (currentPhase)
 	{
-		// 종료
-		animInstance->m_bPlay = false;
-		// mesh 렌더링 중지 -> 근데 그러면 다른애들도 다 안보일걸
-		//이러면 너무 부자연스러움
-		m_pOwner.lock()->m_bCastShadow = false;
-
-		End();
+	case HeadRollerDieState::PLAYANIM:
+		if (!animInstance->m_bOnPlayOnce)
+		{
+			// 종료
+			animInstance->m_bPlay = false;
+			currentPhase = STAYSTILL;
+			m_pOwner.lock()->m_bCastShadow = false;
+		}
+		break;
+	case HeadRollerDieState::STAYSTILL:
+		currentTime	+= TIMER->GetDeltaTime();
+		if (currentTime >= dissolveOffset)
+		{
+			End();
+		}
+		break;
+	default:
+		break;
 	}
 
 	float frameTime = animInstance->GetTotalFrame();
@@ -402,21 +422,12 @@ void HeadRollerDieState::ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> 
 	}
 }
 
-void HeadRollerDieState::SetMeshInvisible()
-{	
-	auto comp = m_pOwner.lock()->GetMeshComponent();
-	auto list = comp->GetChildren();
-	// 얘는 자식의 자식 없어서 이렇게 처리 가능
-	for (auto iter = list.begin(); iter != list.end(); )
-	{
-		iter++;
-	}
-}
-
 
 void HeadRollerDieState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	currentPhase = DiePhase::PLAYANIM;
+	currentTime = 0.0f;
 
 }

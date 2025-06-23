@@ -72,7 +72,7 @@ void HeadRollerMovement::Tick()
 		if (currentStateEnd)
 		{
 			ChangeState(walk);
-			InitPos();
+			InitPosAfterRoll();
 		}
 	}
 	break;
@@ -112,6 +112,23 @@ void HeadRollerMovement::InitPos()
 
 	//look = -look;
 	m_targetYaw = atan2f(look.x, look.z);
+
+	m_rotate = true;
+}
+
+void HeadRollerMovement::InitPosAfterRoll()
+{
+	// direction 을 사용해서 pos 찾기
+
+	m_vPos[0] = GetOwner()->GetPosition() + 4.0f * -direction;
+	m_vPos[1] = GetOwner()->GetPosition() - 1.0f * -direction;
+
+	m_vCurrentTarget = m_vPos[0];
+	m_currentPosIdx = 0;
+	m_vDistance = m_vCurrentTarget - GetOwner()->GetPosition();
+
+	//look = -look;
+	m_targetYaw = atan2f(-direction.x, -direction.z);
 
 	m_rotate = true;
 }

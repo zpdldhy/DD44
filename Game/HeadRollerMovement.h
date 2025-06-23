@@ -44,6 +44,7 @@ public:
 	virtual shared_ptr<UScriptComponent> Clone() override;
 private:
 	void InitPos();
+	void InitPosAfterRoll();
 	void Walk();
 	bool CheckPlayer();
 	void CheckCoolDown();
