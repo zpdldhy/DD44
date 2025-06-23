@@ -23,7 +23,7 @@ void ParticleManager::Tick()
 void ParticleManager::Render()
 {
 	PreRender();
-	for (auto& pParticleActor : m_vInstanceList)
+	for (auto& pParticleActor : m_vInstanceParticle)
 		pParticleActor->Render();
 
 	m_vRenderParticleList.clear();
@@ -94,40 +94,33 @@ void ParticleManager::AddUI(shared_ptr<AParticleActor> _vParticleActor)
 	SetInstance(_vParticleActor);
 }
 
-void ParticleManager::SetInstance(shared_ptr<AParticleActor> _pActor)
+void ParticleManager::CreateInstance()
 {
-	auto meshCom = _pActor->GetMeshComponent();
+	if (m_vInstanceParticle[0] != nullptr)
+		return;
 
-	for (auto& pInstance : m_vInstanceList)
+	for (UINT i = 0; i < static_cast<UINT>(EParticleInstanceType::PT_COUNT); i++)
 	{
-		// Mesh가 다르면 넘어가요
-		if (pInstance->GetMeshPath() != meshCom->GetMeshPath())
-			continue;
-
-		// Texture만 다르면 생성
-		if (pInstance->GetTexturePath() != meshCom->GetMaterial()->GetTexturePath())
-		{
-			MakeInstance(_pActor);
-			return;
-		}
-		else
-		{
-			pInstance->AddInstanceMesh(meshCom);
-			return;
-		}
+		m_vInstanceParticle[i] = make_shared<AInstance>();
 	}
-
-	// 다 찾아보고 없으면 생성
-	MakeInstance(_pActor);
 }
 
-void ParticleManager::MakeInstance(shared_ptr<AParticleActor> _pActor)
+void ParticleManager::SetInstance(shared_ptr<AParticleActor> _pActor)
 {
-	auto pInstance = make_shared<AInstance>();
+	CreateInstance();
 
-	pInstance->SetInstanceMesh(_pActor->GetMeshComponent());
-	pInstance->m_bUseStencil = _pActor->m_bUseStencil;
-	pInstance->Init();
+	auto meshCom = _pActor->GetMeshComponent();
 
-	m_vInstanceList.emplace_back(pInstance);
+	if (_pActor->m_szName == L"DustEffect")
+	{
+		m_vInstanceParticle[0]->AddInstanceMesh(meshCom);
+	}
+	else if (_pActor->m_szName == L"PopDustEffect")
+	{
+		m_vInstanceParticle[1]->AddInstanceMesh(meshCom);
+	}
+	else
+	{
+		m_vInstanceParticle[2]->AddInstanceMesh(meshCom);
+	}
 }
