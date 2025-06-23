@@ -38,7 +38,7 @@ void ProjectileManager::Tick()
 			continue;
 		}
 
-		Vec3 dir = ((*iter).dir) * 9.0f * dt;
+		Vec3 dir = ((*iter).dir) * ((*iter).velocity) * dt;
 		dir.y = 0.0f;
 
 		(*iter).projectile->AddPosition(dir);
@@ -141,6 +141,7 @@ void ProjectileManager::Create()
 
 		Vec3 identity;
 		ProjectileData data;
+		data.velocity = 30.0f;
 		data.projectile = projectile;
 		data.InitData(ProjectileType::PlayerArrow, identity, identity);
 		arrowList[i] = data;
@@ -171,6 +172,7 @@ void ProjectileManager::Create()
 		Vec3 identity;
 		ProjectileData data;
 		data.projectile = ball;
+		data.velocity = 12.0f;
 
 		data.InitData(ProjectileType::MagicBall, identity, identity);
 		magicList[i] = data;

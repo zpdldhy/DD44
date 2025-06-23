@@ -7,12 +7,14 @@ private:
 	weak_ptr<AActor> player;
 	// 
 	float hitElapsed = 0.0f;
+	float hitOffset = 1.0f;
 	// FX
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
 	Vec3 m_vLastMoveDir;
 	Vec3 velocity;
 	bool m_bCrashSet = false;
+	Vec2 m_bloodRange;
 public:
 	void Tick() override;
 public:
@@ -29,5 +31,7 @@ public:
 	void PlayBloodBurst(const Vec3& _origin, const Vec3& _direction, float _speed, float _spreadAngleDeg, int _minCount = 5, int _maxCount = 10);
 	void ApplyCrashToAllMaterials(shared_ptr<UMeshComponent> comp, bool enabled);
 
+	void SetBloodPos(const Vec2& _range) { m_bloodRange = _range; }
+	void SetHitOffset(float _offset) { hitElapsed = _offset; }
 };
 

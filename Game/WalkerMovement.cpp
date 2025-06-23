@@ -17,6 +17,9 @@ void WalkerMovement::Init()
 	auto player = dynamic_pointer_cast<TPlayer>(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer().lock());
 	SetPlayer(player);
 
+	dynamic_pointer_cast<TEnemy>(GetOwner())->SetHitOffset(0.5f);
+	dynamic_pointer_cast<TEnemy>(GetOwner())->SetBloodPos(Vec2(2.0f, 3.0f));
+
 	// position
 	m_bWait = true;
 	m_vPos[0] = GetOwner()->GetPosition() - m_half * Vec3(1, 0, 1);

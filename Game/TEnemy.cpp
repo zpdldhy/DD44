@@ -22,13 +22,18 @@ bool TEnemy::CheckHit()
 	if (hitElapsed > 1.0f)
 	{
 		// 근접 공격 확인
+		Vec3 look = GetLook();
 		bool isCol = false;
 		if (m_vCollisionList.size() > 0)
 		{
 			for (auto& index : m_vCollisionList)
 			{
-				if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
+				auto actor = OBJECT->GetActor(index.first);
+				if (actor->m_szName == L"Melee")
 				{
+					look = actor->GetPosition() - GetPosition();
+					look.Normalize();
+					//look = -look;
 					isCol = true;
 				}
 			}
@@ -44,8 +49,8 @@ bool TEnemy::CheckHit()
 			m_bIsFlashing = true;
 			//// Blood
 			Vec3 basePos = GetPosition();
-			basePos.y += RandomRange(3, 4);
-			Vec3 look = GetLook();
+			basePos.y += RandomRange(m_bloodRange.x, m_bloodRange.y);
+
 			velocity = -look;
 			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 			// HP

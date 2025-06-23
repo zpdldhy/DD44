@@ -17,7 +17,7 @@ struct ProjectileData
 	Vec3 startPos;
 	Vec3 dir;
 	bool parry = false;
-	float velocity = 0.5f;
+	float velocity = 10.0f;
 	float heightRatio = 0.2f;
 	shared_ptr<AActor> projectile;
 	void InitData(ProjectileType _type, Vec3 _sPos, Vec3 _dir)
