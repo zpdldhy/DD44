@@ -117,6 +117,7 @@ void BettyMovement::Tick()
 		EFFECT->PlayDustBurst(pos, 10.f, .5f);
 		EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .5f);
 		EFFECT->PlayBeamBurst(pos, 20, .5f);
+		EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3::Zero, .5f);
 	}
 
 }

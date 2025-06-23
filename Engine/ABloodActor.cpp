@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "ABloodActor.h"
 #include "CameraManager.h"
+#include "UStaticMeshComponent.h"
+#include "ObjectManager.h"
+#include "EffectManager.h"
 
 Vec3 ABloodActor::Prepare(const Vec3& pos, const Vec3& baseVelocity, float _scale)
 {
@@ -37,7 +40,38 @@ Vec3 ABloodActor::Prepare(const Vec3& pos, const Vec3& baseVelocity, float _scal
 
     SetEndScale(endScale);
     SetPosition(pos);
-    SetGravity(-100.0f);
 
-    return velocity;
+
+    // 임시 수정 : 중력 및 이동
+    m_pPhysics->SetWeight(0.5f);
+    SetMove(velocity, 1.f);
+
+    //return velocity;
+    return Vec3();
 }
+
+void ABloodActor::Tick()
+{
+    for (auto& iter : m_vCollisionList)
+    {
+        auto pActor = OBJECT->GetActor(iter.first);
+        if (!pActor) continue;
+
+        if (pActor->m_szName == L"Terrain")
+        {
+            Vec3 pos = iter.second.Inter;
+            pos.y = pActor->GetPosition().y + 0.01f;
+            // 디칼 찍기
+            EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3(0, 0, 0));
+
+            // 바로 삭제
+            m_bRender = false;
+            break;
+        }
+    }
+
+    AEffectActor::Tick();
+}
+
+
+

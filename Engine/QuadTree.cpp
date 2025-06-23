@@ -6,7 +6,9 @@ void QuadTree::Create(int numCols, int numRows, float cellSize)
     float halfWidth = numCols * 0.5f * cellSize;
     float halfHeight = numRows * 0.5f * cellSize;
 
-    Bounds rootBounds = { Vec3(-halfWidth, 0, -halfHeight), Vec3(halfWidth, 0, halfHeight) };
+    Box rootBounds;
+    rootBounds.vMin = Vec3(-halfWidth, -100.f, -halfHeight);
+    rootBounds.vMax = Vec3(halfWidth, 100.f, halfHeight);
 
     m_pRoot = std::make_unique<QuadTreeNode>();
     m_pRoot->iCellIndex = 0;
@@ -36,19 +38,23 @@ void QuadTree::Subdivide(QuadTreeNode* node, int depth, int maxDepth)
     // 4 분할
     node->pChildren[0] = std::make_unique<QuadTreeNode>();
     node->pChildren[0]->iCellIndex = node->iCellIndex * 4 + 1;
-    node->pChildren[0]->bounds = { Vec3(min.x, 0, min.z), Vec3(center.x, 0, center.z) };
+    node->pChildren[0]->bounds.vMin = Vec3(min.x, -100.f, min.z);
+    node->pChildren[0]->bounds.vMax = Vec3(center.x, 100.f, center.z);
 
     node->pChildren[1] = std::make_unique<QuadTreeNode>();
     node->pChildren[1]->iCellIndex = node->iCellIndex * 4 + 2;
-    node->pChildren[1]->bounds = { Vec3(center.x, 0, min.z), Vec3(max.x, 0, center.z) };
+    node->pChildren[1]->bounds.vMin = Vec3(center.x, -100.f, min.z);
+    node->pChildren[1]->bounds.vMax = Vec3(max.x, 100.f, center.z);
 
     node->pChildren[2] = std::make_unique<QuadTreeNode>();
     node->pChildren[2]->iCellIndex = node->iCellIndex * 4 + 3;
-    node->pChildren[2]->bounds = { Vec3(min.x, 0, center.z), Vec3(center.x, 0, max.z) };
+    node->pChildren[2]->bounds.vMin = Vec3(min.x, -100.f, center.z);
+    node->pChildren[2]->bounds.vMax = Vec3(center.x, 100.f, max.z);
 
     node->pChildren[3] = std::make_unique<QuadTreeNode>();
     node->pChildren[3]->iCellIndex = node->iCellIndex * 4 + 4;
-    node->pChildren[3]->bounds = { Vec3(center.x, 0, center.z), Vec3(max.x, 0, max.z) };
+    node->pChildren[3]->bounds.vMin = Vec3(center.x, -100.f, center.z);
+    node->pChildren[3]->bounds.vMax = Vec3(max.x, 100.f, max.z);
 
     // 재귀
     for (int i = 0; i < 4; ++i)
@@ -110,13 +116,13 @@ void QuadTree::RemoveActorFromAllNodes(QuadTreeNode* node, UINT actorIndex)
     }
 }
 
-std::vector<UINT> QuadTree::FindNearbyActorIndices(const AActor& _actor)
+std::vector<UINT> QuadTree::FindNearbyActorIndices(shared_ptr<AActor> _actor)
 {
     std::vector<UINT> result;
 
     // 1. 액터가 포함된 리프 노드 찾기
     QuadTreeNode* pCenterNode = nullptr;
-    Vec3 actorPos = _actor.GetPosition();
+    Vec3 actorPos = _actor->GetPosition();
 
     for (QuadTreeNode* pLeaf : m_pLeafs)
     {

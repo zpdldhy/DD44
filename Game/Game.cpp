@@ -14,6 +14,7 @@
 #include "Sound.h"
 #include "WindManager.h"
 #include "Engine.h"
+#include "QuadTree.h"
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -53,10 +54,6 @@ void Game::Init()
 	// Asset 로딩
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
-	for (auto map : m_vMapList)
-	{
-		map->m_bCastShadow = false;
-	}
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 	OBJECT->AddActorList(m_vMapList);
 	OBJECT->AddActorList(m_vObjectList);
@@ -127,6 +124,8 @@ void Game::Init()
 	m_pCursor = PToA->MakeObject("../Resources/Prefab/Cursor.object.json");
 	m_pCursor->Init();
 	OBJECT->SetCursorActor(m_pCursor);
+
+	UI->DoFadeOut();
 }
 
 void Game::Tick()
@@ -178,6 +177,7 @@ void Game::Tick()
 	}
 
 	CheckEnemyCollision();
+	CheckBloodCollision();
 	PROJECTILE->Tick();
 }
 
@@ -312,8 +312,16 @@ void Game::CreateUI()
 
 	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
 	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
+	m_vInterActionUI = PToA->MakeUIs("../Resources/Prefab/UI_InterAction.uis.json");
 	UI->AddUIList(m_vHPUI);
 	UI->AddUIList(m_vArrowUI);
+	UI->AddUIList(m_vInterActionUI);
+
+	for (auto& pUI : m_vInterActionUI)
+	{
+		pUI->m_bRender = false;
+		pUI->m_bRun = false;
+	}
 
 	m_pActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_active.png");
 	m_pInActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_inactive.png");
@@ -324,18 +332,30 @@ void Game::CreateUI()
 	// Paused UI
 	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
 	UI->AddUIList(m_vPausedBackGround);
+
 	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
 	UI->AddUIList(m_vUpgradeBackGround);
-	m_vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
-	UI->AddUIList(m_vUpgradeState);
+
+	auto vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
+	UI->AddUIList(vUpgradeState);
+	for (int iRow = 0; iRow < 4; iRow++)
+	{
+		vector<shared_ptr<AUIActor>> vUI;
+		for (int iCol = 0; iCol < 8; iCol++)
+		{
+			vUpgradeState[iRow * 8 + iCol]->m_bRender = false;
+			vUpgradeState[iRow * 8 + iCol]->m_bRun = false;
+			vUI.emplace_back(vUpgradeState[iRow * 8 + iCol]);
+		}
+		m_vUpgradeState.emplace_back(vUI);
+	}
+
 	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
 	UI->AddUIList(m_vCoins);
 
 	// Dead
 	m_pDeadUI = PToA->MakeUI("../Resources/Prefab/UI_Dead.ui.json");
 	UI->AddUI(m_pDeadUI);
-
-	UI->DoFadeOut();
 }
 
 void Game::UpdateUI()
@@ -490,30 +510,102 @@ void Game::UpdateUI()
 		break;
 	}
 
+	// InterAction, 상호작용 UI를 띄우는 구간
+	auto vTriggerList = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger();
+	if (vTriggerList.eTriggerType != ETriggerType::TT_NONE)
+	{
+		static Vec3 offsetPos1 = m_vInterActionUI[1]->GetPosition();
+		static Vec3 offsetPos2 = m_vInterActionUI[2]->GetPosition();
+
+		auto pos = CAMERA->GetScreenPos(vTriggerList.vPoint);
+
+		m_vInterActionUI[0]->SetPosition(pos);
+		m_vInterActionUI[1]->SetPosition(pos + offsetPos1);
+		m_vInterActionUI[2]->SetPosition(pos + offsetPos2);
+
+		for (auto& pUI : m_vInterActionUI)
+		{
+			pUI->m_bRun = true;
+			pUI->m_bRender = true;
+
+			if (vTriggerList.eTriggerType == ETriggerType::TT_LADDER)
+			{
+
+			}
+			else if (vTriggerList.eTriggerType == ETriggerType::TT_HEALPOINT)
+			{
+
+			}
+		}		
+	}
+	else
+	{
+		for (auto& pUI : m_vInterActionUI)
+		{
+			pUI->m_bRun = false;
+			pUI->m_bRender = false;
+		}
+	}
+
 	// Paused
 	if (ENGINE->m_bGamePaused == true)
 	{
 		for (auto& pUI : m_vPausedBackGround)
+		{
+			pUI->m_bRun = true;
 			pUI->m_bRender = true;
+		}
 
 		for (auto& pUI : m_vUpgradeBackGround)
+		{
+			pUI->m_bRun = true;
 			pUI->m_bRender = true;
+		}
 
-		for (auto& pUI : m_vUpgradeState)
-			pUI->m_bRender = true;
+		UINT iSelect = 1;
+		for (auto& pUIList : m_vUpgradeState)
+		{
+			if (pUIList[0]->GetStateType() == UIStateType::ST_SELECT)
+			{
+				m_iSelectUI = iSelect;
+			}
+
+			if (iSelect == m_iSelectUI)
+				pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, 0.0f));
+			else
+				pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+
+			for (auto& pUI : pUIList)
+			{
+				pUI->m_bRun = true;
+				pUI->m_bRender = true;
+			}
+
+			iSelect++;
+		}
 
 		OBJECT->SetCursorActor(nullptr);
 	}
 	else
 	{
 		for (auto& pUI : m_vPausedBackGround)
+		{
+			pUI->m_bRun = false;
 			pUI->m_bRender = false;
+		}
 
 		for (auto& pUI : m_vUpgradeBackGround)
+		{
+			pUI->m_bRun = false;
 			pUI->m_bRender = false;
+		}
 
-		for (auto& pUI : m_vUpgradeState)
-			pUI->m_bRender = false;
+		for (auto& pUIList : m_vUpgradeState)
+			for (auto& pUI : pUIList)
+			{
+				pUI->m_bRun = false;
+				pUI->m_bRender = false;
+			}
 
 		OBJECT->SetCursorActor(m_pCursor);
 	}
@@ -696,3 +788,33 @@ void Game::CheckEnemyCollision()
 		proj++;
 	}
 }
+
+void Game::CheckBloodCollision()
+{
+	auto& bloodList = EFFECT->GetBloodList();
+	for (auto blood = bloodList.begin(); blood != bloodList.end(); )
+	{
+		if (blood->get()->GetPosition().y <= 0.f)
+			int i = 0;
+
+		if (!(*blood)->IsActive() || (*blood)->m_bDelete)
+		{
+			blood = bloodList.erase(blood);
+			continue;
+		}
+
+		for (auto iter = m_vMapList.begin(); iter != m_vMapList.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = m_vMapList.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*blood, *iter);
+			iter++;
+		}
+
+		blood++;
+	}
+}
+

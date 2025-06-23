@@ -189,7 +189,7 @@ void UCameraComponent::UpdateFrustumBuffer()
 	{
 		m_tFrustumData.matViewProjInvert = (m_matView * m_matProjection).Invert();
 		DC->UpdateSubresource(m_pFrustumCB.Get(), 0, nullptr, &m_tFrustumData, 0, 0);
-		DC->VSSetConstantBuffers(2, 1, m_pFrustumCB.GetAddressOf());
+		DC->VSSetConstantBuffers(3, 1, m_pFrustumCB.GetAddressOf());
 	}
 }
 

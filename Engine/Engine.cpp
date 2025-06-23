@@ -56,11 +56,13 @@ void Engine::Init()
 		else
 			g_bRangeVisibleMode = false;
 	}
+
+	OBJECT->Init();
+
 	_app->Init();
 
 	// Manager 초기화
 	{
-		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
 		WIND->Init();
@@ -79,9 +81,12 @@ void Engine::Frame()
 	TIMER->Update();
 	LIGHT->Tick();
 
+	UI->Tick();	// Fade가 되려면 여기 위치
+
 	if (!m_bGamePaused)
 	{
 		OBJECT->ObjectMove();				// 1. Move
+		EFFECT->EffectMove();
 	}
 
 	_app->Tick();							// 2. 충돌
@@ -98,8 +103,6 @@ void Engine::Frame()
 			WIND->Tick();
 		}
 	}
-
-	UI->Tick();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 	{

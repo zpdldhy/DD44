@@ -18,6 +18,7 @@ void Collision::Init()
 			CollisionData data;
 			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
 				a->GetPhysicsComponent()->m_bColGrounded = true;
+			data.otherShape = b->GetShapeComponent();
 
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
 		}
@@ -45,12 +46,14 @@ void Collision::Init()
 			data.Inter = Inter;
 			if(Collision::CheckRayToOBB(Sphere->GetGroundRay(), Box->GetBounds(), Inter))
 				a->GetPhysicsComponent()->m_bColGrounded = true;
+			data.otherShape = b->GetShapeComponent();
 
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
 			b->m_vCollisionList.insert(make_pair(a->m_Index, data));
 		}
 
 		};
+
 
 	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_SPHERE}] = [](auto a, auto b) {
 		auto Sphere0 = static_pointer_cast<USphereComponent>(a->GetShapeComponent());
@@ -64,6 +67,7 @@ void Collision::Init()
 			data.Inter = Inter;
 			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
 				a->GetPhysicsComponent()->m_bColGrounded = true;
+			data.otherShape = b->GetShapeComponent();
 
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
 		}
@@ -413,6 +417,26 @@ bool Collision::CheckRayToOBB(const Ray& _ray, const Box& _box, Vec3& inter)
 	inter = _ray.position + _ray.direction * fMin;
 
 	return true;
+}
+
+int Collision::CheckAABBToPlane(const Box& _box, const Plane& _plane)
+{
+	Plane Plane = _plane;
+	Plane.Normalize();
+
+	Vec3 vNormal = Plane.Normal();
+	vNormal.Normalize();
+
+	float fMin = _box.vMin.Dot(vNormal);
+	fMin += Plane.w;
+	float fMax = _box.vMax.Dot(vNormal);
+	fMax += Plane.w;
+
+	if (fMin > 0.f && fMax > 0.f)
+		return 1; // Box가 Plane의 앞에 있음
+	if (fMin < 0.f && fMax < 0.f)
+		return -1; // Box가 Plane의 뒤에 있음
+	return 0; // Box가 Plane와 겹침
 }
 
 bool Collision::CheckOBBToOBB(const Box& _box0, const Box& _box1)

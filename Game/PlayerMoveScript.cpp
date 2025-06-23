@@ -191,6 +191,31 @@ void PlayerMoveScript::Tick()
 		break;
 	}
 
+	// Trigger 확인
+	player->ClearTrigger();
+	if (GetOwner()->m_vCollisionList.size()>0)
+	{
+		for (auto& col : GetOwner()->m_vCollisionList)
+		{
+			auto pObj = OBJECT->GetActor(col.first);
+
+			// 알잘딱 부탁합니다.
+			//col.second.otherShape->m_szName == L"~~~~~~"
+			if (pObj->m_szName == L"I_Ladder")
+			{
+				TriggerData data;
+				data.eTriggerType = ETriggerType::TT_LADDER;
+
+				if (pObj->GetRotation().y > 0.1f || pObj->GetRotation().y < -0.1f)
+					data.vPoint = pObj->GetPosition() + Vec3(-1.5f, 2.f, -1.5f);	// UI 위치 보정값, 수정 가능.
+				else
+					data.vPoint = pObj->GetPosition() + Vec3(1.5f, 2.f, 1.5f);		// UI 위치 보정값, 수정 가능.
+
+				player->SetTrigger(data);
+			}
+		}
+	}
+
 #pragma region TEMP
 	// Test
 	if (INPUT->GetButton(L))

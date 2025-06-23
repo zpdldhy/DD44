@@ -154,12 +154,22 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <FxCompile>
+      <EntryPointName>VS</EntryPointName>
+    </FxCompile>
+    <FxCompile>
+      <ShaderType>Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AActor.h" />
     <ClInclude Include="AAsset.h" />
     <ClInclude Include="ABeamActor.h" />
     <ClInclude Include="ABloodActor.h" />
+    <ClInclude Include="ABloodDecalActor.h" />
     <ClInclude Include="ACameraActor.h" />
     <ClInclude Include="ACharacter.h" />
     <ClInclude Include="ActorLoader.h" />
@@ -276,6 +286,7 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="AAsset.cpp" />
     <ClCompile Include="ABeamActor.cpp" />
     <ClCompile Include="ABloodActor.cpp" />
+    <ClCompile Include="ABloodDecalActor.cpp" />
     <ClCompile Include="ACameraActor.cpp" />
     <ClCompile Include="ACharacter.cpp" />
     <ClCompile Include="ActorLoader.cpp" />

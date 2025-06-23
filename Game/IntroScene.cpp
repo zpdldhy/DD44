@@ -39,15 +39,11 @@ void IntroScene::Init()
 	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Intro_SelectArrow.uis.json");
 	UI->AddUIList(m_vBackGround);
 	UI->AddUIList(m_vMenu);
-	UI->AddUIList(m_vArrowUI);
-	
+	UI->AddUIList(m_vArrowUI);	
 
 	m_vDefaultSelectY = m_vArrowUI[0]->GetPosition().y;
 
 	SetupEngineCamera();
-	//SetupSkybox();
-	SetupSunLight();
-	
 }
 
 void IntroScene::Tick()
@@ -92,21 +88,6 @@ void IntroScene::SetupSkybox()
 	pSkyMesh->SetMaterial(material);
 
 	OBJECT->AddActor(pSky);
-}
-
-void IntroScene::SetupSunLight()
-{
-	auto pSunLight = make_shared<ALight>();
-	pSunLight->m_szName = L"SunLight";
-	pSunLight->GetLightComponent()->SetDirection({ 0, -1.f, 0 });
-	pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
-	pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
-	pSunLight->SetPosition(Vec3(0, 100.0f, 0));
-	pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
-	OBJECT->AddActor(pSunLight);
-
-	LIGHT->Clear();
-	LIGHT->RegisterLight(pSunLight);
 }
 
 void IntroScene::UpdateUIState()

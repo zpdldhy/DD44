@@ -24,7 +24,6 @@ public:
 private:
 	void SetupEngineCamera();
 	void SetupSkybox();
-	void SetupSunLight();
 
 	void UpdateUIState();
 
