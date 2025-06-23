@@ -16,6 +16,7 @@ struct ProjectileData
 	float elapsed;
 	Vec3 startPos;
 	Vec3 dir;
+	bool parry = false;
 	float velocity = 0.5f;
 	float heightRatio = 0.2f;
 	shared_ptr<AActor> projectile;

@@ -26,27 +26,24 @@ void ProjectileManager::Tick()
 	for (auto iter = activeObjList.begin(); iter != activeObjList.end(); )
 	{
 		auto proj = (*iter);
+		auto dt = TIMER->GetDeltaTime();
 
-		(*iter).elapsed += TIMER->GetDeltaTime();
+		(*iter).elapsed += dt;
 
 		//// 너무 오래 계셨어요
-		//if ((*iter).elapsed > (*iter).maxTime)
-		//{
-		//	DeactivateOne(*iter);
-		//	iter = activeObjList.erase(iter);
-		//	continue;
-		//}
+		if ((*iter).elapsed > (*iter).maxTime)
+		{
+			DeactivateOne(*iter);
+			iter = activeObjList.erase(iter);
+			continue;
+		}
 
-
-		Vec3 dir = ((*iter).dir);
-		//dir.x *= (*iter).velocity;
-		//dir.y *= (*iter).velocity;
-		//dir.z *= (*iter).heightRatio;
-		dir.y *= 0.7f;
+		Vec3 dir = ((*iter).dir) * 9.0f * dt;
+		dir.y = 0.0f;
 
 		(*iter).projectile->AddPosition(dir);
 
-		m_fMagicSpawnTimer += TIMER->GetDeltaTime();
+		m_fMagicSpawnTimer += dt;
 		// Effect
 		//if (m_fMagicSpawnTimer >= m_fMagicSpawnDelay)
 		{
@@ -57,28 +54,54 @@ void ProjectileManager::Tick()
 			}
 			m_fMagicSpawnTimer -= m_fMagicSpawnDelay;
 		}
-		
-
-
 
 		// 어딘가에 충돌
-		// 충돌이 안됨 ..  
 		if ((*iter).projectile->m_vCollisionList.size() > 0)
 		{
+			bool alive = false;
 			auto list = (*iter).projectile->m_vCollisionList;
 			for (auto& index : list)
 			{
 				auto actor = OBJECT->GetActor(index.first);
 				auto healthComp = dynamic_pointer_cast<TCharacter>(actor);
+				
+				if ((*iter).parry)
+				{
+					alive = true;
+				}
+				
 				if (healthComp)
 				{
 					healthComp->CheckHitByProjectile((int)(*iter).type, true);
+					alive = false;
 				}
-			}
 
-			DeactivateOne(*iter);
-			iter = activeObjList.erase(iter);
-			continue;
+				if ((*iter).type == ProjectileType::MagicBall && actor->m_szName == L"Melee")
+				{
+					Vec3 reflect = dir - 2* dir.Dot(actor->GetLook()) * actor->GetLook();
+					reflect.Normalize();
+					(*iter).dir = reflect;
+					(*iter).elapsed = 0.0f;
+					(*iter).parry = true;
+					(*iter).projectile->m_szName = L"PlayerAttack";
+					(*iter).type = ProjectileType::PlayerArrow;
+					
+					alive = true;
+					continue;
+				}
+
+			}
+			if (!alive)
+			{
+				DeactivateOne(*iter);
+				iter = activeObjList.erase(iter);
+				continue;
+			}
+			else
+			{
+				iter++;
+				continue;
+			}
 		}
 		iter++;
 	}
@@ -141,7 +164,7 @@ void ProjectileManager::Create()
 		ENEMYCOLLIDER->Add(ball);
 
 		ball->m_bCollision = false;
-		
+
 		collider->m_bVisible = false;
 		mesh->SetVisible(false);
 
