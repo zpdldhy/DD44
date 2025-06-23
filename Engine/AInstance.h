@@ -1,5 +1,7 @@
 #pragma once
 #include "AActor.h"
+#include "EffectType.h"
+
 class AInstance : public AActor
 {
 public:
@@ -14,6 +16,9 @@ public:
 	virtual void Destroy() override;
 
 public:
+	void SetEffectType(EEffectType type) { m_eType = type; }
+	EEffectType GetEffectType() const { return m_eType; }
+
 	wstring GetMeshPath() { return m_vMeshList[0][0]->GetMeshPath(); }
 	wstring GetTexturePath() { return m_vMeshList[0][0]->GetMaterial()->GetTexturePath(); }
 
@@ -31,5 +36,8 @@ protected:
 
 	shared_ptr<Inputlayout> m_pInputLayout = nullptr;
 	shared_ptr<Shader> m_pShader = nullptr;
+
+private:
+	EEffectType m_eType = EEffectType::Count;
 };
 

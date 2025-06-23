@@ -17,6 +17,8 @@ public:
 	void PlayBeamBurst(const Vec3& origin, int count, float _scale);
 	void PlayInit();
 
+	void EffectMove();
+
 private:
 	unordered_map<EEffectType, vector<shared_ptr<AEffectActor>>> m_mEffectPool;
 	array<shared_ptr<class AInstance>, static_cast<size_t>(EEffectType::Count)> m_vInstanceEffect;
@@ -25,4 +27,8 @@ private:
 	shared_ptr<AEffectActor> CreateEffectActor(EEffectType type);
 	shared_ptr<AEffectActor> GetReusableActor(EEffectType type);
 
+
+public:
+	std::vector<std::shared_ptr<AEffectActor>> m_vBloodActorList;
+	std::vector<std::shared_ptr<AEffectActor>>& GetBloodList() { return m_vBloodActorList; }
 };

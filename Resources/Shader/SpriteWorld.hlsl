@@ -21,7 +21,7 @@ VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
     output.p = mul(viewPos, g_matProj);
     output.t = input.t;
     output.c = input.color;
-    
+
     return output;
 }
 

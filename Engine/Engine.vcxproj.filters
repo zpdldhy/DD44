@@ -439,6 +439,9 @@
     <ClInclude Include="APointEffectActor.h">
       <Filter>Object\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="ABloodDecalActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -739,6 +742,9 @@
       <Filter>Core\Animation</Filter>
     </ClCompile>
     <ClCompile Include="APointEffectActor.cpp">
+      <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="ABloodDecalActor.cpp">
       <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>

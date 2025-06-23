@@ -42,6 +42,10 @@ void AInstance::Render()
 			iter++;
 		}
 
+		// MeshList가 삭제되어 없을 때
+		if (m_vMeshList[iMeshIndex].size() <= 0)
+			continue;
+
 		// Mesh를 Binding 해요
 		auto pFirstMesh = m_vMeshList[iMeshIndex][0]->GetMesh();
 

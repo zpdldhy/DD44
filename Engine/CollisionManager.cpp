@@ -53,6 +53,7 @@ void Collision::Init()
 
 		};
 
+
 	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_SPHERE}] = [](auto a, auto b) {
 		auto Sphere0 = static_pointer_cast<USphereComponent>(a->GetShapeComponent());
 		auto Sphere1 = static_pointer_cast<USphereComponent>(b->GetShapeComponent());

@@ -11,17 +11,21 @@
 #include "AShockwaveActor.h"
 #include "ABeamActor.h"
 #include "APoppingDust.h"
+#include "ABloodDecalActor.h"
 #include "AInstance.h"
+#include "USphereComponent.h"
+#include "RenderStateManager.h"
 #include "APointEffectActor.h"
 
 constexpr int INITIAL_POOL_SIZE = 3;
 
 void EffectManager::Init()
 {
-	for (size_t index = 0; index < static_cast<size_t>(EEffectType::Count); ++index)
-	{
-		m_vInstanceEffect[index] = make_shared<AInstance>();
-	}
+    for (size_t index = 0; index < static_cast<size_t>(EEffectType::Count); ++index)
+    {
+        m_vInstanceEffect[index] = make_shared<AInstance>();
+        m_vInstanceEffect[index]->SetEffectType(static_cast<EEffectType>(index));
+    }
 
 	for (int i = 0; i < INITIAL_POOL_SIZE; ++i)
 	{
@@ -45,102 +49,139 @@ void EffectManager::Init()
 
 void EffectManager::Tick()
 {
-	for (auto iter = m_vEffectList.begin(); iter != m_vEffectList.end();)
-	{
-		auto pEffect = *iter;
-		if (pEffect->m_bDelete == true)
-		{
-			iter = m_vEffectList.erase(iter);
-			continue;
-		}
+    // 복사본 리스트 생성
+    vector<shared_ptr<AEffectActor>> currentList = m_vEffectList;
 
-		pEffect->Tick();
-		iter++;
-	}
+    for (auto& pEffect : currentList)
+    {
+        if (pEffect->m_bDelete)
+        {
+            auto iter = std::find(m_vEffectList.begin(), m_vEffectList.end(), pEffect);
+            if (iter != m_vEffectList.end())
+                m_vEffectList.erase(iter);
+            continue;
+        }
+
+        pEffect->Tick();
+    }
 }
 
 void EffectManager::Render()
 {
-	for (auto& pEffect : m_vInstanceEffect)
-	{		
-		if (pEffect == nullptr) continue;
-		if (pEffect->m_bRender == true)
-		{
-			pEffect->Render();
-		}
+    for(auto& pEffect : m_vInstanceEffect)
+    {
+        if (pEffect->m_bRender==true)
+        {
+            if(pEffect->GetEffectType() == EEffectType::BloodDecal)
+            {
+                RenderOption opt;
+                opt.blend = BlendType::AlphaBlend;
+                opt.depth = DepthType::ZTestOn_ZWriteOff;
+                opt.cull = CullType::None;
+                opt.rasterizer = RasterizerType::SolidNone;
+                STATEMANAGER->Apply(opt);
+            }
+            pEffect->Render();
+
+            if (pEffect->GetEffectType() == EEffectType::BloodDecal)
+            {
+                STATEMANAGER->Restore();
+            }
+
+        }
 	}
 }
 
 shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
 {
-	shared_ptr<AEffectActor> actor;
+    shared_ptr<AEffectActor> actor;
+    auto collider = make_shared<USphereComponent>();
 
-	switch (type)
-	{
-	case EEffectType::Blood:
-		actor = make_shared<ABloodActor>();
-		break;
-	case EEffectType::Dust:
-		actor = make_shared<ADustActor>();
-		break;
-	case EEffectType::Feather:
-		actor = make_shared<AFeatherActor>();
-		break;
-	case EEffectType::Shockwave:
-		actor = make_shared<AShockwaveActor>();
-		break;
-	case EEffectType::Beam:
-		actor = make_shared<ABeamActor>();
-		break;
-	case EEffectType::PoppingDust:
-		actor = make_shared<APoppingDust>();
-		break;
-	case EEffectType::Point:
-		actor = make_shared<APointEffectActor>();
-		break;
-	}
+    switch (type)
+    {
+    case EEffectType::Blood:
+        actor = make_shared<ABloodActor>();
+        collider->SetName(L"Blood");
+        collider->SetLocalScale(Vec3(.1f, .1f, .1f));
+        collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+        actor->SetShapeComponent(collider);
 
-	//그림자
-	actor->m_szName = L"Effect";
-	actor->m_bCastShadow = false;
+        break;
+    case EEffectType::Dust:
+        actor = make_shared<ADustActor>();
+        break;
+    case EEffectType::Feather:
+        actor = make_shared<AFeatherActor>();
+        break;
+    case EEffectType::Shockwave:
+        actor = make_shared<AShockwaveActor>();
+        break;
+    case EEffectType::Beam:
+        actor = make_shared<ABeamActor>();
+        break;
+    case EEffectType::PoppingDust:
+        actor = make_shared<APoppingDust>();
+        break;
+    case EEffectType::BloodDecal:
+        actor = make_shared<ABloodDecalActor>();
+        break;
+    case EEffectType::Point:
+        actor = make_shared<APointEffectActor>();
+        break;
+    }
+
+    //그림자
+    actor->m_bCastShadow = false;
 
 	// 메시
 	auto mesh = UStaticMeshComponent::CreatePlane();
 	actor->SetMeshComponent(mesh);
 
-	// 머티리얼
-	auto mat = make_shared<UMaterial>();
-	switch (type)
-	{
-	case EEffectType::Blood:
-		mat->Load(L"../Resources/Texture/Blood2.png", L"../Resources/Shader/blood.hlsl");
-		m_vInstanceEffect[static_cast<size_t>(EEffectType::Blood)]->AddInstanceMesh(mesh);
-		break;
-	case EEffectType::Dust:
-		mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
-		// m_vInstanceEffect[static_cast<size_t>(EEffectType::Dust)]->AddInstanceMesh(mesh);
-		break;
-	case EEffectType::Feather:
-		mat->Load(L"../Resources/Texture/feather.png", L"../Resources/Shader/SpriteUV.hlsl");
-		m_vInstanceEffect[static_cast<size_t>(EEffectType::Feather)]->AddInstanceMesh(mesh);
-		break;
-	case EEffectType::Shockwave:
-		mat->Load(L"../Resources/Texture/circle.png", L"../Resources/Shader/SpriteWorld.hlsl");
-		m_vInstanceEffect[static_cast<size_t>(EEffectType::Shockwave)]->AddInstanceMesh(mesh);
-		break;
-	case EEffectType::Beam:
-		mat->Load(L"../Resources/Texture/Wind.png", L"../Resources/Shader/SpriteWorld.hlsl");
-		m_vInstanceEffect[static_cast<size_t>(EEffectType::Beam)]->AddInstanceMesh(mesh);
-		break;
-	case EEffectType::PoppingDust:
-		mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
-		// m_vInstanceEffect[static_cast<size_t>(EEffectType::PoppingDust)]->AddInstanceMesh(mesh);
-		break;
-	case EEffectType::Point:
-		mat->Load(L"../Resources/Texture/spark_particle.png", L"../Resources/Shader/SpriteUV.hlsl");
-		m_vInstanceEffect[static_cast<size_t>(EEffectType::Point)]->AddInstanceMesh(mesh);
-		break;
-	}
+    // 머티리얼
+    auto mat = make_shared<UMaterial>();
+    switch (type)
+    {
+    case EEffectType::Blood:
+        mat->Load(L"../Resources/Texture/Blood2.png", L"../Resources/Shader/blood.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Blood)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"BloodEffect";
+        break;
+    case EEffectType::Dust:
+        mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
+        actor->m_szName = L"DustEffect";
+       // m_vInstanceEffect[static_cast<size_t>(EEffectType::Dust)]->AddInstanceMesh(mesh);
+        break;
+    case EEffectType::Feather:
+        mat->Load(L"../Resources/Texture/feather.png", L"../Resources/Shader/SpriteUV.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Feather)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"FeatherEffect";
+        break;
+    case EEffectType::Shockwave:
+        mat->Load(L"../Resources/Texture/circle.png", L"../Resources/Shader/SpriteWorld.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Shockwave)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"ShockEffect";
+        break;
+    case EEffectType::Beam:
+        mat->Load(L"../Resources/Texture/Wind.png", L"../Resources/Shader/SpriteWorld.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Beam)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"BeamEffect";
+        break;
+    case EEffectType::PoppingDust:
+        mat->Load(L"../Resources/Texture/smokeDustR_4x4.png", L"../Resources/Shader/SpriteUV.hlsl");
+        actor->m_szName = L"PopDustEffect";
+       // m_vInstanceEffect[static_cast<size_t>(EEffectType::PoppingDust)]->AddInstanceMesh(mesh);
+        break;
+    case EEffectType::BloodDecal:
+        mat->Load(L"../Resources/Texture/bloodspatter.png", L"../Resources/Shader/SpriteWorld.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::BloodDecal)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"DecalEffect";
+        break;
+    case EEffectType::Point:
+        mat->Load(L"../Resources/Texture/spark_particle.png", L"../Resources/Shader/SpriteUV.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Point)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"PointEffect";
+        break;
+    }
 
 	mesh->SetMaterial(mat);
 
@@ -168,7 +209,7 @@ shared_ptr<AEffectActor> EffectManager::GetReusableActor(EEffectType type)
 	if (type == EEffectType::Dust || type == EEffectType::PoppingDust)
 		PARTICLE->AddUI(newActor);
 	else
-		m_vEffectList.emplace_back(newActor);
+ 		m_vEffectList.emplace_back(newActor);
 
 	return newActor;
 }
@@ -180,28 +221,41 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
 	if (!actor)
 		return;
 
+    
+    float duration = 1.0f;
+    actor->GetMeshComponent()->SetInstanceColor(Vec4(1.f, 1.f, 1.f, 1.f));
+    float angle = RandomRange(0.0f, DD_2PI);
+    switch (type)
+    {
+    case EEffectType::Dust:       duration = 1.0f; break;
+    case EEffectType::Blood:      duration = 0.7f; break;
+    case EEffectType::Shockwave:  
+        duration = 0.8f;
+        actor->SetRotation(Vec3(DD_PI/2, 0, 0));
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(1, 1, 1, 1));
+        break;
+    case EEffectType::Beam: 
+        duration = 0.8f;
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(1, 1, 1, 1));
+        break;
+    case EEffectType::BloodDecal: 
+        duration = 10.0f;
+        actor->SetRotation(Vec3(DD_PI / 2, 0, angle));
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(0.6f, 0.05f, 0.05f, 1));        
+        break;
+    case EEffectType::Point:
+        duration = 0.2;
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(0.7f, 0.9f, 0.95, 1.0f));
+        break;
+    default:                      duration = 1.0f; break;
+    }
 
-	float duration = 1.0f;
-	actor->GetMeshComponent()->SetInstanceColor(Vec4(1.f, 1.f, 1.f, 1.f));
-	
-	switch (type)
-	{
-	case EEffectType::Dust:       duration = 1.0f; break;
-	case EEffectType::Blood:      duration = 0.7f; break;
-	case EEffectType::Shockwave:
-		duration = 0.8f;
-		actor->SetRotation(Vec3(DD_PI / 2, 0, 0));
-		break;
-	case EEffectType::Beam:       duration = 0.8; 
-		break;
-	case EEffectType::Point:
-		duration = 0.2;
-		actor->GetMeshComponent()->SetInstanceColor(Vec4(0.7f, 0.9f, 0.95, 1.0f));
-		break;
-	default:                      duration = 1.0f; break;
-	}
+    actor->Play(duration, actor->Prepare(pos, baseVelocity, _scale));
 
-	actor->Play(duration, actor->Prepare(pos, baseVelocity, _scale));
+    if (type == EEffectType::Blood)
+    {
+        m_vBloodActorList.push_back(actor); 
+    }
 }
 
 void EffectManager::PlayDustBurst(const Vec3& _origin, float _speed, float _size)
@@ -245,8 +299,23 @@ void EffectManager::PlayBeamBurst(const Vec3& origin, int count, float _scale)
 		PlayEffect(EEffectType::Beam, origin, 0.0f, dir, _scale);
 	}
 
-
+  
 }
+
+void EffectManager::EffectMove()
+{
+    for (auto pEffect : m_vEffectList)
+    {
+        pEffect->GetPhysicsComponent()->Tick();
+        if (pEffect->GetShapeComponent())
+        {
+            pEffect->GetShapeComponent()->UpdateMatrix();
+            pEffect->GetShapeComponent()->UpdateBounds();
+        }
+    }
+}
+
+
 
 void EffectManager::PlayInit()
 {
