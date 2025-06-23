@@ -198,7 +198,7 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
 
     
     float duration = 1.0f;
-
+    float angle = RandomRange(0.0f, DD_2PI);
     switch (type)
     {
     case EEffectType::Dust:       duration = 1.0f; break;
@@ -214,7 +214,7 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
         break;
     case EEffectType::BloodDecal: 
         duration = 200.0f;
-        actor->SetRotation(Vec3(DD_PI / 2, 0, 0));
+        actor->SetRotation(Vec3(DD_PI / 2, 0, angle));
         actor->GetMeshComponent()->SetInstanceColor(Vec4(0.6f, 0.05f, 0.05f, 1));        
         break;
     default:                      duration = 1.0f; break;
