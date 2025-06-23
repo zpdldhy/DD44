@@ -49,18 +49,21 @@ void EffectManager::Init()
 
 void EffectManager::Tick()
 {
-	for (auto iter = m_vEffectList.begin(); iter != m_vEffectList.end();)
-	{
-		auto pEffect = *iter;
-		if (pEffect->m_bDelete == true)
-		{
-			iter = m_vEffectList.erase(iter);
-			continue;
-		}
+    // 복사본 리스트 생성
+    vector<shared_ptr<AEffectActor>> currentList = m_vEffectList;
 
-		pEffect->Tick();
-		iter++;
-	}
+    for (auto& pEffect : currentList)
+    {
+        if (pEffect->m_bDelete)
+        {
+            auto iter = std::find(m_vEffectList.begin(), m_vEffectList.end(), pEffect);
+            if (iter != m_vEffectList.end())
+                m_vEffectList.erase(iter);
+            continue;
+        }
+
+        pEffect->Tick();
+    }
 }
 
 void EffectManager::Render()
@@ -176,6 +179,7 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     case EEffectType::Point:
         mat->Load(L"../Resources/Texture/spark_particle.png", L"../Resources/Shader/SpriteUV.hlsl");
         m_vInstanceEffect[static_cast<size_t>(EEffectType::Point)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"PointEffect";
         break;
     }
 
@@ -205,7 +209,7 @@ shared_ptr<AEffectActor> EffectManager::GetReusableActor(EEffectType type)
 	if (type == EEffectType::Dust || type == EEffectType::PoppingDust)
 		PARTICLE->AddUI(newActor);
 	else
-		m_vEffectList.emplace_back(newActor);
+ 		m_vEffectList.emplace_back(newActor);
 
 	return newActor;
 }
@@ -235,7 +239,7 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
         actor->GetMeshComponent()->SetInstanceColor(Vec4(1, 1, 1, 1));
         break;
     case EEffectType::BloodDecal: 
-        duration = 200.0f;
+        duration = 10.0f;
         actor->SetRotation(Vec3(DD_PI / 2, 0, angle));
         actor->GetMeshComponent()->SetInstanceColor(Vec4(0.6f, 0.05f, 0.05f, 1));        
         break;

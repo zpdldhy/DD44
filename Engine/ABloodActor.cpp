@@ -62,7 +62,7 @@ void ABloodActor::Tick()
             Vec3 pos = iter.second.Inter;
             pos.y = pActor->GetPosition().y + 0.01f;
             // 디칼 찍기
-            EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3(0, 0, 0)); // 이건 뿌리는 게 아니라 디칼용으로 새로 추가할 수도 있음
+            EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3(0, 0, 0));
 
             // 바로 삭제
             m_bRender = false;
