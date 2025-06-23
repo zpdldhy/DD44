@@ -201,7 +201,8 @@ void PlayerMoveScript::Tick()
 
 			// ¾ËÀßµü ºÎÅ¹ÇÕ´Ï´Ù.
 			//col.second.otherShape->m_szName == L"~~~~~~"
-			if (pObj->m_szName == L"I_Ladder")
+
+			if (pObj->GetShapeComponent()->GetName() == L"Ladder")
 			{
 				TriggerData data;
 				data.eTriggerType = ETriggerType::TT_LADDER;

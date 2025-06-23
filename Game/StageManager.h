@@ -14,7 +14,7 @@ private:
 
 	// Phase
 	enum StagePhase { STAGE00, STAGE01, STAGE10, DONE };
-	StagePhase currentPhase = STAGE10;
+	StagePhase currentPhase = STAGE00;
 public:
 	void AddEnemyInStage(UINT _stageId, shared_ptr<AActor> _actor);
 	void AddEnemiesInStage(UINT _stageId, vector<shared_ptr<AActor>> _actorList);
