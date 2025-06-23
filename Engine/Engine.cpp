@@ -56,11 +56,13 @@ void Engine::Init()
 		else
 			g_bRangeVisibleMode = false;
 	}
+
+	OBJECT->Init();
+
 	_app->Init();
 
 	// Manager ÃÊ±âÈ­
 	{
-		OBJECT->Init();
 		CAMERA->Init();
 		COLLITION->Init();
 		WIND->Init();

@@ -33,9 +33,13 @@ class ObjectManager : public Singleton<ObjectManager>
 	static ComPtr<ID3D11Buffer> m_pRenderModeBuffer;
 	RenderModeCB m_tRenderModeData;
 
+	// QuadTree
+	//shared_ptr<class QuadTree> m_pQuadTree;
+
 public:
 	void Init();
 	void Tick();
+	void RenderShadow();
 	void Render();
 	void Destroy();
 
@@ -55,7 +59,8 @@ public:
 	const map<UINT, shared_ptr<AActor>>& GetActorList() const;
 
 	vector<UINT> GetActorIndexList() { return m_vActorIndexList; }	// 임시 사용
-	void RenderShadow();
+
+	//shared_ptr<class QuadTree> GetQuadTree() const { return m_pQuadTree; }
 
 	// Cursor
 	void SetCursorActor(shared_ptr<AActor> _pCursor);
@@ -72,5 +77,7 @@ private:
 	// 만들어진 Instance가 없다면 생성한다.
 	void SetInstance(shared_ptr<AActor> _pActor);
 	void MakeInstance(shared_ptr<AActor> _pActor);
+	
+	//void CreateQuadTree();
 };
 

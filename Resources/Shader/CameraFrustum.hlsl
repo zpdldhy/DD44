@@ -1,6 +1,6 @@
 #include "MainHeader.hlsli"
 
-cbuffer CB_Frustum : register(b2)
+cbuffer CB_Frustum : register(b3)
 {
     row_major matrix g_matViewProjInvert;
 }

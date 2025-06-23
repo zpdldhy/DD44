@@ -14,6 +14,7 @@
 #include "Sound.h"
 #include "WindManager.h"
 #include "Engine.h"
+#include "QuadTree.h"
 
 // Actor
 #include "ATerrainTileActor.h"
