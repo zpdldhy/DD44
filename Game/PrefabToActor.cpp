@@ -90,6 +90,7 @@ shared_ptr<ATerrainTileActor> PrefabToActor::MakeTileActor(const string& _file)
 	{
 		tile = std::make_shared<ATerrainTileActor>();
 		tile->m_szName = L"Terrain";
+		tile->m_bCastShadow = false;
 		tile->m_eActorType = ActorType::AT_GROUND;
 		tile->m_iNumCols = mapData.Cols;
 		tile->m_iNumRows = mapData.Rows;
