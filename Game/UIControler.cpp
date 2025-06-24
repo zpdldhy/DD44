@@ -184,6 +184,24 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vHPUI);
 	UI->AddUIList(m_vArrowUI);
 
+	// BackGround 분리
+	auto iter = m_vHPUI.begin();
+	m_pHPBackGround = *iter;
+	m_vHPUI.erase(iter);
+
+	// HP 초기값
+	m_vHPUI[4]->m_bRun = false;
+	m_vHPUI[5]->m_bRun = false;
+	m_vHPUI[6]->m_bRun = false;
+	m_vHPUI[7]->m_bRun = false;
+	m_vHPUI[8]->m_bRun = false;
+
+	m_vHPUI[4]->m_bRender = false;
+	m_vHPUI[5]->m_bRender = false;
+	m_vHPUI[6]->m_bRender = false;
+	m_vHPUI[7]->m_bRender = false;
+	m_vHPUI[8]->m_bRender = false;
+
 	m_pActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_active.png");
 	m_pInActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_inactive.png");
 
@@ -310,9 +328,40 @@ void InGameUIControler::FrameReset()
 void InGameUIControler::UpdateHP()
 {
 	// HP
-	Color RestColor;
-	RestColor = fullHP;
-	RestColor.w = -0.5f;
+	if (m_iMaxHP > 9)
+		m_iMaxHP = 9;
+
+	// Max HP 설정
+	static float HPBarSize = m_vHPUI[0]->GetScale().x;
+	static Vec3 HPBackSize = m_pHPBackGround->GetScale();
+	static Vec3 HPBackPos = m_pHPBackGround->GetPosition();
+	
+	int n = m_iMaxHP - 4;
+	float scale = HPBackSize.x + static_cast<float>(n) * HPBarSize;
+	float pos = HPBackPos.x + static_cast<float>(n) * (HPBarSize / 2.f);
+
+	m_pHPBackGround->SetScale(Vec3(scale, HPBackSize.y, HPBackSize.z));
+	m_pHPBackGround->SetPosition(Vec3(pos, HPBackPos.y, HPBackPos.z));
+
+	// Slice
+	if (n == 1)
+		m_pHPBackGround->SetSliceData(Vec4(0.125f, 0.125f, 0.5f, 0.5f));
+	else if (n == 2)
+		m_pHPBackGround->SetSliceData(Vec4(0.1f, 0.1f, 0.5f, 0.5f));
+	else if (n == 3)
+		m_pHPBackGround->SetSliceData(Vec4(0.1f, 0.1f, 0.5f, 0.5f));
+	else if (n == 4)
+		m_pHPBackGround->SetSliceData(Vec4(0.075f, 0.075f, 0.5f, 0.5f));
+	else if (n == 5)
+		m_pHPBackGround->SetSliceData(Vec4(0.075f, 0.075f, 0.5f, 0.5f));
+
+	m_vHPUI[m_iMaxHP - 1]->m_bRun = true;
+	m_vHPUI[m_iMaxHP - 1]->m_bRender = true;
+
+
+	// 현재 HP에 대한 로직
+	static Color FullHPColor = Color(0.055f, 0.247f, -0.324, 0.0f);
+	static Color RestColor = Color(0.055f, 0.247f, -0.324, -0.5f);
 
 	static float currentTime = 0.0f;
 	currentTime = TIMER->GetDeltaTime();
@@ -327,7 +376,7 @@ void InGameUIControler::UpdateHP()
 		m_vHPUI[0]->SetColor(RestColor);
 		m_vHPUI[1]->SetColor(RestColor);
 		m_vHPUI[2]->SetColor(RestColor);
-		m_vHPUI[3]->SetColor(fullHP);
+		m_vHPUI[3]->SetColor(FullHPColor);
 	}
 	break;
 
@@ -344,7 +393,7 @@ void InGameUIControler::UpdateHP()
 		{
 			m_vHPUI[0]->SetColor(RestColor);
 			m_vHPUI[1]->SetColor(RestColor);
-			m_vHPUI[2]->SetColor(fullHP);
+			m_vHPUI[2]->SetColor(FullHPColor);
 		}
 	}
 	break;
@@ -361,7 +410,7 @@ void InGameUIControler::UpdateHP()
 		else
 		{
 			m_vHPUI[0]->SetColor(RestColor);
-			m_vHPUI[1]->SetColor(fullHP);
+			m_vHPUI[1]->SetColor(FullHPColor);
 		}
 	}
 	break;
@@ -376,7 +425,7 @@ void InGameUIControler::UpdateHP()
 		else if (m_bHPUIChange == true)
 			m_bHPUIChange = false;
 		else
-			m_vHPUI[0]->SetColor(fullHP);
+			m_vHPUI[0]->SetColor(FullHPColor);
 
 	}
 	break;

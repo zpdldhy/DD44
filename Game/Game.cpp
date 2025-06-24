@@ -309,19 +309,25 @@ void Game::CreateWind()
 
 void Game::UpdateUI()
 {
+	static int i = 4;
+
+	if (INPUT->GetButton(GameKey::P))
+		i++;		
+
 	// UI가 적용해야 하는 부분
-	m_cUI.SetMaxHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetMaxHp());
+	m_cUI.SetMaxHP(i);
 	m_cUI.SetCurrentHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHp());
 	m_cUI.SetArrowCount(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
-	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());
-	if(INPUT->GetButtonDown(GameKey::P))
-		m_cUI.SetDead(true);
-	else
-		m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
+	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());	
+	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
 
 	m_cUI.Tick();
 
 	// UI의 상태에 따라 적용되는 부분
+	///////////////////////////////////////////////////////////////////////////
+	///////////						Paused							///////////
+	///////////////////////////////////////////////////////////////////////////
+
 	// 계속하기
 	if(m_cUI.SelectContinue())
 		ENGINE->m_bGamePaused = false;
@@ -329,6 +335,10 @@ void Game::UpdateUI()
 	// 게임 종료
 	if(m_cUI.SelectExit())
 		PostQuitMessage(0);
+
+	///////////////////////////////////////////////////////////////////////////
+	///////////						Dead							///////////
+	///////////////////////////////////////////////////////////////////////////
 
 	// Continue UI 선택시, 사운드 등
 	if (m_cUI.SelectDeadContinue())
@@ -339,7 +349,8 @@ void Game::UpdateUI()
 	// Dead UI 종료 시, 캐릭 살아남 등
 	if (m_cUI.EndDeadUI())
 	{
-
+		dynamic_pointer_cast<TPlayer>(m_pPlayer)->SetHp(4);
+		// Dead true 세팅
 	}
 }
 

@@ -46,8 +46,9 @@ class InGameUIControler : public UIControler
 	vector<shared_ptr<class AUIActor>> m_vMainBackGround;
 
 	// HP
+	shared_ptr<class AUIActor> m_pHPBackGround = nullptr;
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
-	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
+	int m_iMaxHP = 4;
 	int m_iCurrentHP = 4;
 	int m_iPreHP = 0;
 	bool m_bHPUIChange = false;
@@ -109,7 +110,7 @@ private:
 
 public:
 	// 구현 필요!
-	void SetMaxHP(int _maxHP) {}
+	void SetMaxHP(int _maxHP) { m_iMaxHP = _maxHP; }
 	void SetCurrentHP(int _currentHP) { m_iCurrentHP = _currentHP; }
 	void SetArrowCount(int _arrowCount) { m_iArrowCount = _arrowCount; }
 	void SetTriggerData(TriggerData _data) { m_tTrigger = _data; }
