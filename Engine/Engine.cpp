@@ -24,6 +24,7 @@
 #include "Sound.h"
 #include "WindManager.h"
 #include "ShadowManager.h"
+#include "BloomManager.h"
 
 bool g_bRangeVisibleMode;
 
@@ -66,6 +67,7 @@ void Engine::Init()
 		CAMERA->Init();
 		COLLITION->Init();
 		WIND->Init();
+		BLOOMMANAGER->Init();
 	}
 
 	// ViewPort를 이용한 3DWorld Texture Rendering
@@ -139,6 +141,9 @@ void Engine::Render()
 		PARTICLE->Render();
 		WIND->Render();
 		POSTPROCESS->SetSRVToSlot(7, WIND->GetSRV());
+		POSTPROCESS->SetSRVToSlot(3, BLOOMMANAGER->GetDownScaleSRV());
+		POSTPROCESS->SetSRVToSlot(9, BLOOMMANAGER->GetDepthSRV());            // Bloom Depth → t9
+		POSTPROCESS->SetSRVToSlot(10, POSTPROCESS->GetMRT(0)->GetDepthSRV()); // Scene Depth → t10 
 		POSTPROCESS->PostRender();
 
 		if (m_pCurrentRasterizer)

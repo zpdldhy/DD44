@@ -252,9 +252,9 @@ void Game::SetupSunLight()
 	m_pSunLight->m_szName = L"SunLight";
 	m_pSunLight->GetLightComponent()->SetDirection({ -1.f, -1.f, -1.f });
 	m_pSunLight->GetLightComponent()->SetAmbientColor(Vec3(1.0f, 1.0f, 1.0f));
-	m_pSunLight->GetLightComponent()->SetAmbientPower(0.3f);
+	m_pSunLight->GetLightComponent()->SetAmbientPower(.7f);
 
-	Vec3 dir = Vec3(-1.f, -1.f, -1.f);
+	Vec3 dir = Vec3(-.7f, -1.f, -.7f);
 	m_pSunLight->SetScale(Vec3(10.0f, 10.0f, 10.0f));
 	m_pSunLight->SetPosition(dir * -300.f);
 	dir.Normalize();

@@ -43,6 +43,9 @@ void RenderStateManager::Apply(const RenderOption& option)
     case BlendType::DualSource:
         DC->OMSetBlendState(STATE->m_pDualSourceBlend.Get(), nullptr, 0xffffffff);
         break;
+    case BlendType::BloomStrongColor:
+        DC->OMSetBlendState(STATE->m_pBloomStrongColorBlend.Get(), nullptr, 0xffffffff);
+        break;
     }
 
 
