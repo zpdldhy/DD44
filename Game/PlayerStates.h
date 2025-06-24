@@ -216,6 +216,7 @@ private:
 	bool isFinish = false;
 	bool isMoving = true;
 	Vec3 ladderDir;
+
 public:
 	PlayerClimbState(weak_ptr<AActor> _pOwner);
 	~PlayerClimbState() {}
@@ -229,6 +230,7 @@ public:
 	void CheckMove(bool _isMoving);
 	void SetLadderDir(Vec3 _dir);
 	void CheckIsMoving(bool _moving) { isMoving = _moving; }
+	int GetCurrentPhase() { return currentPhase; }
 };
 
 class PlayerClimbFinish : public StateBase
@@ -240,6 +242,7 @@ public:
 	~PlayerClimbFinish() {}
 public:
 	Vec3 ladderDir;
+	float offset = 9.0f; 
 public:
 	virtual void Enter() override;
 	virtual void Tick() override;

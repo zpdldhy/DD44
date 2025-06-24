@@ -198,10 +198,6 @@ void PlayerMoveScript::Tick()
 		for (auto& col : GetOwner()->m_vCollisionList)
 		{
 			auto pObj = OBJECT->GetActor(col.first);
-
-			// 알잘딱 부탁합니다.
-			//col.second.otherShape->m_szName == L"~~~~~~"
-
 			if (pObj->GetShapeComponent()->GetName() == L"Ladder")
 			{
 				TriggerData data;
@@ -496,6 +492,11 @@ void PlayerMoveScript::Climb()
 
 	if (moveDir.Length() > 0)
 	{
+		auto fin = dynamic_pointer_cast<PlayerClimbState>(climb)->GetCurrentPhase();
+		if (fin)
+		{
+			return;
+		}
 		// 이동
 		{
 			// Anim control 을 state로 넣어버리자. flag 세팅을 해주는 방식으로 전달만 해 

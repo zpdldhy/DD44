@@ -741,8 +741,10 @@ void PlayerClimbFinish::Tick()
 	Vec3 moveDir = look * 1.0f + up * 0.5f;
 
 	moveDir.Normalize();
+	moveDir = moveDir * offset * TIMER->GetDeltaTime();
 
-	m_pOwner.lock()->AddPosition(moveDir * 0.05);
+	// °ª 
+	m_pOwner.lock()->AddPosition(moveDir);
 
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	if (!animInstance->m_bOnPlayOnce)
