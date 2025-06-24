@@ -99,6 +99,7 @@ void ProjectileManager::Create()
 	{
 		auto projectile = make_shared<AActor>();
 		auto mesh = MESHLOADER->Make("../Resources/Asset/Arrow.mesh.json");
+		mesh->SetName(L"Arrow");
 		projectile->SetMeshComponent(mesh);
 		auto collider = make_shared<UBoxComponent>();
 		collider->SetName(L"PlayerAttack");

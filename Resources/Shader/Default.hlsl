@@ -102,16 +102,8 @@ float PS_SHADOW(VS_OUT input) : SV_Depth
 float4 PS_BLOOM(VS_OUT input) : SV_Target
 {
     float4 texColor = g_txDiffuseA.Sample(sample, input.t);
-    float3 emissive = float3(0, 0, 0);
-    // 기준 컬러 필터링 (0.6 이상일 때만 발광)
-    if (texColor.r < 0.6f)
-    {
-        return float4(0, 0, 0, 1);
-    }
-    else
-    {
-        emissive = float3(0.984, 0.069, 0.073) * 1.f;
-    }
-        
-    return float4(emissive, 1.0f);
+    float3 emissive = float3(0.984, 0.069, 0.073) * 1.f;
+    
+    return float4(1, 0, 0, 1);
+    //return float4(emissive, 1.0f);
 }
