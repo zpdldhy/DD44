@@ -23,26 +23,14 @@ void UInstanceSkinnedMeshComponent::Init()
 
 void UInstanceSkinnedMeshComponent::Tick()
 {
-	//if (!bRender)
-	//{
-	//	dynamic_pointer_cast<USkeletalMeshResources>(m_pMesh)->FreeInstanceIndex(m_instanceId);
-	//	return;
-	//}
-
 	if (m_pBaseAnim) m_pBaseAnim->Tick();
 
 	USceneComponent::Tick();
 
-	auto skinnedMesh = static_pointer_cast<USkeletalMeshResources>(m_pMesh);
-
-	// Index 유효성 확인
-	if (m_instanceId >= skinnedMesh->GetInstanceCount())
+	if (bRender)
 	{
-		m_instanceId = skinnedMesh->AllocateInstanceIndex();
+		UpdateMeshResourceData();
 	}
-
-	// InstanceID에 맞게 meshResources 업데이트
-	UpdateMeshResourceData();
 
 	for (auto& child : m_vChild)
 	{
@@ -53,7 +41,7 @@ void UInstanceSkinnedMeshComponent::Tick()
 
 void UInstanceSkinnedMeshComponent::Render()
 {
-	if (bUseInstance == false)
+	if (bRender && bUseInstance == false)
 	{
 		PreRender();
 		PostRender();
@@ -112,6 +100,14 @@ void UInstanceSkinnedMeshComponent::Destroy()
 
 void UInstanceSkinnedMeshComponent::UpdateMeshResourceData()
 {
+	auto skinnedMesh = static_pointer_cast<USkeletalMeshResources>(m_pMesh);
+
+	// Index 유효성 확인
+	if (m_instanceId >= skinnedMesh->GetInstanceCount() || m_instanceId < 0)
+	{
+		m_instanceId = skinnedMesh->AllocateInstanceIndex();
+	}
+
 	// INSTANCE_VERTEX
 	m_trans.matWorld = GetWorld();
 	float flashTime = GetMaterial()->GetFlashTIme();
@@ -142,4 +138,15 @@ void UInstanceSkinnedMeshComponent::UpdateMeshResourceData()
 	}
 
 	static_pointer_cast<USkeletalMeshResources>(m_pMesh)->AddInstanceData(m_instanceId, m_trans, m_anim);
+}
+
+void UInstanceSkinnedMeshComponent::SetVisible(bool _visible)
+{
+	bRender = _visible;
+	auto skinnedMesh = static_pointer_cast<USkeletalMeshResources>(m_pMesh);
+	if (!bRender)
+	{
+		skinnedMesh->FreeInstanceIndex(m_instanceId);
+		m_instanceId = -1;
+	}
 }

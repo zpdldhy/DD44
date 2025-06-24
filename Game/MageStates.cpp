@@ -56,7 +56,6 @@ void MageAppearState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int idleIndex = animInstance->GetAnimIndex(L"Teleport_in");
 	animInstance->PlayOnce(idleIndex);
-	//m_pOwner.lock()->SetScale(Vec3(0.01f, 0.01f, 0.01f));
 
 	//targetYaw = targetYaw = atan2f(dir.x, dir.z);
 	//Vec3 currentRot = m_pOwner.lock()->GetRotation();
@@ -64,8 +63,7 @@ void MageAppearState::Enter()
 	//m_pOwner.lock()->SetRotation(currentRot);
 
 	m_pOwner.lock()->m_bCollision = true;
-	m_pOwner.lock()->m_bRender = true;
-	m_pOwner.lock()->GetShapeComponent()->m_bVisible = true;
+	SetMeshVisible();
 }
 void MageAppearState::Tick()
 {
@@ -95,6 +93,17 @@ void MageAppearState::SetDirection(Vec3 _targetPos)
 	dir = _targetPos - m_pOwner.lock()->GetPosition();
 }
 
+void MageAppearState::SetMeshVisible()
+{
+	auto body = m_pOwner.lock()->GetMeshComponent();
+	auto weapon = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Chain");
+	auto chain = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Weapon");
+
+	body->SetVisible(true);
+	weapon->SetVisible(true);
+	chain->SetVisible(true);
+}
+
 MageDisappearState::MageDisappearState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_IDLE)
 {
 	m_pOwner = _pOwner;
@@ -120,12 +129,12 @@ void MageDisappearState::Tick()
 	lowerElapsed += TIMER->GetDeltaTime();
 	if (lowerElapsed > 1.6f)
 	{
-		m_pOwner.lock()->m_bRender = false;
 		lowerElapsed = 0.0f;
 	}
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	if (!animInstance->m_bOnPlayOnce)
 	{
+		SetAllMeshInvisible(m_pOwner.lock()->GetMeshComponent());
 		// 애니메이션 종료
 		End();
 	}
@@ -134,6 +143,16 @@ void MageDisappearState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+}
+
+void MageDisappearState::SetAllMeshInvisible(const shared_ptr<UMeshComponent>& _mesh)
+{
+	_mesh->SetVisible(false);
+	auto children = _mesh->GetChildren();
+	for (auto child : children)
+	{
+		SetAllMeshInvisible(child);
+	}
 }
 
 MageHitState::MageHitState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_HIT)
@@ -246,7 +265,7 @@ void MageAttackState::Tick()
 			currentPhase = AttackPhase::Wait;
 			//m_pOwner.lock()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
 			m_pOwner.lock()->m_bCollision = false;
-			m_pOwner.lock()->m_bRender = false;
+			m_pOwner.lock()->GetMeshComponent()->SetVisible(false);
 			m_pOwner.lock()->GetShapeComponent()->m_bVisible = false;
 
 		}

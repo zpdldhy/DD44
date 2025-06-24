@@ -11,6 +11,9 @@ public:
 	void Destroy() override;
 public:
 	void UpdateMeshResourceData();
+public:
+	virtual void SetVisible(bool _visible) override;
+
 private:
 	INSTANCE_VERTEX m_trans;
 	ANIM_VERTEX m_anim;

@@ -443,7 +443,7 @@ void PlayerMoveScript::Move()
 		{
 			moveDir.Normalize();
 			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->SetMove(moveDir, 0.25f);
+			GetOwner()->SetMove(moveDir, 0.4f);
 		}
 
 		// È¸Àü		

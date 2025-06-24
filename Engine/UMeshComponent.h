@@ -44,7 +44,7 @@ public:
 	int GetChildCount() const { return static_cast<int>(m_vChild.size()); }
 
 public:
-	void SetVisible(bool _visible) { bRender = _visible; }
+	virtual void SetVisible(bool _visible) { bRender = _visible; }
 	const bool& GetVisible() { return bRender; }
 
 	// Instance

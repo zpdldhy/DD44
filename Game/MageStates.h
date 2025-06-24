@@ -43,6 +43,8 @@ public:
 	virtual void End() override;
 public:
 	void SetDirection(Vec3 _targetPos);
+private:
+	void SetMeshVisible();
 };
 
 class MageDisappearState : public StateBase
@@ -63,6 +65,8 @@ public:
 	virtual void Enter() override;
 	virtual void Tick() override;
 	virtual void End() override;
+private:
+	void SetAllMeshInvisible(const shared_ptr<class UMeshComponent>& _mesh);
 };
 
 class MageHitState : public StateBase
