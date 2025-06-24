@@ -3,6 +3,7 @@
 #include "IExecute.h"
 #include "ActorLoader.h"
 #include "MeshLoader.h"
+#include "UIControler.h"
 
 class Game : public IExecute
 {
@@ -22,39 +23,11 @@ public:
 
 	float time;
 
+	// UI
+	InGameUIControler m_cUI;
+
 	// UIActor
 	shared_ptr<AActor> m_pCursor = nullptr;
-	// InGame
-	vector<shared_ptr<class AUIActor>> m_vHPUI;
-	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
-	int m_iPreHP = 0;
-	bool m_bHPUIChange = false;
-
-	vector<shared_ptr<class AUIActor>> m_vArrowUI;
-	shared_ptr<class Texture> m_pActiveArrowTexture = nullptr;
-	shared_ptr<class Texture> m_pInActiveArrowTexture = nullptr;
-	Vec3 m_vActiveArrowScale = { 0.f, 0.f, 0.f };
-	Vec3 m_vInActiveArrowScale = { 0.f, 0.f, 0.f };
-
-	vector<shared_ptr<class AUIActor>> m_vInterActionUI;
-	// Paused
-	UINT m_iSelectUI = 0;
-	vector<shared_ptr<class AUIActor>> m_vPausedBackGround;
-	vector<shared_ptr<class AUIActor>> m_vPausedSelect;
-
-	// Paused Upgrade
-	UINT m_iSelectUpgradeUI = 0;	// 0ÀÌ None, 1 ~ 4 Àû¿כ
-	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
-	vector<vector<shared_ptr<class AUIActor>>> m_vUpgradeState;
-	vector<shared_ptr<class AUIActor>> m_vCoins;
-
-	// Paused System
-	vector<shared_ptr<class AUIActor>> m_vSystemBackGround;
-	vector<shared_ptr<class AUIActor>> m_vSystemSelection;
-
-	// Dead
-	shared_ptr<class AUIActor> m_pDeadUI = nullptr;
-	float m_fDeadUIPopTime = 1.f;
 
 	// TEMP
 	vector<shared_ptr<AActor>> enemyList;
@@ -76,7 +49,6 @@ protected:
 	void SetupSkybox();
 	void SetupSunLight();
 	void CreateWind();
-	void CreateUI();
 	void UpdateUI();
 	void UpdateCursor();
 
