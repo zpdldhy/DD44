@@ -27,7 +27,7 @@ protected:
 	// Instance
 	static ComPtr<ID3D11Buffer> m_pInstansBuffer;
 	vector<INSTANCE_VERTEX> m_vInstaceList;
-	UINT m_instanceCount = 0;
+	int m_instanceCount = 0;
 
 public:
 	void Init() override;

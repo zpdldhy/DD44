@@ -62,10 +62,7 @@ void AActor::Render()
 {
 	if (!m_bRender)
 		return;
-	if (m_szName == L"HeadRoller")
-	{
-		int a = 0;
-	}
+
 	m_pTransform->Render();
 
 	for (auto& script : m_vScript)
