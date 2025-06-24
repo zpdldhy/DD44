@@ -183,7 +183,7 @@ void Game::Tick()
 	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
-	CheckEnemyDeath(enemyList1);
+	CheckEnemyDeath(enemyList);
 }
 
 void Game::Render()
@@ -310,21 +310,11 @@ void Game::CreateWind()
 
 void Game::UpdateUI()
 {
-	static int i = 4;
-	static int coin = 0;
-
-	if (INPUT->GetButton(GameKey::P))
-		i++;		
-
-	if (INPUT->GetButtonDown(GameKey::I))
-		coin += 100;
-
-	// UI가 적용해야 하는 부분
-	m_cUI.SetMaxHP(i);
+	m_cUI.SetMaxHP((int)(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetMaxHP()));
 	m_cUI.SetCurrentHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHp());
 	m_cUI.SetArrowCount(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
 	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());	
-	m_cUI.SetCoin(coin);
+	m_cUI.SetCoin(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHisSoul());
 	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
 
 	m_cUI.Tick();
@@ -605,7 +595,7 @@ void Game::CheckEnemyDeath(const vector<shared_ptr<AActor>>& _enemyList)
 		{
 			if (auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer))
 			{
-				player->AddSoul(enemy->GetSoul());
+				player->AddSoul(enemy->GetHisSoul());
 			}
 		}
 	}

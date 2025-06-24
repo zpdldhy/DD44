@@ -25,7 +25,7 @@ void MageMovement::Init()
 
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(6);
-	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(50);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHisSoul(5);
 }
 
 void MageMovement::Tick()

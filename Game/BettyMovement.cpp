@@ -48,7 +48,7 @@ void BettyMovement::Init()
 	
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(20);
-	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(1000);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHisSoul(1000);
 
 
 }
