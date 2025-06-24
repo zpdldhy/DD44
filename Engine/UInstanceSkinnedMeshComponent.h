@@ -5,6 +5,7 @@ class UInstanceSkinnedMeshComponent : public USkinnedMeshComponent
 public:
 	void Init() override;
 	void Tick() override;
+	void Render() override;
 	void PreRender() override;
 	void PostRender() override;
 	void Destroy() override;

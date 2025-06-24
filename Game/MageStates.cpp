@@ -358,6 +358,7 @@ void MageAttackStart::Throw()
 
 	auto handSocket = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightHandSocket");
 	Vec3 pos = handSocket->GetWorldPosition();
+	pos.y -= 1.0f;
 	PROJECTILE->ActivateOne(ProjectileType::MagicBall, pos, dir);
 }
 void MageAttackStart::SetTarget(weak_ptr<AActor> _target)

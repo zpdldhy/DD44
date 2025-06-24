@@ -3,160 +3,435 @@
 #include "AActor.h"
 #include "USkinnedMeshComponent.h"
 #include "UAnimInstance.h"
+#include "Timer.h"
 
-Enemy1IdleState::Enemy1IdleState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_IDLE)
+#include "ObjectManager.h"
+#include "CollisionManager.h"
+#include "UBoxComponent.h"
+
+HeadRollerIdleState::HeadRollerIdleState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_IDLE)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = true;
 }
-
-void Enemy1IdleState::Enter()
-{	
+void HeadRollerIdleState::Enter()
+{
 	// 기본 state 세팅
 	m_bOnPlaying = true;
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	int idleIndex = animInstance->GetAnimIndex(L"Armature|Idle_look");
+	int idleIndex = animInstance->GetAnimIndex(L"Armature|QuickLook");
 	animInstance->SetCurrentAnimTrack(idleIndex);
 }
-
-void Enemy1IdleState::Tick()
+void HeadRollerIdleState::Tick()
 {
 }
-
-void Enemy1IdleState::End()
+void HeadRollerIdleState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
 }
 
-Enemy1WalkState::Enemy1WalkState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_WALK)
+HeadRollerAttackState::HeadRollerAttackState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_ATTACK)
 {
 	m_pOwner = _pOwner;
-	m_bCanInterrupt = true;
+	m_bCanInterrupt = false;
+
+	find = make_shared<HeadRollerRollFind>(m_pOwner);
+	start = make_shared<HeadRollerRollStart>(m_pOwner);
+	middle = make_shared<HeadRollerRollMiddle>(m_pOwner);
+	end = make_shared<HeadRollerRollEnd>(m_pOwner);
 }
 
-void Enemy1WalkState::Enter()
+void HeadRollerAttackState::Enter()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = true;
-	// 애니메이션 Walk 플레이
-	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	int idleIndex = animInstance->GetAnimIndex(L"Armature|Walk");
-	animInstance->SetCurrentAnimTrack(idleIndex);
+
+	// sub-state 세팅
+	find->SetDirection(dir);
+	start->SetDirection(dir);
+	middle->SetDirection(dir);
+	end->SetDirection(dir);
+
+	find->Enter();
+
+	m_pOwner.lock()->m_szName = L"Enemy";
 }
 
-void Enemy1WalkState::Tick()
+void HeadRollerAttackState::Tick()
 {
-
+	switch (currentPhase)
+	{
+	case RollPhase::Find: {
+		find->Tick();
+		if (!find->IsPlaying())
+		{
+			start->Enter();
+			currentPhase = RollPhase::Start;
+		}
+		break;
+	}
+	case RollPhase::Start: {
+		start->Tick();
+		if (!start->IsPlaying())
+		{
+			middle->Enter();
+			currentPhase = RollPhase::Middle;
+		}
+		break;
+	}
+	case RollPhase::Middle: {
+		middle->Tick();
+		rollElapsed += TIMER->GetDeltaTime();
+		if (CheckWallCollision())
+		{
+			middle->End();
+			end->Enter();
+			currentPhase = RollPhase::Final;
+		}
+		break;
+	}
+	case RollPhase::Final: {
+		end->Tick();
+		if (!end->IsPlaying())
+		{
+			currentPhase = RollPhase::Done;
+		}
+		break;
+	}
+	case RollPhase::Done: {
+		End();
+		break;
+	}
+	}
 }
 
-void Enemy1WalkState::End()
+void HeadRollerAttackState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	// 변수 초기화
+	currentPhase = RollPhase::Find;
+	m_pOwner.lock()->m_szName = L"HeadRoller";
 }
 
-Enemy1AttackStartState::Enemy1AttackStartState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_ATTACK)
+bool HeadRollerAttackState::CheckWallCollision()
+{
+	Vec3 pos = m_pOwner.lock()->GetPosition();
+	Vec3 look = dir;
+
+	float offset = 4.0f;
+	Vec3 right = m_pOwner.lock()->GetRight();
+	Ray leftRay(pos + (-right * offset), look);
+	Ray rightRay(pos + (right * offset), look);
+	Ray middleRay(pos, look);
+
+	auto box = dynamic_pointer_cast<UBoxComponent>(m_pOwner.lock()->GetShapeComponent());
+	auto ray = box->GetLookRay();
+	Vec3 range(6.0f, 0.0f, 6.0f);
+
+	for (const auto& colData : m_pOwner.lock()->m_vCollisionList)
+	{
+		if (OBJECT->GetActor(colData.first)->m_szName == L"MyCharacter")
+		{
+			continue;
+		}
+		auto targetShape = OBJECT->GetActor(colData.first)->GetShapeComponent();
+		auto targetBox = dynamic_pointer_cast<UBoxComponent>(targetShape);
+
+		// 걍 뭔가 충돌하면 다 처리해버려 ? 
+
+		return true;
+
+		Vec3 inter;
+		if (Collision::CheckRayToOBB(middleRay, targetBox->GetBounds(), inter))
+		{
+			// 
+			Vec3 dis = pos - inter;
+			dis.y = 0;
+			if (dis.Length() < range.Length())
+			{
+				return true;
+			}
+		}
+
+		if (Collision::CheckRayToOBB(leftRay, targetBox->GetBounds(), inter))
+		{
+			// 
+			Vec3 dis = pos - inter;
+			dis.y = 0;
+			if (dis.Length() < range.Length())
+			{
+				return true;
+			}
+		}
+
+		if (Collision::CheckRayToOBB(rightRay, targetBox->GetBounds(), inter))
+		{
+			// 
+			Vec3 dis = pos - inter;
+			dis.y = 0;
+			if (dis.Length() < range.Length())
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+#pragma region roll sub-state
+HeadRollerRollFind::HeadRollerRollFind(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_ATTACK)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
 }
-
-void Enemy1AttackStartState::Enter()
+void HeadRollerRollFind::Enter()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = true;
+
+	// 애니메이션 Walk 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int idleIndex = animInstance->GetAnimIndex(L"Armature|StartleHop");
+	animInstance->PlayOnce(idleIndex);
+
+	// 회전할 방향 정하기
+	targetYaw = atan2f(dir.x, dir.z);
+}
+void HeadRollerRollFind::Tick()
+{
+	// Lerp 회전
+	{
+		Vec3 currentRot = m_pOwner.lock()->GetRotation();
+		float currentYaw = currentRot.y;
+		float angleDiff = targetYaw - currentYaw;
+		while (angleDiff > DD_PI)  angleDiff -= DD_PI * 2;
+		while (angleDiff < -DD_PI) angleDiff += DD_PI * 2;
+		float smoothedYaw = currentRot.y + angleDiff * 10.0f * TIMER->GetDeltaTime();
+		currentRot.y = smoothedYaw;
+		m_pOwner.lock()->SetRotation(currentRot);
+	}
+
+	// 애니메이션
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	if (!animInstance->m_bOnPlayOnce)
+	{
+		End();
+	}
+}
+void HeadRollerRollFind::End()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = false;
+}
+
+HeadRollerRollStart::HeadRollerRollStart(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_ATTACK)
+{
+	m_pOwner = _pOwner;
+	m_bCanInterrupt = false;
+}
+void HeadRollerRollStart::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+
 	// 애니메이션 Walk 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int idleIndex = animInstance->GetAnimIndex(L"Armature|roll_start");
-	animInstance->SetCurrentAnimTrack(idleIndex);
+	animInstance->PlayOnce(idleIndex);
 }
-
-void Enemy1AttackStartState::Tick()
+void HeadRollerRollStart::Tick()
 {
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	if (!animInstance->m_bOnPlayOnce)
 	{
-		// Roll_loop 시작
-		*m_pCurrentState = m_pRollState;
-		m_pRollState->Enter();
 		End();
 	}
 }
-
-void Enemy1AttackStartState::End()
+void HeadRollerRollStart::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
 }
 
-void Enemy1AttackStartState::SetIdleState(const shared_ptr<StateBase>& _idle)
-{
-	m_pIdleState = _idle;
-}
-void Enemy1AttackStartState::SetRelateState(const shared_ptr<StateBase>& _roll, const shared_ptr<StateBase>& _stun)
-{
-	m_pRollState = _roll;
-	m_pStunState = _stun;
-}
-
-Enemy1RollState::Enemy1RollState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_ATTACK)
+HeadRollerRollMiddle::HeadRollerRollMiddle(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_ATTACK)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
 }
-
-void Enemy1RollState::Enter()
+void HeadRollerRollMiddle::Enter()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = true;
+
 	// 애니메이션 Walk 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int idleIndex = animInstance->GetAnimIndex(L"Armature|roll_loop");
 	animInstance->SetCurrentAnimTrack(idleIndex);
 }
-
-void Enemy1RollState::Tick()
+void HeadRollerRollMiddle::Tick()
 {
-	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	if (!animInstance->m_bOnPlayOnce)
-	{
-		// Roll_loop 시작
-		//*m_pCurrentState = m_pRollState;
-		//m_pRollState->Enter();
-		End();
-	}
+	// 이동
+	m_pOwner.lock()->AddPosition(dir);
 }
-
-void Enemy1RollState::End()
+void HeadRollerRollMiddle::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
 }
 
-Enemy1StunState::Enemy1StunState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_HIT)
+HeadRollerRollEnd::HeadRollerRollEnd(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_ATTACK)
+{
+	m_pOwner = _pOwner;
+	m_bCanInterrupt = false;
+}
+void HeadRollerRollEnd::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+
+	// 애니메이션 Walk 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int index = animInstance->GetAnimIndex(L"Armature|Stun");
+	animInstance->SetKeyFrame(index, 65);
+	animInstance->PlayOnce(index);
+}
+void HeadRollerRollEnd::Tick()
+{
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	// Stun 애니메이션 ( stun + standUp )
+	if (animInstance->GetCurrentFrame() < 24)
+	{
+		m_pOwner.lock()->AddPosition(-dir * 0.25f);
+	}
+	if (!animInstance->m_bOnPlayOnce)
+	{
+		End();
+	}
+}
+void HeadRollerRollEnd::End()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = false;
+}
+#pragma endregion
+
+HeadRollerLookState::HeadRollerLookState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_LOOK)
+{
+	m_pOwner = _pOwner;
+	m_bCanInterrupt = true;
+}
+
+void HeadRollerLookState::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+	// 애니메이션 Idle 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int idleIndex = animInstance->GetAnimIndex(L"Armature|QuickLook");
+	animInstance->PlayOnce(idleIndex);
+}
+
+void HeadRollerLookState::Tick()
+{
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	if (!animInstance->m_bOnPlayOnce)
+	{
+		End();
+	}
+}
+
+void HeadRollerLookState::End()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = false;
+}
+
+HeadRollerDieState::HeadRollerDieState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_DEATH)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
 }
 
-void Enemy1StunState::Enter()
+void HeadRollerDieState::Enter()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = true;
-	// 애니메이션 Walk 플레이
+	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	int idleIndex = animInstance->GetAnimIndex(L"Armature|Stun");
-	animInstance->SetCurrentAnimTrack(idleIndex);
+	int index = animInstance->GetAnimIndex(L"Armature|Stun");
+	animInstance->SetKeyFrame(index, 29);
+	animInstance->m_fAnimPlayRate = 20.0f;
+	animInstance->PlayOnce(index);
+
+	// 눈을 먼저 지워버리자
+	auto eye1 = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Eye1");
+	auto eye2 = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Eye2");
+
+	eye1->SetVisible(false);
+	eye2->SetVisible(false);
+
+
 }
 
-void Enemy1StunState::Tick()
+void HeadRollerDieState::Tick()
 {
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	switch (currentPhase)
+	{
+	case HeadRollerDieState::PLAYANIM:
+		if (!animInstance->m_bOnPlayOnce)
+		{
+			// 종료
+			animInstance->m_bPlay = false;
+			currentPhase = STAYSTILL;
+			m_pOwner.lock()->m_bCastShadow = false;
+		}
+		break;
+	case HeadRollerDieState::STAYSTILL:
+		currentTime	+= TIMER->GetDeltaTime();
+		if (currentTime >= dissolveOffset)
+		{
+			End();
+		}
+		break;
+	default:
+		break;
+	}
+
+	float frameTime = animInstance->GetTotalFrame();
+	frameTime /= 30;
+	m_fDissolveTimer += TIMER->GetDeltaTime();
+	float t = m_fDissolveTimer / frameTime;
+	auto comp = m_pOwner.lock()->GetMeshComponent();
+
+	ApplyDissolveToAllMaterials(comp, t);
 }
 
-void Enemy1StunState::End()
+void HeadRollerDieState::ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> _comp, float _time)
+{
+	if (!_comp) return;
+
+	shared_ptr<UMaterial> mat = _comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetDissolve(_time);
+	}
+
+	for (int i = 0; i < _comp->GetChildCount(); ++i)
+	{
+		ApplyDissolveToAllMaterials(_comp->GetChild(i), _time);
+	}
+}
+
+
+void HeadRollerDieState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	currentPhase = DiePhase::PLAYANIM;
+	currentTime = 0.0f;
+
 }

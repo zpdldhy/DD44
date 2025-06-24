@@ -72,7 +72,7 @@ void WalkerHitState::Enter()
 	m_bOnPlaying = true;
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	int index = animInstance->GetAnimIndex(L"Armature|Stun");
+	int index = animInstance->GetAnimIndex(L"Armature|StartleHop");
 	animInstance->PlayOnce(index);
 	// 사운드
 	SOUND->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
@@ -131,7 +131,6 @@ void WalkerDieState::Tick()
 	float t = m_fDissolveTimer / frameTime;
 	auto comp = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>();
 	ApplyDissolveToAllMaterials(comp, t);
-
 }
 
 

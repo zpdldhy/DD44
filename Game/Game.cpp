@@ -28,6 +28,7 @@
 
 // Component
 #include "UStaticMeshComponent.h"
+#include "UBoxComponent.h"
 
 // Script
 #include "ScriptManager.h"
@@ -39,6 +40,7 @@
 #include "ProjectileManager.h"
 #include "EnemyCollisionManager.h"
 #include "EventManager.h"
+#include "StageManager.h"
 
 // TEMP
 #include "BatMovement.h"
@@ -49,13 +51,10 @@
 void Game::Init()
 {
 	SCRIPT->Init();
+	STAGE->Init();
 	// Asset 로딩
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
-	for (auto map : m_vMapList)
-	{
-		map->m_bCastShadow = false;
-	}
 	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
 	OBJECT->AddActorList(m_vMapList);
 	OBJECT->AddActorList(m_vObjectList);
@@ -63,6 +62,10 @@ void Game::Init()
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
+	//m_pPlayer->SetPosition(Vec3(-90, 39, 100));
+	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
+	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
+	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
 	OBJECT->AddActor(m_pPlayer);
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
@@ -72,16 +75,46 @@ void Game::Init()
 		m_vObjectList.push_back(interactable);
 	}
 
-	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty_test.character.json");
-	
-	enemyList1 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
-	enemyList1.emplace_back(m_pBetty);
-	SetEnemy(enemyList1);
-	OBJECT->AddActorList(enemyList1);
-	
+	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty.character.json");
+	enemyList.emplace_back(m_pBetty);
+	//tempHeadRoller = PToA->MakeCharacter("../Resources/Prefab/Player/HeadRoller1.character.json");
+	//enemyList.emplace_back(tempHeadRoller);
+
+	auto enemy00 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage00/");
+	auto enemy01 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
+	auto enemy10 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage10/");
+	auto otherEnemy = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Other/");
+
+	for (auto e : enemy00)
+	{
+		enemyList.emplace_back(e);
+	}
+
+	for (auto e : enemy01)
+	{
+		enemyList.emplace_back(e);
+	}
+
+	for (auto e : enemy10)
+	{
+		enemyList.emplace_back(e);
+	}
+
+	for (auto e : otherEnemy)
+	{
+		enemyList.emplace_back(e);
+	}
+
+	SetEnemy(enemyList);
+	OBJECT->AddActorList(enemyList);
+	STAGE->AddEnemiesInStage(0, enemy00);
+	STAGE->AddEnemiesInStage(1, enemy01);
+	STAGE->AddEnemiesInStage(2, enemy10);
+
 	PROJECTILE->Init();
 
-	CreateUI();
+	// UI
+	m_cUI.init();
 
 	EFFECT->Init();
 	SetupEngineCamera();
@@ -93,19 +126,23 @@ void Game::Init()
 	m_pCursor = PToA->MakeObject("../Resources/Prefab/Cursor.object.json");
 	m_pCursor->Init();
 	OBJECT->SetCursorActor(m_pCursor);
+
+	UI->DoFadeOut();
 }
 
 void Game::Tick()
 {
+	STAGE->Tick();
 	if (INPUT->GetButton(G))
 	{
-		EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder");
+		EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder1");
 		EVENT->TriggerEvent(EventType::EVENT_FENCE, L"Fence1");
 	}
 
 	UpdateCursor();
 
-	if (INPUT->GetButton(GameKey::ESC))
+	if (ENGINE->m_bGamePaused == false &&
+		INPUT->GetButton(GameKey::ESC))
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
 
 	UpdateUI();
@@ -142,6 +179,7 @@ void Game::Tick()
 		}
 	}
 
+	CheckFrustumCulling();
 	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
@@ -160,12 +198,10 @@ void Game::Destroy()
 	m_pSkyMesh = nullptr;
 	m_pSky = nullptr;
 
-	m_vPausedBackGround.clear();
-	m_vUpgradeBackGround.clear();
-	m_vUpgradeState.clear();
-	m_vCoins.clear();
+	m_cUI.Destroy();
+	m_pCursor = nullptr;
 
-	enemyList1.clear();
+	enemyList.clear();
 	m_vObjectList.clear();
 	m_vMapList.clear();
 }
@@ -271,239 +307,15 @@ void Game::CreateWind()
 	}
 }
 
-void Game::CreateUI()
-{
-	// InGame UI
-	UI->AddUIList(PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json"));
-
-	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
-	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_Arrow.uis.json");
-	UI->AddUIList(m_vHPUI);
-	UI->AddUIList(m_vArrowUI);
-
-	m_pActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_active.png");
-	m_pInActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_inactive.png");
-
-	m_vActiveArrowScale = m_vArrowUI[3]->GetScale();
-	m_vInActiveArrowScale = m_vArrowUI[2]->GetScale();
-
-	// Paused UI
-	m_vPausedBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_BackGround.uis.json");
-	UI->AddUIList(m_vPausedBackGround);
-	m_vUpgradeBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_BackGround.uis.json");
-	UI->AddUIList(m_vUpgradeBackGround);
-	m_vUpgradeState = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_State.uis.json");
-	UI->AddUIList(m_vUpgradeState);
-	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
-	UI->AddUIList(m_vCoins);
-
-	// Dead
-	m_pDeadUI = PToA->MakeUI("../Resources/Prefab/UI_Dead.ui.json");
-	UI->AddUI(m_pDeadUI);
-
-	UI->DoFadeOut();
-}
-
 void Game::UpdateUI()
 {
-	// HP
-	Color RestColor;
-	RestColor = fullHP;
-	RestColor.w = -0.5f;
+	m_cUI.SetMaxHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetMaxHp());
+	m_cUI.SetCurrentHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHp());
+	m_cUI.SetArrowCount(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
+	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());
+	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
 
-	static float currentTime = 0.0f;
-	currentTime = TIMER->GetDeltaTime();
-
-	auto currentHP = dynamic_pointer_cast<TCharacter>(m_pPlayer)->GetHp();	
-
-	if(currentHP!= m_iPreHP)
-		m_bHPUIChange = true;
-
-	switch (currentHP)
-	{
-	case 4:
-	{
-		m_vHPUI[0]->SetColor(RestColor);
-		m_vHPUI[1]->SetColor(RestColor);
-		m_vHPUI[2]->SetColor(RestColor);
-		m_vHPUI[3]->SetColor(fullHP);
-	}
-	break;
-
-	case 3:
-	{
-		if (m_vHPUI[2]->GetColor().w < 0.f && m_bHPUIChange)
-		{
-			m_vHPUI[3]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-		{
-			m_vHPUI[0]->SetColor(RestColor);
-			m_vHPUI[1]->SetColor(RestColor);
-			m_vHPUI[2]->SetColor(fullHP);
-		}
-	}
-	break;
-
-	case 2:
-	{
-		if (m_vHPUI[1]->GetColor().w < 0.f && m_bHPUIChange)
-		{
-			m_vHPUI[2]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-		{
-			m_vHPUI[0]->SetColor(RestColor);
-			m_vHPUI[1]->SetColor(fullHP);
-		}
-	}
-	break;
-
-	case 1:
-	{
-		if (m_vHPUI[0]->GetColor().w < 0.f && m_bHPUIChange)
-		{
-			m_vHPUI[1]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-			m_vHPUI[0]->SetColor(fullHP);
-
-	}
-	break;
-
-	case 0:
-	{
-		m_vHPUI[0]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-	}
-	break;
-	}
-
-	m_iPreHP = currentHP;
-
-	// Arrow
-	switch (dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount())
-	{
-	case 4:
-		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[2]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[3]->SetAllTexture(m_pActiveArrowTexture);
-
-		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[2]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[3]->SetScale(m_vActiveArrowScale);
-
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = true;
-		m_vArrowUI[2]->m_bRender = true;
-		m_vArrowUI[3]->m_bRender = true;
-		break;
-
-	case 3:
-		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[2]->SetAllTexture(m_pActiveArrowTexture);
-
-		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[2]->SetScale(m_vActiveArrowScale);
-
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = true;
-		m_vArrowUI[2]->m_bRender = true;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
-
-	case 2:
-		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[1]->SetAllTexture(m_pActiveArrowTexture);
-
-		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[1]->SetScale(m_vActiveArrowScale);
-
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = true;
-		m_vArrowUI[2]->m_bRender = false;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
-
-	case 1:
-		m_vArrowUI[0]->SetAllTexture(m_pActiveArrowTexture);
-
-		m_vArrowUI[0]->SetScale(m_vActiveArrowScale);
-
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = false;
-		m_vArrowUI[2]->m_bRender = false;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
-
-	case 0:
-		m_vArrowUI[0]->m_bRender = false;
-		m_vArrowUI[1]->m_bRender = false;
-		m_vArrowUI[2]->m_bRender = false;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
-	}
-
-	// Paused
-	if (ENGINE->m_bGamePaused == true)
-	{
-		for (auto& pUI : m_vPausedBackGround)
-			pUI->m_bRender = true;
-
-		for (auto& pUI : m_vUpgradeBackGround)
-			pUI->m_bRender = true;
-
-		for (auto& pUI : m_vUpgradeState)
-			pUI->m_bRender = true;
-
-		OBJECT->SetCursorActor(nullptr);
-	}
-	else
-	{
-		for (auto& pUI : m_vPausedBackGround)
-			pUI->m_bRender = false;
-
-		for (auto& pUI : m_vUpgradeBackGround)
-			pUI->m_bRender = false;
-
-		for (auto& pUI : m_vUpgradeState)
-			pUI->m_bRender = false;
-
-		OBJECT->SetCursorActor(m_pCursor);
-	}	
-
-	// End
-	static float tempTime = 0;
-	if (dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead())
-	{
-		tempTime += TIMER->GetDeltaTime();
-
-		if (tempTime > m_fDeadUIPopTime)
-		{
-			m_pDeadUI->m_bRender = true;
-			m_vCoins[1]->m_bRender = false;
-			m_vCoins[3]->m_bRender = false;
-		}
-	}
-	else
-	{
-		m_pDeadUI->m_bRender = false;
-		tempTime = 0.f;
-		m_vCoins[1]->m_bRender = true;
-		m_vCoins[3]->m_bRender = true;
-	}
+	m_cUI.Tick();
 }
 
 void Game::UpdateCursor()
@@ -541,6 +353,11 @@ void Game::UpdateCursor()
 		angle = (acosf(fDot) + DD_PI / 2.f);
 
 	m_pCursor->SetRotation(Vec3(DD_PI / 2.f, angle, 0.f));
+
+	if(ENGINE->m_bGamePaused == true)
+		OBJECT->SetCursorActor(nullptr);
+	else
+		OBJECT->SetCursorActor(m_pCursor);
 }
 
 void Game::SetEnemy(vector<shared_ptr<AActor>>& _enemyList)
@@ -552,6 +369,24 @@ void Game::SetEnemy(vector<shared_ptr<AActor>>& _enemyList)
 		{
 			e->SetPlayer(m_pPlayer);
 		}
+	}
+}
+
+void Game::CheckFrustumCulling()
+{
+	auto vFrustum = CAMERA->GetFrustum();
+
+	for (auto& pEnemy : enemyList)
+	{
+		if (Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[0]) < 0 ||
+			Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[1]) < 0 ||
+			Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[2]) < 0 ||
+			Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[3]) < 0 ||
+			Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[4]) < 0 ||
+			Collision::CheckOBBToPlane(dynamic_pointer_cast<UBoxComponent>(pEnemy->GetShapeComponent())->GetBounds(), vFrustum[5]) < 0)
+			continue;
+
+		dynamic_pointer_cast<TEnemy>(pEnemy)->SetFrustumIn(true);
 	}
 }
 
@@ -581,11 +416,16 @@ void Game::CheckEnemyCollision()
 	// 이걸 또 영역 별로 넣어야하네 
 	if (melee)
 	{
-		for (auto iter = enemyList1.begin(); iter != enemyList1.end();)
+		for (auto iter = enemyList.begin(); iter != enemyList.end();)
 		{
+			if (dynamic_cast<TEnemy*>(iter->get())->IsFrustumIn() == false)
+			{
+				iter++;
+				continue;
+			}
 			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 			{
-				iter = enemyList1.erase(iter);
+				iter = enemyList.erase(iter);
 				continue;
 			}
 			COLLITION->CheckCollision(*iter, melee);
@@ -593,11 +433,16 @@ void Game::CheckEnemyCollision()
 		}
 	}
 
-	for (auto iter = enemyList1.begin(); iter != enemyList1.end();)
+	for (auto iter = enemyList.begin(); iter != enemyList.end();)
 	{
+		if (dynamic_cast<TEnemy*>(iter->get())->IsFrustumIn() == false)
+		{
+			iter++;
+			continue;
+		}
 		if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 		{
-			iter = enemyList1.erase(iter);
+			iter = enemyList.erase(iter);
 			continue;
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
@@ -612,7 +457,8 @@ void Game::CheckEnemyCollision()
 			continue;
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
-		//COLLITION->CheckCollision(m_pBetty, *iter);
+		//COLLITION->CheckCollision(tempHeadRoller, *iter);
+		COLLITION->CheckCollision(m_pBetty, *iter);
 		iter++;
 	}
 
@@ -643,15 +489,25 @@ void Game::CheckEnemyCollision()
 			iter++;
 		}
 
-		for (auto iter = enemyList1.begin(); iter != enemyList1.end();)
+		for (auto iter = enemyList.begin(); iter != enemyList.end();)
 		{
+			if (dynamic_cast<TEnemy*>(iter->get())->IsFrustumIn() == false)
+			{
+				iter++;
+				continue;
+			}
 			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
 			{
-				iter = enemyList1.erase(iter);
+				iter = enemyList.erase(iter);
 				continue;
 			}
 			COLLITION->CheckCollision(*proj, *iter);
 			iter++;
+		}
+
+		if (melee)
+		{
+			COLLITION->CheckCollision(*proj, melee);
 		}
 		proj++;
 	}

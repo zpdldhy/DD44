@@ -4,81 +4,146 @@
 
 class AActor;
 
-class Enemy1IdleState : public StateBase
+class HeadRollerIdleState : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
 public:
-	Enemy1IdleState(weak_ptr<AActor> _pOwner);
-	~Enemy1IdleState() {}
+	HeadRollerIdleState(weak_ptr<AActor> _pOwner);
+	~HeadRollerIdleState() {}
 public:
 	virtual void Enter() override;
 	virtual void Tick() override;
 	virtual void End() override;
 };
 
-class Enemy1WalkState : public StateBase
-{
-private:
-	weak_ptr<AActor> m_pOwner;
-public:
-	Enemy1WalkState(weak_ptr<AActor> _pOwner);
-	~Enemy1WalkState() {}
-public:
-	virtual void Enter() override;
-	virtual void Tick() override;
-	virtual void End() override;
-};
-
-class Enemy1AttackStartState : public StateBase
+class HeadRollerAttackState : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
 
-	// script에서 돌리고 있는 current state
-	shared_ptr<StateBase>* m_pCurrentState = nullptr;
+	// sub-state
+	enum RollPhase { Find, Start, Middle, Final, Done };
+	RollPhase currentPhase = RollPhase::Find;
 	
-	// 사용할 state
-	shared_ptr<StateBase> m_pIdleState;
-	shared_ptr<StateBase> m_pRollState;
-	shared_ptr<StateBase> m_pStunState;
+	shared_ptr<class HeadRollerRollFind> find;
+	shared_ptr<class HeadRollerRollStart> start;
+	shared_ptr<class HeadRollerRollMiddle> middle;
+	shared_ptr<class HeadRollerRollEnd> end;
+
+	// 
+	Vec3 dir;
+	float rollElapsed = 0.0f;
+	bool bHitWall = false;
 public:
-	Enemy1AttackStartState(weak_ptr<AActor> _pOwner);
-	~Enemy1AttackStartState() {}
+	HeadRollerAttackState(weak_ptr<AActor> _pOwner);
+	~HeadRollerAttackState() {}
 public:
 	virtual void Enter() override;
 	virtual void Tick() override;
 	virtual void End() override;
 public:
-	void SetIdleState(const shared_ptr<StateBase>& _roll);
-	// 1. Roll 2. Stun
-	void SetRelateState(const shared_ptr<StateBase>& _roll, const shared_ptr<StateBase>& _stun);
+	void SetDirection(Vec3 _dir) { dir = _dir; }
+	bool CheckWallCollision();
 };
 
-class Enemy1RollState : public StateBase
+#pragma region RollSubState
+class HeadRollerRollFind : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
-	shared_ptr<StateBase> m_pIdleState;
+	Vec3 dir;
+	float targetYaw;
 public:
-	Enemy1RollState(weak_ptr<AActor> _pOwner);
-	~Enemy1RollState() {}
+	HeadRollerRollFind(weak_ptr<AActor> _pOwner);
+	~HeadRollerRollFind() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+	void SetDirection(Vec3 _dir) { dir = _dir; }
+
+};
+class HeadRollerRollStart : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+	Vec3 dir;
+public:
+	HeadRollerRollStart(weak_ptr<AActor> _pOwner);
+	~HeadRollerRollStart() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+	void SetDirection(Vec3 _dir) { dir = _dir; }
+};
+
+class HeadRollerRollMiddle : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+	Vec3 dir;
+public:
+	HeadRollerRollMiddle(weak_ptr<AActor> _pOwner);
+	~HeadRollerRollMiddle() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+	void SetDirection(Vec3 _dir) { dir = _dir; }
+};
+
+class HeadRollerRollEnd : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+	Vec3 dir;
+public:
+	HeadRollerRollEnd(weak_ptr<AActor> _pOwner);
+	~HeadRollerRollEnd() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+public:
+	void SetDirection(Vec3 _dir) { dir = _dir; }
+};
+#pragma endregion
+
+class HeadRollerLookState : public StateBase
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+public:
+	HeadRollerLookState(weak_ptr<AActor> _pOwner);
+	~HeadRollerLookState() {}
 public:
 	virtual void Enter() override;
 	virtual void Tick() override;
 	virtual void End() override;
 };
 
-class Enemy1StunState : public StateBase
+class HeadRollerDieState : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
-
+	// sub-state
+	enum DiePhase { PLAYANIM, STAYSTILL, };
+	DiePhase currentPhase = DiePhase::PLAYANIM;
+	float dissolveOffset = 2.0f;
+	float currentTime = 0.0f;
 public:
-	Enemy1StunState(weak_ptr<AActor> _pOwner);
-	~Enemy1StunState() {}
+	HeadRollerDieState(weak_ptr<AActor> _pOwner);
+	~HeadRollerDieState() {}
+
 public:
 	virtual void Enter() override;
 	virtual void Tick() override;
 	virtual void End() override;
+	
+	void ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time);
 };

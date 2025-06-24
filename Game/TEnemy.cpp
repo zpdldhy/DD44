@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "TEnemy.h"
+
 #include "TPlayer.h"
 #include "Timer.h"
 #include "ObjectManager.h"
 #include "EffectManager.h"
 #include "ProjectileManager.h"
+#include "StageManager.h"
 
 void TEnemy::Tick()
 {
@@ -13,6 +15,18 @@ void TEnemy::Tick()
 	// FX
 	Flashing();
 	ApplyCrash();
+
+	m_bFrustumIn = false;	// 매 프레임 초기화
+}
+
+void TEnemy::Destroy()
+{
+	TCharacter::Destroy();
+	// StageManger에 알리기
+	if (stageIndex >= 0)
+	{
+		STAGE->DeleteEnemyInStage(stageIndex, m_Index);
+	}
 }
 
 bool TEnemy::CheckHit()
@@ -22,13 +36,18 @@ bool TEnemy::CheckHit()
 	if (hitElapsed > 1.0f)
 	{
 		// 근접 공격 확인
+		Vec3 look = GetLook();
 		bool isCol = false;
 		if (m_vCollisionList.size() > 0)
 		{
 			for (auto& index : m_vCollisionList)
 			{
-				if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
+				auto actor = OBJECT->GetActor(index.first);
+				if (actor->m_szName == L"Melee")
 				{
+					look = actor->GetPosition() - GetPosition();
+					look.Normalize();
+					//look = -look;
 					isCol = true;
 				}
 			}
@@ -44,8 +63,8 @@ bool TEnemy::CheckHit()
 			m_bIsFlashing = true;
 			//// Blood
 			Vec3 basePos = GetPosition();
-			basePos.y += RandomRange(3, 4);
-			Vec3 look = GetLook();
+			basePos.y += RandomRange(m_bloodRange.x, m_bloodRange.y);
+
 			velocity = -look;
 			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 			// HP

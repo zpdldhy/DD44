@@ -13,6 +13,7 @@ public:
 	bool SetWindowClass(HINSTANCE _hInstance);
 	bool SetWindow(float _windowX = 1440.0f, float _windowY = 900.0f);
 	bool SetWindowFullScreen();
+	void SetRun(bool _bRun) { m_bRun = _bRun; }
 	bool ProcessMessage();
 public:
 	bool CheckRun();

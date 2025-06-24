@@ -23,6 +23,7 @@
 void BatMovement::Init()
 {
 	SetPlayer(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer());
+	static_pointer_cast<TEnemy>(GetOwner())->SetBloodPos(Vec2(3, 4));
 
 	m_vCenter = GetOwner()->GetPosition();
 
@@ -149,7 +150,7 @@ void BatMovement::Tick()
 			m_vTargetPos = player.lock()->GetPosition();
 		}
 
-		//Attack();
+		Attack();
 	}
 	else
 	{

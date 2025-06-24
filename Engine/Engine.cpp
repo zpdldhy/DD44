@@ -83,6 +83,8 @@ void Engine::Frame()
 	TIMER->Update();
 	LIGHT->Tick();
 
+	UI->Tick();	// Fade가 되려면 여기 위치
+
 	if (!m_bGamePaused)
 	{
 		OBJECT->ObjectMove();				// 1. Move
@@ -103,8 +105,6 @@ void Engine::Frame()
 			WIND->Tick();
 		}
 	}
-
-	UI->Tick();
 
 	if (_app->m_type != SCENE_TYPE::GAME)
 	{
@@ -205,6 +205,8 @@ void Engine::Run()
 			Frame();
 			Render();
 		}
+
+		_window.SetRun(m_bRun);
 	}
 
 	Release();

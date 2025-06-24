@@ -70,6 +70,8 @@ void EffectManager::Render()
 {
     for(auto& pEffect : m_vInstanceEffect)
     {
+        if (pEffect == nullptr) continue;
+
         if (pEffect->m_bRender==true)
         {
             if(pEffect->GetEffectType() == EEffectType::BloodDecal)

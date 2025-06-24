@@ -161,7 +161,7 @@ bool PrefabLoader::LoadCharacter(const std::string& filePath, PrefabCharacterDat
     file >> j;
 
     data.Name = j["Name"];
-    // data.m_eActorType = j["ActorType"];
+    data.m_eActorType = j["ActorType"];
     data.RootMeshPath = j["RootMeshPath"];
     data.MeshPath = j["MeshPath"];
     data.ShaderPath = j["ShaderPath"];

@@ -2,7 +2,6 @@
 #include "UIManager.h"
 #include "AUIActor.h"
 #include "Timer.h"
-#include "PrefabToActor.h"
 
 UINT UIManager::m_iUIID = 0;
 
@@ -11,14 +10,17 @@ void UIManager::Tick()
 	for (auto pUI = m_vUIList.begin(); pUI != m_vUIList.end();)
 	{
 		if (pUI->second->m_bDelete == true)
+		{
 			pUI = m_vUIList.erase(pUI);
-		else
+			continue;
+		}
+		else if(pUI->second->m_bRun)
 		{
 			pUI->second->Tick();
 			if (pUI->second->m_bRender != false)
 				m_vRenderUIList.emplace_back(pUI->second);
-			pUI++;
 		}
+		pUI++;
 	}
 
 	UpdateFade();

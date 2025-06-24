@@ -46,6 +46,15 @@
     <Filter Include="GameActor\Component">
       <UniqueIdentifier>{e4fc3738-3cca-48b9-a3d9-b93b3a31875c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FSM\Stage">
+      <UniqueIdentifier>{fa4864be-08e0-422c-967b-96e45d438dc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controler">
+      <UniqueIdentifier>{b2635b04-419e-4fcf-8ead-41c21a2f75cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{c830beb1-39a8-45f6-a30c-5f0686f3a682}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -167,6 +176,19 @@
       <Filter>GameManagers</Filter>
     </ClInclude>
     <ClInclude Include="FenceScript.h" />
+    <ClInclude Include="HeadRollerMovement.h">
+      <Filter>Script\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyScriptBase.h">
+      <Filter>Script\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="StageManager.h" />
+    <ClInclude Include="UIControler.h">
+      <Filter>Controler</Filter>
+    </ClInclude>
+    <ClInclude Include="TriggerData.h">
+      <Filter>Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -282,6 +304,16 @@
       <Filter>GameManagers</Filter>
     </ClCompile>
     <ClCompile Include="FenceScript.cpp" />
+    <ClCompile Include="HeadRollerMovement.cpp">
+      <Filter>Script\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyScriptBase.cpp">
+      <Filter>Script\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="StageManager.cpp" />
+    <ClCompile Include="UIControler.cpp">
+      <Filter>Controler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\skinningShader.hlsl">

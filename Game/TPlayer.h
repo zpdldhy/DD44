@@ -1,5 +1,6 @@
 #pragma once
 #include "TCharacter.h"
+#include "TriggerData.h"
 
 class TPlayer : public TCharacter
 {
@@ -8,6 +9,7 @@ public:
 private:
 	int arrowCount = 4;
 	bool isClimbing = false;
+	TriggerData m_Trigger;
 
 	// ±‚≈∏ status
 	//int 
@@ -19,5 +21,11 @@ public:
 	bool IsClimbing() { return isClimbing; }
 	void StartClimbing();
 	void StopClimbing();
+
+	// Trigger
+public:
+	void ClearTrigger() { ZeroMemory(&m_Trigger, sizeof(TriggerData)); }
+	void SetTrigger(TriggerData _trigger) { m_Trigger = _trigger; }
+	TriggerData GetTrigger() { return m_Trigger; }
 };
 
