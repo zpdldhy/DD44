@@ -236,6 +236,10 @@ void MageAttackState::Enter()
 
 	attack->SetTarget(m_pTarget);
 	attack->Enter();
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	originSpped = animInstance->m_fAnimPlayRate;
+	//animInstance->m_fAnimPlayRate = 25.0f;
 }
 void MageAttackState::Tick()
 {
@@ -273,8 +277,10 @@ void MageAttackState::Tick()
 	case AttackPhase::Wait:
 		// 일정 시간 흐르면 appear 실행
 		disElapsed += TIMER->GetDeltaTime();
-		if (disElapsed > 3.0f)
+		if (disElapsed > 2.0f)
 		{
+			// 변경 필요 
+			// 위치 특정한 지점 미리 잡아놓고 거기서만 이동하도록
 			Vec3 oppositLook = m_pOwner.lock()->GetPosition() - m_pTarget.lock()->GetPosition();
 			oppositLook.y = 0.0f;
 			oppositLook.Normalize();
@@ -304,6 +310,9 @@ void MageAttackState::End()
 	// 기본 state 세팅
 	m_bOnPlaying = false;
 	currentPhase = AttackPhase::Attack;
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	animInstance->m_fAnimPlayRate = originSpped;
 }
 void MageAttackState::SetTarget(weak_ptr<AActor> _player)
 {
@@ -380,6 +389,7 @@ void MageAttackStart::Throw()
 	pos.y -= 1.0f;
 	PROJECTILE->ActivateOne(ProjectileType::MagicBall, pos, dir);
 }
+
 void MageAttackStart::SetTarget(weak_ptr<AActor> _target)
 {
 	m_pTarget = _target;

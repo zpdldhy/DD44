@@ -67,11 +67,10 @@ void UAnimInstance::Tick()
 	// Event
 	// should play event only once per frame
 	UINT currentFrame = static_cast<UINT>(animFrame);
-	if (currentFrame != lastEventFrame)
-	{
-		TriggetEvent(currentAnimTrackIndex, currentFrame);
-		lastEventFrame = currentFrame;
+	for (UINT frame = lastEventFrame + 1; frame <= currentFrame; ++frame) {
+		TriggetEvent(currentAnimTrackIndex, frame);
 	}
+	lastEventFrame = currentFrame;
 }
 
 void UAnimInstance::Render()

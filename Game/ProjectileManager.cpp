@@ -137,7 +137,8 @@ void ProjectileManager::Create()
 
 		projectile->m_bCollision = false;
 		collider->m_bVisible = false;
-		mesh->SetVisible(false);
+		projectile->m_bRender = false;
+		//mesh->SetVisible(false);
 
 		Vec3 identity;
 		ProjectileData data;
@@ -165,9 +166,9 @@ void ProjectileManager::Create()
 		ENEMYCOLLIDER->Add(ball);
 
 		ball->m_bCollision = false;
-
+		ball->m_bRender = false;
 		collider->m_bVisible = false;
-		mesh->SetVisible(false);
+		//mesh->SetVisible(false);
 
 		Vec3 identity;
 		ProjectileData data;
@@ -181,6 +182,7 @@ void ProjectileManager::Create()
 
 void ProjectileManager::ActivateOne(ProjectileType _type, Vec3 _pos, Vec3 _dir)
 {
+	bool activate = false;
 	switch (_type)
 	{
 	case ProjectileType::PlayerArrow: {
@@ -194,8 +196,9 @@ void ProjectileManager::ActivateOne(ProjectileType _type, Vec3 _pos, Vec3 _dir)
 				arrow.elapsed = 0.0f;
 
 				arrow.projectile->m_bCollision = true;
+				arrow.projectile->m_bRender = true;
 				arrow.projectile->GetShapeComponent()->m_bVisible = true;
-				arrow.projectile->GetMeshComponent()->SetVisible(true);
+				
 				// R
 				float targetYaw = atan2f(_dir.x, _dir.z);
 				Vec3 currentRot = arrow.projectile->GetRotation();
@@ -206,8 +209,14 @@ void ProjectileManager::ActivateOne(ProjectileType _type, Vec3 _pos, Vec3 _dir)
 				arrow.projectile->SetPosition(_pos);
 
 				activeObjList.push_back(arrow);
+
+				activate = true;
 				break;
 			}
+		}
+		if (!activate)
+		{
+			int a = 0;
 		}
 		// temp
 		// Add other
@@ -224,17 +233,22 @@ void ProjectileManager::ActivateOne(ProjectileType _type, Vec3 _pos, Vec3 _dir)
 				ball.elapsed = 0.0f;
 
 				ball.projectile->m_bCollision = true;
+				ball.projectile->m_bRender = true;
 				ball.projectile->GetShapeComponent()->m_bVisible = true;
-				ball.projectile->GetMeshComponent()->SetVisible(true);
+
 
 				// T
 				ball.projectile->SetPosition(_pos);
 
 				activeObjList.push_back(ball);
 
-
+				activate = true;
 				break;
 			}
+		}
+		if (!activate)
+		{
+			int a = 0;
 		}
 		// temp
 		// Add other
@@ -249,7 +263,8 @@ void ProjectileManager::DeactivateOne(ProjectileData _target)
 {
 	_target.projectile->m_bCollision = false;
 	_target.projectile->GetShapeComponent()->m_bVisible = false;
-	_target.projectile->GetMeshComponent()->SetVisible(false);
+	//_target.projectile->GetMeshComponent()->SetVisible(false);
+	_target.projectile->m_bRender = false;
 
 }
 

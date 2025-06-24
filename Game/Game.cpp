@@ -62,7 +62,7 @@ void Game::Init()
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
-	//m_pPlayer->SetPosition(Vec3(-90, 39, 100));
+	m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
 	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));

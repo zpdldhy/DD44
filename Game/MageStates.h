@@ -100,6 +100,8 @@ private:
 	// teleport 관련 변수
 	Vec3 destination;
 	float disElapsed = 0.0f;
+	// anim 관련 변수
+	float originSpped;
 	// sub-state
 	enum AttackPhase { Attack, Runaway, Disappear, Wait, Appear, Done };
 	AttackPhase currentPhase = AttackPhase::Attack;
