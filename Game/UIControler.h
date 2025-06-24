@@ -9,12 +9,33 @@ public:
 	virtual void Destroy() abstract;
 };
 
+enum SelectMenu
+{
+	SM_START = 0,
+	SM_OPTION,
+	SM_EXIT,
+	SM_COUNT,
+};
+
 class IntroUIControler : public UIControler
 {
+	vector<shared_ptr<class AUIActor>> m_vBackGround;
+	vector<shared_ptr<class AUIActor>> m_vMenu;
+	vector<shared_ptr<class AUIActor>> m_vArrowUI;
+	UINT m_iHoverMenu = 0;
+	float m_vDefaultSelectY = 0.f;
+	bool m_bSelectStartButton = false;
+	bool m_bSelectEndButton = false;
+	bool m_bthrowUI = false;
+
 public:
 	void init() override;
 	void Tick() override;
 	void Destroy() override;
+
+public:
+	int GetPrevMenu() { return m_iHoverMenu; }
+	bool IsSelectMenu() { return m_bSelectStartButton || m_bSelectEndButton; }
 };
 
 class InGameUIControler : public UIControler

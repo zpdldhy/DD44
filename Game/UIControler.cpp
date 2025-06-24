@@ -5,6 +5,7 @@
 #include "PrefabToActor.h"
 #include "UIManager.h"
 #include "ObjectManager.h"
+#include "Input.h"
 #include "Timer.h"
 #include "CameraManager.h"
 #include "Engine.h"
@@ -15,14 +16,157 @@
 
 void IntroUIControler::init()
 {
+	m_vBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Intro_BackGround.uis.json");
+	m_vMenu = PToA->MakeUIs("../Resources/Prefab/UI_Intro_Menu.uis.json");
+	m_vArrowUI = PToA->MakeUIs("../Resources/Prefab/UI_Intro_SelectArrow.uis.json");
+	UI->AddUIList(m_vBackGround);
+	UI->AddUIList(m_vMenu);
+	UI->AddUIList(m_vArrowUI);
+
+	m_vDefaultSelectY = m_vArrowUI[0]->GetPosition().y;
 }
 
 void IntroUIControler::Tick()
 {
+	if (!m_bSelectStartButton || !m_bSelectEndButton)
+	{
+		Vec3 idle(cosf(TIMER->GetGameTime() * 7.f) * 0.2f, 0.f, 0.f);
+
+		// 화살표 Idle
+		m_vArrowUI[0]->AddPosition(idle);
+		m_vArrowUI[1]->AddPosition(-idle);
+
+		auto temp1 = m_vArrowUI[0]->GetPosition().x;
+		auto temp2 = m_vArrowUI[1]->GetPosition().x;
+
+		// 키보드 입력
+		if (INPUT->GetButton(UP))
+		{
+			if (m_iHoverMenu != SM_START)
+			{
+				m_iHoverMenu--;
+			}
+		}
+
+		if (INPUT->GetButton(DOWN))
+		{
+			if (m_iHoverMenu != SM_EXIT)
+			{
+				m_iHoverMenu++;
+			}
+		}
+
+		// 마우스 입력
+		UINT iHover = 0;
+
+		for (auto& menu : m_vMenu)
+		{
+			if (menu->GetStateType() == UIStateType::ST_HOVER)
+				m_iHoverMenu = iHover;
+			else if (menu->GetStateType() == UIStateType::ST_SELECT)
+			{
+				if (iHover == 0)
+					m_bSelectStartButton = true;
+				else if (iHover == 2)
+					m_bSelectEndButton = true;				
+			}
+
+			menu->SetColor(Color(0.5f, 0.5f, 0.5f, 1.f));
+			iHover++;
+		}
+
+		switch (m_iHoverMenu)
+		{
+		case SM_START:
+		{
+			m_vMenu[m_iHoverMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+
+			for (auto& pUI : m_vArrowUI)
+			{
+				Vec3 NowPos(pUI->GetPosition());
+				NowPos.y = m_vDefaultSelectY;
+				pUI->SetPosition(NowPos);
+			}
+
+			if (INPUT->GetButton(ENTER))
+			{
+				m_bSelectStartButton = true;
+			}
+		}
+		break;
+		case SM_OPTION:
+		{
+			m_vMenu[m_iHoverMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+
+			for (auto& pUI : m_vArrowUI)
+			{
+				Vec3 NowPos(pUI->GetPosition());
+				NowPos.y = m_vDefaultSelectY - 0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2);
+				pUI->SetPosition(NowPos);
+			}
+
+		}
+		break;
+		case SM_EXIT:
+		{
+			m_vMenu[m_iHoverMenu]->SetColor(Color(1.f, 1.f, 1.f, 1.f));
+
+			for (auto& pUI : m_vArrowUI)
+			{
+				Vec3 NowPos(pUI->GetPosition());
+				NowPos.y = m_vDefaultSelectY - 2.f * 0.1333333253860473f * (static_cast<float>(g_windowSize.y) / 2);
+				pUI->SetPosition(NowPos);
+			}
+
+			if (INPUT->GetButton(ENTER))
+			{
+				m_bSelectEndButton = true;
+			}
+		}
+		break;
+		}
+	}
+
+	// UIThrow
+	if (m_bSelectStartButton)
+	{
+		// 화살표
+		m_vArrowUI[0]->AddPosition(Vec3(+TIMER->GetDeltaTime() * 1500.f, 0.f, 0.f));
+		m_vArrowUI[1]->AddPosition(Vec3(-TIMER->GetDeltaTime() * 1500.f, 0.f, 0.f));
+
+		// 선택창
+		for (auto& pUI : m_vMenu)
+			pUI->AddPosition(Vec3(0.f, -TIMER->GetDeltaTime() * 1000.f, 0.f));
+
+		// 타이틀
+		m_vBackGround[1]->AddPosition(Vec3(0.f, TIMER->GetDeltaTime() * 1000.f, 0.f));
+
+		auto what = m_vMenu[0]->GetPosition().y;
+
+		if ((m_vMenu[0]->GetPosition().y + (m_vMenu[0]->GetScale().y / 2) < -1.f * (static_cast<float>(g_windowSize.y) / 2.f)) &&
+			(m_vBackGround[1]->GetPosition().y - (m_vBackGround[1]->GetScale().y / 2) > 1.f * (static_cast<float>(g_windowSize.y) / 2.f)))
+		{
+			m_bthrowUI = true;
+			m_bSelectStartButton = false;
+		}
+	}
+
+	if (m_bSelectEndButton)
+		PostQuitMessage(0);
+
+	// Do FadeIn
+	if (m_bthrowUI)
+	{
+		UI->DoFadeIn();
+		m_bthrowUI = false;
+	}
 }
 
 void IntroUIControler::Destroy()
 {
+	m_vBackGround.clear();
+	m_vMenu.clear();
+	m_vArrowUI.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
