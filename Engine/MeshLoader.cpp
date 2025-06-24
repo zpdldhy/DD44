@@ -99,6 +99,7 @@ shared_ptr<UMeshComponent> MeshLoader::MakeMesh(MeshComponentData data, bool bRo
 	if (data.m_type == (int)MeshType::M_SKINNED)
 	{
 		mesh = make_shared<UInstanceSkinnedMeshComponent>();
+
 		mesh->SetMesh(meshRes->second);
 		{
 			auto skinnedRoot = dynamic_pointer_cast<UInstanceSkinnedMeshComponent>(mesh);

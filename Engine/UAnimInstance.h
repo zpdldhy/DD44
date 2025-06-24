@@ -39,7 +39,7 @@ public:
 	bool m_bOnPlayOnce;
 	bool m_bInPlace = false;
 	bool m_bPlay = true;
-	float m_fAnimPlayRate = 25.0f;
+	float m_fAnimPlayRate = 30.0f;
 	map<int, UINT> m_mKeyFrameMap;
 	unordered_map<pair<int, UINT>, function<void()>, AnimEventHash> eventMap;
 

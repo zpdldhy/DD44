@@ -20,7 +20,7 @@ private:
 	bool m_bFrustumIn = false;
 
 	// 
-	UINT stageIndex = -1;
+	int stageIndex = -1;
 public:
 	void Tick() override;
 	void Destroy() override;

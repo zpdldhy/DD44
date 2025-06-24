@@ -25,6 +25,18 @@ void MageMovement::Init()
 
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(6);
+
+	// staticMage
+	if (GetOwner()->m_eActorType == ActorType::AT_NONE)
+	{
+		bStaticMage = true;
+		findDistance = 50.0f;
+		dynamic_pointer_cast<MageHitState>(hit)->CheckStatic(bStaticMage);
+		dynamic_pointer_cast<MageAttackState>(attack)->CheckStatic(bStaticMage);
+		//dynamic_pointer_cast<MageDisappearState>(disappear)->CheckStatic(false);
+	}
+
+
 }
 
 void MageMovement::Tick()
@@ -87,16 +99,15 @@ void MageMovement::Tick()
 			ChangeState(attack);
 		}
 	}
+	else if(bStaticMage)
+	{
+		ChangeState(idle);
+	}
 
 	//
 	Rotate();
 
 	CheckHit();
-
-	//auto hand = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightHandSocket");
-	//Vec3 pos = hand->GetWorldPosition();
-	////EFFECT->PlayDustBurst(pos, 10.f, .1f);
-	//EFFECT->PlayEffect(EEffectType::Dust, pos, 0, Vec3(0.0f, 0.0f, 0.0f), 1.5f);
 }
 
 shared_ptr<UScriptComponent> MageMovement::Clone()

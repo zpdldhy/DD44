@@ -55,14 +55,32 @@ void Game::Init()
 	// Asset 로딩
 	PToA->Init();
 	m_vMapList = PToA->LoadAllPrefabs(".map.json");
-	m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
+	//m_vObjectList = PToA->LoadAllPrefabs(".objects.json");
+
+	stage0 = PToA->MakeObjects("../Resources/Prefab/Stage_0.objects.json");
+	stage1 = PToA->MakeObjects("../Resources/Prefab/Stage_1.objects.json");
+	stage2 = PToA->MakeObjects("../Resources/Prefab/Stage_2.objects.json");
+
+	for (auto obj : stage0)
+	{
+		m_vObjectList.emplace_back(obj);
+	}
+	for (auto obj : stage1)
+	{
+		m_vObjectList.emplace_back(obj);
+	}
+	for (auto obj : stage2)
+	{
+		m_vObjectList.emplace_back(obj);
+	}
+
 	OBJECT->AddActorList(m_vMapList);
 	OBJECT->AddActorList(m_vObjectList);
 	OBJECT->AddActorList(PToA->LoadAllPrefabs(".particlegroup.json"));
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
-	//m_pPlayer->SetPosition(Vec3(-90, 39, 100));
+	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
 	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
@@ -70,9 +88,13 @@ void Game::Init()
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
 	OBJECT->AddActorList(objectList);
-	for (auto interactable : objectList)
+	for (auto& interactable : objectList)
 	{
 		m_vObjectList.push_back(interactable);
+		stage0.push_back(interactable);
+		stage1.push_back(interactable);
+		stage2.push_back(interactable); 
+
 	}
 
 	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty.character.json");
@@ -82,7 +104,10 @@ void Game::Init()
 
 	auto enemy00 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage00/");
 	auto enemy01 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
+	auto enemy02 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage02/");
+
 	auto enemy10 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage10/");
+	auto enemy20 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage20/");
 	auto otherEnemy = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Other/");
 
 	for (auto e : enemy00)
@@ -95,11 +120,19 @@ void Game::Init()
 		enemyList.emplace_back(e);
 	}
 
-	for (auto e : enemy10)
+	for (auto e : enemy02)
 	{
 		enemyList.emplace_back(e);
 	}
-
+	for (auto e : enemy10)
+	{
+		enemyList.emplace_back(e);
+		collisionEnemy1.emplace_back(e);
+	}
+	for (auto e : enemy20)
+	{
+		enemyList.emplace_back(e);
+	}
 	for (auto e : otherEnemy)
 	{
 		enemyList.emplace_back(e);
@@ -133,11 +166,6 @@ void Game::Init()
 void Game::Tick()
 {
 	STAGE->Tick();
-	if (INPUT->GetButton(G))
-	{
-		EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder1");
-		EVENT->TriggerEvent(EventType::EVENT_FENCE, L"Fence1");
-	}
 
 	UpdateCursor();
 
@@ -451,7 +479,118 @@ void Game::CheckFrustumCulling()
 
 void Game::CheckEnemyCollision()
 {
+	StagePhase currentStage = STAGE->GetCurrentStage();
+	auto projectileList = PROJECTILE->GetActorList();
+	switch (currentStage)
+	{
+	case StagePhase::STAGE00:
+		for (auto proj = projectileList.begin(); proj != projectileList.end(); )
+		{
+			COLLITION->CheckCollision(*proj, m_pPlayer);
+
+			for (auto iter = stage0.begin(); iter != stage0.end();)
+			{
+				if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+				{
+					iter = stage0.erase(iter);
+					continue;
+				}
+				COLLITION->CheckCollision(*proj, *iter);
+				iter++;
+			}
+			proj++;
+		}
+	break;
+	case StagePhase::STAGE01:
+		for (auto proj = projectileList.begin(); proj != projectileList.end(); )
+		{
+			COLLITION->CheckCollision(*proj, m_pPlayer);
+
+			for (auto iter = stage0.begin(); iter != stage0.end();)
+			{
+				if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+				{
+					iter = stage0.erase(iter);
+					continue;
+				}
+				COLLITION->CheckCollision(*proj, *iter);
+				iter++;
+			}
+			proj++;
+		}
+	break;
+	case StagePhase::STAGE10:
+		for (auto proj = projectileList.begin(); proj != projectileList.end(); )
+		{
+			COLLITION->CheckCollision(*proj, m_pPlayer);
+
+			for (auto iter = stage1.begin(); iter != stage1.end();)
+			{
+				if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+				{
+					iter = stage1.erase(iter);
+					continue;
+				}
+				COLLITION->CheckCollision(*proj, *iter);
+				iter++;
+			}
+			proj++;
+		}
+
+		for (auto enemy = collisionEnemy1.begin(); enemy != collisionEnemy1.end(); )
+		{
+			if ((enemy->get() == nullptr) || enemy->get()->m_bDelete == true)
+			{
+				enemy = collisionEnemy1.erase(enemy);
+				continue;
+			}
+
+			for (auto obj = stage1.begin(); obj != stage1.end();)
+			{
+				if ((obj->get() == nullptr) || obj->get()->m_bDelete == true)
+				{
+					obj = stage1.erase(obj);
+					continue;
+				}
+				COLLITION->CheckCollision(*enemy, *obj);
+				obj++;
+			}
+			enemy++;
+		}
+		break;	
+	case StagePhase::STAGE20:
+		for (auto proj = projectileList.begin(); proj != projectileList.end(); )
+		{
+			COLLITION->CheckCollision(*proj, m_pPlayer);
+			COLLITION->CheckCollision(*proj, m_pBetty);
+
+			for (auto iter = stage2.begin(); iter != stage2.end();)
+			{
+				if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+				{
+					iter = stage2.erase(iter);
+					continue;
+				}
+				COLLITION->CheckCollision(*proj, *iter);
+				iter++;
+			}
+			proj++;
+		}
+		for (auto obj = stage2.begin(); obj != stage2.end();)
+		{
+			if ((obj->get() == nullptr) || obj->get()->m_bDelete == true)
+			{
+				obj = stage2.erase(obj);
+				continue;
+			}
+			COLLITION->CheckCollision(m_pBetty, *obj);
+			obj++;
+		}
+		break;
+	}
+
 	shared_ptr<AActor> melee;
+	// 몬스터 공격 범위랑 플레이어 확인
 	for (auto iter = ENEMYCOLLIDER->enemyList.begin(); iter != ENEMYCOLLIDER->enemyList.end();)
 	{
 		auto size = ENEMYCOLLIDER->enemyList.size();
@@ -468,11 +607,9 @@ void Game::CheckEnemyCollision()
 				melee = (*iter);
 			}
 		}
-		// player melee랑 enemy 확인
 		iter++;
 	}
-
-	// 이걸 또 영역 별로 넣어야하네 
+	// player melee랑 enemy 확인
 	if (melee)
 	{
 		for (auto iter = enemyList.begin(); iter != enemyList.end();)
@@ -491,7 +628,6 @@ void Game::CheckEnemyCollision()
 			iter++;
 		}
 	}
-
 	for (auto iter = enemyList.begin(); iter != enemyList.end();)
 	{
 		if (dynamic_cast<TEnemy*>(iter->get())->IsFrustumIn() == false)
@@ -516,8 +652,6 @@ void Game::CheckEnemyCollision()
 			continue;
 		}
 		COLLITION->CheckCollision(m_pPlayer, *iter);
-		//COLLITION->CheckCollision(tempHeadRoller, *iter);
-		COLLITION->CheckCollision(m_pBetty, *iter);
 		iter++;
 	}
 
@@ -532,22 +666,8 @@ void Game::CheckEnemyCollision()
 		iter++;
 	}
 
-	auto list = PROJECTILE->GetActorList();
-	for (auto proj = list.begin(); proj != list.end(); )
+	for (auto proj = projectileList.begin(); proj != projectileList.end(); )
 	{
-		COLLITION->CheckCollision(*proj, m_pPlayer);
-
-		for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
-		{
-			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
-			{
-				iter = m_vObjectList.erase(iter);
-				continue;
-			}
-			COLLITION->CheckCollision(*proj, *iter);
-			iter++;
-		}
-
 		for (auto iter = enemyList.begin(); iter != enemyList.end();)
 		{
 			if (dynamic_cast<TEnemy*>(iter->get())->IsFrustumIn() == false)
