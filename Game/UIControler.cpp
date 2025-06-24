@@ -13,6 +13,8 @@
 // Actor
 #include "AUIActor.h"
 
+// Other
+#include "Text.h"
 
 void IntroUIControler::init()
 {
@@ -279,6 +281,9 @@ void InGameUIControler::init()
 	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
 	UI->AddUIList(m_vCoins);
 
+	m_vCoins[1]->SetAlignment(DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	m_vCoins[3]->SetAlignment(DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
 	// Dead
 	m_vDeadUI = PToA->MakeUIs("../Resources/Prefab/UI_Dead.uis.json");
 	UI->AddUIList(m_vDeadUI);
@@ -296,6 +301,7 @@ void InGameUIControler::Tick()
 	UpdateArrow();
 	UpdateInteract();
 	UpdatePaused();
+	UpdateCoin();
 	UpdateDead();
 }
 
@@ -734,6 +740,14 @@ void InGameUIControler::UpdatePaused()
 
 		m_iSelectUpgradeUI = 0;
 	}
+}
+
+void InGameUIControler::UpdateCoin()
+{
+	wstring szCoin = L"x ";
+
+	m_vCoins[1]->SetText(szCoin + L"0");
+	m_vCoins[3]->SetText(szCoin + to_wstring(m_iCoin));
 }
 
 void InGameUIControler::UpdateDead()
