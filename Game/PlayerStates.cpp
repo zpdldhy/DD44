@@ -555,16 +555,16 @@ void PlayerShootStart::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Arrow");
 	animInstance->PlayOnce(index);
-
 	// pr timer로 조절 ( 시간 맞추기 어려우면 anim key event 추가로 바꾸자 ) 
+	// 애니메이션 속도가 달라지면 이거 안돼 -> 무조건 프레임 비교로 해야돼
+
 
 }
 void PlayerShootStart::Tick()
 {
-	elapsed += TIMER->GetDeltaTime();
-	if (elapsed > 0.7f)
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	if (animInstance->GetCurrentFrame() >= 20)
 	{
-		auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 		animInstance->m_bPlay = false;
 		End();
 	}
@@ -573,8 +573,6 @@ void PlayerShootStart::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
-	// Reset
-	elapsed = 0.0f;
 }
 
 PlayerShoot::PlayerShoot(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_SHOOT)

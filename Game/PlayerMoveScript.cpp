@@ -31,7 +31,7 @@ void PlayerMoveScript::Init()
 	m_fCurrentSpeed = m_fSpeed;
 
 	m_vLook = -m_vCameraOffset;
-	
+
 	empty = make_shared<PlayerEmptyState>();
 	idle = make_shared<PlayerIdleState>(m_pOwner);
 	walk = make_shared<PlayerWalkState>(m_pOwner);
@@ -99,7 +99,7 @@ void PlayerMoveScript::Tick()
 	// 모든 state 공통
 	PlayFX();
 	CheckCoolTIme();
-	CheckCollision();
+
 
 	currentState->Tick();
 	bool currentStateEnd = !currentState->IsPlaying();
@@ -108,18 +108,21 @@ void PlayerMoveScript::Tick()
 	switch (currentStateId)
 	{
 	case EMPTY_STATE:
+		CheckCollision();
 		CheckRoll();
 		CheckMove();
 		CheckClimb();
 		CheckAttack();
 		break;
 	case PLAYER_S_IDLE:
+		CheckCollision();
 		CheckRoll();
 		CheckMove();
 		CheckClimb();
 		CheckAttack();
 		break;
 	case PLAYER_S_WALK:
+		CheckCollision();
 		CheckRoll();
 		CheckMove();
 		CheckClimb();
@@ -127,6 +130,7 @@ void PlayerMoveScript::Tick()
 		break;
 	case PLAYER_S_ATTACK:
 		CheckComboAttack();
+		CheckCollision();
 		if (currentStateEnd)
 		{
 			attackRangeActor->m_bCollision = false;
@@ -138,21 +142,31 @@ void PlayerMoveScript::Tick()
 		if (currentStateEnd)
 		{
 			player->StopClimbing();
-			m_bCanClimb = true;
+			m_bCanClimb = false;
 		}
 		if (playerPos.y > m_vLadderEnd.y)
 		{
-			dynamic_pointer_cast<PlayerClimbState>(currentState)->CheckClimbFinish(true);
+			if (currentState == climb)
+			{
+				dynamic_pointer_cast<PlayerClimbState>(currentState)->CheckClimbFinish(true);
+			}
 		}
+		// 자연스러운 처리 없음
+		CheckCollision();
 		CheckMove();
 		break;
 	case PLAYER_S_SHOOT:
+		CheckCollision();
 		CheckRoll();
 		UpdateBow();
 		if (INPUT->GetButtonUp(RCLICK) || INPUT->GetButtonFree(RCLICK))
 		{
+
 			// 끝내라 신호 주기
-			dynamic_pointer_cast<PlayerShootState>(currentState)->CheckEnd(true);
+			if (currentState == shoot)
+			{
+				dynamic_pointer_cast<PlayerShootState>(currentState)->CheckEnd(true);
+			}
 		}
 		else
 		{
@@ -169,6 +183,7 @@ void PlayerMoveScript::Tick()
 		return;
 		break;
 	case PLAYER_S_HIT:
+		CheckCollision();
 		if (currentStateEnd)
 		{
 			m_bDamageCoolTime = true;
@@ -193,7 +208,7 @@ void PlayerMoveScript::Tick()
 
 	// Trigger 확인
 	player->ClearTrigger();
-	if (GetOwner()->m_vCollisionList.size()>0)
+	if (GetOwner()->m_vCollisionList.size() > 0)
 	{
 		for (auto& col : GetOwner()->m_vCollisionList)
 		{
@@ -242,7 +257,8 @@ void PlayerMoveScript::ChangeState(shared_ptr<StateBase> _state)
 			m_bCanRoll = true;
 		}
 	}
-	else if (currentStateId == PLAYER_S_SHOOT)
+	
+	if (currentStateId == PLAYER_S_SHOOT)
 	{
 		bow->m_bRender = false;
 	}
@@ -470,6 +486,11 @@ void PlayerMoveScript::Move()
 }
 void PlayerMoveScript::Climb()
 {
+	if (currentState != climb)
+	{
+		return;
+	}
+
 	float deltaTime = TIMER->GetDeltaTime();
 	Vec3 up = { 0, 1, 0 };
 	m_vRight = up.Cross(m_vLook);
@@ -489,10 +510,9 @@ void PlayerMoveScript::Climb()
 	{
 		moveDir += -up;
 	}
-
 	if (moveDir.Length() > 0)
 	{
-		auto fin = dynamic_pointer_cast<PlayerClimbState>(climb)->GetCurrentPhase();
+		auto fin = dynamic_pointer_cast<PlayerClimbState>(currentState)->GetCurrentPhase();
 		if (fin)
 		{
 			return;
@@ -500,21 +520,22 @@ void PlayerMoveScript::Climb()
 		// 이동
 		{
 			// Anim control 을 state로 넣어버리자. flag 세팅을 해주는 방식으로 전달만 해 
-			dynamic_pointer_cast<PlayerClimbState>(climb)->CheckIsMoving(true);
+			dynamic_pointer_cast<PlayerClimbState>(currentState)->CheckIsMoving(true);
 			Vec3 pos = moveDir * 0.2f;
 			GetOwner()->AddPosition(pos);
+
 		}
 	}
 	else
 	{
-		dynamic_pointer_cast<PlayerClimbState>(climb)->CheckIsMoving(false);
+		dynamic_pointer_cast<PlayerClimbState>(currentState)->CheckIsMoving(false);
 	}
 }
 
 void PlayerMoveScript::RollMove()
 {
 	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
-	GetOwner()->SetMove(m_vRollLook, 0.5f);
+	GetOwner()->SetMove(m_vRollLook, 0.7f);
 }
 
 bool PlayerMoveScript::CanAttack()

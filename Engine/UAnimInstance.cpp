@@ -38,7 +38,11 @@ void UAnimInstance::Tick()
 		}
 		else
 		{
-			m_bOnPlayOnce = false;
+			if (m_bOnPlayOnce)
+			{
+				//currentAnimTrackIndex = prevIndex;
+				m_bOnPlayOnce = false;
+			}
 			animFrame = lastFrame;
 		}
 	}
@@ -66,10 +70,13 @@ void UAnimInstance::Tick()
 
 	// Event
 	// should play event only once per frame
-	UINT currentFrame = static_cast<UINT>(animFrame);
-	for (UINT frame = lastEventFrame + 1; frame <= currentFrame; ++frame) {
-		TriggetEvent(currentAnimTrackIndex, frame);
+	int currentFrame = static_cast<int>(floor(animFrame));
+
+	for (int i = lastEventFrame + 1; i <= currentFrame; ++i)
+	{
+		TriggetEvent(currentAnimTrackIndex, i);
 	}
+
 	lastEventFrame = currentFrame;
 }
 

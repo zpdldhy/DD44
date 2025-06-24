@@ -16,7 +16,7 @@ public:
     shared_ptr<class ATerrainTileActor> MakeTileActor(const string& _file);
     shared_ptr<AActor> MakeCharacter(const string& _file);
     shared_ptr<class APawn> MakeObject(const string& _file);
-    vector<shared_ptr<class APawn>> MakeObjects(const string& _file);
+    vector<shared_ptr<class AActor>> MakeObjects(const string& _file);
     shared_ptr<class AUIActor> MakeUI(const string& _file);
     vector<shared_ptr<class AUIActor>> MakeUIs(const string& _file);
     vector<shared_ptr<class AParticleActor>> MakeParticleGroup(const std::string& _filePath);

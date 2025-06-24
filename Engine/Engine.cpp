@@ -54,7 +54,7 @@ void Engine::Init()
 			g_bRangeVisibleMode = true;
 		}
 		else
-			g_bRangeVisibleMode = true;
+			g_bRangeVisibleMode = false;
 	}
 
 	OBJECT->Init();

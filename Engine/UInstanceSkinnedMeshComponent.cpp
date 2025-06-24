@@ -140,6 +140,25 @@ void UInstanceSkinnedMeshComponent::UpdateMeshResourceData()
 	static_pointer_cast<USkeletalMeshResources>(m_pMesh)->AddInstanceData(m_instanceId, m_trans, m_anim);
 }
 
+void UInstanceSkinnedMeshComponent::RenderShadow()
+{
+	if (bRenderShadow)
+	{
+		PreRender();
+		//		auto shadowShader = SHADER->Get(L"../Resources/Shader/Shadow.hlsl");
+		auto shadowShader = SHADER->Get(GetMaterial()->GetShaderPath(), L"VS_SHADOW", L"PS_SHADOW");
+		DC->VSSetShader(shadowShader->GetVS().Get(), nullptr, 0);
+		DC->PSSetShader(shadowShader->GetPS().Get(), nullptr, 0);
+		PostRender();
+
+	}
+
+	for (auto& child : m_vChild)
+	{
+		child->RenderShadow();
+	}
+}
+
 void UInstanceSkinnedMeshComponent::SetVisible(bool _visible)
 {
 	bRender = _visible;

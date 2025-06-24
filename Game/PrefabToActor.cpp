@@ -234,9 +234,9 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 	return obj;
 }
 
-vector<shared_ptr<APawn>> PrefabToActor::MakeObjects(const string& _file)
+vector<shared_ptr<AActor>> PrefabToActor::MakeObjects(const string& _file)
 {
-	vector<shared_ptr<APawn>> vObjList;
+	vector<shared_ptr<AActor>> vObjList;
 
 	std::vector<PrefabObjectData> objList;
 	if (PREFAB->LoadObjectArray(_file, objList))
