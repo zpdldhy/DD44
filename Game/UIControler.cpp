@@ -269,6 +269,8 @@ void InGameUIControler::init()
 		pUI->m_bRender = false;
 	}
 
+	m_vUpgradeExplain[1]->SetAlignment(DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
 	// Paused System
 	m_vSystemBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_System_BackGround.uis.json");
 	UI->AddUIList(m_vSystemBackGround);
@@ -665,18 +667,35 @@ void InGameUIControler::UpdatePaused()
 			{
 			case 0:
 			{
-				
+				m_vUpgradeExplain[0]->SetText(L"최대 체력");
+				m_vUpgradeExplain[1]->SetText(L"최대 체력이 증가합니다.\n최대 체력이 높을수록 전투에서 더 오래 생존할 수 있으며,\n강력한 적이나 보스의 공격도 버틸 수 있는 여유가 생깁니다.");
+				m_vUpgradeExplain[2]->SetText(L"x 100");
 				break;
 			}
 
-			case 1:
+			case 1: 
+			{
+				m_vUpgradeExplain[0]->SetText(L"근접 공격");
+				m_vUpgradeExplain[1]->SetText(L"근접 공격력과 공격 범위가 증가합니다.\n근접 전투 시 적에게 주는 피해가 증가하며,\n전투를 빠르게 끝낼 수 있는 힘을 제공합니다.");
+				m_vUpgradeExplain[2]->SetText(L"x 100");
 				break;
+			}
 
 			case 2:
+			{
+				m_vUpgradeExplain[0]->SetText(L"이동 속도");
+				m_vUpgradeExplain[1]->SetText(L"이동과 구르기의 속도가 증가합니다.\n적의 공격을 피하거나 유리한 위치를 선점하는 데 도움이 되며,\n전장의 흐름을 유리하게 이끌 수 있습니다.");
+				m_vUpgradeExplain[2]->SetText(L"x 100");
 				break;
+			}
 
 			case 3:
+			{
+				m_vUpgradeExplain[0]->SetText(L"원거리 공격");
+				m_vUpgradeExplain[1]->SetText(L"화살의 공격력과 개수가 증가합니다.\n멀리 있는 적을 더 효과적으로 처리할 수 있으며,\n안전한 거리에서 전투를 이어가는 전략에 적합합니다.");
+				m_vUpgradeExplain[2]->SetText(L"x 100");
 				break;
+			}
 			}
 
 			break;
