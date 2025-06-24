@@ -177,6 +177,10 @@ void IntroUIControler::Destroy()
 
 void InGameUIControler::init()
 {
+	m_pActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_active.png");
+	m_pInActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_inactive.png");
+	m_pUpgradeDoneTexture = TEXTURE->Get(L"../Resources/Texture/UI/upgrade_slot_glow-1.png");
+
 	// InGame UI	
 	m_vMainBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json");
 	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
@@ -203,10 +207,7 @@ void InGameUIControler::init()
 	m_vHPUI[6]->m_bRender = false;
 	m_vHPUI[7]->m_bRender = false;
 	m_vHPUI[8]->m_bRender = false;
-
-	m_pActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_active.png");
-	m_pInActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_inactive.png");
-
+	
 	m_vActiveArrowScale = m_vArrowUI[3]->GetScale();
 	m_vInActiveArrowScale = m_vArrowUI[2]->GetScale();
 
@@ -601,6 +602,11 @@ void InGameUIControler::UpdatePaused()
 		if (iSelectMenu > 1)
 			iSelectMenu = 1;
 
+		static int iHealthPoint = 0;
+		static int iAttackPoint = 0;
+		static int iSpeedPoint = 0;
+		static int iArrowPoint = 0;
+
 		switch (iSelectMenu)
 		{
 			// Upgrade
@@ -669,7 +675,7 @@ void InGameUIControler::UpdatePaused()
 			{
 				m_vUpgradeExplain[0]->SetText(L"최대 체력");
 				m_vUpgradeExplain[1]->SetText(L"최대 체력이 증가합니다.\n최대 체력이 높을수록 전투에서 더 오래 생존할 수 있으며,\n강력한 적이나 보스의 공격도 버틸 수 있는 여유가 생깁니다.");
-				m_vUpgradeExplain[2]->SetText(L"x 100");
+				m_vUpgradeExplain[2]->SetText(L"x 100");				
 				break;
 			}
 
@@ -697,6 +703,42 @@ void InGameUIControler::UpdatePaused()
 				break;
 			}
 			}
+
+			if (INPUT->GetButton(GameKey::SPACE))
+			{
+				m_iSelectUpgrade = iSelectUpgrade + 1;
+				if (iSelectUpgrade == 0 && iHealthPoint < 5)
+				{
+					m_vUpgradeState[iSelectUpgrade][iHealthPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
+					iHealthPoint++;
+				}
+				else if (iSelectUpgrade == 1 && iAttackPoint < 5)
+				{
+					m_vUpgradeState[iSelectUpgrade][iAttackPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
+					iAttackPoint++;
+				}
+				else if (iSelectUpgrade == 2 && iSpeedPoint < 5)
+				{
+					m_vUpgradeState[iSelectUpgrade][iSpeedPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
+					iSpeedPoint++;
+				}
+				else if (iSelectUpgrade == 3&& iArrowPoint < 5)
+				{
+					m_vUpgradeState[iSelectUpgrade][iArrowPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
+					iArrowPoint++;
+				}
+			}
+			else
+				m_iSelectUpgrade = 0;
+
+			if (iHealthPoint > 5)
+				iHealthPoint = 5;
+			if (iAttackPoint > 5)
+				iAttackPoint = 5;
+			if (iSpeedPoint > 5)
+				iSpeedPoint = 5;
+			if (iArrowPoint > 5)
+				iArrowPoint = 5;
 
 			break;
 		}
