@@ -82,7 +82,9 @@ void Game::Init()
 
 	auto enemy00 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage00/");
 	auto enemy01 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
+	auto enemy02 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage02/");
 	auto enemy10 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage10/");
+	auto enemy20 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage20/");
 	auto otherEnemy = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Other/");
 
 	for (auto e : enemy00)
@@ -95,11 +97,18 @@ void Game::Init()
 		enemyList.emplace_back(e);
 	}
 
+	for (auto e : enemy02)
+	{
+		enemyList.emplace_back(e);
+	}
 	for (auto e : enemy10)
 	{
 		enemyList.emplace_back(e);
 	}
-
+	for (auto e : enemy20)
+	{
+		enemyList.emplace_back(e);
+	}
 	for (auto e : otherEnemy)
 	{
 		enemyList.emplace_back(e);
