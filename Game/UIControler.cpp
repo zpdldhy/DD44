@@ -261,6 +261,14 @@ void InGameUIControler::init()
 		m_vUpgradeState.emplace_back(vUI);
 	}
 
+	m_vUpgradeExplain = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_Explain.uis.json");
+	UI->AddUIList(m_vUpgradeExplain);
+	for (auto& pUI : m_vUpgradeExplain)
+	{
+		pUI->m_bRun = false;
+		pUI->m_bRender = false;
+	}
+
 	// Paused System
 	m_vSystemBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_System_BackGround.uis.json");
 	UI->AddUIList(m_vSystemBackGround);
@@ -277,6 +285,9 @@ void InGameUIControler::init()
 		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
+
+	m_vSystemSelection[0]->SetState(make_shared<IdleUIState>(UIUseType::UT_NOMOUSE));
+	m_vSystemSelection[1]->SetState(make_shared<IdleUIState>(UIUseType::UT_NOMOUSE));
 
 	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
 	UI->AddUIList(m_vCoins);
@@ -558,6 +569,10 @@ void InGameUIControler::UpdateInteract()
 
 void InGameUIControler::UpdatePaused()
 {
+	static int iSelectMenu = 0;
+	static int iSelectUpgrade = 0;
+	static int iSelectSystem = 0;
+
 	// Paused
 	if (ENGINE->m_bGamePaused == true)
 	{
@@ -574,17 +589,24 @@ void InGameUIControler::UpdatePaused()
 		}
 
 		// 0이 없그레이드, 1이 설정
-		if (m_vPausedSelect[0]->GetStateType() == UIStateType::ST_SELECT)
-			m_iSelectUI = 0;
-		else if (m_vPausedSelect[1]->GetStateType() == UIStateType::ST_SELECT)
-			m_iSelectUI = 1;
+		if (INPUT->GetButton(GameKey::A))
+			iSelectMenu--;
+		else if (INPUT->GetButton(GameKey::D))
+			iSelectMenu++;
 
-		switch (m_iSelectUI)
+		if (iSelectMenu < 0)
+			iSelectMenu = 0;
+		if (iSelectMenu > 1)
+			iSelectMenu = 1;
+
+		switch (iSelectMenu)
 		{
 			// Upgrade
 		case 0:
 		{
-			// 선택된 옵션 밝게
+			iSelectSystem = 0;
+
+			// 선택된 메뉴 밝게
 			m_vPausedSelect[0]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
 			m_vPausedSelect[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
 
@@ -602,38 +624,51 @@ void InGameUIControler::UpdatePaused()
 			}
 
 			// 설정값
+			if (INPUT->GetButton(GameKey::W))
+				iSelectUpgrade--;
+			if (INPUT->GetButton(GameKey::S))
+				iSelectUpgrade++;
+
+			if (iSelectUpgrade < 0)
+				iSelectUpgrade = 0;
+			if (iSelectUpgrade > 3)
+				iSelectUpgrade = 3;
+
 			for (auto& pUI : m_vUpgradeBackGround)
 			{
 				pUI->m_bRun = true;
 				pUI->m_bRender = true;
 			}
 
-			UINT iSelect = 1;
 			for (auto& pUIList : m_vUpgradeState)
 			{
-				// 해당 Upgrade 부분을 선택하면 색깔이 바뀌게 하는 로직
-				if (pUIList[0]->GetStateType() == UIStateType::ST_SELECT)
-				{
-					m_iSelectUpgradeUI = iSelect;
-				}
-
-				if (iSelect == m_iSelectUpgradeUI)
-					pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, 0.0f));
-				else
-					pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+				pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
 
 				for (auto& pUI : pUIList)
 				{
 					pUI->m_bRun = true;
 					pUI->m_bRender = true;
 				}
-
-				iSelect++;
 			}
 
-			// 선택된 Upgrade의 설명이 적힌 부분을 Render한다.
-			switch (m_iSelectUpgradeUI)
+			for (auto& pUI : m_vUpgradeExplain)
 			{
+				pUI->m_bRun = true;
+				pUI->m_bRender = true;
+			}
+
+			// 선택된 Upgrade의 색만 변경
+			m_vUpgradeState[iSelectUpgrade][1]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
+
+			// 선택된 Upgrade의 설명이 적힌 부분을 Render한다.
+			switch (iSelectUpgrade)
+			{
+			case 0:
+			{
+				
+				break;
+			}
+
 			case 1:
 				break;
 
@@ -642,11 +677,6 @@ void InGameUIControler::UpdatePaused()
 
 			case 3:
 				break;
-
-			case 4:
-				break;
-			default:
-				break;
 			}
 
 			break;
@@ -654,7 +684,9 @@ void InGameUIControler::UpdatePaused()
 		// System
 		case 1:
 		{
-			// 선택된 옵션 밝게
+			iSelectUpgrade = 0;
+
+			// 선택된 메뉴 밝게
 			m_vPausedSelect[0]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
 			m_vPausedSelect[1]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
 
@@ -672,7 +704,11 @@ void InGameUIControler::UpdatePaused()
 					pUI->m_bRender = false;
 				}
 
-			m_iSelectUpgradeUI = 0;
+			for (auto& pUI : m_vUpgradeExplain)
+			{
+				pUI->m_bRun = false;
+				pUI->m_bRender = false;
+			}
 
 			// 설정값
 			for (auto& pUI : m_vSystemBackGround)
@@ -686,6 +722,30 @@ void InGameUIControler::UpdatePaused()
 				pUI->m_bRun = true;
 				pUI->m_bRender = true;
 			}
+
+			if (INPUT->GetButton(GameKey::W))
+				iSelectSystem--;
+			if (INPUT->GetButton(GameKey::S))
+				iSelectSystem++;
+
+			if (iSelectSystem < 0)
+				iSelectSystem = 0;
+			if (iSelectSystem > 1)
+				iSelectSystem = 1;
+
+			if (iSelectSystem == 0)
+			{
+				m_vSystemSelection[0]->SetStateType(UIStateType::ST_HOVER);
+				m_vSystemSelection[1]->SetStateType(UIStateType::ST_IDLE);
+			}
+			else if (iSelectSystem == 1)
+			{
+				m_vSystemSelection[0]->SetStateType(UIStateType::ST_IDLE);
+				m_vSystemSelection[1]->SetStateType(UIStateType::ST_HOVER);
+			}
+
+			if (INPUT->CheckKey(GameKey::SPACE))
+				m_vSystemSelection[iSelectSystem]->SetStateType(UIStateType::ST_SELECT);
 
 			if (m_vSystemSelection[0]->GetStateType() == UIStateType::ST_SELECT)
 				m_bContinue = true;
@@ -738,7 +798,7 @@ void InGameUIControler::UpdatePaused()
 			pUI->m_bRender = false;
 		}
 
-		m_iSelectUpgradeUI = 0;
+		iSelectUpgrade = 0;
 	}
 }
 

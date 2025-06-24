@@ -68,14 +68,17 @@ class InGameUIControler : public UIControler
 	////////////
 	// Paused //
 	////////////
-	UINT m_iSelectUI = 0;
 	vector<shared_ptr<class AUIActor>> m_vPausedBackGround;
 	vector<shared_ptr<class AUIActor>> m_vPausedSelect;
 
 	// Paused Upgrade
-	UINT m_iSelectUpgradeUI = 0;	// 0이 None, 1 ~ 4 적용
 	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
 	vector<vector<shared_ptr<class AUIActor>>> m_vUpgradeState;
+	int m_iHealthPoint = 0;
+	int m_iAttackPoint = 0;
+	int m_iSpeedPoint = 0;
+	int m_iArrowPoint = 0;
+	vector<shared_ptr<class AUIActor>> m_vUpgradeExplain;
 
 	// Paused System
 	vector<shared_ptr<class AUIActor>> m_vSystemBackGround;
@@ -115,11 +118,14 @@ private:
 	void UpdateDead();
 
 public:
-	// 구현 필요!
 	void SetMaxHP(int _maxHP) { m_iMaxHP = _maxHP; }
 	void SetCurrentHP(int _currentHP) { m_iCurrentHP = _currentHP; }
 	void SetArrowCount(int _arrowCount) { m_iArrowCount = _arrowCount; }
 	void SetTriggerData(TriggerData _data) { m_tTrigger = _data; }
+	void SetUpgradeHealthPoint(int _point) { m_iHealthPoint = _point; }
+	void SetUpgradeAttackPoint(int _point) { m_iAttackPoint = _point; }
+	void SetUpgradeSpeedPoint(int _point) { m_iSpeedPoint = _point; }
+	void SetUpgradeArrowPoint(int _point) { m_iArrowPoint = _point; }
 	void SetCoin(int _coin) { m_iCoin = _coin; }
 	void SetDead(bool _isDead) { m_bDead = _isDead; }
 

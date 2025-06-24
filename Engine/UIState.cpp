@@ -23,6 +23,8 @@ bool UIState::CheckCollision(Vec3 _scale, Vec3 _pos)
 
 void IdleUIState::ProcessState(AUIActor* _pUI)
 {	
+	if (m_eUseType != UIUseType::UT_MOUSE) return;
+
 	if (CheckCollision(_pUI->GetScale(), _pUI->GetPosition()))
 	{
 		_pUI->SetState(make_shared<HoverUIState>());
@@ -34,6 +36,8 @@ void IdleUIState::ProcessState(AUIActor* _pUI)
 
 void HoverUIState::ProcessState(AUIActor* _pUI)
 {
+	if (m_eUseType != UIUseType::UT_MOUSE) return;
+
 	if (!CheckCollision(_pUI->GetScale(), _pUI->GetPosition()))
 	{
 		_pUI->SetState(make_shared<IdleUIState>());
@@ -52,6 +56,8 @@ void HoverUIState::ProcessState(AUIActor* _pUI)
 
 void ActiveUIState::ProcessState(AUIActor* _pUI)
 {
+	if (m_eUseType != UIUseType::UT_MOUSE) return;
+
 	if (INPUT->GetButton(LCLICK) || INPUT->GetButtonDown(LCLICK))
 		return;
 
@@ -76,6 +82,8 @@ void ActiveUIState::ProcessState(AUIActor* _pUI)
 
 void SelectUIState::ProcessState(AUIActor* _pUI)
 {
+	if (m_eUseType != UIUseType::UT_MOUSE) return;
+
 	if (!CheckCollision(_pUI->GetScale(), _pUI->GetPosition()))
 	{
 		_pUI->SetState(make_shared<IdleUIState>());
