@@ -455,7 +455,7 @@ void PlayerMoveScript::Move()
 		{
 			moveDir.Normalize();
 			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->SetMove(moveDir, 0.4f);
+			GetOwner()->SetMove(moveDir, 0.25f);
 		}
 
 		// È¸Àü		
@@ -535,7 +535,7 @@ void PlayerMoveScript::Climb()
 void PlayerMoveScript::RollMove()
 {
 	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
-	GetOwner()->SetMove(m_vRollLook, 0.7f);
+	GetOwner()->SetMove(m_vRollLook, 0.5f);
 }
 
 bool PlayerMoveScript::CanAttack()
