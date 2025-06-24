@@ -49,6 +49,7 @@ public:
 	wstring GetFontPath() { return m_szFontPath; }
 	void SetText(const wstring& _szText) { m_szText = _szText; }
 	wstring GetText() { return m_szText; }
+	void SetAlignment(DWRITE_TEXT_ALIGNMENT _txtAlignment, DWRITE_PARAGRAPH_ALIGNMENT _praAlignment) { m_TextAlignment = _txtAlignment; m_ParaAlignment = _praAlignment; }
 
 	// Prefab
 	void SetPrefabData(const PrefabUIData& _data) { m_PrefabData = _data; }
@@ -86,6 +87,8 @@ protected:
 	unique_ptr<Font> m_pFont = nullptr;
 	unique_ptr<Text> m_pText = nullptr;
 	wstring m_szText = L"Hello World";
+	DWRITE_TEXT_ALIGNMENT m_TextAlignment = DWRITE_TEXT_ALIGNMENT_CENTER;
+	DWRITE_PARAGRAPH_ALIGNMENT m_ParaAlignment = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
 
 	// Prefab
 	PrefabUIData m_PrefabData;

@@ -13,6 +13,8 @@
 // Actor
 #include "AUIActor.h"
 
+// Other
+#include "Text.h"
 
 void IntroUIControler::init()
 {
@@ -184,6 +186,24 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vHPUI);
 	UI->AddUIList(m_vArrowUI);
 
+	// BackGround 분리
+	auto iter = m_vHPUI.begin();
+	m_pHPBackGround = *iter;
+	m_vHPUI.erase(iter);
+
+	// HP 초기값
+	m_vHPUI[4]->m_bRun = false;
+	m_vHPUI[5]->m_bRun = false;
+	m_vHPUI[6]->m_bRun = false;
+	m_vHPUI[7]->m_bRun = false;
+	m_vHPUI[8]->m_bRun = false;
+
+	m_vHPUI[4]->m_bRender = false;
+	m_vHPUI[5]->m_bRender = false;
+	m_vHPUI[6]->m_bRender = false;
+	m_vHPUI[7]->m_bRender = false;
+	m_vHPUI[8]->m_bRender = false;
+
 	m_pActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_active.png");
 	m_pInActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_inactive.png");
 
@@ -261,17 +281,93 @@ void InGameUIControler::init()
 	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
 	UI->AddUIList(m_vCoins);
 
+	m_vCoins[1]->SetAlignment(DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	m_vCoins[3]->SetAlignment(DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
 	// Dead
-	m_pDeadUI = PToA->MakeUI("../Resources/Prefab/UI_Dead.ui.json");
-	UI->AddUI(m_pDeadUI);
+	m_vDeadUI = PToA->MakeUIs("../Resources/Prefab/UI_Dead.uis.json");
+	UI->AddUIList(m_vDeadUI);
+	for (auto& pUI : m_vDeadUI)
+	{
+		pUI->m_bRun = false;
+		pUI->m_bRender = false;
+	}
 }
 
 void InGameUIControler::Tick()
 {
+	FrameReset();
+	UpdateHP();
+	UpdateArrow();
+	UpdateInteract();
+	UpdatePaused();
+	UpdateCoin();
+	UpdateDead();
+}
+
+void InGameUIControler::Destroy()
+{
+	m_vMainBackGround.clear();
+	m_vHPUI.clear();
+	m_vArrowUI.clear();
+	m_vInterActionUI.clear();
+
+	m_vPausedBackGround.clear();
+	m_vPausedSelect.clear();
+	m_vUpgradeBackGround.clear();
+	m_vUpgradeState.clear();
+	m_vCoins.clear();
+
+	m_vSystemBackGround.clear();
+	m_vSystemSelection.clear();
+
+	m_vDeadUI.clear();
+}
+
+void InGameUIControler::FrameReset()
+{
+	m_bContinue = false;
+	m_bExit = false;
+	m_bDeadUIEnd = false;
+}
+
+void InGameUIControler::UpdateHP()
+{
 	// HP
-	Color RestColor;
-	RestColor = fullHP;
-	RestColor.w = -0.5f;
+	if (m_iMaxHP > 9)
+		m_iMaxHP = 9;
+
+	// Max HP 설정
+	static float HPBarSize = m_vHPUI[0]->GetScale().x;
+	static Vec3 HPBackSize = m_pHPBackGround->GetScale();
+	static Vec3 HPBackPos = m_pHPBackGround->GetPosition();
+	
+	int n = m_iMaxHP - 4;
+	float scale = HPBackSize.x + static_cast<float>(n) * HPBarSize;
+	float pos = HPBackPos.x + static_cast<float>(n) * (HPBarSize / 2.f);
+
+	m_pHPBackGround->SetScale(Vec3(scale, HPBackSize.y, HPBackSize.z));
+	m_pHPBackGround->SetPosition(Vec3(pos, HPBackPos.y, HPBackPos.z));
+
+	// Slice
+	if (n == 1)
+		m_pHPBackGround->SetSliceData(Vec4(0.125f, 0.125f, 0.5f, 0.5f));
+	else if (n == 2)
+		m_pHPBackGround->SetSliceData(Vec4(0.1f, 0.1f, 0.5f, 0.5f));
+	else if (n == 3)
+		m_pHPBackGround->SetSliceData(Vec4(0.1f, 0.1f, 0.5f, 0.5f));
+	else if (n == 4)
+		m_pHPBackGround->SetSliceData(Vec4(0.075f, 0.075f, 0.5f, 0.5f));
+	else if (n == 5)
+		m_pHPBackGround->SetSliceData(Vec4(0.075f, 0.075f, 0.5f, 0.5f));
+
+	m_vHPUI[m_iMaxHP - 1]->m_bRun = true;
+	m_vHPUI[m_iMaxHP - 1]->m_bRender = true;
+
+
+	// 현재 HP에 대한 로직
+	static Color FullHPColor = Color(0.055f, 0.247f, -0.324, 0.0f);
+	static Color RestColor = Color(0.055f, 0.247f, -0.324, -0.5f);
 
 	static float currentTime = 0.0f;
 	currentTime = TIMER->GetDeltaTime();
@@ -286,7 +382,7 @@ void InGameUIControler::Tick()
 		m_vHPUI[0]->SetColor(RestColor);
 		m_vHPUI[1]->SetColor(RestColor);
 		m_vHPUI[2]->SetColor(RestColor);
-		m_vHPUI[3]->SetColor(fullHP);
+		m_vHPUI[3]->SetColor(FullHPColor);
 	}
 	break;
 
@@ -303,7 +399,7 @@ void InGameUIControler::Tick()
 		{
 			m_vHPUI[0]->SetColor(RestColor);
 			m_vHPUI[1]->SetColor(RestColor);
-			m_vHPUI[2]->SetColor(fullHP);
+			m_vHPUI[2]->SetColor(FullHPColor);
 		}
 	}
 	break;
@@ -320,7 +416,7 @@ void InGameUIControler::Tick()
 		else
 		{
 			m_vHPUI[0]->SetColor(RestColor);
-			m_vHPUI[1]->SetColor(fullHP);
+			m_vHPUI[1]->SetColor(FullHPColor);
 		}
 	}
 	break;
@@ -335,7 +431,7 @@ void InGameUIControler::Tick()
 		else if (m_bHPUIChange == true)
 			m_bHPUIChange = false;
 		else
-			m_vHPUI[0]->SetColor(fullHP);
+			m_vHPUI[0]->SetColor(FullHPColor);
 
 	}
 	break;
@@ -348,7 +444,10 @@ void InGameUIControler::Tick()
 	}
 
 	m_iPreHP = m_iCurrentHP;
+}
 
+void InGameUIControler::UpdateArrow()
+{
 	// Arrow
 	switch (m_iArrowCount)
 	{
@@ -415,9 +514,12 @@ void InGameUIControler::Tick()
 		m_vArrowUI[3]->m_bRender = false;
 		break;
 	}
+}
 
+void InGameUIControler::UpdateInteract()
+{
 	// InterAction, 상호작용 UI를 띄우는 구간
-	//auto vTriggerList = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger();
+//auto vTriggerList = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger();
 	if (m_tTrigger.eTriggerType != ETriggerType::TT_NONE)
 	{
 		static Vec3 offsetPos1 = m_vInterActionUI[1]->GetPosition();
@@ -452,7 +554,10 @@ void InGameUIControler::Tick()
 			pUI->m_bRender = false;
 		}
 	}
+}
 
+void InGameUIControler::UpdatePaused()
+{
 	// Paused
 	if (ENGINE->m_bGamePaused == true)
 	{
@@ -583,10 +688,10 @@ void InGameUIControler::Tick()
 			}
 
 			if (m_vSystemSelection[0]->GetStateType() == UIStateType::ST_SELECT)
-				ENGINE->m_bGamePaused = false;
+				m_bContinue = true;
 
 			if (m_vSystemSelection[1]->GetStateType() == UIStateType::ST_SELECT)
-				ENGINE->m_bRun = false;
+				m_bExit = true;
 
 			break;
 		}
@@ -635,44 +740,120 @@ void InGameUIControler::Tick()
 
 		m_iSelectUpgradeUI = 0;
 	}
+}
 
-	// End
+void InGameUIControler::UpdateCoin()
+{
+	wstring szCoin = L"x ";
+
+	m_vCoins[1]->SetText(szCoin + L"0");
+	m_vCoins[3]->SetText(szCoin + to_wstring(m_iCoin));
+}
+
+void InGameUIControler::UpdateDead()
+{
+	// Dead
 	static float tempTime = 0;
+	static Vec3 tempScale = m_vDeadUI[0]->GetScale();
+	static Vec3 tempBackPosition = m_vDeadUI[0]->GetPosition();
+	static Vec3 tempLPosition = m_vDeadUI[2]->GetPosition();
+	static Vec3 tempRPosition = m_vDeadUI[3]->GetPosition();
+
 	if (m_bDead)
 	{
 		tempTime += TIMER->GetDeltaTime();
 
-		if (tempTime > m_fDeadUIPopTime)
+		// 사망 UI가 뜨는 시간
+		if (tempTime > 1.f)
 		{
-			m_pDeadUI->m_bRender = true;
+			m_vDeadUI[0]->m_bRun = true;
+			m_vDeadUI[0]->m_bRender = true;
+
+			// 떨리는 효과
+			float deltaX = tempBackPosition.x + 2.f * cosf(rand());
+			float deltaY = tempBackPosition.y + 2.f * cosf(rand());
+
+			m_vDeadUI[0]->SetPosition(Vec3(deltaX, deltaY, 1.f));
+
+			if (tempTime < 4.f) 
+			{
+				// 커지는 효과
+				float ratio = tempScale.x / tempScale.y;
+				
+				// 커진 픽셀은 50
+				float scaleX = tempScale.x + 50.f * ratio * (tempTime - 1.f) / 3.f;
+				float scaleY = tempScale.y + 50.f * (tempTime - 1.f) / 3.f;
+				m_vDeadUI[0]->SetScale(Vec3(scaleX, scaleY, 1.f));
+			}
+
+			// continue가 뜨는 시간
+			if (tempTime > 4.f)
+			{
+				m_vDeadUI[1]->m_bRun = true;
+				m_vDeadUI[2]->m_bRun = true;
+				m_vDeadUI[3]->m_bRun = true;
+				m_vDeadUI[1]->m_bRender = true;
+				m_vDeadUI[2]->m_bRender = true;
+				m_vDeadUI[3]->m_bRender = true;
+
+				// 화살표 좌우 Idle 움직임
+				if (m_bDeadUIMove == false)
+				{
+					float deltaTime = cosf(3.f * TIMER->GetGameTime()) / 2.f;
+					m_vDeadUI[2]->AddPosition(Vec3(-deltaTime, 0.f, 0.f));
+					m_vDeadUI[3]->AddPosition(Vec3(deltaTime, 0.f, 0.f));
+				}
+
+				// continue에서 enter 또는 UI선택시
+				if (INPUT->GetButton(GameKey::ENTER) ||
+					m_vDeadUI[1]->GetStateType() == UIStateType::ST_SELECT)
+				{
+					m_bDeadContinue = true;
+					m_bDeadUIMove = true;
+				}
+
+				// 화살표 UI가 날라가는 부분
+				if (m_bDeadUIMove == true)
+				{
+					float deltaTime = 1000.f * TIMER->GetDeltaTime();
+					m_vDeadUI[2]->AddPosition(Vec3(-deltaTime, 0.f, 0.f));
+					m_vDeadUI[3]->AddPosition(Vec3(deltaTime, 0.f, 0.f));
+
+					auto toNDC = m_vDeadUI[2]->GetPosition().x / (static_cast<float>(g_windowSize.x) / 2.f);
+
+					// 화살표 다 날라가면 끝
+					if (toNDC < -1.2f )
+					{
+						m_bDeadUIMove = false;
+						m_bDeadUIEnd = true;
+					}
+				}
+			}
+
+			for (auto& pUI : m_vDeadUI) 
+			{
+				pUI->m_bRender = true;
+			}
+
+			// coin의 글자를 지워준다
 			m_vCoins[1]->m_bRender = false;
 			m_vCoins[3]->m_bRender = false;
 		}
 	}
 	else
 	{
-		m_pDeadUI->m_bRender = false;
+		m_vDeadUI[0]->SetScale(tempScale);
+		m_vDeadUI[0]->SetPosition(tempBackPosition);
+		m_vDeadUI[2]->SetPosition(tempLPosition);
+		m_vDeadUI[3]->SetPosition(tempRPosition);
+
+		for (auto& pUI : m_vDeadUI)
+		{
+			pUI->m_bRun = false;
+			pUI->m_bRender = false;
+		}
 		tempTime = 0.f;
 		m_vCoins[1]->m_bRender = true;
 		m_vCoins[3]->m_bRender = true;
 	}
-}
-
-void InGameUIControler::Destroy()
-{
-	m_vMainBackGround.clear();
-	m_vHPUI.clear();
-	m_vArrowUI.clear();
-	m_vInterActionUI.clear();
-
-	m_vPausedBackGround.clear();
-	m_vPausedSelect.clear();
-	m_vUpgradeBackGround.clear();
-	m_vUpgradeState.clear();
-	m_vCoins.clear();
-
-	m_vSystemBackGround.clear();
-	m_vSystemSelection.clear();
-
-	m_pDeadUI = nullptr;
 }

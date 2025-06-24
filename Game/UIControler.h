@@ -46,8 +46,9 @@ class InGameUIControler : public UIControler
 	vector<shared_ptr<class AUIActor>> m_vMainBackGround;
 
 	// HP
+	shared_ptr<class AUIActor> m_pHPBackGround = nullptr;
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
-	Color fullHP = { 0.055f, 0.247f, -0.324, 0.0f };
+	int m_iMaxHP = 4;
 	int m_iCurrentHP = 4;
 	int m_iPreHP = 0;
 	bool m_bHPUIChange = false;
@@ -75,29 +76,55 @@ class InGameUIControler : public UIControler
 	UINT m_iSelectUpgradeUI = 0;	// 0이 None, 1 ~ 4 적용
 	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
 	vector<vector<shared_ptr<class AUIActor>>> m_vUpgradeState;
-	vector<shared_ptr<class AUIActor>> m_vCoins;
 
 	// Paused System
 	vector<shared_ptr<class AUIActor>> m_vSystemBackGround;
 	vector<shared_ptr<class AUIActor>> m_vSystemSelection;
 
+	bool m_bContinue = false;
+	bool m_bExit = false;
+
+	////////////
+	//  Coin  //
+	////////////
+	vector<shared_ptr<class AUIActor>> m_vCoins;
+	int m_iCoin = 0;
+
 	////////////
 	//  Dead  //
 	////////////
-	shared_ptr<class AUIActor> m_pDeadUI = nullptr;
+	vector<shared_ptr<class AUIActor>> m_vDeadUI;
 	bool m_bDead = false;
-	float m_fDeadUIPopTime = 1.f;
+	bool m_bDeadContinue = false;
+	bool m_bDeadUIMove = false;
+	bool m_bDeadUIEnd = false;
 
 public:
 	void init() override;
 	void Tick() override;
 	void Destroy() override;
 
+	void FrameReset();
+
+private:
+	void UpdateHP();
+	void UpdateArrow();
+	void UpdateInteract();
+	void UpdatePaused();
+	void UpdateCoin();
+	void UpdateDead();
+
 public:
 	// 구현 필요!
-	void SetMaxHP(int _maxHP) {}
+	void SetMaxHP(int _maxHP) { m_iMaxHP = _maxHP; }
 	void SetCurrentHP(int _currentHP) { m_iCurrentHP = _currentHP; }
 	void SetArrowCount(int _arrowCount) { m_iArrowCount = _arrowCount; }
 	void SetTriggerData(TriggerData _data) { m_tTrigger = _data; }
+	void SetCoin(int _coin) { m_iCoin = _coin; }
 	void SetDead(bool _isDead) { m_bDead = _isDead; }
+
+	bool SelectContinue() { return m_bContinue; }
+	bool SelectExit() { return m_bExit; }
+	bool SelectDeadContinue() { return m_bDeadContinue; }
+	bool EndDeadUI() { return m_bDeadUIEnd; }
 };
