@@ -23,6 +23,7 @@ void CameraManager::Init()
 	}
 
 	CreateCameraBuffer();
+	m_FrustumPlanes.resize(6);
 }
 
 void CameraManager::Tick()
@@ -36,7 +37,7 @@ void CameraManager::Tick()
 	m_pUICameraActor->Tick();
 	m_p3DCameraActor->GetCameraComponent()->SetFrustumVisible(false);
 
-	//UpdateFrustumPlanes();
+	UpdateFrustumPlanes();
 
 	//auto QuadRoot = OBJECT->GetQuadTree()->GetRoot();
 	//FrustumCulling(QuadRoot);
@@ -229,4 +230,29 @@ Matrix CameraManager::GetUIView()
 Matrix CameraManager::GetUIProjection()
 {
 	return m_pUIComponent->GetProjection();
+}
+
+Vec3 CameraManager::GetNDCPos(Vec3 _vWorldPos)
+{
+	Vec3 ret;
+
+	Vec4 temp = Vec4(_vWorldPos.x, _vWorldPos.y, _vWorldPos.z, 1.f);
+	temp = XMVector4Transform(temp, Get3DView());
+	temp = XMVector4Transform(temp, Get3DProjection());
+
+	temp /= temp.w;
+
+	ret = Vec3(temp.x, temp.y, temp.z);
+
+	return ret;
+}
+
+Vec3 CameraManager::GetScreenPos(Vec3 _vWorldPos)
+{
+	Vec3 ret = GetNDCPos(_vWorldPos);
+
+	ret.x *= (static_cast<float>(g_windowSize.x) / 2.f);
+	ret.y *= (static_cast<float>(g_windowSize.y) / 2.f);
+
+	return ret;
 }

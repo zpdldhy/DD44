@@ -18,6 +18,7 @@ class Engine : public Singleton<Engine>
 
 public:
 	bool m_bGamePaused = false;
+	bool m_bRun = true;
 
 public:
 	void Init();

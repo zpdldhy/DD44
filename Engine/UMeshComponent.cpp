@@ -1,12 +1,23 @@
 #include "pch.h"
 #include "UMeshComponent.h"
 #include "ShadowManager.h"
+#include "BloomManager.h"
 
 
 void UMeshComponent::Render()
 {
 	if (bRender && bUseInstance == false)
 	{
+		if (GetName() == L"BackSword" || GetName() == L"RightSword" || GetName() == L"LeftSword")
+		{
+			BLOOMMANAGER->BeginBloomPass();
+			PreRender();
+			auto bloomShader = SHADER->Get(GetMaterial()->GetShaderPath(), L"VS_BLOOM", L"PS_BLOOM");
+			DC->VSSetShader(bloomShader->GetVS().Get(), nullptr, 0);
+			DC->PSSetShader(bloomShader->GetPS().Get(), nullptr, 0);
+			PostRender();
+			BLOOMMANAGER->EndBloomPass();
+		}
 		PreRender();
 		PostRender();
 	}

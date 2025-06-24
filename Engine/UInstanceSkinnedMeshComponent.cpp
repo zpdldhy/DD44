@@ -23,6 +23,12 @@ void UInstanceSkinnedMeshComponent::Init()
 
 void UInstanceSkinnedMeshComponent::Tick()
 {
+	//if (!bRender)
+	//{
+	//	dynamic_pointer_cast<USkeletalMeshResources>(m_pMesh)->FreeInstanceIndex(m_instanceId);
+	//	return;
+	//}
+
 	if (m_pBaseAnim) m_pBaseAnim->Tick();
 
 	USceneComponent::Tick();
@@ -43,6 +49,20 @@ void UInstanceSkinnedMeshComponent::Tick()
 		child->Tick();
 	}
 
+}
+
+void UInstanceSkinnedMeshComponent::Render()
+{
+	if (bUseInstance == false)
+	{
+		PreRender();
+		PostRender();
+	}
+
+	for (auto& child : m_vChild)
+	{
+		child->Render();
+	}
 }
 
 void UInstanceSkinnedMeshComponent::PreRender()

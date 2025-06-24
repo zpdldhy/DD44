@@ -13,6 +13,7 @@ protected:
 
 public:
 	virtual void Tick() override;
+	virtual void Destroy() override;
 public:
 	void SetHp(int _hp);
 	int GetHp() { return hp; }

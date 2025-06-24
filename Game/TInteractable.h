@@ -10,9 +10,9 @@ public:
 	virtual ~TInteractable() = default;
 public:
 	virtual void Init() override;
+	virtual void Tick() override;
 public:
 	void Interact();
-
 private:
 	shared_ptr<TInteractScriptComponent> interactionScript;
 };

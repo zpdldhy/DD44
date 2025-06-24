@@ -1,5 +1,6 @@
 #pragma once
 #include "TCharacter.h"
+#include "TriggerData.h"
 
 enum class EStatType
 {
@@ -24,6 +25,7 @@ public:
 private:
 	int arrowCount = 4;
 	bool isClimbing = false;
+	TriggerData m_Trigger;
 
 	// 스테이터스
 	float m_fMaxHP = 4.f;
@@ -45,6 +47,12 @@ public:
 	bool IsClimbing() { return isClimbing; }
 	void StartClimbing();
 	void StopClimbing();
+
+	// Trigger
+public:
+	void ClearTrigger() { ZeroMemory(&m_Trigger, sizeof(TriggerData)); }
+	void SetTrigger(TriggerData _trigger) { m_Trigger = _trigger; }
+	TriggerData GetTrigger() { return m_Trigger; }
 public:
 	// 영혼(재화)
 	void AddSoul(int _amount) { m_iSoul += _amount; }

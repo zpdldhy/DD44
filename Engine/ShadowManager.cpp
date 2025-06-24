@@ -122,7 +122,9 @@ void ShadowManager::EndShadowPass()
 
 void ShadowManager::UpdateCameraCB()
 {
-	auto pCameraComponent = LIGHT->GetLight(0)->GetCameraComponent();;
+	if (LIGHT->GetLight(0) == nullptr) return;
+	auto pCameraComponent = LIGHT->GetLight(0)->GetCameraComponent();
+
 	pCameraComponent->SetNear(100.f);
 	pCameraComponent->SetFar(1500.f);
 	pCameraComponent->SetOrthographic(450.f, 450.f);
