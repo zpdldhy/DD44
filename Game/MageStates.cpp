@@ -184,7 +184,7 @@ void MageHitState::Enter()
 void MageHitState::Tick()
 {
 	runElapsed += TIMER->GetDeltaTime();
-	if (bMove)
+	if (bMove && !bStaticMage)
 	{
 		// 이동
 		Vec3 pos = dir * Vec3(0.1f, 0.0f, 0.1f);
@@ -261,11 +261,34 @@ void MageAttackState::Tick()
 		attack->Tick();
 		if (!attack->IsPlaying())
 		{
-			runaway->SetDirection(m_pTarget.lock()->GetPosition());
-			runaway->Enter();
-			currentPhase = AttackPhase::Runaway;
+			if (!bStaticMage)
+			{
+				runaway->SetDirection(m_pTarget.lock()->GetPosition());
+				runaway->Enter();
+				currentPhase = AttackPhase::Runaway;
+			}
+			else
+			{
+				// 애니메이션 Idle 플레이
+				auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+				int idleIndex = animInstance->GetAnimIndex(L"Idle2");
+				animInstance->SetCurrentAnimTrack(idleIndex);
+				currentPhase = AttackPhase::StandStill;
+
+			}
 		}
 		break;
+	case AttackPhase::StandStill:
+	{
+		waitElapsed += TIMER->GetDeltaTime();
+		if (waitElapsed > 2.0f)
+		{
+			waitElapsed = 0.0f;
+			attack->Enter();
+			currentPhase = AttackPhase::Attack;
+		}
+	}
+	break;
 	case AttackPhase::Runaway:
 		runaway->Tick();
 		if (!runaway->IsPlaying())
@@ -279,9 +302,7 @@ void MageAttackState::Tick()
 		if (!disappear->IsPlaying())
 		{
 			currentPhase = AttackPhase::Wait;
-			//m_pOwner.lock()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
 			m_pOwner.lock()->m_bCollision = false;
-			//m_pOwner.lock()->GetMeshComponent()->SetVisible(false);
 			m_pOwner.lock()->GetShapeComponent()->m_bVisible = false;
 
 		}

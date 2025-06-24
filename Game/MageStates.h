@@ -52,6 +52,7 @@ class MageDisappearState : public StateBase
 private:
 	weak_ptr<AActor> m_pOwner;
 public:
+	bool bStaticMage = false;
 	// Scaling
 	float lowerElapsed = 0.0f;
 	Vec3 increment = { 0.01f, 0.004f, 0.01f };
@@ -67,6 +68,7 @@ public:
 	virtual void End() override;
 private:
 	void SetAllMeshInvisible(const shared_ptr<class UMeshComponent>& _mesh);
+	void CheckStatic(bool _b) { bStaticMage = _b; }
 };
 
 class MageHitState : public StateBase
@@ -74,6 +76,7 @@ class MageHitState : public StateBase
 private:
 	weak_ptr<AActor> m_pOwner;
 	Vec3 dir;
+	bool bStaticMage = false;
 	float runElapsed = 0.0f;
 	float rotateElapsed = 0.0f;
 	float targetYaw;
@@ -87,6 +90,7 @@ public:
 	virtual void End() override;
 public:
 	void SetDirection(Vec3 _playerPos);
+	void CheckStatic(bool _b) { bStaticMage = _b; }
 };
 
 class MageAttackState : public StateBase
@@ -95,15 +99,17 @@ private:
 	weak_ptr<AActor> m_pOwner;
 	weak_ptr<AActor> m_pTarget;
 	// 이동
+	bool bStaticMage = false;
 	Vec3 dir;
 	float targetYaw;
 	// teleport 관련 변수
 	Vec3 destination;
 	float disElapsed = 0.0f;
+	float waitElapsed = 0.0f;
 	// anim 관련 변수
 	float originSpped;
 	// sub-state
-	enum AttackPhase { Attack, Runaway, Disappear, Wait, Appear, Done };
+	enum AttackPhase { Attack, Runaway, Disappear, Wait, StandStill, Appear, Done };
 	AttackPhase currentPhase = AttackPhase::Attack;
 	shared_ptr<class MageAttackStart> attack;
 	shared_ptr<class MageRunaway> runaway;
@@ -120,6 +126,7 @@ public:
 public:
 	void SetTarget(weak_ptr<AActor> _pTarget);
 	void SetDirection();
+	void CheckStatic(bool _s) { bStaticMage = _s; }
 };
 
 class MageAttackStart : public StateBase

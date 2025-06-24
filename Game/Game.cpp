@@ -80,7 +80,7 @@ void Game::Init()
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
-	m_pPlayer->SetPosition(Vec3(-90, 39, 70));
+	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
 	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
@@ -165,11 +165,6 @@ void Game::Init()
 void Game::Tick()
 {
 	STAGE->Tick();
-	if (INPUT->GetButton(G))
-	{
-		EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder1");
-		EVENT->TriggerEvent(EventType::EVENT_FENCE, L"Fence1");
-	}
 
 	UpdateCursor();
 
@@ -991,6 +986,7 @@ void Game::CheckEnemyCollision()
 				COLLITION->CheckCollision(*proj, *iter);
 				iter++;
 			}
+			proj++;
 		}
 		for (auto obj = stage2.begin(); obj != stage2.end();)
 		{
@@ -1084,20 +1080,6 @@ void Game::CheckEnemyCollision()
 
 	for (auto proj = projectileList.begin(); proj != projectileList.end(); )
 	{
-		//COLLITION->CheckCollision(*proj, m_pPlayer);
-		//COLLITION->CheckCollision(*proj, m_pBetty);
-		//
-		//for (auto iter = m_vObjectList.begin(); iter != m_vObjectList.end();)
-		//{
-		//	if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
-		//	{
-		//		iter = m_vObjectList.erase(iter);
-		//		continue;
-		//	}
-		//	COLLITION->CheckCollision(*proj, *iter);
-		//	iter++;
-		//}
-
 		for (auto iter = enemyList.begin(); iter != enemyList.end();)
 		{
 			if (dynamic_cast<TEnemy*>(iter->get())->IsFrustumIn() == false)
