@@ -195,6 +195,8 @@
     <ClInclude Include="TInteractable.h" />
     <ClInclude Include="TInteractScriptComponent.h" />
     <ClInclude Include="TPlayer.h" />
+    <ClInclude Include="TriggerData.h" />
+    <ClInclude Include="UIControler.h" />
     <ClInclude Include="WalkerMovement.h" />
     <ClInclude Include="WalkerStates.h" />
   </ItemGroup>
@@ -241,6 +243,7 @@
     <ClCompile Include="TInteractable.cpp" />
     <ClCompile Include="TInteractScriptComponent.cpp" />
     <ClCompile Include="TPlayer.cpp" />
+    <ClCompile Include="UIControler.cpp" />
     <ClCompile Include="WalkerMovement.cpp" />
     <ClCompile Include="WalkerStates.cpp" />
   </ItemGroup>

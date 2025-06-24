@@ -149,6 +149,31 @@ void DxState::CreateBlendStates()
 			DX_CHECK(hr, _T(__FUNCTION__));
 		}
 	}
+
+	// BloomStrongColor Blend (배경 무시하고 원색 유지)
+	{
+		D3D11_BLEND_DESC bd;
+		ZeroMemory(&bd, sizeof(bd));
+		bd.AlphaToCoverageEnable = FALSE;
+		bd.IndependentBlendEnable = TRUE;
+		for (int i = 0; i < m_iMRTNum; i++)
+		{
+			bd.RenderTarget[i].BlendEnable = TRUE;
+			bd.RenderTarget[i].SrcBlend = D3D11_BLEND_ONE;
+			bd.RenderTarget[i].DestBlend = D3D11_BLEND_ZERO; // 배경 무시
+			bd.RenderTarget[i].BlendOp = D3D11_BLEND_OP_ADD;
+			bd.RenderTarget[i].SrcBlendAlpha = D3D11_BLEND_ONE;
+			bd.RenderTarget[i].DestBlendAlpha = D3D11_BLEND_ZERO;
+			bd.RenderTarget[i].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+			bd.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		}
+
+		HRESULT hr = DEVICE->CreateBlendState(&bd, m_pBloomStrongColorBlend.GetAddressOf());
+		if (FAILED(hr))
+		{
+			DX_CHECK(hr, _T(__FUNCTION__));
+		}
+	}
 }
 
 void DxState::CreateSamplerStates()

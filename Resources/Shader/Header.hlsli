@@ -152,12 +152,12 @@ float3 ApplySpecular(float3 normal, float3 worldPos)
         }
 
         float3 N = normalize(normal);
-        float3 V = normalize(g_vCameraPos - worldPos); // ← 여기 반대 실험도 가능
+        float3 V = normalize(g_vCameraPos - worldPos); //  여기 반대 실험도 가능
         float3 R = reflect(-lightDir, N);
 
         float NdotL = dot(N, lightDir);
         if (NdotL <= 0.0f)
-            continue; // ← Backface 억제
+            continue; //  Backface 억제
 
         float spec = pow(saturate(dot(R, V)), g_fShininess);
         result += UnpackLightColor(i) * spec * UnpackIntensity(i) * attenuation * g_vSpecularCoeff;

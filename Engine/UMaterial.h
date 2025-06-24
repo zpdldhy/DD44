@@ -25,8 +25,8 @@ struct CB_MaterialEffect
 	Vec3   g_vDiffuseCoeff = Vec3(1, 1, 1);
 	float  g_fDiffusePower = 1.0f;
 
-	Vec3   g_vSpecularCoeff = Vec3(0,0,0);   
-	float  g_fShininess = 10.0f;
+	Vec3   g_vSpecularCoeff = Vec3(0.2f,0.2f,0.2f);   
+	float  g_fShininess = 32.0f;
 
 	Vec4 TintColor = Vec4(1, 1, 1, 1);
 
