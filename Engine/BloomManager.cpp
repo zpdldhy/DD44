@@ -26,7 +26,7 @@ void BloomManager::BeginBloomPass()
 
 	RenderOption opt;
 	opt.blend = BlendType::BloomStrongColor;
-	opt.depth = DepthType::ZTestOff;
+	opt.depth = DepthType::ZTestOn_ZWriteOn;
 	opt.cull = CullType::None;
 	opt.sampler = SamplerType::Linear;
 

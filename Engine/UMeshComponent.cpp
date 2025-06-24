@@ -8,7 +8,7 @@ void UMeshComponent::Render()
 {
 	if (bRender && bUseInstance == false)
 	{
-		if (GetName() == L"BackSword" || GetName() == L"RightSword" || GetName() == L"LeftSword")
+		if (GetName() == L"BackSword" || GetName() == L"RightSword" || GetName() == L"LeftSword" )
 		{
 			BLOOMMANAGER->BeginBloomPass();
 			PreRender();

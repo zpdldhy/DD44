@@ -80,8 +80,8 @@ void PostProcessManager::Present()
 		m_p3DWorld->Render();
 	}
 
-	ID3D11ShaderResourceView* nullSRVs[8] = { nullptr };
-	DC->PSSetShaderResources(0, 8, nullSRVs);
+	ID3D11ShaderResourceView* nullSRVs[11] = { nullptr };
+	DC->PSSetShaderResources(0, 11, nullSRVs);
 }
 
 

@@ -124,6 +124,7 @@ float PS_SHADOW(VS_OUT input) : SV_Depth
     return input.p.z / input.p.w;
 }
 
+
 float4 PS_BLOOM(VS_OUT_RIM input) : SV_Target
 {
     float4 texColor = g_txDiffuseA.Sample(sample, input.t);

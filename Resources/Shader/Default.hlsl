@@ -54,6 +54,23 @@ VS_OUT VS_SHADOW_INSTANCE(VS_INSTANCE_IN input)
     return output;
 }
 
+VS_OUT VS_BLOOM(VS_IN input)
+{
+    VS_OUT output;
+    
+    float4 vLocal = float4(input.p, 1.0f);
+    float4 vWorld = mul(vLocal, g_matWorld);
+    float4 vView = mul(vWorld, g_matView);
+    float4 vProj = mul(vView, g_matProj);
+    
+    output.p = vProj;
+    output.c = input.c;
+    output.n = input.n;
+    output.t = input.t;
+    
+    return output;
+}
+
 PS_OUT PS(VS_OUT input)
 {
      
@@ -79,4 +96,22 @@ PS_OUT PS(VS_OUT input)
 float PS_SHADOW(VS_OUT input) : SV_Depth
 {
     return input.p.z / input.p.w;
+}
+
+
+float4 PS_BLOOM(VS_OUT input) : SV_Target
+{
+    float4 texColor = g_txDiffuseA.Sample(sample, input.t);
+    float3 emissive = float3(0, 0, 0);
+    // 기준 컬러 필터링 (0.6 이상일 때만 발광)
+    if (texColor.r < 0.6f)
+    {
+        return float4(0, 0, 0, 1);
+    }
+    else
+    {
+        emissive = float3(0.984, 0.069, 0.073) * 1.f;
+    }
+        
+    return float4(emissive, 1.0f);
 }

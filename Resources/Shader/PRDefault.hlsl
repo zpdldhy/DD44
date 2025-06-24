@@ -26,6 +26,8 @@ Texture2D g_txLight : register(t4); // Light
 Texture2D g_txNormal : register(t5); // Normal
 Texture2D g_txDepth : register(t6); // Depth
 Texture2D g_txTemp : register(t7); // Temp
+Texture2D g_txBloomDepth : register(t9);
+Texture2D g_txSceneDepth : register(t10);
 
 VS_OUT VS(VS_IN input)
 {
@@ -83,7 +85,10 @@ PS_PROCESS_OUT PS(VS_OUT input)
     
     float4 blur = blurH + blurV;
    
-    
+    float bloomDepth = g_txBloomDepth.Sample(sample, uv).r;
+    float sceneDepth = g_txSceneDepth.Sample(sample, uv).r;
+    float bloomVisible = step(bloomDepth, sceneDepth + 0.00001f); // 벽보다 앞에 있으면 표시
+ 
     
     float4 result = original;
     
@@ -101,8 +106,8 @@ PS_PROCESS_OUT PS(VS_OUT input)
 
     if (bloom.r > 0.01f)
     {
-        float bloomIntensity = 1.f; // 필요 시 조절
-        result.rgb += blur.rgb * bloomIntensity; // * bloomIntensity;
+        //float bloomIntensity = 1.f; // 필요 시 조절
+        result.rgb += blur.rgb * bloomVisible; // * bloomIntensity;
     }
     
 // ──────────────────────────────

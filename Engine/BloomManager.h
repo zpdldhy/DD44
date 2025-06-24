@@ -11,6 +11,7 @@ public:
  
 
     ID3D11ShaderResourceView* GetDownScaleSRV() const { return m_pDownScaleRT->GetSRV(); }
+    ID3D11ShaderResourceView* GetDepthSRV() const { return m_pDownScaleRT->GetDepthSRV(); }
     void SRVreset() { m_pDownScaleRT->m_pTexSRV = nullptr; }
 
 private:

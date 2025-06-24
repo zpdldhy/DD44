@@ -87,6 +87,7 @@ void PlayerMoveScript::Init()
 	bow = make_shared<AActor>();
 	auto meshComp = MESHLOADER->Make("../Resources/Asset/bow.mesh.json");
 	bow->SetMeshComponent(meshComp);
+	bow->m_szName = L"Arrow";
 	OBJECT->AddActor(bow);
 	bow->m_bRender = false;
 }

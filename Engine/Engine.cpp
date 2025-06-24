@@ -142,6 +142,8 @@ void Engine::Render()
 		WIND->Render();
 		POSTPROCESS->SetSRVToSlot(7, WIND->GetSRV());
 		POSTPROCESS->SetSRVToSlot(3, BLOOMMANAGER->GetDownScaleSRV());
+		POSTPROCESS->SetSRVToSlot(9, BLOOMMANAGER->GetDepthSRV());            // Bloom Depth ¡æ t9
+		POSTPROCESS->SetSRVToSlot(10, POSTPROCESS->GetMRT(0)->GetDepthSRV()); // Scene Depth ¡æ t10 
 		POSTPROCESS->PostRender();
 
 		if (m_pCurrentRasterizer)
