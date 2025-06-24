@@ -71,7 +71,7 @@ void PostProcessManager::PostRender()
 void PostProcessManager::Present()
 {
 	m_tBlurCB.g_vTexelSize = Vec2(1.0f / g_windowSize.x, 1.0f / g_windowSize.y);
-
+	m_tBlurCB.g_fBlurScale = 1.0f;
 	ApplyBlurCB();
 	ApplyDebugCB();
 	// PRDefault ¿¬»ê
@@ -80,8 +80,8 @@ void PostProcessManager::Present()
 		m_p3DWorld->Render();
 	}
 
-	ID3D11ShaderResourceView* nullSRVs[8] = { nullptr };
-	DC->PSSetShaderResources(0, 8, nullSRVs);
+	ID3D11ShaderResourceView* nullSRVs[11] = { nullptr };
+	DC->PSSetShaderResources(0, 11, nullSRVs);
 }
 
 
