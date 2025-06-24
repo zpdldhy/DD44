@@ -9,7 +9,8 @@ enum class BlendType
     Additive,
     Multiply,
     Premultiplied,
-    DualSource 
+    DualSource,
+    BloomStrongColor
 };
 
 enum class DepthType 

@@ -71,7 +71,7 @@ void PostProcessManager::PostRender()
 void PostProcessManager::Present()
 {
 	m_tBlurCB.g_vTexelSize = Vec2(1.0f / g_windowSize.x, 1.0f / g_windowSize.y);
-
+	m_tBlurCB.g_fBlurScale = 1.0f;
 	ApplyBlurCB();
 	ApplyDebugCB();
 	// PRDefault ¿¬»ê

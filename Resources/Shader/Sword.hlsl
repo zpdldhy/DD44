@@ -34,6 +34,19 @@ VS_OUT VS_SHADOW_INSTANCE(VS_INSTANCE_IN input)
     return output;
 }
 
+VS_OUT_RIM VS_BLOOM(VS_IN input)
+{
+    VS_OUT_RIM output = (VS_OUT_RIM) 0;
+
+    float4 worldPos = mul(float4(input.p, 1.0f), g_matWorld);
+    output.p = mul(mul(worldPos, g_matView), g_matProj);
+    output.wPos = worldPos.xyz;
+    output.n = normalize(mul(float4(input.n, 0.0f), g_matWorld).xyz);
+    output.t = input.t;
+
+    return output;
+}
+
 PS_OUT PS(VS_OUT_RIM input) : SV_Target
 {
     PS_OUT output = (PS_OUT) 0;
@@ -58,12 +71,12 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
         emissive = float3(0, 0, 0);
         ambient = float3(1, 1, 1);
         specular = float3(0, 0, 0);
-        output.c2 = float4(0.f, 0.f, 1.f, 1.f); 
+        output.c2 = float4(0.f, 0.f, 1.f, 1.f);
     }
     else
     {
-        emissive = g_vEmissiveColor * g_fEmissivePower * 5.0f;
-        output.c2 = float4(1.f, 1.f, 1.f, 1.f); 
+        emissive = g_vEmissiveColor * g_fEmissivePower * 10.0f;
+        output.c2 = float4(1.f, 1.f, 1.f, 1.f);
     }
     
     float3 baseColor = texColor.rgb;
@@ -109,4 +122,21 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
 float PS_SHADOW(VS_OUT input) : SV_Depth
 {
     return input.p.z / input.p.w;
+}
+
+float4 PS_BLOOM(VS_OUT_RIM input) : SV_Target
+{
+    float4 texColor = g_txDiffuseA.Sample(sample, input.t);
+    float3 emissive = float3(0, 0, 0);
+    // 기준 컬러 필터링 (0.6 이상일 때만 발광)
+    if (texColor.r < 0.6f)
+    {
+        return float4(0, 0, 0, 1);
+    }
+    else
+    {
+        emissive = float3(0.984, 0.069, 0.073) * 1.f;
+    }
+        
+    return float4(emissive, 1.0f);
 }

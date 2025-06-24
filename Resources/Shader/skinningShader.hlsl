@@ -113,7 +113,7 @@ PS_OUT PS(VS_OUT_RIM_INSTANCE input) : SV_Target
         float4 silhouette = float4(0.2f, 0.2f, 0.2f, 1.0f);
         output.c = silhouette;
         output.c1 = silhouette;
-        output.c2 = silhouette;
+        //output.c2 = silhouette;
         return output;
     }
 
@@ -135,12 +135,12 @@ PS_OUT PS(VS_OUT_RIM_INSTANCE input) : SV_Target
         emissive = float3(0, 0, 0);
         ambient = float3(1, 1, 1);
         specular = float3(0, 0, 0);
-        output.c2 = float4(0.f, 0.f, 1.f, 1.f);
+        //output.c2 = float4(0.f, 0.f, 1.f, 1.f);
     }
     else
     {
         emissive = g_vEmissiveColor * g_fEmissivePower * 5.0f;
-        output.c2 = float4(1.f, 1.f, 1.f, 1.f);
+        //output.c2 = float4(1.f, 1.f, 1.f, 1.f);
     }
     
     float3 baseColor = texColor.rgb;

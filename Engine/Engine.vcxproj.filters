@@ -442,6 +442,9 @@
     <ClInclude Include="ABloodDecalActor.h">
       <Filter>Object\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="BloomManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -746,6 +749,9 @@
     </ClCompile>
     <ClCompile Include="ABloodDecalActor.cpp">
       <Filter>Object\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="BloomManager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

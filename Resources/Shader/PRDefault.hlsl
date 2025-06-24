@@ -63,14 +63,27 @@ PS_PROCESS_OUT PS(VS_OUT input)
         0.227027f, 0.1945946f, 0.1216216f, 0.0540541f, 0.0162162f
     };
 
-    float4 blur = g_txBlur.Sample(sample, uv) * weights[0];
-    
+    float4 blurH = g_txBloom.Sample(sample, uv) * weights[0];
+    float4 blurV = g_txBloom.Sample(sample, uv) * weights[0];
     for (int i = 1; i < 5; ++i)
     {
-        float2 offset = float2(g_vTexelSize.x * i * g_fBlurScale, 0); // 가로 방향
-        blur += g_txBlur.Sample(sample, uv + offset) * weights[i];
-        blur += g_txBlur.Sample(sample, uv - offset) * weights[i];
+        float2 offset = g_vTexelSize * i * g_fBlurScale * float2(1,0);
+
+        blurH += g_txBloom.Sample(sample, uv + offset) * weights[i];
+        blurH += g_txBloom.Sample(sample, uv - offset) * weights[i];
     }
+    
+    for (int j = 1; j < 5; ++j)
+    {
+        float2 offset = g_vTexelSize * i * g_fBlurScale * float2(0, 1);
+
+        blurV += g_txBloom.Sample(sample, uv + offset) * weights[j];
+        blurV += g_txBloom.Sample(sample, uv - offset) * weights[j];
+    }
+    
+    float4 blur = blurH + blurV;
+   
+    
     
     float4 result = original;
     
@@ -83,9 +96,14 @@ PS_PROCESS_OUT PS(VS_OUT input)
     //if (bloom.a > 0.01f)
     //    result.rgb += bloom.rgb * bloom.a * 2.0f;
     
-    result.rgb = saturate(result.rgb);
+    //result.rgb = saturate(result.rgb);
    
 
+    if (bloom.r > 0.01f)
+    {
+        float bloomIntensity = 1.f; // 필요 시 조절
+        result.rgb += blur.rgb * bloomIntensity; // * bloomIntensity;
+    }
     
 // ──────────────────────────────
 // 엣지 감지: Normal + Depth
