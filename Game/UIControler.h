@@ -81,17 +81,31 @@ class InGameUIControler : public UIControler
 	vector<shared_ptr<class AUIActor>> m_vSystemBackGround;
 	vector<shared_ptr<class AUIActor>> m_vSystemSelection;
 
+	bool m_bContinue = false;
+	bool m_bExit = false;
+
 	////////////
 	//  Dead  //
 	////////////
-	shared_ptr<class AUIActor> m_pDeadUI = nullptr;
+	vector<shared_ptr<class AUIActor>> m_vDeadUI;
 	bool m_bDead = false;
-	float m_fDeadUIPopTime = 1.f;
+	bool m_bDeadContinue = false;
+	bool m_bDeadUIMove = false;
+	bool m_bDeadUIEnd = false;
 
 public:
 	void init() override;
 	void Tick() override;
 	void Destroy() override;
+
+	void FrameReset();
+
+private:
+	void UpdateHP();
+	void UpdateArrow();
+	void UpdateInteract();
+	void UpdatePaused();
+	void UpdateDead();
 
 public:
 	// 구현 필요!
@@ -100,4 +114,9 @@ public:
 	void SetArrowCount(int _arrowCount) { m_iArrowCount = _arrowCount; }
 	void SetTriggerData(TriggerData _data) { m_tTrigger = _data; }
 	void SetDead(bool _isDead) { m_bDead = _isDead; }
+
+	bool SelectContinue() { return m_bContinue; }
+	bool SelectExit() { return m_bExit; }
+	bool SelectDeadContinue() { return m_bDeadContinue; }
+	bool EndDeadUI() { return m_bDeadUIEnd; }
 };

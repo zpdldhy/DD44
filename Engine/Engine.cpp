@@ -200,8 +200,6 @@ void Engine::Run()
 			Frame();
 			Render();
 		}
-
-		_window.SetRun(m_bRun);
 	}
 
 	Release();
