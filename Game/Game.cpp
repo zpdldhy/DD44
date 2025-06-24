@@ -361,6 +361,24 @@ void Game::UpdateUI()
 	///////////						Paused							///////////
 	///////////////////////////////////////////////////////////////////////////
 
+	// Upgrade State
+	// 0은 Default로 Upgrade 없음을 나타냄
+	switch (m_cUI.SelectUpgrade())
+	{
+	case 1: // MaxHP
+		// MaxHP++
+		break;
+
+	case 2: // Attack
+		break;
+
+	case 3: // Speed
+		break;
+
+	case 4:	// Arrow
+		break;
+	}
+
 	// 계속하기
 	if(m_cUI.SelectContinue())
 		ENGINE->m_bGamePaused = false;
