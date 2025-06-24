@@ -737,7 +737,6 @@ void PlayerClimbFinish::Tick()
 	Vec3 look = ladderDir;
 	Vec3 up = m_pOwner.lock()->GetUp();
 
-	float offset = 1.0f;
 	Vec3 moveDir = look * 1.0f + up * 0.5f;
 
 	moveDir.Normalize();

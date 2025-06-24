@@ -41,7 +41,7 @@ void UInstanceSkinnedMeshComponent::Tick()
 
 void UInstanceSkinnedMeshComponent::Render()
 {
-	if (bRender && bUseInstance == false)
+	if (bRender)
 	{
 		PreRender();
 		PostRender();

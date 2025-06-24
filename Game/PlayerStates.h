@@ -242,7 +242,7 @@ public:
 	~PlayerClimbFinish() {}
 public:
 	Vec3 ladderDir;
-	float offset = 9.0f; 
+	float offset = 8.0f; 
 public:
 	virtual void Enter() override;
 	virtual void Tick() override;
