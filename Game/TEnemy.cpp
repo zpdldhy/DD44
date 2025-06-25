@@ -47,6 +47,8 @@ bool TEnemy::CheckHit()
 				auto actor = OBJECT->GetActor(index.first);
 				if (actor->m_szName == L"Melee")
 				{
+					string st = to_string(hp);
+					Profiler p("Betty Hit  " + st);
 					look = actor->GetPosition() - GetPosition();
 					look.Normalize();
 					//look = -look;

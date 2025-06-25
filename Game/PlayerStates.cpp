@@ -11,7 +11,7 @@
 #include "ProjectileManager.h"
 #include "UMaterial.h"
 
-PlayerEmptyState::PlayerEmptyState() : StateBase(EMPTY_STATE)
+PlayerEmptyState::PlayerEmptyState() : PlayerBaseState(EMPTY_STATE)
 {
 	
 }
@@ -19,7 +19,7 @@ void PlayerEmptyState::Enter() {}
 void PlayerEmptyState::Tick() {}
 void PlayerEmptyState::End() {}
 
-PlayerIdleState::PlayerIdleState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_IDLE)
+PlayerIdleState::PlayerIdleState(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_IDLE)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = true;
@@ -43,7 +43,7 @@ void PlayerIdleState::End()
 	m_bOnPlaying = false;
 }
 
-PlayerWalkState::PlayerWalkState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_WALK)
+PlayerWalkState::PlayerWalkState(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_WALK)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = true;
@@ -92,7 +92,7 @@ void PlayerWalkState::End()
 	m_fDustTimer = 0.0f;
 }
 
-PlayerAttackState::PlayerAttackState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_ATTACK)
+PlayerAttackState::PlayerAttackState(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_ATTACK)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = true;
@@ -230,6 +230,12 @@ void PlayerAttackState::End()
 	auto back = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"BackSword");
 	back->SetVisible(true);
 
+	//
+	m_bCanBeHit = false;
+
+	// 
+	m_pAttackRange.lock()->m_bCollision = false;
+
 	// 
 	m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Slash")->SetVisible(false);
 }
@@ -292,7 +298,7 @@ void PlayerAttackState::Slash()
 	}
 }
 
-PlayerHitState::PlayerHitState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_HIT)
+PlayerHitState::PlayerHitState(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_HIT)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -335,7 +341,7 @@ void PlayerHitState::End()
 	m_bOnPlaying = false;
 }
 
-PlayerDieState::PlayerDieState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_DEATH)
+PlayerDieState::PlayerDieState(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_DEATH)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -377,7 +383,7 @@ void PlayerDieState::End()
 	m_bOnPlaying = false;
 }
 
-PlayerRollState::PlayerRollState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_ROLL)
+PlayerRollState::PlayerRollState(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_ROLL)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -430,9 +436,10 @@ void PlayerRollState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	m_bCanRoll = false;
 }
 
-PlayerShootState::PlayerShootState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_SHOOT)
+PlayerShootState::PlayerShootState(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_SHOOT)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = true;
@@ -504,6 +511,9 @@ void PlayerShootState::End()
 	animInstance->m_bOnPlayOnce = false;
 	bEnd = false;
 
+	// bow 세팅
+	m_pBow.lock()->m_bRender = false;
+
 }
 void PlayerShootState::Rotate()
 {
@@ -541,7 +551,7 @@ void PlayerShootState::CheckShootCount(bool _able)
 	bCanShoot = _able;
 }
 
-PlayerShootStart::PlayerShootStart(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_SHOOT)
+PlayerShootStart::PlayerShootStart(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_SHOOT)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = true;
@@ -575,7 +585,7 @@ void PlayerShootStart::End()
 	m_bOnPlaying = false;
 }
 
-PlayerShoot::PlayerShoot(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_SHOOT)
+PlayerShoot::PlayerShoot(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_SHOOT)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = true;
@@ -627,12 +637,10 @@ void PlayerShoot::CanShoot()
 	dynamic_pointer_cast<TPlayer>(m_pOwner.lock())->DecArrowCount();
 }
 
-PlayerClimbState::PlayerClimbState(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_CLIMB)
+PlayerClimbState::PlayerClimbState(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_CLIMB)
 {
 	m_pOwner = _pOwner;
-	// 사다리 오를 때 공격당하면 어떻게 되지 ? 
 	m_bCanInterrupt = false;
-
 	finish = make_shared<PlayerClimbFinish>(m_pOwner);
 }
 void PlayerClimbState::Enter()
@@ -712,7 +720,7 @@ void PlayerClimbState::SetLadderDir(Vec3 _dir)
 	ladderDir = _dir;
 }
 
-PlayerClimbFinish::PlayerClimbFinish(weak_ptr<AActor> _pOwner) : StateBase(PLAYER_S_CLIMB)
+PlayerClimbFinish::PlayerClimbFinish(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_CLIMB)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -761,4 +769,9 @@ void PlayerClimbFinish::End()
 void PlayerClimbFinish::SetLadderDir(Vec3 _dir)
 {
 	ladderDir = _dir;
+}
+
+PlayerBaseState::PlayerBaseState(UINT _iStateId) : StateBase(_iStateId)
+{
+	
 }
