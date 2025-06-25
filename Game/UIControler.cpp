@@ -177,8 +177,11 @@ void IntroUIControler::Destroy()
 
 void InGameUIControler::init()
 {
+	m_pActiveHPTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_hp_active 1.png");
+	m_pEmptyHPTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_hp_empty 1.png");
 	m_pActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_active.png");
 	m_pInActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_inactive.png");
+	m_pEmptyArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_empty.png");
 	m_pUpgradeDoneTexture = TEXTURE->Get(L"../Resources/Texture/UI/upgrade_slot_glow-1.png");
 
 	// InGame UI	
@@ -201,6 +204,13 @@ void InGameUIControler::init()
 	m_vHPUI[6]->m_bRender = false;
 	m_vHPUI[7]->m_bRender = false;
 	m_vHPUI[8]->m_bRender = false;
+
+	// Arrow 초기값
+	m_vArrowUI[4]->m_bRender = false;
+	m_vArrowUI[5]->m_bRender = false;
+	m_vArrowUI[6]->m_bRender = false;
+	m_vArrowUI[7]->m_bRender = false;
+	m_vArrowUI[8]->m_bRender = false;
 	
 	m_vActiveArrowScale = m_vArrowUI[3]->GetScale();
 	m_vInActiveArrowScale = m_vArrowUI[2]->GetScale();
@@ -363,162 +373,80 @@ void InGameUIControler::UpdateHP()
 	m_vHPUI[m_iMaxHP - 1]->m_bRun = true;
 	m_vHPUI[m_iMaxHP - 1]->m_bRender = true;
 
-
 	// 현재 HP에 대한 로직
-	static Color FullHPColor = Color(0.055f, 0.247f, -0.324, 0.0f);
-	static Color RestColor = Color(0.055f, 0.247f, -0.324, -0.5f);
-
-	static float currentTime = 0.0f;
-	currentTime = TIMER->GetDeltaTime();
-
-	if (m_iCurrentHP != m_iPreHP)
-		m_bHPUIChange = true;
-
-	switch (m_iCurrentHP)
+	for (auto& pUI : m_vHPUI)
 	{
-	case 4:
-	{
-		m_vHPUI[0]->SetColor(RestColor);
-		m_vHPUI[1]->SetColor(RestColor);
-		m_vHPUI[2]->SetColor(RestColor);
-		m_vHPUI[3]->SetColor(FullHPColor);
+		pUI->SetAllTexture(m_pEmptyHPTexture);
+		pUI->SetColor(Color(0.f, 0.f, 0.f, 0.f));
 	}
-	break;
 
-	case 3:
+	for (int i = 0; i < m_iCurrentHP; i++)
 	{
-		if (m_vHPUI[2]->GetColor().w < 0.f && m_bHPUIChange)
+		if (i > 0)
 		{
-			m_vHPUI[3]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+			m_vHPUI[i - 1]->SetColor(Color(0.055f, 0.247f, -0.324, -0.5f));
 		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-		{
-			m_vHPUI[0]->SetColor(RestColor);
-			m_vHPUI[1]->SetColor(RestColor);
-			m_vHPUI[2]->SetColor(FullHPColor);
-		}
-	}
-	break;
-
-	case 2:
-	{
-		if (m_vHPUI[1]->GetColor().w < 0.f && m_bHPUIChange)
-		{
-			m_vHPUI[2]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-		{
-			m_vHPUI[0]->SetColor(RestColor);
-			m_vHPUI[1]->SetColor(FullHPColor);
-		}
-	}
-	break;
-
-	case 1:
-	{
-		if (m_vHPUI[0]->GetColor().w < 0.f && m_bHPUIChange)
-		{
-			m_vHPUI[1]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-			m_vHPUI[0]->SetColor(FullHPColor);
-
-	}
-	break;
-
-	case 0:
-	{
-		m_vHPUI[0]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-	}
-	break;
+		m_vHPUI[i]->SetAllTexture(m_pActiveHPTexture);
+		m_vHPUI[i]->SetColor(Color(0.055f, 0.247f, -0.324, 0.0f));
 	}
 
-	m_iPreHP = m_iCurrentHP;
+	// 피가 바뀌는 로직
+	//static float currentTime = 0.0f;
+	//currentTime = TIMER->GetDeltaTime();
+
+	//if (m_iCurrentHP != m_iPreHP)
+	//	m_bHPUIChange = true;
+
+	//if (m_iCurrentHP > 0 &&
+	//	m_vHPUI[m_iCurrentHP]->GetColor().w < 0.f &&
+	//	m_bHPUIChange)
+	//{
+	//	m_vHPUI[m_iCurrentHP - 1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+	//}
+	//else if (m_bHPUIChange)
+	//{
+	//	m_bHPUIChange = false;
+	//	currentTime = 0.f;
+	//}
+	//else if (m_iCurrentHP > 0)
+	//	m_vHPUI[m_iCurrentHP - 1]->SetColor(FullHPColor);
+
+	//m_iPreHP = m_iCurrentHP;
 }
 
 void InGameUIControler::UpdateArrow()
 {
-	// Arrow
-	switch (m_iArrowCount)
+	if (m_iMaxArrow > 9)
+		m_iMaxArrow = 9;
+
+	// Max Arrow 설정	
+	m_vArrowUI[m_iMaxArrow - 1]->m_bRun = true;
+	m_vArrowUI[m_iMaxArrow - 1]->m_bRender = true;
+	m_vArrowUI[m_iMaxArrow - 1]->SetAllTexture(m_pEmptyArrowTexture);
+
+	for (auto& pUI : m_vArrowUI)
 	{
-	case 4:
-		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[2]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[3]->SetAllTexture(m_pActiveArrowTexture);
+		pUI->SetAllTexture(m_pEmptyArrowTexture);
+		pUI->SetScale(m_vInActiveArrowScale);
+	}
 
-		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[2]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[3]->SetScale(m_vActiveArrowScale);
+	// Current Arrow 설정
+	for (int i = 0; i < m_iCurrentArrow; i++)
+	{
+		if (i > 0)
+		{
+			m_vArrowUI[i - 1]->SetAllTexture(m_pInActiveArrowTexture);
+			m_vArrowUI[i - 1]->SetScale(m_vInActiveArrowScale);
+		}
 
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = true;
-		m_vArrowUI[2]->m_bRender = true;
-		m_vArrowUI[3]->m_bRender = true;
-		break;
-
-	case 3:
-		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[2]->SetAllTexture(m_pActiveArrowTexture);
-
-		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[2]->SetScale(m_vActiveArrowScale);
-
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = true;
-		m_vArrowUI[2]->m_bRender = true;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
-
-	case 2:
-		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[1]->SetAllTexture(m_pActiveArrowTexture);
-
-		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[1]->SetScale(m_vActiveArrowScale);
-
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = true;
-		m_vArrowUI[2]->m_bRender = false;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
-
-	case 1:
-		m_vArrowUI[0]->SetAllTexture(m_pActiveArrowTexture);
-
-		m_vArrowUI[0]->SetScale(m_vActiveArrowScale);
-
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = false;
-		m_vArrowUI[2]->m_bRender = false;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
-
-	case 0:
-		m_vArrowUI[0]->m_bRender = false;
-		m_vArrowUI[1]->m_bRender = false;
-		m_vArrowUI[2]->m_bRender = false;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
+		m_vArrowUI[i]->SetAllTexture(m_pActiveArrowTexture);
+		m_vArrowUI[i]->SetScale(m_vActiveArrowScale);
 	}
 }
 
 void InGameUIControler::UpdateInteract()
 {
 	// InterAction, 상호작용 UI를 띄우는 구간
-//auto vTriggerList = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger();
 	if (m_tTrigger.eTriggerType != ETriggerType::TT_NONE)
 	{
 		static Vec3 offsetPos1 = m_vInterActionUI[1]->GetPosition();

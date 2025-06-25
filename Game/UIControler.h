@@ -47,6 +47,8 @@ class InGameUIControler : public UIControler
 
 	// HP
 	shared_ptr<class AUIActor> m_pHPBackGround = nullptr;
+	shared_ptr<class Texture> m_pActiveHPTexture = nullptr;
+	shared_ptr<class Texture> m_pEmptyHPTexture = nullptr;
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
 	int m_iMaxHP = 4;
 	int m_iCurrentHP = 4;
@@ -54,10 +56,12 @@ class InGameUIControler : public UIControler
 	bool m_bHPUIChange = false;
 
 	// Arrow
-	int m_iArrowCount = 4;
 	vector<shared_ptr<class AUIActor>> m_vArrowUI;
 	shared_ptr<class Texture> m_pActiveArrowTexture = nullptr;
 	shared_ptr<class Texture> m_pInActiveArrowTexture = nullptr;
+	shared_ptr<class Texture> m_pEmptyArrowTexture = nullptr;
+	int m_iMaxArrow = 4;
+	int m_iCurrentArrow = 4;
 	Vec3 m_vActiveArrowScale = { 0.f, 0.f, 0.f };
 	Vec3 m_vInActiveArrowScale = { 0.f, 0.f, 0.f };
 
@@ -124,7 +128,8 @@ private:
 public:
 	void SetMaxHP(int _maxHP) { m_iMaxHP = _maxHP; }
 	void SetCurrentHP(int _currentHP) { m_iCurrentHP = _currentHP; }
-	void SetArrowCount(int _arrowCount) { m_iArrowCount = _arrowCount; }
+	void SetMaxArrow(int _maxArrow) { m_iMaxArrow = _maxArrow; }
+	void SetCurrentArrow(int _arrowCount) { m_iCurrentArrow = _arrowCount; }
 	void SetTriggerData(TriggerData _data) { m_tTrigger = _data; }
 	void SetCoin(int _coin) { m_iCoin = _coin; }
 	void SetHealthPrice(int _price) { m_iHealthPrice = _price; }
