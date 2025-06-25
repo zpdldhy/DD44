@@ -469,8 +469,7 @@ void Game::UpdateCursor()
 
 void Game::BettyMeetMovie()
 {
-	if (!m_bStartBettyMoveScene) return;
-
+	if (!m_bStartBettyMoveScene || m_cBettyMovie.IsEnd()) return;
 
 	// 시작하기 전에 세팅할 것들
 	if (!m_cBettyMovie.IsStart())
@@ -487,11 +486,10 @@ void Game::BettyMeetMovie()
 		m_cBettyMovie.SetTimeTrack1(7.f);
 
 		m_cBettyMovie.SetMoveTime2(10.f);
-		m_cBettyMovie.SetTimeTrack2(20.f);
+		m_cBettyMovie.SetTimeTrack2(12.f);
 
-		m_cBettyMovie.SetUIPopDownTime(25.f);
-		m_cBettyMovie.SetTimeTrack3(30.f);	// 베티 애니메이션 6초
-		m_cBettyMovie.SetTimeTrack4(40.f);
+		m_cBettyMovie.SetUIPopUpTime(20.f);
+		m_cBettyMovie.SetTimeTrack3(23.f);	// 베티 애니메이션 6초
 	}
 
 	m_cBettyMovie.StartMovie();
@@ -499,11 +497,14 @@ void Game::BettyMeetMovie()
 
 	if (m_cBettyMovie.StartTrack1() || m_cBettyMovie.StartTrack2())
 	{
+		int i = 0;
+		m_pCursor->m_bRender = false;
 		// 까마귀를 Walk Animation으로 변경
 	}
 	
 	if (m_cBettyMovie.EndMove())
 	{
+		int i = 0;
 		// 까마귀를 Idle Animation으로 변경
 	}
 
@@ -512,10 +513,18 @@ void Game::BettyMeetMovie()
 		// 베티가 화내기 시작하는 부분
 	}
 
+	if (m_cBettyMovie.IsUIPopUp())
+	{
+		int i = 0;
+	}
+
 	// 장면이 완전 종료되었을 때
 	if (m_cBettyMovie.IsEnd())
 	{
+		// 베티 움직이기 시작하는 구간
+		CAMERA->Set3DCameraActor(m_pGameCameraActor);
 		m_bStartBettyMoveScene = false;
+		m_pCursor->m_bRender = true;
 	}
 
 	// Player 움직임 구현

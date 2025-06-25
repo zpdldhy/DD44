@@ -50,18 +50,14 @@ public:
 	void SetMoveTime2(float _fTime) { m_fMoveTime2 = _fTime; }
 	void SetTimeTrack2(float _fTime) { m_fTrack2 = _fTime; }
 	void SetTimeTrack3(float _fTime) { m_fTrack3 = _fTime; }
-	void SetTimeTrack4(float _fTime) { m_fTrack4 = _fTime; }
 	void SetUIPopUpTime(float _fTime) { m_fPopUpTime = _fTime; }
-	void SetUIPopDownTime(float _fTime) { m_fPopDownTime = _fTime; }
 
 	// Track Flag
 	bool StartTrack1() { return m_bStartTrack1; }
 	bool EndMove() { return m_bMoveEnd; }
 	bool StartTrack2() { return m_bStartTrack2; }
 	bool StartTrack3() { return m_bStartTrack3; }
-	bool StartTrack4() { return m_bStartTrack4; }
 	bool IsUIPopUp() { return m_bUIPopUp; }
-	bool IsUIPopDown() { return m_bUIPopDown; }
 
 private:
 	void ResetData();
@@ -81,16 +77,12 @@ private:
 	float m_fMoveTime2 = 0.f;
 	float m_fTrack2 = 0.f;
 	float m_fTrack3 = 0.f;
-	float m_fTrack4 = 0.f;
 	float m_fPopUpTime = 0.f;
-	float m_fPopDownTime = 0.f;
 
 	// Track Flag
 	bool m_bMoveEnd = false;
 	bool m_bStartTrack1 = false;
 	bool m_bStartTrack2 = false;
 	bool m_bStartTrack3 = false;
-	bool m_bStartTrack4 = false;
 	bool m_bUIPopUp = false;
-	bool m_bUIPopDown = false;
 };

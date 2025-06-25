@@ -23,6 +23,7 @@ void UCameraComponent::Init()
 void UCameraComponent::Tick()
 {
 	USceneComponent::Tick();
+	m_vLookTo = m_vWorldLook;
 
 	UpdateView();
 	UpdateProjection();
