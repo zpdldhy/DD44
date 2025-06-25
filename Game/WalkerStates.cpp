@@ -5,7 +5,8 @@
 #include "UAnimInstance.h"
 #include "Sound.h"
 #include "Timer.h"
-
+#include "EffectManager.h"
+#include "TPlayer.h"
 
 WalkerIdleState::WalkerIdleState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_IDLE)
 {
@@ -112,7 +113,8 @@ void WalkerDieState::Enter()
 	animInstance->SetKeyFrame(index, 30);
 	animInstance->m_fAnimPlayRate = 20.0f;
 	animInstance->PlayOnce(index);
-
+	
+	
 }
 
 void WalkerDieState::Tick()

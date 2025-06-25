@@ -447,6 +447,9 @@
     <ClInclude Include="BloomManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="ASoulActor.h">
+      <Filter>Object\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp">
@@ -756,6 +759,9 @@
     </ClCompile>
     <ClCompile Include="BloomManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ASoulActor.cpp">
+      <Filter>Object\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

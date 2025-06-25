@@ -162,7 +162,6 @@ void Game::Tick()
 
 		if (m_bWind)
 			CreateWind();
-
 	}
 
 	if (INPUT->GetButton(O))
@@ -183,6 +182,8 @@ void Game::Tick()
 	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
+
+
 }
 
 void Game::Render()

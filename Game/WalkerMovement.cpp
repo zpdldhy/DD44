@@ -139,6 +139,7 @@ void WalkerMovement::Tick()
 		Vec3 direction = GetOwner()->GetPosition() - player.lock()->GetPosition();
 		direction.y = 0;
 		direction.Normalize();
+	
 		Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
 		Vec3 moveDir = tempUp.Cross(direction); // 반시계 방향
 		float targetYaw = atan2f(moveDir.x, moveDir.z);
@@ -147,6 +148,10 @@ void WalkerMovement::Tick()
 		GetOwner()->SetRotation(currentRot);
 		m_rotate = false;
 
+		Vec3 soulDirection = player.lock()->GetPosition() - GetOwner()->GetPosition(); 
+		soulDirection.Normalize();
+		EFFECT->PlayEffect(EEffectType::Soul, GetOwner()->GetPosition(), 0, soulDirection,1.0f, player.lock()->GetPosition());
+		
 		ChangeState(death);
 	}
 

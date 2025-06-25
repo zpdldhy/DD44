@@ -48,6 +48,7 @@ class WalkerDieState : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
+	weak_ptr<AActor> player;
 public:
 	WalkerDieState(weak_ptr<AActor> _pOwner);
 	~WalkerDieState() {}
