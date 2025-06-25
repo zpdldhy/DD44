@@ -4,6 +4,7 @@
 #include "UMaterial.h"
 #include "DxWrite.h"
 #include "UStaticMeshComponent.h"
+#include "Timer.h"
 
 void AUIActor::Init()
 {
@@ -35,6 +36,7 @@ void AUIActor::Tick()
 	}
 
 	UpdateUVSlice();
+	UpdateShake();
 
 	if (m_bTextUI)
 		UpdateText();
@@ -152,5 +154,39 @@ void AUIActor::UpdateText()
 	m_pFont->SetAlignment(m_TextAlignment, m_ParaAlignment);
 	Vec2 scale(GetScale().x, GetScale().y);
 	m_pText->Create(m_szText, scale, m_pFont.get());
+}
+
+void AUIActor::UpdateShake()
+{
+	if (!m_bRunShake) 
+	{
+		m_iPastPos = GetPosition(); 
+		return; 
+	}
+
+	// 시간 넘어갈시 종료
+	if (m_fTempTime > m_fRunTime)
+	{
+		SetPosition(m_iPastPos);
+		m_bRunShake = false;
+		m_fTempTime = 0.f;
+		return;
+	}
+
+	m_fTempTime += TIMER->GetDeltaTime();
+
+	float deltaX = m_iPastPos.x + m_fDeltaX * cosf(TIMER->GetGameTime() * m_fSpeed);
+	float deltaY = m_iPastPos.y + m_fDeltaY * cosf(TIMER->GetGameTime() * m_fSpeed);
+
+	SetPosition(Vec3(deltaX, deltaY, m_iPastPos.z));
+}
+
+void AUIActor::SetShake(float _time, float _speed, float _deltaX, float _deltaY)
+{
+	m_bRunShake = true;
+	m_fRunTime = _time;
+	m_fSpeed = _speed;
+	m_fDeltaX = _deltaX;
+	m_fDeltaY = _deltaY;
 }
 
