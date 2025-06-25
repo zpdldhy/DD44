@@ -464,6 +464,7 @@ void InGameUIControler::UpdateArrow()
 
 void InGameUIControler::UpdateInteract()
 {
+	m_bHeal = false;
 	// InterAction, 상호작용 UI를 띄우는 구간
 	if (m_tTrigger.eTriggerType != ETriggerType::TT_NONE)
 	{
@@ -488,6 +489,10 @@ void InGameUIControler::UpdateInteract()
 			else if (m_tTrigger.eTriggerType == ETriggerType::TT_HEALPOINT)
 			{
 				m_vInterActionUI[2]->SetText(L"회복");
+				if(INPUT->GetButton(GameKey::E))
+				{
+					m_bHeal = true;
+				}
 			}
 		}
 	}
