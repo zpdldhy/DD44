@@ -14,6 +14,5 @@ public:
 	virtual void Interact() override;
 
 private:
-	bool m_bAppear = false;
 };
 
