@@ -3,6 +3,11 @@
 #include "UTerrainMeshComponent.h"
 #include "Texture.h"
 
+struct TSplatVertexData
+{
+    float fAlpha = 0.0f;
+};
+
 class ATerrainTileActor : public AActor
 {
 public:
@@ -34,4 +39,9 @@ public:
     void SetNumCols(int cols) { m_iNumCols = cols; }
     void SetNumRows(int rows) { m_iNumRows = rows; }
     void SetCellSize(float size) { m_fCellSize = size; }
+
+public:
+    vector<vector<TSplatVertexData>> m_vSplatData; // [row][col]
+    void InitSplatData();
+    void ApplySplatBrush(const Vec3& brushCenter, float brushRadius, float strength);
 };

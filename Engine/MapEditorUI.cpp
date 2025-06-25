@@ -137,6 +137,16 @@ void MapEditorUI::DrawUI()
     }
 
     ImGui::Separator(); ImGui::Spacing();
+
+    if (ImGui::CollapsingHeader("Splatting Brush"))
+    {
+        ImGui::Checkbox("Splatting Mode", &m_bSplattingMode);
+        ImGui::SliderFloat("Brush Radius", &m_fBrushRadius, 1.0f, 50.0f);
+        ImGui::SliderFloat("Brush Strength", &m_fBrushStrength, 0.0f, 1.0f);
+
+        const char* channels[] = { "Red", "Green", "Blue", "Alpha" };
+        ImGui::Combo("Target Channel", &m_iBrushChannel, channels, IM_ARRAYSIZE(channels));
+    }
 }
 
 std::wstring MapEditorUI::GetTexturePath() const

@@ -29,6 +29,7 @@ bool ATerrainTileActor::CreateTerrain(const wstring& _texturePath, const wstring
 	}
 
 	m_pTerrainMeshComponent->CreateGrid(m_iNumCols, m_iNumRows, m_fCellSize);
+	InitSplatData();
 
 	auto material = make_shared<UMaterial>();
 	material->Load(_texturePath, _shaderPath);	
@@ -177,4 +178,56 @@ int ATerrainTileActor::GetCellIndexAt(float x, float z)
 	}
 
 	return row * numCols + col;
+}
+
+void ATerrainTileActor::InitSplatData()
+{
+	m_vSplatData.resize(m_iNumRows + 1);
+	for (int r = 0; r <= m_iNumRows; ++r)
+	{
+		m_vSplatData[r].resize(m_iNumCols + 1);
+		for (int c = 0; c <= m_iNumCols; ++c)
+		{
+			m_vSplatData[r][c].fAlpha = 0.0f;
+		}
+	}
+}
+
+void ATerrainTileActor::ApplySplatBrush(const Vec3& brushCenter, float brushRadius, float strength)
+{
+	if (!m_pTerrainMeshComponent) return;
+
+	auto mesh = m_pTerrainMeshComponent->GetMesh();
+	if (!mesh) return;
+
+	std::vector<PNCT_VERTEX> vtxList = mesh->GetVertexList();
+	if (vtxList.empty()) return;
+
+	float safeRadius = (brushRadius <= 0.0001f) ? 0.0001f : brushRadius;
+	float radiusInv = 1.0f / safeRadius;
+
+	for (size_t i = 0; i < vtxList.size(); ++i)
+	{
+		PNCT_VERTEX& vtx = vtxList[i];
+
+		float dx = vtx.pos.x - brushCenter.x;
+		float dz = vtx.pos.z - brushCenter.z;
+		float dist = sqrtf(dx * dx + dz * dz);
+
+		if (dist > safeRadius)
+			continue;
+
+		float falloff = 1.0f - (dist * radiusInv);
+		if (falloff < 0.0f) falloff = 0.0f;
+		else if (falloff > 1.0f) falloff = 1.0f;
+
+		float newAlpha = vtx.color.x + (strength * falloff);
+		if (newAlpha < 0.0f) newAlpha = 0.0f;
+		else if (newAlpha > 1.0f) newAlpha = 1.0f;
+
+		vtx.color.x = newAlpha;
+	}
+
+	mesh->SetVertexList(vtxList);
+	mesh->Create();
 }

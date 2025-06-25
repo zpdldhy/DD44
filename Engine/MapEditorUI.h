@@ -26,6 +26,11 @@ public:
     std::wstring GetTexturePath() const;
     std::wstring GetShaderPath() const;
 
+    bool IsSplattingMode() const { return m_bSplattingMode; }
+    float GetBrushRadius() const { return m_fBrushRadius; }
+    float GetBrushStrength() const { return m_fBrushStrength; }
+    int GetBrushChannel() const { return m_iBrushChannel; }
+
 private:
     int m_iCols = 20;
     int m_iRows = 20;
@@ -43,6 +48,12 @@ private:
     char m_szShaderName[256] = "Default.hlsl";
 
     std::vector<std::string> m_vMapPrafabList;
+
+    float m_fBrushRadius = 10.0f;
+    float m_fBrushStrength = 0.3f;
+    int   m_iBrushChannel = 0; // 0: R, 1: G, 2: B, 3: A
+
+    bool  m_bSplattingMode = false;
 
     std::function<void()> m_OnCreate;
 };

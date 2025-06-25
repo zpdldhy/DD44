@@ -1,5 +1,8 @@
 #include "Header.hlsli"
 
+Texture2D g_txSplatB : register(t8); // 보조 텍스처
+SamplerState g_samSplat : register(s2); // 전용 샘플러
+
 VS_OUT_RIM VS(VS_IN input)
 {
     VS_OUT_RIM output = (VS_OUT_RIM) 0;
@@ -36,7 +39,10 @@ PS_OUT PS(VS_OUT_RIM input) : SV_Target
     }
 
     float4 texColor = g_txDiffuseA.Sample(sample, input.t);
-    float3 baseColor = texColor.rgb;
+    float blend = saturate(input.c.r); // vertexColor.r
+    float3 splat = g_txSplatB.Sample(g_samSplat, input.t).rgb;
+
+    float3 baseColor = lerp(texColor.rgb, splat, blend);
 
     float3 shadowTexCoord = input.shadowCoord.xyz / input.shadowCoord.w;
     shadowTexCoord.xy = shadowTexCoord.xy * 0.5f + 0.5f;
