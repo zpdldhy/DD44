@@ -11,7 +11,7 @@ static const StatUpgradeInfo g_StatTable[(int)EStatType::COUNT][5] =
 	// MoveSpeed (코스트, 이동 속도, 구르기 속도)
 	{ {150, 0.05f, 0.01f}, {170, 0.05f, 0.01f}, {200, 0.05f, 0.01f}, {250, 0.05f, 0.01f}, {300, 0.05f, 0.06f} },
 	// RangedDamage (코스트, 원거리 공격력, 화살 개수)
-	{ {100, 0.2f, 1.0f}, {120, 0.2f, 1.0f}, {150, 0.2f, 1.0f}, {200, 0.2f, 1.0f}, {250, 1.2f, 9.0f} }
+	{ {100, 0.2f, 1.0f}, {120, 0.2f, 1.0f}, {150, 0.2f, 1.0f}, {200, 0.2f, 1.0f}, {250, 1.2f, 1.0f} }
 };
 
 void TPlayer::IncArrowCount(int _count)

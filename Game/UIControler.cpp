@@ -301,10 +301,22 @@ void InGameUIControler::init()
 	{
 		pUI->m_bRender = false;
 	}
+
+	// Sinema
+	m_pBettyName = PToA->MakeUI("../Resources/Prefab/UI_Movie_Betty.ui.json");
+	UI->AddUI(m_pBettyName);
+	m_pBettyName->m_bRun = false;
+	m_pBettyName->m_bRender = false;
 }
 
 void InGameUIControler::Tick()
 {
+	if (m_bNoRender)	
+		return;	
+
+	for (auto& pUI : m_vMainBackGround)
+		pUI->m_bRender = true;
+
 	FrameReset();
 	UpdateHP();
 	UpdateArrow();
@@ -331,6 +343,7 @@ void InGameUIControler::Destroy()
 	m_vSystemSelection.clear();
 
 	m_vDeadUI.clear();
+	m_pBettyName = nullptr;
 }
 
 void InGameUIControler::FrameReset()
@@ -356,7 +369,9 @@ void InGameUIControler::UpdateHP()
 	float pos = HPBackPos.x + static_cast<float>(n) * (HPBarSize / 2.f);
 
 	m_pHPBackGround->SetScale(Vec3(scale, HPBackSize.y, HPBackSize.z));
-	m_pHPBackGround->SetPosition(Vec3(pos, HPBackPos.y, HPBackPos.z));
+	m_pHPBackGround->SetPosition(Vec3(pos, HPBackPos.y, HPBackPos.z));	
+
+	m_pHPBackGround->m_bRender = true;
 
 	// Slice
 	if (n == 1)
@@ -370,14 +385,12 @@ void InGameUIControler::UpdateHP()
 	else if (n == 5)
 		m_pHPBackGround->SetSliceData(Vec4(0.075f, 0.075f, 0.5f, 0.5f));
 
-	m_vHPUI[m_iMaxHP - 1]->m_bRun = true;
-	m_vHPUI[m_iMaxHP - 1]->m_bRender = true;
-
 	// 현재 HP에 대한 로직
-	for (auto& pUI : m_vHPUI)
+	for (int i = 0; i < m_iMaxHP; i++)
 	{
-		pUI->SetAllTexture(m_pEmptyHPTexture);
-		pUI->SetColor(Color(0.f, 0.f, 0.f, 0.f));
+		m_vHPUI[i]->SetAllTexture(m_pEmptyHPTexture);
+		m_vHPUI[i]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
+		m_vHPUI[i]->m_bRender = true;
 	}
 
 	for (int i = 0; i < m_iCurrentHP; i++)
@@ -424,14 +437,11 @@ void InGameUIControler::UpdateArrow()
 		m_iMaxArrow = 9;
 
 	// Max Arrow 설정	
-	m_vArrowUI[m_iMaxArrow - 1]->m_bRun = true;
-	m_vArrowUI[m_iMaxArrow - 1]->m_bRender = true;
-	m_vArrowUI[m_iMaxArrow - 1]->SetAllTexture(m_pEmptyArrowTexture);
-
-	for (auto& pUI : m_vArrowUI)
+	for (int i = 0; i < m_iMaxArrow; i++)
 	{
-		pUI->SetAllTexture(m_pEmptyArrowTexture);
-		pUI->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[i]->SetAllTexture(m_pEmptyArrowTexture);
+		m_vArrowUI[i]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[i]->m_bRender = true;
 	}
 
 	// Current Arrow 설정
@@ -447,12 +457,14 @@ void InGameUIControler::UpdateArrow()
 		{
 			m_vArrowUI[i]->SetAllTexture(m_pActiveArrowTexture);
 			m_vArrowUI[i]->SetScale(m_vActiveArrowScale);
+			m_vArrowUI[i]->m_bRender = true;
 		}
 	}
 }
 
 void InGameUIControler::UpdateInteract()
 {
+	m_bHeal = false;
 	// InterAction, 상호작용 UI를 띄우는 구간
 	if (m_tTrigger.eTriggerType != ETriggerType::TT_NONE)
 	{
@@ -472,11 +484,15 @@ void InGameUIControler::UpdateInteract()
 
 			if (m_tTrigger.eTriggerType == ETriggerType::TT_LADDER)
 			{
-
+				m_vInterActionUI[2]->SetText(L"오르기");
 			}
 			else if (m_tTrigger.eTriggerType == ETriggerType::TT_HEALPOINT)
 			{
-
+				m_vInterActionUI[2]->SetText(L"회복");
+				if(INPUT->GetButton(GameKey::E))
+				{
+					m_bHeal = true;
+				}
 			}
 		}
 	}
@@ -861,6 +877,9 @@ void InGameUIControler::UpdateCoin()
 {
 	wstring szCoin = L"x ";
 
+	for (auto& pUI : m_vCoins)
+		pUI->m_bRender = true;
+
 	m_vCoins[1]->SetText(szCoin + L"0");
 	m_vCoins[3]->SetText(szCoin + to_wstring(m_iCoin));
 }
@@ -971,4 +990,35 @@ void InGameUIControler::UpdateDead()
 		m_vCoins[1]->m_bRender = true;
 		m_vCoins[3]->m_bRender = true;
 	}
+}
+
+void InGameUIControler::PopUpBettyName()
+{
+	m_pBettyName->m_bRun = true;
+	m_pBettyName->m_bRender = true;
+}
+
+void InGameUIControler::PopDownBettyName()
+{
+	m_pBettyName->m_bRun = false;
+	m_pBettyName->m_bRender = false;
+}
+
+void InGameUIControler::NoRenderStateUI()
+{
+	m_bNoRender = true;
+
+	for (auto& pUI : m_vMainBackGround)
+		pUI->m_bRender = false;
+
+	m_pHPBackGround->m_bRender = false;
+
+	for (auto& pUI : m_vHPUI)
+		pUI->m_bRender = false;
+
+	for (auto& pUI : m_vArrowUI)
+		pUI->m_bRender = false;
+
+	for (auto& pUI : m_vCoins)
+		pUI->m_bRender = false;
 }

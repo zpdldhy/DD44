@@ -189,6 +189,9 @@
     <ClInclude Include="TriggerData.h">
       <Filter>Data</Filter>
     </ClInclude>
+    <ClInclude Include="MovieControler.h">
+      <Filter>Controler</Filter>
+    </ClInclude>
     <ClInclude Include="HealerScript.h">
       <Filter>Script\Object</Filter>
     </ClInclude>
@@ -315,6 +318,9 @@
     </ClCompile>
     <ClCompile Include="StageManager.cpp" />
     <ClCompile Include="UIControler.cpp">
+      <Filter>Controler</Filter>
+    </ClCompile>
+    <ClCompile Include="MovieControler.cpp">
       <Filter>Controler</Filter>
     </ClCompile>
     <ClCompile Include="HealerScript.cpp">

@@ -85,7 +85,7 @@ void Game::Init()
 	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
-	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
+	m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
 	OBJECT->AddActor(m_pPlayer);
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
@@ -163,11 +163,17 @@ void Game::Init()
 	OBJECT->SetCursorActor(m_pCursor);
 
 	UI->DoFadeOut();
+
+	m_cBettyMovie.SetCameraStart(Vec3(64.f, 4.f, -94.f), Vec3(-0.06f, 11.65f, 0.f));
 }
 
 void Game::Tick()
 {
 	STAGE->Tick();
+	if (STAGE->GetCurrentStage() == StagePhase::FINAL)
+	{
+		m_bStartBettyMoveScene = true;
+	}
 
 	UpdateCursor();
 
@@ -176,6 +182,7 @@ void Game::Tick()
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
 
 	UpdateUI();
+	BettyMeetMovie();
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
@@ -388,10 +395,15 @@ void Game::UpdateUI()
 	m_cUI.Tick();
 
 	// UI의 상태에 따라 적용되는 부분
+	
+	if (m_cUI.IsHealAction())
+	{
+		player->SetHp(player->GetMaxHP());
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	///////////						Paused							///////////
 	///////////////////////////////////////////////////////////////////////////
-
 
 	// 계속하기
 	if(m_cUI.SelectContinue())
@@ -458,6 +470,76 @@ void Game::UpdateCursor()
 		OBJECT->SetCursorActor(nullptr);
 	else
 		OBJECT->SetCursorActor(m_pCursor);
+}
+
+void Game::BettyMeetMovie()
+{
+	if (!m_bStartBettyMoveScene || m_cBettyMovie.IsEnd()) return;
+
+	// 시작하기 전에 세팅할 것들
+	if (!m_cBettyMovie.IsStart())
+	{
+		// 연출 위치 조작
+		m_pPlayer->GetPhysicsComponent()->SetWeight(0.f);
+		auto pos = m_pPlayer->GetPosition();
+		m_cBettyMovie.SetPlayerEnterPos(pos);
+		m_cBettyMovie.SetPlayerStartPos(Vec3(64.f, pos.y, -94.f));
+		m_cBettyMovie.SetPlayerEndPos(Vec3(52.f, pos.y, -85.f));
+
+		m_cBettyMovie.SetMoveTime1(3.f);
+		m_cBettyMovie.SetRotTime1(5.f);
+		m_cBettyMovie.SetTimeTrack1(7.f);
+
+		m_cBettyMovie.SetMoveTime2(10.f);
+		m_cBettyMovie.SetTimeTrack2(12.f);
+
+		m_cBettyMovie.SetUIPopUpTime(18.f);
+		m_cBettyMovie.SetTimeTrack3(23.f);	// 베티 애니메이션 6초
+
+		m_cUI.NoRenderStateUI();
+	}
+
+	m_cBettyMovie.StartMovie();
+	m_cBettyMovie.Tick();
+
+	if (m_cBettyMovie.StartTrack1() || m_cBettyMovie.StartTrack2())
+	{
+		int i = 0;
+		m_pCursor->m_bRender = false;
+		// 까마귀를 Walk Animation으로 변경
+	}
+	
+	if (m_cBettyMovie.EndMove())
+	{
+		int i = 0;
+		// 까마귀를 Idle Animation으로 변경
+	}
+
+	if (m_cBettyMovie.StartTrack3())
+	{
+		// 베티가 화내기 시작하는 부분
+	}
+
+	if (m_cBettyMovie.IsUIPopUp())
+	{
+		m_cUI.PopUpBettyName();
+	}
+
+	// 장면이 완전 종료되었을 때
+	if (m_cBettyMovie.IsEnd())
+	{
+		// 베티 움직이기 시작하는 구간
+		m_cUI.PopDownBettyName();
+		m_cUI.RenderStateUI();
+		CAMERA->Set3DCameraActor(m_pGameCameraActor);
+		m_bStartBettyMoveScene = false;
+		m_pCursor->m_bRender = true;
+		m_pPlayer->GetPhysicsComponent()->SetWeight(1.f);
+	}
+
+	// Player 움직임 구현
+	m_pPlayer->SetPosition(m_cBettyMovie.GetPlayerPos());
+	m_pPlayer->SetRotation(m_cBettyMovie.GetPlayerRot());
 }
 
 void Game::SetEnemy(vector<shared_ptr<AActor>>& _enemyList)

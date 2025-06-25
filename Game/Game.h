@@ -4,6 +4,7 @@
 #include "ActorLoader.h"
 #include "MeshLoader.h"
 #include "UIControler.h"
+#include "MovieControler.h"
 
 class Game : public IExecute
 {
@@ -21,8 +22,6 @@ public:
 	bool m_bEnginCamera = false;
 	bool m_bWind = false;
 
-	float time;
-
 	int m_iSoulStorage = 0;
 
 	// UI
@@ -38,6 +37,10 @@ public:
 	
 	vector<shared_ptr<AActor>> m_vObjectList;
 	vector<shared_ptr<AActor>> m_vMapList;
+
+	// 씬 연출
+	BettyMeetControler m_cBettyMovie;
+	bool m_bStartBettyMoveScene = false;	// 콜리전 박스에 닿으면 실행할 수 있도록
 
 	// TEMP
 	vector<shared_ptr<AActor>> stage0;
@@ -60,6 +63,8 @@ protected:
 	void UpdateUI();
 	void UpdateCursor();
 
+	void BettyMeetMovie();
+
 protected:
 	void SetEnemy(vector<shared_ptr<AActor>>& _enemyList);
 	void CheckFrustumCulling();
@@ -68,7 +73,6 @@ protected:
 	void CheckBloodCollision();
 
 	void CheckEnemyDeath(const vector<shared_ptr<AActor>>& _enemyList);
-
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }
 };

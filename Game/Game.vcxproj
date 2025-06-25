@@ -176,6 +176,7 @@
     <ClInclude Include="MageMovement.h" />
     <ClInclude Include="MageStates.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="MovieControler.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayerMoveScript.h" />
     <ClInclude Include="PrefabToActor.h" />
@@ -223,6 +224,7 @@
     <ClCompile Include="MageMovement.cpp" />
     <ClCompile Include="MageStates.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MovieControler.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>

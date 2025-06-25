@@ -44,6 +44,7 @@ class InGameUIControler : public UIControler
 	// InGame //
 	////////////
 	vector<shared_ptr<class AUIActor>> m_vMainBackGround;
+	bool m_bNoRender = false;
 
 	// HP
 	shared_ptr<class AUIActor> m_pHPBackGround = nullptr;
@@ -68,6 +69,7 @@ class InGameUIControler : public UIControler
 	// Interact
 	vector<shared_ptr<class AUIActor>> m_vInterActionUI;
 	struct TriggerData m_tTrigger;
+	bool m_bHeal = false;
 
 	////////////
 	// Paused //
@@ -110,6 +112,11 @@ class InGameUIControler : public UIControler
 	bool m_bDeadUIMove = false;
 	bool m_bDeadUIEnd = false;
 
+	//////////////
+	//  Sinema  //
+	//////////////
+	shared_ptr<class AUIActor> m_pBettyName = nullptr;
+
 public:
 	void init() override;
 	void Tick() override;
@@ -144,4 +151,11 @@ public:
 	bool SelectExit() { return m_bExit; }
 	bool SelectDeadContinue() { return m_bDeadContinue; }
 	bool EndDeadUI() { return m_bDeadUIEnd; }
+	bool IsHealAction() { return m_bHeal; }
+
+	void PopUpBettyName();
+	void PopDownBettyName();
+
+	void NoRenderStateUI();
+	void RenderStateUI() { m_bNoRender = false; }
 };
