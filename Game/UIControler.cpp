@@ -196,12 +196,6 @@ void InGameUIControler::init()
 	m_vHPUI.erase(iter);
 
 	// HP 초기값
-	m_vHPUI[4]->m_bRun = false;
-	m_vHPUI[5]->m_bRun = false;
-	m_vHPUI[6]->m_bRun = false;
-	m_vHPUI[7]->m_bRun = false;
-	m_vHPUI[8]->m_bRun = false;
-
 	m_vHPUI[4]->m_bRender = false;
 	m_vHPUI[5]->m_bRender = false;
 	m_vHPUI[6]->m_bRender = false;
@@ -217,7 +211,6 @@ void InGameUIControler::init()
 	for (auto& pUI : m_vInterActionUI)
 	{
 		pUI->m_bRender = false;
-		pUI->m_bRun = false;
 	}
 
 	ZeroMemory(&m_tTrigger, sizeof(TriggerData));
@@ -227,7 +220,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vPausedBackGround);
 	for (auto& pUI : m_vPausedBackGround)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 
@@ -235,7 +227,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vPausedSelect);
 	for (auto& pUI : m_vPausedSelect)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 
@@ -244,7 +235,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vUpgradeBackGround);
 	for (auto& pUI : m_vUpgradeBackGround)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 
@@ -256,7 +246,6 @@ void InGameUIControler::init()
 		for (int iCol = 0; iCol < 8; iCol++)
 		{
 			vUpgradeState[iRow * 8 + iCol]->m_bRender = false;
-			vUpgradeState[iRow * 8 + iCol]->m_bRun = false;
 			vUI.emplace_back(vUpgradeState[iRow * 8 + iCol]);
 		}
 		m_vUpgradeState.emplace_back(vUI);
@@ -266,7 +255,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vUpgradeExplain);
 	for (auto& pUI : m_vUpgradeExplain)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 
@@ -277,7 +265,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vSystemBackGround);
 	for (auto& pUI : m_vSystemBackGround)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 
@@ -285,7 +272,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vSystemSelection);
 	for (auto& pUI : m_vSystemSelection)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 
@@ -303,7 +289,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vDeadUI);
 	for (auto& pUI : m_vDeadUI)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 }
@@ -673,9 +658,22 @@ void InGameUIControler::UpdatePaused()
 			{
 			case 0:
 			{
+
 				m_vUpgradeExplain[0]->SetText(L"최대 체력");
 				m_vUpgradeExplain[1]->SetText(L"최대 체력이 증가합니다.\n최대 체력이 높을수록 전투에서 더 오래 생존할 수 있으며,\n강력한 적이나 보스의 공격도 버틸 수 있는 여유가 생깁니다.");
-				m_vUpgradeExplain[2]->SetText(L"x 100");				
+				if (iHealthPoint < 5)
+				{
+					m_vUpgradeExplain[5]->m_bRender = false;
+
+					m_vUpgradeExplain[2]->SetText(L"x " + to_wstring(m_iHealthPrice));
+				}
+				else if (iHealthPoint == 5)	// 강화 완료
+				{
+					m_vUpgradeExplain[5]->m_bRender = true;
+					m_vUpgradeExplain[2]->m_bRender = false;
+					m_vUpgradeExplain[3]->m_bRender = false;
+					m_vUpgradeExplain[4]->m_bRender = false;
+				}
 				break;
 			}
 
@@ -683,7 +681,19 @@ void InGameUIControler::UpdatePaused()
 			{
 				m_vUpgradeExplain[0]->SetText(L"근접 공격");
 				m_vUpgradeExplain[1]->SetText(L"근접 공격력과 공격 범위가 증가합니다.\n근접 전투 시 적에게 주는 피해가 증가하며,\n전투를 빠르게 끝낼 수 있는 힘을 제공합니다.");
-				m_vUpgradeExplain[2]->SetText(L"x 100");
+				if (iAttackPoint < 5)
+				{
+					m_vUpgradeExplain[5]->m_bRender = false;
+
+					m_vUpgradeExplain[2]->SetText(L"x " + to_wstring(m_iAttackPrice));
+				}
+				else if (iAttackPoint == 5)	// 강화 완료
+				{
+					m_vUpgradeExplain[5]->m_bRender = true;
+					m_vUpgradeExplain[2]->m_bRender = false;
+					m_vUpgradeExplain[3]->m_bRender = false;
+					m_vUpgradeExplain[4]->m_bRender = false;
+				}
 				break;
 			}
 
@@ -691,7 +701,19 @@ void InGameUIControler::UpdatePaused()
 			{
 				m_vUpgradeExplain[0]->SetText(L"이동 속도");
 				m_vUpgradeExplain[1]->SetText(L"이동과 구르기의 속도가 증가합니다.\n적의 공격을 피하거나 유리한 위치를 선점하는 데 도움이 되며,\n전장의 흐름을 유리하게 이끌 수 있습니다.");
-				m_vUpgradeExplain[2]->SetText(L"x 100");
+				if (iSpeedPoint < 5)
+				{
+					m_vUpgradeExplain[5]->m_bRender = false;
+
+					m_vUpgradeExplain[2]->SetText(L"x " + to_wstring(m_iSpeedPrice));
+				}
+				else if (iSpeedPoint == 5)	// 강화 완료
+				{
+					m_vUpgradeExplain[5]->m_bRender = true;
+					m_vUpgradeExplain[2]->m_bRender = false;
+					m_vUpgradeExplain[3]->m_bRender = false;
+					m_vUpgradeExplain[4]->m_bRender = false;
+				}
 				break;
 			}
 
@@ -699,12 +721,24 @@ void InGameUIControler::UpdatePaused()
 			{
 				m_vUpgradeExplain[0]->SetText(L"원거리 공격");
 				m_vUpgradeExplain[1]->SetText(L"화살의 공격력과 개수가 증가합니다.\n멀리 있는 적을 더 효과적으로 처리할 수 있으며,\n안전한 거리에서 전투를 이어가는 전략에 적합합니다.");
-				m_vUpgradeExplain[2]->SetText(L"x 100");
+				if (iArrowPoint < 5)
+				{
+					m_vUpgradeExplain[5]->m_bRender = false;
+
+					m_vUpgradeExplain[2]->SetText(L"x " + to_wstring(m_iArrowPrice));
+				}
+				else if (iArrowPoint == 5)	// 강화 완료
+				{
+					m_vUpgradeExplain[5]->m_bRender = true;
+					m_vUpgradeExplain[2]->m_bRender = false;
+					m_vUpgradeExplain[3]->m_bRender = false;
+					m_vUpgradeExplain[4]->m_bRender = false;
+				}
 				break;
 			}
 			}
 
-			if (INPUT->GetButton(GameKey::SPACE))
+			if (INPUT->GetButton(GameKey::SPACE)&& m_iBuyUpgrade == true)
 			{
 				m_iSelectUpgrade = iSelectUpgrade + 1;
 				if (iSelectUpgrade == 0 && iHealthPoint < 5)
@@ -726,6 +760,33 @@ void InGameUIControler::UpdatePaused()
 				{
 					m_vUpgradeState[iSelectUpgrade][iArrowPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
 					iArrowPoint++;
+				}
+			}
+			// 못하면 흔들리는 연출
+			else if (m_iBuyUpgrade == false)
+			{
+				m_iSelectUpgrade = 0;
+
+				for (auto& pUI : m_vUpgradeExplain)
+				{
+					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
+				}
+				for (auto& pUI : m_vPausedSelect)
+				{
+					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
+				}
+				for (auto& pUI : m_vUpgradeBackGround)
+				{
+					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
+				}
+				for (auto& vUIList : m_vUpgradeState)
+				{
+					for (auto& pUI : vUIList)
+						pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
+				}
+				for (auto& pUI : m_vUpgradeExplain)
+				{
+					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
 				}
 			}
 			else

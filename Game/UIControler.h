@@ -76,6 +76,11 @@ class InGameUIControler : public UIControler
 	vector<vector<shared_ptr<class AUIActor>>> m_vUpgradeState;
 	shared_ptr<class Texture> m_pUpgradeDoneTexture = nullptr;
 	int m_iSelectUpgrade = 0;
+	int m_iHealthPrice = 100;
+	int m_iAttackPrice = 100;
+	int m_iSpeedPrice = 100;
+	int m_iArrowPrice = 100;
+	bool m_iBuyUpgrade = true;
 
 	vector<shared_ptr<class AUIActor>> m_vUpgradeExplain;
 
@@ -122,9 +127,14 @@ public:
 	void SetArrowCount(int _arrowCount) { m_iArrowCount = _arrowCount; }
 	void SetTriggerData(TriggerData _data) { m_tTrigger = _data; }
 	void SetCoin(int _coin) { m_iCoin = _coin; }
+	void SetHealthPrice(int _price) { m_iHealthPrice = _price; }
+	void SetAttackPrice(int _price) { m_iAttackPrice = _price; }
+	void SetSpeedPrice(int _price) { m_iSpeedPrice = _price; }
+	void SetArrowPrice(int _price) { m_iArrowPrice = _price; }
+	void IsBuyUpgrade(bool _isBuy) { m_iBuyUpgrade = _isBuy; }
 	void SetDead(bool _isDead) { m_bDead = _isDead; }
 
-	int SelectUpgrade() { return m_iSelectUpgrade; }
+	int  SelectUpgrade() { return m_iSelectUpgrade; }
 	bool SelectContinue() { return m_bContinue; }
 	bool SelectExit() { return m_bExit; }
 	bool SelectDeadContinue() { return m_bDeadContinue; }

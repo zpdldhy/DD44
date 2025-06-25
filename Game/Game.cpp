@@ -207,8 +207,8 @@ void Game::Tick()
 		}
 	}
 
-	CheckFrustumCulling();
-	CheckEnemyCollision();
+	//CheckFrustumCulling();
+	//CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
 }
@@ -353,6 +353,15 @@ void Game::UpdateUI()
 	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());	
 	m_cUI.SetCoin(coin);
 	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
+
+	// 가격 출력하는 부분
+	m_cUI.SetHealthPrice(200);
+
+	// 업그레이드 실패시
+	if (INPUT->GetButtonDown(GameKey::U))
+		m_cUI.IsBuyUpgrade(false);
+	else
+		m_cUI.IsBuyUpgrade(true);
 
 	m_cUI.Tick();
 
