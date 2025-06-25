@@ -177,6 +177,10 @@ void IntroUIControler::Destroy()
 
 void InGameUIControler::init()
 {
+	m_pActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_active.png");
+	m_pInActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_inactive.png");
+	m_pUpgradeDoneTexture = TEXTURE->Get(L"../Resources/Texture/UI/upgrade_slot_glow-1.png");
+
 	// InGame UI	
 	m_vMainBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Game_BackGround.uis.json");
 	m_vHPUI = PToA->MakeUIs("../Resources/Prefab/UI_Game_HP.uis.json");
@@ -192,21 +196,12 @@ void InGameUIControler::init()
 	m_vHPUI.erase(iter);
 
 	// HP 초기값
-	m_vHPUI[4]->m_bRun = false;
-	m_vHPUI[5]->m_bRun = false;
-	m_vHPUI[6]->m_bRun = false;
-	m_vHPUI[7]->m_bRun = false;
-	m_vHPUI[8]->m_bRun = false;
-
 	m_vHPUI[4]->m_bRender = false;
 	m_vHPUI[5]->m_bRender = false;
 	m_vHPUI[6]->m_bRender = false;
 	m_vHPUI[7]->m_bRender = false;
 	m_vHPUI[8]->m_bRender = false;
-
-	m_pActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_active.png");
-	m_pInActiveArrowTexture = TEXTURE->Get(L"Resources/Texture/UI/hud_energy_inactive.png");
-
+	
 	m_vActiveArrowScale = m_vArrowUI[3]->GetScale();
 	m_vInActiveArrowScale = m_vArrowUI[2]->GetScale();
 
@@ -216,7 +211,6 @@ void InGameUIControler::init()
 	for (auto& pUI : m_vInterActionUI)
 	{
 		pUI->m_bRender = false;
-		pUI->m_bRun = false;
 	}
 
 	ZeroMemory(&m_tTrigger, sizeof(TriggerData));
@@ -226,7 +220,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vPausedBackGround);
 	for (auto& pUI : m_vPausedBackGround)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 
@@ -234,7 +227,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vPausedSelect);
 	for (auto& pUI : m_vPausedSelect)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 
@@ -243,7 +235,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vUpgradeBackGround);
 	for (auto& pUI : m_vUpgradeBackGround)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 
@@ -255,18 +246,25 @@ void InGameUIControler::init()
 		for (int iCol = 0; iCol < 8; iCol++)
 		{
 			vUpgradeState[iRow * 8 + iCol]->m_bRender = false;
-			vUpgradeState[iRow * 8 + iCol]->m_bRun = false;
 			vUI.emplace_back(vUpgradeState[iRow * 8 + iCol]);
 		}
 		m_vUpgradeState.emplace_back(vUI);
 	}
+
+	m_vUpgradeExplain = PToA->MakeUIs("../Resources/Prefab/UI_Paused_Upgrade_Explain.uis.json");
+	UI->AddUIList(m_vUpgradeExplain);
+	for (auto& pUI : m_vUpgradeExplain)
+	{
+		pUI->m_bRender = false;
+	}
+
+	m_vUpgradeExplain[1]->SetAlignment(DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
 	// Paused System
 	m_vSystemBackGround = PToA->MakeUIs("../Resources/Prefab/UI_Paused_System_BackGround.uis.json");
 	UI->AddUIList(m_vSystemBackGround);
 	for (auto& pUI : m_vSystemBackGround)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 
@@ -274,9 +272,11 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vSystemSelection);
 	for (auto& pUI : m_vSystemSelection)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
+
+	m_vSystemSelection[0]->SetState(make_shared<IdleUIState>(UIUseType::UT_NOMOUSE));
+	m_vSystemSelection[1]->SetState(make_shared<IdleUIState>(UIUseType::UT_NOMOUSE));
 
 	m_vCoins = PToA->MakeUIs("../Resources/Prefab/UI_Game_Coins.uis.json");
 	UI->AddUIList(m_vCoins);
@@ -289,7 +289,6 @@ void InGameUIControler::init()
 	UI->AddUIList(m_vDeadUI);
 	for (auto& pUI : m_vDeadUI)
 	{
-		pUI->m_bRun = false;
 		pUI->m_bRender = false;
 	}
 }
@@ -558,6 +557,10 @@ void InGameUIControler::UpdateInteract()
 
 void InGameUIControler::UpdatePaused()
 {
+	static int iSelectMenu = 0;
+	static int iSelectUpgrade = 0;
+	static int iSelectSystem = 0;
+
 	// Paused
 	if (ENGINE->m_bGamePaused == true)
 	{
@@ -574,17 +577,29 @@ void InGameUIControler::UpdatePaused()
 		}
 
 		// 0이 없그레이드, 1이 설정
-		if (m_vPausedSelect[0]->GetStateType() == UIStateType::ST_SELECT)
-			m_iSelectUI = 0;
-		else if (m_vPausedSelect[1]->GetStateType() == UIStateType::ST_SELECT)
-			m_iSelectUI = 1;
+		if (INPUT->GetButton(GameKey::A))
+			iSelectMenu--;
+		else if (INPUT->GetButton(GameKey::D))
+			iSelectMenu++;
 
-		switch (m_iSelectUI)
+		if (iSelectMenu < 0)
+			iSelectMenu = 0;
+		if (iSelectMenu > 1)
+			iSelectMenu = 1;
+
+		static int iHealthPoint = 0;
+		static int iAttackPoint = 0;
+		static int iSpeedPoint = 0;
+		static int iArrowPoint = 0;
+
+		switch (iSelectMenu)
 		{
 			// Upgrade
 		case 0:
 		{
-			// 선택된 옵션 밝게
+			iSelectSystem = 0;
+
+			// 선택된 메뉴 밝게
 			m_vPausedSelect[0]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
 			m_vPausedSelect[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
 
@@ -602,59 +617,198 @@ void InGameUIControler::UpdatePaused()
 			}
 
 			// 설정값
+			if (INPUT->GetButton(GameKey::W))
+				iSelectUpgrade--;
+			if (INPUT->GetButton(GameKey::S))
+				iSelectUpgrade++;
+
+			if (iSelectUpgrade < 0)
+				iSelectUpgrade = 0;
+			if (iSelectUpgrade > 3)
+				iSelectUpgrade = 3;
+
 			for (auto& pUI : m_vUpgradeBackGround)
 			{
 				pUI->m_bRun = true;
 				pUI->m_bRender = true;
 			}
 
-			UINT iSelect = 1;
 			for (auto& pUIList : m_vUpgradeState)
 			{
-				// 해당 Upgrade 부분을 선택하면 색깔이 바뀌게 하는 로직
-				if (pUIList[0]->GetStateType() == UIStateType::ST_SELECT)
-				{
-					m_iSelectUpgradeUI = iSelect;
-				}
-
-				if (iSelect == m_iSelectUpgradeUI)
-					pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, 0.0f));
-				else
-					pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
+				pUIList[1]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
 
 				for (auto& pUI : pUIList)
 				{
 					pUI->m_bRun = true;
 					pUI->m_bRender = true;
 				}
-
-				iSelect++;
 			}
+
+			for (auto& pUI : m_vUpgradeExplain)
+			{
+				pUI->m_bRun = true;
+				pUI->m_bRender = true;
+			}
+
+			// 선택된 Upgrade의 색만 변경
+			m_vUpgradeState[iSelectUpgrade][1]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
 
 			// 선택된 Upgrade의 설명이 적힌 부분을 Render한다.
-			switch (m_iSelectUpgradeUI)
+			switch (iSelectUpgrade)
 			{
-			case 1:
-				break;
+			case 0:
+			{
 
-			case 2:
-				break;
+				m_vUpgradeExplain[0]->SetText(L"최대 체력");
+				m_vUpgradeExplain[1]->SetText(L"최대 체력이 증가합니다.\n최대 체력이 높을수록 전투에서 더 오래 생존할 수 있으며,\n강력한 적이나 보스의 공격도 버틸 수 있는 여유가 생깁니다.");
+				if (iHealthPoint < 5)
+				{
+					m_vUpgradeExplain[5]->m_bRender = false;
 
-			case 3:
-				break;
-
-			case 4:
-				break;
-			default:
+					m_vUpgradeExplain[2]->SetText(L"x " + to_wstring(m_iHealthPrice));
+				}
+				else if (iHealthPoint == 5)	// 강화 완료
+				{
+					m_vUpgradeExplain[5]->m_bRender = true;
+					m_vUpgradeExplain[2]->m_bRender = false;
+					m_vUpgradeExplain[3]->m_bRender = false;
+					m_vUpgradeExplain[4]->m_bRender = false;
+				}
 				break;
 			}
+
+			case 1: 
+			{
+				m_vUpgradeExplain[0]->SetText(L"근접 공격");
+				m_vUpgradeExplain[1]->SetText(L"근접 공격력과 공격 범위가 증가합니다.\n근접 전투 시 적에게 주는 피해가 증가하며,\n전투를 빠르게 끝낼 수 있는 힘을 제공합니다.");
+				if (iAttackPoint < 5)
+				{
+					m_vUpgradeExplain[5]->m_bRender = false;
+
+					m_vUpgradeExplain[2]->SetText(L"x " + to_wstring(m_iAttackPrice));
+				}
+				else if (iAttackPoint == 5)	// 강화 완료
+				{
+					m_vUpgradeExplain[5]->m_bRender = true;
+					m_vUpgradeExplain[2]->m_bRender = false;
+					m_vUpgradeExplain[3]->m_bRender = false;
+					m_vUpgradeExplain[4]->m_bRender = false;
+				}
+				break;
+			}
+
+			case 2:
+			{
+				m_vUpgradeExplain[0]->SetText(L"이동 속도");
+				m_vUpgradeExplain[1]->SetText(L"이동과 구르기의 속도가 증가합니다.\n적의 공격을 피하거나 유리한 위치를 선점하는 데 도움이 되며,\n전장의 흐름을 유리하게 이끌 수 있습니다.");
+				if (iSpeedPoint < 5)
+				{
+					m_vUpgradeExplain[5]->m_bRender = false;
+
+					m_vUpgradeExplain[2]->SetText(L"x " + to_wstring(m_iSpeedPrice));
+				}
+				else if (iSpeedPoint == 5)	// 강화 완료
+				{
+					m_vUpgradeExplain[5]->m_bRender = true;
+					m_vUpgradeExplain[2]->m_bRender = false;
+					m_vUpgradeExplain[3]->m_bRender = false;
+					m_vUpgradeExplain[4]->m_bRender = false;
+				}
+				break;
+			}
+
+			case 3:
+			{
+				m_vUpgradeExplain[0]->SetText(L"원거리 공격");
+				m_vUpgradeExplain[1]->SetText(L"화살의 공격력과 개수가 증가합니다.\n멀리 있는 적을 더 효과적으로 처리할 수 있으며,\n안전한 거리에서 전투를 이어가는 전략에 적합합니다.");
+				if (iArrowPoint < 5)
+				{
+					m_vUpgradeExplain[5]->m_bRender = false;
+
+					m_vUpgradeExplain[2]->SetText(L"x " + to_wstring(m_iArrowPrice));
+				}
+				else if (iArrowPoint == 5)	// 강화 완료
+				{
+					m_vUpgradeExplain[5]->m_bRender = true;
+					m_vUpgradeExplain[2]->m_bRender = false;
+					m_vUpgradeExplain[3]->m_bRender = false;
+					m_vUpgradeExplain[4]->m_bRender = false;
+				}
+				break;
+			}
+			}
+
+			if (INPUT->GetButton(GameKey::SPACE)&& m_iBuyUpgrade == true)
+			{
+				m_iSelectUpgrade = iSelectUpgrade + 1;
+				if (iSelectUpgrade == 0 && iHealthPoint < 5)
+				{
+					m_vUpgradeState[iSelectUpgrade][iHealthPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
+					iHealthPoint++;
+				}
+				else if (iSelectUpgrade == 1 && iAttackPoint < 5)
+				{
+					m_vUpgradeState[iSelectUpgrade][iAttackPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
+					iAttackPoint++;
+				}
+				else if (iSelectUpgrade == 2 && iSpeedPoint < 5)
+				{
+					m_vUpgradeState[iSelectUpgrade][iSpeedPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
+					iSpeedPoint++;
+				}
+				else if (iSelectUpgrade == 3&& iArrowPoint < 5)
+				{
+					m_vUpgradeState[iSelectUpgrade][iArrowPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
+					iArrowPoint++;
+				}
+			}
+			// 못하면 흔들리는 연출
+			else if (m_iBuyUpgrade == false)
+			{
+				m_iSelectUpgrade = 0;
+
+				for (auto& pUI : m_vUpgradeExplain)
+				{
+					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
+				}
+				for (auto& pUI : m_vPausedSelect)
+				{
+					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
+				}
+				for (auto& pUI : m_vUpgradeBackGround)
+				{
+					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
+				}
+				for (auto& vUIList : m_vUpgradeState)
+				{
+					for (auto& pUI : vUIList)
+						pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
+				}
+				for (auto& pUI : m_vUpgradeExplain)
+				{
+					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
+				}
+			}
+			else
+				m_iSelectUpgrade = 0;
+
+			if (iHealthPoint > 5)
+				iHealthPoint = 5;
+			if (iAttackPoint > 5)
+				iAttackPoint = 5;
+			if (iSpeedPoint > 5)
+				iSpeedPoint = 5;
+			if (iArrowPoint > 5)
+				iArrowPoint = 5;
 
 			break;
 		}
 		// System
 		case 1:
 		{
-			// 선택된 옵션 밝게
+			iSelectUpgrade = 0;
+
+			// 선택된 메뉴 밝게
 			m_vPausedSelect[0]->SetColor(Color(0.f, 0.f, 0.f, -0.3f));
 			m_vPausedSelect[1]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
 
@@ -672,7 +826,11 @@ void InGameUIControler::UpdatePaused()
 					pUI->m_bRender = false;
 				}
 
-			m_iSelectUpgradeUI = 0;
+			for (auto& pUI : m_vUpgradeExplain)
+			{
+				pUI->m_bRun = false;
+				pUI->m_bRender = false;
+			}
 
 			// 설정값
 			for (auto& pUI : m_vSystemBackGround)
@@ -686,6 +844,30 @@ void InGameUIControler::UpdatePaused()
 				pUI->m_bRun = true;
 				pUI->m_bRender = true;
 			}
+
+			if (INPUT->GetButton(GameKey::W))
+				iSelectSystem--;
+			if (INPUT->GetButton(GameKey::S))
+				iSelectSystem++;
+
+			if (iSelectSystem < 0)
+				iSelectSystem = 0;
+			if (iSelectSystem > 1)
+				iSelectSystem = 1;
+
+			if (iSelectSystem == 0)
+			{
+				m_vSystemSelection[0]->SetStateType(UIStateType::ST_HOVER);
+				m_vSystemSelection[1]->SetStateType(UIStateType::ST_IDLE);
+			}
+			else if (iSelectSystem == 1)
+			{
+				m_vSystemSelection[0]->SetStateType(UIStateType::ST_IDLE);
+				m_vSystemSelection[1]->SetStateType(UIStateType::ST_HOVER);
+			}
+
+			if (INPUT->CheckKey(GameKey::SPACE))
+				m_vSystemSelection[iSelectSystem]->SetStateType(UIStateType::ST_SELECT);
 
 			if (m_vSystemSelection[0]->GetStateType() == UIStateType::ST_SELECT)
 				m_bContinue = true;
@@ -738,7 +920,7 @@ void InGameUIControler::UpdatePaused()
 			pUI->m_bRender = false;
 		}
 
-		m_iSelectUpgradeUI = 0;
+		iSelectUpgrade = 0;
 	}
 }
 

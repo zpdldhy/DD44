@@ -207,8 +207,8 @@ void Game::Tick()
 		}
 	}
 
-	CheckFrustumCulling();
-	CheckEnemyCollision();
+	//CheckFrustumCulling();
+	//CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
 }
@@ -354,12 +354,39 @@ void Game::UpdateUI()
 	m_cUI.SetCoin(coin);
 	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
 
+	// 가격 출력하는 부분
+	m_cUI.SetHealthPrice(200);
+
+	// 업그레이드 실패시
+	if (INPUT->GetButtonDown(GameKey::U))
+		m_cUI.IsBuyUpgrade(false);
+	else
+		m_cUI.IsBuyUpgrade(true);
+
 	m_cUI.Tick();
 
 	// UI의 상태에 따라 적용되는 부분
 	///////////////////////////////////////////////////////////////////////////
 	///////////						Paused							///////////
 	///////////////////////////////////////////////////////////////////////////
+
+	// Upgrade State
+	// 0은 Default로 Upgrade 없음을 나타냄
+	switch (m_cUI.SelectUpgrade())
+	{
+	case 1: // MaxHP
+		// MaxHP++
+		break;
+
+	case 2: // Attack
+		break;
+
+	case 3: // Speed
+		break;
+
+	case 4:	// Arrow
+		break;
+	}
 
 	// 계속하기
 	if(m_cUI.SelectContinue())

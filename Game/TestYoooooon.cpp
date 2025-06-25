@@ -51,7 +51,6 @@ void TestYoooooon::Init()
 
 	SetupEngineCamera();
 	//SetupSkybox();
-	SetupSunLight();
 
 	CreateCollisionObject();
 }
