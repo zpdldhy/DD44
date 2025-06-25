@@ -22,6 +22,8 @@ public:
 
 	float time;
 
+	int m_iSoulStorage = 0;
+
 	// UI
 	InGameUIControler m_cUI;
 

@@ -5,7 +5,7 @@
 static const StatUpgradeInfo g_StatTable[(int)EStatType::COUNT][5] =
 {
 	// HP (코스트, 최대 체력)
-	{ {200, 1.0f, 0.f}, {220, 1.0f, 0.f}, {250, 1.0f, 0.f}, {290, 1.0f, 0.f}, {350, 9.0f, 0.f} },
+	{ {200, 1.0f, 0.f}, {220, 1.0f, 0.f}, {250, 1.0f, 0.f}, {290, 1.0f, 0.f}, {350, 1.0f, 0.f} },
 	// MeleeDamage (코스트, 근접 공격력, 공격 범위)
 	{ {80, 0.5f, 0.2f}, {100, 0.5f, 0.2f}, {130, 0.5f, 0.2f}, {170, 0.5f, 0.2f}, {200, 1.0f, 0.2f} },
 	// MoveSpeed (코스트, 이동 속도, 구르기 속도)
@@ -83,7 +83,7 @@ bool TPlayer::UpgradeStat(EStatType type)
 	switch (type)
 	{
 	case EStatType::HP:
-		m_iMaxHP += info.delta1;
+    		m_iMaxHP += info.delta1;
 		break;
 	case EStatType::MeleeDamage:
 		m_fMeleeDamage += info.delta1;
@@ -95,7 +95,7 @@ bool TPlayer::UpgradeStat(EStatType type)
 		break;
 	case EStatType::RangedDamage:
 		m_fRangedDamage += info.delta1;
-		m_iArrowCount += info.delta2;
+		m_iArrowCount += (int)info.delta2;
 		break;
 	}
 

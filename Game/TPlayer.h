@@ -34,7 +34,7 @@ private:
 	float m_fMoveSpeed = 0.25f;
 	float m_fRollSpeed = 0.5f;
 	float m_fRangedDamage = 1.f;
-	float m_iArrowCount = 4;
+	int m_iArrowCount = 4;
 	
 	// 각 능력치 현재 레벨
 	int m_iStatLevel[(int)EStatType::COUNT] = { 0 };

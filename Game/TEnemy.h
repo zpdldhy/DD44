@@ -23,7 +23,8 @@ private:
 	int stageIndex = -1;
 
 	// 입는 데미지 연산용
-	float m_iDamaged = 1.0f;
+	float m_iDamagedByM = 1.0f;
+	float m_iDamagedByP = 1.0f;
 
 public:
 	void Tick() override;
@@ -49,7 +50,10 @@ public:
 	void SetFrustumIn(bool _isFrustumIn) { m_bFrustumIn = _isFrustumIn; }
 	bool IsFrustumIn() { return m_bFrustumIn; }
 
-	float GetDamaged() const { return m_iDamaged; }
-	void SetDamaged(float _damage) { m_iDamaged = _damage; }
+	float GetDamagedByM() const { return m_iDamagedByM; }
+	void SetDamagedByM(float _damage) { m_iDamagedByM = _damage; }
+
+	float GetDamagedByP() const { return m_iDamagedByP; }
+	void SetDamagedByP(float _damage) { m_iDamagedByP = _damage; }
 };
 

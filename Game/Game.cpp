@@ -36,6 +36,7 @@
 #include "EngineCameraMoveScript.h"
 #include "GameCameraMove.h"
 #include "MageMovement.h"
+#include "PlayerMoveScript.h"
 
 // Game
 #include "ProjectileManager.h"
@@ -413,8 +414,7 @@ void Game::UpdateUI()
 	// Dead UI 종료 시, 캐릭 살아남 등
 	if (m_cUI.EndDeadUI())
 	{
-		dynamic_pointer_cast<TPlayer>(m_pPlayer)->SetHp(player->GetMaxHP());
-		// Dead true 세팅
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
 	}
 }
 
@@ -644,7 +644,7 @@ void Game::CheckEnemyCollision()
 				if (enemy)
 				{
 					float damage = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetMeleeDamage();
-					enemy->SetDamaged(damage);
+					enemy->SetDamagedByM(damage);
 				}
 			}
 
@@ -703,7 +703,16 @@ void Game::CheckEnemyCollision()
 				iter = enemyList.erase(iter);
 				continue;
 			}
-			COLLITION->CheckCollision(*proj, *iter);
+			//COLLITION->CheckCollision(*proj, *iter);
+			if (COLLITION->CheckCollision(*proj, *iter))
+			{
+				auto enemy = dynamic_pointer_cast<TEnemy>(*iter);
+				if (enemy)
+				{
+					float damage = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetRangedDamage();
+					enemy->SetDamagedByP(damage);
+				}
+			}
 			iter++;
 		}
 
@@ -756,7 +765,12 @@ void Game::CheckBloodCollision()
 			pSoul->SetTarget(playerPos);
 		}
 
-		COLLITION->CheckCollision(*soul, m_pPlayer);
+		if (COLLITION->CheckCollision(*soul, m_pPlayer))
+		{
+			//CheckEnemyDeath(enemyList);
+			dynamic_pointer_cast<TPlayer>(m_pPlayer)->AddSoul(m_iSoulStorage);
+			m_iSoulStorage = 0;
+		}
 		soul++;
 	}
 
@@ -773,7 +787,8 @@ void Game::CheckEnemyDeath(const vector<shared_ptr<AActor>>& _enemyList)
 		{
 			if (auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer))
 			{
-				player->AddSoul(enemy->GetHisSoul());
+				//player->AddSoul(enemy->GetHisSoul());
+				m_iSoulStorage += enemy->GetHisSoul();
 			}
 		}
 	}

@@ -84,6 +84,7 @@ public:
 	void Tick() override;
 	virtual shared_ptr<UScriptComponent> Clone() override;
 public:
+	void Resurrection();
 	void ChangeState(shared_ptr<StateBase> _state);
 public:
 	void PlayFX();

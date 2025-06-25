@@ -54,7 +54,7 @@ bool TEnemy::CheckHit()
 		}
 
 		bool isHitByP = IsHitByProjectile();
-		if (isCol || isHitByP)
+		if (isCol)
 		{
 			hitElapsed = 0.0f;
 			// FX
@@ -68,11 +68,29 @@ bool TEnemy::CheckHit()
 			velocity = -look;
 			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 			// HP
-			TakeDamage(m_iDamaged); // <-- Player 공격력 데미지 m_pPlayer->Attack
-			if (!isHitByP)
+			TakeDamage(m_iDamagedByM); // <-- Player 근접공격력 데미지
+			if (dynamic_pointer_cast<TPlayer>(player.lock())->GetArrowCount() <= 9)
 			{
 				dynamic_pointer_cast<TPlayer>(player.lock())->IncArrowCount();
 			}
+
+			return true;
+		}
+		if (isHitByP)
+		{
+			hitElapsed = 0.0f;
+			// FX
+			//// Flashing
+			m_fHitFlashTimer = 1.f;  // 1초 동안
+			m_bIsFlashing = true;
+			//// Blood
+			Vec3 basePos = GetPosition();
+			basePos.y += RandomRange(m_bloodRange.x, m_bloodRange.y);
+
+			velocity = -look;
+			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
+			// HP
+			TakeDamage(m_iDamagedByP); // <-- Player 원거리공격력 데미지
 
 			return true;
 		}

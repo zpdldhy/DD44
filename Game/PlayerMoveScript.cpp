@@ -233,15 +233,20 @@ void PlayerMoveScript::Tick()
 	// Test
 	if (INPUT->GetButton(L))
 	{
-		dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(4);
-		if (currentState->GetId() == PLAYER_S_DEATH)
-		{
-			currentState->End();
-			ChangeState(idle);
-		}
+		Resurrection();
 	}
 #pragma endregion
 
+}
+
+void PlayerMoveScript::Resurrection()
+{
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(dynamic_pointer_cast<TCharacter>(GetOwner())->GetMaxHp());
+	if (currentState->GetId() == PLAYER_S_DEATH)
+	{
+		currentState->End();
+		ChangeState(idle);
+	}
 }
 
 void PlayerMoveScript::ChangeState(shared_ptr<StateBase> _state)
