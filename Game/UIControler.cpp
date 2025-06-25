@@ -483,11 +483,11 @@ void InGameUIControler::UpdateInteract()
 
 			if (m_tTrigger.eTriggerType == ETriggerType::TT_LADDER)
 			{
-
+				m_vInterActionUI[2]->SetText(L"오르기");
 			}
 			else if (m_tTrigger.eTriggerType == ETriggerType::TT_HEALPOINT)
 			{
-
+				m_vInterActionUI[2]->SetText(L"회복");
 			}
 		}
 	}
