@@ -59,6 +59,7 @@ void BatMovement::Init()
 
 	collider->m_bVisible = false;
 
+	dynamic_pointer_cast<BatAttackState>(attack)->SetAttackCollider(attackRangeActor);
 	// Body
 	GetOwner()->m_bCollision = true;
 
@@ -69,7 +70,6 @@ void BatMovement::Init()
 
 void BatMovement::Tick()
 {
-
 	auto pos = GetOwner()->GetPosition();
 	attackRangeActor->SetPosition(pos + colOffset * GetOwner()->GetLook() + Vec3(0.0f, 2.0f, 0.0f));
 
@@ -284,6 +284,7 @@ void BatMovement::Attack()
 {
 	if (m_bCanStartAttack) 
 	{
+		// attack 콜라이더를 키는 타이밍 변경
 		attackRangeActor->m_bCollision = true;
 		attackRangeActor->GetShapeComponent()->m_bVisible = true;
 		// 이 부분 처리 개선 필요
