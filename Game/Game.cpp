@@ -25,6 +25,7 @@
 #include "AWindActor.h"
 #include "TEnemy.h"
 #include "TPlayer.h"
+#include "ASoulActor.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -546,6 +547,13 @@ void Game::CheckBloodCollision()
 		{
 			soul = soulList.erase(soul);
 			continue;
+		}
+
+		if (auto pSoul = dynamic_pointer_cast<ASoulActor>(*soul))
+		{
+			Vec3 playerPos = m_pPlayer->GetPosition();
+			playerPos.y += 1.5f;
+			pSoul->SetTarget(playerPos);
 		}
 
 		COLLITION->CheckCollision(*soul, m_pPlayer);

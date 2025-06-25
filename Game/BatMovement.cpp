@@ -64,6 +64,7 @@ void BatMovement::Init()
 
 	//// 
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(1);
+	dynamic_pointer_cast<BatDieState>(death)->SetPlayer(player);
 }
 
 

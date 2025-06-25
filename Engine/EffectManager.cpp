@@ -268,7 +268,7 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
         {
             pSoul->SetTarget(targetPos);
         }
-        duration = 10.f;
+        duration = 30.f;
         break;
     default:                      duration = 1.0f; break;
     }
