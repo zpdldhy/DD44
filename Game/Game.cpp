@@ -349,7 +349,8 @@ void Game::UpdateUI()
 	// UI가 적용해야 하는 부분
 	m_cUI.SetMaxHP(i);
 	m_cUI.SetCurrentHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHp());
-	m_cUI.SetArrowCount(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
+	m_cUI.SetMaxArrow(i);
+	m_cUI.SetCurrentArrow(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
 	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());	
 	m_cUI.SetCoin(coin);
 	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());

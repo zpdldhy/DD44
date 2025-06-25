@@ -201,6 +201,13 @@ void InGameUIControler::init()
 	m_vHPUI[6]->m_bRender = false;
 	m_vHPUI[7]->m_bRender = false;
 	m_vHPUI[8]->m_bRender = false;
+
+	// Arrow 초기값
+	m_vArrowUI[4]->m_bRender = false;
+	m_vArrowUI[5]->m_bRender = false;
+	m_vArrowUI[6]->m_bRender = false;
+	m_vArrowUI[7]->m_bRender = false;
+	m_vArrowUI[8]->m_bRender = false;
 	
 	m_vActiveArrowScale = m_vArrowUI[3]->GetScale();
 	m_vInActiveArrowScale = m_vArrowUI[2]->GetScale();
@@ -447,8 +454,15 @@ void InGameUIControler::UpdateHP()
 
 void InGameUIControler::UpdateArrow()
 {
+	if (m_iMaxArrow > 9)
+		m_iMaxArrow = 9;
+
+	// Max Arrow 설정
+	m_vArrowUI[m_iMaxArrow - 1]->m_bRun = true;
+	m_vArrowUI[m_iMaxArrow - 1]->m_bRender = true;
+
 	// Arrow
-	switch (m_iArrowCount)
+	switch (m_iCurrentArrow)
 	{
 	case 4:
 		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
