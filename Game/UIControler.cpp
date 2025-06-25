@@ -177,6 +177,8 @@ void IntroUIControler::Destroy()
 
 void InGameUIControler::init()
 {
+	m_pActiveHPTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_hp_active 1.png");
+	m_pEmptyHPTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_hp_empty 1.png");
 	m_pActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_active.png");
 	m_pInActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_inactive.png");
 	m_pEmptyArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_empty.png");
@@ -371,98 +373,45 @@ void InGameUIControler::UpdateHP()
 	m_vHPUI[m_iMaxHP - 1]->m_bRun = true;
 	m_vHPUI[m_iMaxHP - 1]->m_bRender = true;
 
-
 	// 현재 HP에 대한 로직
-	static Color FullHPColor = Color(0.055f, 0.247f, -0.324, 0.0f);
-	static Color RestColor = Color(0.055f, 0.247f, -0.324, -0.5f);
+	for (auto& pUI : m_vHPUI)
+	{
+		pUI->SetAllTexture(m_pEmptyHPTexture);
+		pUI->SetColor(Color(0.f, 0.f, 0.f, 0.f));
+	}
 
-	static float currentTime = 0.0f;
-	currentTime = TIMER->GetDeltaTime();
+	for (int i = 0; i < m_iCurrentHP; i++)
+	{
+		if (i > 0)
+		{
+			m_vHPUI[i - 1]->SetColor(Color(0.055f, 0.247f, -0.324, -0.5f));
+		}
+		m_vHPUI[i]->SetAllTexture(m_pActiveHPTexture);
+		m_vHPUI[i]->SetColor(Color(0.055f, 0.247f, -0.324, 0.0f));
+	}
 
-	if (m_iCurrentHP != m_iPreHP)
-		m_bHPUIChange = true;
+	// 피가 바뀌는 로직
+	//static float currentTime = 0.0f;
+	//currentTime = TIMER->GetDeltaTime();
 
-	//for (auto& pUI : m_vHPUI)
-	//	pUI->m_bRender = false;
+	//if (m_iCurrentHP != m_iPreHP)
+	//	m_bHPUIChange = true;
 
-	//for (int i = 0; i < m_iCurrentHP; i++)
+	//if (m_iCurrentHP > 0 &&
+	//	m_vHPUI[m_iCurrentHP]->GetColor().w < 0.f &&
+	//	m_bHPUIChange)
 	//{
-	//	if (i > 0)
-	//	{
-	//		m_vHPUI[i - 1]->SetColor(RestColor);
-	//	}
-	//	m_vHPUI[i]->SetColor(FullHPColor);
+	//	m_vHPUI[m_iCurrentHP - 1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
 	//}
+	//else if (m_bHPUIChange)
+	//{
+	//	m_bHPUIChange = false;
+	//	currentTime = 0.f;
+	//}
+	//else if (m_iCurrentHP > 0)
+	//	m_vHPUI[m_iCurrentHP - 1]->SetColor(FullHPColor);
 
-	switch (m_iCurrentHP)
-	{
-	case 4:
-	{
-		m_vHPUI[0]->SetColor(RestColor);
-		m_vHPUI[1]->SetColor(RestColor);
-		m_vHPUI[2]->SetColor(RestColor);
-		m_vHPUI[3]->SetColor(FullHPColor);
-	}
-	break;
-
-	case 3:
-	{
-		if (m_vHPUI[2]->GetColor().w < 0.f && m_bHPUIChange)
-		{
-			m_vHPUI[3]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-		{
-			m_vHPUI[0]->SetColor(RestColor);
-			m_vHPUI[1]->SetColor(RestColor);
-			m_vHPUI[2]->SetColor(FullHPColor);
-		}
-	}
-	break;
-
-	case 2:
-	{
-		if (m_vHPUI[1]->GetColor().w < 0.f && m_bHPUIChange)
-		{
-			m_vHPUI[2]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-		{
-			m_vHPUI[0]->SetColor(RestColor);
-			m_vHPUI[1]->SetColor(FullHPColor);
-		}
-	}
-	break;
-
-	case 1:
-	{
-		if (m_vHPUI[0]->GetColor().w < 0.f && m_bHPUIChange)
-		{
-			m_vHPUI[1]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-			m_vHPUI[0]->SetColor(FullHPColor);
-
-	}
-	break;
-
-	case 0:
-	{
-		m_vHPUI[0]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-	}
-	break;
-	}
-
-	m_iPreHP = m_iCurrentHP;
+	//m_iPreHP = m_iCurrentHP;
 }
 
 void InGameUIControler::UpdateArrow()
@@ -498,7 +447,6 @@ void InGameUIControler::UpdateArrow()
 void InGameUIControler::UpdateInteract()
 {
 	// InterAction, 상호작용 UI를 띄우는 구간
-//auto vTriggerList = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger();
 	if (m_tTrigger.eTriggerType != ETriggerType::TT_NONE)
 	{
 		static Vec3 offsetPos1 = m_vInterActionUI[1]->GetPosition();

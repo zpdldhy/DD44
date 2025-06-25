@@ -47,6 +47,8 @@ class InGameUIControler : public UIControler
 
 	// HP
 	shared_ptr<class AUIActor> m_pHPBackGround = nullptr;
+	shared_ptr<class Texture> m_pActiveHPTexture = nullptr;
+	shared_ptr<class Texture> m_pEmptyHPTexture = nullptr;
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
 	int m_iMaxHP = 4;
 	int m_iCurrentHP = 4;
