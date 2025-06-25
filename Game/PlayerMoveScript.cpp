@@ -620,6 +620,9 @@ void PlayerMoveScript::CheckClimb()
 
 void PlayerMoveScript::CheckRoll()
 {
+	if (m_bNoInput)
+		return;
+
 	if (INPUT->GetButton(SPACE) && m_bCanRoll)
 	{
 		// ±¸¸£±â
@@ -632,6 +635,9 @@ void PlayerMoveScript::CheckRoll()
 
 void PlayerMoveScript::CheckAttack()
 {
+	if (m_bNoInput)
+		return;
+
 	// ATTACK
 	if (INPUT->GetButton(LCLICK))
 	{
@@ -674,6 +680,9 @@ void PlayerMoveScript::CheckComboAttack()
 
 void PlayerMoveScript::CheckMove()
 {
+	if (m_bNoInput)
+		return;
+
 	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
 	if (player->IsClimbing())
 	{
