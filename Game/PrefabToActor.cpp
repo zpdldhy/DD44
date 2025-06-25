@@ -118,10 +118,15 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 		else if (characterData.m_eActorType == 7)
 		{
 			actor = std::make_shared<TInteractable>();
+
+		}
+		else if (characterData.m_eActorType == 3 || characterData.m_eActorType == 2)
+		{
+			actor = std::make_shared<TEnemy>();
 		}
 		else
 		{
-			actor = std::make_shared<TEnemy>();
+			actor = std::make_shared<TCharacter>();
 		}
 
 		shared_ptr<UMeshComponent> meshComponent = MESHLOADER->Make(characterData.MeshPath.c_str());
