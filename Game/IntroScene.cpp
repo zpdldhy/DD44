@@ -96,7 +96,7 @@ void IntroScene::UpdateUIState()
 		SOUND->GetPtr(ESoundType::Click)->PlayEffect2D();
 
 	// Select Start Button
-	if (UI->GetFadeWorkDone())
+	if (UI->GetFadeInDone())
 	{
 		Destroy();
 		auto game = make_shared<Game>();

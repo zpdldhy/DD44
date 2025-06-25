@@ -162,6 +162,8 @@ void Game::Init()
 	m_pCursor->Init();
 	OBJECT->SetCursorActor(m_pCursor);
 
+	// FadeOut 중엔 Paused 못하게
+	m_bNoPaused = true;
 	UI->DoFadeOut();
 
 	m_cBettyMovie.SetCameraStart(Vec3(64.f, 4.f, -94.f), Vec3(-0.06f, 11.65f, 0.f));
@@ -169,6 +171,9 @@ void Game::Init()
 
 void Game::Tick()
 {
+	if (UI->GetFadeOutDone())
+		m_bNoPaused = false;
+
 	STAGE->Tick();
 	if (STAGE->GetCurrentStage() == StagePhase::FINAL)
 	{
@@ -178,7 +183,8 @@ void Game::Tick()
 	UpdateCursor();
 
 	if (ENGINE->m_bGamePaused == false &&
-		INPUT->GetButton(GameKey::ESC))
+		INPUT->GetButton(GameKey::ESC)&&
+		!m_bNoPaused)
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
 
 	UpdateUI();
@@ -433,6 +439,13 @@ void Game::UpdateUI()
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
 		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
 	}
+
+	///////////////////////////////////////////////////////////////////////////
+	///////////						Ending							///////////
+	///////////////////////////////////////////////////////////////////////////
+
+	if (INPUT->GetButton(GameKey::P))
+		m_cUI.GoEnding();
 }
 
 void Game::UpdateCursor()
@@ -502,6 +515,8 @@ void Game::BettyMeetMovie()
 		m_cBettyMovie.SetTimeTrack3(23.f);	// 베티 애니메이션 6초
 
 		m_cUI.NoRenderStateUI();
+
+		m_bNoPaused = true;
 	}
 
 	m_cBettyMovie.StartMovie();
@@ -537,9 +552,10 @@ void Game::BettyMeetMovie()
 		m_cUI.PopDownBettyName();
 		m_cUI.RenderStateUI();
 		CAMERA->Set3DCameraActor(m_pGameCameraActor);
+		m_pPlayer->GetPhysicsComponent()->SetWeight(1.f);
 		m_bStartBettyMoveScene = false;
 		m_pCursor->m_bRender = true;
-		m_pPlayer->GetPhysicsComponent()->SetWeight(1.f);
+		m_bNoPaused = false;
 	}
 
 	// Player 움직임 구현
