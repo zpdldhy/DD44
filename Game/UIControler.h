@@ -79,7 +79,7 @@ class InGameUIControler : public UIControler
 	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
 	vector<vector<shared_ptr<class AUIActor>>> m_vUpgradeState;
 	shared_ptr<class Texture> m_pUpgradeDoneTexture = nullptr;
-	int m_iSelectUpgrade = 0;
+	int m_iCurrentUpgrade = 0;
 	int m_iHealthPrice = 100;
 	int m_iAttackPrice = 100;
 	int m_iSpeedPrice = 100;
@@ -139,7 +139,7 @@ public:
 	void IsBuyUpgrade(bool _isBuy) { m_iBuyUpgrade = _isBuy; }
 	void SetDead(bool _isDead) { m_bDead = _isDead; }
 
-	int  SelectUpgrade() { return m_iSelectUpgrade; }
+	int  CurrentUpgrade() { return m_iCurrentUpgrade; }
 	bool SelectContinue() { return m_bContinue; }
 	bool SelectExit() { return m_bExit; }
 	bool SelectDeadContinue() { return m_bDeadContinue; }

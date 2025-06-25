@@ -357,13 +357,26 @@ void Game::UpdateUI()
 	m_cUI.SetSpeedPrice(player->GetNextUpgradeCost(EStatType::MoveSpeed));
 	m_cUI.SetArrowPrice(player->GetNextUpgradeCost(EStatType::RangedDamage));
 
-	// 업그레이드 실패시
-	//if (INPUT->GetButtonDown(GameKey::U))
-	//	m_cUI.IsBuyUpgrade(false);
-	//else
-	//	m_cUI.IsBuyUpgrade(true);
-
-	if(player->UpgradeStat(EStatType::HP))
+	if (INPUT->GetButton(GameKey::SPACE))
+	{
+		switch (m_cUI.CurrentUpgrade())
+		{
+		case 1:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::HP));
+			break;
+		case 2:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::MeleeDamage));
+			break;
+		case 3:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::MoveSpeed));
+			break;
+		case 4:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::RangedDamage));
+			break;
+		}
+	}
+	else
+		m_cUI.IsBuyUpgrade(true);
 
 	m_cUI.Tick();
 
@@ -372,44 +385,6 @@ void Game::UpdateUI()
 	///////////						Paused							///////////
 	///////////////////////////////////////////////////////////////////////////
 
-	// Upgrade State
-	// 0은 Default로 Upgrade 없음을 나타냄
-
-	static int iHP = 0;
-
-	switch (m_cUI.SelectUpgrade())
-	{
-	case 1: // MaxHP
-		//if (player->UpgradeStat(EStatType::HP))
-		//	m_cUI.IsBuyUpgrade(true);
-		//else
-		//	m_cUI.IsBuyUpgrade(false);
-
-		player->UpgradeStat(EStatType::HP);
-		
-		break;
-
-	case 2: // Attack
-		//if(player->UpgradeStat(EStatType::MeleeDamage))
-		//	m_cUI.IsBuyUpgrade(true);
-		//else
-		//	m_cUI.IsBuyUpgrade(false);
-		break;
-
-	case 3: // Speed
-		/*if(player->UpgradeStat(EStatType::MoveSpeed))
-			m_cUI.IsBuyUpgrade(true);
-		else
-			m_cUI.IsBuyUpgrade(false);*/
-		break;
-
-	case 4:	// Arrow
-		//if(player->UpgradeStat(EStatType::RangedDamage))
-		//	m_cUI.IsBuyUpgrade(true);
-		//else
-		//	m_cUI.IsBuyUpgrade(false);
-		break;
-	}
 
 	// 계속하기
 	if(m_cUI.SelectContinue())
