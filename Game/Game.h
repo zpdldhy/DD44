@@ -67,7 +67,6 @@ protected:
 	void CheckBloodCollision();
 
 	void CheckEnemyDeath(const vector<shared_ptr<AActor>>& _enemyList);
-
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }
 };

@@ -79,6 +79,11 @@ void FenceScript::Interact()
 {
 	// ´Ý±â
 	m_bClose = true;
+
+	if (GetOwner()->m_szName == L"Fence3")
+	{
+		EVENT->TriggerEvent(EventType::EVENT_STAGE, L"Enter_Final");
+	}
 }
 
 void FenceScript::Open()

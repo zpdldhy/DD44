@@ -85,7 +85,7 @@ void Game::Init()
 	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
-	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
+	m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
 	OBJECT->AddActor(m_pPlayer);
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
@@ -168,6 +168,11 @@ void Game::Init()
 void Game::Tick()
 {
 	STAGE->Tick();
+	if (STAGE->GetCurrentStage() == StagePhase::FINAL)
+	{
+		// 플레이어가 베티 보스전 입장한 거임.
+		int a = 0;
+	}
 
 	UpdateCursor();
 
