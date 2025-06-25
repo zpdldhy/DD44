@@ -71,7 +71,7 @@ void StageManager::Tick()
 {
 	switch (currentPhase)
 	{
-	case StageManager::STAGE00:
+	case StagePhase::STAGE00:
 	{
 		if (stageList[0].size() <= 0)
 		{
@@ -79,23 +79,24 @@ void StageManager::Tick()
 			EVENT->TriggerEvent(EventType::EVENT_FENCE, L"I_Fence2");
 
 			// 다음 페이즈
-			currentPhase = STAGE01;
+			currentPhase = StagePhase::STAGE01;
 		}
 	}
 	break;
-	case StageManager::STAGE01:
+	case StagePhase::STAGE01:
 	{
 		if (stageList[1].size() <= 0)
 		{
 			// 사다리 내리기
 			EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder2");
+			EVENT->TriggerEvent(EventType::EVENT_LADDER, L"I_Ladder1");
 
 			// 다음 페이즈
-			currentPhase = STAGE10;
+			currentPhase = StagePhase::STAGE10;
 		}
 	}
 	break;
-	case StageManager::STAGE10:
+	case StagePhase::STAGE10:
 	{
 		if (stageList[2].size() <= 0)
 		{
@@ -103,15 +104,19 @@ void StageManager::Tick()
 			if (INPUT->GetButton(H))
 			{
 				EVENT->TriggerEvent(EventType::EVENT_FENCE, L"I_Fence1");
-				currentPhase = DONE;
+				currentPhase = StagePhase::STAGE20;
 
 			}
 
 			// 다음 페이즈
 		}
 	}
+	case StagePhase::STAGE20:
+	{
+
+	}
 	break;
-	case StageManager::DONE:
+	case StagePhase::DONE:
 		break;
 	default:
 		break;

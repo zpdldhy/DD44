@@ -12,6 +12,8 @@ public:
 private:
 	weak_ptr<AActor> player;
 
+	bool bStaticMage = false;
+
 	// States
 	shared_ptr<StateBase> idle;
 	shared_ptr<StateBase> appear;

@@ -147,5 +147,6 @@ public:
 	virtual void End() override;
 	
 	void ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time);
+	void SetShadowVisible(const shared_ptr<class UMeshComponent>& _comp);
 	void SetPlayer(const weak_ptr<AActor>& _player) { m_pPlayer = _player; }
 };

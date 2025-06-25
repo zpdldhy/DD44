@@ -13,7 +13,6 @@ public:
 	
 	shared_ptr<class AActor> m_pPlayer;
 	shared_ptr<class AActor> m_pBetty;
-	shared_ptr<class AActor> tempHeadRoller;
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
 	shared_ptr<class ALight> m_pSunLight;
@@ -29,13 +28,19 @@ public:
 	// UIActor
 	shared_ptr<AActor> m_pCursor = nullptr;
 
-	// TEMP
+	// 충돌
 	vector<shared_ptr<AActor>> enemyList;
-	//vector<shared_ptr<AActor>> enemyList0;
-	//vector<shared_ptr<AActor>> enemyList1;
-	//vector<shared_ptr<AActor>> enemyList2;
+	// stage1의 잡몹들
+	vector<shared_ptr<AActor>> collisionEnemy1;
+	
 	vector<shared_ptr<AActor>> m_vObjectList;
 	vector<shared_ptr<AActor>> m_vMapList;
+
+	// TEMP
+	vector<shared_ptr<AActor>> stage0;
+	vector<shared_ptr<AActor>> stage1;
+	vector<shared_ptr<AActor>> stage2;
+
 
 public:
 	void Init() override;

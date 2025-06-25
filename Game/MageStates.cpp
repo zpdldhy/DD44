@@ -7,6 +7,7 @@
 #include "Timer.h"
 #include "ProjectileManager.h"
 #include "EffectManager.h"
+
 // TEMP
 #include "Input.h"
 #include "Sound.h"
@@ -57,7 +58,6 @@ void MageAppearState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int idleIndex = animInstance->GetAnimIndex(L"Teleport_in");
 	animInstance->PlayOnce(idleIndex);
-	//m_pOwner.lock()->SetScale(Vec3(0.01f, 0.01f, 0.01f));
 
 	//targetYaw = targetYaw = atan2f(dir.x, dir.z);
 	//Vec3 currentRot = m_pOwner.lock()->GetRotation();
@@ -65,8 +65,7 @@ void MageAppearState::Enter()
 	//m_pOwner.lock()->SetRotation(currentRot);
 
 	m_pOwner.lock()->m_bCollision = true;
-	m_pOwner.lock()->m_bRender = true;
-	m_pOwner.lock()->GetShapeComponent()->m_bVisible = true;
+	SetMeshVisible();
 }
 void MageAppearState::Tick()
 {
@@ -96,6 +95,19 @@ void MageAppearState::SetDirection(Vec3 _targetPos)
 	dir = _targetPos - m_pOwner.lock()->GetPosition();
 }
 
+void MageAppearState::SetMeshVisible()
+{
+	//auto body = m_pOwner.lock()->GetMeshComponent();
+	//auto weapon = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Chain");
+	//auto chain = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"Weapon");
+
+	//body->SetVisible(true);
+	//weapon->SetVisible(true);
+	//chain->SetVisible(true);
+
+	m_pOwner.lock()->SetScale(Vec3(0.5f, 0.5f, 0.5f));
+}
+
 MageDisappearState::MageDisappearState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_IDLE)
 {
 	m_pOwner = _pOwner;
@@ -119,14 +131,21 @@ void MageDisappearState::Tick()
 	// scale이 일정 이하면 없어지게 처리 필요할 듯 
 	m_pOwner.lock()->SetScale(scale);
 	lowerElapsed += TIMER->GetDeltaTime();
+	if (lowerElapsed < 1.3f)
+	{
+		auto hand = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightHandSocket");
+		Vec3 pos = hand->GetWorldPosition();
+		//EFFECT->PlayDustBurst(pos, 10.f, .1f);
+		EFFECT->PlayEffect(EEffectType::Dust, pos, 0, Vec3(0.0f, 0.0f, 0.0f), 1.3f);
+	}
 	if (lowerElapsed > 1.6f)
 	{
-		m_pOwner.lock()->m_bRender = false;
 		lowerElapsed = 0.0f;
 	}
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	if (!animInstance->m_bOnPlayOnce)
 	{
+		SetAllMeshInvisible(m_pOwner.lock()->GetMeshComponent());
 		// 애니메이션 종료
 		End();
 	}
@@ -135,6 +154,18 @@ void MageDisappearState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+}
+
+void MageDisappearState::SetAllMeshInvisible(const shared_ptr<UMeshComponent>& _mesh)
+{
+	//_mesh->SetVisible(false);
+	//auto children = _mesh->GetChildren();
+	//for (auto child : children)
+	//{
+	//	SetAllMeshInvisible(child);
+	//}
+
+	m_pOwner.lock()->SetScale(Vec3(0, 0, 0));
 }
 
 MageHitState::MageHitState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_HIT)
@@ -154,7 +185,7 @@ void MageHitState::Enter()
 void MageHitState::Tick()
 {
 	runElapsed += TIMER->GetDeltaTime();
-	if (bMove)
+	if (bMove && !bStaticMage)
 	{
 		// 이동
 		Vec3 pos = dir * Vec3(0.1f, 0.0f, 0.1f);
@@ -218,6 +249,10 @@ void MageAttackState::Enter()
 
 	attack->SetTarget(m_pTarget);
 	attack->Enter();
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	originSpped = animInstance->m_fAnimPlayRate;
+	//animInstance->m_fAnimPlayRate = 25.0f;
 }
 void MageAttackState::Tick()
 {
@@ -227,11 +262,34 @@ void MageAttackState::Tick()
 		attack->Tick();
 		if (!attack->IsPlaying())
 		{
-			runaway->SetDirection(m_pTarget.lock()->GetPosition());
-			runaway->Enter();
-			currentPhase = AttackPhase::Runaway;
+			if (!bStaticMage)
+			{
+				runaway->SetDirection(m_pTarget.lock()->GetPosition());
+				runaway->Enter();
+				currentPhase = AttackPhase::Runaway;
+			}
+			else
+			{
+				// 애니메이션 Idle 플레이
+				auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+				int idleIndex = animInstance->GetAnimIndex(L"Idle2");
+				animInstance->SetCurrentAnimTrack(idleIndex);
+				currentPhase = AttackPhase::StandStill;
+
+			}
 		}
 		break;
+	case AttackPhase::StandStill:
+	{
+		waitElapsed += TIMER->GetDeltaTime();
+		if (waitElapsed > 2.0f)
+		{
+			waitElapsed = 0.0f;
+			attack->Enter();
+			currentPhase = AttackPhase::Attack;
+		}
+	}
+	break;
 	case AttackPhase::Runaway:
 		runaway->Tick();
 		if (!runaway->IsPlaying())
@@ -245,9 +303,7 @@ void MageAttackState::Tick()
 		if (!disappear->IsPlaying())
 		{
 			currentPhase = AttackPhase::Wait;
-			//m_pOwner.lock()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
 			m_pOwner.lock()->m_bCollision = false;
-			m_pOwner.lock()->m_bRender = false;
 			m_pOwner.lock()->GetShapeComponent()->m_bVisible = false;
 
 		}
@@ -255,8 +311,10 @@ void MageAttackState::Tick()
 	case AttackPhase::Wait:
 		// 일정 시간 흐르면 appear 실행
 		disElapsed += TIMER->GetDeltaTime();
-		if (disElapsed > 3.0f)
+		if (disElapsed > 2.0f)
 		{
+			// 변경 필요 
+			// 위치 특정한 지점 미리 잡아놓고 거기서만 이동하도록
 			Vec3 oppositLook = m_pOwner.lock()->GetPosition() - m_pTarget.lock()->GetPosition();
 			oppositLook.y = 0.0f;
 			oppositLook.Normalize();
@@ -286,6 +344,9 @@ void MageAttackState::End()
 	// 기본 state 세팅
 	m_bOnPlaying = false;
 	currentPhase = AttackPhase::Attack;
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	animInstance->m_fAnimPlayRate = originSpped;
 }
 void MageAttackState::SetTarget(weak_ptr<AActor> _player)
 {
@@ -327,6 +388,11 @@ void MageAttackStart::Enter()
 }
 void MageAttackStart::Tick()
 {
+	auto hand = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightHandSocket");
+	Vec3 pos = hand->GetWorldPosition();
+	//EFFECT->PlayDustBurst(pos, 10.f, .1f);
+	EFFECT->PlayEffect(EEffectType::Dust, pos, 0, Vec3(0.0f, 0.0f, 0.0f), 2.3f);
+
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	if (!animInstance->m_bOnPlayOnce)
 	{
@@ -362,6 +428,7 @@ void MageAttackStart::Throw()
 	pos.y -= 1.0f;
 	PROJECTILE->ActivateOne(ProjectileType::MagicBall, pos, dir);
 }
+
 void MageAttackStart::SetTarget(weak_ptr<AActor> _target)
 {
 	m_pTarget = _target;
@@ -393,6 +460,11 @@ void MageRunaway::Enter()
 }
 void MageRunaway::Tick()
 {
+	auto hand = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightHandSocket");
+	Vec3 pos = hand->GetWorldPosition();
+	//EFFECT->PlayDustBurst(pos, 10.f, .1f);
+	EFFECT->PlayEffect(EEffectType::Dust, pos, 0, Vec3(0.0f, 0.0f, 0.0f), 2.0f);
+
 	elapsed += TIMER->GetDeltaTime();
 	if (elapsed > 1.5f)
 	{

@@ -137,6 +137,22 @@ UINT USkeletalMeshResources::AllocateInstanceIndex()
 		m_freeIndices.pop();
 		if (index >= m_instanceCount)
 		{
+			while (!m_freeIndices.empty())
+			{
+				index = m_freeIndices.front();
+				m_freeIndices.pop();
+			}
+
+			if (index >= m_instanceCount)
+			{
+				index = m_instanceCount++;
+				m_vInstaceList.resize(m_instanceCount);
+				m_vIWInstanceList.resize(m_instanceCount);
+			}
+		}
+
+		if (index >= m_instanceCount)
+		{
 			assert(false);
 		}
 	}
@@ -153,8 +169,11 @@ UINT USkeletalMeshResources::AllocateInstanceIndex()
 void USkeletalMeshResources::FreeInstanceIndex(UINT index)
 {
 	m_instanceCount--;
-	m_vInstaceList.resize(m_instanceCount);
-	m_vIWInstanceList.resize(m_instanceCount);
+	if (m_instanceCount >= 0)
+	{
+		m_vInstaceList.resize(m_instanceCount);
+		m_vIWInstanceList.resize(m_instanceCount);
+	}
 	if (index < m_instanceCount)
 	{
 		m_freeIndices.push(index);

@@ -167,7 +167,6 @@ void ActorLoader::LoadOne(string _path)
 }
 shared_ptr<UMeshResources> ActorLoader::LoadOneRes(string _path)
 {
-	//Profiler p("ActorLoader::LoadOneRes");
 	auto iter = m_mResPathMap.find(to_mw(_path));
 	if(iter == m_mResPathMap.end()) { assert(false); }
 

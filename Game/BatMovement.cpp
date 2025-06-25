@@ -277,7 +277,7 @@ void BatMovement::ReturningToPos()
 
 void BatMovement::Attack()
 {
-	if (m_bCanStartAttack) // 실제 로직에선 플레이어 인식 후 targetPos 업데이트
+	if (m_bCanStartAttack) 
 	{
 		attackRangeActor->m_bCollision = true;
 		attackRangeActor->GetShapeComponent()->m_bVisible = true;

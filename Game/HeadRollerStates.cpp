@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "HeadRollerStates.h"
 #include "AActor.h"
-#include "USkinnedMeshComponent.h"
+#include "UInstanceSkinnedMeshComponent.h"
 #include "UAnimInstance.h"
 #include "Timer.h"
 
@@ -388,26 +388,13 @@ void HeadRollerDieState::Enter()
 void HeadRollerDieState::Tick()
 {
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	switch (currentPhase)
+
+	if (!animInstance->m_bOnPlayOnce)
 	{
-	case HeadRollerDieState::PLAYANIM:
-		if (!animInstance->m_bOnPlayOnce)
-		{
-			// 종료
-			animInstance->m_bPlay = false;
-			currentPhase = STAYSTILL;
-			m_pOwner.lock()->m_bCastShadow = false;
-		}
-		break;
-	case HeadRollerDieState::STAYSTILL:
-		currentTime	+= TIMER->GetDeltaTime();
-		if (currentTime >= dissolveOffset)
-		{
-			End();
-		}
-		break;
-	default:
-		break;
+		// 종료
+		animInstance->m_bPlay = false;
+		currentPhase = STAYSTILL;
+		End();
 	}
 
 	float frameTime = animInstance->GetTotalFrame();
@@ -432,6 +419,20 @@ void HeadRollerDieState::ApplyDissolveToAllMaterials(shared_ptr<UMeshComponent> 
 	for (int i = 0; i < _comp->GetChildCount(); ++i)
 	{
 		ApplyDissolveToAllMaterials(_comp->GetChild(i), _time);
+	}
+}
+
+void HeadRollerDieState::SetShadowVisible(const shared_ptr<class UMeshComponent>& _comp)
+{
+	auto mesh = dynamic_pointer_cast<UInstanceSkinnedMeshComponent>(_comp);
+	if (mesh)
+	{
+		mesh->SetVisible(false);
+	}
+
+	for (int i = 0; i < _comp->GetChildCount(); ++i)
+	{
+		SetShadowVisible(_comp->GetChild(i));
 	}
 }
 
