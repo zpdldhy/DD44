@@ -153,11 +153,13 @@ void SoundManager::LoadAllSounds()
 	//BGM
 	Load(ESoundType::Intro, L"../Resources/Sound/intro.mp3");
 	Load(ESoundType::Stage0, L"../Resources/Sound/state0.mp3");
+	Load(ESoundType::Boss1, L"../Resources/Sound/betty.mp3");
+	Load(ESoundType::Ending, L"../Resources/Sound/ending.mp3");
 
 	//Charactor
 	Load(ESoundType::Walk, L"../Resources/Sound/hero_walk_footsteps_stone_louder.wav");
 	Load(ESoundType::Dash, L"../Resources/Sound/hero_dash.wav");
-	Load(ESoundType::Slash, L"../Resources/Sound/hero_slash.wav");
+	Load(ESoundType::Slash, L"../Resources/Sound/crow_sword1.mp3");
 	Load(ESoundType::Hit, L"../Resources/Sound/hero_damaged.wav");
 	Load(ESoundType::Die, L"../Resources/Sound/hero_damaged.wav");
 

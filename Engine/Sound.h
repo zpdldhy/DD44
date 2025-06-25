@@ -17,18 +17,46 @@ enum class ESoundType
 
 	//Charactor
 	Slash,
+	Slash_2,
+	Slash_3,
+	Bow_Stretch,
+	Bow_Release,
 	Dash,
 	Walk,
 	Hit,
+	Ladder,
 	Die,
 
 	//Bat
 	Attack_Bat,
 	Enemy_Damaged,
 
+	//Walker
+	Impact,
+	Dead_Walker,
+
+	//Mage
+	Attack_Mage,
+
+	//Betty
+	Attack_Betty,
+	Screaming_Betty,
+	Growling_Betty,
+	Impact_Betty,
+	Scraping_Betty,
+
+	//Env
+	Open_Fence,
+	Close_Fence,
+	Healing,
+
 	//UI
 	Hover,
 	Click,
+	GetSoul,
+	Allow,
+	Deny,
+	CrowDead,
 
 	//Fire
 	Fire,
