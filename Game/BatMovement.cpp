@@ -62,8 +62,9 @@ void BatMovement::Init()
 	// Body
 	GetOwner()->m_bCollision = true;
 
-	//// 
+	// »óÅÂ°ª
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(1);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(2);
 	dynamic_pointer_cast<BatDieState>(death)->SetPlayer(player);
 }
 

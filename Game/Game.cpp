@@ -211,8 +211,12 @@ void Game::Tick()
 	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
+	CheckEnemyDeath(enemyList);
 
-
+	if (m_pPlayer->GetPosition().y < -4.0f)
+	{
+		m_pPlayer->SetPosition(Vec3(50.0f, 40.0f, 100.0f));
+	}
 }
 
 void Game::Render()
@@ -339,30 +343,44 @@ void Game::CreateWind()
 
 void Game::UpdateUI()
 {
-	static int i = 4;
-	static int coin = 0;
+	auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer);
 
-	if (INPUT->GetButton(GameKey::P))
-		i++;		
+	m_cUI.SetMaxHP(player->GetMaxHP());
+	m_cUI.SetCurrentHP(player->GetHp());
 
-	if (INPUT->GetButtonDown(GameKey::I))
-		coin += 100;
+	m_cUI.SetMaxArrow(player->GetArrowCapacity());
+	m_cUI.SetCurrentArrow(player->GetArrowCount());
 
-	// UI가 적용해야 하는 부분
-	m_cUI.SetMaxHP(i);
-	m_cUI.SetCurrentHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHp());
-	m_cUI.SetMaxArrow(i);
-	m_cUI.SetCurrentArrow(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
-	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());	
-	m_cUI.SetCoin(coin);
-	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
+	m_cUI.SetTriggerData(player->GetTrigger());
+
+	m_cUI.SetCoin(player->GetHisSoul());
+	m_cUI.SetDead(player->IsDead());
 
 	// 가격 출력하는 부분
-	m_cUI.SetHealthPrice(200);
+	m_cUI.SetHealthPrice(player->GetNextUpgradeCost(EStatType::HP));
+	m_cUI.SetAttackPrice(player->GetNextUpgradeCost(EStatType::MeleeDamage));
+	m_cUI.SetSpeedPrice(player->GetNextUpgradeCost(EStatType::MoveSpeed));
+	m_cUI.SetArrowPrice(player->GetNextUpgradeCost(EStatType::RangedDamage));
 
-	// 업그레이드 실패시
-	if (INPUT->GetButtonDown(GameKey::U))
-		m_cUI.IsBuyUpgrade(false);
+	if (INPUT->GetButton(GameKey::SPACE))
+	{
+		switch (m_cUI.CurrentUpgrade())
+		{
+		case 1:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::HP));
+			break;
+		case 2:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::MeleeDamage));
+
+			break;
+		case 3:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::MoveSpeed));
+			break;
+		case 4:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::RangedDamage));
+			break;
+		}
+	}
 	else
 		m_cUI.IsBuyUpgrade(true);
 
@@ -373,23 +391,6 @@ void Game::UpdateUI()
 	///////////						Paused							///////////
 	///////////////////////////////////////////////////////////////////////////
 
-	// Upgrade State
-	// 0은 Default로 Upgrade 없음을 나타냄
-	switch (m_cUI.SelectUpgrade())
-	{
-	case 1: // MaxHP
-		// MaxHP++
-		break;
-
-	case 2: // Attack
-		break;
-
-	case 3: // Speed
-		break;
-
-	case 4:	// Arrow
-		break;
-	}
 
 	// 계속하기
 	if(m_cUI.SelectContinue())
@@ -412,7 +413,7 @@ void Game::UpdateUI()
 	// Dead UI 종료 시, 캐릭 살아남 등
 	if (m_cUI.EndDeadUI())
 	{
-		dynamic_pointer_cast<TPlayer>(m_pPlayer)->SetHp(4);
+		dynamic_pointer_cast<TPlayer>(m_pPlayer)->SetHp(player->GetMaxHP());
 		// Dead true 세팅
 	}
 }
@@ -636,7 +637,17 @@ void Game::CheckEnemyCollision()
 				iter = enemyList.erase(iter);
 				continue;
 			}
-			COLLITION->CheckCollision(*iter, melee);
+			
+			if (COLLITION->CheckCollision(*iter, melee))
+			{
+				auto enemy = dynamic_pointer_cast<TEnemy>(*iter);
+				if (enemy)
+				{
+					float damage = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetMeleeDamage();
+					enemy->SetDamaged(damage);
+				}
+			}
+
 			iter++;
 		}
 	}
@@ -749,5 +760,22 @@ void Game::CheckBloodCollision()
 		soul++;
 	}
 
+}
+
+void Game::CheckEnemyDeath(const vector<shared_ptr<AActor>>& _enemyList)
+{
+	for (const auto& actor : _enemyList)
+	{
+		if (!actor) continue;
+
+		TCharacter* enemy = dynamic_cast<TCharacter*>(actor.get());
+		if (enemy && enemy->IsDead())
+		{
+			if (auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer))
+			{
+				player->AddSoul(enemy->GetHisSoul());
+			}
+		}
+	}
 }
 

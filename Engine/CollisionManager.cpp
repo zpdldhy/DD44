@@ -214,7 +214,7 @@ bool Collision::CheckCollision(shared_ptr<class AActor> _p1, shared_ptr<class AA
 		iter->second(_p1, _p2);
 	}
 
-	return false;
+	return true;
 }
 
 bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor)
