@@ -488,8 +488,10 @@ void Game::BettyMeetMovie()
 		m_cBettyMovie.SetMoveTime2(10.f);
 		m_cBettyMovie.SetTimeTrack2(12.f);
 
-		m_cBettyMovie.SetUIPopUpTime(20.f);
+		m_cBettyMovie.SetUIPopUpTime(18.f);
 		m_cBettyMovie.SetTimeTrack3(23.f);	// 베티 애니메이션 6초
+
+		m_cUI.NoRenderStateUI();
 	}
 
 	m_cBettyMovie.StartMovie();
@@ -515,16 +517,19 @@ void Game::BettyMeetMovie()
 
 	if (m_cBettyMovie.IsUIPopUp())
 	{
-		int i = 0;
+		m_cUI.PopUpBettyName();
 	}
 
 	// 장면이 완전 종료되었을 때
 	if (m_cBettyMovie.IsEnd())
 	{
 		// 베티 움직이기 시작하는 구간
+		m_cUI.PopDownBettyName();
+		m_cUI.RenderStateUI();
 		CAMERA->Set3DCameraActor(m_pGameCameraActor);
 		m_bStartBettyMoveScene = false;
 		m_pCursor->m_bRender = true;
+		m_pPlayer->GetPhysicsComponent()->SetWeight(1.f);
 	}
 
 	// Player 움직임 구현
