@@ -338,15 +338,20 @@ void Game::CreateWind()
 
 void Game::UpdateUI()
 {
-	m_cUI.SetMaxHP((int)(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetMaxHP()));
-	m_cUI.SetCurrentHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHp());
-	m_cUI.SetArrowCount(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
-	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());	
-	m_cUI.SetCoin(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHisSoul());
-	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
+	auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer);
+
+	m_cUI.SetMaxHP((int)(player->GetMaxHP()));
+	m_cUI.SetCurrentHP(player->GetHp());
+	m_cUI.SetArrowCount(player->GetArrowCount());
+	m_cUI.SetTriggerData(player->GetTrigger());
+	m_cUI.SetCoin(player->GetHisSoul());
+	m_cUI.SetDead(player->IsDead());
 
 	// 가격 출력하는 부분
-	m_cUI.SetHealthPrice(200);
+	m_cUI.SetHealthPrice(player->GetNextUpgradeCost(EStatType::HP));
+	m_cUI.SetAttackPrice(player->GetNextUpgradeCost(EStatType::MeleeDamage));
+	m_cUI.SetSpeedPrice(player->GetNextUpgradeCost(EStatType::MoveSpeed));
+	m_cUI.SetArrowPrice(player->GetNextUpgradeCost(EStatType::RangedDamage));
 
 	// 업그레이드 실패시
 	if (INPUT->GetButtonDown(GameKey::U))

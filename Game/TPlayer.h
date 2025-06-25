@@ -60,6 +60,7 @@ public:
 
 	// 스테이터스
 	int GetStatLevel(EStatType type) const { return m_iStatLevel[(int)type]; }
+	int GetNextUpgradeCost(EStatType type) const;
 	bool UpgradeStat(EStatType type);
 
 	// MaxHP

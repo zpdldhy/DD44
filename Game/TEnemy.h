@@ -23,7 +23,7 @@ private:
 	int stageIndex = -1;
 
 	// 입는 데미지 연산용
-	int m_iDamaged = 1;
+	float m_iDamaged = 1.0f;
 
 public:
 	void Tick() override;
