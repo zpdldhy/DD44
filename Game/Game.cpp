@@ -207,8 +207,8 @@ void Game::Tick()
 		}
 	}
 
-	//CheckFrustumCulling();
-	//CheckEnemyCollision();
+	CheckFrustumCulling();
+	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
 	CheckEnemyDeath(enemyList);
@@ -346,6 +346,15 @@ void Game::UpdateUI()
 	m_cUI.SetTriggerData(player->GetTrigger());
 	m_cUI.SetCoin(player->GetHisSoul());
 	m_cUI.SetDead(player->IsDead());
+
+	// UI가 적용해야 하는 부분
+	m_cUI.SetMaxHP(i);
+	m_cUI.SetCurrentHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHp());
+	m_cUI.SetMaxArrow(i);
+	m_cUI.SetCurrentArrow(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
+	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());	
+	m_cUI.SetCoin(coin);
+	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
 
 	// 가격 출력하는 부분
 	m_cUI.SetHealthPrice(player->GetNextUpgradeCost(EStatType::HP));

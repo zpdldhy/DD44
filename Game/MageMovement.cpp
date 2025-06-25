@@ -29,7 +29,7 @@ void MageMovement::Init()
 
 
 	// staticMage
-	if (GetOwner()->m_eActorType == ActorType::AT_NONE)
+	if (GetOwner()->m_eActorType == ActorType::AT_STATICMONSTER)
 	{
 		bStaticMage = true;
 		findDistance = 50.0f;
