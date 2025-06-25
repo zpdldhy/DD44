@@ -915,7 +915,7 @@ void InGameUIControler::UpdateDead()
 				}
 
 				// continue에서 enter 또는 UI선택시
-				if (INPUT->GetButton(GameKey::ENTER) ||
+				if (INPUT->GetButton(GameKey::SPACE) ||
 					m_vDeadUI[1]->GetStateType() == UIStateType::ST_SELECT)
 				{
 					m_bDeadContinue = true;
