@@ -23,6 +23,7 @@ void HeadRollerMovement::Init()
 
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(3);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(4);
 
 	// Movement
 	InitPos();

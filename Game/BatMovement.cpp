@@ -64,7 +64,7 @@ void BatMovement::Init()
 
 	// »óÅÂ°ª
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(1);
-	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHisSoul(2);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(2);
 }
 
 

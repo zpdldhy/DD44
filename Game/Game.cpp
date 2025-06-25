@@ -212,6 +212,11 @@ void Game::Tick()
 	CheckBloodCollision();
 	PROJECTILE->Tick();
 	CheckEnemyDeath(enemyList);
+
+	if (m_pPlayer->GetPosition().y < -4.0f)
+	{
+		m_pPlayer->SetPosition(Vec3(50.0f, 40.0f, 100.0f));
+	}
 }
 
 void Game::Render()
@@ -366,6 +371,7 @@ void Game::UpdateUI()
 			break;
 		case 2:
 			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::MeleeDamage));
+
 			break;
 		case 3:
 			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::MoveSpeed));
