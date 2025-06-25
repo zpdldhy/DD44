@@ -433,7 +433,7 @@ void Game::UpdateCursor()
 	rotVec.Normalize();
 
 	// 특정 거리를 넘어가지 않도록 반지름 지정
-	float radius = 7.5f;
+	float radius = 15.f;
 	if (rotDir.Length() > radius)
 		inter = playerPos + rotVec * radius;
 
