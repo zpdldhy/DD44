@@ -10,7 +10,7 @@ struct pair_hash {
 
 class Collision : public Singleton<Collision>
 {
-    using CollisionFunc = function<void(shared_ptr<class AActor>, shared_ptr<class AActor>)>;
+    using CollisionFunc = function<bool(shared_ptr<class AActor>, shared_ptr<class AActor>)>;
     unordered_map<pair<ShapeType, ShapeType>, CollisionFunc, pair_hash> collisionMap;
 
 public:

@@ -745,7 +745,10 @@ void Game::CheckBloodCollision()
 			pSoul->SetTarget(playerPos);
 		}
 
-		COLLITION->CheckCollision(*soul, m_pPlayer);
+		if (COLLITION->CheckCollision(*soul, m_pPlayer))
+		{
+			int a = 0;
+		}
 		soul++;
 	}
 

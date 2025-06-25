@@ -7,86 +7,94 @@
 
 void Collision::Init()
 {
-	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_BOX}] = [](auto a, auto b) {
+	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_BOX}] = [](auto a, auto b) -> bool {
 		auto boxA = static_pointer_cast<UBoxComponent>(a->GetShapeComponent());
 		auto boxB = static_pointer_cast<UBoxComponent>(b->GetShapeComponent());
 
-		//충돌 검사 로직
 		if (Collision::CheckOBBToOBB(boxA->GetBounds(), boxB->GetBounds()))
 		{
-			// 충돌 처리
 			CollisionData data;
 			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
 				a->GetPhysicsComponent()->m_bColGrounded = true;
 			data.otherShape = b->GetShapeComponent();
-
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
+			return true;
 		}
+		return false;
 		};
 
-	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_SPHERE}] = [](auto a, auto b) {
+	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_SPHERE}] = [](auto a, auto b) -> bool {
 		auto boxA = static_pointer_cast<UBoxComponent>(a->GetShapeComponent());
-		// ...
+		auto sphereB = static_pointer_cast<USphereComponent>(b->GetShapeComponent());
+		Vec3 inter;
+		if (Collision::CheckSphereToOBB(sphereB->GetBounds(), boxA->GetBounds(), inter))
+		{
+			CollisionData data;
+			data.Inter = inter;
+			data.otherShape = b->GetShapeComponent();
+			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
+			return true;
+		}
+		return false;
 		};
 
-	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_CAPSULE}] = [](auto a, auto b) {
-		auto boxA = static_pointer_cast<UBoxComponent>(a->GetShapeComponent());
-		// ...
+	collisionMap[{ShapeType::ST_BOX, ShapeType::ST_CAPSULE}] = [](auto a, auto b) -> bool {
+		return false; // 구현 예정
 		};
 
-	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_BOX}] = [](auto a, auto b) {
+	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_BOX}] = [](auto a, auto b) -> bool {
 		auto Sphere = static_pointer_cast<USphereComponent>(a->GetShapeComponent());
 		auto Box = static_pointer_cast<UBoxComponent>(b->GetShapeComponent());
 
 		Vec3 Inter;
 		if (Collision::CheckSphereToOBB(Sphere->GetBounds(), Box->GetBounds(), Inter))
 		{
-			// 충돌 처리
 			CollisionData data;
 			data.Inter = Inter;
-			if(Collision::CheckRayToOBB(Sphere->GetGroundRay(), Box->GetBounds(), Inter))
+			if (Collision::CheckRayToOBB(Sphere->GetGroundRay(), Box->GetBounds(), Inter))
 				a->GetPhysicsComponent()->m_bColGrounded = true;
-			data.otherShape = b->GetShapeComponent();
 
+			data.otherShape = b->GetShapeComponent();
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
 			b->m_vCollisionList.insert(make_pair(a->m_Index, data));
+			return true;
 		}
-
+		return false;
 		};
 
-
-	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_SPHERE}] = [](auto a, auto b) {
+	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_SPHERE}] = [](auto a, auto b) -> bool {
 		auto Sphere0 = static_pointer_cast<USphereComponent>(a->GetShapeComponent());
 		auto Sphere1 = static_pointer_cast<USphereComponent>(b->GetShapeComponent());
 
 		Vec3 Inter;
 		if (Collision::CheckSphereToSphere(Sphere0->GetBounds(), Sphere1->GetBounds(), Inter))
 		{
-			// 충돌 처리
 			CollisionData data;
 			data.Inter = Inter;
 			if (b->m_szName == L"Terrain" || b->m_szName == L"Stair")
 				a->GetPhysicsComponent()->m_bColGrounded = true;
+
 			data.otherShape = b->GetShapeComponent();
-
 			a->m_vCollisionList.insert(make_pair(b->m_Index, data));
+			return true;
 		}
+		return false;
 		};
 
-	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_CAPSULE}] = [](auto a, auto b) {
-		// ...
+	collisionMap[{ShapeType::ST_SPHERE, ShapeType::ST_CAPSULE}] = [](auto a, auto b) -> bool {
+		return false; // 구현 예정
 		};
 
-	collisionMap[{ShapeType::ST_CAPSULE, ShapeType::ST_BOX}] = [](auto a, auto b) {
-		// ...
+	collisionMap[{ShapeType::ST_CAPSULE, ShapeType::ST_BOX}] = [](auto a, auto b) -> bool {
+		return false; // 구현 예정
 		};
 
-	collisionMap[{ShapeType::ST_CAPSULE, ShapeType::ST_SPHERE}] = [](auto a, auto b) {
-		// ...
+	collisionMap[{ShapeType::ST_CAPSULE, ShapeType::ST_SPHERE}] = [](auto a, auto b) -> bool {
+		return false; // 구현 예정
 		};
 
-	collisionMap[{ShapeType::ST_CAPSULE, ShapeType::ST_CAPSULE}] = [](auto a, auto b) {
-		// ...
+	collisionMap[{ShapeType::ST_CAPSULE, ShapeType::ST_CAPSULE}] = [](auto a, auto b) -> bool {
+		return false; // 구현 예정
 		};
 }
 
@@ -211,7 +219,7 @@ bool Collision::CheckCollision(shared_ptr<class AActor> _p1, shared_ptr<class AA
 
 	if (iter != collisionMap.end())
 	{
-		iter->second(_p1, _p2);
+		return iter->second(_p1, _p2);
 	}
 
 	return false;
