@@ -25,6 +25,7 @@
 #include "AWindActor.h"
 #include "TEnemy.h"
 #include "TPlayer.h"
+#include "ASoulActor.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -190,7 +191,6 @@ void Game::Tick()
 
 		if (m_bWind)
 			CreateWind();
-
 	}
 
 	if (INPUT->GetButton(O))
@@ -211,6 +211,8 @@ void Game::Tick()
 	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
+
+
 }
 
 void Game::Render()
@@ -707,9 +709,6 @@ void Game::CheckBloodCollision()
 	auto& bloodList = EFFECT->GetBloodList();
 	for (auto blood = bloodList.begin(); blood != bloodList.end(); )
 	{
-		if (blood->get()->GetPosition().y <= 0.f)
-			int i = 0;
-
 		if (!(*blood)->IsActive() || (*blood)->m_bDelete)
 		{
 			blood = bloodList.erase(blood);
@@ -729,5 +728,26 @@ void Game::CheckBloodCollision()
 
 		blood++;
 	}
+
+	auto& soulList = EFFECT->GetSoulList();
+	for (auto soul = soulList.begin(); soul != soulList.end(); )
+	{
+		if (!(*soul)->IsActive() || (*soul)->m_bDelete)
+		{
+			soul = soulList.erase(soul);
+			continue;
+		}
+
+		if (auto pSoul = dynamic_pointer_cast<ASoulActor>(*soul))
+		{
+			Vec3 playerPos = m_pPlayer->GetPosition();
+			playerPos.y += 1.5f;
+			pSoul->SetTarget(playerPos);
+		}
+
+		COLLITION->CheckCollision(*soul, m_pPlayer);
+		soul++;
+	}
+
 }
 

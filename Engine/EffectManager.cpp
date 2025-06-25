@@ -16,6 +16,7 @@
 #include "USphereComponent.h"
 #include "RenderStateManager.h"
 #include "APointEffectActor.h"
+#include "ASoulActor.h"
 
 constexpr int INITIAL_POOL_SIZE = 3;
 
@@ -130,6 +131,13 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
     case EEffectType::Point:
         actor = make_shared<APointEffectActor>();
         break;
+    case EEffectType::Soul:
+        actor = make_shared<ASoulActor>();
+        collider->SetName(L"Soul");
+        collider->SetLocalScale(Vec3(.1f, .1f, .1f));
+        collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+        actor->SetShapeComponent(collider);
+        break;
     }
 
     //±×¸²ÀÚ
@@ -183,6 +191,11 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
         m_vInstanceEffect[static_cast<size_t>(EEffectType::Point)]->AddInstanceMesh(mesh);
         actor->m_szName = L"PointEffect";
         break;
+    case EEffectType::Soul:
+        mat->Load(L"../Resources/Texture/Soft.png", L"../Resources/Shader/SpriteUV.hlsl");
+        m_vInstanceEffect[static_cast<size_t>(EEffectType::Soul)]->AddInstanceMesh(mesh);
+        actor->m_szName = L"PointEffect";
+        break;
     }
 
 	mesh->SetMaterial(mat);
@@ -217,7 +230,7 @@ shared_ptr<AEffectActor> EffectManager::GetReusableActor(EEffectType type)
 }
 
 
-void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngleSpreadDeg, const Vec3& baseVelocity, float _scale)
+void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngleSpreadDeg, const Vec3& baseVelocity, float _scale, const Vec3& targetPos)
 {
 	auto actor = GetReusableActor(type);
 	if (!actor)
@@ -227,6 +240,7 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     float duration = 1.0f;
     actor->GetMeshComponent()->SetInstanceColor(Vec4(1.f, 1.f, 1.f, 1.f));
     float angle = RandomRange(0.0f, DD_2PI);
+    auto pSoul = dynamic_pointer_cast<ASoulActor>(actor);
     switch (type)
     {
     case EEffectType::Dust:       duration = 1.0f; break;
@@ -249,6 +263,13 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
         duration = 0.2;
         actor->GetMeshComponent()->SetInstanceColor(Vec4(0.7f, 0.9f, 0.95, 1.0f));
         break;
+    case EEffectType::Soul:
+        if (pSoul)
+        {
+            pSoul->SetTarget(targetPos);
+        }
+        duration = 10.f;
+        break;
     default:                      duration = 1.0f; break;
     }
 
@@ -257,6 +278,10 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     if (type == EEffectType::Blood)
     {
         m_vBloodActorList.push_back(actor); 
+    }
+    else if (type == EEffectType::Soul)
+    {
+        m_vSoulActorList.push_back(actor);
     }
 }
 
@@ -324,7 +349,15 @@ void EffectManager::PlayInit()
 	for (int i = 0; i < INITIAL_POOL_SIZE; ++i)
 	{
 		PlayEffect(EEffectType::Feather, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
+     
 	}
+    for (int i = 0; i < 10; ++i)
+    {
+        PlayEffect(EEffectType::BloodDecal, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
+        PlayEffect(EEffectType::Soul, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
+    }
+
 	PlayEffect(EEffectType::Dust, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
 	PlayEffect(EEffectType::Point, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
+
 }

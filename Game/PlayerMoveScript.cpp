@@ -96,6 +96,7 @@ void PlayerMoveScript::Tick()
 	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
 	auto playerPos = player->GetPosition();
 
+
 	// 모든 state 공통
 	PlayFX();
 	CheckCoolTIme();
