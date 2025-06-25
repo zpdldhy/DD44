@@ -67,6 +67,4 @@ void LadderScript::Interact()
 	m_bAppear = true;
 	// 플레이어 움직이는 거 관련해서는 PlayerMoveScript
 
-
-
 }

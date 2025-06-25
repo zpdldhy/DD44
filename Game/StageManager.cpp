@@ -101,7 +101,7 @@ void StageManager::Tick()
 		if (stageList[2].size() <= 0)
 		{
 			// Ææ½º ³»¸®±â
-			if (INPUT->GetButton(H))
+			//if (INPUT->GetButton(H))
 			{
 				EVENT->TriggerEvent(EventType::EVENT_FENCE, L"I_Fence1");
 				currentPhase = StagePhase::STAGE20;
