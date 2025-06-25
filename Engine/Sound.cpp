@@ -153,13 +153,18 @@ void SoundManager::LoadAllSounds()
 	//BGM
 	Load(ESoundType::Intro, L"../Resources/Sound/intro.mp3");
 	Load(ESoundType::Stage0, L"../Resources/Sound/state0.mp3");
-	Load(ESoundType::Boss1, L"../Resources/Sound/betty.mp3");
+	Load(ESoundType::Boss1, L"../Resources/Sound/boss_betty.mp3");
 	Load(ESoundType::Ending, L"../Resources/Sound/ending.mp3");
 
 	//Charactor
 	Load(ESoundType::Walk, L"../Resources/Sound/hero_walk_footsteps_stone_louder.wav");
 	Load(ESoundType::Dash, L"../Resources/Sound/hero_dash.wav");
 	Load(ESoundType::Slash, L"../Resources/Sound/crow_sword1.mp3");
+	Load(ESoundType::Slash_2, L"../Resources/Sound/crow_sword2.mp3");
+	Load(ESoundType::Slash_3, L"../Resources/Sound/crow_sword3.mp3");
+	Load(ESoundType::Bow_Stretch, L"../Resources/Sound/bow_stretch.mp3");
+	Load(ESoundType::Bow_Release, L"../Resources/Sound/bow_release.mp3");
+	Load(ESoundType::Ladder, L"../Resources/Sound/ladder.mp3");
 	Load(ESoundType::Hit, L"../Resources/Sound/hero_damaged.wav");
 	Load(ESoundType::Die, L"../Resources/Sound/hero_damaged.wav");
 
@@ -169,10 +174,27 @@ void SoundManager::LoadAllSounds()
 	//Monster
 	Load(ESoundType::Attack_Bat, L"../Resources/Sound/bat_attack.wav");
 	Load(ESoundType::Enemy_Damaged, L"../Resources/Sound/enemy_damage.wav");
+	Load(ESoundType::Impact, L"../Resources/Sound/monster_impact.mp3");
+	Load(ESoundType::Dead_Walker, L"../Resources/Sound/zombie_dead.mp3");
+	Load(ESoundType::Attack_Mage, L"../Resources/Sound/mage_magic.mp3");
+	Load(ESoundType::Attack_Betty, L"../Resources/Sound/betty_attack.mp3");
+	Load(ESoundType::Screaming_Betty, L"../Resources/Sound/betty_screaming.mp3");
+	Load(ESoundType::Growling_Betty, L"../Resources/Sound/betty_growling.mp3");
+	Load(ESoundType::Impact_Betty, L"../Resources/Sound/betty_impact.mp3");
+	Load(ESoundType::Scraping_Betty, L"../Resources/Sound/betty_scraping.mp3");
+
+	//Env
+	Load(ESoundType::Open_Fence, L"../Resources/Sound/fence_open.mp3");
+	Load(ESoundType::Close_Fence, L"../Resources/Sound/fence_close.mp3");
+	Load(ESoundType::GetSoul, L"../Resources/Sound/soul_get.mp3");
+	Load(ESoundType::Healing, L"../Resources/Sound/healing.mp3");
 
 	//UI
 	Load(ESoundType::Hover, L"../Resources/Sound/ui_hover.wav");
 	Load(ESoundType::Click, L"../Resources/Sound/ui_save.wav");
+	Load(ESoundType::Allow, L"../Resources/Sound/ui_levelup.mp3");
+	Load(ESoundType::Deny, L"../Resources/Sound/ui_deny.mp3");
+	Load(ESoundType::CrowDead, L"../Resources/Sound/ui_dead.mp3");
 }
 
 Sound* SoundManager::GetPtr(ESoundType type)

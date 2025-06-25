@@ -400,6 +400,9 @@ void Game::UpdateUI()
 	if (m_cUI.IsHealAction())
 	{
 		player->SetHp(player->GetMaxHP());
+
+		// »ç¿îµå
+		SOUND->GetPtr(ESoundType::Healing)->PlayEffect2D();
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -428,6 +431,7 @@ void Game::UpdateUI()
 	if (m_cUI.EndDeadUI())
 	{
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
+		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
 	}
 }
 
@@ -852,6 +856,7 @@ void Game::CheckBloodCollision()
 		{
 			//CheckEnemyDeath(enemyList);
 			dynamic_pointer_cast<TPlayer>(m_pPlayer)->AddSoul(m_iSoulStorage);
+			SOUND->GetPtr(ESoundType::GetSoul)->PlayEffect2D();
 			m_iSoulStorage = 0;
 		}
 		soul++;
