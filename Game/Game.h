@@ -12,6 +12,7 @@ public:
 	shared_ptr<class ACameraActor> m_pGameCameraActor;
 	
 	shared_ptr<class AActor> m_pPlayer;
+	shared_ptr<class AActor> m_pHealer;
 	shared_ptr<class AActor> m_pBetty;
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
