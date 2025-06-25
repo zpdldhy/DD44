@@ -307,6 +307,11 @@ void InGameUIControler::init()
 	UI->AddUI(m_pBettyName);
 	m_pBettyName->m_bRun = false;
 	m_pBettyName->m_bRender = false;
+
+	m_pEnding = PToA->MakeUI("../Resources/Prefab/UI_Ending.ui.json");
+	UI->AddUI(m_pEnding);
+	m_pEnding->m_bRun = false;
+	m_pEnding->m_bRender = false;
 }
 
 void InGameUIControler::Tick()
@@ -324,6 +329,7 @@ void InGameUIControler::Tick()
 	UpdatePaused();
 	UpdateCoin();
 	UpdateDead();
+	UpdateEnding();
 }
 
 void InGameUIControler::Destroy()
@@ -990,6 +996,39 @@ void InGameUIControler::UpdateDead()
 		m_vCoins[1]->m_bRender = true;
 		m_vCoins[3]->m_bRender = true;
 	}
+}
+
+void InGameUIControler::UpdateEnding()
+{
+	if (!m_bGoEnding) return;
+	static bool oneFrame = true;
+	static wstring ending = L"";
+
+	if (oneFrame)
+	{
+		auto pos = m_pEnding->GetPosition();
+		pos.y = -1500.f;
+		m_pEnding->SetPosition(pos);
+		m_pEnding->SetAlignment(DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		ending += L"팀명\t\t\t        DD44\n\n";
+		ending += L"팀원\t\t\t        서 준\n\n";
+		ending += L"\t\t\t        오 세영\n\n";
+		ending += L"\t\t\t        김 예린\n\n";
+		ending += L"\t\t\t        이 윤석\n\n";
+		ending += L"협찬\t\t          KGCA 아카데미\n\n\n\n\n\n\n\n\n\n";
+		ending += L"       플레이  해주셔서  감사합니다!";
+	}
+
+	m_pEnding->m_bRun = true;
+	m_pEnding->m_bRender = true;
+
+	m_pEnding->SetText(ending);
+
+	if (m_pEnding->GetPosition().y < g_windowSize.y*0.74f)
+		m_pEnding->AddPosition(Vec3(0.f, TIMER->GetDeltaTime() * 100.f, 0.f));
+
+	oneFrame = false;
 }
 
 void InGameUIControler::PopUpBettyName()

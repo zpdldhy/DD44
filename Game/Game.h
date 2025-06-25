@@ -40,6 +40,7 @@ public:
 	// 씬 연출
 	BettyMeetControler m_cBettyMovie;
 	bool m_bStartBettyMoveScene = false;	// 콜리전 박스에 닿으면 실행할 수 있도록
+	bool m_bNoPaused = false;
 
 	// TEMP
 	vector<shared_ptr<AActor>> stage0;
