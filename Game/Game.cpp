@@ -340,21 +340,16 @@ void Game::UpdateUI()
 {
 	auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer);
 
-	m_cUI.SetMaxHP((int)(player->GetMaxHP()));
+	m_cUI.SetMaxHP(player->GetMaxHP());
 	m_cUI.SetCurrentHP(player->GetHp());
-	m_cUI.SetArrowCount(player->GetArrowCount());
+
+	m_cUI.SetMaxArrow(player->GetArrowCapacity());
+	m_cUI.SetCurrentArrow(player->GetArrowCount());
+
 	m_cUI.SetTriggerData(player->GetTrigger());
+
 	m_cUI.SetCoin(player->GetHisSoul());
 	m_cUI.SetDead(player->IsDead());
-
-	// UI가 적용해야 하는 부분
-	m_cUI.SetMaxHP(i);
-	m_cUI.SetCurrentHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHp());
-	m_cUI.SetMaxArrow(i);
-	m_cUI.SetCurrentArrow(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
-	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());	
-	m_cUI.SetCoin(coin);
-	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
 
 	// 가격 출력하는 부분
 	m_cUI.SetHealthPrice(player->GetNextUpgradeCost(EStatType::HP));
@@ -363,10 +358,12 @@ void Game::UpdateUI()
 	m_cUI.SetArrowPrice(player->GetNextUpgradeCost(EStatType::RangedDamage));
 
 	// 업그레이드 실패시
-	if (INPUT->GetButtonDown(GameKey::U))
-		m_cUI.IsBuyUpgrade(false);
-	else
-		m_cUI.IsBuyUpgrade(true);
+	//if (INPUT->GetButtonDown(GameKey::U))
+	//	m_cUI.IsBuyUpgrade(false);
+	//else
+	//	m_cUI.IsBuyUpgrade(true);
+
+	if(player->UpgradeStat(EStatType::HP))
 
 	m_cUI.Tick();
 
@@ -377,19 +374,40 @@ void Game::UpdateUI()
 
 	// Upgrade State
 	// 0은 Default로 Upgrade 없음을 나타냄
+
+	static int iHP = 0;
+
 	switch (m_cUI.SelectUpgrade())
 	{
 	case 1: // MaxHP
-		// MaxHP++
+		//if (player->UpgradeStat(EStatType::HP))
+		//	m_cUI.IsBuyUpgrade(true);
+		//else
+		//	m_cUI.IsBuyUpgrade(false);
+
+		player->UpgradeStat(EStatType::HP);
+		
 		break;
 
 	case 2: // Attack
+		//if(player->UpgradeStat(EStatType::MeleeDamage))
+		//	m_cUI.IsBuyUpgrade(true);
+		//else
+		//	m_cUI.IsBuyUpgrade(false);
 		break;
 
 	case 3: // Speed
+		/*if(player->UpgradeStat(EStatType::MoveSpeed))
+			m_cUI.IsBuyUpgrade(true);
+		else
+			m_cUI.IsBuyUpgrade(false);*/
 		break;
 
 	case 4:	// Arrow
+		//if(player->UpgradeStat(EStatType::RangedDamage))
+		//	m_cUI.IsBuyUpgrade(true);
+		//else
+		//	m_cUI.IsBuyUpgrade(false);
 		break;
 	}
 
@@ -414,7 +432,7 @@ void Game::UpdateUI()
 	// Dead UI 종료 시, 캐릭 살아남 등
 	if (m_cUI.EndDeadUI())
 	{
-		dynamic_pointer_cast<TPlayer>(m_pPlayer)->SetHp(4);
+		dynamic_pointer_cast<TPlayer>(m_pPlayer)->SetHp(player->GetMaxHP());
 		// Dead true 세팅
 	}
 }

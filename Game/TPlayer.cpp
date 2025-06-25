@@ -18,7 +18,7 @@ void TPlayer::IncArrowCount(int _count)
 {
 	arrowCount += _count;
 	// ÃÖ´ñ°ª 4
-	arrowCount = arrowCount >= (int)m_fArrowCount ? (int)m_fArrowCount : arrowCount;
+	arrowCount = arrowCount >= (int)m_iArrowCount ? (int)m_iArrowCount : arrowCount;
 }
 
 void TPlayer::DecArrowCount(int _count)
@@ -83,7 +83,7 @@ bool TPlayer::UpgradeStat(EStatType type)
 	switch (type)
 	{
 	case EStatType::HP:
-		m_fMaxHP += info.delta1;
+		m_iMaxHP += info.delta1;
 		break;
 	case EStatType::MeleeDamage:
 		m_fMeleeDamage += info.delta1;
@@ -95,7 +95,7 @@ bool TPlayer::UpgradeStat(EStatType type)
 		break;
 	case EStatType::RangedDamage:
 		m_fRangedDamage += info.delta1;
-		m_fArrowCount += info.delta2;
+		m_iArrowCount += info.delta2;
 		break;
 	}
 

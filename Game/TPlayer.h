@@ -28,13 +28,13 @@ private:
 	TriggerData m_Trigger;
 
 	// 스테이터스
-	float m_fMaxHP = 4.f;
+	int m_iMaxHP = 4;
 	float m_fMeleeDamage = 1.f;
 	Vec3 m_vMeleeRange = Vec3(3.f, 1.f, 2.f);
 	float m_fMoveSpeed = 0.25f;
 	float m_fRollSpeed = 0.5f;
 	float m_fRangedDamage = 1.f;
-	float m_fArrowCount = 4.f;
+	float m_iArrowCount = 4;
 	
 	// 각 능력치 현재 레벨
 	int m_iStatLevel[(int)EStatType::COUNT] = { 0 };
@@ -64,8 +64,8 @@ public:
 	bool UpgradeStat(EStatType type);
 
 	// MaxHP
-	float GetMaxHP() const { return m_fMaxHP; }
-	void  SetMaxHP(float hp) { m_fMaxHP = hp; }
+	int   GetMaxHP() const { return m_iMaxHP; }
+	void  SetMaxHP(int hp) { m_iMaxHP = hp; }
 
 	// Melee Damage
 	float GetMeleeDamage() const { return m_fMeleeDamage; }
@@ -88,8 +88,8 @@ public:
 	void  SetRangedDamage(float dmg) { m_fRangedDamage = dmg; }
 
 	// Arrow Count Max
-	float GetArrowCapacity() const { return m_fArrowCount; }
-	void  SetArrowCapacity(float count) { m_fArrowCount = count; }
+	int   GetArrowCapacity() const { return m_iArrowCount; }
+	void  SetArrowCapacity(int count) { m_iArrowCount = count; }
 
 };
 
