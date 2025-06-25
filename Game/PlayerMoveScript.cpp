@@ -96,10 +96,6 @@ void PlayerMoveScript::Tick()
 	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
 	auto playerPos = player->GetPosition();
 
-	if (INPUT->GetButton(K))
-	{
-		EFFECT->PlayEffect(EEffectType::Soul, playerPos, 0, Vec3(0,0,0));
-	}
 
 	// 모든 state 공통
 	PlayFX();
