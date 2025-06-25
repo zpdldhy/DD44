@@ -428,6 +428,13 @@ void Game::UpdateUI()
 	{
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
 	}
+
+	///////////////////////////////////////////////////////////////////////////
+	///////////						Ending							///////////
+	///////////////////////////////////////////////////////////////////////////
+
+	if (INPUT->GetButton(GameKey::P))
+		m_cUI.GoEnding();
 }
 
 void Game::UpdateCursor()

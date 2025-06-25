@@ -116,6 +116,8 @@ class InGameUIControler : public UIControler
 	//  Sinema  //
 	//////////////
 	shared_ptr<class AUIActor> m_pBettyName = nullptr;
+	shared_ptr<class AUIActor> m_pEnding = nullptr;
+	bool m_bGoEnding = false;
 
 public:
 	void init() override;
@@ -131,6 +133,7 @@ private:
 	void UpdatePaused();
 	void UpdateCoin();
 	void UpdateDead();
+	void UpdateEnding();
 
 public:
 	void SetMaxHP(int _maxHP) { m_iMaxHP = _maxHP; }
@@ -158,4 +161,6 @@ public:
 
 	void NoRenderStateUI();
 	void RenderStateUI() { m_bNoRender = false; }
+
+	void GoEnding() { m_bGoEnding = true; }
 };
