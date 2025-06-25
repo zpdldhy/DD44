@@ -457,6 +457,44 @@ void Game::UpdateCursor()
 		OBJECT->SetCursorActor(m_pCursor);
 }
 
+void Game::BettyMeetMovie()
+{
+	if (!m_bStartBettyMoveScene) return;
+
+	// 시작하기 전에 세팅할 것들
+	if (!m_cBettyMovie.IsStart())
+	{
+		// 연출 위치 조작
+		m_cBettyMovie.SetCameraStart(Vec3(64.f, 4.f, -94.f), Vec3(-0.06f, 11.65f, 0.f));
+		m_cBettyMovie.SetPlayerCurrentPos(m_pPlayer->GetPosition());
+		m_cBettyMovie.SetPlayerStartPos(Vec3(64.f, 0.f, -94.f));
+		m_cBettyMovie.SetPlayerEndPos(Vec3(52.f, 0.f, -85.f));
+		m_cBettyMovie.SetTimeTrack1(3.f);
+		m_cBettyMovie.SetTimeTrack2(7.f);
+		m_cBettyMovie.SetTimeTrack3(15.f);
+		m_cBettyMovie.SetTimeTrack4(20.f);
+		m_cBettyMovie.SetUIPopDownTime(17.f);
+	}
+
+	m_cBettyMovie.StartMovie();
+	m_cBettyMovie.Tick();
+
+	// 베티가 화내기 시작하는 부분
+	if (m_cBettyMovie.StartTrack3())
+	{
+
+	}
+
+	// 장면이 완전 종료되었을 때
+	if (m_cBettyMovie.IsEnd())
+	{
+		m_bStartBettyMoveScene = false;
+	}
+
+	// Player 움직임 구현
+	m_pPlayer->SetPosition(m_cBettyMovie.GetPlayerPos());
+}
+
 void Game::SetEnemy(vector<shared_ptr<AActor>>& _enemyList)
 {
 	for (auto& enemy : _enemyList)

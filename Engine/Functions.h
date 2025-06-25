@@ -6,7 +6,7 @@
 #include <locale>
 #include <codecvt>
 #include <random>
-
+#include "Types.h"
 
 static void DX_CHECK(HRESULT _hr, const TCHAR* _function)
 {
@@ -143,4 +143,37 @@ static float DegreesToRadians(float degrees)
 static float Lerp(float a, float b, float t)
 {
 	return a + (b - a) * t;
+}
+
+static Vec3 BezierCubic(const Vec3& p0,
+						const Vec3& p1,
+						const Vec3& p2,
+						const Vec3& p3,
+						float t)
+{
+	float u = 1.0f - t;
+	float tt = t * t;
+	float uu = u * u;
+	float uuu = uu * u;
+	float ttt = tt * t;
+
+	Vec3 result = { 0, 0, 0 };
+
+	result.x = uuu * p0.x; // (1 - t)^3 * P0
+	result.y = uuu * p0.y;
+	result.z = uuu * p0.z;
+
+	result.x += 3 * uu * t * p1.x; // 3(1 - t)^2 t * P1
+	result.y += 3 * uu * t * p1.y;
+	result.z += 3 * uu * t * p1.z;
+
+	result.x += 3 * u * tt * p2.x; // 3(1 - t) t^2 * P2
+	result.y += 3 * u * tt * p2.y;
+	result.z += 3 * u * tt * p2.z;
+
+	result.x += ttt * p3.x; // t^3 * P3
+	result.y += ttt * p3.y;
+	result.z += ttt * p3.z;
+
+	return result;
 }

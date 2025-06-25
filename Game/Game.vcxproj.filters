@@ -189,6 +189,9 @@
     <ClInclude Include="TriggerData.h">
       <Filter>Data</Filter>
     </ClInclude>
+    <ClInclude Include="MovieControler.h">
+      <Filter>Controler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -312,6 +315,9 @@
     </ClCompile>
     <ClCompile Include="StageManager.cpp" />
     <ClCompile Include="UIControler.cpp">
+      <Filter>Controler</Filter>
+    </ClCompile>
+    <ClCompile Include="MovieControler.cpp">
       <Filter>Controler</Filter>
     </ClCompile>
   </ItemGroup>
