@@ -69,6 +69,7 @@ void BatMovement::Init()
 
 void BatMovement::Tick()
 {
+
 	auto pos = GetOwner()->GetPosition();
 	attackRangeActor->SetPosition(pos + colOffset * GetOwner()->GetLook() + Vec3(0.0f, 2.0f, 0.0f));
 
@@ -90,6 +91,10 @@ void BatMovement::Tick()
 	if (m_bReturn)
 	{
 		ReturningToPos();
+		return;
+	}
+	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_DEATH)
+	{
 		return;
 	}
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_ATTACK && currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
@@ -217,6 +222,8 @@ void BatMovement::ChangetState(shared_ptr<StateBase> _state)
 
 		if (currentState)
 			currentState->Enter();
+		
+		return;
 	}
 	if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
