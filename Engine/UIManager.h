@@ -14,7 +14,8 @@ class UIManager : public Singleton<UIManager>
 	float m_fFadeTime = 2.f;
 	bool isFadeIn = false;
 	bool isFadeOut = false;
-	bool isFadeWorkDone = false;
+	bool isFadeInDone = false;
+	bool isFadeOutDone = false;
 	bool isFirstFrame = false;
 
 public:
@@ -41,6 +42,7 @@ public:
 	void SetFadeTime(float _time) { m_fFadeTime = _time; }
 	void DoFadeIn() { isFadeIn = true; isFirstFrame = true;	}
 	void DoFadeOut() { isFadeOut = true; isFirstFrame = true; }
-	bool GetFadeWorkDone() { return isFadeWorkDone; }
+	bool GetFadeInDone() { return isFadeInDone; }
+	bool GetFadeOutDone() { return isFadeOutDone; }
 };
 
