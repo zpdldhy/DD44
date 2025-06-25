@@ -145,6 +145,29 @@ static float Lerp(float a, float b, float t)
 	return a + (b - a) * t;
 }
 
+static Vec3 Lerp(const Vec3& startPos,
+				 const Vec3& endPos,
+				 float t)
+{
+	Vec3 result;
+
+	result.x = (1.0f - t) * startPos.x + t * endPos.x;
+	result.y = (1.0f - t) * startPos.y + t * endPos.y;
+	result.z = (1.0f - t) * startPos.z + t * endPos.z;
+
+	return result;
+}
+
+static Vec3 LerpEased(const Vec3& start, const Vec3& end, float t)
+{
+	float easedT = 1.0f - (1.0f - t) * (1.0f - t);
+	Vec3 result;
+	result.x = (1.0f - easedT) * start.x + easedT * end.x;
+	result.y = (1.0f - easedT) * start.y + easedT * end.y;
+	result.z = (1.0f - easedT) * start.z + easedT * end.z;
+	return result;
+}
+
 static Vec3 BezierCubic(const Vec3& p0,
 						const Vec3& p1,
 						const Vec3& p2,

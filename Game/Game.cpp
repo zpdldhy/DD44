@@ -163,6 +163,8 @@ void Game::Init()
 	OBJECT->SetCursorActor(m_pCursor);
 
 	UI->DoFadeOut();
+
+	m_cBettyMovie.SetCameraStart(Vec3(64.f, 4.f, -94.f), Vec3(-0.06f, 11.65f, 0.f));
 }
 
 void Game::Tick()
@@ -170,8 +172,7 @@ void Game::Tick()
 	STAGE->Tick();
 	if (STAGE->GetCurrentStage() == StagePhase::FINAL)
 	{
-		// 플레이어가 베티 보스전 입장한 거임.
-		int a = 0;
+		m_bStartBettyMoveScene = true;
 	}
 
 	UpdateCursor();
@@ -181,6 +182,7 @@ void Game::Tick()
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
 
 	UpdateUI();
+	BettyMeetMovie();
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
@@ -469,28 +471,45 @@ void Game::BettyMeetMovie()
 {
 	if (!m_bStartBettyMoveScene) return;
 
+
 	// 시작하기 전에 세팅할 것들
 	if (!m_cBettyMovie.IsStart())
 	{
 		// 연출 위치 조작
-		m_cBettyMovie.SetCameraStart(Vec3(64.f, 4.f, -94.f), Vec3(-0.06f, 11.65f, 0.f));
-		m_cBettyMovie.SetPlayerCurrentPos(m_pPlayer->GetPosition());
-		m_cBettyMovie.SetPlayerStartPos(Vec3(64.f, 0.f, -94.f));
-		m_cBettyMovie.SetPlayerEndPos(Vec3(52.f, 0.f, -85.f));
-		m_cBettyMovie.SetTimeTrack1(3.f);
-		m_cBettyMovie.SetTimeTrack2(7.f);
-		m_cBettyMovie.SetTimeTrack3(15.f);
-		m_cBettyMovie.SetTimeTrack4(20.f);
-		m_cBettyMovie.SetUIPopDownTime(17.f);
+		m_pPlayer->GetPhysicsComponent()->SetWeight(0.f);
+		auto pos = m_pPlayer->GetPosition();
+		m_cBettyMovie.SetPlayerEnterPos(pos);
+		m_cBettyMovie.SetPlayerStartPos(Vec3(64.f, pos.y, -94.f));
+		m_cBettyMovie.SetPlayerEndPos(Vec3(52.f, pos.y, -85.f));
+
+		m_cBettyMovie.SetMoveTime1(3.f);
+		m_cBettyMovie.SetRotTime1(5.f);
+		m_cBettyMovie.SetTimeTrack1(7.f);
+
+		m_cBettyMovie.SetMoveTime2(10.f);
+		m_cBettyMovie.SetTimeTrack2(20.f);
+
+		m_cBettyMovie.SetUIPopDownTime(25.f);
+		m_cBettyMovie.SetTimeTrack3(30.f);	// 베티 애니메이션 6초
+		m_cBettyMovie.SetTimeTrack4(40.f);
 	}
 
 	m_cBettyMovie.StartMovie();
 	m_cBettyMovie.Tick();
 
-	// 베티가 화내기 시작하는 부분
+	if (m_cBettyMovie.StartTrack1() || m_cBettyMovie.StartTrack2())
+	{
+		// 까마귀를 Walk Animation으로 변경
+	}
+	
+	if (m_cBettyMovie.EndMove())
+	{
+		// 까마귀를 Idle Animation으로 변경
+	}
+
 	if (m_cBettyMovie.StartTrack3())
 	{
-
+		// 베티가 화내기 시작하는 부분
 	}
 
 	// 장면이 완전 종료되었을 때
@@ -501,6 +520,7 @@ void Game::BettyMeetMovie()
 
 	// Player 움직임 구현
 	m_pPlayer->SetPosition(m_cBettyMovie.GetPlayerPos());
+	m_pPlayer->SetRotation(m_cBettyMovie.GetPlayerRot());
 }
 
 void Game::SetEnemy(vector<shared_ptr<AActor>>& _enemyList)

@@ -21,8 +21,6 @@ public:
 	bool m_bEnginCamera = false;
 	bool m_bWind = false;
 
-	float time;
-
 	int m_iSoulStorage = 0;
 
 	// UI
