@@ -207,8 +207,8 @@ void Game::Tick()
 		}
 	}
 
-	//CheckFrustumCulling();
-	//CheckEnemyCollision();
+	CheckFrustumCulling();
+	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
 }

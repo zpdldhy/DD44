@@ -57,6 +57,7 @@ class InGameUIControler : public UIControler
 	vector<shared_ptr<class AUIActor>> m_vArrowUI;
 	shared_ptr<class Texture> m_pActiveArrowTexture = nullptr;
 	shared_ptr<class Texture> m_pInActiveArrowTexture = nullptr;
+	shared_ptr<class Texture> m_pEmptyArrowTexture = nullptr;
 	int m_iMaxArrow = 4;
 	int m_iCurrentArrow = 4;
 	Vec3 m_vActiveArrowScale = { 0.f, 0.f, 0.f };

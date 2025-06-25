@@ -179,6 +179,7 @@ void InGameUIControler::init()
 {
 	m_pActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_active.png");
 	m_pInActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_inactive.png");
+	m_pEmptyArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_empty.png");
 	m_pUpgradeDoneTexture = TEXTURE->Get(L"../Resources/Texture/UI/upgrade_slot_glow-1.png");
 
 	// InGame UI	
@@ -381,6 +382,18 @@ void InGameUIControler::UpdateHP()
 	if (m_iCurrentHP != m_iPreHP)
 		m_bHPUIChange = true;
 
+	//for (auto& pUI : m_vHPUI)
+	//	pUI->m_bRender = false;
+
+	//for (int i = 0; i < m_iCurrentHP; i++)
+	//{
+	//	if (i > 0)
+	//	{
+	//		m_vHPUI[i - 1]->SetColor(RestColor);
+	//	}
+	//	m_vHPUI[i]->SetColor(FullHPColor);
+	//}
+
 	switch (m_iCurrentHP)
 	{
 	case 4:
@@ -457,95 +470,29 @@ void InGameUIControler::UpdateArrow()
 	if (m_iMaxArrow > 9)
 		m_iMaxArrow = 9;
 
-	// Max Arrow 설정
+	// Max Arrow 설정	
 	m_vArrowUI[m_iMaxArrow - 1]->m_bRun = true;
 	m_vArrowUI[m_iMaxArrow - 1]->m_bRender = true;
+	m_vArrowUI[m_iMaxArrow - 1]->SetAllTexture(m_pEmptyArrowTexture);
 
 	for (auto& pUI : m_vArrowUI)
-		pUI->m_bRender = false;
+	{
+		pUI->SetAllTexture(m_pEmptyArrowTexture);
+		pUI->SetScale(m_vInActiveArrowScale);
+	}
 
+	// Current Arrow 설정
 	for (int i = 0; i < m_iCurrentArrow; i++)
 	{
 		if (i > 0)
 		{
 			m_vArrowUI[i - 1]->SetAllTexture(m_pInActiveArrowTexture);
 			m_vArrowUI[i - 1]->SetScale(m_vInActiveArrowScale);
-			m_vArrowUI[i - 1]->m_bRender = true;
 		}
 
 		m_vArrowUI[i]->SetAllTexture(m_pActiveArrowTexture);
 		m_vArrowUI[i]->SetScale(m_vActiveArrowScale);
-		m_vArrowUI[i]->m_bRender = true;
 	}
-
-	//// Arrow
-	//switch (m_iCurrentArrow)
-	//{
-	//case 5: 
-
-	//case 4:
-	//	m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-	//	m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
-	//	m_vArrowUI[2]->SetAllTexture(m_pInActiveArrowTexture);
-	//	m_vArrowUI[3]->SetAllTexture(m_pActiveArrowTexture);
-
-	//	m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-	//	m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
-	//	m_vArrowUI[2]->SetScale(m_vInActiveArrowScale);
-	//	m_vArrowUI[3]->SetScale(m_vActiveArrowScale);
-
-	//	m_vArrowUI[0]->m_bRender = true;
-	//	m_vArrowUI[1]->m_bRender = true;
-	//	m_vArrowUI[2]->m_bRender = true;
-	//	m_vArrowUI[3]->m_bRender = true;
-	//	break;
-
-	//case 3:
-	//	m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-	//	m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
-	//	m_vArrowUI[2]->SetAllTexture(m_pActiveArrowTexture);
-
-	//	m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-	//	m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
-	//	m_vArrowUI[2]->SetScale(m_vActiveArrowScale);
-
-	//	m_vArrowUI[0]->m_bRender = true;
-	//	m_vArrowUI[1]->m_bRender = true;
-	//	m_vArrowUI[2]->m_bRender = true;
-	//	m_vArrowUI[3]->m_bRender = false;
-	//	break;
-
-	//case 2:
-	//	m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-	//	m_vArrowUI[1]->SetAllTexture(m_pActiveArrowTexture);
-
-	//	m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-	//	m_vArrowUI[1]->SetScale(m_vActiveArrowScale);
-
-	//	m_vArrowUI[0]->m_bRender = true;
-	//	m_vArrowUI[1]->m_bRender = true;
-	//	m_vArrowUI[2]->m_bRender = false;
-	//	m_vArrowUI[3]->m_bRender = false;
-	//	break;
-
-	//case 1:
-	//	m_vArrowUI[0]->SetAllTexture(m_pActiveArrowTexture);
-
-	//	m_vArrowUI[0]->SetScale(m_vActiveArrowScale);
-
-	//	m_vArrowUI[0]->m_bRender = true;
-	//	m_vArrowUI[1]->m_bRender = false;
-	//	m_vArrowUI[2]->m_bRender = false;
-	//	m_vArrowUI[3]->m_bRender = false;
-	//	break;
-
-	//case 0:
-	//	m_vArrowUI[0]->m_bRender = false;
-	//	m_vArrowUI[1]->m_bRender = false;
-	//	m_vArrowUI[2]->m_bRender = false;
-	//	m_vArrowUI[3]->m_bRender = false;
-	//	break;
-	//}
 }
 
 void InGameUIControler::UpdateInteract()
