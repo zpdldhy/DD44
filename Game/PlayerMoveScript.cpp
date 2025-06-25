@@ -226,6 +226,14 @@ void PlayerMoveScript::Tick()
 
 				player->SetTrigger(data);
 			}
+
+			if (pObj->m_szName == L"Healer")
+			{
+				TriggerData data;
+				data.eTriggerType = ETriggerType::TT_HEALPOINT;
+				data.vPoint = pObj->GetPosition() + Vec3(2.f);	// UI 위치 보정값, 수정 가능.
+				player->SetTrigger(data);
+			}
 		}
 	}
 
