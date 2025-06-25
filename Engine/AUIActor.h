@@ -25,6 +25,8 @@ private:
 	void CreateText();
 	void UpdateText();
 
+	void UpdateShake();
+
 public:
 	void SetState(shared_ptr<UIState> _pState) { m_pState = _pState; }
 	void SetStateType(UIStateType _eStateType) { m_eStateType = _eStateType; }
@@ -35,6 +37,9 @@ public:
 	void SetActiveTexture(shared_ptr<Texture> _pTexture) { m_pActiveTexture = _pTexture; }
 	void SetSelectTexture(shared_ptr<Texture> _pTexture) { m_pSelectTexture = _pTexture; }
 	void SetAllTexture(shared_ptr<Texture> _pTexture) { m_pIdleTexture = m_pHoverTexture = m_pActiveTexture = m_pSelectTexture = _pTexture; }
+
+	// ±â´É
+	void SetShake(float _time, float _speed, float _deltaX, float _deltaY);
 
 	// 9-slice
 	void SetSliceData(const Vec4& _vSlice) { m_vSlice = _vSlice; }
@@ -70,6 +75,15 @@ protected:
 	shared_ptr<Texture> m_pHoverTexture = nullptr;
 	shared_ptr<Texture> m_pActiveTexture = nullptr;
 	shared_ptr<Texture> m_pSelectTexture = nullptr;
+
+	// Shake
+	bool m_bRunShake = false;
+	float m_fRunTime = 0.f;
+	float m_fTempTime = 0.f;
+	float m_fSpeed = 0.f;
+	float m_fDeltaX = 0.f;
+	float m_fDeltaY = 0.f;
+	Vec3 m_iPastPos = Vec3();
 
 	// Slice-9
 	vector<shared_ptr<UStaticMeshComponent>> m_vSliceMesh;

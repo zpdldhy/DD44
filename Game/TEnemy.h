@@ -20,7 +20,7 @@ private:
 	bool m_bFrustumIn = false;
 
 	// 
-	UINT stageIndex = -1;
+	int stageIndex = -1;
 
 	// 입는 데미지 연산용
 	int m_iDamaged = 1;

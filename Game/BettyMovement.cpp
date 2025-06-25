@@ -9,6 +9,7 @@
 #include "TEnemy.h"
 #include "TCharacter.h"
 #include "UStaticMeshComponent.h"
+#include "USkinnedMeshComponent.h"
 #include "UBoxComponent.h"
 #include "EnemyCollisionManager.h"
 
@@ -50,7 +51,9 @@ void BettyMovement::Init()
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(20);
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHisSoul(1000);
 
-
+	// animation 
+	auto anim = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	anim->m_fAnimPlayRate = 25.0f;
 }
 
 void BettyMovement::Tick()
