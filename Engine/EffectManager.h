@@ -31,4 +31,7 @@ private:
 public:
 	std::vector<std::shared_ptr<AEffectActor>> m_vBloodActorList;
 	std::vector<std::shared_ptr<AEffectActor>>& GetBloodList() { return m_vBloodActorList; }
+
+	std::vector<std::shared_ptr<AEffectActor>> m_vSoulActorList;
+	std::vector<std::shared_ptr<AEffectActor>>& GetSoulList() { return m_vSoulActorList; }
 };

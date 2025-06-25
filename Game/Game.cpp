@@ -519,9 +519,6 @@ void Game::CheckBloodCollision()
 	auto& bloodList = EFFECT->GetBloodList();
 	for (auto blood = bloodList.begin(); blood != bloodList.end(); )
 	{
-		if (blood->get()->GetPosition().y <= 0.f)
-			int i = 0;
-
 		if (!(*blood)->IsActive() || (*blood)->m_bDelete)
 		{
 			blood = bloodList.erase(blood);
@@ -541,5 +538,19 @@ void Game::CheckBloodCollision()
 
 		blood++;
 	}
+
+	auto& soulList = EFFECT->GetSoulList();
+	for (auto soul = soulList.begin(); soul != soulList.end(); )
+	{
+		if (!(*soul)->IsActive() || (*soul)->m_bDelete)
+		{
+			soul = soulList.erase(soul);
+			continue;
+		}
+
+		COLLITION->CheckCollision(*soul, m_pPlayer);
+		soul++;
+	}
+
 }
 

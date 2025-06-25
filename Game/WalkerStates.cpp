@@ -114,7 +114,14 @@ void WalkerDieState::Enter()
 	animInstance->m_fAnimPlayRate = 20.0f;
 	animInstance->PlayOnce(index);
 	
-	
+	Vec3 playerPos = m_pPlayer.lock()->GetPosition();
+	playerPos.y += 1.5f;
+	Vec3 soulDirection = playerPos - m_pOwner.lock()->GetPosition();
+	soulDirection.Normalize();
+	EFFECT->PlayEffect(EEffectType::Soul, m_pOwner.lock()->GetPosition(), 0, soulDirection, 1.0f, playerPos);
+
+	// »ç¿îµå
+	SOUND->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
 }
 
 void WalkerDieState::Tick()

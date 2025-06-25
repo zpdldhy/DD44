@@ -53,6 +53,7 @@ void WalkerMovement::Init()
 
 	// 
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(3);
+	dynamic_pointer_cast<WalkerDieState>(death)->SetPlayer(player);
 }
 
 void WalkerMovement::Tick()
@@ -148,10 +149,12 @@ void WalkerMovement::Tick()
 		GetOwner()->SetRotation(currentRot);
 		m_rotate = false;
 
-		Vec3 soulDirection = player.lock()->GetPosition() - GetOwner()->GetPosition(); 
+		Vec3 playerPos = player.lock()->GetPosition();
+		playerPos.y += 1.5f;
+		Vec3 soulDirection = playerPos - GetOwner()->GetPosition();
 		soulDirection.Normalize();
-		EFFECT->PlayEffect(EEffectType::Soul, GetOwner()->GetPosition(), 0, soulDirection,1.0f, player.lock()->GetPosition());
-		
+		EFFECT->PlayEffect(EEffectType::Soul, GetOwner()->GetPosition(), 0, soulDirection, 1.0f, playerPos);
+
 		ChangeState(death);
 	}
 

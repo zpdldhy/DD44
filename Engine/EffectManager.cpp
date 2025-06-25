@@ -133,6 +133,10 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
         break;
     case EEffectType::Soul:
         actor = make_shared<ASoulActor>();
+        collider->SetName(L"Soul");
+        collider->SetLocalScale(Vec3(.1f, .1f, .1f));
+        collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
+        actor->SetShapeComponent(collider);
         break;
     }
 
@@ -274,6 +278,10 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     if (type == EEffectType::Blood)
     {
         m_vBloodActorList.push_back(actor); 
+    }
+    else if (type == EEffectType::Soul)
+    {
+        m_vSoulActorList.push_back(actor);
     }
 }
 

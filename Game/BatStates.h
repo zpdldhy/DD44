@@ -47,6 +47,7 @@ class BatDieState : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
+	weak_ptr<AActor> m_pPlayer;
 public:
 	BatDieState(weak_ptr<AActor> _pOwner);
 	~BatDieState() {}
@@ -56,4 +57,6 @@ public:
 	virtual void Tick() override;
 	void ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time);
 	virtual void End() override;
+
+	void SetPlayer(const weak_ptr<AActor>& _player) { m_pPlayer = _player; }
 };

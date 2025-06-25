@@ -12,7 +12,6 @@
 void MageMovement::Init()
 {
 	SetPlayer(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer());
-
 	dynamic_pointer_cast<TEnemy>(GetOwner())->SetBloodPos(Vec2(2.0f, 3.0f));
 
 	idle = make_shared<MageIdleState>(m_pOwner);
@@ -22,9 +21,10 @@ void MageMovement::Init()
 	attack = make_shared<MageAttackState>(m_pOwner);
 	death = make_shared<MageDieState>(m_pOwner);
 	ChangeState(idle);
-
+	
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(6);
+	dynamic_pointer_cast<MageDieState>(death)->SetPlayer(player);
 }
 
 void MageMovement::Tick()
@@ -174,5 +174,6 @@ void MageMovement::CheckHit()
 	if (comp->IsDead())
 	{
 		ChangeState(death);
+		
 	}
 }

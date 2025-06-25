@@ -80,6 +80,7 @@ void BatMovement::Tick()
 			// bat Á×À½
 			GetOwner()->m_bDelete = true;
 			/*attackRangeActor->m_bDelete = true;*/
+
 		}
 		return;
 	}
