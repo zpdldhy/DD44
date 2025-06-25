@@ -9,5 +9,6 @@ enum class EEffectType
     PoppingDust,
     BloodDecal,
     Point,
+    Soul,
     Count,
 };

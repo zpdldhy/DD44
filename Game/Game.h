@@ -21,6 +21,10 @@ public:
 	bool m_bEnginCamera = false;
 	bool m_bWind = false;
 
+	float time;
+
+	int m_iSoulStorage = 0;
+
 	// UI
 	InGameUIControler m_cUI;
 
@@ -69,6 +73,7 @@ protected:
 	//blood
 	void CheckBloodCollision();
 
+	void CheckEnemyDeath(const vector<shared_ptr<AActor>>& _enemyList);
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }
 };

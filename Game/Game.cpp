@@ -25,6 +25,7 @@
 #include "AWindActor.h"
 #include "TEnemy.h"
 #include "TPlayer.h"
+#include "ASoulActor.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -35,6 +36,7 @@
 #include "EngineCameraMoveScript.h"
 #include "GameCameraMove.h"
 #include "MageMovement.h"
+#include "PlayerMoveScript.h"
 
 // Game
 #include "ProjectileManager.h"
@@ -83,7 +85,7 @@ void Game::Init()
 	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
-	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
+	m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
 	OBJECT->AddActor(m_pPlayer);
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
@@ -166,6 +168,11 @@ void Game::Init()
 void Game::Tick()
 {
 	STAGE->Tick();
+	if (STAGE->GetCurrentStage() == StagePhase::FINAL)
+	{
+		// 플레이어가 베티 보스전 입장한 거임.
+		int a = 0;
+	}
 
 	UpdateCursor();
 
@@ -190,7 +197,6 @@ void Game::Tick()
 
 		if (m_bWind)
 			CreateWind();
-
 	}
 
 	if (INPUT->GetButton(O))
@@ -211,6 +217,12 @@ void Game::Tick()
 	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
+	CheckEnemyDeath(enemyList);
+
+	if (m_pPlayer->GetPosition().y < -4.0f)
+	{
+		m_pPlayer->SetPosition(Vec3(50.0f, 40.0f, 100.0f));
+	}
 }
 
 void Game::Render()
@@ -337,30 +349,44 @@ void Game::CreateWind()
 
 void Game::UpdateUI()
 {
-	static int i = 4;
-	static int coin = 0;
+	auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer);
 
-	if (INPUT->GetButton(GameKey::P))
-		i++;		
+	m_cUI.SetMaxHP(player->GetMaxHP());
+	m_cUI.SetCurrentHP(player->GetHp());
 
-	if (INPUT->GetButtonDown(GameKey::I))
-		coin += 100;
+	m_cUI.SetMaxArrow(player->GetArrowCapacity());
+	m_cUI.SetCurrentArrow(player->GetArrowCount());
 
-	// UI가 적용해야 하는 부분
-	m_cUI.SetMaxHP(i);
-	m_cUI.SetCurrentHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHp());
-	m_cUI.SetMaxArrow(i);
-	m_cUI.SetCurrentArrow(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
-	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());	
-	m_cUI.SetCoin(coin);
-	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
+	m_cUI.SetTriggerData(player->GetTrigger());
+
+	m_cUI.SetCoin(player->GetHisSoul());
+	m_cUI.SetDead(player->IsDead());
 
 	// 가격 출력하는 부분
-	m_cUI.SetHealthPrice(200);
+	m_cUI.SetHealthPrice(player->GetNextUpgradeCost(EStatType::HP));
+	m_cUI.SetAttackPrice(player->GetNextUpgradeCost(EStatType::MeleeDamage));
+	m_cUI.SetSpeedPrice(player->GetNextUpgradeCost(EStatType::MoveSpeed));
+	m_cUI.SetArrowPrice(player->GetNextUpgradeCost(EStatType::RangedDamage));
 
-	// 업그레이드 실패시
-	if (INPUT->GetButtonDown(GameKey::U))
-		m_cUI.IsBuyUpgrade(false);
+	if (INPUT->GetButton(GameKey::SPACE))
+	{
+		switch (m_cUI.CurrentUpgrade())
+		{
+		case 1:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::HP));
+			break;
+		case 2:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::MeleeDamage));
+
+			break;
+		case 3:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::MoveSpeed));
+			break;
+		case 4:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::RangedDamage));
+			break;
+		}
+	}
 	else
 		m_cUI.IsBuyUpgrade(true);
 
@@ -371,23 +397,6 @@ void Game::UpdateUI()
 	///////////						Paused							///////////
 	///////////////////////////////////////////////////////////////////////////
 
-	// Upgrade State
-	// 0은 Default로 Upgrade 없음을 나타냄
-	switch (m_cUI.SelectUpgrade())
-	{
-	case 1: // MaxHP
-		// MaxHP++
-		break;
-
-	case 2: // Attack
-		break;
-
-	case 3: // Speed
-		break;
-
-	case 4:	// Arrow
-		break;
-	}
 
 	// 계속하기
 	if(m_cUI.SelectContinue())
@@ -410,8 +419,7 @@ void Game::UpdateUI()
 	// Dead UI 종료 시, 캐릭 살아남 등
 	if (m_cUI.EndDeadUI())
 	{
-		dynamic_pointer_cast<TPlayer>(m_pPlayer)->SetHp(4);
-		// Dead true 세팅
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
 	}
 }
 
@@ -433,7 +441,7 @@ void Game::UpdateCursor()
 	rotVec.Normalize();
 
 	// 특정 거리를 넘어가지 않도록 반지름 지정
-	float radius = 7.5f;
+	float radius = 15.f;
 	if (rotDir.Length() > radius)
 		inter = playerPos + rotVec * radius;
 
@@ -672,7 +680,17 @@ void Game::CheckEnemyCollision()
 				iter = enemyList.erase(iter);
 				continue;
 			}
-			COLLITION->CheckCollision(*iter, melee);
+			
+			if (COLLITION->CheckCollision(*iter, melee))
+			{
+				auto enemy = dynamic_pointer_cast<TEnemy>(*iter);
+				if (enemy)
+				{
+					float damage = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetMeleeDamage();
+					enemy->SetDamagedByM(damage);
+				}
+			}
+
 			iter++;
 		}
 	}
@@ -728,7 +746,16 @@ void Game::CheckEnemyCollision()
 				iter = enemyList.erase(iter);
 				continue;
 			}
-			COLLITION->CheckCollision(*proj, *iter);
+			//COLLITION->CheckCollision(*proj, *iter);
+			if (COLLITION->CheckCollision(*proj, *iter))
+			{
+				auto enemy = dynamic_pointer_cast<TEnemy>(*iter);
+				if (enemy)
+				{
+					float damage = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetRangedDamage();
+					enemy->SetDamagedByP(damage);
+				}
+			}
 			iter++;
 		}
 
@@ -745,9 +772,6 @@ void Game::CheckBloodCollision()
 	auto& bloodList = EFFECT->GetBloodList();
 	for (auto blood = bloodList.begin(); blood != bloodList.end(); )
 	{
-		if (blood->get()->GetPosition().y <= 0.f)
-			int i = 0;
-
 		if (!(*blood)->IsActive() || (*blood)->m_bDelete)
 		{
 			blood = bloodList.erase(blood);
@@ -766,6 +790,50 @@ void Game::CheckBloodCollision()
 		}
 
 		blood++;
+	}
+
+	auto& soulList = EFFECT->GetSoulList();
+	for (auto soul = soulList.begin(); soul != soulList.end(); )
+	{
+		if (!(*soul)->IsActive() || (*soul)->m_bDelete)
+		{
+			soul = soulList.erase(soul);
+			continue;
+		}
+
+		if (auto pSoul = dynamic_pointer_cast<ASoulActor>(*soul))
+		{
+			Vec3 playerPos = m_pPlayer->GetPosition();
+			playerPos.y += 1.5f;
+			pSoul->SetTarget(playerPos);
+		}
+
+		if (COLLITION->CheckCollision(*soul, m_pPlayer))
+		{
+			//CheckEnemyDeath(enemyList);
+			dynamic_pointer_cast<TPlayer>(m_pPlayer)->AddSoul(m_iSoulStorage);
+			m_iSoulStorage = 0;
+		}
+		soul++;
+	}
+
+}
+
+void Game::CheckEnemyDeath(const vector<shared_ptr<AActor>>& _enemyList)
+{
+	for (const auto& actor : _enemyList)
+	{
+		if (!actor) continue;
+
+		TCharacter* enemy = dynamic_cast<TCharacter*>(actor.get());
+		if (enemy && enemy->IsDead())
+		{
+			if (auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer))
+			{
+				//player->AddSoul(enemy->GetHisSoul());
+				m_iSoulStorage += enemy->GetHisSoul();
+			}
+		}
 	}
 }
 

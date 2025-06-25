@@ -386,8 +386,12 @@ void InGameUIControler::UpdateHP()
 		{
 			m_vHPUI[i - 1]->SetColor(Color(0.055f, 0.247f, -0.324, -0.5f));
 		}
-		m_vHPUI[i]->SetAllTexture(m_pActiveHPTexture);
-		m_vHPUI[i]->SetColor(Color(0.055f, 0.247f, -0.324, 0.0f));
+
+		if (i < 9) 
+		{
+			m_vHPUI[i]->SetAllTexture(m_pActiveHPTexture);
+			m_vHPUI[i]->SetColor(Color(0.055f, 0.247f, -0.324, 0.0f));
+		}
 	}
 
 	// 피가 바뀌는 로직
@@ -439,8 +443,11 @@ void InGameUIControler::UpdateArrow()
 			m_vArrowUI[i - 1]->SetScale(m_vInActiveArrowScale);
 		}
 
-		m_vArrowUI[i]->SetAllTexture(m_pActiveArrowTexture);
-		m_vArrowUI[i]->SetScale(m_vActiveArrowScale);
+		if (i < 9)
+		{
+			m_vArrowUI[i]->SetAllTexture(m_pActiveArrowTexture);
+			m_vArrowUI[i]->SetScale(m_vActiveArrowScale);
+		}
 	}
 }
 
@@ -555,6 +562,8 @@ void InGameUIControler::UpdatePaused()
 			if (iSelectUpgrade > 3)
 				iSelectUpgrade = 3;
 
+			m_iCurrentUpgrade = iSelectUpgrade + 1;
+
 			for (auto& pUI : m_vUpgradeBackGround)
 			{
 				pUI->m_bRun = true;
@@ -668,7 +677,6 @@ void InGameUIControler::UpdatePaused()
 
 			if (INPUT->GetButton(GameKey::SPACE)&& m_iBuyUpgrade == true)
 			{
-				m_iSelectUpgrade = iSelectUpgrade + 1;
 				if (iSelectUpgrade == 0 && iHealthPoint < 5)
 				{
 					m_vUpgradeState[iSelectUpgrade][iHealthPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
@@ -693,8 +701,6 @@ void InGameUIControler::UpdatePaused()
 			// 못하면 흔들리는 연출
 			else if (m_iBuyUpgrade == false)
 			{
-				m_iSelectUpgrade = 0;
-
 				for (auto& pUI : m_vUpgradeExplain)
 				{
 					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
@@ -717,8 +723,6 @@ void InGameUIControler::UpdatePaused()
 					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
 				}
 			}
-			else
-				m_iSelectUpgrade = 0;
 
 			if (iHealthPoint > 5)
 				iHealthPoint = 5;
@@ -849,6 +853,7 @@ void InGameUIControler::UpdatePaused()
 		}
 
 		iSelectUpgrade = 0;
+		m_iCurrentUpgrade = 0;
 	}
 }
 
@@ -915,7 +920,7 @@ void InGameUIControler::UpdateDead()
 				}
 
 				// continue에서 enter 또는 UI선택시
-				if (INPUT->GetButton(GameKey::ENTER) ||
+				if (INPUT->GetButton(GameKey::SPACE) ||
 					m_vDeadUI[1]->GetStateType() == UIStateType::ST_SELECT)
 				{
 					m_bDeadContinue = true;
