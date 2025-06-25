@@ -18,7 +18,7 @@ private:
 	vector<shared_ptr<AActor>> triggerList;
 
 	// Phase
-	StagePhase currentPhase = StagePhase::STAGE00;
+	StagePhase currentPhase = StagePhase::STAGE10;
 
 public:
 	void AddEnemyInStage(UINT _stageId, shared_ptr<AActor> _actor);

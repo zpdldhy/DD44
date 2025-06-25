@@ -80,7 +80,7 @@ void Game::Init()
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
-	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
+	m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
 	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
@@ -99,8 +99,6 @@ void Game::Init()
 
 	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty.character.json");
 	enemyList.emplace_back(m_pBetty);
-	//tempHeadRoller = PToA->MakeCharacter("../Resources/Prefab/Player/HeadRoller1.character.json");
-	//enemyList.emplace_back(tempHeadRoller);
 
 	auto enemy00 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage00/");
 	auto enemy01 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
@@ -161,6 +159,8 @@ void Game::Init()
 	OBJECT->SetCursorActor(m_pCursor);
 
 	UI->DoFadeOut();
+
+
 }
 
 void Game::Tick()
@@ -546,11 +546,11 @@ void Game::CheckEnemyCollision()
 			proj++;
 		}
 
-		for (auto enemy = collisionEnemy1.begin(); enemy != collisionEnemy1.end(); )
+		for (auto enemy1 = collisionEnemy1.begin(); enemy1 != collisionEnemy1.end(); )
 		{
-			if ((enemy->get() == nullptr) || enemy->get()->m_bDelete == true)
+			if ((enemy1->get() == nullptr) || enemy1->get()->m_bDelete == true)
 			{
-				enemy = collisionEnemy1.erase(enemy);
+				enemy1 = collisionEnemy1.erase(enemy1);
 				continue;
 			}
 
@@ -561,10 +561,19 @@ void Game::CheckEnemyCollision()
 					obj = stage1.erase(obj);
 					continue;
 				}
-				COLLITION->CheckCollision(*enemy, *obj);
+				COLLITION->CheckCollision(*enemy1, *obj);
 				obj++;
 			}
-			enemy++;
+
+			for (auto it2 = std::next(enemy1); it2 != collisionEnemy1.end(); ++it2)
+			{
+				if ((*it2 == nullptr) || (*it2)->m_bDelete)
+					continue;
+
+				COLLITION->CheckCollision(*enemy1, *it2);
+			}
+
+			enemy1++;
 		}
 		break;	
 	case StagePhase::STAGE20:

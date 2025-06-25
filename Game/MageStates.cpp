@@ -8,6 +8,11 @@
 #include "ProjectileManager.h"
 #include "EffectManager.h"
 
+#include "UBoxComponent.h"
+#include "ObjectManager.h"
+
+#include "TEnemy.h"
+
 // TEMP
 #include "Input.h"
 
@@ -44,7 +49,7 @@ void MageIdleState::End()
 	m_bOnPlaying = false;
 }
 
-MageAppearState::MageAppearState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_IDLE)
+MageAppearState::MageAppearState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_APPEAR)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -58,16 +63,18 @@ void MageAppearState::Enter()
 	int idleIndex = animInstance->GetAnimIndex(L"Teleport_in");
 	animInstance->PlayOnce(idleIndex);
 
-	//targetYaw = targetYaw = atan2f(dir.x, dir.z);
-	//Vec3 currentRot = m_pOwner.lock()->GetRotation();
-	//currentRot.y = targetYaw;
-	//m_pOwner.lock()->SetRotation(currentRot);
-
 	m_pOwner.lock()->m_bCollision = true;
 	SetMeshVisible();
 }
 void MageAppearState::Tick()
 {
+	// Scale
+	Vec3 scale = m_pOwner.lock()->GetScale();
+	scale += increment;
+	scale = V_Clamp(scale, minV, maxV);
+
+	m_pOwner.lock()->SetScale(scale);
+
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	if (!animInstance->m_bOnPlayOnce)
 	{
@@ -75,13 +82,6 @@ void MageAppearState::Tick()
 		m_pOwner.lock()->SetScale(Vec3(1.0f, 1.0f, 1.0f));
 		End();
 	}
-
-	// Scale
-	Vec3 scale = m_pOwner.lock()->GetScale();
-	scale += increment;
-	scale = V_Clamp(scale, minV, maxV);
-
-	m_pOwner.lock()->SetScale(scale);
 
 }
 void MageAppearState::End()
@@ -93,7 +93,6 @@ void MageAppearState::SetDirection(Vec3 _targetPos)
 {
 	dir = _targetPos - m_pOwner.lock()->GetPosition();
 }
-
 void MageAppearState::SetMeshVisible()
 {
 	//auto body = m_pOwner.lock()->GetMeshComponent();
@@ -107,7 +106,7 @@ void MageAppearState::SetMeshVisible()
 	m_pOwner.lock()->SetScale(Vec3(0.5f, 0.5f, 0.5f));
 }
 
-MageDisappearState::MageDisappearState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_IDLE)
+MageDisappearState::MageDisappearState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_DISAPPEAR)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -154,7 +153,6 @@ void MageDisappearState::End()
 	// 기본 state 세팅
 	m_bOnPlaying = false;
 }
-
 void MageDisappearState::SetAllMeshInvisible(const shared_ptr<UMeshComponent>& _mesh)
 {
 	//_mesh->SetVisible(false);
@@ -183,13 +181,14 @@ void MageHitState::Enter()
 }
 void MageHitState::Tick()
 {
-	runElapsed += TIMER->GetDeltaTime();
+	auto dt = TIMER->GetDeltaTime();
+	runElapsed += dt;
 	if (bMove && !bStaticMage)
 	{
 		// 이동
-		Vec3 pos = dir * Vec3(0.1f, 0.0f, 0.1f);
+		Vec3 pos = dir * Vec3(1.0f, 0.0f, 1.0f) * 7.0f * dt;
 		m_pOwner.lock()->AddPosition(pos);
-		if (runElapsed > 1.3f)
+		if (runElapsed > 1.0f)
 		{
 			bMove = false;
 			runElapsed = 0.0f;
@@ -199,20 +198,9 @@ void MageHitState::Tick()
 	else
 	{
 		// 회전 
-		rotateElapsed += TIMER->GetDeltaTime();
+		rotateElapsed += dt;
 
-		if (rotateElapsed < 0.4f)
-		{
-			//Vec3 currentRot = m_pOwner.lock()->GetRotation();
-			//float currentYaw = currentRot.y;
-			//float angleDiff = targetYaw - currentYaw;
-			//while (angleDiff > DD_PI)  angleDiff -= DD_PI * 2;
-			//while (angleDiff < -DD_PI) angleDiff += DD_PI * 2;
-			//float smoothedYaw = currentRot.y + angleDiff * 8.0f * TIMER->GetDeltaTime();
-			//currentRot.y = smoothedYaw;
-			//m_pOwner.lock()->SetRotation(currentRot);
-		}
-		else
+		if (rotateElapsed > 1.0f)
 		{
 			rotateElapsed = 0.0f;
 			bMove = true;
@@ -234,7 +222,7 @@ void MageHitState::SetDirection(Vec3 _playerPos)
 MageAttackState::MageAttackState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_ATTACK)
 {
 	m_pOwner = _pOwner;
-	m_bCanInterrupt = false;
+	m_bCanInterrupt = true;
 
 	attack = make_shared<MageAttackStart>(m_pOwner.lock());
 	runaway = make_shared<MageRunaway>(m_pOwner.lock());
@@ -263,6 +251,7 @@ void MageAttackState::Tick()
 		{
 			if (!bStaticMage)
 			{
+				// 충돌 확인
 				runaway->SetDirection(m_pTarget.lock()->GetPosition());
 				runaway->Enter();
 				currentPhase = AttackPhase::Runaway;
@@ -274,7 +263,6 @@ void MageAttackState::Tick()
 				int idleIndex = animInstance->GetAnimIndex(L"Idle2");
 				animInstance->SetCurrentAnimTrack(idleIndex);
 				currentPhase = AttackPhase::StandStill;
-
 			}
 		}
 		break;
@@ -290,6 +278,10 @@ void MageAttackState::Tick()
 	}
 	break;
 	case AttackPhase::Runaway:
+		if (CheckCollision())
+		{
+			runaway->SetDirection(dir);
+		}
 		runaway->Tick();
 		if (!runaway->IsPlaying())
 		{
@@ -302,9 +294,44 @@ void MageAttackState::Tick()
 		if (!disappear->IsPlaying())
 		{
 			currentPhase = AttackPhase::Wait;
-			m_pOwner.lock()->m_bCollision = false;
-			m_pOwner.lock()->GetShapeComponent()->m_bVisible = false;
+			m_pOwner.lock()->m_bCollision = true;
+			dynamic_pointer_cast<TEnemy>(m_pOwner.lock())->SetHitEnable(false);
 
+			// 스폰 위치 미리 잡기
+			// 충돌 검사는 Wait Phase에서
+			// 여기서 min / max 검사
+			Vec3 oppositLook = m_pOwner.lock()->GetPosition() - m_pTarget.lock()->GetPosition();
+			Vec3 offset = {15.0f, 0.0f, 15.0f};
+			oppositLook.y = 0.0f;
+			oppositLook.Normalize();
+			destination = m_pTarget.lock()->GetPosition() + oppositLook * offset;
+
+			// 단순
+			minPos.y = destination.y;
+			maxPos.y = destination.y;
+
+			destination = V_Clamp(destination, minPos, maxPos);
+
+			//// 뭔가 더 처리
+			//if (destination.x < minPos.x)
+			//{
+			//	offset * Vec3();
+			//}
+			//else if (destination.x > maxPos.x)
+			//{
+
+			//}
+
+			//if (destination.z < minPos.y)
+			//{
+
+			//}
+			//else if (destination.z > maxPos.y)
+			//{
+
+			//}
+
+			m_pOwner.lock()->SetPosition(destination);
 		}
 		break;
 	case AttackPhase::Wait:
@@ -312,18 +339,14 @@ void MageAttackState::Tick()
 		disElapsed += TIMER->GetDeltaTime();
 		if (disElapsed > 2.0f)
 		{
-			// 변경 필요 
-			// 위치 특정한 지점 미리 잡아놓고 거기서만 이동하도록
-			Vec3 oppositLook = m_pOwner.lock()->GetPosition() - m_pTarget.lock()->GetPosition();
-			oppositLook.y = 0.0f;
-			oppositLook.Normalize();
-			destination = m_pTarget.lock()->GetPosition() + oppositLook * Vec3(15.0f, 0.0f, 15.0f);
-			m_pOwner.lock()->SetPosition(destination);
-			currentPhase = AttackPhase::Appear;
-			dir = m_pTarget.lock()->GetPosition() - m_pOwner.lock()->GetPosition();
-			appear->SetDirection(dir);
-			appear->Enter();
-			disElapsed = 0.0f;
+			if (SetAppearPoint())
+			{
+				appear->SetDirection(dir);
+				appear->Enter();
+				disElapsed = 0.0f;
+				dynamic_pointer_cast<TEnemy>(m_pOwner.lock())->SetHitEnable(true);
+				currentPhase = AttackPhase::Appear;
+			}
 		}
 		break;
 	case AttackPhase::Appear:
@@ -331,7 +354,7 @@ void MageAttackState::Tick()
 		if (!appear->IsPlaying())
 		{
 			currentPhase = AttackPhase::Done;
-		}
+		}  
 		break;
 	case AttackPhase::Done:
 		End();
@@ -360,6 +383,40 @@ void MageAttackState::SetDirection()
 	dir = playerPos - m_pOwner.lock()->GetPosition();
 	dir.y = y;
 	dir.Normalize();
+}
+
+bool MageAttackState::CheckCollision()
+{
+	for (const auto& colData : m_pOwner.lock()->m_vCollisionList)
+	{
+		auto actor = OBJECT->GetActor(colData.first);
+		if (actor->m_szName == L"MyCharacter" || actor->m_szName == L"MageSphere")
+		{
+			continue;
+		}
+
+		// 방향 바꾸기
+		dir = dir - 2 * dir.Dot(actor->GetLook()) * actor->GetLook();
+		dir.Normalize();
+		return true;
+	}
+	return false;
+}
+
+bool MageAttackState::SetAppearPoint()
+{
+	if (CheckCollision())
+	{
+		m_pOwner.lock()->AddPosition(dir * 3.0f);
+		dir = m_pTarget.lock()->GetPosition() - m_pOwner.lock()->GetPosition();
+		dynamic_pointer_cast<TEnemy>(m_pOwner.lock())->SetHitEnable(true);
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+
 }
 
 #pragma region Attack-sub-state
@@ -443,7 +500,7 @@ void MageAttackStart::SetDirection()
 	dir.Normalize();
 }
 
-MageRunaway::MageRunaway(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_ATTACK)
+MageRunaway::MageRunaway(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_WALK)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -459,21 +516,21 @@ void MageRunaway::Enter()
 }
 void MageRunaway::Tick()
 {
+	auto dt = TIMER->GetDeltaTime();
 	auto hand = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"RightHandSocket");
 	Vec3 pos = hand->GetWorldPosition();
 	//EFFECT->PlayDustBurst(pos, 10.f, .1f);
 	EFFECT->PlayEffect(EEffectType::Dust, pos, 0, Vec3(0.0f, 0.0f, 0.0f), 2.0f);
 
-	elapsed += TIMER->GetDeltaTime();
+	elapsed += dt;
 	if (elapsed > 1.5f)
 	{
 		elapsed = 0.0f;
 		End();
 	}
 
-	// 돌면서 이동
 	dir.Normalize();
-	m_pOwner.lock()->AddPosition(dir * 0.1f);
+	m_pOwner.lock()->AddPosition(dir * 3.0f * dt);
 
 }
 void MageRunaway::End()
@@ -487,13 +544,11 @@ void MageRunaway::SetDirection(Vec3 _targetPos)
 }
 #pragma endregion
 
-
 MageDieState::MageDieState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_DEATH)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
 }
-
 void MageDieState::Enter()
 {
 	// 기본 state 세팅
@@ -503,7 +558,6 @@ void MageDieState::Enter()
 	int index = animInstance->GetAnimIndex(L"Death");
 	animInstance->PlayOnce(index);
 }
-
 void MageDieState::Tick()
 {
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
@@ -520,7 +574,6 @@ void MageDieState::Tick()
 	auto comp = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>();
 	ApplyDissolveToAllMaterials(comp, t);
 }
-
 void MageDieState::ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time)
 {
 	if (!_comp) return;
@@ -536,7 +589,6 @@ void MageDieState::ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> 
 		ApplyDissolveToAllMaterials(_comp->GetChild(i), _time);
 	}
 }
-
 void MageDieState::End()
 {
 	// 기본 state 세팅

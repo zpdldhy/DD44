@@ -31,6 +31,8 @@ void TEnemy::Destroy()
 
 bool TEnemy::CheckHit()
 {
+	if(!checkCollision) { return false; }
+
 	hitElapsed += TIMER->GetDeltaTime();
 	// 충돌 확인
 	if (hitElapsed > 1.0f)

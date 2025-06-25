@@ -2,10 +2,13 @@
 #include "TCharacter.h"
 class TEnemy : public TCharacter
 {
+public:
+	virtual ~TEnemy() = default;
 private:
 	//
 	weak_ptr<AActor> player;
 	// 
+	// mage 이동 처리를 위한 변수 추가
 	float hitElapsed = 0.0f;
 	float hitOffset = 1.0f;
 	// FX
@@ -15,6 +18,7 @@ private:
 	Vec3 velocity;
 	bool m_bCrashSet = false;
 	Vec2 m_bloodRange;
+	bool checkCollision = true;
 
 	// Frustum 내부에 들어왔을 때 충돌 연산
 	bool m_bFrustumIn = false;
@@ -28,6 +32,7 @@ public:
 	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
 	const weak_ptr<AActor>& GetPlayer() { return player; }
 
+	void SetHitEnable(bool _b) { checkCollision = _b; }
 	bool CheckHit();
 	virtual void CheckHitByProjectile(int type, bool _hit);
 public:
