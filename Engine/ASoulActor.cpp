@@ -40,6 +40,7 @@ void ASoulActor::Tick()
 
 	toTarget.Normalize();
 	float speed = 5.f;
+	speed += 1
 	m_vVelocity = toTarget * speed;
 
 	AEffectActor::Tick();

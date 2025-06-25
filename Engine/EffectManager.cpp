@@ -268,7 +268,7 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
         {
             pSoul->SetTarget(targetPos);
         }
-        duration = 30.f;
+        duration = 10.f;
         break;
     default:                      duration = 1.0f; break;
     }
@@ -354,9 +354,10 @@ void EffectManager::PlayInit()
     for (int i = 0; i < 10; ++i)
     {
         PlayEffect(EEffectType::BloodDecal, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
+        PlayEffect(EEffectType::Soul, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
     }
 
 	PlayEffect(EEffectType::Dust, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
 	PlayEffect(EEffectType::Point, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
-    PlayEffect(EEffectType::Soul, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
+
 }
