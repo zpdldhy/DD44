@@ -69,6 +69,7 @@ class InGameUIControler : public UIControler
 	// Interact
 	vector<shared_ptr<class AUIActor>> m_vInterActionUI;
 	struct TriggerData m_tTrigger;
+	bool m_bHeal = false;
 
 	////////////
 	// Paused //
@@ -150,6 +151,7 @@ public:
 	bool SelectExit() { return m_bExit; }
 	bool SelectDeadContinue() { return m_bDeadContinue; }
 	bool EndDeadUI() { return m_bDeadUIEnd; }
+	bool IsHealAction() { return m_bHeal; }
 
 	void PopUpBettyName();
 	void PopDownBettyName();
