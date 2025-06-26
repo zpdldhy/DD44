@@ -204,7 +204,8 @@ class PlayerHitState : public PlayerBaseState
 private:
 	weak_ptr<AActor> m_pOwner;
 	bool m_bPlayNext = true;
-
+	Vec3 hitDir;
+	Vec3 hitPos;
 public:
 	PlayerHitState(weak_ptr<AActor> _pOwner);
 	~PlayerHitState() {}

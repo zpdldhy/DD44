@@ -102,11 +102,9 @@ void PlayerMoveScript::Tick()
 	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
 	auto playerPos = player->GetPosition();
 
-
 	// 모든 state 공통
 	PlayFX();
 	CheckCoolTIme();
-
 
 	currentState->Tick();
 	bool currentStateEnd = !currentState->IsPlaying();
@@ -121,6 +119,7 @@ void PlayerMoveScript::Tick()
 			return;
 		}
 	}
+
 	// state별 추가 처리
 	switch (currentStateId)
 	{

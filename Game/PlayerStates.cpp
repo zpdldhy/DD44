@@ -321,9 +321,12 @@ void PlayerHitState::Enter()
 	//Sound
 	SOUND->GetPtr(ESoundType::Hit)->PlayEffect2D();
 
+	hitPos = m_pOwner.lock()->GetPosition();
 }
 void PlayerHitState::Tick()
 {
+	// 밀려나지 않게 고정시켜버림
+	m_pOwner.lock()->SetPosition(hitPos);
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	if (!animInstance->m_bOnPlayOnce)
 	{
@@ -343,6 +346,8 @@ void PlayerHitState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+
+	//m_pOwner.lock()->GetShapeComponent()->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 }
 
 PlayerDieState::PlayerDieState(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_DEATH)
