@@ -347,10 +347,11 @@ void HeadRollerDieState::Tick()
 		animInstance->m_bPlay = false;
 		currentPhase = STAYSTILL;
 		End();
+		return;
 	}
 
 	float frameTime = animInstance->GetTotalFrame();
-	frameTime /= 30;
+	frameTime /= 25;
 	m_fDissolveTimer += TIMER->GetDeltaTime();
 	float t = m_fDissolveTimer / frameTime;
 	auto comp = m_pOwner.lock()->GetMeshComponent();

@@ -579,7 +579,7 @@ void MageDieState::Tick()
 	}
 
 	float frameTime = animInstance->GetTotalFrame();
-	frameTime /= 30;
+	frameTime /= 20;
 	m_fDissolveTimer += TIMER->GetDeltaTime();
 	float t = m_fDissolveTimer / frameTime;
 	auto comp = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>();
