@@ -192,6 +192,9 @@
     <ClInclude Include="MovieControler.h">
       <Filter>Controler</Filter>
     </ClInclude>
+    <ClInclude Include="HealerScript.h">
+      <Filter>Script\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -319,6 +322,9 @@
     </ClCompile>
     <ClCompile Include="MovieControler.cpp">
       <Filter>Controler</Filter>
+    </ClCompile>
+    <ClCompile Include="HealerScript.cpp">
+      <Filter>Script\Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

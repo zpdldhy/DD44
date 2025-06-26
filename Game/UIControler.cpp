@@ -15,6 +15,7 @@
 
 // Other
 #include "Text.h"
+#include "Sound.h"
 
 void IntroUIControler::init()
 {
@@ -717,6 +718,8 @@ void InGameUIControler::UpdatePaused()
 					m_vUpgradeState[iSelectUpgrade][iArrowPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
 					iArrowPoint++;
 				}
+
+				SOUND->GetPtr(ESoundType::Allow)->PlayEffect2D();
 			}
 			// 못하면 흔들리는 연출
 			else if (m_iBuyUpgrade == false)
@@ -742,6 +745,8 @@ void InGameUIControler::UpdatePaused()
 				{
 					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
 				}
+
+				SOUND->GetPtr(ESoundType::Deny)->PlayEffect2D();
 			}
 
 			if (iHealthPoint > 5)
@@ -977,6 +982,9 @@ void InGameUIControler::UpdateDead()
 			m_vCoins[1]->m_bRender = false;
 			m_vCoins[3]->m_bRender = false;
 		}
+
+		SOUND->GetPtr(ESoundType::Stage0)->Stop();
+		SOUND->GetPtr(ESoundType::CrowDead)->Play2D(false);
 	}
 	else
 	{

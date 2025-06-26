@@ -85,7 +85,7 @@ void Game::Init()
 	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
-	m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
+	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
 	OBJECT->AddActor(m_pPlayer);
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
@@ -244,6 +244,7 @@ void Game::Tick()
 
 	if (m_pPlayer->GetPosition().y < -4.0f)
 	{
+		dynamic_pointer_cast<TPlayer>(m_pPlayer)->TakeDamage(1);
 		m_pPlayer->SetPosition(Vec3(50.0f, 40.0f, 100.0f));
 	}
 }
@@ -420,6 +421,9 @@ void Game::UpdateUI()
 	if (m_cUI.IsHealAction())
 	{
 		player->SetHp(player->GetMaxHP());
+
+		// »ç¿îµå
+		SOUND->GetPtr(ESoundType::Healing)->PlayEffect2D();
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -448,6 +452,7 @@ void Game::UpdateUI()
 	if (m_cUI.EndDeadUI())
 	{
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
+		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
 	}
 }
 
@@ -880,6 +885,7 @@ void Game::CheckBloodCollision()
 		{
 			//CheckEnemyDeath(enemyList);
 			dynamic_pointer_cast<TPlayer>(m_pPlayer)->AddSoul(m_iSoulStorage);
+			SOUND->GetPtr(ESoundType::GetSoul)->PlayEffect2D();
 			m_iSoulStorage = 0;
 		}
 		soul++;

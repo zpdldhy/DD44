@@ -253,6 +253,8 @@ void MageAttackState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	originSpped = animInstance->m_fAnimPlayRate;
 	//animInstance->m_fAnimPlayRate = 25.0f;
+
+	SOUND->GetPtr(ESoundType::Attack_Mage)->PlayEffect2D();
 }
 void MageAttackState::Tick()
 {

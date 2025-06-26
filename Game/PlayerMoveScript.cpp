@@ -227,7 +227,7 @@ void PlayerMoveScript::Tick()
 				player->SetTrigger(data);
 			}
 
-			if (pObj->m_szName == L"Healer")
+			if (pObj->GetShapeComponent()->GetName() == L"Healer")
 			{
 				TriggerData data;
 				data.eTriggerType = ETriggerType::TT_HEALPOINT;
