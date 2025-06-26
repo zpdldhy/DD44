@@ -48,11 +48,12 @@ void LadderScript::Tick()
 				activeChildNum = 0;
 				m_bAppear = false;
 
-				SOUND->GetPtr(ESoundType::Close_Fence)->PlayEffect2D();
 				return;
 			}
 			children[activeChildNum--]->SetVisible(true);
 		}
+
+		SOUND->GetPtr(ESoundType::Close_Fence)->Play2D(false);
 	}
 }
 
