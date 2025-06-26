@@ -15,6 +15,7 @@
 
 // Other
 #include "Text.h"
+#include "Sound.h"
 
 void IntroUIControler::init()
 {
@@ -177,8 +178,11 @@ void IntroUIControler::Destroy()
 
 void InGameUIControler::init()
 {
+	m_pActiveHPTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_hp_active 1.png");
+	m_pEmptyHPTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_hp_empty 1.png");
 	m_pActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_active.png");
 	m_pInActiveArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_inactive.png");
+	m_pEmptyArrowTexture = TEXTURE->Get(L"../Resources/Texture/UI/hud_energy_empty.png");
 	m_pUpgradeDoneTexture = TEXTURE->Get(L"../Resources/Texture/UI/upgrade_slot_glow-1.png");
 
 	// InGame UI	
@@ -201,6 +205,13 @@ void InGameUIControler::init()
 	m_vHPUI[6]->m_bRender = false;
 	m_vHPUI[7]->m_bRender = false;
 	m_vHPUI[8]->m_bRender = false;
+
+	// Arrow 초기값
+	m_vArrowUI[4]->m_bRender = false;
+	m_vArrowUI[5]->m_bRender = false;
+	m_vArrowUI[6]->m_bRender = false;
+	m_vArrowUI[7]->m_bRender = false;
+	m_vArrowUI[8]->m_bRender = false;
 	
 	m_vActiveArrowScale = m_vArrowUI[3]->GetScale();
 	m_vInActiveArrowScale = m_vArrowUI[2]->GetScale();
@@ -291,10 +302,26 @@ void InGameUIControler::init()
 	{
 		pUI->m_bRender = false;
 	}
+
+	// Sinema
+	m_pBettyName = PToA->MakeUI("../Resources/Prefab/UI_Movie_Betty.ui.json");
+	UI->AddUI(m_pBettyName);
+	m_pBettyName->m_bRun = false;
+	m_pBettyName->m_bRender = false;
+
+	m_pEnding = PToA->MakeUI("../Resources/Prefab/UI_Ending.ui.json");
 }
 
 void InGameUIControler::Tick()
 {
+	UpdateEnding();
+
+	if (m_bNoRender)	
+		return;	
+
+	for (auto& pUI : m_vMainBackGround)
+		pUI->m_bRender = true;
+
 	FrameReset();
 	UpdateHP();
 	UpdateArrow();
@@ -321,6 +348,7 @@ void InGameUIControler::Destroy()
 	m_vSystemSelection.clear();
 
 	m_vDeadUI.clear();
+	m_pBettyName = nullptr;
 }
 
 void InGameUIControler::FrameReset()
@@ -346,7 +374,9 @@ void InGameUIControler::UpdateHP()
 	float pos = HPBackPos.x + static_cast<float>(n) * (HPBarSize / 2.f);
 
 	m_pHPBackGround->SetScale(Vec3(scale, HPBackSize.y, HPBackSize.z));
-	m_pHPBackGround->SetPosition(Vec3(pos, HPBackPos.y, HPBackPos.z));
+	m_pHPBackGround->SetPosition(Vec3(pos, HPBackPos.y, HPBackPos.z));	
+
+	m_pHPBackGround->m_bRender = true;
 
 	// Slice
 	if (n == 1)
@@ -360,165 +390,87 @@ void InGameUIControler::UpdateHP()
 	else if (n == 5)
 		m_pHPBackGround->SetSliceData(Vec4(0.075f, 0.075f, 0.5f, 0.5f));
 
-	m_vHPUI[m_iMaxHP - 1]->m_bRun = true;
-	m_vHPUI[m_iMaxHP - 1]->m_bRender = true;
-
-
 	// 현재 HP에 대한 로직
-	static Color FullHPColor = Color(0.055f, 0.247f, -0.324, 0.0f);
-	static Color RestColor = Color(0.055f, 0.247f, -0.324, -0.5f);
-
-	static float currentTime = 0.0f;
-	currentTime = TIMER->GetDeltaTime();
-
-	if (m_iCurrentHP != m_iPreHP)
-		m_bHPUIChange = true;
-
-	switch (m_iCurrentHP)
+	for (int i = 0; i < m_iMaxHP; i++)
 	{
-	case 4:
-	{
-		m_vHPUI[0]->SetColor(RestColor);
-		m_vHPUI[1]->SetColor(RestColor);
-		m_vHPUI[2]->SetColor(RestColor);
-		m_vHPUI[3]->SetColor(FullHPColor);
+		m_vHPUI[i]->SetAllTexture(m_pEmptyHPTexture);
+		m_vHPUI[i]->SetColor(Color(0.f, 0.f, 0.f, 0.f));
+		m_vHPUI[i]->m_bRender = true;
 	}
-	break;
 
-	case 3:
+	for (int i = 0; i < m_iCurrentHP; i++)
 	{
-		if (m_vHPUI[2]->GetColor().w < 0.f && m_bHPUIChange)
+		if (i > 0)
 		{
-			m_vHPUI[3]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[2]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+			m_vHPUI[i - 1]->SetColor(Color(0.055f, 0.247f, -0.324, -0.5f));
 		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
+
+		if (i < 9) 
 		{
-			m_vHPUI[0]->SetColor(RestColor);
-			m_vHPUI[1]->SetColor(RestColor);
-			m_vHPUI[2]->SetColor(FullHPColor);
+			m_vHPUI[i]->SetAllTexture(m_pActiveHPTexture);
+			m_vHPUI[i]->SetColor(Color(0.055f, 0.247f, -0.324, 0.0f));
 		}
 	}
-	break;
 
-	case 2:
-	{
-		if (m_vHPUI[1]->GetColor().w < 0.f && m_bHPUIChange)
-		{
-			m_vHPUI[2]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-		{
-			m_vHPUI[0]->SetColor(RestColor);
-			m_vHPUI[1]->SetColor(FullHPColor);
-		}
-	}
-	break;
+	// 피가 바뀌는 로직
+	//static float currentTime = 0.0f;
+	//currentTime = TIMER->GetDeltaTime();
 
-	case 1:
-	{
-		if (m_vHPUI[0]->GetColor().w < 0.f && m_bHPUIChange)
-		{
-			m_vHPUI[1]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-			m_vHPUI[0]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
-		}
-		else if (m_bHPUIChange == true)
-			m_bHPUIChange = false;
-		else
-			m_vHPUI[0]->SetColor(FullHPColor);
+	//if (m_iCurrentHP != m_iPreHP)
+	//	m_bHPUIChange = true;
 
-	}
-	break;
+	//if (m_iCurrentHP > 0 &&
+	//	m_vHPUI[m_iCurrentHP]->GetColor().w < 0.f &&
+	//	m_bHPUIChange)
+	//{
+	//	m_vHPUI[m_iCurrentHP - 1]->AddColor(Color(0.f, 0.f, 0.f, currentTime / 2));
+	//}
+	//else if (m_bHPUIChange)
+	//{
+	//	m_bHPUIChange = false;
+	//	currentTime = 0.f;
+	//}
+	//else if (m_iCurrentHP > 0)
+	//	m_vHPUI[m_iCurrentHP - 1]->SetColor(FullHPColor);
 
-	case 0:
-	{
-		m_vHPUI[0]->SetColor(Color(0.f, 0.f, 0.f, -1.f));
-	}
-	break;
-	}
-
-	m_iPreHP = m_iCurrentHP;
+	//m_iPreHP = m_iCurrentHP;
 }
 
 void InGameUIControler::UpdateArrow()
 {
-	// Arrow
-	switch (m_iArrowCount)
+	if (m_iMaxArrow > 9)
+		m_iMaxArrow = 9;
+
+	// Max Arrow 설정	
+	for (int i = 0; i < m_iMaxArrow; i++)
 	{
-	case 4:
-		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[2]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[3]->SetAllTexture(m_pActiveArrowTexture);
+		m_vArrowUI[i]->SetAllTexture(m_pEmptyArrowTexture);
+		m_vArrowUI[i]->SetScale(m_vInActiveArrowScale);
+		m_vArrowUI[i]->m_bRender = true;
+	}
 
-		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[2]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[3]->SetScale(m_vActiveArrowScale);
+	// Current Arrow 설정
+	for (int i = 0; i < m_iCurrentArrow; i++)
+	{
+		if (i > 0)
+		{
+			m_vArrowUI[i - 1]->SetAllTexture(m_pInActiveArrowTexture);
+			m_vArrowUI[i - 1]->SetScale(m_vInActiveArrowScale);
+		}
 
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = true;
-		m_vArrowUI[2]->m_bRender = true;
-		m_vArrowUI[3]->m_bRender = true;
-		break;
-
-	case 3:
-		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[1]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[2]->SetAllTexture(m_pActiveArrowTexture);
-
-		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[1]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[2]->SetScale(m_vActiveArrowScale);
-
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = true;
-		m_vArrowUI[2]->m_bRender = true;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
-
-	case 2:
-		m_vArrowUI[0]->SetAllTexture(m_pInActiveArrowTexture);
-		m_vArrowUI[1]->SetAllTexture(m_pActiveArrowTexture);
-
-		m_vArrowUI[0]->SetScale(m_vInActiveArrowScale);
-		m_vArrowUI[1]->SetScale(m_vActiveArrowScale);
-
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = true;
-		m_vArrowUI[2]->m_bRender = false;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
-
-	case 1:
-		m_vArrowUI[0]->SetAllTexture(m_pActiveArrowTexture);
-
-		m_vArrowUI[0]->SetScale(m_vActiveArrowScale);
-
-		m_vArrowUI[0]->m_bRender = true;
-		m_vArrowUI[1]->m_bRender = false;
-		m_vArrowUI[2]->m_bRender = false;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
-
-	case 0:
-		m_vArrowUI[0]->m_bRender = false;
-		m_vArrowUI[1]->m_bRender = false;
-		m_vArrowUI[2]->m_bRender = false;
-		m_vArrowUI[3]->m_bRender = false;
-		break;
+		if (i < 9)
+		{
+			m_vArrowUI[i]->SetAllTexture(m_pActiveArrowTexture);
+			m_vArrowUI[i]->SetScale(m_vActiveArrowScale);
+			m_vArrowUI[i]->m_bRender = true;
+		}
 	}
 }
 
 void InGameUIControler::UpdateInteract()
 {
+	m_bHeal = false;
 	// InterAction, 상호작용 UI를 띄우는 구간
-//auto vTriggerList = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger();
 	if (m_tTrigger.eTriggerType != ETriggerType::TT_NONE)
 	{
 		static Vec3 offsetPos1 = m_vInterActionUI[1]->GetPosition();
@@ -537,11 +489,15 @@ void InGameUIControler::UpdateInteract()
 
 			if (m_tTrigger.eTriggerType == ETriggerType::TT_LADDER)
 			{
-
+				m_vInterActionUI[2]->SetText(L"오르기");
 			}
 			else if (m_tTrigger.eTriggerType == ETriggerType::TT_HEALPOINT)
 			{
-
+				m_vInterActionUI[2]->SetText(L"회복");
+				if(INPUT->GetButton(GameKey::E))
+				{
+					m_bHeal = true;
+				}
 			}
 		}
 	}
@@ -626,6 +582,8 @@ void InGameUIControler::UpdatePaused()
 				iSelectUpgrade = 0;
 			if (iSelectUpgrade > 3)
 				iSelectUpgrade = 3;
+
+			m_iCurrentUpgrade = iSelectUpgrade + 1;
 
 			for (auto& pUI : m_vUpgradeBackGround)
 			{
@@ -740,7 +698,6 @@ void InGameUIControler::UpdatePaused()
 
 			if (INPUT->GetButton(GameKey::SPACE)&& m_iBuyUpgrade == true)
 			{
-				m_iSelectUpgrade = iSelectUpgrade + 1;
 				if (iSelectUpgrade == 0 && iHealthPoint < 5)
 				{
 					m_vUpgradeState[iSelectUpgrade][iHealthPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
@@ -761,12 +718,12 @@ void InGameUIControler::UpdatePaused()
 					m_vUpgradeState[iSelectUpgrade][iArrowPoint + 2]->SetAllTexture(m_pUpgradeDoneTexture);
 					iArrowPoint++;
 				}
+
+				SOUND->GetPtr(ESoundType::Allow)->PlayEffect2D();
 			}
 			// 못하면 흔들리는 연출
 			else if (m_iBuyUpgrade == false)
 			{
-				m_iSelectUpgrade = 0;
-
 				for (auto& pUI : m_vUpgradeExplain)
 				{
 					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
@@ -788,9 +745,9 @@ void InGameUIControler::UpdatePaused()
 				{
 					pUI->SetShake(0.5f, 100.f, 5.f, 0.f);
 				}
+
+				SOUND->GetPtr(ESoundType::Deny)->PlayEffect2D();
 			}
-			else
-				m_iSelectUpgrade = 0;
 
 			if (iHealthPoint > 5)
 				iHealthPoint = 5;
@@ -921,12 +878,16 @@ void InGameUIControler::UpdatePaused()
 		}
 
 		iSelectUpgrade = 0;
+		m_iCurrentUpgrade = 0;
 	}
 }
 
 void InGameUIControler::UpdateCoin()
 {
 	wstring szCoin = L"x ";
+
+	for (auto& pUI : m_vCoins)
+		pUI->m_bRender = true;
 
 	m_vCoins[1]->SetText(szCoin + L"0");
 	m_vCoins[3]->SetText(szCoin + to_wstring(m_iCoin));
@@ -987,7 +948,7 @@ void InGameUIControler::UpdateDead()
 				}
 
 				// continue에서 enter 또는 UI선택시
-				if (INPUT->GetButton(GameKey::ENTER) ||
+				if (INPUT->GetButton(GameKey::SPACE) ||
 					m_vDeadUI[1]->GetStateType() == UIStateType::ST_SELECT)
 				{
 					m_bDeadContinue = true;
@@ -1021,6 +982,9 @@ void InGameUIControler::UpdateDead()
 			m_vCoins[1]->m_bRender = false;
 			m_vCoins[3]->m_bRender = false;
 		}
+
+		SOUND->GetPtr(ESoundType::Stage0)->Stop();
+		SOUND->GetPtr(ESoundType::CrowDead)->Play2D(false);
 	}
 	else
 	{
@@ -1038,4 +1002,69 @@ void InGameUIControler::UpdateDead()
 		m_vCoins[1]->m_bRender = true;
 		m_vCoins[3]->m_bRender = true;
 	}
+}
+
+void InGameUIControler::UpdateEnding()
+{
+	if (!m_bGoEnding) return;
+	static bool oneFrame = true;
+	static wstring ending = L"";
+
+	if (oneFrame)
+	{
+		UI->AddUI(m_pEnding);
+
+		m_pEnding->m_bRun = true;
+		m_pEnding->m_bRender = true;
+
+		auto pos = m_pEnding->GetPosition();
+		pos.y = -1500.f;
+		m_pEnding->SetPosition(pos);
+		m_pEnding->SetAlignment(DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		ending += L"팀 명\t\t\t        DD44\n\n";
+		ending += L"팀 원\t\t\t        서 준\n\n";
+		ending += L"\t\t\t        오 세영\n\n";
+		ending += L"\t\t\t        김 예린\n\n";
+		ending += L"\t\t\t        이 윤석\n\n";
+		ending += L"특별 감사\t\t        김 명균 선생님\n\n\n\n\n\n\n\n\n\n";
+		ending += L"       플레이  해주셔서  감사합니다!";
+	}
+	m_pEnding->SetText(ending);
+
+	if (m_pEnding->GetPosition().y < g_windowSize.y*0.74f)
+		m_pEnding->AddPosition(Vec3(0.f, TIMER->GetDeltaTime() * 100.f, 0.f));
+
+	oneFrame = false;
+}
+
+void InGameUIControler::PopUpBettyName()
+{
+	m_pBettyName->m_bRun = true;
+	m_pBettyName->m_bRender = true;
+}
+
+void InGameUIControler::PopDownBettyName()
+{
+	m_pBettyName->m_bRun = false;
+	m_pBettyName->m_bRender = false;
+}
+
+void InGameUIControler::NoRenderStateUI()
+{
+	m_bNoRender = true;
+
+	for (auto& pUI : m_vMainBackGround)
+		pUI->m_bRender = false;
+
+	m_pHPBackGround->m_bRender = false;
+
+	for (auto& pUI : m_vHPUI)
+		pUI->m_bRender = false;
+
+	for (auto& pUI : m_vArrowUI)
+		pUI->m_bRender = false;
+
+	for (auto& pUI : m_vCoins)
+		pUI->m_bRender = false;
 }

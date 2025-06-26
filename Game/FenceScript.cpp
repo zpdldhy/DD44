@@ -7,6 +7,8 @@
 #include "ObjectManager.h"
 #include "EnemyCollisionManager.h"
 
+#include "Sound.h"
+
 void FenceScript::Init()
 {
 	originPos = GetOwner()->GetPosition();
@@ -81,9 +83,16 @@ void FenceScript::Interact()
 {
 	// ´Ý±â
 	m_bClose = true;
+	SOUND->GetPtr(ESoundType::Close_Fence)->PlayEffect2D();
+
+	if (GetOwner()->m_szName == L"Fence3")
+	{
+		EVENT->TriggerEvent(EventType::EVENT_STAGE, L"Enter_Final");
+	}
 }
 
 void FenceScript::Open()
 {
 	m_bOpen = true;
+	SOUND->GetPtr(ESoundType::Open_Fence)->PlayEffect2D();
 }

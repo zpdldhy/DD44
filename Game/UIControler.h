@@ -44,9 +44,12 @@ class InGameUIControler : public UIControler
 	// InGame //
 	////////////
 	vector<shared_ptr<class AUIActor>> m_vMainBackGround;
+	bool m_bNoRender = false;
 
 	// HP
 	shared_ptr<class AUIActor> m_pHPBackGround = nullptr;
+	shared_ptr<class Texture> m_pActiveHPTexture = nullptr;
+	shared_ptr<class Texture> m_pEmptyHPTexture = nullptr;
 	vector<shared_ptr<class AUIActor>> m_vHPUI;
 	int m_iMaxHP = 4;
 	int m_iCurrentHP = 4;
@@ -54,16 +57,19 @@ class InGameUIControler : public UIControler
 	bool m_bHPUIChange = false;
 
 	// Arrow
-	int m_iArrowCount = 4;
 	vector<shared_ptr<class AUIActor>> m_vArrowUI;
 	shared_ptr<class Texture> m_pActiveArrowTexture = nullptr;
 	shared_ptr<class Texture> m_pInActiveArrowTexture = nullptr;
+	shared_ptr<class Texture> m_pEmptyArrowTexture = nullptr;
+	int m_iMaxArrow = 4;
+	int m_iCurrentArrow = 4;
 	Vec3 m_vActiveArrowScale = { 0.f, 0.f, 0.f };
 	Vec3 m_vInActiveArrowScale = { 0.f, 0.f, 0.f };
 
 	// Interact
 	vector<shared_ptr<class AUIActor>> m_vInterActionUI;
 	struct TriggerData m_tTrigger;
+	bool m_bHeal = false;
 
 	////////////
 	// Paused //
@@ -75,7 +81,7 @@ class InGameUIControler : public UIControler
 	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
 	vector<vector<shared_ptr<class AUIActor>>> m_vUpgradeState;
 	shared_ptr<class Texture> m_pUpgradeDoneTexture = nullptr;
-	int m_iSelectUpgrade = 0;
+	int m_iCurrentUpgrade = 0;
 	int m_iHealthPrice = 100;
 	int m_iAttackPrice = 100;
 	int m_iSpeedPrice = 100;
@@ -106,6 +112,13 @@ class InGameUIControler : public UIControler
 	bool m_bDeadUIMove = false;
 	bool m_bDeadUIEnd = false;
 
+	//////////////
+	//  Sinema  //
+	//////////////
+	shared_ptr<class AUIActor> m_pBettyName = nullptr;
+	shared_ptr<class AUIActor> m_pEnding = nullptr;
+	bool m_bGoEnding = false;
+
 public:
 	void init() override;
 	void Tick() override;
@@ -120,11 +133,13 @@ private:
 	void UpdatePaused();
 	void UpdateCoin();
 	void UpdateDead();
+	void UpdateEnding();
 
 public:
 	void SetMaxHP(int _maxHP) { m_iMaxHP = _maxHP; }
 	void SetCurrentHP(int _currentHP) { m_iCurrentHP = _currentHP; }
-	void SetArrowCount(int _arrowCount) { m_iArrowCount = _arrowCount; }
+	void SetMaxArrow(int _maxArrow) { m_iMaxArrow = _maxArrow; }
+	void SetCurrentArrow(int _arrowCount) { m_iCurrentArrow = _arrowCount; }
 	void SetTriggerData(TriggerData _data) { m_tTrigger = _data; }
 	void SetCoin(int _coin) { m_iCoin = _coin; }
 	void SetHealthPrice(int _price) { m_iHealthPrice = _price; }
@@ -134,9 +149,18 @@ public:
 	void IsBuyUpgrade(bool _isBuy) { m_iBuyUpgrade = _isBuy; }
 	void SetDead(bool _isDead) { m_bDead = _isDead; }
 
-	int  SelectUpgrade() { return m_iSelectUpgrade; }
+	int  CurrentUpgrade() { return m_iCurrentUpgrade; }
 	bool SelectContinue() { return m_bContinue; }
 	bool SelectExit() { return m_bExit; }
 	bool SelectDeadContinue() { return m_bDeadContinue; }
 	bool EndDeadUI() { return m_bDeadUIEnd; }
+	bool IsHealAction() { return m_bHeal; }
+
+	void PopUpBettyName();
+	void PopDownBettyName();
+
+	void NoRenderStateUI();
+	void RenderStateUI() { m_bNoRender = false; }
+
+	void GoEnding() { m_bGoEnding = true; }
 };

@@ -119,7 +119,10 @@ void UIManager::UpdateFade()
 {
 	// 1Frame만 true 해주도록 설계
 	if (!isFadeIn && !isFadeOut)
-		isFadeWorkDone = false;
+	{
+		isFadeInDone = false;
+		isFadeOutDone = false;
+	}
 
 	if (m_pFade == nullptr)
 		return;
@@ -141,7 +144,7 @@ void UIManager::UpdateFade()
 		m_pFade->SetColor(Color(m_cFadeColor.x, m_cFadeColor.y, m_cFadeColor.z, temp));
 		if (m_fFadeTime < fCurrentFadeTime)
 		{
-			isFadeWorkDone = true;
+			isFadeInDone = true;
 			isFadeIn = false;
 			fCurrentFadeTime = 0.f;
 		}
@@ -155,10 +158,9 @@ void UIManager::UpdateFade()
 
 		if (m_fFadeTime < fCurrentFadeTime)
 		{
-			isFadeWorkDone = true;
+			isFadeOutDone = true;
 			isFadeOut = false;
 			fCurrentFadeTime = 0.f;
-			m_pFade = nullptr;
 		}
 	}
 	if (m_pFade)

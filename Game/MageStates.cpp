@@ -15,6 +15,7 @@
 
 // TEMP
 #include "Input.h"
+#include "Sound.h"
 
 Vec3 V_Clamp(const Vec3& v, const Vec3& minV, const Vec3& maxV)
 {
@@ -240,6 +241,8 @@ void MageAttackState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	originSpped = animInstance->m_fAnimPlayRate;
 	//animInstance->m_fAnimPlayRate = 25.0f;
+
+	SOUND->GetPtr(ESoundType::Attack_Mage)->PlayEffect2D();
 }
 void MageAttackState::Tick()
 {
@@ -557,6 +560,14 @@ void MageDieState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Death");
 	animInstance->PlayOnce(index);
+
+	Vec3 playerPos =m_pPlayer.lock()->GetPosition();
+	playerPos.y += 1.5f;
+	Vec3 soulDirection = playerPos - m_pOwner.lock()->GetPosition();
+	soulDirection.Normalize();
+	EFFECT->PlayEffect(EEffectType::Soul, m_pOwner.lock()->GetPosition(), 0, soulDirection, 1.0f, playerPos);
+
+	SOUND->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
 }
 void MageDieState::Tick()
 {

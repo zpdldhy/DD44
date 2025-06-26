@@ -7,6 +7,7 @@ class TestYoooooon : public IExecute
 {
 public:
 	shared_ptr<class ACameraActor> m_pCameraActor = nullptr;
+	shared_ptr<class ACameraActor> m_pCinemaCamera = nullptr;
 	shared_ptr<class AActor> m_pPlayer = nullptr;
 	shared_ptr<class AActor> m_pBox = nullptr;
 	shared_ptr<class AActor> m_pSphere = nullptr;

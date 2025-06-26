@@ -3,6 +3,7 @@
 #include "TPlayer.h"
 #include "TEnemy.h"
 #include "Timer.h"
+#include "EffectManager.h"
 
 // temptemptemptmepte
 #include "Input.h"
@@ -23,7 +24,10 @@ void HeadRollerMovement::Init()
 
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(3);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(4);
 
+	// Setplayer
+	dynamic_pointer_cast<HeadRollerDieState>(death)->SetPlayer(player);
 	// Movement
 	InitPos();
 

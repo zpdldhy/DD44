@@ -61,10 +61,20 @@ void StageManager::DeleteEnemyInStage(UINT _stageId, UINT _actorId)
 	}
 }
 
+void StageManager::EnterFinalStage()
+{
+	currentPhase = StagePhase::FINAL;
+}
+
 void StageManager::Init()
 {
 	// 개수 설정 주의
 	stageList.resize(3);
+
+	// final stage 입장 확인을 위한 이벤트 
+	EVENT->AddStageEvent(L"Enter_Final", [this]() {
+		this->EnterFinalStage();
+		});
 }
 
 void StageManager::Tick()
@@ -112,6 +122,11 @@ void StageManager::Tick()
 		}
 	}
 	case StagePhase::STAGE20:
+	{
+
+	}
+	break;
+	case StagePhase::FINAL:
 	{
 
 	}

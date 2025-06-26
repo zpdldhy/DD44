@@ -63,8 +63,10 @@ void BatMovement::Init()
 	// Body
 	GetOwner()->m_bCollision = true;
 
-	//// 
+	// 상태값
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(1);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(2);
+	dynamic_pointer_cast<BatDieState>(death)->SetPlayer(player);
 }
 
 
@@ -81,6 +83,7 @@ void BatMovement::Tick()
 			// bat 죽음
 			GetOwner()->m_bDelete = true;
 			/*attackRangeActor->m_bDelete = true;*/
+
 		}
 		return;
 	}

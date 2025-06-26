@@ -4,6 +4,7 @@
 #include "ActorLoader.h"
 #include "MeshLoader.h"
 #include "UIControler.h"
+#include "MovieControler.h"
 
 class Game : public IExecute
 {
@@ -12,6 +13,7 @@ public:
 	shared_ptr<class ACameraActor> m_pGameCameraActor;
 	
 	shared_ptr<class AActor> m_pPlayer;
+	shared_ptr<class AActor> m_pHealer;
 	shared_ptr<class AActor> m_pBetty;
 	shared_ptr<class UStaticMeshComponent> m_pSkyMesh;
 	shared_ptr<class ASky> m_pSky;
@@ -20,7 +22,7 @@ public:
 	bool m_bEnginCamera = false;
 	bool m_bWind = false;
 
-	float time;
+	int m_iSoulStorage = 0;
 
 	// UI
 	InGameUIControler m_cUI;
@@ -35,6 +37,11 @@ public:
 	
 	vector<shared_ptr<AActor>> m_vObjectList;
 	vector<shared_ptr<AActor>> m_vMapList;
+
+	// 씬 연출
+	BettyMeetControler m_cBettyMovie;
+	bool m_bStartBettyMoveScene = false;	// 콜리전 박스에 닿으면 실행할 수 있도록
+	bool m_bNoPaused = false;
 
 	// TEMP
 	vector<shared_ptr<AActor>> stage0;
@@ -57,6 +64,8 @@ protected:
 	void UpdateUI();
 	void UpdateCursor();
 
+	void BettyMeetMovie();
+
 protected:
 	void SetEnemy(vector<shared_ptr<AActor>>& _enemyList);
 	void CheckFrustumCulling();
@@ -64,6 +73,7 @@ protected:
 	//blood
 	void CheckBloodCollision();
 
+	void CheckEnemyDeath(const vector<shared_ptr<AActor>>& _enemyList);
 public:
 	Game() { m_type = SCENE_TYPE::GAME; }
 };

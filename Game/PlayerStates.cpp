@@ -171,6 +171,8 @@ void PlayerAttackState::Tick()
 
 		currentPhase = OnSecond;
 		m_bOnCombo = false;
+
+		SOUND->GetPtr(ESoundType::Slash_2)->PlayEffect2D();
 	}
 	break;
 	case AttackCombo::OnSecond:
@@ -195,6 +197,8 @@ void PlayerAttackState::Tick()
 
 		currentPhase = OnThird;
 		m_bOnCombo = false;
+
+		SOUND->GetPtr(ESoundType::Slash_3)->PlayEffect2D();
 	}
 	break;
 	case AttackCombo::OnThird:
@@ -455,6 +459,8 @@ void PlayerShootState::Enter()
 
 	start->Enter();
 	shoot->CheckShootCount(bCanShoot);
+
+	SOUND->GetPtr(ESoundType::Bow_Stretch)->PlayEffect2D();
 }
 void PlayerShootState::Tick()
 {
@@ -491,6 +497,8 @@ void PlayerShootState::Tick()
 		if (!shoot->IsPlaying())
 		{
 			currentPhase = ShootPhase::Done;
+
+			SOUND->GetPtr(ESoundType::Bow_Release)->PlayEffect2D();
 			break;
 		}
 		break;
@@ -655,6 +663,15 @@ void PlayerClimbState::Enter()
 
 	// 중력 적용
 	m_pOwner.lock()->GetPhysicsComponent()->SetWeight(0.f);
+
+	//if (isMoving)
+	//{
+	//	SOUND->GetPtr(ESoundType::Ladder)->PlayEffect2D();
+	//}
+	//else
+	//{
+	//	SOUND->GetPtr(ESoundType::Ladder)->Paused();
+	//}
 }
 void PlayerClimbState::Tick()
 {

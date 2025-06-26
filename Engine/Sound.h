@@ -8,8 +8,8 @@
 enum class ESoundType
 {
 	Intro,
-	Stage0,
-	Boss1,
+	Stage0, // 보스방 들어가면 중단
+	Boss1, // 보스방 사운드
 	Stage1,
 	Boss2,
 	STage2,
@@ -17,18 +17,46 @@ enum class ESoundType
 
 	//Charactor
 	Slash,
+	Slash_2,
+	Slash_3,
+	Bow_Stretch,
+	Bow_Release,
 	Dash,
 	Walk,
 	Hit,
+	Ladder,
 	Die,
 
 	//Bat
 	Attack_Bat,
 	Enemy_Damaged,
 
+	//Walker
+	Impact, //HeadRoller 벽에 부딪힐 때 나는 소리
+	Dead_Walker,
+
+	//Mage
+	Attack_Mage,
+
+	//Betty
+	Attack_Betty,
+	Screaming_Betty,
+	Growling_Betty,
+	Impact_Betty,
+	Scraping_Betty,
+
+	//Env
+	Open_Fence,
+	Close_Fence,
+	GetSoul,
+	Healing,
+
 	//UI
 	Hover,
 	Click,
+	Allow,
+	Deny,
+	CrowDead,
 
 	//Fire
 	Fire,

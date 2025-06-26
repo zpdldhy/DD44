@@ -100,6 +100,7 @@ void PlayerMoveScript::Tick()
 	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
 	auto playerPos = player->GetPosition();
 
+
 	// 모든 state 공통
 	PlayFX();
 	CheckCoolTIme();
@@ -222,6 +223,14 @@ void PlayerMoveScript::Tick()
 
 				player->SetTrigger(data);
 			}
+
+			if (pObj->GetShapeComponent()->GetName() == L"Healer")
+			{
+				TriggerData data;
+				data.eTriggerType = ETriggerType::TT_HEALPOINT;
+				data.vPoint = pObj->GetPosition() + Vec3(2.f);	// UI 위치 보정값, 수정 가능.
+				player->SetTrigger(data);
+			}
 		}
 	}
 
@@ -229,15 +238,20 @@ void PlayerMoveScript::Tick()
 	// Test
 	if (INPUT->GetButton(L))
 	{
-		dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(4);
-		if (currentState->GetId() == PLAYER_S_DEATH)
-		{
-			currentState->End();
-			ChangeState(idle);
-		}
+		Resurrection();
 	}
 #pragma endregion
 
+}
+
+void PlayerMoveScript::Resurrection()
+{
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(dynamic_pointer_cast<TCharacter>(GetOwner())->GetMaxHp());
+	if (currentState->GetId() == PLAYER_S_DEATH)
+	{
+		currentState->End();
+		ChangeState(idle);
+	}
 }
 
 void PlayerMoveScript::ChangeState(shared_ptr<PlayerBaseState> _state)
@@ -443,7 +457,8 @@ void PlayerMoveScript::Move()
 		{
 			moveDir.Normalize();
 			//Vec3 pos = moveDir * m_fCurrentSpeed * deltaTime;
-			GetOwner()->SetMove(moveDir, 0.25f);
+			auto maxSpeed = dynamic_pointer_cast<TPlayer>(GetOwner())->GetMoveSpeed();
+			GetOwner()->SetMove(moveDir, maxSpeed);
 		}
 
 		// 회전		
@@ -522,8 +537,9 @@ void PlayerMoveScript::Climb()
 
 void PlayerMoveScript::RollMove()
 {
-	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();	
-	GetOwner()->SetMove(m_vRollLook, 0.5f);
+	//Vec3 pos = m_vRollLook * m_fRollSpeed * TIMER->GetDeltaTime();
+	auto maxRollSpeed = dynamic_pointer_cast<TPlayer>(GetOwner())->GetRollSpeed();
+	GetOwner()->SetMove(m_vRollLook, maxRollSpeed);
 }
 
 bool PlayerMoveScript::CanAttack()
@@ -590,6 +606,9 @@ void PlayerMoveScript::CheckClimb()
 
 void PlayerMoveScript::CheckRoll()
 {
+	if (m_bNoInput)
+		return;
+
 	if (INPUT->GetButton(SPACE) && roll->m_bCanRoll)
 	{
 		// 구르기
@@ -600,6 +619,9 @@ void PlayerMoveScript::CheckRoll()
 
 void PlayerMoveScript::CheckAttack()
 {
+	if (m_bNoInput)
+		return;
+
 	// ATTACK
 	if (INPUT->GetButton(LCLICK))
 	{
@@ -642,6 +664,9 @@ void PlayerMoveScript::CheckComboAttack()
 
 void PlayerMoveScript::CheckMove()
 {
+	if (m_bNoInput)
+		return;
+
 	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
 	if (player->IsClimbing())
 	{

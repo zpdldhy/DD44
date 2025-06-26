@@ -81,6 +81,10 @@ public:
 	void SetAttackRange();
 	shared_ptr<AActor> CreateSnowBall();
 	void ChangeState(shared_ptr<BettyStateBase> _state);
+
+
+	// GetBettyAction
+	bool IsBettyDie() { return currentAction == BettyAction::Die; }
 public:
 	//Phase
 	void HandleAttack(float _deltaTime);

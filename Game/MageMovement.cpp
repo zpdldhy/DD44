@@ -22,9 +22,11 @@ void MageMovement::Init()
 	attack = make_shared<MageAttackState>(m_pOwner);
 	death = make_shared<MageDieState>(m_pOwner);
 	ChangeState(idle);
-
+	
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(6);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(5);
+
 
 	// staticMage
 	if (GetOwner()->m_eActorType == ActorType::AT_STATICMONSTER)
@@ -35,6 +37,10 @@ void MageMovement::Init()
 		dynamic_pointer_cast<MageAttackState>(attack)->CheckStatic(bStaticMage);
 		//dynamic_pointer_cast<MageDisappearState>(disappear)->CheckStatic(false);
 	}
+
+	// Player Pos
+	dynamic_pointer_cast<MageDieState>(death)->SetPlayer(player);
+
 }
 
 void MageMovement::Tick()
@@ -119,6 +125,7 @@ void MageMovement::CheckHit()
 	if (comp->IsDead())
 	{
 		ChangeState(death);
+		
 	}
 }
 
