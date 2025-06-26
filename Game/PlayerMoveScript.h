@@ -17,14 +17,6 @@ public:
 	float m_fCurrentSpeed = 0.f;
 	float m_fRotationSpeed = 8.0f;
 
-	bool m_bDamageCoolTime = false;
-	float m_fDamageCoolTime = 1.0f;
-	bool m_bCanBeHit = true;
-
-	bool m_bRollCoolTime = false;
-	float m_fRollCoolTime = 0.3f;
-	bool m_bCanRoll = true;
-
 	// Attack
 	shared_ptr<AActor> attackRangeActor;
 	shared_ptr<AActor> bow;
@@ -40,16 +32,16 @@ public:
 	shared_ptr<Texture> m_pSubTexture;
 	shared_ptr<Texture> m_pNoiesTexture;
 
-	shared_ptr<StateBase> empty;
-	shared_ptr<StateBase> idle;
-	shared_ptr<StateBase> walk;
-	shared_ptr<StateBase> climb;
-	shared_ptr<StateBase> roll;
-	shared_ptr<StateBase> attack;
-	shared_ptr<StateBase> hit;
-	shared_ptr<StateBase> shoot;
-	shared_ptr<StateBase> die;
-	shared_ptr<StateBase> currentState;
+	shared_ptr<PlayerBaseState> empty;
+	shared_ptr<PlayerBaseState> idle;
+	shared_ptr<PlayerBaseState> walk;
+	shared_ptr<PlayerBaseState> climb;
+	shared_ptr<PlayerBaseState> roll;
+	shared_ptr<PlayerBaseState> attack;
+	shared_ptr<PlayerBaseState> hit;
+	shared_ptr<PlayerBaseState> shoot;
+	shared_ptr<PlayerBaseState> die;
+	shared_ptr<PlayerBaseState> currentState;
 	PLAYER_STATE currentStateId;
 
 	// Cilmb
@@ -89,7 +81,7 @@ public:
 	virtual shared_ptr<UScriptComponent> Clone() override;
 public:
 	void Resurrection();
-	void ChangeState(shared_ptr<StateBase> _state);
+	void ChangeState(shared_ptr<PlayerBaseState> _state);
 public:
 	void PlayFX();
 	//void Slash();

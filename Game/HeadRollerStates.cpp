@@ -120,65 +120,17 @@ void HeadRollerAttackState::End()
 
 bool HeadRollerAttackState::CheckWallCollision()
 {
-	Vec3 pos = m_pOwner.lock()->GetPosition();
-	Vec3 look = dir;
-
-	float offset = 4.0f;
-	Vec3 right = m_pOwner.lock()->GetRight();
-	Ray leftRay(pos + (-right * offset), look);
-	Ray rightRay(pos + (right * offset), look);
-	Ray middleRay(pos, look);
-
-	auto box = dynamic_pointer_cast<UBoxComponent>(m_pOwner.lock()->GetShapeComponent());
-	auto ray = box->GetLookRay();
-	Vec3 range(6.0f, 0.0f, 6.0f);
-
 	for (const auto& colData : m_pOwner.lock()->m_vCollisionList)
 	{
-		if (OBJECT->GetActor(colData.first)->m_szName == L"MyCharacter")
+		auto name = OBJECT->GetActor(colData.first)->m_szName;
+		if (name == L"MyCharacter" || name == L"MageSphere")
 		{
 			continue;
 		}
 		auto targetShape = OBJECT->GetActor(colData.first)->GetShapeComponent();
 		auto targetBox = dynamic_pointer_cast<UBoxComponent>(targetShape);
 
-		// 걍 뭔가 충돌하면 다 처리해버려 ? 
-
 		return true;
-
-		Vec3 inter;
-		if (Collision::CheckRayToOBB(middleRay, targetBox->GetBounds(), inter))
-		{
-			// 
-			Vec3 dis = pos - inter;
-			dis.y = 0;
-			if (dis.Length() < range.Length())
-			{
-				return true;
-			}
-		}
-
-		if (Collision::CheckRayToOBB(leftRay, targetBox->GetBounds(), inter))
-		{
-			// 
-			Vec3 dis = pos - inter;
-			dis.y = 0;
-			if (dis.Length() < range.Length())
-			{
-				return true;
-			}
-		}
-
-		if (Collision::CheckRayToOBB(rightRay, targetBox->GetBounds(), inter))
-		{
-			// 
-			Vec3 dis = pos - inter;
-			dis.y = 0;
-			if (dis.Length() < range.Length())
-			{
-				return true;
-			}
-		}
 	}
 	return false;
 }

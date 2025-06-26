@@ -89,6 +89,10 @@ void PlayerMoveScript::Init()
 	bow->SetMeshComponent(meshComp);
 	OBJECT->AddActor(bow);
 	bow->m_bRender = false;
+
+	// state 세팅
+	dynamic_pointer_cast<PlayerAttackState>(attack)->SetAttackRange(attackRangeActor);
+	dynamic_pointer_cast<PlayerShootState>(shoot)->SetBow(bow);
 }
 
 void PlayerMoveScript::Tick()
@@ -134,8 +138,6 @@ void PlayerMoveScript::Tick()
 		CheckCollision();
 		if (currentStateEnd)
 		{
-			attackRangeActor->m_bCollision = false;
-			attackRangeActor->GetShapeComponent()->m_bVisible = false;
 			ChangeState(empty);
 		}
 		break;
@@ -152,8 +154,7 @@ void PlayerMoveScript::Tick()
 				dynamic_pointer_cast<PlayerClimbState>(currentState)->CheckClimbFinish(true);
 			}
 		}
-		// 자연스러운 처리 없음
-		CheckCollision();
+		//CheckCollision();
 		CheckMove();
 		break;
 	case PLAYER_S_SHOOT:
@@ -176,7 +177,6 @@ void PlayerMoveScript::Tick()
 
 		if (currentStateEnd)
 		{
-			bow->m_bRender = false;
 			ChangeState(empty);
 		}
 		break;
@@ -184,17 +184,14 @@ void PlayerMoveScript::Tick()
 		return;
 		break;
 	case PLAYER_S_HIT:
-		CheckCollision();
 		if (currentStateEnd)
 		{
-			m_bDamageCoolTime = true;
 			ChangeState(empty);
 		}
 		break;
 	case PLAYER_S_ROLL:
 		if (currentStateEnd)
 		{
-			m_bRollCoolTime = true;
 			ChangeState(idle);
 		}
 		else
@@ -257,19 +254,11 @@ void PlayerMoveScript::Resurrection()
 	}
 }
 
-void PlayerMoveScript::ChangeState(shared_ptr<StateBase> _state)
+void PlayerMoveScript::ChangeState(shared_ptr<PlayerBaseState> _state)
 {
 	if (_state == currentState)
 	{
 		return;
-	}
-
-	if (_state->GetId() == PLAYER_S_HIT)
-	{
-		if (currentStateId == PLAYER_S_ROLL)
-		{
-			m_bCanRoll = true;
-		}
 	}
 	
 	if (currentStateId == PLAYER_S_SHOOT)
@@ -299,7 +288,7 @@ void PlayerMoveScript::CheckCollision()
 	auto healthComp = dynamic_pointer_cast<TCharacter>(GetOwner());
 
 	// 충돌 확인
-	if (m_bCanBeHit)
+	if (hit->m_bCanBeHit)
 	{
 		// 근접 공격 확인
 		bool isCol = false;
@@ -348,7 +337,6 @@ void PlayerMoveScript::CheckCollision()
 				if (!dynamic_pointer_cast<TCharacter>(GetOwner())->IsDead())
 				{
 					ChangeState(hit);
-					m_bCanBeHit = false;
 				}
 				else
 				{
@@ -585,24 +573,22 @@ void PlayerMoveScript::UpdateBow()
 
 void PlayerMoveScript::CheckCoolTIme()
 {
-	if (m_bDamageCoolTime)
+	if (!hit->m_bCanBeHit)
 	{
-		m_fDamageCoolTime -= TIMER->GetDeltaTime();
-		if (m_fDamageCoolTime < 0)
+		hit->m_fDamageElapsed += TIMER->GetDeltaTime();
+		if (hit->m_fDamageElapsed >= hit->m_fDamageOffset)
 		{
-			m_bDamageCoolTime = false;
-			m_fDamageCoolTime = 1.0f;
-			m_bCanBeHit = true;
+			hit->m_bCanBeHit = true;
+			hit->m_fDamageElapsed = 0.0f;
 		}
 	}
-	if (m_bRollCoolTime)
+	if (!roll->m_bCanRoll)
 	{
-		m_fRollCoolTime -= TIMER->GetDeltaTime();
-		if (m_fRollCoolTime < 0)
+		roll->m_fRollElapsed += TIMER->GetDeltaTime();
+		if (roll->m_fRollElapsed >= roll->m_fRollOffset)
 		{
-			m_bRollCoolTime = false;
-			m_fRollCoolTime = 0.5f;
-			m_bCanRoll = true;
+			roll->m_fRollElapsed = 0.0f;
+			roll->m_bCanRoll = true;
 		}
 	}
 }
@@ -623,13 +609,11 @@ void PlayerMoveScript::CheckRoll()
 	if (m_bNoInput)
 		return;
 
-	if (INPUT->GetButton(SPACE) && m_bCanRoll)
+	if (INPUT->GetButton(SPACE) && roll->m_bCanRoll)
 	{
 		// 구르기
 		m_vRollLook = GetOwner()->GetLook();
 		ChangeState(roll);
-
-		m_bCanRoll = false;
 	}
 }
 

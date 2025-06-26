@@ -115,12 +115,12 @@ shared_ptr<AActor> PrefabToActor::MakeCharacter(const string& _file)
 		{
 			actor = std::make_shared<TPlayer>();
 		}
-		else if (characterData.m_eActorType == 7)
+		else if (characterData.m_eActorType == (UINT)ActorType::AT_INTERACTABLE)
 		{
 			actor = std::make_shared<TInteractable>();
 
 		}
-		else if (characterData.m_eActorType == 3 || characterData.m_eActorType == 2)
+		else if (characterData.m_eActorType == (UINT)ActorType::AT_MONSTER || characterData.m_eActorType == (UINT)ActorType::AT_STATICMONSTER)
 		{
 			actor = std::make_shared<TEnemy>();
 		}

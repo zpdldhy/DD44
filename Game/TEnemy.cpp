@@ -31,6 +31,8 @@ void TEnemy::Destroy()
 
 bool TEnemy::CheckHit()
 {
+	if(!checkCollision) { return false; }
+
 	hitElapsed += TIMER->GetDeltaTime();
 	// 충돌 확인
 	if (hitElapsed > 1.0f)
@@ -45,6 +47,8 @@ bool TEnemy::CheckHit()
 				auto actor = OBJECT->GetActor(index.first);
 				if (actor->m_szName == L"Melee")
 				{
+					string st = to_string(hp);
+					Profiler p("Betty Hit  " + st);
 					look = actor->GetPosition() - GetPosition();
 					look.Normalize();
 					//look = -look;

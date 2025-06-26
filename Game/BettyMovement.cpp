@@ -12,6 +12,7 @@
 #include "USkinnedMeshComponent.h"
 #include "UBoxComponent.h"
 #include "EnemyCollisionManager.h"
+#include "EventManager.h"
 
 // temp temp temp !!!!!
 #include "Input.h"
@@ -19,6 +20,8 @@
 void BettyMovement::Init()
 {
 	SetPlayer(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer());
+
+	AddColliderActor();
 
 	// state
 	idle = make_shared<BettyIdleState>(m_pOwner);
@@ -31,6 +34,8 @@ void BettyMovement::Init()
 	dropAttack = make_shared<BettyDropAttack>(m_pOwner);
 	roarAttack = make_shared<BettyRoarAttack>(m_pOwner);
 	death = make_shared<BettyDeathState>(m_pOwner);
+
+	SetAttackRange();
 
 	meleeState.push_back(twoHandAttack);
 	meleeState.push_back(oneHandDownAttack);
@@ -45,15 +50,19 @@ void BettyMovement::Init()
 
 	SetSnowBall();
 
-	AddColliderActor();
-	
+
 	// HP
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(20);
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(1000);
 
-	// animation 
-	auto anim = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	anim->m_fAnimPlayRate = 25.0f;
+	// Intro trigger
+	EVENT->AddStageEvent(L"StartIntro", [this]() {
+		this->EnterIntro();
+		});
+	EVENT->AddStageEvent(L"FinishIntro", [this]() {
+		this->FinishIntro();
+		});
+
 }
 
 void BettyMovement::Tick()
@@ -64,14 +73,27 @@ void BettyMovement::Tick()
 	// 공격
 	switch (currentAction)
 	{
-	case BettyAction::Intro: {
-		// 진입 조건 변경 필요 
-		Vec3 diff = player.lock()->GetPosition() - GetOwner()->GetPosition();
-		if (diff.Length() < 20.0f)
+	case BettyAction::BeforeIntro:
+		if (bEnterIntro)
 		{
 			ChangeState(intro);
-			currentAction = BettyAction::Attack;
+			currentAction = BettyAction::Intro;
 		}
+		break;
+	case BettyAction::Intro: {
+		currentState->Tick();
+		if (!currentState->IsPlaying())
+		{
+			ChangeState(idle);
+		}
+		if (bFinishIntro)
+		{
+			currentAction = BettyAction::Attack;
+
+			auto anim = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+			anim->m_fAnimPlayRate = 22.0f;
+		}
+
 		break;
 	}
 	case BettyAction::Attack: {
@@ -85,23 +107,27 @@ void BettyMovement::Tick()
 			distance = (player.lock()->GetPosition() - GetOwner()->GetPosition());
 			GetOwner()->m_szName = L"Betty";
 			GetOwner()->GetShapeComponent()->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
-			rightRange->m_bCollision = false;
-			rightRange->GetShapeComponent()->m_bVisible = false;
-			leftRange->m_bCollision = false;
-			leftRange->GetShapeComponent()->m_bVisible = false;
 			HandleAttack(delta);
 		}
+
 		if (bSnowControl)
 		{
-			//auto delta = TIMER->GetDeltaTime();
 			DropSnowBall(delta);
 			HandleSnowBall();
+		}
+
+		if (currentStateId == BETTY_S_DEATH)
+		{
+			currentAction = BettyAction::Die;
+			// 모든 콜라이더 끄기
+			GetOwner()->m_bCollision = false;
+			leftRange->m_bCollision = false;
+			rightRange->m_bCollision = false;
 		}
 		break;
 	}
 	case BettyAction::Die: {
-		auto delta = TIMER->GetDeltaTime();
-		currentState->Tick();
+		return;
 	}
 	}
 
@@ -141,6 +167,15 @@ void BettyMovement::SetSnowBall()
 		snowList[i] = CreateSnowBall();
 	}
 
+}
+void BettyMovement::SetAttackRange()
+{
+	// Attack state에 콜라이더 넣어주기
+	jumpAttack->SetRange(leftRange, rightRange);
+	twoHandAttack->SetRange(leftRange, rightRange);
+	oneHandBackAttack->SetRange(leftRange, rightRange);
+	oneHandDownAttack->SetRange(leftRange, rightRange);
+	dropAttack->SetRange(leftRange, rightRange);
 }
 shared_ptr<AActor> BettyMovement::CreateSnowBall()
 {
@@ -254,7 +289,7 @@ void BettyMovement::DropSnowBall(float _delta)
 		}
 	}
 }
-void BettyMovement::ChangeState(shared_ptr<StateBase> _state)
+void BettyMovement::ChangeState(shared_ptr<BettyStateBase> _state)
 {
 	if (currentState && !currentState->IsInterruptible() && currentState->IsPlaying())
 	{
@@ -277,70 +312,52 @@ void BettyMovement::ChangeState(shared_ptr<StateBase> _state)
 }
 #pragma endregion Snowball
 
+void BettyMovement::EnterIntro()
+{
+	bEnterIntro = true;
+}
+
+void BettyMovement::FinishIntro()
+{
+	bFinishIntro = true;
+}
+
 void BettyMovement::HandleAttack(float _delta)
 {
 	if (distance.Length() < 20.0f)
 	{
-		// 근접 공격
-		auto look = GetOwner()->GetLook();
-		float dot = look.Dot(distance);
-		// 뒤 ? 무조건 OneHandBack
-		if (dot < 0)
+		// 공격 가능 확인
+		if (canMeleeAttack)
 		{
-			auto next = oneHandBackAttack;
-			dynamic_pointer_cast<BettyOneHandBackAttack>(next)->CheckDirection(player.lock()->GetPosition());
-			rightRange->m_bCollision = true;
-			rightRange->GetShapeComponent()->m_bVisible = true;
-			leftRange->m_bCollision = true;
-			leftRange->GetShapeComponent()->m_bVisible = true;
+			// 근접 공격
+			auto look = GetOwner()->GetLook();
+			float dot = look.Dot(distance);
+			// 뒤 ? 무조건 OneHandBack
+			if (dot < 0)
+			{
+				auto next = oneHandBackAttack;
+				dynamic_pointer_cast<BettyOneHandBackAttack>(next)->CheckDirection(player.lock()->GetPosition());
 
-			ChangeState(next);
+				ChangeState(next);
+			}
+			else
+			{
+				//meleeIndex = (meleeIndex + 1) % meleeState.size();
+				meleeIndex = (int)RandomRange(0.0f, meleeState.size());
+				auto next = meleeState[meleeIndex];
+				if (next->GetId() == BETTY_S_A_HANDBACK)
+				{
+					bool right = dynamic_pointer_cast<BettyOneHandBackAttack>(next)->CheckDirection(player.lock()->GetPosition());
+				}
+				if (next->GetId() == BETTY_S_A_HANDDOWN)
+				{
+					bool right = dynamic_pointer_cast<BettyOneHandDownAttack>(next)->CheckDirection(player.lock()->GetPosition());
+				}
+
+				ChangeState(next);
+			}
+			meleeAttackCount--;
 		}
-		else
-		{
-			//meleeIndex = (meleeIndex + 1) % meleeState.size();
-			meleeIndex = (int)RandomRange(0.0f, meleeState.size());
-			auto next = meleeState[meleeIndex];
-			if (next->GetId() == BETTY_S_A_HANDBACK)
-			{
-				bool right = dynamic_pointer_cast<BettyOneHandBackAttack>(next)->CheckDirection(player.lock()->GetPosition());
-				if (right)
-				{
-					rightRange->m_bCollision = true;
-					rightRange->GetShapeComponent()->m_bVisible = true;
-				}
-				else
-				{
-					leftRange->m_bCollision = true;
-					leftRange->GetShapeComponent()->m_bVisible = true;
-
-				}
-			}
-			if (next->GetId() == BETTY_S_A_HANDDOWN)
-			{
-				bool right = dynamic_pointer_cast<BettyOneHandDownAttack>(next)->CheckDirection(player.lock()->GetPosition());
-				if (right)
-				{
-					rightRange->m_bCollision = true;
-					rightRange->GetShapeComponent()->m_bVisible = true;
-				}
-				else
-				{
-					leftRange->m_bCollision = true;
-					leftRange->GetShapeComponent()->m_bVisible = true;
-
-				}
-			}
-			if (next->GetId() == BETTY_S_A_TWOHAND)
-			{
-				rightRange->m_bCollision = true;
-				rightRange->GetShapeComponent()->m_bVisible = true;
-				leftRange->m_bCollision = true;
-				leftRange->GetShapeComponent()->m_bVisible = true;
-			}
-			ChangeState(next);
-		}
-
 	}
 	else
 	{
@@ -363,10 +380,6 @@ void BettyMovement::HandleAttack(float _delta)
 			dynamic_pointer_cast<BettyJumpAttack>(next)->SetTargetPos(player.lock()->GetPosition());
 			GetOwner()->GetShapeComponent()->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 			GetOwner()->m_szName = L"Enemy";
-			rightRange->m_bCollision = true;
-			rightRange->GetShapeComponent()->m_bVisible = true;
-			leftRange->m_bCollision = true;
-			leftRange->GetShapeComponent()->m_bVisible = true;
 		}
 		if (next->GetId() == BETTY_S_A_DROPSNOW)
 		{
@@ -405,51 +418,11 @@ void BettyMovement::CheckHit()
 	{
 		ChangeState(death);
 	}
-
-	#pragma region Old
-				// 투사체 충돌 확인
-	//auto healthComp = dynamic_pointer_cast<TCharacter>(GetOwner());
-
-	//hitElapsed += TIMER->GetDeltaTime();
-	//// 충돌 확인
-	//if (hitElapsed > 1.0f) //&& GetOwner()->m_vCollisionList.size() > 0)
-	//{
-	//	// 근접 공격 확인
-	//	bool isCol = false;
-	//	if (GetOwner()->m_vCollisionList.size() > 0)
-	//	{
-	//		auto list = GetOwner()->m_vCollisionList;
-	//		for (auto& index : list)
-	//		{
-	//			if (OBJECT->GetActor(index.first)->m_szName == L"Melee")
-	//				isCol = true;
-	//		}
-	//	}
-
-	//	if (isCol || healthComp->IsHitByProjectile())
-	//	{
-	//		hitElapsed = 0.0f;
-	//		// 피격 시 경직 없고, flashing 뿐
-	//		m_fHitFlashTimer = 1.f;  // 1초 동안
-	//		m_bIsFlashing = true;
-
-	//		// Anim
-	//		healthComp->TakeDamage(1);
-
-	//		if (healthComp->IsDead())
-	//		{
-	//			currentAction = BettyAction::Die;
-	//			ChangeState(death);
-	//		}
-	//	}
-	//}  
-#pragma endregion
-
 }
 void BettyMovement::AddColliderActor()
 {
 	// Collider 
-	auto body = dynamic_pointer_cast<UMeshComponent>(GetOwner()->GetMeshComponent());
+	auto body = GetOwner()->GetMeshComponent();
 	leftHand = body->GetChildByName(L"LeftHand");
 	rightHand = body->GetChildByName(L"RightHand");
 
@@ -460,7 +433,7 @@ void BettyMovement::AddColliderActor()
 		auto collider = make_shared<UBoxComponent>();
 		collider->m_bVisible = true;
 		collider->SetName(L"Enemy");
-		collider->SetLocalScale(Vec3(4.0f, 5.0f, 4.0f));
+		collider->SetLocalScale(Vec3(3.0f, 5.0f, 3.0f));
 		collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 		leftRange->SetShapeComponent(collider);
 
@@ -469,8 +442,6 @@ void BettyMovement::AddColliderActor()
 
 		OBJECT->AddActor(leftRange);
 		ENEMYCOLLIDER->Add(leftRange);
-
-		collider->m_bVisible = false;
 	}
 
 	{
@@ -480,7 +451,7 @@ void BettyMovement::AddColliderActor()
 		auto collider = make_shared<UBoxComponent>();
 		collider->m_bVisible = true;
 		collider->SetName(L"Enemy");
-		collider->SetLocalScale(Vec3(4.0f, 5.0f, 4.0f));
+		collider->SetLocalScale(Vec3(3.0f, 5.0f, 3.0f));
 		collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
 		rightRange->SetShapeComponent(collider);
 
@@ -489,8 +460,6 @@ void BettyMovement::AddColliderActor()
 
 		OBJECT->AddActor(rightRange);
 		ENEMYCOLLIDER->Add(rightRange);
-
-		collider->m_bVisible = false;
 	}
 
 }

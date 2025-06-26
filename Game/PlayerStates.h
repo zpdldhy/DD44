@@ -17,7 +17,27 @@ enum PLAYER_STATE
 	PLAYER_S_GETITEM,
 	PLAYER_S_COUNT
 };
-class PlayerEmptyState : public StateBase
+class PlayerBaseState : public StateBase
+{
+public:
+	PlayerBaseState(UINT _iStateId);
+	virtual ~PlayerBaseState() = default;
+public:
+	virtual void Enter() override {};
+	virtual void Tick() override {};
+	virtual void End() override {};
+public:
+	// 구르기
+	bool m_bCanRoll = true;
+	float m_fRollElapsed = 0.0f;
+	float m_fRollOffset = 0.5f;
+
+	// 피격
+	bool m_bCanBeHit = true;
+	float m_fDamageElapsed = 0.0f;
+	float m_fDamageOffset = 1.0f;
+};
+class PlayerEmptyState : public PlayerBaseState
 {
 public:
 	PlayerEmptyState();
@@ -29,7 +49,7 @@ public:
 
 };
 
-class PlayerIdleState : public StateBase
+class PlayerIdleState : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;
@@ -44,7 +64,7 @@ public:
 
 };
 
-class PlayerWalkState : public StateBase
+class PlayerWalkState : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;
@@ -60,7 +80,7 @@ public:
 
 };
 
-class PlayerRollState : public StateBase
+class PlayerRollState : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;
@@ -76,12 +96,13 @@ public:
 	float m_fDustSpawnTimer = 0.0f;
 };
 
-class PlayerAttackState : public StateBase
+class PlayerAttackState : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;
+	weak_ptr<AActor> m_pAttackRange;
 
-	enum AttackCombo { OnFirst = 0, OnSecond, OnThird, Done};
+	enum AttackCombo { OnFirst = 0, OnSecond, OnThird, Done };
 	AttackCombo currentPhase = OnFirst;
 	bool m_bOnCombo = false;
 	Vec3 dir;
@@ -107,13 +128,16 @@ public:
 	void Rotate();
 	void Move();
 	void Slash();
+public:
+	void SetAttackRange(shared_ptr<AActor> _attack) { m_pAttackRange = _attack; }
 };
 
-class PlayerShootState : public StateBase
+class PlayerShootState : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;
 	weak_ptr<AActor> m_pTarget;
+	weak_ptr<AActor> m_pBow;
 	//
 	Vec3 dir;
 	// sub-state
@@ -136,10 +160,11 @@ public:
 	void CheckMouse();
 	void CheckEnd(bool _end) { bEnd = _end; }
 	void CheckShootCount(bool _able);
+	void SetBow(shared_ptr<AActor> _bow) { m_pBow = _bow; }
 };
 
 #pragma region shoot-substate
-class PlayerShootStart : public StateBase
+class PlayerShootStart : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;
@@ -154,11 +179,11 @@ public:
 	virtual void End() override;
 };
 
-class PlayerShoot : public StateBase
+class PlayerShoot : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;
-	bool bCanShoot; 
+	bool bCanShoot;
 public:
 	PlayerShoot(weak_ptr<AActor> _pOwner);
 	~PlayerShoot() {}
@@ -173,7 +198,7 @@ public:
 
 #pragma endregion
 
-class PlayerHitState : public StateBase
+class PlayerHitState : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;
@@ -189,7 +214,7 @@ public:
 	virtual void End() override;
 };
 
-class PlayerDieState : public StateBase
+class PlayerDieState : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;
@@ -205,7 +230,7 @@ public:
 	virtual void End() override;
 };
 
-class PlayerClimbState : public StateBase
+class PlayerClimbState : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;
@@ -233,7 +258,7 @@ public:
 	int GetCurrentPhase() { return currentPhase; }
 };
 
-class PlayerClimbFinish : public StateBase
+class PlayerClimbFinish : public PlayerBaseState
 {
 private:
 	weak_ptr<AActor> m_pOwner;

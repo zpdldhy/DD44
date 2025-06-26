@@ -59,6 +59,7 @@ void BatMovement::Init()
 
 	collider->m_bVisible = false;
 
+	dynamic_pointer_cast<BatAttackState>(attack)->SetAttackCollider(attackRangeActor);
 	// Body
 	GetOwner()->m_bCollision = true;
 
@@ -93,6 +94,10 @@ void BatMovement::Tick()
 	if (m_bReturn)
 	{
 		ReturningToPos();
+		return;
+	}
+	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_DEATH)
+	{
 		return;
 	}
 	if (currentState->GetId() != ENEMY_STATE::ENEMY_S_ATTACK && currentState->GetId() != ENEMY_STATE::ENEMY_S_DEATH)
@@ -220,6 +225,8 @@ void BatMovement::ChangetState(shared_ptr<StateBase> _state)
 
 		if (currentState)
 			currentState->Enter();
+		
+		return;
 	}
 	if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
@@ -280,6 +287,7 @@ void BatMovement::Attack()
 {
 	if (m_bCanStartAttack) 
 	{
+		// attack 콜라이더를 키는 타이밍 변경
 		attackRangeActor->m_bCollision = true;
 		attackRangeActor->GetShapeComponent()->m_bVisible = true;
 		// 이 부분 처리 개선 필요
