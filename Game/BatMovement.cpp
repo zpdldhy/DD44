@@ -288,8 +288,8 @@ void BatMovement::Attack()
 	if (m_bCanStartAttack) 
 	{
 		// attack 콜라이더를 키는 타이밍 변경
-		attackRangeActor->m_bCollision = true;
-		attackRangeActor->GetShapeComponent()->m_bVisible = true;
+		///attackRangeActor->m_bCollision = true;
+		//attackRangeActor->GetShapeComponent()->m_bVisible = true;
 		// 이 부분 처리 개선 필요
 		if (!currentState->IsInterruptible() && currentState->IsPlaying())
 		{
