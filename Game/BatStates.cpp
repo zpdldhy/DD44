@@ -79,7 +79,7 @@ void BatAttackState::Enter()
 		});
 
 	animInstance->AddEvent(index, attackEndFrame, [this]() {
-		this->EnableAttackRange();
+		this->DisableAttackRange();
 		});
 
 	animInstance->PlayOnce(index);
@@ -107,7 +107,14 @@ void BatAttackState::End()
 
 void BatAttackState::EnableAttackRange()
 {
-	bActiveRange = !bActiveRange;
+	bActiveRange = true;
+
+	m_pAttackRange->m_bCollision = bActiveRange;
+}
+
+void BatAttackState::DisableAttackRange()
+{
+	bActiveRange = false;
 
 	m_pAttackRange->m_bCollision = bActiveRange;
 }

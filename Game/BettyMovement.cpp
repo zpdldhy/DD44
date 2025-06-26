@@ -52,7 +52,7 @@ void BettyMovement::Init()
 
 
 	// HP
-	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(20);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(1);
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(1000);
 
 	// Intro trigger
@@ -62,6 +62,11 @@ void BettyMovement::Init()
 	EVENT->AddStageEvent(L"FinishIntro", [this]() {
 		this->FinishIntro();
 		});
+
+	// die 효과
+	auto animInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	frameTime = animInstance->GetTotalFrame();
+	frameTime /= 15;
 
 }
 
@@ -127,6 +132,17 @@ void BettyMovement::Tick()
 		break;
 	}
 	case BettyAction::Die: {
+		//Dissolve
+		auto dt = TIMER->GetDeltaTime();
+		m_fDissolveTimer += dt;
+		float t = m_fDissolveTimer / frameTime;
+		auto comp = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>();
+		ApplyDissolveToAllMaterials(comp, t);
+		dissolveElapsed += dt;
+		if (dissolveElapsed >= 3.5f)
+		{
+			GetOwner()->m_bRender = false;
+		}
 		return;
 	}
 	}
@@ -149,7 +165,10 @@ void BettyMovement::Tick()
 		EFFECT->PlayBeamBurst(pos, 20, .5f);
 		EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3::Zero, .5f);
 	}
-
+	if (INPUT->GetButton(Q))
+	{
+		OneSnowBall();
+	}
 }
 
 shared_ptr<UScriptComponent> BettyMovement::Clone()
@@ -228,6 +247,7 @@ void BettyMovement::HandleSnowBall()
 		// ground 높이 확인 필요
 		if ((*iter)->GetPosition().y <= 0.5f)
 		{
+			EFFECT->PlayDustBurst((*iter)->GetPosition(), 10.f, 0.4f);
 			(*iter)->m_bCollision = false;
 			(*iter)->SetPosition(Vec3(0.0f, 20.0f, 0.0f));
 			(*iter)->GetPhysicsComponent()->SetWeight(0.0f);
@@ -495,5 +515,42 @@ void BettyMovement::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp,
 	for (int i = 0; i < comp->GetChildCount(); ++i)
 	{
 		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
+	}
+}
+
+void BettyMovement::OneSnowBall()
+{
+	// snowball 생성
+	float randomX = RandomRange(-20.0f, 20.0f);
+	float randomZ = RandomRange(-20.0f, 20.0f);
+	Vec3 snowPos = GetOwner()->GetPosition();
+	snowPos.x += randomX;
+	snowPos.z += randomZ;
+	snowPos.y = 20.0f;
+
+	auto snow = GetSnowBall();
+	snow->m_bCollision = true;
+	snow->GetShapeComponent()->m_bVisible = true;
+	snow->GetMeshComponent()->SetVisible(true);
+	snow->SetPosition(snowPos);
+	activeSnowList.push_back(snow);
+
+	auto pPhysics = snow->GetPhysicsComponent();
+	pPhysics->SetWeight(1.0f);
+}
+
+void BettyMovement::ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time)
+{
+	if (!_comp) return;
+
+	shared_ptr<UMaterial> mat = _comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetDissolve(_time);
+	}
+
+	for (int i = 0; i < _comp->GetChildCount(); ++i)
+	{
+		ApplyDissolveToAllMaterials(_comp->GetChild(i), _time);
 	}
 }

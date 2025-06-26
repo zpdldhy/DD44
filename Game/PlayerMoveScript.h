@@ -74,6 +74,7 @@ public:
 
 	// 행동 제약(Move, Attack 등)
 	bool m_bNoInput = false;
+	bool isSetEnd = false;
 
 public:
 	void Init() override;
@@ -109,6 +110,7 @@ public:
 	void CanInput() { m_bNoInput = false; }
 	void WalkAnim() { ChangeState(walk); }
 	void IdleAnim() { ChangeState(idle); }
+	void EndGame();
 
 public:
 	void CheckClimb();

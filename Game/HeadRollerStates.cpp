@@ -307,6 +307,10 @@ HeadRollerDieState::HeadRollerDieState(weak_ptr<AActor> _pOwner) : StateBase(ENE
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int index = animInstance->GetAnimIndex(L"Armature|Stun");
+	animInstance->SetKeyFrame(index, 29);
 }
 
 void HeadRollerDieState::Enter()
@@ -316,7 +320,7 @@ void HeadRollerDieState::Enter()
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|Stun");
-	animInstance->SetKeyFrame(index, 29);
+	//animInstance->SetKeyFrame(index, 29);
 	animInstance->m_fAnimPlayRate = 20.0f;
 	animInstance->PlayOnce(index);
 
@@ -346,13 +350,15 @@ void HeadRollerDieState::Tick()
 	if (!animInstance->m_bOnPlayOnce)
 	{
 		// 종료
+		Profiler p(to_string(animInstance->GetCurrentFrame()));
 		animInstance->m_bPlay = false;
 		currentPhase = STAYSTILL;
 		End();
+		return;
 	}
 
 	float frameTime = animInstance->GetTotalFrame();
-	frameTime /= 30;
+	frameTime /= 25;
 	m_fDissolveTimer += TIMER->GetDeltaTime();
 	float t = m_fDissolveTimer / frameTime;
 	auto comp = m_pOwner.lock()->GetMeshComponent();
