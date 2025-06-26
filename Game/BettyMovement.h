@@ -14,8 +14,10 @@ private:
 	weak_ptr<AActor> player;
 private:
 	// Phase
-	enum BettyAction { Intro = 0, Attack, Die };
-	BettyAction currentAction = Intro;
+	bool bEnterIntro = false;
+	bool bFinishIntro = false;
+	enum BettyAction { BeforeIntro =0, Intro, Attack, Die };
+	BettyAction currentAction = BeforeIntro;
 	//// Common
 	float hitElapsed = 1.0f;
 	Vec3 distance;
@@ -27,6 +29,10 @@ private:
 	shared_ptr<AActor> rightRange;
 	shared_ptr<AActor> bodyRange;
 
+	bool canMeleeAttack = true;
+	float attackElapsed = 0.0f;
+	float attackOffset = 2.0f;
+	int meleeAttackCount = 3;
 
 	//// Roll
 	int rollCount = 3;
@@ -45,22 +51,24 @@ private:
 	// FX
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
-
+	float frameTime;
+	float m_fDissolveTimer = 0.0f;
+	float dissolveElapsed = 0.0f;
 	// States 
-	shared_ptr<StateBase> idle;
-	shared_ptr<StateBase> intro;
-	shared_ptr<StateBase> jumpAttack;
-	shared_ptr<StateBase> twoHandAttack;
-	shared_ptr<StateBase> oneHandBackAttack;
-	shared_ptr<StateBase> oneHandDownAttack;
-	shared_ptr<StateBase> rollAttack;
-	shared_ptr<StateBase> dropAttack;
-	shared_ptr<StateBase> roarAttack;
-	shared_ptr<StateBase> death;
-	shared_ptr<StateBase> currentState;
+	shared_ptr<BettyStateBase> idle;
+	shared_ptr<BettyStateBase> intro;
+	shared_ptr<BettyStateBase> jumpAttack;
+	shared_ptr<BettyStateBase> twoHandAttack;
+	shared_ptr<BettyStateBase> oneHandBackAttack;
+	shared_ptr<BettyStateBase> oneHandDownAttack;
+	shared_ptr<BettyStateBase> rollAttack;
+	shared_ptr<BettyStateBase> dropAttack;
+	shared_ptr<BettyStateBase> roarAttack;
+	shared_ptr<BettyStateBase> death;
+	shared_ptr<BettyStateBase> currentState;
 	UINT currentStateId;
-	vector<shared_ptr<StateBase>> meleeState;
-	vector<shared_ptr<StateBase>> rangedState;
+	vector<shared_ptr<BettyStateBase>> meleeState;
+	vector<shared_ptr<BettyStateBase>> rangedState;
 	int meleeIndex = 0;
 	int rangedIndex = 0;
 
@@ -74,11 +82,15 @@ public:
 public:
 	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
 	void SetSnowBall();
+	void SetAttackRange();
 	shared_ptr<AActor> CreateSnowBall();
-	void ChangeState(shared_ptr<StateBase> _state);
+	void ChangeState(shared_ptr<BettyStateBase> _state);
+
 
 	// GetBettyAction
 	bool IsBettyDie() { return currentAction == BettyAction::Die; }
+	void EnterIntro();
+	void FinishIntro();
 public:
 	//Phase
 	void HandleAttack(float _deltaTime);
@@ -86,6 +98,7 @@ public:
 	void DropSnowBall(float _deltaTime);
 	shared_ptr<AActor> GetSnowBall();
 	void HandleSnowBall();
+	void OneSnowBall();
 public:
 	//Collision
 	void CheckHit();
@@ -94,5 +107,6 @@ public:
 	//FX
 	void Flashing();
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
+	void ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time);
 };
 

@@ -100,8 +100,14 @@ private:
 	weak_ptr<AActor> m_pTarget;
 	// 이동
 	bool bStaticMage = false;
-	Vec3 dir = Vec3();
-	float targetYaw = 0.f;
+	Vec3 dir;
+	float targetYaw;
+	////
+	//Vec2 minPos = { -10, 60 };
+	//Vec2 maxPos = { 60, 140 };
+	Vec3 minPos = { -110, 0, 60 };
+	Vec3 maxPos = { 0, 0, 130 };
+
 	// teleport 관련 변수
 	Vec3 destination = Vec3();
 	float disElapsed = 0.0f;
@@ -127,6 +133,9 @@ public:
 	void SetTarget(weak_ptr<AActor> _pTarget);
 	void SetDirection();
 	void CheckStatic(bool _s) { bStaticMage = _s; }
+	void SetRunaway() { currentPhase = AttackPhase::Runaway; }
+	bool CheckCollision();
+	bool SetAppearPoint();
 };
 
 class MageAttackStart : public StateBase

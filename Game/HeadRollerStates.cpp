@@ -120,65 +120,17 @@ void HeadRollerAttackState::End()
 
 bool HeadRollerAttackState::CheckWallCollision()
 {
-	Vec3 pos = m_pOwner.lock()->GetPosition();
-	Vec3 look = dir;
-
-	float offset = 4.0f;
-	Vec3 right = m_pOwner.lock()->GetRight();
-	Ray leftRay(pos + (-right * offset), look);
-	Ray rightRay(pos + (right * offset), look);
-	Ray middleRay(pos, look);
-
-	auto box = dynamic_pointer_cast<UBoxComponent>(m_pOwner.lock()->GetShapeComponent());
-	auto ray = box->GetLookRay();
-	Vec3 range(6.0f, 0.0f, 6.0f);
-
 	for (const auto& colData : m_pOwner.lock()->m_vCollisionList)
 	{
-		if (OBJECT->GetActor(colData.first)->m_szName == L"MyCharacter")
+		auto name = OBJECT->GetActor(colData.first)->m_szName;
+		if (name == L"MyCharacter" || name == L"MageSphere")
 		{
 			continue;
 		}
 		auto targetShape = OBJECT->GetActor(colData.first)->GetShapeComponent();
 		auto targetBox = dynamic_pointer_cast<UBoxComponent>(targetShape);
 
-		// 걍 뭔가 충돌하면 다 처리해버려 ? 
-
 		return true;
-
-		Vec3 inter;
-		if (Collision::CheckRayToOBB(middleRay, targetBox->GetBounds(), inter))
-		{
-			// 
-			Vec3 dis = pos - inter;
-			dis.y = 0;
-			if (dis.Length() < range.Length())
-			{
-				return true;
-			}
-		}
-
-		if (Collision::CheckRayToOBB(leftRay, targetBox->GetBounds(), inter))
-		{
-			// 
-			Vec3 dis = pos - inter;
-			dis.y = 0;
-			if (dis.Length() < range.Length())
-			{
-				return true;
-			}
-		}
-
-		if (Collision::CheckRayToOBB(rightRay, targetBox->GetBounds(), inter))
-		{
-			// 
-			Vec3 dis = pos - inter;
-			dis.y = 0;
-			if (dis.Length() < range.Length())
-			{
-				return true;
-			}
-		}
 	}
 	return false;
 }
@@ -355,6 +307,10 @@ HeadRollerDieState::HeadRollerDieState(weak_ptr<AActor> _pOwner) : StateBase(ENE
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int index = animInstance->GetAnimIndex(L"Armature|Stun");
+	animInstance->SetKeyFrame(index, 29);
 }
 
 void HeadRollerDieState::Enter()
@@ -364,7 +320,7 @@ void HeadRollerDieState::Enter()
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|Stun");
-	animInstance->SetKeyFrame(index, 29);
+	//animInstance->SetKeyFrame(index, 29);
 	animInstance->m_fAnimPlayRate = 20.0f;
 	animInstance->PlayOnce(index);
 
@@ -377,9 +333,11 @@ void HeadRollerDieState::Enter()
 
 	Vec3 playerPos = m_pPlayer.lock()->GetPosition();
 	playerPos.y += 1.5f;
+	Vec3 monPos = m_pOwner.lock()->GetPosition();
+	monPos.y += 1.5f;
 	Vec3 soulDirection = playerPos - m_pOwner.lock()->GetPosition();
 	soulDirection.Normalize();
-	EFFECT->PlayEffect(EEffectType::Soul, m_pOwner.lock()->GetPosition(), 0, soulDirection, 1.0f, playerPos);
+	EFFECT->PlayEffect(EEffectType::Soul, monPos, 0, soulDirection, 1.0f, playerPos);
 
 	// 사운드
 	SOUND->GetPtr(ESoundType::Dead_Walker)->PlayEffect2D();
@@ -392,13 +350,15 @@ void HeadRollerDieState::Tick()
 	if (!animInstance->m_bOnPlayOnce)
 	{
 		// 종료
+		Profiler p(to_string(animInstance->GetCurrentFrame()));
 		animInstance->m_bPlay = false;
 		currentPhase = STAYSTILL;
 		End();
+		return;
 	}
 
-	float frameTime = static_cast<float>(animInstance->GetTotalFrame());
-	frameTime /= 30;
+	float frameTime = animInstance->GetTotalFrame();
+	frameTime /= 25;
 	m_fDissolveTimer += TIMER->GetDeltaTime();
 	float t = m_fDissolveTimer / frameTime;
 	auto comp = m_pOwner.lock()->GetMeshComponent();

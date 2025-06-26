@@ -17,14 +17,6 @@ public:
 	float m_fCurrentSpeed = 0.f;
 	float m_fRotationSpeed = 8.0f;
 
-	bool m_bDamageCoolTime = false;
-	float m_fDamageCoolTime = 1.0f;
-	bool m_bCanBeHit = true;
-
-	bool m_bRollCoolTime = false;
-	float m_fRollCoolTime = 0.3f;
-	bool m_bCanRoll = true;
-
 	// Attack
 	shared_ptr<AActor> attackRangeActor = nullptr;
 	shared_ptr<AActor> bow = nullptr;
@@ -40,17 +32,17 @@ public:
 	shared_ptr<Texture> m_pSubTexture = nullptr;
 	shared_ptr<Texture> m_pNoiesTexture = nullptr;
 
-	shared_ptr<StateBase> empty = nullptr;
-	shared_ptr<StateBase> idle = nullptr;
-	shared_ptr<StateBase> walk = nullptr;
-	shared_ptr<StateBase> climb = nullptr;
-	shared_ptr<StateBase> roll = nullptr;
-	shared_ptr<StateBase> attack = nullptr;
-	shared_ptr<StateBase> hit = nullptr;
-	shared_ptr<StateBase> shoot = nullptr;
-	shared_ptr<StateBase> die = nullptr;
-	shared_ptr<StateBase> currentState = nullptr;
-	PLAYER_STATE currentStateId = PLAYER_STATE::EMPTY_STATE;
+	shared_ptr<PlayerBaseState> empty;
+	shared_ptr<PlayerBaseState> idle;
+	shared_ptr<PlayerBaseState> walk;
+	shared_ptr<PlayerBaseState> climb;
+	shared_ptr<PlayerBaseState> roll;
+	shared_ptr<PlayerBaseState> attack;
+	shared_ptr<PlayerBaseState> hit;
+	shared_ptr<PlayerBaseState> shoot;
+	shared_ptr<PlayerBaseState> die;
+	shared_ptr<PlayerBaseState> currentState;
+	PLAYER_STATE currentStateId;
 
 	// Cilmb
 	bool m_bCanClimb = false;
@@ -82,6 +74,7 @@ public:
 
 	// 행동 제약(Move, Attack 등)
 	bool m_bNoInput = false;
+	bool isSetEnd = false;
 
 public:
 	void Init() override;
@@ -89,7 +82,7 @@ public:
 	virtual shared_ptr<UScriptComponent> Clone() override;
 public:
 	void Resurrection();
-	void ChangeState(shared_ptr<StateBase> _state);
+	void ChangeState(shared_ptr<PlayerBaseState> _state);
 public:
 	void PlayFX();
 	//void Slash();
@@ -117,6 +110,7 @@ public:
 	void CanInput() { m_bNoInput = false; }
 	void WalkAnim() { ChangeState(walk); }
 	void IdleAnim() { ChangeState(idle); }
+	void EndGame();
 
 public:
 	void CheckClimb();

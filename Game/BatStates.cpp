@@ -73,6 +73,15 @@ void BatAttackState::Enter()
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Bite");
+
+	animInstance->AddEvent(index, attackStartFrame, [this]() {
+		this->EnableAttackRange();
+		});
+
+	animInstance->AddEvent(index, attackEndFrame, [this]() {
+		this->DisableAttackRange();
+		});
+
 	animInstance->PlayOnce(index);
 	// 사운드
 	SOUND->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
@@ -93,6 +102,21 @@ void BatAttackState::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	bActiveRange = false;
+}
+
+void BatAttackState::EnableAttackRange()
+{
+	bActiveRange = true;
+
+	m_pAttackRange->m_bCollision = bActiveRange;
+}
+
+void BatAttackState::DisableAttackRange()
+{
+	bActiveRange = false;
+
+	m_pAttackRange->m_bCollision = bActiveRange;
 }
 
 BatDieState::BatDieState(weak_ptr<AActor> _pOwner) : StateBase(ENEMY_S_DEATH)
@@ -112,9 +136,11 @@ void BatDieState::Enter()
 
 	Vec3 playerPos = m_pPlayer.lock()->GetPosition();
 	playerPos.y += 1.5f;
+	Vec3 monPos = m_pOwner.lock()->GetPosition();
+	monPos.y += 1.5f;
 	Vec3 soulDirection = playerPos - m_pOwner.lock()->GetPosition();
 	soulDirection.Normalize();
-	EFFECT->PlayEffect(EEffectType::Soul, m_pOwner.lock()->GetPosition(), 0, soulDirection, 1.0f, playerPos);
+	EFFECT->PlayEffect(EEffectType::Soul, monPos, 0, soulDirection, 1.0f, playerPos);
 
 
 	// 사운드
@@ -129,12 +155,12 @@ void BatDieState::Tick()
 		// 애니메이션 종료
 		End();
 	}
-	
+
 	//Dissolve
 	float frameTime = static_cast<float>(animInstance->GetTotalFrame());
 	frameTime /= 30;
 	m_fDissolveTimer += TIMER->GetDeltaTime();
-	float t = m_fDissolveTimer / frameTime; 
+	float t = m_fDissolveTimer / frameTime;
 	auto comp = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>();
 	ApplyDissolveToAllMaterials(comp, t);
 }

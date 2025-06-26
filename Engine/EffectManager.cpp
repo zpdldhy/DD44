@@ -18,7 +18,7 @@
 #include "APointEffectActor.h"
 #include "ASoulActor.h"
 
-constexpr int INITIAL_POOL_SIZE = 3;
+constexpr int INITIAL_POOL_SIZE = 0;
 
 void EffectManager::Init()
 {
@@ -137,6 +137,7 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
         collider->SetLocalScale(Vec3(.1f, .1f, .1f));
         collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
         actor->SetShapeComponent(collider);
+        actor->m_bAutoScale = false;
         break;
     }
 
@@ -346,7 +347,7 @@ void EffectManager::EffectMove()
 
 void EffectManager::PlayInit()
 {
-	for (int i = 0; i < INITIAL_POOL_SIZE; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
 		PlayEffect(EEffectType::Feather, Vec3(0, 0, 0), 0.0f, Vec3(0, 0, 0));
      

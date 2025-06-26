@@ -22,6 +22,7 @@ public:
 
     virtual Vec3 Prepare(const Vec3& _pos, const Vec3& _baseVelocity, float _scale=1.f);
     float m_fRemainTime = 0.0f;
+    bool m_bAutoScale = true;
 
 protected:
     EEffectType m_eType;
@@ -34,4 +35,5 @@ protected:
     Vec3 m_vStartScale = Vec3(.3f, .2f, .2f);
     Vec3 m_vEndScale = Vec3(3.5f, .5f, 3.f);
     Vec3 m_vInitDir;
+
 };

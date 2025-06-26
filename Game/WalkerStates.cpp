@@ -116,12 +116,19 @@ void WalkerDieState::Enter()
 	
 	Vec3 playerPos = m_pPlayer.lock()->GetPosition();
 	playerPos.y += 1.5f;
+	Vec3 monPos = m_pOwner.lock()->GetPosition();
+	monPos.y += 1.5f;
 	Vec3 soulDirection = playerPos - m_pOwner.lock()->GetPosition();
 	soulDirection.Normalize();
-	EFFECT->PlayEffect(EEffectType::Soul, m_pOwner.lock()->GetPosition(), 0, soulDirection, 1.0f, playerPos);
+	EFFECT->PlayEffect(EEffectType::Soul, monPos, 0, soulDirection, 1.0f, playerPos);
 
 	// 사운드
 	SOUND->GetPtr(ESoundType::Dead_Walker)->PlayEffect2D();
+
+	// 위치
+	Vec3 currentPos = m_pOwner.lock()->GetPosition();
+	currentPos.y -= 1.0f;
+	m_pOwner.lock()->SetPosition(currentPos);
 }
 
 void WalkerDieState::Tick()

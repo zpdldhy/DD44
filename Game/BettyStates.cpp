@@ -92,7 +92,7 @@ Vec3 JumpMotionHandler::Update()
 	return pos;
 }
 
-BettyIdleState::BettyIdleState(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_IDLE)
+BettyIdleState::BettyIdleState(weak_ptr<AActor> _pOwner) : BettyStateBase(BETTY_S_IDLE)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = true;
@@ -116,7 +116,7 @@ void BettyIdleState::End()
 	m_bOnPlaying = false;
 }
 
-BettyIntroState::BettyIntroState(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_INTRO)
+BettyIntroState::BettyIntroState(weak_ptr<AActor> _pOwner) : BettyStateBase(BETTY_S_INTRO)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -168,7 +168,7 @@ void BettyIntroState::PlayFx()
 	EFFECT->PlayBeamBurst(pos, 20, .7f);
 }
 
-BettyJumpAttack::BettyJumpAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_JUMPHIGH)
+BettyJumpAttack::BettyJumpAttack(weak_ptr<AActor> _pOwner) : BettyStateBase(BETTY_S_A_JUMPHIGH)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -182,17 +182,12 @@ void BettyJumpAttack::Enter()
 	int index = animInstance->GetAnimIndex(L"Armature|Punch_double");
 	animInstance->PlayOnce(index);
 
-	animInstance->AddEvent(index, 25, [this]() {
-		this->SlowAnimSpeed();
-		});
-	animInstance->AddEvent(index, 26, [this]() {
-		this->PlayBodyFx();
-		});
-	animInstance->AddEvent(index, 35, [this]() {
-		this->NormalizeAnimSpeed();
-		});
-	animInstance->AddEvent(index, 31, [this]() {
+	animInstance->AddEvent(index, 39, [this]() {
 		this->PlayHandFx();
+		});
+
+	animInstance->AddEvent(index, 43, [this]() {
+		this->EnableCollider();
 		});
 
 	//// 사운드
@@ -205,12 +200,16 @@ void BettyJumpAttack::Enter()
 	Vec3 startPos = m_pOwner.lock()->GetPosition();
 	Vec3 endPos = targetPos;
 	//Vec3 endPos = startPos + posOffset * look;
-	float totalTime = (animInstance->GetTotalFrame()) / TIMER->GetFPS();
-	jumpHandler.Init(startPos, endPos, 8.0f, totalTime, 0.1f, 2.0f);
+	float totalTime = (animInstance->GetTotalFrame()) / 30.0f;
+	jumpHandler.Init(startPos, endPos, 8.0f, totalTime, 0.03f, 2.0f);
 
 	// 회전
 	Vec3 dir = endPos - startPos;
 	targetYaw = atan2f(dir.x, dir.z);
+
+	// 콜라이더
+	leftRange.lock()->m_bCollision = true;
+	rightRange.lock()->m_bCollision = true;
 }
 void BettyJumpAttack::Tick()
 {
@@ -246,21 +245,7 @@ void BettyJumpAttack::End()
 
 	bControlOnce = true;
 }
-void BettyJumpAttack::SlowAnimSpeed()
-{
-	if (bControlOnce)
-	{
-		auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-		originAnimSpeed = animInstance->m_fAnimPlayRate;
-		animInstance->m_fAnimPlayRate -= 5.0f;
-		bControlOnce = false;
-	}
-}
-void BettyJumpAttack::NormalizeAnimSpeed()
-{
-	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	animInstance->m_fAnimPlayRate = originAnimSpeed;
-}
+
 void BettyJumpAttack::PlayHandFx()
 {
 	// 사운드 ( 소스 변경 필요 ) 
@@ -287,7 +272,7 @@ void BettyJumpAttack::PlayBodyFx()
 	//EFFECT->PlayBeamBurst(pos, 20, .5f);
 }
 
-BettyTwoHandAttack::BettyTwoHandAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_TWOHAND)
+BettyTwoHandAttack::BettyTwoHandAttack(weak_ptr<AActor> _pOwner) : BettyStateBase(BETTY_S_A_TWOHAND)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -300,23 +285,68 @@ void BettyTwoHandAttack::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|FistSlam");
 	animInstance->PlayOnce(index);
+	originAnimSpeed = animInstance->m_fAnimPlayRate;
+	// 52 프레임
+	animInstance->AddEvent(index, 30, [this]() {
+		this->StartCol();
+		});
+	animInstance->AddEvent(index, 42, [this]() {
+		this->EndAnim();
+		});
+
+
 }
 void BettyTwoHandAttack::Tick()
 {
 	// Anim
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	if (!animInstance->m_bOnPlayOnce)
+	if (!animInstance->m_bOnPlayOnce && !bAnimStop)
 	{
-		End();
+		animInstance->m_bPlay = false;
+		bAnimStop = true;
 	}
+
+	if (bAnimStop)
+	{
+		elapsed += TIMER->GetDeltaTime();
+		if (elapsed >= offset)
+		{
+			bAnimStop = false;
+			elapsed = 0.0f;
+			animInstance->m_bPlay = true;
+			animInstance->m_fAnimPlayRate = originAnimSpeed;
+			End();
+		}
+	}
+
 }
 void BettyTwoHandAttack::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	bAnimStop = false;
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	animInstance->m_bPlay = true;
 }
 
-BettyOneHandBackAttack::BettyOneHandBackAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_HANDBACK)
+void BettyTwoHandAttack::StartCol()
+{
+	// 콜라이더
+	leftRange.lock()->m_bCollision = true;
+	rightRange.lock()->m_bCollision = true;
+}
+
+void BettyTwoHandAttack::EndAnim()
+{
+	// 콜라이더
+	leftRange.lock()->m_bCollision = false;
+	rightRange.lock()->m_bCollision = false;
+
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	animInstance->m_fAnimPlayRate = 18.0f;
+}
+
+BettyOneHandBackAttack::BettyOneHandBackAttack(weak_ptr<AActor> _pOwner) : BettyStateBase(BETTY_S_A_HANDBACK)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -327,20 +357,49 @@ void BettyOneHandBackAttack::Enter()
 	m_bOnPlaying = true;
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+
 	int index = animInstance->GetAnimIndex(L"Armature|Slash_right");
 	if (!bRight)
 	{
 		index = animInstance->GetAnimIndex(L"Armature|Slash_left");
+		leftRange.lock()->m_bCollision = true;
+	}
+	else
+	{
+		rightRange.lock()->m_bCollision = true;
 	}
 	animInstance->PlayOnce(index);
+	originAnimSpeed = animInstance->m_fAnimPlayRate;
+	animInstance->AddEvent(index, 25, [this]() {
+		this->StartCol();
+		});
+	animInstance->AddEvent(index, 38, [this]() {
+		this->EnableCollider();
+		});
+
+
 }
 void BettyOneHandBackAttack::Tick()
 {
 	// Anim
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	if (!animInstance->m_bOnPlayOnce)
+	if (!animInstance->m_bOnPlayOnce && !bAnimStop)
 	{
-		End();
+		animInstance->m_bPlay = false;
+		bAnimStop = true;
+	}
+
+	if (bAnimStop)
+	{
+		elapsed += TIMER->GetDeltaTime();
+		if (elapsed >= offset)
+		{
+			bAnimStop = false;
+			elapsed = 0.0f;
+			animInstance->m_bPlay = true;
+			animInstance->m_fAnimPlayRate = originAnimSpeed;
+			End();
+		}
 	}
 	// Lerp 회전
 	{
@@ -358,6 +417,9 @@ void BettyOneHandBackAttack::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	bAnimStop = false;
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	animInstance->m_bPlay = true;
 }
 bool BettyOneHandBackAttack::CheckDirection(Vec3 _targetPos)
 {
@@ -382,7 +444,19 @@ bool BettyOneHandBackAttack::CheckDirection(Vec3 _targetPos)
 	return bRight;
 }
 
-BettyOneHandDownAttack::BettyOneHandDownAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_HANDDOWN)
+void BettyOneHandBackAttack::StartCol()
+{
+	if (!bRight)
+	{
+		leftRange.lock()->m_bCollision = true;
+	}
+	else
+	{
+		rightRange.lock()->m_bCollision = true;
+	}
+}
+
+BettyOneHandDownAttack::BettyOneHandDownAttack(weak_ptr<AActor> _pOwner) : BettyStateBase(BETTY_S_A_HANDDOWN)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -397,16 +471,44 @@ void BettyOneHandDownAttack::Enter()
 	if (!bRight)
 	{
 		index = animInstance->GetAnimIndex(L"Armature|Punch_left");
+		leftRange.lock()->m_bCollision = true;
 	}
+	else
+	{
+		rightRange.lock()->m_bCollision = true;
+	}
+	originAnimSpeed = animInstance->m_fAnimPlayRate;
 	animInstance->PlayOnce(index);
+
+	// 33 프레임
+	animInstance->AddEvent(index, 26, [this]() {
+		this->StartCol();
+		});
+	animInstance->AddEvent(index, 29, [this]() {
+		this->EnableCollider();
+		});
 }
 void BettyOneHandDownAttack::Tick()
 {
 	// Anim
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	if (!animInstance->m_bOnPlayOnce)
+	if (!animInstance->m_bOnPlayOnce && !bAnimStop)
 	{
-		End();
+		animInstance->m_bPlay = false;
+		bAnimStop = true;
+	}
+
+	if (bAnimStop)
+	{
+		elapsed += TIMER->GetDeltaTime();
+		if (elapsed >= offset)
+		{
+			bAnimStop = false;
+			elapsed = 0.0f;
+			animInstance->m_bPlay = true;
+			animInstance->m_fAnimPlayRate = originAnimSpeed;
+			End();
+		}
 	}
 	// Lerp 회전
 	{
@@ -424,6 +526,9 @@ void BettyOneHandDownAttack::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	bAnimStop = false;
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	animInstance->m_bPlay = true;
 }
 bool BettyOneHandDownAttack::CheckDirection(Vec3 _targetPos)
 {
@@ -447,7 +552,19 @@ bool BettyOneHandDownAttack::CheckDirection(Vec3 _targetPos)
 	return bRight;
 }
 
-BettyRollAttack::BettyRollAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_ROLL)
+void BettyOneHandDownAttack::StartCol()
+{
+	if (!bRight)
+	{
+		leftRange.lock()->m_bCollision = true;
+	}
+	else
+	{
+		rightRange.lock()->m_bCollision = true;
+	}
+}
+
+BettyRollAttack::BettyRollAttack(weak_ptr<AActor> _pOwner) : BettyStateBase(BETTY_S_A_ROLL)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -672,11 +789,11 @@ bool BettyRollMiddle::CheckWallCollision()
 		{
 			continue;
 		}
-		
+
 		auto targetShape = OBJECT->GetActor(colData.first)->GetShapeComponent();
 		auto targetBox = dynamic_pointer_cast<UBoxComponent>(targetShape);
 
-		Vec3 inter; 
+		Vec3 inter;
 		if (Collision::CheckRayToOBB(middleRay, targetBox->GetBounds(), inter))
 		{
 			// 
@@ -776,7 +893,7 @@ void BettyRollEnd::End()
 }
 #pragma endregion
 
-BettyDropAttack::BettyDropAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_DROPSNOW)
+BettyDropAttack::BettyDropAttack(weak_ptr<AActor> _pOwner) : BettyStateBase(BETTY_S_A_DROPSNOW)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -789,6 +906,10 @@ void BettyDropAttack::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|FistSlam_anger");
 	animInstance->PlayOnce(index);
+
+	leftRange.lock()->m_bCollision = true;
+	rightRange.lock()->m_bCollision = true;
+
 }
 void BettyDropAttack::Tick()
 {
@@ -803,9 +924,10 @@ void BettyDropAttack::End()
 {
 	// 기본 state 세팅
 	m_bOnPlaying = false;
+	EnableCollider();
 }
 
-BettyRoarAttack::BettyRoarAttack(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_A_ROAR)
+BettyRoarAttack::BettyRoarAttack(weak_ptr<AActor> _pOwner) : BettyStateBase(BETTY_S_A_ROAR)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -834,7 +956,7 @@ void BettyRoarAttack::End()
 	m_bOnPlaying = false;
 }
 
-BettyDeathState::BettyDeathState(weak_ptr<AActor> _pOwner) : StateBase(BETTY_S_DEATH)
+BettyDeathState::BettyDeathState(weak_ptr<AActor> _pOwner) : BettyStateBase(BETTY_S_DEATH)
 {
 	m_pOwner = _pOwner;
 	m_bCanInterrupt = false;
@@ -855,4 +977,22 @@ void BettyDeathState::Tick()
 }
 void BettyDeathState::End()
 {
+}
+
+BettyStateBase::BettyStateBase(UINT _iStateId) : StateBase(_iStateId)
+{
+
+}
+
+void BettyStateBase::SetRange(const shared_ptr<AActor>& left, const shared_ptr<AActor>& right)
+{
+	leftRange = left;
+	rightRange = right;
+}
+
+void BettyStateBase::EnableCollider()
+{
+	// 콜라이더
+	leftRange.lock()->m_bCollision = false;
+	rightRange.lock()->m_bCollision = false;
 }

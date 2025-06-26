@@ -21,6 +21,7 @@ void HealerScript::Tick()
 	float deltaY = currY - prevY;
 
 	GetOwner()->AddPosition(Vec3(0.f, deltaY, 0.f));
+	GetOwner()->AddRotation(Vec3(0.f, 0.1f, 0.f));
 }
 
 shared_ptr<UScriptComponent> HealerScript::Clone()
@@ -31,5 +32,5 @@ shared_ptr<UScriptComponent> HealerScript::Clone()
 
 void HealerScript::Interact()
 {
-	GetOwner()->AddRotation(Vec3(0.f, 0.1f, 0.f));
+
 }

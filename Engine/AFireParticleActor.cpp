@@ -26,9 +26,11 @@ void AFireParticleActor::Tick()
     m_fLocalTime += TIMER->GetDeltaTime();
 
     float t = m_fLocalTime + m_fTimeOffset;
+    float tx = fmodf((m_fLocalTime + m_fTimeOffset) * m_vRandomFreq.x, DD_2PI);
+    float ty = fmodf((m_fLocalTime + m_fTimeOffset) * m_vRandomFreq.y, DD_2PI);
 
-    float x = sinf(t * m_vRandomFreq.x) * m_vAmplitude.x;
-    float y = sinf(t * m_vRandomFreq.y) * m_vAmplitude.y;
+    float x = sinf(tx) * m_vAmplitude.x;
+    float y = sinf(ty) * m_vAmplitude.y;
 
     float targetFlicker = RandomRange(-0.03f, 0.03f);
     m_fFlickerValue = Lerp(m_fFlickerValue, targetFlicker, TIMER->GetDeltaTime() * 5.0f);
