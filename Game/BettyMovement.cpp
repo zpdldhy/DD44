@@ -149,7 +149,10 @@ void BettyMovement::Tick()
 		EFFECT->PlayBeamBurst(pos, 20, .5f);
 		EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3::Zero, .5f);
 	}
-
+	if (INPUT->GetButton(Q))
+	{
+		OneSnowBall();
+	}
 }
 
 shared_ptr<UScriptComponent> BettyMovement::Clone()
@@ -228,6 +231,7 @@ void BettyMovement::HandleSnowBall()
 		// ground 높이 확인 필요
 		if ((*iter)->GetPosition().y <= 0.5f)
 		{
+			EFFECT->PlayDustBurst((*iter)->GetPosition(), 10.f, 0.4f);
 			(*iter)->m_bCollision = false;
 			(*iter)->SetPosition(Vec3(0.0f, 20.0f, 0.0f));
 			(*iter)->GetPhysicsComponent()->SetWeight(0.0f);
@@ -496,4 +500,25 @@ void BettyMovement::ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp,
 	{
 		ApplyHitFlashToAllMaterials(comp->GetChild(i), value);
 	}
+}
+
+void BettyMovement::OneSnowBall()
+{
+	// snowball 생성
+	float randomX = RandomRange(-20.0f, 20.0f);
+	float randomZ = RandomRange(-20.0f, 20.0f);
+	Vec3 snowPos = GetOwner()->GetPosition();
+	snowPos.x += randomX;
+	snowPos.z += randomZ;
+	snowPos.y = 20.0f;
+
+	auto snow = GetSnowBall();
+	snow->m_bCollision = true;
+	snow->GetShapeComponent()->m_bVisible = true;
+	snow->GetMeshComponent()->SetVisible(true);
+	snow->SetPosition(snowPos);
+	activeSnowList.push_back(snow);
+
+	auto pPhysics = snow->GetPhysicsComponent();
+	pPhysics->SetWeight(1.0f);
 }
