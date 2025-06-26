@@ -472,14 +472,17 @@ void Game::UpdateUI()
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
 
 		StagePhase currentStage = STAGE->GetCurrentStage();
-		if (currentStage != StagePhase::FINAL)
+
+		SOUND->GetPtr(ESoundType::Stage0)->SetPause(false);
+		SOUND->GetPtr(ESoundType::Boss1)->SetPause(false);
+		/*if (currentStage != StagePhase::FINAL)
 		{
 			SOUND->GetPtr(ESoundType::Stage0)->Play2D();
 		}
 		else
 		{
 			SOUND->GetPtr(ESoundType::Boss1)->Play2D();
-		}
+		}*/
 	}
 }
 
