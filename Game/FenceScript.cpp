@@ -38,6 +38,8 @@ void FenceScript::Init()
 	bodyCollider->SetShapeComponent(collider);
 	OBJECT->AddActor(bodyCollider);
 	ENEMYCOLLIDER->AddObject(bodyCollider);
+
+	maxY = GetOwner()->GetPosition().y + 6.0f;
 }
 
 void FenceScript::Tick()
@@ -48,6 +50,13 @@ void FenceScript::Tick()
 		m_elapsed += dt;
 		m_dustElapsed += dt;
 		GetOwner()->AddPosition(Vec3(0, -1, 0) * 5.0f * dt);
+		auto pos = GetOwner()->GetPosition();
+		if (pos.y >= maxY)
+		{
+			pos.y = maxY;
+			GetOwner()->SetPosition(pos);
+		}
+
 		bodyCollider->SetPosition(GetOwner()->GetPosition() + Vec3(0, 2, 0));
 		if (m_elapsed > 3.0f)
 		{

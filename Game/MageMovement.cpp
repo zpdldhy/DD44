@@ -35,7 +35,6 @@ void MageMovement::Init()
 		findDistance = 50.0f;
 		dynamic_pointer_cast<MageHitState>(hit)->CheckStatic(bStaticMage);
 		dynamic_pointer_cast<MageAttackState>(attack)->CheckStatic(bStaticMage);
-		//dynamic_pointer_cast<MageDisappearState>(disappear)->CheckStatic(false);
 	}
 
 	// Player Pos
