@@ -17,7 +17,7 @@ private:
 	queue<pair<UINT, UINT>> m_freeIndices;
 
 	// Phase
-	StagePhase currentPhase = StagePhase::STAGE10;
+	StagePhase currentPhase = StagePhase::STAGE00;
 
 public:
 	void AddEnemyInStage(UINT _stageId, shared_ptr<AActor> _actor);

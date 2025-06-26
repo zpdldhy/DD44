@@ -56,7 +56,7 @@ void FenceScript::Tick()
 		}
 
 		auto right = GetOwner()->GetRight();
-		if (m_dustElapsed >= 0.5f && m_elapsed <= 1.0f)
+		if (m_dustElapsed >= 0.4f && m_elapsed <= 1.0f)
 		{
 			//Profiler p("Enter");
 			//EFFECT->PlayEffect(EEffectType::PoppingDust, pos, 0, Vec3(0.0f, 0.0f, 0.0f), 0.6f);
