@@ -8,16 +8,16 @@ class AActor;
 
 struct CB_Blur
 {
-	Vec2 g_vTexelSize;
-	Vec2 g_vDirection;
-	float g_fBlurScale;
-	Vec3 padding;
+	Vec2 g_vTexelSize = Vec2();
+	Vec2 g_vDirection = Vec2();
+	float g_fBlurScale = 0.f;
+	Vec3 padding = Vec3();
 };
 
 struct CB_Debug
 {
-	int g_iDebugMode;
-	Vec3 padding;
+	int g_iDebugMode = 0;
+	Vec3 padding = Vec3();
 };
 
 class PostProcessManager : public Singleton<PostProcessManager>
@@ -32,7 +32,7 @@ class PostProcessManager : public Singleton<PostProcessManager>
 	shared_ptr<AActor> m_p3DWorld = nullptr;
 
 	// Get Prev Viewport
-	D3D11_VIEWPORT m_PrevVP;
+	D3D11_VIEWPORT m_PrevVP = D3D11_VIEWPORT();
 	UINT m_iPrevViewPorts = 0;
 	ID3D11RenderTargetView* m_pPrevRTV = nullptr;
 	ID3D11DepthStencilView* m_pPrevDSV = nullptr;
@@ -40,8 +40,8 @@ class PostProcessManager : public Singleton<PostProcessManager>
 	CB_Blur m_tBlurCB = {};
 
 	int m_iDebugMode = 0;
-	CB_Debug m_tDebugData;       
-	ComPtr<ID3D11Buffer> m_pCBDebug; 
+	CB_Debug m_tDebugData = CB_Debug();
+	ComPtr<ID3D11Buffer> m_pCBDebug = nullptr;
 
 public:
 	// 후처리용 텍스처 및 shader초기화
@@ -56,7 +56,7 @@ private:
 
 public:
 	shared_ptr<ViewPortTexture> GetMRT(UINT iIndex) { return m_vMRTList[iIndex]; }
-	UINT GetMRTNum() { return m_vMRTList.size(); }	
+	UINT GetMRTNum() { return static_cast<UINT>(m_vMRTList.size()); }	
 	void SetBlurScale(float _scale) { m_tBlurCB.g_fBlurScale = _scale;}
 	void SetSRVToSlot(int _index, const ComPtr<ID3D11ShaderResourceView>& _srv);
 

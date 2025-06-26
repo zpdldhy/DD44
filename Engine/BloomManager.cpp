@@ -6,7 +6,7 @@
 void BloomManager::Init()
 {
 	m_pDownScaleRT = std::make_unique<ViewPortTexture>();
-	m_pDownScaleRT->CreateViewPortTexture(g_windowSize.x / 2, g_windowSize.y / 2);
+	m_pDownScaleRT->CreateViewPortTexture(static_cast<FLOAT>(g_windowSize.x) / 2.f, static_cast<FLOAT>(g_windowSize.y) / 2.f);
 }
 
 void BloomManager::BeginBloomPass()

@@ -3,7 +3,7 @@
 
 VS_OUT VS(VS_IN input)
 {
-    VS_OUT output;
+    VS_OUT output = (VS_OUT) 0;
 
     float4 local = float4(input.p.xyz, 1.0f);
 

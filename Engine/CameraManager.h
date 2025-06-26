@@ -10,8 +10,8 @@ enum class CameraViewType
 
 class CameraManager : public Singleton<CameraManager>
 {
-	ComPtr<ID3D11Buffer> m_pCameraCB;
-	CameraConstantData m_CameraData;
+	ComPtr<ID3D11Buffer> m_pCameraCB = nullptr;
+	CameraConstantData m_CameraData = CameraConstantData();
 
 	shared_ptr<class AActor> m_p3DCameraActor = nullptr;	// 3D Camera
 	shared_ptr<class AActor> m_pUICameraActor = nullptr;	// Canvers
@@ -20,7 +20,7 @@ class CameraManager : public Singleton<CameraManager>
 
 	// Frustum	
 	vector<Plane> m_FrustumPlanes;
-	vector<class QuadTreeNode*> m_vCulledNodes;
+	vector<struct QuadTreeNode*> m_vCulledNodes;
 
 public:
 	void Init();
@@ -31,7 +31,7 @@ public:
 private:
 	void CreateCameraBuffer();
 	void UpdateFrustumPlanes();
-	void FrustumCulling(class QuadTreeNode* pNode);
+	void FrustumCulling(struct QuadTreeNode* pNode);
 	bool CheckPointToPlane(const Vec3& _point) const;
 
 public:

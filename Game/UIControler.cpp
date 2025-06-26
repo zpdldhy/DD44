@@ -43,7 +43,7 @@ void IntroUIControler::Tick()
 		auto temp2 = m_vArrowUI[1]->GetPosition().x;
 
 		// 키보드 입력
-		if (INPUT->GetButton(UP))
+		if (INPUT->GetButton(GameKey::W))
 		{
 			if (m_iHoverMenu != SM_START)
 			{
@@ -51,7 +51,7 @@ void IntroUIControler::Tick()
 			}
 		}
 
-		if (INPUT->GetButton(DOWN))
+		if (INPUT->GetButton(GameKey::S))
 		{
 			if (m_iHoverMenu != SM_EXIT)
 			{
@@ -91,7 +91,7 @@ void IntroUIControler::Tick()
 				pUI->SetPosition(NowPos);
 			}
 
-			if (INPUT->GetButton(ENTER))
+			if (INPUT->GetButton(GameKey::SPACE))
 			{
 				m_bSelectStartButton = true;
 			}

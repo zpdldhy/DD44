@@ -50,7 +50,7 @@ void LightManager::Clear()
     m_iIndex = 0;
 }
 
-const shared_ptr<ALight>& LightManager::GetLight(UINT _iIndex) const
+const shared_ptr<ALight> LightManager::GetLight(UINT _iIndex) const
 {
     auto inter= m_vLights.find(_iIndex);
     if (inter == m_vLights.end())

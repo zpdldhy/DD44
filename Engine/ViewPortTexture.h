@@ -5,8 +5,8 @@ class ViewPortTexture : public Texture
 {
 protected:
 	// Current Viewport
-	D3D11_VIEWPORT m_CurrentVP;
-	D3D11_TEXTURE2D_DESC	m_TexDesc;
+	D3D11_VIEWPORT m_CurrentVP = D3D11_VIEWPORT();
+	D3D11_TEXTURE2D_DESC	m_TexDesc = D3D11_TEXTURE2D_DESC();
 	ComPtr<ID3D11Texture2D> m_pTexture = nullptr;
 	ComPtr<ID3D11RenderTargetView> m_pRenderTargetView = nullptr;
 	ComPtr<ID3D11DepthStencilView> m_pDepthStencilView = nullptr;

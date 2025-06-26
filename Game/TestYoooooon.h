@@ -12,7 +12,7 @@ public:
 	shared_ptr<class AActor> m_pBox = nullptr;
 	shared_ptr<class AActor> m_pSphere = nullptr;
 	vector<shared_ptr<class AActor>> m_vGround;
-	class MouseRay m_Cursor;
+	struct MouseRay m_Cursor = MouseRay();
 
 	bool m_bEnginCamera = true;
 

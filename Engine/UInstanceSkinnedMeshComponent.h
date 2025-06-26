@@ -18,8 +18,8 @@ public:
 	void SetShadowVisible(bool _b) { bRenderShadow = _b; }
 
 private:
-	INSTANCE_VERTEX m_trans;
-	ANIM_VERTEX m_anim;
+	INSTANCE_VERTEX m_trans = INSTANCE_VERTEX();
+	ANIM_VERTEX m_anim = ANIM_VERTEX();
 
 	// shadow
 	bool bRenderShadow = true;

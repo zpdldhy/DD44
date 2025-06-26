@@ -84,9 +84,9 @@ void AInstance::Render()
 
 		// Draw Call 해요
 		if (pFirstMesh->GetIndexCount() <= 0)
-			DC->DrawInstanced(pFirstMesh->GetVertexCount(), vInstanceList.size(), 0, 0);
+			DC->DrawInstanced(pFirstMesh->GetVertexCount(), static_cast<UINT>(vInstanceList.size()), 0, 0);
 		else
-			DC->DrawIndexedInstanced(pFirstMesh->GetIndexCount(), vInstanceList.size(), 0, 0, 0);
+			DC->DrawIndexedInstanced(pFirstMesh->GetIndexCount(), static_cast<UINT>(vInstanceList.size()), 0, 0, 0);
 	}
 }
 
@@ -157,9 +157,9 @@ void AInstance::RenderShadow()
 
 		// Draw Call 해요
 		if (pFirstMesh->GetIndexCount() <= 0)
-			DC->DrawInstanced(pFirstMesh->GetVertexCount(), vInstanceList.size(), 0, 0);
+			DC->DrawInstanced(pFirstMesh->GetVertexCount(), static_cast<UINT>(vInstanceList.size()), 0, 0);
 		else
-			DC->DrawIndexedInstanced(pFirstMesh->GetIndexCount(), vInstanceList.size(), 0, 0, 0);
+			DC->DrawIndexedInstanced(pFirstMesh->GetIndexCount(), static_cast<UINT>(vInstanceList.size()), 0, 0, 0);
 	}
 }
 

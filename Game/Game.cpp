@@ -195,6 +195,9 @@ void Game::Tick()
 	if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
 		//if (INPUT->GetButton(GameKey::P))
 	{
+		static bool isEnd = false;
+		if (isEnd == false)
+		{
 		SOUND->GetPtr(ESoundType::Boss1)->Stop();
 		SOUND->GetPtr(ESoundType::Ending)->Play2D();
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
@@ -202,6 +205,8 @@ void Game::Tick()
 		UI->DoFadeIn();
 		m_cUI.NoRenderStateUI();
 		m_cUI.GoEnding();
+		}
+		isEnd = true;
 	}
 
 	STAGE->Tick();
@@ -357,7 +362,7 @@ void Game::CreateWind()
 		for (int i = 0; i < spawnCount; ++i)
 		{
 			// NDC 기준 왼쪽 위에서 오른쪽 아래로
-			float startX = RandomRange(-1.2f, 0); // 살짝 바깥쪽에서 시작
+			float startX = RandomRange(-1.2f, 0.f); // 살짝 바깥쪽에서 시작
 			float startY = RandomRange(0.5f, 1.5f); // 상단에서만
 			if (startY < 1.0f)
 			{
