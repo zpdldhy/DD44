@@ -83,7 +83,7 @@ bool TPlayer::UpgradeStat(EStatType type)
 	switch (type)
 	{
 	case EStatType::HP:
-    		m_iMaxHP += info.delta1;
+    		m_iMaxHP += static_cast<int>(info.delta1);
 		break;
 	case EStatType::MeleeDamage:
 		m_fMeleeDamage += info.delta1;

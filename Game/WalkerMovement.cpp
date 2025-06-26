@@ -167,7 +167,7 @@ void WalkerMovement::ChangeState(shared_ptr<StateBase> _state)
 {
 	if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
-		if (!_state->GetId() == ENEMY_S_DEATH)
+		if (!(_state->GetId() == static_cast<UINT>(ENEMY_S_DEATH)))
 		{
 			return;
 		}

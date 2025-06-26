@@ -358,7 +358,7 @@ void TestYoooooon::CreateCollisionObject()
 	{
 		m_pSphere = make_shared<AActor>();
 
-		auto pCube = UStaticMeshComponent::CreateSphere(20.f, 20.f);
+		auto pCube = UStaticMeshComponent::CreateSphere(20, 20);
 		m_pSphere->SetMeshComponent(pCube);
 		m_pSphere->m_szName = L"Stair";
 

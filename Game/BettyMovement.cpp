@@ -65,7 +65,7 @@ void BettyMovement::Init()
 
 	// die È¿°ú
 	auto animInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
-	frameTime = animInstance->GetTotalFrame();
+	frameTime = static_cast<float>(animInstance->GetTotalFrame());
 	frameTime /= 15;
 
 }
@@ -363,7 +363,7 @@ void BettyMovement::HandleAttack(float _delta)
 			else
 			{
 				//meleeIndex = (meleeIndex + 1) % meleeState.size();
-				meleeIndex = (int)RandomRange(0.0f, meleeState.size());
+				meleeIndex = RandomRange(0, static_cast<int>(meleeState.size()));
 				auto next = meleeState[meleeIndex];
 				if (next->GetId() == BETTY_S_A_HANDBACK)
 				{
