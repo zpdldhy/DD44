@@ -32,7 +32,7 @@ void MageMovement::Init()
 	if (GetOwner()->m_eActorType == ActorType::AT_STATICMONSTER)
 	{
 		bStaticMage = true;
-		findDistance = 50.0f;
+		findDistance = 25.0f;
 		dynamic_pointer_cast<MageHitState>(hit)->CheckStatic(bStaticMage);
 		dynamic_pointer_cast<MageAttackState>(attack)->CheckStatic(bStaticMage);
 	}

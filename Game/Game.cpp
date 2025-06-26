@@ -85,7 +85,7 @@ void Game::Init()
 	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
-	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
+	m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
 	OBJECT->AddActor(m_pPlayer);
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
@@ -175,6 +175,11 @@ void Game::Init()
 	UI->DoFadeOut();
 
 	m_cBettyMovie.SetCameraStart(Vec3(64.f, 4.f, -94.f), Vec3(-0.06f, 11.65f, 0.f));
+
+	//bgm
+	{
+		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
+	}
 }
 
 void Game::Tick()
@@ -190,6 +195,8 @@ void Game::Tick()
 	if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
 		//if (INPUT->GetButton(GameKey::P))
 	{
+		SOUND->GetPtr(ESoundType::Boss1)->Stop();
+		SOUND->GetPtr(ESoundType::Ending)->Play2D();
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->EndGame();
 		UI->DoFadeIn();
@@ -215,10 +222,7 @@ void Game::Tick()
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
-	//bgm
-	{
-		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
-	}
+
 	//wind	
 	{
 		if (INPUT->GetButton(M))
@@ -537,6 +541,8 @@ void Game::BettyMeetMovie()
 		m_cUI.NoRenderStateUI();
 
 		m_bNoPaused = true;
+
+		SOUND->GetPtr(ESoundType::Stage0)->Stop();
 	}
 
 	m_cBettyMovie.StartMovie();
@@ -567,6 +573,7 @@ void Game::BettyMeetMovie()
 	// 장면이 완전 종료되었을 때
 	if (m_cBettyMovie.IsEnd())
 	{
+		SOUND->GetPtr(ESoundType::Boss1)->Play2D();
 		// 베티 움직이기 시작하는 구간
 		EVENT->TriggerEvent(EventType::EVENT_STAGE, L"FinishIntro");
 
