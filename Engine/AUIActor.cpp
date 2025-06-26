@@ -145,7 +145,7 @@ void AUIActor::CreateText()
 
 void AUIActor::UpdateText()
 {
-	if (!DXWRITE->m_pDxWrite)
+	if (!DXWRITE_DD->m_pDxWrite)
 		return;
 
 	m_pFont->SetPath(m_szFontPath);

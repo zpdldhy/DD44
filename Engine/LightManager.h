@@ -19,7 +19,7 @@ public:
     void Clear();
 
 public:
-    const shared_ptr<ALight>& GetLight(UINT _iIndex) const;
+    const shared_ptr<ALight> GetLight(UINT _iIndex) const;
 
 private:
     map<UINT, shared_ptr<ALight>> m_vLights;

@@ -17,9 +17,9 @@ public:
 	virtual ~UMeshResources() = default;
 
 protected:
-	MeshType m_Type;
-	ComPtr<ID3D11Buffer> m_pVertexBuffer;
-	ComPtr<ID3D11Buffer> m_pIndexBuffer;
+	MeshType m_Type = MeshType::M_STATIC;
+	ComPtr<ID3D11Buffer> m_pVertexBuffer = nullptr;
+	ComPtr<ID3D11Buffer> m_pIndexBuffer = nullptr;
 	vector<PNCT_VERTEX> m_vVertexList;
 	vector<DWORD> m_vIndexList;
 	D3D11_PRIMITIVE_TOPOLOGY m_Topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;

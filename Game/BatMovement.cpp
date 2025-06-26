@@ -197,7 +197,7 @@ void BatMovement::Tick()
 			// 
 			m_bReturn = true;
 			ChangetState(walk);
-			m_fLerp = -0.05;
+			m_fLerp = -0.05f;
 		}
 	}
 
@@ -230,7 +230,7 @@ void BatMovement::ChangetState(shared_ptr<StateBase> _state)
 	}
 	if (!currentState->IsInterruptible() && currentState->IsPlaying())
 	{
-		if (!_state->GetId() == ENEMY_S_DEATH)
+		if (!(_state->GetId() == static_cast<UINT>(ENEMY_S_DEATH)))
 		{
 			return;
 		}

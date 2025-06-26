@@ -56,8 +56,8 @@ bool Window::SetWindow(float _windowX, float _windowY)
 {
 	m_fWidth = _windowX;
 	m_fHeight = _windowY;
-	g_windowSize.x = m_fWidth;
-	g_windowSize.y = m_fHeight;
+	g_windowSize.x = static_cast<LONG>(m_fWidth);
+	g_windowSize.y = static_cast<LONG>(m_fHeight);
 
 	RECT winRect = { 0, 0, g_windowSize.x,  g_windowSize.y };
 	AdjustWindowRect(&winRect, WS_OVERLAPPEDWINDOW, FALSE);
@@ -85,10 +85,10 @@ bool Window::SetWindowFullScreen()
 	RECT desktopRect;
 	GetWindowRect(GetDesktopWindow(), &desktopRect);  // 모니터 해상도 얻기
 
-	m_fWidth = desktopRect.right;
-	m_fHeight = desktopRect.bottom;
-	g_windowSize.x = m_fWidth;
-	g_windowSize.y = m_fHeight;
+	m_fWidth = static_cast<float>(desktopRect.right);
+	m_fHeight = static_cast<float>(desktopRect.bottom);
+	g_windowSize.x = desktopRect.right;
+	g_windowSize.y = desktopRect.bottom;
 
 	RECT winRect = { 0, 0, g_windowSize.x,  g_windowSize.y };
 	m_hWnd = CreateWindow(

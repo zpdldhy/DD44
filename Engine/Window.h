@@ -2,11 +2,11 @@
 
 class Window
 {
-	HINSTANCE m_hInstance;
-	HWND m_hWnd;
+	HINSTANCE m_hInstance = HINSTANCE();
+	HWND m_hWnd = HWND();
 
-	float m_fWidth;
-	float m_fHeight;
+	float m_fWidth = 0.f;
+	float m_fHeight = 0.f;
 	bool m_bRun = true;
 
 public:

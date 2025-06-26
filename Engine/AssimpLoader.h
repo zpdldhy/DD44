@@ -5,11 +5,11 @@ class AssimpLoader
 {
 private:
     Assimp::Importer m_importer;
-    const aiScene* m_pScene;      // Assimp::Importer 에서 메모리 관리
+    const aiScene* m_pScene = nullptr;      // Assimp::Importer 에서 메모리 관리
     vector<MeshData> m_meshes;    // 매쉬 정보
-    UINT m_numVertices;
-    UINT m_numMaterial;
-    Vec3 center;
+    UINT m_numVertices = 0;
+    UINT m_numMaterial = 0;
+    Vec3 center = Vec3();
 public:
 
     vector<MeshData> Load(const string& fileName);

@@ -120,7 +120,7 @@ void USkeletalMeshResources::UpdateInstanceData()
 
 void USkeletalMeshResources::AddInstanceData(UINT _index, INSTANCE_VERTEX _transform, ANIM_VERTEX _anim)
 {
-	if (_index >= m_instanceCount)
+	if (static_cast<int>(_index) >= m_instanceCount)
 	{
 		assert(false);
 	}
@@ -135,7 +135,7 @@ UINT USkeletalMeshResources::AllocateInstanceIndex()
 	{
 		index = m_freeIndices.front();
 		m_freeIndices.pop();
-		if (index >= m_instanceCount)
+		if (static_cast<int>(index) >= m_instanceCount)
 		{
 			while (!m_freeIndices.empty())
 			{
@@ -143,7 +143,7 @@ UINT USkeletalMeshResources::AllocateInstanceIndex()
 				m_freeIndices.pop();
 			}
 
-			if (index >= m_instanceCount)
+			if (static_cast<int>(index) >= m_instanceCount)
 			{
 				index = m_instanceCount++;
 				m_vInstaceList.resize(m_instanceCount);
@@ -151,7 +151,7 @@ UINT USkeletalMeshResources::AllocateInstanceIndex()
 			}
 		}
 
-		if (index >= m_instanceCount)
+		if (static_cast<int>(index) >= m_instanceCount)
 		{
 			assert(false);
 		}
@@ -174,7 +174,7 @@ void USkeletalMeshResources::FreeInstanceIndex(UINT index)
 		m_vInstaceList.resize(m_instanceCount);
 		m_vIWInstanceList.resize(m_instanceCount);
 	}
-	if (index < m_instanceCount)
+	if (static_cast<int>(index) < m_instanceCount)
 	{
 		m_freeIndices.push(index);
 	}

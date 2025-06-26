@@ -2,7 +2,7 @@
 
 VS_OUT VS(VS_IN input)
 {
-    VS_OUT output;
+    VS_OUT output = (VS_OUT) 0;
 
     float4 worldPos = mul(float4(input.p, 1.0f), g_matWorld);
     float4 viewPos = mul(worldPos, g_matView);
@@ -14,7 +14,7 @@ VS_OUT VS(VS_IN input)
 
 VS_OUT VS_INSTANCE(VS_INSTANCE_IN input)
 {
-    VS_OUT output;
+    VS_OUT output = (VS_OUT) 0;
 
     float4 worldPos = mul(float4(input.p, 1.0f), input.matWorld);
     float4 viewPos = mul(worldPos, g_matView);

@@ -23,7 +23,7 @@ protected:
 	void UpdateCollisionRange() override;
 
 public:
-	const Sphere& const GetBounds() { return m_Sphere; }
-	const Vec3& const GetCenter() override { return m_Sphere.vCenter; }
+	const Sphere GetBounds() { return m_Sphere; }
+	const Vec3 GetCenter() override { return m_Sphere.vCenter; }
 };
 

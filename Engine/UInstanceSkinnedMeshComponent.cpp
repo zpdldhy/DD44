@@ -119,8 +119,8 @@ void UInstanceSkinnedMeshComponent::UpdateMeshResourceData()
 	// ANIM_VERTEX
 	if (m_pBaseAnim)
 	{
-		m_anim.track = m_pBaseAnim->GetCurrentIndex();
-		m_anim.frame = m_pBaseAnim->GetCurrentFrame();
+		m_anim.track = static_cast<UINT>(m_pBaseAnim->GetCurrentIndex());
+		m_anim.frame = static_cast<UINT>(m_pBaseAnim->GetCurrentFrame());
 		auto pos = m_pBaseAnim->GetRootPos();
 		m_anim.rootPos.x = pos.x;
 		m_anim.rootPos.y = pos.y;
@@ -129,8 +129,8 @@ void UInstanceSkinnedMeshComponent::UpdateMeshResourceData()
 	else
 	{
 		auto base = m_pMeshAnim->animInstance;
-		m_anim.track = base->GetCurrentIndex();
-		m_anim.frame = base->GetCurrentFrame();
+		m_anim.track = static_cast<UINT>(base->GetCurrentIndex());
+		m_anim.frame = static_cast<UINT>(base->GetCurrentFrame());
 		auto pos = base->GetRootPos();
 		m_anim.rootPos.x = pos.x;
 		m_anim.rootPos.y = pos.y;

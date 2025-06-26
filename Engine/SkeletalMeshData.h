@@ -2,24 +2,24 @@
 
 struct MeshComponentData
 {
-	wstring m_szComp;
-	wstring m_szRes;
+	wstring m_szComp = L"";
+	wstring m_szRes = L"";
 	int m_type = 0;
 	bool m_bVisible = true;
 	
-	wstring m_szAnim;
-	bool m_bHasAnim;
+	wstring m_szAnim = L"";
+	bool m_bHasAnim = false;		// 초기화 추가
 	int m_targetBone = 0;
-	Matrix m_matBone;
+	Matrix m_matBone = Matrix();
 	bool m_bInPlace = false;
-	int m_rootIndex;
+	int m_rootIndex = 0;
 	
-	wstring m_szTex;
-	wstring m_szShader;
+	wstring m_szTex = L"";
+	wstring m_szShader = L"";
 
-	Vec3 m_pos;
-	Vec3 m_rot;
-	Vec3 m_scale;
+	Vec3 m_pos = Vec3();
+	Vec3 m_rot = Vec3();
+	Vec3 m_scale = Vec3();
 
 	vector<MeshComponentData> m_vChild;
 };
@@ -27,7 +27,7 @@ struct MeshComponentData
 struct MeshData
 {
 	bool m_bSkeleton = false;
-	wstring m_szName;
+	wstring m_szName = L"";
 	vector<PNCT_VERTEX> m_vVertexList;
 	vector<IW_VERTEX> m_vIwList;
 	vector<DWORD> m_vIndexList;
@@ -37,9 +37,9 @@ struct MeshData
 
 struct BoneNode
 {
-	UINT m_iIndex;
-	wstring m_szName;
-	wstring m_szParentName;
+	UINT m_iIndex = 0;
+	wstring m_szName = L"";
+	wstring m_szParentName = L"";
 	vector<wstring> m_vChildName;
 };
 
@@ -50,9 +50,9 @@ struct Skeleton
 
 struct AnimTrackData
 {
-	wstring m_szName;
-	UINT m_iStartFrame;
-	UINT m_iEndFrame;
+	wstring m_szName = L"";
+	UINT m_iStartFrame = 0;
+	UINT m_iEndFrame = 0;
 
 	vector<vector<Matrix>> m_vAnim;
 

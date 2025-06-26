@@ -7,7 +7,7 @@ cbuffer CB_Frustum : register(b3)
 
 VS_OUT VS(VS_IN input)
 {
-    VS_OUT output;
+    VS_OUT output = (VS_OUT) 0;
     
     float4 vNDC = float4(input.p, 1.0f);
     float4 vWorld = mul(vNDC, g_matViewProjInvert);

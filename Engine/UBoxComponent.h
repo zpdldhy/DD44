@@ -23,9 +23,9 @@ protected:
 	void UpdateCollisionRange() override;
 
 public:
-	const Box& const GetBounds() { return m_Box; }
+	const Box GetBounds() { return m_Box; }
 
 public:
-	const Vec3& const GetCenter() override { return m_Box.vCenter; }
+	const Vec3 GetCenter() override { return m_Box.vCenter; }
 };
 

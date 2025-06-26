@@ -229,6 +229,7 @@ bool ImGuiCore::CreateImGuiWindow(HINSTANCE _hInstance, int _winX, int _winY)
 
 	ShowWindow(m_hWndImGui, SW_SHOW);
 	UpdateWindow(m_hWndImGui);
+	return true;
 }
 
 bool ImGuiCore::CreateDevice()

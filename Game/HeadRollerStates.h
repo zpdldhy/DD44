@@ -52,8 +52,8 @@ class HeadRollerRollFind : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
-	Vec3 dir;
-	float targetYaw;
+	Vec3 dir = Vec3();
+	float targetYaw = 0.f;
 public:
 	HeadRollerRollFind(weak_ptr<AActor> _pOwner);
 	~HeadRollerRollFind() {}
