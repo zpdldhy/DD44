@@ -34,6 +34,7 @@ enum class ESoundType
 	//Walker
 	Impact, //HeadRoller 벽에 부딪힐 때 나는 소리
 	Dead_Walker,
+	Rolling_Walker,
 
 	//Mage
 	Attack_Mage,
@@ -42,8 +43,10 @@ enum class ESoundType
 	Attack_Betty,
 	Screaming_Betty,
 	Growling_Betty,
-	Impact_Betty,
+	Impact_Betty1,
+	Impact_Betty2,
 	Scraping_Betty,
+	Rolling_Betty,
 
 	//Env
 	Open_Fence,

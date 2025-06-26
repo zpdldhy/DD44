@@ -251,6 +251,8 @@ void HeadRollerRollEnd::Enter()
 	int index = animInstance->GetAnimIndex(L"Armature|Stun");
 	animInstance->SetKeyFrame(index, 65);
 	animInstance->PlayOnce(index);
+
+	SOUND->GetPtr(ESoundType::Impact)->PlayEffect2D();
 }
 void HeadRollerRollEnd::Tick()
 {
