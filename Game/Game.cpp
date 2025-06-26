@@ -900,8 +900,22 @@ void Game::CheckBloodCollision()
 			iter++;
 		}
 
+
+		for (auto iter = stage2.begin(); iter != stage2.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = stage2.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*blood, *iter);
+			iter++;
+		}
+
 		blood++;
 	}
+
+
 
 	auto& soulList = EFFECT->GetSoulList();
 	for (auto soul = soulList.begin(); soul != soulList.end(); )

@@ -57,7 +57,19 @@ void ABloodActor::Tick()
         auto pActor = OBJECT->GetActor(iter.first);
         if (!pActor) continue;
 
-        if (pActor->m_szName == L"Terrain")
+        if (pActor->m_szName == L"Terrain" )
+        {
+            Vec3 pos = iter.second.Inter;
+            pos.y = pActor->GetPosition().y + 0.01f;
+            // µðÄ® Âï±â
+            EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3(0, 0, 0));
+
+            // ¹Ù·Î »èÁ¦
+            m_bRender = false;
+            break;
+        }
+
+        if (pActor->m_szName == L"Object")
         {
             Vec3 pos = iter.second.Inter;
             pos.y = pActor->GetPosition().y + 0.01f;
