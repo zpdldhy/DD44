@@ -190,11 +190,16 @@ void Game::Tick()
 	if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
 		//if (INPUT->GetButton(GameKey::P))
 	{
-		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
-		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->EndGame();
-		UI->DoFadeIn();
-		m_cUI.NoRenderStateUI();
-		m_cUI.GoEnding();
+		static bool isEnd = false;
+		if (isEnd == false)
+		{
+			dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
+			dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->EndGame();
+			m_cUI.NoRenderStateUI();
+			m_cUI.GoEnding();
+			UI->DoFadeIn();
+		}
+		isEnd = true;
 	}
 
 	STAGE->Tick();
