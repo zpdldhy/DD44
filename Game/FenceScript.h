@@ -25,5 +25,6 @@ private:
 	Vec3 offset;
 	Vec3 dustPos;
 	float m_dustElapsed = 0.2f;
+	bool m_bIsPaly = true;
 };
 
