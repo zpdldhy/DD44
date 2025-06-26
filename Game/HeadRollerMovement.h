@@ -28,7 +28,7 @@ private:
 	bool countAttackCool = false;
 	bool canAttack = true;
 	// movement
-	float m_walkSpeed = 0.006;
+	float m_walkSpeed = 0.006f;
 	float posOffset = 3.0f;
 	Vec3 m_vPos[2];
 	Vec3 m_vCurrentTarget;

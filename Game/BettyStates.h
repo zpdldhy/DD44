@@ -29,16 +29,16 @@ public:
 	JumpMotionHandler() = default;
 	~JumpMotionHandler(){}
 private:
-	Vec3 start;
-	Vec3 end;
-	Vec3 prevPos;
-	Vec3 velocity;
-	float height;
-	float gravity;
-	float fall;
-	float totalTime;
-	float elapsed;
-	float hangDuration;
+	Vec3 start = Vec3();
+	Vec3 end = Vec3();
+	Vec3 prevPos = Vec3();
+	Vec3 velocity = Vec3();
+	float height = 0.f;
+	float gravity = 0.f;
+	float fall = 0.f;
+	float totalTime = 0.f;
+	float elapsed = 0.f;
+	float hangDuration = 0.f;
 	float hangElapsed = 0.0f;
 
 	bool bDone = false;
@@ -85,14 +85,14 @@ private:
 	
 	// MOVEMENT
 	//// JUMP
-	Vec3 targetPos;
+	Vec3 targetPos = Vec3();
 	float posOffset = 5.0f;
 	JumpMotionHandler jumpHandler;
 	//// Rotate
-	float targetYaw;
+	float targetYaw = 0.f;
 	//// Anim
 	bool bControlOnce = true;
-	float originAnimSpeed;
+	float originAnimSpeed = 0.f;
 public:
 	BettyJumpAttack(weak_ptr<AActor> _pOwner);
 	~BettyJumpAttack() {}
@@ -129,7 +129,7 @@ private:
 	// 
 	bool bRight = true;
 	//// Rotate
-	float targetYaw;
+	float targetYaw = 0.f;
 public:
 	BettyOneHandBackAttack(weak_ptr<AActor> _pOwner);
 	~BettyOneHandBackAttack() {}
@@ -148,7 +148,7 @@ private:
 	// 
 	bool bRight = true;
 	//// Rotate
-	float targetYaw;
+	float targetYaw = 0.f;
 public:
 	BettyOneHandDownAttack(weak_ptr<AActor> _pOwner);
 	~BettyOneHandDownAttack() {}
@@ -196,7 +196,7 @@ private:
 	// jump motion
 	float posOffset = 15.0f;
 	JumpMotionHandler jumpHandler;
-	float targetYaw;
+	float targetYaw = 0.f;
 public:
 	BettyRollStart(weak_ptr<AActor> _pOwner);
 	~BettyRollStart() {}
@@ -228,11 +228,11 @@ class BettyRollEnd : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
-	Vec3 dir;
+	Vec3 dir = Vec3();
 	// jump motion
 	float posOffset = 10.0f;
-	JumpMotionHandler jumpHandler;
-	float targetYaw;
+	JumpMotionHandler jumpHandler = JumpMotionHandler();
+	float targetYaw = 0.f;
 
 public:
 	BettyRollEnd(weak_ptr<AActor> _pOwner);

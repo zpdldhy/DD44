@@ -125,6 +125,16 @@ static std::vector<std::string> GetFileNames(std::string _path)
 }
 
 // 두값 사이에 랜덤한 숫자 반환
+static int RandomRange(int min, int max)
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+
+	std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+	int t = static_cast<int>(dist(gen)); // [0,1]
+	return min + (max - min) * t;
+}
+
 static float RandomRange(float min, float max)
 {
 	static std::random_device rd;

@@ -21,7 +21,7 @@ void LadderScript::Init()
 			});
 		auto triggerMesh = GetOwner()->GetMeshComponent();
 		auto children = triggerMesh->GetChildren();
-		for (int i = children.size() - 2; i >= 0; i--)
+		for (size_t i = children.size() - 2; i >= 0; i--)
 		{
 			children[i]->SetVisible(false);
 
@@ -30,7 +30,7 @@ void LadderScript::Init()
 
 	auto triggerMesh = GetOwner()->GetMeshComponent();
 	auto children = triggerMesh->GetChildren();
-	activeChildNum = children.size() - 1;
+	activeChildNum = static_cast<int>(children.size()) - 1;
 }
 
 void LadderScript::Tick()

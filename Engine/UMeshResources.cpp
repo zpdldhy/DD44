@@ -45,7 +45,7 @@ bool UMeshResources::CreateIndexBuffer()
 	if (m_vIndexList.size() <= 0) { return true; }
 	D3D11_BUFFER_DESC pDesc;
 	ZeroMemory(&pDesc, sizeof(pDesc));
-	pDesc.ByteWidth = sizeof(DWORD) * m_vIndexList.size();
+	pDesc.ByteWidth = static_cast<UINT>(sizeof(DWORD) * m_vIndexList.size());
 	pDesc.Usage = D3D11_USAGE_DEFAULT;
 	pDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 

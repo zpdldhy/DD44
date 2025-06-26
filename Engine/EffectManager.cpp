@@ -257,11 +257,11 @@ void EffectManager::PlayEffect(EEffectType type, const Vec3& pos, float maxAngle
     case EEffectType::BloodDecal: 
         duration = 10.0f;
         actor->SetRotation(Vec3(DD_PI / 2, 0, angle));
-        actor->GetMeshComponent()->SetInstanceColor(Vec4(0.6f, 0.05f, 0.05f, 1));        
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(0.6f, 0.05f, 0.05f, 1.f));        
         break;
     case EEffectType::Point:
-        duration = 0.2;
-        actor->GetMeshComponent()->SetInstanceColor(Vec4(0.7f, 0.9f, 0.95, 1.0f));
+        duration = 0.2f;
+        actor->GetMeshComponent()->SetInstanceColor(Vec4(0.7f, 0.9f, 0.95f, 1.0f));
         break;
     case EEffectType::Soul:
         if (pSoul)

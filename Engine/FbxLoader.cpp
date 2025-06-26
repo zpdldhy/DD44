@@ -51,8 +51,8 @@ TFbxResource FbxLoader::Load(string _loadFile)
 	// 본 파싱 및 메시 리스트화
 	PreProcess(m_pRootNode);
 	
-	m_result.m_iBoneCount = m_result.m_mSkeletonList.size();
-	m_result.m_iMeshCount = m_vMeshes.size();
+	m_result.m_iBoneCount = static_cast<UINT>(m_result.m_mSkeletonList.size());
+	m_result.m_iMeshCount = static_cast<UINT>(m_vMeshes.size());
 	m_result.m_iNodeCount = m_result.m_iMeshCount + m_result.m_iBoneCount;
 
 	// 원점에 위치시키기 위해
@@ -62,9 +62,9 @@ TFbxResource FbxLoader::Load(string _loadFile)
 	{
 		FbxVector4 rootP = iter->second.m_node->EvaluateGlobalTransform(0).GetT();
 
-		m_vRootPos.x = -rootP[0];
-		m_vRootPos.y = -rootP[1];
-		m_vRootPos.z = -rootP[2];
+		m_vRootPos.x = static_cast<float>(-rootP[0]);
+		m_vRootPos.y = static_cast<float>(-rootP[1]);
+		m_vRootPos.z = static_cast<float>(-rootP[2]);
 	}
 
 	// mesh 처리
@@ -198,7 +198,7 @@ void FbxLoader::ParseMesh(FbxNode* _node)
 		if (pSurface)
 		{
 			string texPath = ParseMaterial(pSurface);
-			int texNum = m_result.m_mTexPathList.size() + i;
+			int texNum = static_cast<int>(m_result.m_mTexPathList.size()) + i;
 			m_result.m_mTexPathList.insert(make_pair(texNum, (to_mw(texPath))));
 			if (!texPath.empty())
 			{
@@ -206,7 +206,7 @@ void FbxLoader::ParseMesh(FbxNode* _node)
 			}
 		}
 	}
-	m_result.m_iTexPathCount = m_result.m_mTexPathList.size();
+	m_result.m_iTexPathCount = static_cast<UINT>(m_result.m_mTexPathList.size());
 
 	int iNumPolyCount = mesh->GetPolygonCount();
 	FbxVector4* pVertexPositions = mesh->GetControlPoints();
@@ -240,31 +240,31 @@ void FbxLoader::ParseMesh(FbxNode* _node)
 				// 행렬을 곱한다 ( 오른손 좌표계라 행렬 * 정점 으로 정의된 MultT 함수 ) 
 				auto p = geom.MultT(pPos);
 
-				v.pos.x = p.mData[0];
-				v.pos.y = p.mData[2];
-				v.pos.z = p.mData[1];
+				v.pos.x = static_cast<float>(p.mData[0]);
+				v.pos.y = static_cast<float>(p.mData[2]);
+				v.pos.z = static_cast<float>(p.mData[1]);
 
 				// COLOR
 				FbxColor color = FbxColor(1, 1, 1, 1);
 				if (VertexColorSet.size() > 0)
 				{
-					color = ReadColor(mesh, VertexColorSet.size(), VertexColorSet[0], cornerIndex[index], iBasePolyIndex + VertexIndex[index]);
+					color = ReadColor(mesh, static_cast<DWORD>(VertexColorSet.size()), VertexColorSet[0], cornerIndex[index], iBasePolyIndex + VertexIndex[index]);
 				}
-				v.color.x = color.mRed;
-				v.color.y = color.mGreen;
-				v.color.z = color.mBlue;
+				v.color.x = static_cast<float>(color.mRed);
+				v.color.y = static_cast<float>(color.mGreen);
+				v.color.z = static_cast<float>(color.mBlue);
 				v.color.w = 1.0f;
 
 				// NORMAL
 				if (VertexNormalSet.size() > 0)
 				{
-					FbxVector4 finalNorm = ReadNormal(mesh, VertexNormalSet.size(), VertexNormalSet[0], cornerIndex[index], iBasePolyIndex + VertexIndex[index]);
+					FbxVector4 finalNorm = ReadNormal(mesh, static_cast<DWORD>(VertexNormalSet.size()), VertexNormalSet[0], cornerIndex[index], iBasePolyIndex + VertexIndex[index]);
 					finalNorm.mData[3] = 0.0f;
 					finalNorm = normalMatrix.MultT(finalNorm);
 					finalNorm.Normalize();
-					v.normal.x = finalNorm.mData[0];
-					v.normal.y = finalNorm.mData[2];
-					v.normal.z = finalNorm.mData[1];
+					v.normal.x = static_cast<float>(finalNorm.mData[0]);
+					v.normal.y = static_cast<float>(finalNorm.mData[2]);
+					v.normal.z = static_cast<float>(finalNorm.mData[1]);
 				}
 
 				// UV
@@ -274,8 +274,8 @@ void FbxLoader::ParseMesh(FbxNode* _node)
 					FbxVector2 uv;
 					ReadTextureCoord(mesh, pUVSet, cornerIndex[index], uvIndex[index], uv);
 
-					v.uv.x = uv.mData[0];
-					v.uv.y = 1.0f - uv.mData[1];
+					v.uv.x = static_cast<float>(uv.mData[0]);
+					v.uv.y = 1.0f - static_cast<float>(uv.mData[1]);
 				}
 
 				IW_VERTEX iw;
@@ -288,13 +288,13 @@ void FbxLoader::ParseMesh(FbxNode* _node)
 					{
 						if (iWeight > 3)
 						{
-							iw.i2[iWeight - 4] = m_VertexWeights[cornerIndex[index]].m_vIndexList[iWeight];
-							iw.w2[iWeight - 4] = m_VertexWeights[cornerIndex[index]].m_vWeightList[iWeight];
+							iw.i2[iWeight - 4] = static_cast<float>(m_VertexWeights[cornerIndex[index]].m_vIndexList[iWeight]);
+							iw.w2[iWeight - 4] = static_cast<float>(m_VertexWeights[cornerIndex[index]].m_vWeightList[iWeight]);
 						}
 						else
 						{
-							iw.i1[iWeight] = m_VertexWeights[cornerIndex[index]].m_vIndexList[iWeight];
-							iw.w1[iWeight] = m_VertexWeights[cornerIndex[index]].m_vWeightList[iWeight];
+							iw.i1[iWeight] = static_cast<float>(m_VertexWeights[cornerIndex[index]].m_vIndexList[iWeight]);
+							iw.w1[iWeight] = static_cast<float>(m_VertexWeights[cornerIndex[index]].m_vWeightList[iWeight]);
 						}
 					}
 				}
@@ -365,7 +365,7 @@ bool FbxLoader::ParseSkinningMesh(FbxMesh* _mesh)
 			{
 				bRet = true;
 				int iIndex = pFbxNodeIndex[v];
-				float fWeight = pFbxNodeWegiht[v];
+				float fWeight = static_cast<float>(pFbxNodeWegiht[v]);
 				int a = m_VertexWeights[iIndex].Insert(boneIndex, fWeight);
 			}
 
@@ -413,7 +413,7 @@ bool FbxLoader::ParseSkinningMesh(FbxMesh* _mesh)
 void FbxLoader::ParseAnimation()
 {
 	// ANIM
-	int animBoneCount = m_result.m_mSkeletonList.size() + m_result.m_vMeshList.size();
+	int animBoneCount = static_cast<int>(m_result.m_mSkeletonList.size() + m_result.m_vMeshList.size());
 	int animTrackCount = m_pScene->GetSrcObjectCount<FbxAnimStack>();
 	m_result.m_iAnimTrackCount = animTrackCount;
 
@@ -432,7 +432,7 @@ void FbxLoader::ParseAnimation()
 		//}
 	}
 
-	for (int iTrack = 0; iTrack < m_result.m_iAnimTrackCount; iTrack++)
+	for (UINT iTrack = 0; iTrack < m_result.m_iAnimTrackCount; iTrack++)
 	{
 		GetAnimationTrack(iTrack, animBoneCount);
 	}
@@ -447,7 +447,7 @@ void FbxLoader::GetAnimationTrack(int animTrack, int nodeCount)
 	AnimTrackData track;
 	track.m_vAnim.resize(nodeCount);
 	GetAnimation(animTrack, &track);
-	for (int iBone = 0; iBone < m_result.m_iBoneCount; iBone++)
+	for (UINT iBone = 0; iBone < m_result.m_iBoneCount; iBone++)
 	{
 		auto iter = m_FbxBones.find(m_result.m_mSkeletonList[iBone].m_szName);
 		if (iter == m_FbxBones.end())
@@ -456,14 +456,14 @@ void FbxLoader::GetAnimationTrack(int animTrack, int nodeCount)
 		}
 		track.m_vAnim[iBone] = GetNodeAnimation(iter->second.m_node, &track);
 	}
-	for (int iMesh = 0; iMesh < m_result.m_iMeshCount; iMesh++)
+	for (UINT iMesh = 0; iMesh < m_result.m_iMeshCount; iMesh++)
 	{
 		track.m_vAnim[m_result.m_iBoneCount + iMesh] = GetNodeAnimation(m_vMeshes[iMesh], &track);
 	}
 
 	if (maxValidFrame > 0)
 	{
-		for (int i = 0; i < m_result.m_iNodeCount; i++)
+		for (UINT i = 0; i < m_result.m_iNodeCount; i++)
 		{
 			track.m_vAnim[i].resize(maxValidFrame);
 		}
@@ -492,8 +492,8 @@ void FbxLoader::GetAnimation(int _animTrack, AnimTrackData* _track)
 	FbxLongLong s = start.GetFrameCount(TimeMode);
 	FbxLongLong n = end.GetFrameCount(TimeMode);
 	float endTime = static_cast<float>(TakeInfo->mLocalTimeSpan.GetStop().GetFrameCount());
-	_track->m_iStartFrame = s;
-	_track->m_iEndFrame = endTime;
+	_track->m_iStartFrame = static_cast<UINT>(s);
+	_track->m_iEndFrame = static_cast<UINT>(endTime);
 }
 
 vector<Matrix> FbxLoader::GetNodeAnimation(FbxNode* _node, AnimTrackData* _track)
@@ -527,7 +527,7 @@ vector<Matrix> FbxLoader::GetNodeAnimation(FbxNode* _node, AnimTrackData* _track
 		}
 
 		if (repeatCount < repeatThreshold) {
-			lastMeaningfulFrame = t;
+			lastMeaningfulFrame = static_cast<int>(t);
 		}
 		maxValidFrame = maxValidFrame < lastMeaningfulFrame ? lastMeaningfulFrame : maxValidFrame;
 
@@ -772,7 +772,7 @@ Matrix FbxLoader::ConvertAMatrix(FbxAMatrix& m)
 	double* pSrcArray = reinterpret_cast<double*>(&m);
 	for (int i = 0; i < 16; i++)
 	{
-		pMatArray[i] = pSrcArray[i];
+		pMatArray[i] = static_cast<float>(pSrcArray[i]);
 	}
 	return mat;
 }

@@ -22,7 +22,7 @@ public:
 	void Destroy() override;
 
 public:
-	const shared_ptr<USkeletalMeshResources>& GetMesh() { return static_pointer_cast<USkeletalMeshResources>(m_pMesh); }
+	const shared_ptr<USkeletalMeshResources> GetMesh() { return static_pointer_cast<USkeletalMeshResources>(m_pMesh); }
 
 	void SetBaseAnim(shared_ptr<UAnimInstance> _anim) { m_pBaseAnim = _anim; }
 	void SetMeshAnim(shared_ptr<AnimTrack> _meshAnim) { m_pMeshAnim = _meshAnim; }

@@ -68,7 +68,7 @@ bool TEnemy::CheckHit()
 			velocity = -look;
 			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 			// HP
-			TakeDamage(m_iDamagedByM); // <-- Player 근접공격력 데미지
+			TakeDamage(static_cast<int>(m_iDamagedByM)); // <-- Player 근접공격력 데미지
 			if (dynamic_pointer_cast<TPlayer>(player.lock())->GetArrowCount() <= 9)
 			{
 				dynamic_pointer_cast<TPlayer>(player.lock())->IncArrowCount();
@@ -90,7 +90,7 @@ bool TEnemy::CheckHit()
 			velocity = -look;
 			PlayBloodBurst(basePos, velocity, 25.0f, 90.0f);
 			// HP
-			TakeDamage(m_iDamagedByP); // <-- Player 원거리공격력 데미지
+			TakeDamage(static_cast<int>(m_iDamagedByP)); // <-- Player 원거리공격력 데미지
 
 			return true;
 		}

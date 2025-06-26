@@ -30,9 +30,9 @@ public:
 	Vec3 maxV = { 1.0f, 1.0f, 1.0f };
 	Vec3 minV = { 0.01f, 0.01f, 0.01f };
 	// Rotation
-	Vec3 targetPos;
-	Vec3 dir;
-	float targetYaw;
+	Vec3 targetPos = Vec3();
+	Vec3 dir = Vec3();
+	float targetYaw = 0.f;
 
 public:
 	MageAppearState(weak_ptr<AActor> _pOwner);
@@ -75,12 +75,12 @@ class MageHitState : public StateBase
 {
 private:
 	weak_ptr<AActor> m_pOwner;
-	Vec3 dir;
+	Vec3 dir = Vec3();
 	bool bStaticMage = false;
 	float runElapsed = 0.0f;
 	float rotateElapsed = 0.0f;
-	float targetYaw;
-	bool bMove;
+	float targetYaw = 0.f;
+	bool bMove = true;		// 초기화 추가
 public:
 	MageHitState(weak_ptr<AActor> _pOwner);
 	~MageHitState() {}
@@ -100,21 +100,21 @@ private:
 	weak_ptr<AActor> m_pTarget;
 	// 이동
 	bool bStaticMage = false;
-	Vec3 dir;
-	float targetYaw;
+	Vec3 dir = Vec3();
+	float targetYaw = 0.f;
 	// teleport 관련 변수
-	Vec3 destination;
+	Vec3 destination = Vec3();
 	float disElapsed = 0.0f;
 	float waitElapsed = 0.0f;
 	// anim 관련 변수
-	float originSpped;
+	float originSpped = 0.f;
 	// sub-state
 	enum AttackPhase { Attack, Runaway, Disappear, Wait, StandStill, Appear, Done };
 	AttackPhase currentPhase = AttackPhase::Attack;
-	shared_ptr<class MageAttackStart> attack;
-	shared_ptr<class MageRunaway> runaway;
-	shared_ptr<class MageDisappearState> disappear;
-	shared_ptr<class MageAppearState> appear;
+	shared_ptr<class MageAttackStart> attack = nullptr;
+	shared_ptr<class MageRunaway> runaway = nullptr;
+	shared_ptr<class MageDisappearState> disappear = nullptr;
+	shared_ptr<class MageAppearState> appear = nullptr;
 
 public:
 	MageAttackState(weak_ptr<AActor> _pOwner);
@@ -136,8 +136,8 @@ private:
 	weak_ptr<AActor> m_pTarget;
 
 	// 이동
-	Vec3 dir;
-	float targetYaw;
+	Vec3 dir = Vec3();
+	float targetYaw = 0.f;
 
 public:
 	MageAttackStart(weak_ptr<AActor> _pOwner);
@@ -157,8 +157,8 @@ class MageRunaway : public StateBase
 private:
 	weak_ptr<AActor> m_pOwner;
 	// 이동
-	Vec3 dir;
-	float targetYaw;
+	Vec3 dir = Vec3();
+	float targetYaw = 0.f;
 	float elapsed = 0.0f;
 
 public:

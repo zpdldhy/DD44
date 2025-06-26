@@ -6,8 +6,8 @@ void ViewPortTexture::CreateViewPortTexture(FLOAT _fWidth, FLOAT _fHeight)
 {
 	SetViewPort(_fWidth, _fHeight);
 
-	m_TexDesc.Width = _fWidth;
-	m_TexDesc.Height = _fHeight;
+	m_TexDesc.Width = static_cast<UINT>(_fWidth);
+	m_TexDesc.Height = static_cast<UINT>(_fHeight);
 	m_TexDesc.MipLevels = 1;
 	m_TexDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	m_TexDesc.SampleDesc.Count = 1;
@@ -48,8 +48,8 @@ void ViewPortTexture::CreateViewPortTexture(FLOAT _fWidth, FLOAT _fHeight)
 	ComPtr<ID3D11Texture2D> pDSTexture = nullptr;
 	D3D11_TEXTURE2D_DESC DescDepth;
 	ZeroMemory(&DescDepth, sizeof(D3D11_TEXTURE2D_DESC));
-	DescDepth.Width = _fWidth;
-	DescDepth.Height = _fHeight;
+	DescDepth.Width = static_cast<UINT>(_fWidth);
+	DescDepth.Height = static_cast<UINT>(_fHeight);
 	DescDepth.MipLevels = 1;
 	DescDepth.ArraySize = 1;
 	DescDepth.Format = DXGI_FORMAT_R24G8_TYPELESS;

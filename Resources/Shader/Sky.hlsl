@@ -2,7 +2,7 @@
 
 VS_OUT VS(VS_IN input)
 {
-    VS_OUT output;
+    VS_OUT output = (VS_OUT) 0;
 
     float4 vLocal = float4(input.p, 1.0f);
     float4 vWorld = mul(vLocal, g_matWorld);

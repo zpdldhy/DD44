@@ -26,37 +26,37 @@ public:
 	bool m_bCanRoll = true;
 
 	// Attack
-	shared_ptr<AActor> attackRangeActor;
-	shared_ptr<AActor> bow;
-	shared_ptr<AActor> sword;
-	Vec3 colOffset;
+	shared_ptr<AActor> attackRangeActor = nullptr;
+	shared_ptr<AActor> bow = nullptr;
+	shared_ptr<AActor> sword = nullptr;
+	Vec3 colOffset = Vec3();
 
-	Vec3 m_vLook;
-	Vec3 m_vRight;
-	Vec3 m_vLastMoveDir;
-	Vec3 velocity;
-	Vec3 m_vRollLook;
+	Vec3 m_vLook = Vec3();
+	Vec3 m_vRight = Vec3();
+	Vec3 m_vLastMoveDir = Vec3();
+	Vec3 velocity = Vec3();
+	Vec3 m_vRollLook = Vec3();
 
-	shared_ptr<Texture> m_pSubTexture;
-	shared_ptr<Texture> m_pNoiesTexture;
+	shared_ptr<Texture> m_pSubTexture = nullptr;
+	shared_ptr<Texture> m_pNoiesTexture = nullptr;
 
-	shared_ptr<StateBase> empty;
-	shared_ptr<StateBase> idle;
-	shared_ptr<StateBase> walk;
-	shared_ptr<StateBase> climb;
-	shared_ptr<StateBase> roll;
-	shared_ptr<StateBase> attack;
-	shared_ptr<StateBase> hit;
-	shared_ptr<StateBase> shoot;
-	shared_ptr<StateBase> die;
-	shared_ptr<StateBase> currentState;
-	PLAYER_STATE currentStateId;
+	shared_ptr<StateBase> empty = nullptr;
+	shared_ptr<StateBase> idle = nullptr;
+	shared_ptr<StateBase> walk = nullptr;
+	shared_ptr<StateBase> climb = nullptr;
+	shared_ptr<StateBase> roll = nullptr;
+	shared_ptr<StateBase> attack = nullptr;
+	shared_ptr<StateBase> hit = nullptr;
+	shared_ptr<StateBase> shoot = nullptr;
+	shared_ptr<StateBase> die = nullptr;
+	shared_ptr<StateBase> currentState = nullptr;
+	PLAYER_STATE currentStateId = PLAYER_STATE::EMPTY_STATE;
 
 	// Cilmb
 	bool m_bCanClimb = false;
-	Vec3 m_vLadder;
-	Vec3 m_vDirToLadder;
-	Vec3 m_vLadderEnd;
+	Vec3 m_vLadder = Vec3();
+	Vec3 m_vDirToLadder = Vec3();
+	Vec3 m_vLadderEnd = Vec3();
 
 	// state·Î ÀÌ°ü
 	//// Slash 

@@ -9,7 +9,7 @@
 #define INPUTLAYOUT GET_SINGLE(InputlayoutManager)
 #define STATE		GET_SINGLE(DxState)
 #define INPUT		GET_SINGLE(Input)
-#define DXWRITE     GET_SINGLE(DxWrite)
+#define DXWRITE_DD  GET_SINGLE(DxWrite)
 #define TIMER		GET_SINGLE(Timer)
 #define GUI			GET_SINGLE(ImGuiCore)
 #define SOUND		GET_SINGLE(SoundManager)

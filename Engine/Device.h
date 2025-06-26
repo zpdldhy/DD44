@@ -4,19 +4,19 @@
 class Device : public Singleton<Device>
 {
     // Device & SwapChain
-    ComPtr<ID3D11Device> m_pd3dDevice;
-    ComPtr<ID3D11DeviceContext> m_pd3dContext;
-    ComPtr<IDXGISwapChain> m_pSwapChain;
+    ComPtr<ID3D11Device> m_pd3dDevice = nullptr;
+    ComPtr<ID3D11DeviceContext> m_pd3dContext = nullptr;
+    ComPtr<IDXGISwapChain> m_pSwapChain = nullptr;
 
     // Render Target View
-    ComPtr<ID3D11RenderTargetView> m_pRTV;
+    ComPtr<ID3D11RenderTargetView> m_pRTV = nullptr;
 
     // Depth Stencil View
-    ComPtr<ID3D11DepthStencilView> m_pDSV;
-    ComPtr<ID3D11Texture2D> m_pDepthStencilTexture;
+    ComPtr<ID3D11DepthStencilView> m_pDSV = nullptr;
+    ComPtr<ID3D11Texture2D> m_pDepthStencilTexture = nullptr;
 
     // Viewport
-    D3D11_VIEWPORT m_MainVP;
+    D3D11_VIEWPORT m_MainVP = D3D11_VIEWPORT();
 
     // DxState
     bool m_bWireFrame = false;

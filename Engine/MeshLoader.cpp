@@ -234,6 +234,7 @@ shared_ptr<UMeshResources> MeshLoader::GetMeshRes(wstring _name)
 		assert(false);
 		//return shared_ptr<UMeshResources>();
 	}
+	return nullptr;
 }
 
 shared_ptr<UAnimInstance> MeshLoader::GetAnimInstance(wstring _name)
@@ -248,4 +249,5 @@ shared_ptr<UAnimInstance> MeshLoader::GetAnimInstance(wstring _name)
 		assert(false);
 		//return shared_ptr<UMeshResources>();
 	}
+	return nullptr;
 }

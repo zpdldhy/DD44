@@ -524,7 +524,7 @@ void MageDieState::Tick()
 		End();
 	}
 
-	float frameTime = animInstance->GetTotalFrame();
+	float frameTime = static_cast<float>(animInstance->GetTotalFrame());
 	frameTime /= 30;
 	m_fDissolveTimer += TIMER->GetDeltaTime();
 	float t = m_fDissolveTimer / frameTime;

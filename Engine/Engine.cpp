@@ -46,7 +46,7 @@ void Engine::Init()
 		LIGHT->Init();
 		SHADOW->Init();
 		INPUT->Init();
-		DXWRITE->Create();
+		DXWRITE_DD->Create();
 		SOUND->LoadAllSounds();
 
 		if (_app->m_type != SCENE_TYPE::GAME)
@@ -117,11 +117,11 @@ void Engine::Frame()
 void Engine::Render()
 {
 	GET_SINGLE(Device)->PreRender();
-	DXWRITE->BeginDraw();
+	DXWRITE_DD->BeginDraw();
 
 #ifndef DEBUG
 	D2D1_RECT_F rt = { 0.0f, 0.0f, 800.0f, 600.0f };
-	DXWRITE->Draw(rt, TIMER->m_szTime);
+	DXWRITE_DD->Draw(rt, TIMER->m_szTime);
 #endif // DEBUG
 
 	_app->Render();
@@ -163,7 +163,7 @@ void Engine::Render()
 		m_pCurrentRasterizer.Reset();
 	}
 
-	DXWRITE->EndDraw();
+	DXWRITE_DD->EndDraw();
 	GET_SINGLE(Device)->PostRender();
 
 	if (_app->m_type != SCENE_TYPE::GAME)

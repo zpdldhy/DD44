@@ -718,7 +718,7 @@ void UIEditorUI::ResolvePrefabData(const PrefabUIData& data)
     m_fFontSize = data.FontSize;
     for (size_t i = 0; i < m_vFontList.size(); i++)
         if (!strcmp(m_vFontList[i].c_str(), data.FontPath.c_str()))
-            m_iFontIndex = i;
+            m_iFontIndex = static_cast<int>(i);
 
     // Texts
     strcpy_s(m_szText, data.Text.c_str());
@@ -726,7 +726,7 @@ void UIEditorUI::ResolvePrefabData(const PrefabUIData& data)
     memcpy(m_vSliceUV, data.SliceUV, sizeof(float) * 4);
 
     // Texture
-    for (size_t i = 0; i < m_vTextureList.size(); ++i)
+    for (int i = 0; i < static_cast<int>(m_vTextureList.size()); ++i)
     {
         if (!strcmp(m_vTextureList[i].c_str(), data.IdleTexturePath.c_str()))
             m_iIdleIndex = i;

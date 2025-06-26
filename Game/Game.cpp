@@ -345,7 +345,7 @@ void Game::CreateWind()
 		for (int i = 0; i < spawnCount; ++i)
 		{
 			// NDC 기준 왼쪽 위에서 오른쪽 아래로
-			float startX = RandomRange(-1.2f, 0); // 살짝 바깥쪽에서 시작
+			float startX = RandomRange(-1.2f, 0.f); // 살짝 바깥쪽에서 시작
 			float startY = RandomRange(0.5f, 1.5f); // 상단에서만
 			if (startY < 1.0f)
 			{

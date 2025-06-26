@@ -15,10 +15,10 @@ public:
 private:
 	weak_ptr<AActor> player;
 public:
-	Vec3 m_vCenter;
-	Vec3 m_vTargetPos;
-	Vec3 m_vPrevPos;
-	float m_fLerp = -0.05;
+	Vec3 m_vCenter = Vec3();
+	Vec3 m_vTargetPos = Vec3();
+	Vec3 m_vPrevPos = Vec3();
+	float m_fLerp = -0.05f;
 	float m_fLerpOffset = 0.005f;
 	float m_fRadius = 5.0f;
 	float angle = 0.0f; 
@@ -30,12 +30,12 @@ public:
 	//
 	bool m_bClockWise = false;
 	// 
-	bool m_bReturn;
-	Vec3 m_vReturnPos;
+	bool m_bReturn = false;
+	Vec3 m_vReturnPos = Vec3();
 	bool m_bStopAllMove = false;
 	//
-	shared_ptr<AActor> attackRangeActor;
-	Vec3 colOffset;
+	shared_ptr<AActor> attackRangeActor = nullptr;
+	Vec3 colOffset = Vec3();
 
 	// TEMP
 	bool m_bMove = false;

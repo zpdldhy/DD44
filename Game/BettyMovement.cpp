@@ -258,7 +258,7 @@ void BettyMovement::ChangeState(shared_ptr<StateBase> _state)
 {
 	if (currentState && !currentState->IsInterruptible() && currentState->IsPlaying())
 	{
-		if (!_state->GetId() == BETTY_S_DEATH)
+		if (!(_state->GetId() == static_cast<UINT>(BETTY_S_DEATH)))
 		{
 			return;
 		}
@@ -299,7 +299,7 @@ void BettyMovement::HandleAttack(float _delta)
 		else
 		{
 			//meleeIndex = (meleeIndex + 1) % meleeState.size();
-			meleeIndex = (int)RandomRange(0.0f, meleeState.size());
+			meleeIndex = (int)RandomRange(0.0f, static_cast<float>(meleeState.size()));
 			auto next = meleeState[meleeIndex];
 			if (next->GetId() == BETTY_S_A_HANDBACK)
 			{
@@ -345,11 +345,11 @@ void BettyMovement::HandleAttack(float _delta)
 	else
 	{
 		// 원거리 공격
-		auto nextIndex = (int)RandomRange(0.0f, rangedState.size());
+		auto nextIndex = (int)RandomRange(0.0f, static_cast<float>(rangedState.size()));
 		// 중복 방지
 		while (nextIndex == rangedIndex)
 		{
-			nextIndex = (int)RandomRange(0.0f, rangedState.size());
+			nextIndex = (int)RandomRange(0.0f, static_cast<float>(rangedState.size()));
 		}
 		rangedIndex = nextIndex;
 		auto next = rangedState[rangedIndex];

@@ -12,14 +12,14 @@
 class ImGuiCore : public Singleton<ImGuiCore>
 {
 private:
-	std::unique_ptr<class CharacterEditorUI> m_pCharacterEditorUI;
-	std::unique_ptr<class MapEditorUI> m_pMapEditorUI;
-	std::unique_ptr<class ObjectEditorUI> m_pObjectEditorUI;
-	std::unique_ptr<class EffectEditorUI> m_pEffectEditorUI;
-	std::unique_ptr<class ActorListUI> m_pActorListUI;
-	std::unique_ptr<class MeshEditorUI> m_pMeshEditorUI;
-	std::unique_ptr<class UIEditorUI> m_pUIEditorUI;
-	std::unique_ptr<class ParticleEditorUI> m_pParticleEditorUI;
+	std::unique_ptr<class CharacterEditorUI> m_pCharacterEditorUI = nullptr;
+	std::unique_ptr<class MapEditorUI> m_pMapEditorUI = nullptr;
+	std::unique_ptr<class ObjectEditorUI> m_pObjectEditorUI = nullptr;
+	std::unique_ptr<class EffectEditorUI> m_pEffectEditorUI = nullptr;
+	std::unique_ptr<class ActorListUI> m_pActorListUI = nullptr;
+	std::unique_ptr<class MeshEditorUI> m_pMeshEditorUI = nullptr;
+	std::unique_ptr<class UIEditorUI> m_pUIEditorUI = nullptr;
+	std::unique_ptr<class ParticleEditorUI> m_pParticleEditorUI = nullptr;
 
 
 public:
@@ -86,15 +86,15 @@ private:
 	HWND m_hWndImGui = nullptr;
 
 	// Device & SwapChain
-	ComPtr<ID3D11Device> m_pd3dDevice;
-	ComPtr<ID3D11DeviceContext> m_pd3dContext;
-	ComPtr<IDXGISwapChain> m_pSwapChain;
+	ComPtr<ID3D11Device> m_pd3dDevice = nullptr;
+	ComPtr<ID3D11DeviceContext> m_pd3dContext = nullptr;
+	ComPtr<IDXGISwapChain> m_pSwapChain = nullptr;
 
 	// Render Target View
-	ComPtr<ID3D11RenderTargetView> m_pRTV;
+	ComPtr<ID3D11RenderTargetView> m_pRTV = nullptr;
 
 	// Viewport
-	D3D11_VIEWPORT m_MainVP;	
+	D3D11_VIEWPORT m_MainVP = D3D11_VIEWPORT();
 
 public:
 	bool CreateImGuiWindow(HINSTANCE _hInstance, int _winX = 1000, int _winY = (int)g_windowSize.y - 100);

@@ -21,7 +21,7 @@ void DxState::CreateBlendStates()
 		ZeroMemory(&bd, sizeof(bd));
 		bd.AlphaToCoverageEnable = FALSE;
 		bd.IndependentBlendEnable = TRUE;
-		for (int i = 0; i < m_iMRTNum; i++)
+		for (UINT i = 0; i < m_iMRTNum; i++)
 		{
 			bd.RenderTarget[i].BlendEnable = TRUE;
 			bd.RenderTarget[i].SrcBlend = D3D11_BLEND_SRC_ALPHA;
@@ -46,7 +46,7 @@ void DxState::CreateBlendStates()
 		ZeroMemory(&bd, sizeof(bd));
 		bd.AlphaToCoverageEnable = FALSE;
 		bd.IndependentBlendEnable = TRUE;
-		for (int i = 0; i < m_iMRTNum; i++)
+		for (UINT i = 0; i < m_iMRTNum; i++)
 		{
 			bd.RenderTarget[i].BlendEnable = TRUE;
 			bd.RenderTarget[i].SrcBlend = D3D11_BLEND_ONE;
@@ -71,7 +71,7 @@ void DxState::CreateBlendStates()
 		ZeroMemory(&bd, sizeof(bd));
 		bd.AlphaToCoverageEnable = FALSE;
 		bd.IndependentBlendEnable = TRUE;
-		for (int i = 0; i < m_iMRTNum; i++)
+		for (UINT i = 0; i < m_iMRTNum; i++)
 		{
 			bd.RenderTarget[i].BlendEnable = TRUE;
 			bd.RenderTarget[i].SrcBlend = D3D11_BLEND_DEST_COLOR;
@@ -96,7 +96,7 @@ void DxState::CreateBlendStates()
 		ZeroMemory(&bd, sizeof(bd));
 		bd.AlphaToCoverageEnable = FALSE;
 		bd.IndependentBlendEnable = TRUE;
-		for (int i = 0; i < m_iMRTNum; i++)
+		for (UINT i = 0; i < m_iMRTNum; i++)
 		{
 			bd.RenderTarget[i].BlendEnable = TRUE;
 			bd.RenderTarget[i].SrcBlend = D3D11_BLEND_ONE;
@@ -156,7 +156,7 @@ void DxState::CreateBlendStates()
 		ZeroMemory(&bd, sizeof(bd));
 		bd.AlphaToCoverageEnable = FALSE;
 		bd.IndependentBlendEnable = TRUE;
-		for (int i = 0; i < m_iMRTNum; i++)
+		for (UINT i = 0; i < m_iMRTNum; i++)
 		{
 			bd.RenderTarget[i].BlendEnable = TRUE;
 			bd.RenderTarget[i].SrcBlend = D3D11_BLEND_ONE;

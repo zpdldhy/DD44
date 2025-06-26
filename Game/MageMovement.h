@@ -15,15 +15,15 @@ private:
 	bool bStaticMage = false;
 
 	// States
-	shared_ptr<StateBase> idle;
-	shared_ptr<StateBase> appear;
-	shared_ptr<StateBase> disappear;
-	shared_ptr<StateBase> walk;
-	shared_ptr<StateBase> attack;
-	shared_ptr<StateBase> hit;
-	shared_ptr<StateBase> death;
-	shared_ptr<StateBase> currentState;
-	UINT currentStateId;
+	shared_ptr<StateBase> idle = nullptr;
+	shared_ptr<StateBase> appear = nullptr;
+	shared_ptr<StateBase> disappear = nullptr;
+	shared_ptr<StateBase> walk = nullptr;
+	shared_ptr<StateBase> attack = nullptr;
+	shared_ptr<StateBase> hit = nullptr;
+	shared_ptr<StateBase> death = nullptr;
+	shared_ptr<StateBase> currentState = nullptr;
+	UINT currentStateId = 0;
 	// attackOffset
 	float findDistance = 30.0f;
 	float hitElapsed = 0.0f;

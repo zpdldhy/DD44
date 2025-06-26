@@ -17,7 +17,7 @@ void HealerScript::Tick()
 	float time = TIMER->GetGameTime();
 
 	float currY = cosf(time * 2.0f) * 0.5f;
-	float prevY = cosf((time - TIMER->GetDeltaTime()) * 2.0f) * 0.5;
+	float prevY = cosf((time - TIMER->GetDeltaTime()) * 2.0f) * 0.5f;
 	float deltaY = currY - prevY;
 
 	GetOwner()->AddPosition(Vec3(0.f, deltaY, 0.f));
