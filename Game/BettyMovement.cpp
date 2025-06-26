@@ -16,6 +16,7 @@
 
 // temp temp temp !!!!!
 #include "Input.h"
+#include "Sound.h"
 
 void BettyMovement::Init()
 {
@@ -249,6 +250,8 @@ void BettyMovement::HandleSnowBall()
 		if ((*iter)->GetPosition().y <= 0.5f)
 		{
 			EFFECT->PlayDustBurst((*iter)->GetPosition(), 10.f, 0.4f);
+			SOUND->GetPtr(ESoundType::SnowFalling_Betty)->PlayEffect2D();
+
 			(*iter)->m_bCollision = false;
 			(*iter)->SetPosition(Vec3(0.0f, 20.0f, 0.0f));
 			(*iter)->GetPhysicsComponent()->SetWeight(0.0f);
@@ -411,10 +414,10 @@ void BettyMovement::HandleAttack(float _delta)
 	}
 
 	auto hp = dynamic_pointer_cast<TCharacter>(GetOwner())->GetHp();
-	if (hp < 15 && hp > 10)
+	if (hp < 20 && hp > 10)
 	{
 		// Phase 2
-		currentSnowDropCount = 2;
+		currentSnowDropCount = 10;
 		bSnowControl = true;
 	}
 

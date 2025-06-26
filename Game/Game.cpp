@@ -83,6 +83,8 @@ void Game::Init()
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
+
+	// Teleporter
 	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
@@ -471,14 +473,17 @@ void Game::UpdateUI()
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
 
 		StagePhase currentStage = STAGE->GetCurrentStage();
-		if (currentStage != StagePhase::FINAL)
+
+		SOUND->GetPtr(ESoundType::Stage0)->SetPause(false);
+		SOUND->GetPtr(ESoundType::Boss1)->SetPause(false);
+		/*if (currentStage != StagePhase::FINAL)
 		{
 			SOUND->GetPtr(ESoundType::Stage0)->Play2D();
 		}
 		else
 		{
 			SOUND->GetPtr(ESoundType::Boss1)->Play2D();
-		}
+		}*/
 	}
 }
 

@@ -569,7 +569,7 @@ void MageDieState::Enter()
 	soulDirection.Normalize();
 	EFFECT->PlayEffect(EEffectType::Soul, monPos, 0, soulDirection, 1.0f, playerPos);
 
-	SOUND->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Dead_Mage)->PlayEffect2D();
 }
 void MageDieState::Tick()
 {

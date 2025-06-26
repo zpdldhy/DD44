@@ -178,12 +178,17 @@ void SoundManager::LoadAllSounds()
 	Load(ESoundType::Enemy_Damaged, L"../Resources/Sound/enemy_damage.wav");
 	Load(ESoundType::Impact, L"../Resources/Sound/monster_impact.mp3");
 	Load(ESoundType::Dead_Walker, L"../Resources/Sound/zombie_dead.mp3");
+	Load(ESoundType::Rolling_Walker, L"../Resources/Sound/Walker_Rolling.mp3");
 	Load(ESoundType::Attack_Mage, L"../Resources/Sound/mage_magic.mp3");
+	Load(ESoundType::Dead_Mage, L"../Resources/Sound/mage_dead.mp3");
 	Load(ESoundType::Attack_Betty, L"../Resources/Sound/betty_attack.mp3");
 	Load(ESoundType::Screaming_Betty, L"../Resources/Sound/betty_screaming.mp3");
 	Load(ESoundType::Growling_Betty, L"../Resources/Sound/betty_growling.mp3");
-	Load(ESoundType::Impact_Betty, L"../Resources/Sound/betty_impact.mp3");
+	Load(ESoundType::Impact_Betty1, L"../Resources/Sound/betty_impact1.mp3");
+	Load(ESoundType::Impact_Betty2, L"../Resources/Sound/betty_impact2.mp3");
 	Load(ESoundType::Scraping_Betty, L"../Resources/Sound/betty_scraping.mp3");
+	Load(ESoundType::Rolling_Betty, L"../Resources/Sound/betty_rolling.mp3");
+	Load(ESoundType::SnowFalling_Betty, L"../Resources/Sound/betty_snow.mp3");
 
 	//Env
 	Load(ESoundType::Open_Fence, L"../Resources/Sound/fence_open.mp3");
@@ -225,5 +230,29 @@ SoundManager::~SoundManager()
 	{
 		m_pSystem->close();
 		m_pSystem->release();
+	}
+}
+
+void Sound::SetPause(bool bPause)
+{
+	if (m_pChannel)
+	{
+		bool paused;
+		if (m_pChannel->getPaused(&paused) == FMOD_OK && paused != bPause)
+		{
+			m_pChannel->setPaused(bPause);
+		}
+	}
+
+	for (auto& channel : m_pEffectChannels)
+	{
+		if (channel)
+		{
+			bool paused;
+			if (channel->getPaused(&paused) == FMOD_OK && paused != bPause)
+			{
+				channel->setPaused(bPause);
+			}
+		}
 	}
 }
