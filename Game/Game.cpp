@@ -163,8 +163,8 @@ void Game::Init()
 	OBJECT->SetCursorActor(m_pCursor);
 
 	// FadeOut 중엔 Paused 못하게
-	m_bNoPaused = true;
-	dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
+	//m_bNoPaused = true;
+	//dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
 	UI->DoFadeOut();
 
 	m_cBettyMovie.SetCameraStart(Vec3(64.f, 4.f, -94.f), Vec3(-0.06f, 11.65f, 0.f));
@@ -183,7 +183,7 @@ void Game::Tick()
 	//if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
 	if (INPUT->GetButton(GameKey::P))
 	{
-		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->CanInput();
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
 		UI->DoFadeIn();
 		m_cUI.NoRenderStateUI();		
 		m_cUI.GoEnding();
