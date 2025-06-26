@@ -98,6 +98,7 @@ public:
 	void DropSnowBall(float _deltaTime);
 	shared_ptr<AActor> GetSnowBall();
 	void HandleSnowBall();
+	void OneSnowBall();
 public:
 	//Collision
 	void CheckHit();
