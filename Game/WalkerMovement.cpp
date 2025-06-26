@@ -70,7 +70,7 @@ void WalkerMovement::Tick()
 		}
 		else
 		{
-			return;
+			//return;
 		}
 	}
 	currentState->Tick();
