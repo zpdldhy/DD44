@@ -60,6 +60,10 @@ void Editor::Init()
 	SetEnemy();
 	OBJECT->AddActorList(vlist);
 
+	auto Betty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty.character.json");
+	dynamic_pointer_cast<TEnemy>(Betty)->SetPlayer(m_pPlayer);
+	OBJECT->AddActor(Betty);
+
 	SetupGameCamera();
 	SetupEngineCamera();
 	SetupSkybox();

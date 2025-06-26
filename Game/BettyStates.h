@@ -49,10 +49,30 @@ public:
 	bool IsDone() { return bDone; }
 };
 
-class BettyIdleState : public StateBase
+class BettyStateBase : public StateBase
 {
-private:
+public:
+	BettyStateBase(UINT _iStateId);
+	~BettyStateBase() {}
+protected:
 	weak_ptr<AActor> m_pOwner;
+public:
+	// 공격 범위들
+	weak_ptr<AActor> leftRange;
+	weak_ptr<AActor> rightRange;
+	bool bAnimStop = false;
+
+	// 후딜
+	float originAnimSpeed;
+	float elapsed = 0.0f;
+	float offset = 0.3f;
+public:
+	void SetRange(const shared_ptr<AActor>& left, const shared_ptr<AActor>& right);
+	void EnableCollider();
+};
+
+class BettyIdleState : public BettyStateBase
+{
 public:
 	BettyIdleState(weak_ptr<AActor> _pOwner);
 	~BettyIdleState() {}
@@ -62,10 +82,8 @@ public:
 	virtual void End() override;
 };
 
-class BettyIntroState : public StateBase
+class BettyIntroState : public BettyStateBase
 {
-private:
-	weak_ptr<AActor> m_pOwner;
 	bool m_bNextAnim = true;
 public:
 	BettyIntroState(weak_ptr<AActor> _pOwner);
@@ -78,11 +96,8 @@ public:
 	void PlayFx();
 };
 
-class BettyJumpAttack : public StateBase
-{
-private:
-	weak_ptr<AActor> m_pOwner;
-	
+class BettyJumpAttack : public BettyStateBase
+{	
 	// MOVEMENT
 	//// JUMP
 	Vec3 targetPos;
@@ -103,16 +118,12 @@ public:
 public:
 	void SetTargetPos(Vec3 _pos) { targetPos = _pos; }
 public:
-	void SlowAnimSpeed();
-	void NormalizeAnimSpeed();
 	void PlayHandFx();
 	void PlayBodyFx();
 };
 
-class BettyTwoHandAttack : public StateBase
+class BettyTwoHandAttack : public BettyStateBase
 {
-private:
-	weak_ptr<AActor> m_pOwner;
 public:
 	BettyTwoHandAttack(weak_ptr<AActor> _pOwner);
 	~BettyTwoHandAttack() {}
@@ -120,12 +131,14 @@ public:
 	virtual void Enter() override;
 	virtual void Tick() override;
 	virtual void End() override;
+private:
+	void StartCol();
+	void EndAnim();
+
 };
 
-class BettyOneHandBackAttack : public StateBase
+class BettyOneHandBackAttack : public BettyStateBase
 {
-private:
-	weak_ptr<AActor> m_pOwner;
 	// 
 	bool bRight = true;
 	//// Rotate
@@ -139,12 +152,11 @@ public:
 	virtual void End() override;
 public:
 	bool CheckDirection(Vec3 _targetPos);
+	void StartCol();
 };
 
-class BettyOneHandDownAttack : public StateBase
+class BettyOneHandDownAttack : public BettyStateBase
 {
-private:
-	weak_ptr<AActor> m_pOwner;
 	// 
 	bool bRight = true;
 	//// Rotate
@@ -158,12 +170,12 @@ public:
 	virtual void End() override;
 public:
 	bool CheckDirection(Vec3 _targetPos);
+	void StartCol();
 };
 
-class BettyRollAttack : public StateBase
+class BettyRollAttack : public BettyStateBase
 {
 private:
-	weak_ptr<AActor> m_pOwner;
 	weak_ptr<AActor> m_pTarget;
 	// sub-state
 	enum RollPhase { Start, Middle, Final, Done };
@@ -247,10 +259,8 @@ public:
 };
 #pragma endregion
 
-class BettyDropAttack : public StateBase
+class BettyDropAttack : public BettyStateBase
 {
-private:
-	weak_ptr<AActor> m_pOwner;
 public:
 	BettyDropAttack(weak_ptr<AActor> _pOwner);
 	~BettyDropAttack() {}
@@ -260,10 +270,8 @@ public:
 	virtual void End() override;
 };
 
-class BettyRoarAttack : public StateBase
+class BettyRoarAttack : public BettyStateBase
 {
-private:
-	weak_ptr<AActor> m_pOwner;
 public:
 	BettyRoarAttack(weak_ptr<AActor> _pOwner);
 	~BettyRoarAttack() {}
@@ -273,10 +281,8 @@ public:
 	virtual void End() override;
 };
 
-class BettyDeathState : public StateBase
+class BettyDeathState : public BettyStateBase
 {
-private:
-	weak_ptr<AActor> m_pOwner;
 public:
 	BettyDeathState(weak_ptr<AActor> _pOwner);
 	~BettyDeathState() {}

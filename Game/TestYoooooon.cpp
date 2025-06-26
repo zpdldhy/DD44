@@ -42,12 +42,6 @@ void TestYoooooon::Init()
 
 	m_vGround = PToA->LoadAllPrefabs(".map.json");
 	OBJECT->AddActorList(m_vGround);
-	//OBJECT->AddActorList(PRA->LoadAllPrefabs(".object.json"));
-	//OBJECT->AddActorList(PToA->LoadAllPrefabs(".objects.json"));
-
-	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
-	OBJECT->AddActor(m_pPlayer);
-	m_pPlayer->SetPosition(Vec3(-50.f, 0.f, 0.f));
 
 	SetupEngineCamera();
 	//SetupSkybox();
@@ -62,7 +56,7 @@ void TestYoooooon::Tick()
 		if (m_bEnginCamera)
 		{
 			m_bEnginCamera = false;
-			CAMERA->Set3DCameraActor(m_pPlayer);
+			CAMERA->Set3DCameraActor(m_pCinemaCamera);
 		}
 		else
 		{
@@ -74,7 +68,7 @@ void TestYoooooon::Tick()
 	//if (INPUT->GetButton(LCLICK))
 		//ClickMouse();
 
-	CheckCollision();
+	//CheckCollision();
 }
 
 void TestYoooooon::Render()
@@ -97,6 +91,12 @@ void TestYoooooon::SetupEngineCamera()
 
 	CAMERA->Set3DCameraActor(m_pCameraActor);
 	OBJECT->AddActor(m_pCameraActor);
+
+	m_pCinemaCamera = make_shared<ACameraActor>();
+	m_pCinemaCamera->m_szName = L"EnginCamera";
+	m_pCinemaCamera->SetPosition(Vec3(0.f, 20.f, -30.f));
+
+	OBJECT->AddActor(m_pCinemaCamera);
 }
 
 void TestYoooooon::SetupSkybox()
@@ -350,7 +350,7 @@ void TestYoooooon::CreateCollisionObject()
 
 		m_pBox->SetScale(Vec3(30.f, 30.f, 30.f));
 		m_pBox->SetRotation(Vec3(0.f, 0.f, DD_PI / 8.f));
-		m_pBox->SetPosition(Vec3(0.f, -10.f, 0.f));
+		m_pBox->SetPosition(Vec3(100.f, -10.f, 200.f));
 
 		OBJECT->AddActor(m_pBox);
 	}
@@ -380,23 +380,23 @@ void TestYoooooon::CreateCollisionObject()
 
 void TestYoooooon::ClickMouse()
 {
-	m_Cursor.Click();
+	//m_Cursor.Click();
 
-	auto boxCom = static_pointer_cast<UBoxComponent>(m_pPlayer->GetShapeComponent());
+	//auto boxCom = static_pointer_cast<UBoxComponent>(m_pPlayer->GetShapeComponent());
 
-	Vec3 vinter;
+	//Vec3 vinter;
 
-	if (Collision::CheckRayToOBB(m_Cursor, boxCom->GetBounds(), vinter))
-	{
-		int a = 0;
-	}
+	//if (Collision::CheckRayToOBB(m_Cursor, boxCom->GetBounds(), vinter))
+	//{
+	//	int a = 0;
+	//}
 }
 
 void TestYoooooon::CheckCollision()
 {
-	COLLITION->CheckCollision(m_pPlayer, m_pBox);
-	COLLITION->CheckCollision(m_pPlayer, m_pSphere);
+	//COLLITION->CheckCollision(m_pPlayer, m_pBox);
+	//COLLITION->CheckCollision(m_pPlayer, m_pSphere);
 
-	for (auto& ground : m_vGround)
-		COLLITION->CheckCollision(m_pPlayer, ground);
+	//for (auto& ground : m_vGround)
+	//	COLLITION->CheckCollision(m_pPlayer, ground);
 }

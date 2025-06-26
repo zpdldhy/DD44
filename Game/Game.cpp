@@ -36,6 +36,7 @@
 #include "EngineCameraMoveScript.h"
 #include "GameCameraMove.h"
 #include "MageMovement.h"
+#include "PlayerMoveScript.h"
 
 // Game
 #include "ProjectileManager.h"
@@ -94,14 +95,21 @@ void Game::Init()
 		m_vObjectList.push_back(interactable);
 		stage0.push_back(interactable);
 		stage1.push_back(interactable);
-		stage2.push_back(interactable); 
+		stage2.push_back(interactable);
 
+	}
+
+	auto fenceList = ENEMYCOLLIDER->triggerObjectList;
+	for (auto& obj : fenceList)
+	{
+		m_vObjectList.push_back(obj);
+		stage0.push_back(obj);
+		stage1.push_back(obj);
+		stage2.push_back(obj);
 	}
 
 	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty.character.json");
 	enemyList.emplace_back(m_pBetty);
-	//tempHeadRoller = PToA->MakeCharacter("../Resources/Prefab/Player/HeadRoller1.character.json");
-	//enemyList.emplace_back(tempHeadRoller);
 
 	auto enemy00 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage00/");
 	auto enemy01 = PToA->LoadAllPrefabs(".character.json", "../Resources/Prefab/Stage01/");
@@ -161,20 +169,48 @@ void Game::Init()
 	m_pCursor->Init();
 	OBJECT->SetCursorActor(m_pCursor);
 
+	// FadeOut 중엔 Paused 못하게
+	//m_bNoPaused = true;
+	//dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
 	UI->DoFadeOut();
+
+	m_cBettyMovie.SetCameraStart(Vec3(64.f, 4.f, -94.f), Vec3(-0.06f, 11.65f, 0.f));
 }
 
 void Game::Tick()
 {
+	// FadeOut이 처음 완료 되었을 때,
+	if (UI->GetFadeOutDone())
+	{
+		m_bNoPaused = false;
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->CanInput();
+	}
+
+	// Betty가 죽으면
+	if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
+		//if (INPUT->GetButton(GameKey::P))
+	{
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
+		UI->DoFadeIn();
+		m_cUI.NoRenderStateUI();
+		m_cUI.GoEnding();
+	}
+
 	STAGE->Tick();
+	if (STAGE->GetCurrentStage() == StagePhase::FINAL)
+	{
+		m_bStartBettyMoveScene = true;
+	}
 
 	UpdateCursor();
 
 	if (ENGINE->m_bGamePaused == false &&
-		INPUT->GetButton(GameKey::ESC))
+		INPUT->GetButton(GameKey::ESC) &&
+		!m_bNoPaused)
 		ENGINE->m_bGamePaused = !ENGINE->m_bGamePaused;
 
 	UpdateUI();
+	BettyMeetMovie();
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
@@ -211,8 +247,13 @@ void Game::Tick()
 	CheckEnemyCollision();
 	CheckBloodCollision();
 	PROJECTILE->Tick();
+	CheckEnemyDeath(enemyList);
 
-
+	if (m_pPlayer->GetPosition().y < -4.0f)
+	{
+		dynamic_pointer_cast<TPlayer>(m_pPlayer)->TakeDamage(1);
+		m_pPlayer->SetPosition(Vec3(50.0f, 40.0f, 100.0f));
+	}
 }
 
 void Game::Render()
@@ -339,64 +380,69 @@ void Game::CreateWind()
 
 void Game::UpdateUI()
 {
-	static int i = 4;
-	static int coin = 0;
+	auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer);
 
-	if (INPUT->GetButton(GameKey::P))
-		i++;		
+	m_cUI.SetMaxHP(player->GetMaxHP());
+	m_cUI.SetCurrentHP(player->GetHp());
 
-	if (INPUT->GetButtonDown(GameKey::I))
-		coin += 100;
+	m_cUI.SetMaxArrow(player->GetArrowCapacity());
+	m_cUI.SetCurrentArrow(player->GetArrowCount());
 
-	// UI가 적용해야 하는 부분
-	m_cUI.SetMaxHP(i);
-	m_cUI.SetCurrentHP(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetHp());
-	m_cUI.SetMaxArrow(i);
-	m_cUI.SetCurrentArrow(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetArrowCount());
-	m_cUI.SetTriggerData(dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetTrigger());	
-	m_cUI.SetCoin(coin);
-	m_cUI.SetDead(dynamic_pointer_cast<TPlayer>(m_pPlayer)->IsDead());
+	m_cUI.SetTriggerData(player->GetTrigger());
+
+	m_cUI.SetCoin(player->GetHisSoul());
+	m_cUI.SetDead(player->IsDead());
 
 	// 가격 출력하는 부분
-	m_cUI.SetHealthPrice(200);
+	m_cUI.SetHealthPrice(player->GetNextUpgradeCost(EStatType::HP));
+	m_cUI.SetAttackPrice(player->GetNextUpgradeCost(EStatType::MeleeDamage));
+	m_cUI.SetSpeedPrice(player->GetNextUpgradeCost(EStatType::MoveSpeed));
+	m_cUI.SetArrowPrice(player->GetNextUpgradeCost(EStatType::RangedDamage));
 
-	// 업그레이드 실패시
-	if (INPUT->GetButtonDown(GameKey::U))
-		m_cUI.IsBuyUpgrade(false);
+	if (INPUT->GetButton(GameKey::SPACE))
+	{
+		switch (m_cUI.CurrentUpgrade())
+		{
+		case 1:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::HP));
+			break;
+		case 2:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::MeleeDamage));
+
+			break;
+		case 3:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::MoveSpeed));
+			break;
+		case 4:
+			m_cUI.IsBuyUpgrade(player->UpgradeStat(EStatType::RangedDamage));
+			break;
+		}
+	}
 	else
 		m_cUI.IsBuyUpgrade(true);
 
 	m_cUI.Tick();
 
 	// UI의 상태에 따라 적용되는 부분
+
+	if (m_cUI.IsHealAction())
+	{
+		player->SetHp(player->GetMaxHP());
+
+		// 사운드
+		SOUND->GetPtr(ESoundType::Healing)->PlayEffect2D();
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	///////////						Paused							///////////
 	///////////////////////////////////////////////////////////////////////////
 
-	// Upgrade State
-	// 0은 Default로 Upgrade 없음을 나타냄
-	switch (m_cUI.SelectUpgrade())
-	{
-	case 1: // MaxHP
-		// MaxHP++
-		break;
-
-	case 2: // Attack
-		break;
-
-	case 3: // Speed
-		break;
-
-	case 4:	// Arrow
-		break;
-	}
-
 	// 계속하기
-	if(m_cUI.SelectContinue())
+	if (m_cUI.SelectContinue())
 		ENGINE->m_bGamePaused = false;
 
 	// 게임 종료
-	if(m_cUI.SelectExit())
+	if (m_cUI.SelectExit())
 		PostQuitMessage(0);
 
 	///////////////////////////////////////////////////////////////////////////
@@ -412,8 +458,8 @@ void Game::UpdateUI()
 	// Dead UI 종료 시, 캐릭 살아남 등
 	if (m_cUI.EndDeadUI())
 	{
-		dynamic_pointer_cast<TPlayer>(m_pPlayer)->SetHp(4);
-		// Dead true 세팅
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
+		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
 	}
 }
 
@@ -453,10 +499,91 @@ void Game::UpdateCursor()
 
 	m_pCursor->SetRotation(Vec3(DD_PI / 2.f, angle, 0.f));
 
-	if(ENGINE->m_bGamePaused == true)
+	if (ENGINE->m_bGamePaused == true)
 		OBJECT->SetCursorActor(nullptr);
 	else
 		OBJECT->SetCursorActor(m_pCursor);
+}
+
+void Game::BettyMeetMovie()
+{
+	if (!m_bStartBettyMoveScene || m_cBettyMovie.IsEnd()) return;
+
+	// 시작하기 전에 세팅할 것들
+	if (!m_cBettyMovie.IsStart())
+	{
+		// 연출 위치 조작
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
+		m_pPlayer->GetPhysicsComponent()->SetWeight(0.f);
+		auto pos = m_pPlayer->GetPosition();
+		pos.y = 0.025f;
+
+		m_cBettyMovie.SetPlayerEnterPos(pos);
+		m_cBettyMovie.SetPlayerStartPos(Vec3(64.f, pos.y, -94.f));
+		m_cBettyMovie.SetPlayerEndPos(Vec3(52.f, pos.y, -85.f));
+
+		m_cBettyMovie.SetMoveTime1(3.f);
+		m_cBettyMovie.SetRotTime1(4.f);
+		m_cBettyMovie.SetTimeTrack1(7.f);
+
+		m_cBettyMovie.SetMoveTime2(9.f);
+		m_cBettyMovie.SetRestTime(11.f);
+		m_cBettyMovie.SetTimeTrack2(12.f);
+
+		m_cBettyMovie.SetUIPopUpTime(18.f);
+		m_cBettyMovie.SetTimeTrack3(23.f);	// 베티 애니메이션 6초
+
+		m_cUI.NoRenderStateUI();
+
+		m_bNoPaused = true;
+	}
+
+	m_cBettyMovie.StartMovie();
+	m_cBettyMovie.Tick();
+
+	if (m_cBettyMovie.StartTrack1() || m_cBettyMovie.StartTrack2())
+	{
+		m_pCursor->m_bRender = false;
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->WalkAnim();
+	}
+
+	if (m_cBettyMovie.EndMove())
+	{
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->IdleAnim();
+	}
+
+	if (m_cBettyMovie.StartTrack3())
+	{
+		// 베티가 화내기 시작하는 부분
+		EVENT->TriggerEvent(EventType::EVENT_STAGE, L"StartIntro");
+	}
+
+	if (m_cBettyMovie.IsUIPopUp())
+	{
+		m_cUI.PopUpBettyName();
+	}
+
+	// 장면이 완전 종료되었을 때
+	if (m_cBettyMovie.IsEnd())
+	{
+		// 베티 움직이기 시작하는 구간
+		EVENT->TriggerEvent(EventType::EVENT_STAGE, L"FinishIntro");
+
+		m_cUI.PopDownBettyName();
+		m_cUI.RenderStateUI();
+		CAMERA->Set3DCameraActor(m_pGameCameraActor);
+
+		m_pPlayer->GetPhysicsComponent()->SetWeight(1.f);
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->CanInput();
+
+		m_bStartBettyMoveScene = false;
+		m_pCursor->m_bRender = true;
+		m_bNoPaused = false;
+	}
+
+	// Player 움직임 구현
+	m_pPlayer->SetPosition(m_cBettyMovie.GetPlayerPos());
+	m_pPlayer->SetRotation(m_cBettyMovie.GetPlayerRot());
 }
 
 void Game::SetEnemy(vector<shared_ptr<AActor>>& _enemyList)
@@ -512,7 +639,7 @@ void Game::CheckEnemyCollision()
 			}
 			proj++;
 		}
-	break;
+		break;
 	case StagePhase::STAGE01:
 		for (auto proj = projectileList.begin(); proj != projectileList.end(); )
 		{
@@ -530,7 +657,7 @@ void Game::CheckEnemyCollision()
 			}
 			proj++;
 		}
-	break;
+		break;
 	case StagePhase::STAGE10:
 		for (auto proj = projectileList.begin(); proj != projectileList.end(); )
 		{
@@ -549,11 +676,11 @@ void Game::CheckEnemyCollision()
 			proj++;
 		}
 
-		for (auto enemy = collisionEnemy1.begin(); enemy != collisionEnemy1.end(); )
+		for (auto enemy1 = collisionEnemy1.begin(); enemy1 != collisionEnemy1.end(); )
 		{
-			if ((enemy->get() == nullptr) || enemy->get()->m_bDelete == true)
+			if ((enemy1->get() == nullptr) || enemy1->get()->m_bDelete == true)
 			{
-				enemy = collisionEnemy1.erase(enemy);
+				enemy1 = collisionEnemy1.erase(enemy1);
 				continue;
 			}
 
@@ -564,13 +691,40 @@ void Game::CheckEnemyCollision()
 					obj = stage1.erase(obj);
 					continue;
 				}
-				COLLITION->CheckCollision(*enemy, *obj);
+				COLLITION->CheckCollision(*enemy1, *obj);
 				obj++;
 			}
-			enemy++;
+
+			for (auto it2 = std::next(enemy1); it2 != collisionEnemy1.end(); ++it2)
+			{
+				if ((*it2 == nullptr) || (*it2)->m_bDelete)
+					continue;
+
+				COLLITION->CheckCollision(*enemy1, *it2);
+			}
+
+			enemy1++;
 		}
-		break;	
+		break;
 	case StagePhase::STAGE20:
+		for (auto proj = projectileList.begin(); proj != projectileList.end(); )
+		{
+			COLLITION->CheckCollision(*proj, m_pPlayer);
+
+			for (auto iter = stage2.begin(); iter != stage2.end();)
+			{
+				if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+				{
+					iter = stage2.erase(iter);
+					continue;
+				}
+				COLLITION->CheckCollision(*proj, *iter);
+				iter++;
+			}
+			proj++;
+		}
+		break;
+	case StagePhase::FINAL:
 		for (auto proj = projectileList.begin(); proj != projectileList.end(); )
 		{
 			COLLITION->CheckCollision(*proj, m_pPlayer);
@@ -636,7 +790,17 @@ void Game::CheckEnemyCollision()
 				iter = enemyList.erase(iter);
 				continue;
 			}
-			COLLITION->CheckCollision(*iter, melee);
+
+			if (COLLITION->CheckCollision(*iter, melee))
+			{
+				auto enemy = dynamic_pointer_cast<TEnemy>(*iter);
+				if (enemy)
+				{
+					float damage = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetMeleeDamage();
+					enemy->SetDamagedByM(damage);
+				}
+			}
+
 			iter++;
 		}
 	}
@@ -692,7 +856,16 @@ void Game::CheckEnemyCollision()
 				iter = enemyList.erase(iter);
 				continue;
 			}
-			COLLITION->CheckCollision(*proj, *iter);
+			//COLLITION->CheckCollision(*proj, *iter);
+			if (COLLITION->CheckCollision(*proj, *iter))
+			{
+				auto enemy = dynamic_pointer_cast<TEnemy>(*iter);
+				if (enemy)
+				{
+					float damage = dynamic_pointer_cast<TPlayer>(m_pPlayer)->GetRangedDamage();
+					enemy->SetDamagedByP(damage);
+				}
+			}
 			iter++;
 		}
 
@@ -745,9 +918,33 @@ void Game::CheckBloodCollision()
 			pSoul->SetTarget(playerPos);
 		}
 
-		COLLITION->CheckCollision(*soul, m_pPlayer);
+		if (COLLITION->CheckCollision(*soul, m_pPlayer))
+		{
+			//CheckEnemyDeath(enemyList);
+			dynamic_pointer_cast<TPlayer>(m_pPlayer)->AddSoul(m_iSoulStorage);
+			SOUND->GetPtr(ESoundType::GetSoul)->PlayEffect2D();
+			m_iSoulStorage = 0;
+		}
 		soul++;
 	}
 
+}
+
+void Game::CheckEnemyDeath(const vector<shared_ptr<AActor>>& _enemyList)
+{
+	for (const auto& actor : _enemyList)
+	{
+		if (!actor) continue;
+
+		TCharacter* enemy = dynamic_cast<TCharacter*>(actor.get());
+		if (enemy && enemy->IsDead())
+		{
+			if (auto player = std::dynamic_pointer_cast<TPlayer>(m_pPlayer))
+			{
+				//player->AddSoul(enemy->GetHisSoul());
+				m_iSoulStorage += enemy->GetHisSoul();
+			}
+		}
+	}
 }
 

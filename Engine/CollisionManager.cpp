@@ -222,7 +222,7 @@ bool Collision::CheckCollision(shared_ptr<class AActor> _p1, shared_ptr<class AA
 		return iter->second(_p1, _p2);
 	}
 
-	return false;
+	return true;
 }
 
 bool Collision::CheckRayCollision(const Ray& _ray, vector<UINT> _vActorIndex, shared_ptr<class AActor>& _pColActor)
@@ -575,7 +575,7 @@ bool Collision::CheckOBBToOBB(const Box& _box0, const Box& _box1)
 	// 두 Box의 각 축에 외적하여 나오는 축과 비교
 	{
 		// Box0의 x축과 Box1의 모든 축을 외적한 벡터(각 축에 수직)에 투영
-	
+
 		//A0xB0
 		box0Radius = _box0.vExtent[1] * absAxisDot[2][0] + _box0.vExtent[2] * absAxisDot[1][0];
 		box1Radius = _box1.vExtent[1] * absAxisDot[0][2] + _box1.vExtent[2] * absAxisDot[0][1];

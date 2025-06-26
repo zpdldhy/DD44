@@ -2,10 +2,13 @@
 #include "TCharacter.h"
 class TEnemy : public TCharacter
 {
+public:
+	virtual ~TEnemy() = default;
 private:
 	//
 	weak_ptr<AActor> player;
 	// 
+	// mage 이동 처리를 위한 변수 추가
 	float hitElapsed = 0.0f;
 	float hitOffset = 1.0f;
 	// FX
@@ -15,12 +18,18 @@ private:
 	Vec3 velocity;
 	bool m_bCrashSet = false;
 	Vec2 m_bloodRange;
+	bool checkCollision = true;
 
 	// Frustum 내부에 들어왔을 때 충돌 연산
 	bool m_bFrustumIn = false;
 
 	// 
 	int stageIndex = -1;
+
+	// 입는 데미지 연산용
+	float m_iDamagedByM = 1.0f;
+	float m_iDamagedByP = 1.0f;
+
 public:
 	void Tick() override;
 	void Destroy() override;
@@ -28,6 +37,7 @@ public:
 	void SetPlayer(const weak_ptr<AActor>& _player) { player = _player; }
 	const weak_ptr<AActor>& GetPlayer() { return player; }
 
+	void SetHitEnable(bool _b) { checkCollision = _b; }
 	bool CheckHit();
 	virtual void CheckHitByProjectile(int type, bool _hit);
 public:
@@ -44,4 +54,11 @@ public:
 
 	void SetFrustumIn(bool _isFrustumIn) { m_bFrustumIn = _isFrustumIn; }
 	bool IsFrustumIn() { return m_bFrustumIn; }
+
+	float GetDamagedByM() const { return m_iDamagedByM; }
+	void SetDamagedByM(float _damage) { m_iDamagedByM = _damage; }
+
+	float GetDamagedByP() const { return m_iDamagedByP; }
+	void SetDamagedByP(float _damage) { m_iDamagedByP = _damage; }
 };
+

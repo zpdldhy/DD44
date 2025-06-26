@@ -44,6 +44,7 @@ class InGameUIControler : public UIControler
 	// InGame //
 	////////////
 	vector<shared_ptr<class AUIActor>> m_vMainBackGround;
+	bool m_bNoRender = false;
 
 	// HP
 	shared_ptr<class AUIActor> m_pHPBackGround = nullptr;
@@ -68,6 +69,7 @@ class InGameUIControler : public UIControler
 	// Interact
 	vector<shared_ptr<class AUIActor>> m_vInterActionUI;
 	struct TriggerData m_tTrigger;
+	bool m_bHeal = false;
 
 	////////////
 	// Paused //
@@ -79,7 +81,7 @@ class InGameUIControler : public UIControler
 	vector<shared_ptr<class AUIActor>> m_vUpgradeBackGround;
 	vector<vector<shared_ptr<class AUIActor>>> m_vUpgradeState;
 	shared_ptr<class Texture> m_pUpgradeDoneTexture = nullptr;
-	int m_iSelectUpgrade = 0;
+	int m_iCurrentUpgrade = 0;
 	int m_iHealthPrice = 100;
 	int m_iAttackPrice = 100;
 	int m_iSpeedPrice = 100;
@@ -110,6 +112,13 @@ class InGameUIControler : public UIControler
 	bool m_bDeadUIMove = false;
 	bool m_bDeadUIEnd = false;
 
+	//////////////
+	//  Sinema  //
+	//////////////
+	shared_ptr<class AUIActor> m_pBettyName = nullptr;
+	shared_ptr<class AUIActor> m_pEnding = nullptr;
+	bool m_bGoEnding = false;
+
 public:
 	void init() override;
 	void Tick() override;
@@ -124,6 +133,7 @@ private:
 	void UpdatePaused();
 	void UpdateCoin();
 	void UpdateDead();
+	void UpdateEnding();
 
 public:
 	void SetMaxHP(int _maxHP) { m_iMaxHP = _maxHP; }
@@ -139,9 +149,18 @@ public:
 	void IsBuyUpgrade(bool _isBuy) { m_iBuyUpgrade = _isBuy; }
 	void SetDead(bool _isDead) { m_bDead = _isDead; }
 
-	int  SelectUpgrade() { return m_iSelectUpgrade; }
+	int  CurrentUpgrade() { return m_iCurrentUpgrade; }
 	bool SelectContinue() { return m_bContinue; }
 	bool SelectExit() { return m_bExit; }
 	bool SelectDeadContinue() { return m_bDeadContinue; }
 	bool EndDeadUI() { return m_bDeadUIEnd; }
+	bool IsHealAction() { return m_bHeal; }
+
+	void PopUpBettyName();
+	void PopDownBettyName();
+
+	void NoRenderStateUI();
+	void RenderStateUI() { m_bNoRender = false; }
+
+	void GoEnding() { m_bGoEnding = true; }
 };

@@ -93,10 +93,10 @@ void IntroScene::UpdateUIState()
 	m_cUI.Tick();
 
 	if(m_cUI.IsSelectMenu())
-		SOUND->GetPtr(ESoundType::Click)->PlayEffect2D();
+		SOUND->GetPtr(ESoundType::Click)->Play2D(false);
 
 	// Select Start Button
-	if (UI->GetFadeWorkDone())
+	if (UI->GetFadeInDone())
 	{
 		Destroy();
 		auto game = make_shared<Game>();
