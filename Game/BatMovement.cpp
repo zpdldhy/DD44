@@ -124,7 +124,7 @@ void BatMovement::Tick()
 		Vec3 pos;
 		pos.x = m_vCenter.x + m_fRadius * std::cos(angle);
 		pos.z = m_vCenter.z + m_fRadius * std::sin(angle);
-
+		pos.y = m_vCenter.y;
 		GetOwner()->SetPosition(pos);
 
 		Vec3 direction = m_vCenter - GetOwner()->GetPosition();
