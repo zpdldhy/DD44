@@ -309,7 +309,8 @@ void InGameUIControler::init()
 	m_pBettyName->m_bRun = false;
 	m_pBettyName->m_bRender = false;
 
-	m_pEnding = PToA->MakeUI("../Resources/Prefab/UI_Ending.ui.json");
+	m_pEndingFade = PToA->MakeUI("../Resources/Prefab/UI_Fade.ui.json");
+	m_vEnding = PToA->MakeUIs("../Resources/Prefab/UI_Ending_Cradit.uis.json");
 }
 
 void InGameUIControler::Tick()
@@ -1008,32 +1009,211 @@ void InGameUIControler::UpdateEnding()
 {
 	if (!m_bGoEnding) return;
 	static bool oneFrame = true;
-	static wstring ending = L"";
 
 	if (oneFrame)
 	{
-		UI->AddUI(m_pEnding);
+		UI->AddUI(m_pEndingFade);
+		UI->AddUIList(m_vEnding);
 
-		m_pEnding->m_bRun = true;
-		m_pEnding->m_bRender = true;
+		m_pEndingFade->m_bRun = true;
+		m_pEndingFade->m_bRender = true;
 
-		auto pos = m_pEnding->GetPosition();
-		pos.y = -1500.f;
-		m_pEnding->SetPosition(pos);
-		m_pEnding->SetAlignment(DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		for (auto& pUI : m_vEnding) 
+		{
+			pUI->m_bRun = true;
+			pUI->m_bRender = true;
+			pUI->AddColor(Color(0.f, 0.f, 0.f, -1.f));
+		}
 
-		ending += L"팀 명\t\t\t        DD44\n\n";
-		ending += L"팀 원\t\t\t        서 준\n\n";
-		ending += L"\t\t\t        오 세영\n\n";
-		ending += L"\t\t\t        김 예린\n\n";
-		ending += L"\t\t\t        이 윤석\n\n";
-		ending += L"특별 감사\t\t        김 명균 선생님\n\n\n\n\n\n\n\n\n\n";
-		ending += L"       플레이  해주셔서  감사합니다!";
+		wstring ending = L"팀 명\n\n\n";
+		ending += L"DD44\n\n\n\n\n\n\n\n\n\n";
+		ending += L"팀 원\n\n\n";
+		ending += L"서  준\n\n";
+		ending += L"오세영\n\n";
+		ending += L"김예린\n\n";
+		ending += L"이윤석\n\n\n\n\n\n\n\n\n\n\n\n";
+		ending += L"특별 감사\n\n\n";
+		ending += L"김명균 원장님\n\n\n\n\n\n\n\n\n\n";
+		ending += L"플레이  해주셔서  감사합니다!";
+
+		m_vEnding[0]->SetText(ending);
+		m_vEnding[0]->SetColor(Color(0.f, 0.f, 0.f, 1.f));
+		m_vEnding[0]->SetPosition(Vec3(0.f, -(g_windowSize.y * 2.f), 0.f));
+
+		//ending += L"팀 명\t\t\t        DD44\n\n";
+		//ending += L"팀 원\t\t\t        서 준\n\n";
+		//ending += L"\t\t\t        오세영\n\n";
+		//ending += L"\t\t\t        김예린\n\n";
+		//ending += L"\t\t\t        이윤석\n\n";
+		//ending += L"특별 감사\t\t        김명균 원장님\n\n\n\n\n\n\n\n\n\n";
+		//ending += L"       플레이  해주셔서  감사합니다!";
+
 	}
-	m_pEnding->SetText(ending);
 
-	if (m_pEnding->GetPosition().y < g_windowSize.y*0.74f)
-		m_pEnding->AddPosition(Vec3(0.f, TIMER->GetDeltaTime() * 100.f, 0.f));
+	//if (INPUT->GetButton(GameKey::V))
+	//{
+	//	m_vEnding[0]->AddPosition(Vec3(0.f, g_windowSize.y*0.1f, 0.f));
+	//}
+
+	static float fCurrentFadeTime = 0.f;
+	static bool bEnd = false;
+	fCurrentFadeTime += TIMER->GetDeltaTime();
+			
+	// Fade
+	if (m_pEndingFade->GetColor().w < 0.f)
+		m_pEndingFade->SetColor(Color(-0.5f, -0.5f, -0.5f, ((fCurrentFadeTime - 2.f) / 2.f)));
+		
+	auto trigger = m_vEnding[0]->GetPosition().y;
+
+	if (trigger < g_windowSize.y * 1.42f)
+		m_vEnding[0]->AddPosition(Vec3(0.f, TIMER->GetDeltaTime() * 70.f, 0.f));
+	else
+		bEnd = true;
+
+	// 0 
+	if (trigger >= -(g_windowSize.y * 1.8f) && trigger < -(g_windowSize.y * 1.7f))
+	{
+		// 0 ~ 1 선형
+		auto temp = (trigger + (g_windowSize.y * 1.7f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[1]->SetColor(Color(0.1f, 0.1f, 0.1f, temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 1.7f) && trigger < -(g_windowSize.y * 1.6f))
+	{
+		m_vEnding[1]->SetColor(Color(0.1f, 0.1f, 0.1f, 0.f));
+	}
+	else if (trigger >= -(g_windowSize.y * 1.6f) && trigger < -(g_windowSize.y * 1.5f))
+	{
+		auto temp = (trigger + (g_windowSize.y * 1.6f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[1]->SetColor(Color(0.1f, 0.1f, 0.1f, -temp));
+	}
+	else if(trigger >= -(g_windowSize.y * 1.5f))
+		m_vEnding[1]->SetColor(Color(0.1f, 0.1f, 0.1f, -1.f));
+
+	// 1
+	if (trigger >= -(g_windowSize.y * 1.5f) && trigger < -(g_windowSize.y * 1.4f))
+	{
+		// 0 ~ 1 선형
+		auto temp = (trigger + (g_windowSize.y * 1.4f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[2]->SetColor(Color(0.1f, 0.1f, 0.1f, temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 1.4f) && trigger < -(g_windowSize.y * 1.3f))
+	{
+		m_vEnding[2]->SetColor(Color(0.1f, 0.1f, 0.1f, 0.f));
+	}
+	else if (trigger >= -(g_windowSize.y * 1.3f) && trigger < -(g_windowSize.y * 1.2f))
+	{
+		auto temp = (trigger + (g_windowSize.y * 1.3f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[2]->SetColor(Color(0.1f, 0.1f, 0.1f, -temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 1.2f))
+		m_vEnding[2]->SetColor(Color(0.1f, 0.1f, 0.1f, -1.f));
+
+	// 2
+	if (trigger >= -(g_windowSize.y * 1.2f) && trigger < -(g_windowSize.y * 1.1f))
+	{
+		// 0 ~ 1 선형
+		auto temp = (trigger + (g_windowSize.y * 1.1f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[3]->SetColor(Color(0.1f, 0.1f, 0.1f, temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 1.1f) && trigger < -(g_windowSize.y * 1.f))
+	{
+		m_vEnding[3]->SetColor(Color(0.1f, 0.1f, 0.1f, 0.f));
+	}
+	else if (trigger >= -(g_windowSize.y * 1.f) && trigger < -(g_windowSize.y * 0.9f))
+	{
+		auto temp = (trigger + (g_windowSize.y * 1.f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[3]->SetColor(Color(0.1f, 0.1f, 0.1f, -temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 0.9f))
+		m_vEnding[3]->SetColor(Color(0.1f, 0.1f, 0.1f, -1.f));
+
+	// 3
+	if (trigger >= -(g_windowSize.y * 0.9f) && trigger < -(g_windowSize.y * 0.8f))
+	{
+		// 0 ~ 1 선형
+		auto temp = (trigger + (g_windowSize.y * 0.8f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[4]->SetColor(Color(0.1f, 0.1f, 0.1f, temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 0.8f) && trigger < -(g_windowSize.y * 0.7f))
+	{
+		m_vEnding[4]->SetColor(Color(0.1f, 0.1f, 0.1f, 0.f));
+	}
+	else if (trigger >= -(g_windowSize.y * 0.7f) && trigger < -(g_windowSize.y * 0.6f))
+	{
+		auto temp = (trigger + (g_windowSize.y * 0.7f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[4]->SetColor(Color(0.1f, 0.1f, 0.1f, -temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 0.6f))
+		m_vEnding[4]->SetColor(Color(0.1f, 0.1f, 0.1f, -1.f));
+
+	// 4
+	if (trigger >= -(g_windowSize.y * 0.6f) && trigger < -(g_windowSize.y * 0.5f))
+	{
+		// 0 ~ 1 선형
+		auto temp = (trigger + (g_windowSize.y * 0.5f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[5]->SetColor(Color(0.1f, 0.1f, 0.1f, temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 0.5f) && trigger < -(g_windowSize.y * 0.4f))
+	{
+		m_vEnding[5]->SetColor(Color(0.1f, 0.1f, 0.1f, 0.f));
+	}
+	else if (trigger >= -(g_windowSize.y * 0.4f) && trigger < -(g_windowSize.y * 0.3f))
+	{
+		auto temp = (trigger + (g_windowSize.y * 0.4f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[5]->SetColor(Color(0.1f, 0.1f, 0.1f, -temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 0.3f))
+		m_vEnding[5]->SetColor(Color(0.1f, 0.1f, 0.1f, -1.f));
+
+	// 5
+	if (trigger >= -(g_windowSize.y * 0.3f) && trigger < -(g_windowSize.y * 0.2f))
+	{
+		// 0 ~ 1 선형
+		auto temp = (trigger + (g_windowSize.y * 0.2f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[6]->SetColor(Color(0.1f, 0.1f, 0.1f, temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 0.2f) && trigger < -(g_windowSize.y * 0.1f))
+	{
+		m_vEnding[6]->SetColor(Color(0.1f, 0.1f, 0.1f, 0.f));
+	}
+	else if (trigger >= -(g_windowSize.y * 0.1f) && trigger < -(g_windowSize.y * 0.0f))
+	{
+		auto temp = (trigger + (g_windowSize.y * 0.1f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[6]->SetColor(Color(0.1f, 0.1f, 0.1f, -temp));
+	}
+	else if (trigger >= -(g_windowSize.y * 0.0f))
+		m_vEnding[6]->SetColor(Color(0.1f, 0.1f, 0.1f, -1.f));
+
+	if (trigger >= (g_windowSize.y * 0.3f) && trigger < (g_windowSize.y * 0.4f))
+	{
+		// 0 ~ 1 선형
+		auto temp = (trigger - (g_windowSize.y * 0.4f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[7]->SetColor(Color(0.1f, 0.1f, 0.1f, temp));
+	}
+	else if (trigger >= (g_windowSize.y * 0.4f) && trigger < (g_windowSize.y * 0.8f))
+	{
+		m_vEnding[7]->SetColor(Color(0.1f, 0.1f, 0.1f, 0.f));
+	}
+	else if (trigger >= (g_windowSize.y * 0.8f) && trigger < (g_windowSize.y * 0.9f))
+	{
+		auto temp = (trigger - (g_windowSize.y * 0.8f)) / (g_windowSize.y * 0.15f);
+		m_vEnding[7]->SetColor(Color(0.1f, 0.1f, 0.1f, -temp));
+	}
+	else if (trigger >= (g_windowSize.y * 0.9f))
+		m_vEnding[7]->SetColor(Color(0.1f, 0.1f, 0.1f, -1.f));
+
+	// 끝
+	if (bEnd)
+	{
+		// 나오는 시간
+		static float fadein = 0.0f;
+		fadein += TIMER->GetDeltaTime();
+
+		float tempTime = (fadein - 1.5f) / 1.5f;
+
+		m_vEnding[8]->SetColor(Color(0.f, 0.f, 0.f, tempTime));
+		m_vEnding[9]->SetColor(Color(0.f, 0.f, 0.f, tempTime));
+	}
 
 	oneFrame = false;
 }

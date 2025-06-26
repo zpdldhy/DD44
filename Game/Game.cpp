@@ -193,8 +193,8 @@ void Game::Tick()
 	}
 
 	// Betty°¡ Á×À¸¸é
+	//if (INPUT->GetButton(GameKey::P))
 	if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
-		//if (INPUT->GetButton(GameKey::P))
 	{
 		static bool isEnd = false;
 		if (isEnd == false)
@@ -203,7 +203,6 @@ void Game::Tick()
 		SOUND->GetPtr(ESoundType::Ending)->Play2D();
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->EndGame();
-		UI->DoFadeIn();
 		m_cUI.NoRenderStateUI();
 		m_cUI.GoEnding();
 		}
