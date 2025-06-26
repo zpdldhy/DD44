@@ -42,11 +42,13 @@ using namespace std;
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
 
+#ifdef _DEBUG
 // Assimp
 #include <Assimp/Importer.hpp>
 #include <Assimp/scene.h>
 #include <Assimp/postprocess.h>
 #include <Assimp/cimport.h>
+#endif
 
 // JSON
 #include "JSON/json.hpp"
@@ -61,7 +63,6 @@ using json = nlohmann::json;
 #ifndef _DEBUG
 #pragma comment(lib, "DxTk/DirectXTK_r.lib")
 #pragma comment(lib, "DirectXTex/DirectXTex.lib")
-#pragma comment(lib, "Assimp/assimp-vc143-mt.lib")
 #else
 #pragma comment(lib, "DxTk/DirectXTK_d.lib")
 #pragma comment(lib, "DirectXTex/DirectXTex_debug.lib")

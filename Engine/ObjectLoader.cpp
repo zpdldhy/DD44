@@ -11,7 +11,9 @@ vector<shared_ptr<APawn>> ObjectLoader::Load()
 	vector<vector<MeshData>> meshes;
 	for (int iFile = 0; iFile < objFileNameList.size(); iFile++)
 	{
+#ifdef _DEBUG
 		meshes.emplace_back(objectLoader.Load(objFileNameList[iFile]));
+#endif
 	}
 
 	// MAKE TEMP MATERIAL
@@ -69,6 +71,7 @@ map<wstring, shared_ptr<UMeshResources>> ObjectLoader::LoadMeshMap()
 
 void ObjectLoader::LoadAsFR(string path)
 {
+#ifdef _DEBUG
 	TFbxResource ret;
 	ret.Clear();
 	vector<MeshData> dataList = objectLoader.Load(path);
@@ -76,4 +79,5 @@ void ObjectLoader::LoadAsFR(string path)
 	ret.m_vMeshList.emplace_back(dataList[0]);
 
 	AAsset::Export(ret, path);
+#endif
 }

@@ -3,8 +3,10 @@
 #include "PrefabLoader.h"
 #include "ActorLoader.h"
 #include "MeshLoader.h"
-#include "AssimpLoader.h"
 #include "ParticleManager.h"
+#ifdef _DEBUG
+#include "AssimpLoader.h"
+#endif
 
 // Actor
 #include "ATerrainTileActor.h"
@@ -183,6 +185,7 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 		shared_ptr<UStaticMeshComponent> meshComp = make_shared<UStaticMeshComponent>();
 		if (SplitExt(to_mw(objData.MeshPath)) == L".obj")
 		{
+#ifdef _DEBUG
 			//Profiler p("Mesh From Obj");
 			AssimpLoader loader;
 			vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
@@ -195,6 +198,7 @@ shared_ptr<APawn> PrefabToActor::MakeObject(const string& _file)
 				meshRes->Create();
 				meshComp->SetMesh(meshRes);
 			}
+#endif
 
 		}
 		else

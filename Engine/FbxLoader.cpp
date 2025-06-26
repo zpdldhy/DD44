@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "FbxLoader.h"
 
+#ifdef _DEBUG
 void FbxLoader::Init(string _loadFile)
 {
 	m_pManager = FbxManager::Create();
@@ -776,3 +777,4 @@ Matrix FbxLoader::ConvertAMatrix(FbxAMatrix& m)
 	}
 	return mat;
 }
+#endif

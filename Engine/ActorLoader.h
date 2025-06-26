@@ -1,8 +1,11 @@
 #pragma once
 #include "Singleton.h"
 #include "FbxLoader.h"
-#include "AssimpLoader.h"
 #include "SkeletalMeshData.h"
+
+#ifdef _DEBUG
+#include "AssimpLoader.h"
+#endif
 
 class APawn;
 class UMeshComponent;
@@ -20,8 +23,10 @@ public:
 		m_mMeshMap.clear();
 	}
 public:
+#ifdef _DEBUG
 	FbxLoader m_FbxImporter;
 	AssimpLoader m_ObjImporter;
+#endif
 
 	vector<TFbxResource> m_vFbxList;
 	map<wstring, shared_ptr<UMeshResources>> m_mMeshMap;

@@ -1,9 +1,12 @@
 #pragma once
 #include "SkeletalMeshData.h"
+
+#ifdef _DEBUG
 #include <Fbx/fbxsdk.h>
 #pragma comment(lib, "Fbx/libfbxsdk-md.lib")
 #pragma comment(lib, "Fbx/libxml2-md.lib")
 #pragma comment(lib, "Fbx/zlib-md.lib")
+#endif
 
 struct TIwData
 {
@@ -70,6 +73,7 @@ struct TFbxResource
 //	vector<wstring> m_vTexPathList;
 //};
 
+#ifdef _DEBUG
 struct TempNode
 {
 	UINT m_iIndex = 0;
@@ -129,4 +133,5 @@ public:
 	Matrix DxConvertMatrix(Matrix m);
 	Matrix ConvertAMatrix(FbxAMatrix& m);
 };
+#endif
 

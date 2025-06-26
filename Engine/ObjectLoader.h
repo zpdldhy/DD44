@@ -1,5 +1,7 @@
 #pragma once
+#ifdef _DEBUG
 #include "AssimpLoader.h"
+#endif
 #include "FbxLoader.h"
 class UMeshComponent;
 class UMeshResources;
@@ -9,7 +11,9 @@ class APawn;
 // °ð Æó±â ¿¹Á¤ Å¬·¡½º
 class ObjectLoader
 {
+#ifdef _DEBUG
 	AssimpLoader objectLoader;
+#endif
 	vector<shared_ptr<APawn>> m_vObjList; 
 	vector<shared_ptr<UMeshComponent>> m_vMeshList;
 	map<wstring, shared_ptr<UMeshResources>> m_mMeshMap;

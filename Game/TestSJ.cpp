@@ -18,10 +18,12 @@
 #include "ObjectManager.h"
 #include "LightManager.h"
 #include "PostProcessManager.h"
-#include "AssimpLoader.h"
 #include "ATerrainTileActor.h"
 #include "UBoxComponent.h"
 #include "PlayerMoveScript.h"
+#ifdef _DEBUG
+#include "AssimpLoader.h"
+#endif
 
 void TestSJ::Init()
 {
@@ -529,6 +531,7 @@ void TestSJ::SetupObjectEditorCallback()
 {
 	GUI->SetObjectEditorCallback([this](const char* texPath, const char* shaderPath, const char* objPath, Vec3 pos, Vec3 rot, Vec3 scale, Vec3 specularColor, float shininess, Vec3 emissiveColor, float emissivePower, ShapeComponentData shapeData)
 		{
+#ifdef _DEBUG
 			AssimpLoader loader;
 			vector<MeshData> meshList = loader.Load(objPath);
 			if (meshList.empty())
@@ -569,6 +572,7 @@ void TestSJ::SetupObjectEditorCallback()
 			actor->SetScale(scale);
 
 			OBJECT->AddActor(actor);
+#endif
 		});
 }
 
@@ -648,6 +652,7 @@ void TestSJ::LoadAllPrefabs(const std::string& extension)
 				shared_ptr<UStaticMeshComponent> meshComp = make_shared<UStaticMeshComponent>();
 				if (SplitExt(to_mw(objData.MeshPath)) == L".obj")
 				{
+#ifdef _DEBUG
 					AssimpLoader loader;
 					vector<MeshData> meshList = loader.Load(objData.MeshPath.c_str());
 					meshComp->SetMeshPath(to_mw(objData.MeshPath));
@@ -659,6 +664,7 @@ void TestSJ::LoadAllPrefabs(const std::string& extension)
 						meshRes->Create();
 						meshComp->SetMesh(meshRes);
 					}
+#endif
 
 				}
 				else

@@ -10,7 +10,6 @@
 #include "CollisionManager.h"
 #include "UIManager.h"
 #include "MeshLoader.h"
-#include "AssimpLoader.h"
 #include "DxWrite.h"
 #include "PrefabToActor.h"
 #include "ScriptManager.h"

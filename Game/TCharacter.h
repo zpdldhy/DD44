@@ -4,10 +4,11 @@
 class TCharacter : public AActor
 {
 public:
+	TCharacter() = default;
 	virtual ~TCharacter() = default;
 protected:
-	int hp;
-	int m_iMax_Hp;
+	int hp = 0;
+	int m_iMax_Hp = 0;
 	bool bDead = false;
 	bool bHitByProjectile = false;
 

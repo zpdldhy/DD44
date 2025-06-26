@@ -119,7 +119,7 @@ void TEnemy::Flashing()
 		}
 
 		// hitFlashAmount는 1 → 0 으로 감소
-		float hitFlashAmount = std::min(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
+		float hitFlashAmount = std::min<float>(std::max<float>(m_fHitFlashTimer, 0.0f), 1.0f);
 
 		auto root = GetMeshComponent();
 		ApplyHitFlashToAllMaterials(root, hitFlashAmount);

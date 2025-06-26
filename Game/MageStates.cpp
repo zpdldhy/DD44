@@ -20,9 +20,9 @@
 Vec3 V_Clamp(const Vec3& v, const Vec3& minV, const Vec3& maxV)
 {
 	return Vec3(
-		max(minV.x, std::min(maxV.x, v.x)),
-		max(minV.y, std::min(maxV.y, v.y)),
-		max(minV.z, std::min(maxV.z, v.z))
+		max<float>(minV.x, std::min<float>(maxV.x, v.x)),
+		max<float>(minV.y, std::min<float>(maxV.y, v.y)),
+		max<float>(minV.z, std::min<float>(maxV.z, v.z))
 	);
 }
 

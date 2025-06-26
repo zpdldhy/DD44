@@ -34,8 +34,10 @@ void ActorLoader::ConvertFbxToAsset(string _path)
 
 	for (int iPath = 0; iPath < fileList.size(); iPath++)
 	{
+#ifdef _DEBUG
 		TFbxResource ret = m_FbxImporter.Load(fileList[iPath]);
 		AAsset::Export(ret, fileList[iPath]);
+#endif
 	}
 }
 void ActorLoader::ConvertObjToAsset(string _path)
@@ -49,6 +51,7 @@ void ActorLoader::ConvertObjToAsset(string _path)
 }
 void ActorLoader::LoadAsFbxResource(string path)
 {
+#ifdef _DEBUG
 	TFbxResource ret;
 	ret.Clear();
 	vector<MeshData> dataList = m_ObjImporter.Load(path);
@@ -56,6 +59,7 @@ void ActorLoader::LoadAsFbxResource(string path)
 	ret.m_vMeshList.emplace_back(dataList[0]);
 
 	AAsset::Export(ret, path);
+#endif
 }
 
 void ActorLoader::LoadAllAsset()

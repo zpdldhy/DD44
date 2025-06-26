@@ -100,8 +100,8 @@ private:
 	weak_ptr<AActor> m_pTarget;
 	// ¿Ãµø
 	bool bStaticMage = false;
-	Vec3 dir;
-	float targetYaw;
+	Vec3 dir = Vec3();
+	float targetYaw = 0.f;
 	////
 	//Vec2 minPos = { -10, 60 };
 	//Vec2 maxPos = { 60, 140 };

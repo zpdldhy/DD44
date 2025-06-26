@@ -198,7 +198,9 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClInclude Include="AShockwaveActor.h" />
     <ClInclude Include="ASky.h" />
     <ClInclude Include="ASoulActor.h" />
-    <ClInclude Include="AssimpLoader.h" />
+    <ClInclude Include="AssimpLoader.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="AUIActor.h" />
     <ClInclude Include="AWindActor.h" />
     <ClInclude Include="BloomManager.h" />
@@ -317,7 +319,9 @@ if not exist "$(SolutionDir)Debug\assimp-vc143-mtd.dll" copy /Y "$(SolutionDir)L
     <ClCompile Include="AShockwaveActor.cpp" />
     <ClCompile Include="ASky.cpp" />
     <ClCompile Include="ASoulActor.cpp" />
-    <ClCompile Include="AssimpLoader.cpp" />
+    <ClCompile Include="AssimpLoader.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="AUIActor.cpp" />
     <ClCompile Include="AWindActor.cpp" />
     <ClCompile Include="BloomManager.cpp" />

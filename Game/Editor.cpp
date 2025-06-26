@@ -11,7 +11,6 @@
 #include "EngineCameraMoveScript.h"
 #include "GameCameraMove.h"
 #include "PlayerMoveScript.h"
-#include "AssimpLoader.h"
 #include "LightManager.h"
 #include "ALight.h"
 #include "UMeshComponent.h"
@@ -31,6 +30,9 @@
 #include "CollisionManager.h"
 #include "ScriptManager.h"
 #include "ProjectileManager.h"
+#ifdef _DEBUG
+#include "AssimpLoader.h"
+#endif
 
 //#undef RUN_GAME
 void Editor::Init()
@@ -359,6 +361,7 @@ void Editor::SetupObjectEditorCallback()
 			if (SplitExt(to_mw(objPath)) == L".obj")
 			{
 				//Profiler p("Mesh From Obj");
+#ifdef _DEBUG
 				AssimpLoader loader;
 				vector<MeshData> meshList = loader.Load(objPath);
 				meshComp->SetMeshPath(to_mw(objPath)); // 이거 풀네임으로 들어가야되는건가 ? 나중에 어디서 쓰이나 ? 
@@ -370,6 +373,7 @@ void Editor::SetupObjectEditorCallback()
 					meshRes->Create();
 					meshComp->SetMesh(meshRes);
 				}
+#endif
 
 			}
 			else
