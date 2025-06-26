@@ -137,6 +137,7 @@ shared_ptr<AEffectActor> EffectManager::CreateEffectActor(EEffectType type)
         collider->SetLocalScale(Vec3(.1f, .1f, .1f));
         collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYONLY);
         actor->SetShapeComponent(collider);
+        actor->m_bAutoScale = false;
         break;
     }
 

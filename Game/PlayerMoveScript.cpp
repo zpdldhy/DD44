@@ -105,7 +105,10 @@ void PlayerMoveScript::Tick()
 	PlayFX();
 	CheckCoolTIme();
 
-
+	//if (INPUT->GetButton(E))
+	//{
+	//	EFFECT->PlayEffect(EEffectType::Dust, GetOwner()->GetPosition(), 0, Vec3(0.0f, 0.0f, 0.0f), 1.3f);
+	//}
 	currentState->Tick();
 	bool currentStateEnd = !currentState->IsPlaying();
 
