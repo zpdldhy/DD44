@@ -161,6 +161,7 @@ public:
 	void CheckEnd(bool _end) { bEnd = _end; }
 	void CheckShootCount(bool _able);
 	void SetBow(shared_ptr<AActor> _bow) { m_pBow = _bow; }
+	void UpdateBow();
 };
 
 #pragma region shoot-substate

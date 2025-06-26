@@ -97,6 +97,7 @@ void PlayerMoveScript::Init()
 
 void PlayerMoveScript::Tick()
 {
+	Profiler p(to_string(currentStateId));
 	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
 	auto playerPos = player->GetPosition();
 
@@ -637,8 +638,6 @@ void PlayerMoveScript::CheckAttack()
 	}
 	if (INPUT->GetButton(RCLICK))
 	{
-		UpdateBow();
-		bow->m_bRender = true;
 		// TPlayer의 arrowCount 확인해서 bool 세팅하기 
 		int aCount = dynamic_pointer_cast<TPlayer>(GetOwner())->GetArrowCount();
 		if (aCount > 0)

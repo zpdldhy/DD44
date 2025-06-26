@@ -459,6 +459,8 @@ void PlayerShootState::Enter()
 
 	start->Enter();
 	shoot->CheckShootCount(bCanShoot);
+	m_pBow.lock()->m_bRender = true;
+	UpdateBow();
 
 	SOUND->GetPtr(ESoundType::Bow_Stretch)->PlayEffect2D();
 }
@@ -557,6 +559,16 @@ void PlayerShootState::CheckMouse()
 void PlayerShootState::CheckShootCount(bool _able)
 {
 	bCanShoot = _able;
+}
+
+void PlayerShootState::UpdateBow()
+{
+	Vec3 bowPos = m_pOwner.lock()->GetMeshComponent()->GetChildByName(L"LeftHandSocket")->GetWorldPosition();
+	m_pBow.lock()->SetPosition(bowPos);
+	float targetYaw = atan2f(m_pOwner.lock()->GetLook().x, m_pOwner.lock()->GetLook().z);
+	Vec3 currentRot = m_pOwner.lock()->GetRotation();
+	currentRot.y = targetYaw;
+	m_pBow.lock()->SetRotation(currentRot);
 }
 
 PlayerShootStart::PlayerShootStart(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_SHOOT)
