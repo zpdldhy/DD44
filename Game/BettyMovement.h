@@ -51,7 +51,9 @@ private:
 	// FX
 	float m_fHitFlashTimer = 0.0f;
 	bool m_bIsFlashing = false;
-
+	float frameTime;
+	float m_fDissolveTimer = 0.0f;
+	float dissolveElapsed = 0.0f;
 	// States 
 	shared_ptr<BettyStateBase> idle;
 	shared_ptr<BettyStateBase> intro;
@@ -105,5 +107,6 @@ public:
 	//FX
 	void Flashing();
 	void ApplyHitFlashToAllMaterials(shared_ptr<UMeshComponent> comp, float value);
+	void ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time);
 };
 

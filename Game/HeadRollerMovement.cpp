@@ -38,10 +38,11 @@ void HeadRollerMovement::Init()
 void HeadRollerMovement::Tick()
 {
 	CheckCoolDown();
-	CheckHit();
+	
 
 	currentState->Tick();
 	bool currentStateEnd = !currentState->IsPlaying();
+
 
 	switch (currentStateId)
 	{
@@ -95,6 +96,7 @@ void HeadRollerMovement::Tick()
 		break;
 	}
 
+	CheckHit();
 
 }
 

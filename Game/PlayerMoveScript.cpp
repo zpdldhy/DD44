@@ -20,6 +20,8 @@
 #include "Texture.h"
 #include "MeshLoader.h"
 
+#include "StageManager.h"
+
 shared_ptr<UScriptComponent> PlayerMoveScript::Clone()
 {
 	auto script = make_shared<PlayerMoveScript>();
@@ -100,14 +102,23 @@ void PlayerMoveScript::Tick()
 	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
 	auto playerPos = player->GetPosition();
 
-
 	// 모든 state 공통
 	PlayFX();
 	CheckCoolTIme();
 
-
 	currentState->Tick();
 	bool currentStateEnd = !currentState->IsPlaying();
+	if (isSetEnd)
+	{
+		if (currentStateEnd)
+		{
+			ChangeState(idle);
+		}
+		else
+		{
+			return;
+		}
+	}
 
 	// state별 추가 처리
 	switch (currentStateId)
@@ -593,6 +604,14 @@ void PlayerMoveScript::CheckCoolTIme()
 	}
 }
 
+void PlayerMoveScript::EndGame()
+{
+	if (!isSetEnd)
+	{
+		isSetEnd = true;
+	}
+}
+
 void PlayerMoveScript::CheckClimb()
 {
 	if (m_bCanClimb && INPUT->GetButton(E))
@@ -637,8 +656,6 @@ void PlayerMoveScript::CheckAttack()
 	}
 	if (INPUT->GetButton(RCLICK))
 	{
-		UpdateBow();
-		bow->m_bRender = true;
 		// TPlayer의 arrowCount 확인해서 bool 세팅하기 
 		int aCount = dynamic_pointer_cast<TPlayer>(GetOwner())->GetArrowCount();
 		if (aCount > 0)

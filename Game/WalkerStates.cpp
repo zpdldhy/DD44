@@ -124,6 +124,11 @@ void WalkerDieState::Enter()
 
 	// 사운드
 	SOUND->GetPtr(ESoundType::Dead_Walker)->PlayEffect2D();
+
+	// 위치
+	Vec3 currentPos = m_pOwner.lock()->GetPosition();
+	currentPos.y -= 1.0f;
+	m_pOwner.lock()->SetPosition(currentPos);
 }
 
 void WalkerDieState::Tick()

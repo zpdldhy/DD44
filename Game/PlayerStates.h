@@ -161,6 +161,7 @@ public:
 	void CheckEnd(bool _end) { bEnd = _end; }
 	void CheckShootCount(bool _able);
 	void SetBow(shared_ptr<AActor> _bow) { m_pBow = _bow; }
+	void UpdateBow();
 };
 
 #pragma region shoot-substate
@@ -203,7 +204,8 @@ class PlayerHitState : public PlayerBaseState
 private:
 	weak_ptr<AActor> m_pOwner;
 	bool m_bPlayNext = true;
-
+	Vec3 hitDir;
+	Vec3 hitPos;
 public:
 	PlayerHitState(weak_ptr<AActor> _pOwner);
 	~PlayerHitState() {}

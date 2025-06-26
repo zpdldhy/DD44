@@ -37,7 +37,7 @@ private:
 	shared_ptr<AActor> m_pAttackRange;
 	bool bActiveRange = false;
 
-	UINT attackStartFrame = 18;
+	UINT attackStartFrame = 20;
 	UINT attackEndFrame = 40;
 public:
 	BatAttackState(weak_ptr<AActor> _pOwner);
@@ -49,6 +49,7 @@ public:
 public:
 	void SetAttackCollider(const shared_ptr<AActor>& _attackRange) { m_pAttackRange = _attackRange; }
 	void EnableAttackRange();
+	void DisableAttackRange();
 };
 
 class BatDieState : public StateBase

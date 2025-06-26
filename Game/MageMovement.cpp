@@ -96,8 +96,8 @@ void MageMovement::Tick()
 	}
 
 	//
-	Rotate();
 	CheckHit();
+	Rotate();
 }
 
 shared_ptr<UScriptComponent> MageMovement::Clone()
@@ -108,6 +108,10 @@ shared_ptr<UScriptComponent> MageMovement::Clone()
 
 void MageMovement::Rotate()
 {
+	if (currentStateId == ENEMY_S_DEATH)
+	{
+		return;
+	}
 	Vec3 dir = player.lock()->GetPosition() - m_pOwner.lock()->GetPosition();
 	float targetYaw = atan2f(dir.x, dir.z);
 

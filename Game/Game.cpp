@@ -191,6 +191,7 @@ void Game::Tick()
 		//if (INPUT->GetButton(GameKey::P))
 	{
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->EndGame();
 		UI->DoFadeIn();
 		m_cUI.NoRenderStateUI();
 		m_cUI.GoEnding();

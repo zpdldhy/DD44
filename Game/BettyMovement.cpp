@@ -52,7 +52,7 @@ void BettyMovement::Init()
 
 
 	// HP
-	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(20);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(1);
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(1000);
 
 	// Intro trigger
@@ -62,6 +62,11 @@ void BettyMovement::Init()
 	EVENT->AddStageEvent(L"FinishIntro", [this]() {
 		this->FinishIntro();
 		});
+
+	// die È¿°ú
+	auto animInstance = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	frameTime = animInstance->GetTotalFrame();
+	frameTime /= 15;
 
 }
 
@@ -127,6 +132,17 @@ void BettyMovement::Tick()
 		break;
 	}
 	case BettyAction::Die: {
+		//Dissolve
+		auto dt = TIMER->GetDeltaTime();
+		m_fDissolveTimer += dt;
+		float t = m_fDissolveTimer / frameTime;
+		auto comp = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>();
+		ApplyDissolveToAllMaterials(comp, t);
+		dissolveElapsed += dt;
+		if (dissolveElapsed >= 3.5f)
+		{
+			GetOwner()->m_bRender = false;
+		}
 		return;
 	}
 	}
@@ -521,4 +537,20 @@ void BettyMovement::OneSnowBall()
 
 	auto pPhysics = snow->GetPhysicsComponent();
 	pPhysics->SetWeight(1.0f);
+}
+
+void BettyMovement::ApplyDissolveToAllMaterials(shared_ptr<class UMeshComponent> _comp, float _time)
+{
+	if (!_comp) return;
+
+	shared_ptr<UMaterial> mat = _comp->GetMaterial();
+	if (mat)
+	{
+		mat->SetDissolve(_time);
+	}
+
+	for (int i = 0; i < _comp->GetChildCount(); ++i)
+	{
+		ApplyDissolveToAllMaterials(_comp->GetChild(i), _time);
+	}
 }
