@@ -405,7 +405,7 @@ void PlayerRollState::Enter()
 	animInstance->PlayOnce(index);
 
 	// »ç¿îµå
-	SOUND->GetPtr(ESoundType::Dash)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Dash)->Play2D(false);
 
 }
 void PlayerRollState::Tick()

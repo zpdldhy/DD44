@@ -33,7 +33,7 @@ void Sound::Destroy()
 bool Sound::Load(FMOD::System* _pSystem, std::wstring _filename)
 {
 	m_pSystem = _pSystem;
-	FMOD_RESULT hr = m_pSystem->createSound(to_wm(_filename).c_str(), FMOD_DEFAULT, 0, &m_pSound);
+	FMOD_RESULT hr = m_pSystem->createSound(to_wm(_filename).c_str(), FMOD_DEFAULT | FMOD_CREATESAMPLE, 0, &m_pSound);
 	if (hr == FMOD_OK)
 	{
 		return true;

@@ -430,7 +430,7 @@ void Game::UpdateUI()
 		player->SetHp(player->GetMaxHP());
 
 		// »ç¿îµå
-		SOUND->GetPtr(ESoundType::Healing)->PlayEffect2D();
+		SOUND->GetPtr(ESoundType::Healing)->Play2D(false);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -922,7 +922,7 @@ void Game::CheckBloodCollision()
 		{
 			//CheckEnemyDeath(enemyList);
 			dynamic_pointer_cast<TPlayer>(m_pPlayer)->AddSoul(m_iSoulStorage);
-			SOUND->GetPtr(ESoundType::GetSoul)->PlayEffect2D();
+			SOUND->GetPtr(ESoundType::GetSoul)->Play2D(false);
 			m_iSoulStorage = 0;
 		}
 		soul++;
