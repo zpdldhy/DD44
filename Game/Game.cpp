@@ -26,6 +26,7 @@
 #include "TEnemy.h"
 #include "TPlayer.h"
 #include "ASoulActor.h"
+#include "ABloodActor.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -85,7 +86,7 @@ void Game::Init()
 	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
-	m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
+	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
 	OBJECT->AddActor(m_pPlayer);
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
@@ -880,9 +881,17 @@ void Game::CheckEnemyCollision()
 
 void Game::CheckBloodCollision()
 {
+	StagePhase currentStage = STAGE->GetCurrentStage();
+	
 	auto& bloodList = EFFECT->GetBloodList();
 	for (auto blood = bloodList.begin(); blood != bloodList.end(); )
 	{
+		shared_ptr<ABloodActor> pBlood = dynamic_pointer_cast<ABloodActor>(*blood);
+		if (currentStage == StagePhase::FINAL)
+		{
+			pBlood->SetBlood(true);
+		}
+
 		if (!(*blood)->IsActive() || (*blood)->m_bDelete)
 		{
 			blood = bloodList.erase(blood);
@@ -900,7 +909,6 @@ void Game::CheckBloodCollision()
 			iter++;
 		}
 
-
 		for (auto iter = stage2.begin(); iter != stage2.end();)
 		{
 			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
@@ -911,6 +919,7 @@ void Game::CheckBloodCollision()
 			COLLITION->CheckCollision(*blood, *iter);
 			iter++;
 		}
+		
 
 		blood++;
 	}
