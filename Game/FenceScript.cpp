@@ -96,7 +96,12 @@ void FenceScript::Interact()
 {
 	// ´Ý±â
 	m_bClose = true;
-	SOUND->GetPtr(ESoundType::Close_Fence)->PlayEffect2D();
+	if (m_bIsPaly)
+	{
+		SOUND->GetPtr(ESoundType::Close_Fence)->PlayEffect2D();
+		m_bIsPaly = false;
+	}
+	
 
 	if (GetOwner()->m_szName == L"Fence3")
 	{
@@ -107,7 +112,9 @@ void FenceScript::Interact()
 void FenceScript::Open()
 {
 	m_bOpen = true;
+
 	SOUND->GetPtr(ESoundType::Open_Fence)->PlayEffect2D();
+
 
 	dustPos = bodyCollider->GetPosition();
 }
