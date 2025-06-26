@@ -50,7 +50,7 @@ static std::wstring SplitPath(std::wstring _filename)
 
 static std::wstring SplitName(std::wstring filename)
 {
-	TCHAR szFileName[256];
+	TCHAR szFileName[256] = { 0, };
 	TCHAR Drive[MAX_PATH];
 	TCHAR Dir[MAX_PATH];
 	TCHAR FName[MAX_PATH];
@@ -63,7 +63,7 @@ static std::wstring SplitName(std::wstring filename)
 
 static std::wstring SplitExt(std::wstring filename)
 {
-	TCHAR szFileName[256];
+	TCHAR szFileName[256] = { 0, };
 	TCHAR Drive[MAX_PATH];
 	TCHAR Dir[MAX_PATH];
 	TCHAR FName[MAX_PATH];
@@ -72,6 +72,46 @@ static std::wstring SplitExt(std::wstring filename)
 
 	return Ext;
 }
+
+static std::string SplitPath(std::string _filename)
+{
+	CHAR szFileName[256] = { 0, };
+	CHAR Drive[MAX_PATH];
+	CHAR Dir[MAX_PATH];
+	CHAR FName[MAX_PATH];
+	CHAR Ext[MAX_PATH];
+	_splitpath_s(_filename.c_str(), Drive, Dir, FName, Ext);
+
+	std::string key = FName;
+	key += Ext;
+	return key;
+}
+
+static std::string SplitName(std::string filename)
+{
+	CHAR szFileName[256] = { 0, };
+	CHAR Drive[MAX_PATH];
+	CHAR Dir[MAX_PATH];
+	CHAR FName[MAX_PATH];
+	CHAR Ext[MAX_PATH];
+	_splitpath_s(filename.c_str(), Drive, Dir, FName, Ext);
+
+	std::string key = FName;
+	return key;
+}
+
+static std::string SplitExt(std::string filename)
+{
+	CHAR szFileName[256] = { 0, };
+	CHAR Drive[MAX_PATH];
+	CHAR Dir[MAX_PATH];
+	CHAR FName[MAX_PATH];
+	CHAR Ext[MAX_PATH];
+	_splitpath_s(filename.c_str(), Drive, Dir, FName, Ext);
+
+	return Ext;
+}
+
 static std::wstring to_mw(const std::string& _src)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;

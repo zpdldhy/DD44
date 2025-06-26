@@ -38,7 +38,7 @@ void CharacterEditorUI::DrawUI()
         meshLoader.SetAnim(m_mAnimMap);
 
 
-        string name = to_wm(SplitName(to_mw(m_szAssetPath)));
+        string name = SplitName(m_szAssetPath);
         string meshPath = "../Resources/Asset/";
         meshPath += name;
         meshPath += ".mesh.json";
