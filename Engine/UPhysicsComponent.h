@@ -21,7 +21,9 @@ public:
 
 public:
 	bool m_bFly = false;
+	bool m_bFall = false;
 	bool m_bColGrounded = false;
+	float m_fNoGroundTime =0.f;
 
 	// Gravity
 	float m_fWeight = 0.f;
