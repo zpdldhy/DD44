@@ -150,12 +150,6 @@ void WalkerMovement::Tick()
 		GetOwner()->SetRotation(currentRot);
 		m_rotate = false;
 
-		Vec3 playerPos = player.lock()->GetPosition();
-		playerPos.y += 1.5f;
-		Vec3 soulDirection = playerPos - GetOwner()->GetPosition();
-		soulDirection.Normalize();
-		EFFECT->PlayEffect(EEffectType::Soul, GetOwner()->GetPosition(), 0, soulDirection, 1.0f, playerPos);
-
 		ChangeState(death);
 	}
 
