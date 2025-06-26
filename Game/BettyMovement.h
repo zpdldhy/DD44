@@ -14,8 +14,10 @@ private:
 	weak_ptr<AActor> player;
 private:
 	// Phase
-	enum BettyAction { Intro = 0, Attack, Die };
-	BettyAction currentAction = Intro;
+	bool bEnterIntro = false;
+	bool bFinishIntro = false;
+	enum BettyAction { BeforeIntro =0, Intro, Attack, Die };
+	BettyAction currentAction = BeforeIntro;
 	//// Common
 	float hitElapsed = 1.0f;
 	Vec3 distance;
@@ -85,6 +87,8 @@ public:
 
 	// GetBettyAction
 	bool IsBettyDie() { return currentAction == BettyAction::Die; }
+	void EnterIntro();
+	void FinishIntro();
 public:
 	//Phase
 	void HandleAttack(float _deltaTime);

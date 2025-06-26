@@ -12,6 +12,7 @@
 #include "USkinnedMeshComponent.h"
 #include "UBoxComponent.h"
 #include "EnemyCollisionManager.h"
+#include "EventManager.h"
 
 // temp temp temp !!!!!
 #include "Input.h"
@@ -21,7 +22,7 @@ void BettyMovement::Init()
 	SetPlayer(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer());
 
 	AddColliderActor();
-	
+
 	// state
 	idle = make_shared<BettyIdleState>(m_pOwner);
 	intro = make_shared<BettyIntroState>(m_pOwner);
@@ -54,7 +55,13 @@ void BettyMovement::Init()
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(20);
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(1000);
 
-	// animation 
+	// Intro trigger
+	EVENT->AddStageEvent(L"StartIntro", [this]() {
+		this->EnterIntro();
+		});
+	EVENT->AddStageEvent(L"FinishIntro", [this]() {
+		this->FinishIntro();
+		});
 
 }
 
@@ -66,17 +73,27 @@ void BettyMovement::Tick()
 	// 공격
 	switch (currentAction)
 	{
-	case BettyAction::Intro: {
-		// 진입 조건 변경 필요 
-		Vec3 diff = player.lock()->GetPosition() - GetOwner()->GetPosition();
-		if (diff.Length() < 20.0f)
+	case BettyAction::BeforeIntro:
+		if (bEnterIntro)
 		{
 			ChangeState(intro);
+			currentAction = BettyAction::Intro;
+		}
+		break;
+	case BettyAction::Intro: {
+		currentState->Tick();
+		if (!currentState->IsPlaying())
+		{
+			ChangeState(idle);
+		}
+		if (bFinishIntro)
+		{
 			currentAction = BettyAction::Attack;
 
 			auto anim = GetOwner()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 			anim->m_fAnimPlayRate = 22.0f;
 		}
+
 		break;
 	}
 	case BettyAction::Attack: {
@@ -102,6 +119,10 @@ void BettyMovement::Tick()
 		if (currentStateId == BETTY_S_DEATH)
 		{
 			currentAction = BettyAction::Die;
+			// 모든 콜라이더 끄기
+			GetOwner()->m_bCollision = false;
+			leftRange->m_bCollision = false;
+			rightRange->m_bCollision = false;
 		}
 		break;
 	}
@@ -290,6 +311,16 @@ void BettyMovement::ChangeState(shared_ptr<BettyStateBase> _state)
 	}
 }
 #pragma endregion Snowball
+
+void BettyMovement::EnterIntro()
+{
+	bEnterIntro = true;
+}
+
+void BettyMovement::FinishIntro()
+{
+	bFinishIntro = true;
+}
 
 void BettyMovement::HandleAttack(float _delta)
 {
