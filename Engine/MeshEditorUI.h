@@ -9,27 +9,27 @@ class APawn;
 struct PreMeshData
 {
     // Base
-    bool bRoot;
-    bool bVisible;
-    bool bSkeletal;
-    wstring meshName;
-    wstring compName;
-    wstring parentCompName;
+    bool bRoot = false;
+    bool bVisible = false;
+    bool bSkeletal = false;
+    wstring meshName = L"";
+    wstring compName = L"";
+    wstring parentCompName = L"";
     // Mat
-    int texIndex;
-    string texPath;
-    string shaderPath;
+    int texIndex = 0;
+    string texPath = "";
+    string shaderPath = "";
     Vec3 specular = {0,0,0};
-    float shininess;
+    float shininess = 0.f;
     // Anim
-    string parentBoneName;
-    string rootBoneName;
-    int animIndex;
-    bool bAnimatedStatic;
+    string parentBoneName = "";
+    string rootBoneName = "";
+    int animIndex = 0;
+    bool bAnimatedStatic = false;
     bool bRootMotion = false;
     bool bInverseMatBone = false;
     // WILL BE DEPRECATED
-    shared_ptr<APawn> actor;
+    shared_ptr<APawn> actor = nullptr;
 };
 
 class MeshEditorUI
@@ -127,61 +127,61 @@ private:
 
     vector<string> m_vTexList;
     vector<const char*> m_vTexPtrList;
-    char texPath[250];
-    char shaderPath[250];
-    char compName[250];
-    Vec3 m_specular;
-    float m_shininess;
+    char texPath[250] = { 0, };
+    char shaderPath[250] = { 0, };
+    char compName[250] = { 0, };
+    Vec3 m_specular = Vec3();
+    float m_shininess = 0.f;
 
     vector<string> m_vBoneList;
     vector<const char*> m_vBonePtrList;
 
     bool m_bBoneSetting = false;
 
-    int m_meshIndex;
-    int m_animIndex;
-    int m_texIndex;
+    int m_meshIndex = 0;
+    int m_animIndex = 0;
+    int m_texIndex = 0;
     int m_parentBoneIndex = -1;
     int m_rootBoneIndex = -1;
 
     bool m_modifyChild = false;
     bool m_inverseMatBone = false;
     bool m_moveChildMesh = false;
-    int m_childIndex;
-    Vec3 m_pos;
-    Vec3 m_scale;
-    Vec3 m_rot;
-    PreMeshData m_childData;
+    int m_childIndex = 0;
+    Vec3 m_pos = Vec3();
+    Vec3 m_scale = Vec3();
+    Vec3 m_rot = Vec3();
+    PreMeshData m_childData = PreMeshData();
 
-    bool m_animStop;
-    int m_currentAnim;
-    bool m_bActorSet;
+    bool m_animStop = false;        // 초기화 추가
+    int m_currentAnim = 0;          // 초기화 추가
+    bool m_bActorSet = false;       // 초기화 추가
 
     /// <summary>
     /// flag 정리
     /// </summary>
-    bool m_bRootCreated;
-    bool m_bSkinnedRoot;
+    bool m_bRootCreated = false;    // 초기화 추가
+    bool m_bSkinnedRoot = false;    // 초기화 추가
     char m_meshSaveName[250];
     bool m_bVisible = true;
     bool m_bAnimatedStatic = false;
 
 
-    shared_ptr<APawn> m_pActor;
-    string m_selectedMeshName;
-    string m_rootMeshName;
+    shared_ptr<APawn> m_pActor = nullptr;
+    string m_selectedMeshName = "";
+    string m_rootMeshName = "";
 
-    function<void(PreMeshData, shared_ptr<APawn>&)> m_OnCreateActor;
-    function<void(PreMeshData)> m_OnCreateChild;
-    function<void(string, Vec3)> m_OnMoveChild;
-    function<void(string, Vec3)> m_OnScaleChild;
-    function<void(string, Vec3)> m_OnRotateChild;
-    function<void(bool)> m_OnAnimStop;
-    function<void(int)> m_OnAnimChange;
-    function<void(string, string, bool )> m_OnParentBoneChange;
-    function<void(int, bool, string)> m_OnMeshSave;
-    function<void(string, bool)> m_OnChangeMeshVisible;
-    function<void(string)> m_OnRemoveChild;
+    function<void(PreMeshData, shared_ptr<APawn>&)> m_OnCreateActor = nullptr;
+    function<void(PreMeshData)> m_OnCreateChild = nullptr;
+    function<void(string, Vec3)> m_OnMoveChild = nullptr;
+    function<void(string, Vec3)> m_OnScaleChild = nullptr;
+    function<void(string, Vec3)> m_OnRotateChild = nullptr;
+    function<void(bool)> m_OnAnimStop = nullptr;
+    function<void(int)> m_OnAnimChange = nullptr;
+    function<void(string, string, bool )> m_OnParentBoneChange = nullptr;
+    function<void(int, bool, string)> m_OnMeshSave = nullptr;
+    function<void(string, bool)> m_OnChangeMeshVisible = nullptr;
+    function<void(string)> m_OnRemoveChild = nullptr;
 
 
 };

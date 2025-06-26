@@ -26,10 +26,15 @@ void UPhysicsComponent::Tick()
 
 	// ม฿ทย
 	if (m_bColGrounded == false && m_fWeight > 0.f)
+	{
+		m_fNoGroundTime+=TIMER->GetDeltaTime();
 		m_vCurrentGravity += 0.1f * m_fWeight;
+	}
 	else if (m_bColGrounded == true)
+	{
+		m_fNoGroundTime = 0.f;
 		m_vCurrentGravity = 0.f;
-
+	}
 	if (m_vCurrentGravity > m_vMaxGravity)
 		m_vCurrentGravity = m_vMaxGravity;
 
@@ -40,6 +45,11 @@ void UPhysicsComponent::Tick()
 	//m_vVelocity *= tempTime;
 
 	GetOwner()->AddPosition(m_vVelocity);
+
+	if(m_fNoGroundTime > 0.3f)
+		m_bFall = true;
+	 else
+		m_bFall = false;
 
 	// reset
 	m_bColGrounded = false;

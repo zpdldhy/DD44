@@ -4,10 +4,10 @@
 
 HRESULT Font::Create(const wstring& _szFontPath, float _fFontSize, Color _color)
 {
-	if (!DXWRITE->m_pDxWrite)
-		return false;
+	if (!DXWRITE_DD->m_pDxWrite)
+		return -1;				// 오류 날 수도?
 
-	DXWRITE->LoadFontResources(_szFontPath);
+	DXWRITE_DD->LoadFontResources(_szFontPath);
 
 	wstring name = m_szFontPath = _szFontPath;
 	m_fFontSize = _fFontSize;
@@ -22,7 +22,7 @@ HRESULT Font::Create(const wstring& _szFontPath, float _fFontSize, Color _color)
 	}
 
 	// 브러쉬 생성
-	HRESULT hr = DXWRITE->m_pd2dRT->CreateSolidColorBrush(D2D1::ColorF(_color.x, _color.y, _color.z, _color.w), m_pColorBrush.GetAddressOf());
+	HRESULT hr = DXWRITE_DD->m_pd2dRT->CreateSolidColorBrush(D2D1::ColorF(_color.x, _color.y, _color.z, _color.w), m_pColorBrush.GetAddressOf());
 
 	if (FAILED(hr))
 	{
@@ -35,8 +35,8 @@ HRESULT Font::Create(const wstring& _szFontPath, float _fFontSize, Color _color)
 
 HRESULT Font::CreateTextFormat(const wstring& _szFontName, float _fFontSize)
 {
-	if (!DXWRITE->m_pDxWrite)
-		return false;
+	if (!DXWRITE_DD->m_pDxWrite)
+		return -1;
 
 	if (m_pTextFormat)
 	{
@@ -45,7 +45,7 @@ HRESULT Font::CreateTextFormat(const wstring& _szFontName, float _fFontSize)
 	}
 
 	//텍스트 포맷 생성
-	HRESULT hr = DXWRITE->m_pDxWrite->CreateTextFormat(
+	HRESULT hr = DXWRITE_DD->m_pDxWrite->CreateTextFormat(
 		_szFontName.c_str(), NULL,
 		DWRITE_FONT_WEIGHT_NORMAL,
 		DWRITE_FONT_STYLE_NORMAL,
@@ -143,7 +143,7 @@ HRESULT Text::Create(const wstring& _msg, const Vec2& _size, Font* _font)
 	m_vSize = _size;
 
 	// 텍스트 레이아웃 생성
-	HRESULT hr = DXWRITE->m_pDxWrite->CreateTextLayout(
+	HRESULT hr = DXWRITE_DD->m_pDxWrite->CreateTextLayout(
 		_msg.c_str(),
 		static_cast<UINT32>(_msg.length()),
 		_font->GetTextFormat(),
@@ -165,7 +165,7 @@ void Text::Draw(const Vec2& _position)
 		return;
 
 	// 색상 설정 및 그리기
-	DXWRITE->m_pd2dRT->DrawTextLayout(
+	DXWRITE_DD->m_pd2dRT->DrawTextLayout(
 		{ _position.x - (m_vSize.x / 2.f),
 		_position.y - (m_vSize.y / 2.f) },
 		m_pTextLayout.Get(),

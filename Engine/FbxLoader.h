@@ -13,20 +13,20 @@ struct TIwData
 	{
 		m_vIndexList.emplace_back(index);
 		m_vWeightList.emplace_back(weight);
-		return m_vIndexList.size();
+		return static_cast<UINT>(m_vIndexList.size());
 	}
 };
 
 struct TFbxResource
 {
-	wstring name;
-	wstring m_ResPathName;
+	wstring name = L"";
+	wstring m_ResPathName = L"";
 	// Material
 	map<int, wstring> m_mTexPathList;
 
 	// AnimData
 	vector<AnimTrackData> m_vAnimTrackList;
-	AnimTrackData m_vAnimArray;
+	AnimTrackData m_vAnimArray = AnimTrackData();
 
 	// MESH DATA
 	vector<vector<Matrix>> m_vInverseBindPose;
@@ -36,11 +36,11 @@ struct TFbxResource
 	map<int, BoneNode> m_mSkeletonList;
 
 	// COUNT FOR FILE I/O
-	UINT m_iBoneCount;
-	UINT m_iTexPathCount;
-	UINT m_iMeshCount;
-	UINT m_iAnimTrackCount;
-	UINT m_iNodeCount;
+	UINT m_iBoneCount = 0;
+	UINT m_iTexPathCount = 0;
+	UINT m_iMeshCount = 0;
+	UINT m_iAnimTrackCount = 0;
+	UINT m_iNodeCount = 0;
 
 	// FOR INDEX
 	UINT m_iBoneIndex = 0;
@@ -72,11 +72,11 @@ struct TFbxResource
 
 struct TempNode
 {
-	UINT m_iIndex;
-	FbxNode* m_node;
-	TempNode* m_parentNode;
-	wstring m_szPatrentName;
-	wstring m_szName;
+	UINT m_iIndex = 0;
+	FbxNode* m_node = nullptr;
+	TempNode* m_parentNode = nullptr;
+	wstring m_szPatrentName = L"";
+	wstring m_szName = L"";
 	bool m_bLeaf = false;
 	bool m_bMesh = false;
 	bool m_bSkeleton = false;
@@ -85,19 +85,19 @@ struct TempNode
 class FbxLoader
 {
 public:
-	FbxManager* m_pManager;
-	FbxImporter* m_pImporter;
-	FbxScene* m_pScene;
-	FbxNode* m_pRootNode;
+	FbxManager* m_pManager = nullptr;
+	FbxImporter* m_pImporter = nullptr;
+	FbxScene* m_pScene = nullptr;
+	FbxNode* m_pRootNode = nullptr;
 
-	TFbxResource m_result;
+	TFbxResource m_result = TFbxResource();
 	vector<FbxNode*> m_vMeshes;
 	map<wstring, TempNode> m_FbxBones;
 	vector<TIwData> m_VertexWeights;
 
-	Vec4 m_vRootPos;
+	Vec4 m_vRootPos = Vec4();
 	UINT m_iBoneIndex = 0;
-	Vec4 m_vStaticRootPos;
+	Vec4 m_vStaticRootPos = Vec4();
 
 	// Anim 
 	int repeatThreshold = 2;

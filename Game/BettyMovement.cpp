@@ -52,7 +52,7 @@ void BettyMovement::Init()
 
 
 	// HP
-	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(20);
+	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(40);
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(1000);
 
 	// Intro trigger
@@ -313,7 +313,7 @@ void BettyMovement::ChangeState(shared_ptr<BettyStateBase> _state)
 {
 	if (currentState && !currentState->IsInterruptible() && currentState->IsPlaying())
 	{
-		if (!_state->GetId() == BETTY_S_DEATH)
+		if (!(_state->GetId() == static_cast<UINT>(BETTY_S_DEATH)))
 		{
 			return;
 		}
@@ -382,11 +382,11 @@ void BettyMovement::HandleAttack(float _delta)
 	else
 	{
 		// 원거리 공격
-		auto nextIndex = (int)RandomRange(0.0f, rangedState.size());
+		auto nextIndex = (int)RandomRange(0.0f, static_cast<float>(rangedState.size()));
 		// 중복 방지
 		while (nextIndex == rangedIndex)
 		{
-			nextIndex = (int)RandomRange(0.0f, rangedState.size());
+			nextIndex = (int)RandomRange(0.0f, static_cast<float>(rangedState.size()));
 		}
 		rangedIndex = nextIndex;
 		auto next = rangedState[rangedIndex];

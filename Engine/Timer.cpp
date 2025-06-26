@@ -15,7 +15,7 @@ void Timer::Update()
     if (m_fTempTimer > 1.0f)
     {
         m_fTempTimer = 0.0f;
-        m_iGameFrame = GetFPS();
+        m_iGameFrame = static_cast<int>(GetFPS());
     }
     m_szTime = L"FPS: ";
     m_szTime += std::to_wstring(m_iGameFrame);

@@ -13,8 +13,8 @@ protected:
 	//shared_ptr<UStaticMeshResources> m_pMesh = nullptr;
 	
 	shared_ptr<UAnimInstance> m_pAnim = nullptr;
-	int m_targetBoneIndex;
-	Matrix m_matBone;
+	int m_targetBoneIndex = 0;
+	Matrix m_matBone = Matrix();
 public:
 	void Init() override;
 	void Tick() override;
@@ -24,7 +24,7 @@ public:
 
 public:
 	//void SetMesh(shared_ptr<UStaticMeshResources> _mesh) { m_pMesh = _mesh; }
-	const shared_ptr<UStaticMeshResources>& GetMesh() { return static_pointer_cast<UStaticMeshResources>(m_pMesh); }
+	const shared_ptr<UStaticMeshResources> GetMesh() { return static_pointer_cast<UStaticMeshResources>(m_pMesh); }
 
 	void SetAnimInstance(shared_ptr<UAnimInstance> _anim) { m_pAnim = _anim; }
 	shared_ptr<UAnimInstance> GetAnimInstance() { return m_pAnim; }

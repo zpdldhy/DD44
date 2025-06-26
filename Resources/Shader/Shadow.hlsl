@@ -5,7 +5,7 @@
 
 VS_OUT VS(PNCTIW_IN input)
 {
-    VS_OUT output;
+    VS_OUT output = (VS_OUT) 0;
     //float4 worldPos = mul(float4(input.p, 1.0f), g_matShadowWorld);
     //worldPos = mul(worldPos, g_matShadowView);
     //output.p = mul(worldPos, g_matShadowProj);

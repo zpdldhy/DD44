@@ -9,8 +9,8 @@ class IExecute;
 
 class Engine : public Singleton<Engine>
 {
-	Window _window;
-	HINSTANCE _hInstance;
+	Window _window = Window();
+	HINSTANCE _hInstance = 0;
 	shared_ptr<IExecute> _app = nullptr;
 
 	// 3D World View Æò¸é

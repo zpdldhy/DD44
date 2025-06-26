@@ -26,6 +26,7 @@
 #include "TEnemy.h"
 #include "TPlayer.h"
 #include "ASoulActor.h"
+#include "ABloodActor.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -177,6 +178,11 @@ void Game::Init()
 	UI->DoFadeOut();
 
 	m_cBettyMovie.SetCameraStart(Vec3(64.f, 4.f, -94.f), Vec3(-0.06f, 11.65f, 0.f));
+
+	//bgm
+	{
+		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
+	}
 }
 
 void Game::Tick()
@@ -192,11 +198,18 @@ void Game::Tick()
 	if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
 		//if (INPUT->GetButton(GameKey::P))
 	{
+		static bool isEnd = false;
+		if (isEnd == false)
+		{
+		SOUND->GetPtr(ESoundType::Boss1)->Stop();
+		SOUND->GetPtr(ESoundType::Ending)->Play2D();
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->EndGame();
 		UI->DoFadeIn();
 		m_cUI.NoRenderStateUI();
 		m_cUI.GoEnding();
+		}
+		isEnd = true;
 	}
 
 	STAGE->Tick();
@@ -217,10 +230,7 @@ void Game::Tick()
 
 	m_pSky->AddRotation(Vec3(0.0f, 0.05f * TIMER->GetDeltaTime(), 0.0f));
 
-	//bgm
-	{
-		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
-	}
+
 	//wind	
 	{
 		if (INPUT->GetButton(M))
@@ -355,7 +365,7 @@ void Game::CreateWind()
 		for (int i = 0; i < spawnCount; ++i)
 		{
 			// NDC 기준 왼쪽 위에서 오른쪽 아래로
-			float startX = RandomRange(-1.2f, 0); // 살짝 바깥쪽에서 시작
+			float startX = RandomRange(-1.2f, 0.f); // 살짝 바깥쪽에서 시작
 			float startY = RandomRange(0.5f, 1.5f); // 상단에서만
 			if (startY < 1.0f)
 			{
@@ -462,7 +472,16 @@ void Game::UpdateUI()
 	if (m_cUI.EndDeadUI())
 	{
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
-		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
+
+		StagePhase currentStage = STAGE->GetCurrentStage();
+		if (currentStage != StagePhase::FINAL)
+		{
+			SOUND->GetPtr(ESoundType::Stage0)->Play2D();
+		}
+		else
+		{
+			SOUND->GetPtr(ESoundType::Boss1)->Play2D();
+		}
 	}
 }
 
@@ -539,6 +558,8 @@ void Game::BettyMeetMovie()
 		m_cUI.NoRenderStateUI();
 
 		m_bNoPaused = true;
+
+		SOUND->GetPtr(ESoundType::Stage0)->Stop();
 	}
 
 	m_cBettyMovie.StartMovie();
@@ -569,6 +590,7 @@ void Game::BettyMeetMovie()
 	// 장면이 완전 종료되었을 때
 	if (m_cBettyMovie.IsEnd())
 	{
+		SOUND->GetPtr(ESoundType::Boss1)->Play2D();
 		// 베티 움직이기 시작하는 구간
 		EVENT->TriggerEvent(EventType::EVENT_STAGE, L"FinishIntro");
 
@@ -882,9 +904,17 @@ void Game::CheckEnemyCollision()
 
 void Game::CheckBloodCollision()
 {
+	StagePhase currentStage = STAGE->GetCurrentStage();
+	
 	auto& bloodList = EFFECT->GetBloodList();
 	for (auto blood = bloodList.begin(); blood != bloodList.end(); )
 	{
+		shared_ptr<ABloodActor> pBlood = dynamic_pointer_cast<ABloodActor>(*blood);
+		if (currentStage == StagePhase::FINAL)
+		{
+			pBlood->SetBlood(true);
+		}
+
 		if (!(*blood)->IsActive() || (*blood)->m_bDelete)
 		{
 			blood = bloodList.erase(blood);
@@ -902,8 +932,22 @@ void Game::CheckBloodCollision()
 			iter++;
 		}
 
+		for (auto iter = stage2.begin(); iter != stage2.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = stage2.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*blood, *iter);
+			iter++;
+		}
+		
+
 		blood++;
 	}
+
+
 
 	auto& soulList = EFFECT->GetSoulList();
 	for (auto soul = soulList.begin(); soul != soulList.end(); )

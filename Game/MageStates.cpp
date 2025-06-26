@@ -242,7 +242,7 @@ void MageAttackState::Enter()
 	originSpped = animInstance->m_fAnimPlayRate;
 	//animInstance->m_fAnimPlayRate = 25.0f;
 
-	SOUND->GetPtr(ESoundType::Attack_Mage)->PlayEffect2D();
+	
 }
 void MageAttackState::Tick()
 {
@@ -275,8 +275,7 @@ void MageAttackState::Tick()
 		if (waitElapsed > 2.0f)
 		{
 			waitElapsed = 0.0f;
-			attack->Enter();
-			currentPhase = AttackPhase::Attack;
+			End();
 		}
 	}
 	break;
@@ -479,6 +478,7 @@ void MageAttackStart::End()
 }
 void MageAttackStart::Throw()
 {
+	SOUND->GetPtr(ESoundType::Attack_Mage)->PlayEffect2D();
 	// action
 	SetDirection();
 

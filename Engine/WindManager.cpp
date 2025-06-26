@@ -8,7 +8,7 @@ void WindManager::Init()
 {
     // m_vWindList.clear();
     m_pWindTexture = std::make_unique<ViewPortTexture>();
-    m_pWindTexture->CreateViewPortTexture(g_windowSize.x, g_windowSize.y); // 윈도우 크기 기준
+    m_pWindTexture->CreateViewPortTexture(static_cast<FLOAT>(g_windowSize.x), static_cast<FLOAT>(g_windowSize.y)); // 윈도우 크기 기준
 }
 
 void WindManager::Tick()

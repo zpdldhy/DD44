@@ -3,7 +3,7 @@
 
 VS_OUT_RIM_INSTANCE VS(INSTANCEIW_IN input)
 {
-    VS_OUT_RIM_INSTANCE output;
+    VS_OUT_RIM_INSTANCE output = (VS_OUT_RIM_INSTANCE) 0;
     output.p = float4(input.p, 1.0f);
     float4 vLocal = float4(input.p, 1.0f);
     
@@ -55,7 +55,7 @@ VS_OUT_RIM_INSTANCE VS(INSTANCEIW_IN input)
 
 VS_OUT VS_SHADOW(INSTANCEIW_IN input)
 {
-    VS_OUT output;
+    VS_OUT output = (VS_OUT) 0;
     //float4 worldPos = mul(float4(input.p, 1.0f), g_matShadowWorld);
     //worldPos = mul(worldPos, g_matShadowView);
     //output.p = mul(worldPos, g_matShadowProj);

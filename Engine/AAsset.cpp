@@ -38,7 +38,7 @@ void AAsset::Export(TFbxResource _result, string filepath)
 
 	// ANIM DATA
 	{
-		for (int iAnimTrack = 0; iAnimTrack < _result.m_iAnimTrackCount; iAnimTrack++)
+		for (UINT iAnimTrack = 0; iAnimTrack < _result.m_iAnimTrackCount; iAnimTrack++)
 		{
 			// NODE NAME
 			UINT nameSize = static_cast<UINT>(_result.m_vAnimTrackList[iAnimTrack].m_szName.size());
@@ -49,9 +49,9 @@ void AAsset::Export(TFbxResource _result, string filepath)
 			fwrite(&_result.m_vAnimTrackList[iAnimTrack].m_iStartFrame, sizeof(UINT), 1, pFile);
 			fwrite(&_result.m_vAnimTrackList[iAnimTrack].m_iEndFrame, sizeof(UINT), 1, pFile);
 
-			UINT frameCount = _result.m_vAnimTrackList[iAnimTrack].m_vAnim[0].size();
+			UINT frameCount = static_cast<UINT>(_result.m_vAnimTrackList[iAnimTrack].m_vAnim[0].size());
 			fwrite(&frameCount, sizeof(UINT), 1, pFile);
-			for (int iBone = 0; iBone < _result.m_iNodeCount; iBone++)
+			for (UINT iBone = 0; iBone < _result.m_iNodeCount; iBone++)
 			{
 				fwrite(&_result.m_vAnimTrackList[iAnimTrack].m_vAnim[iBone].at(0), sizeof(Matrix), frameCount, pFile);
 			}
@@ -74,27 +74,27 @@ void AAsset::Export(TFbxResource _result, string filepath)
 	}
 
 	// INVERSE MAT BONE
-	for (int iMat = 0; iMat < _result.m_iMeshCount; iMat++)
+	for (UINT iMat = 0; iMat < _result.m_iMeshCount; iMat++)
 	{
 		if (_result.m_iBoneCount <= 0) continue; // ????..??
 		fwrite(&_result.m_vInverseBindPose[iMat].at(0), sizeof(Matrix), _result.m_iNodeCount, pFile);
 	}
 
 	// MESH NODES
-	for (int iMesh = 0; iMesh < _result.m_iMeshCount; iMesh++)
+	for (UINT iMesh = 0; iMesh < _result.m_iMeshCount; iMesh++)
 	{
 		auto& child = _result.m_vMeshList[iMesh];
 		// HEADER FOR NODE
-		UINT nameSize = child.m_szName.size();
+		UINT nameSize = static_cast<UINT>(child.m_szName.size());
 		fwrite(&nameSize, sizeof(UINT), 1, pFile);
 		fwrite(child.m_szName.data(), sizeof(wchar_t), nameSize, pFile);
 
 		fwrite(&child.m_bSkeleton, sizeof(bool), 1, pFile);
-		UINT vertexSize = child.m_vVertexList.size();
+		UINT vertexSize = static_cast<UINT>(child.m_vVertexList.size());
 		fwrite(&vertexSize, sizeof(UINT), 1, pFile);
-		UINT iwSize = child.m_vIwList.size();
+		UINT iwSize = static_cast<UINT>(child.m_vIwList.size());
 		fwrite(&iwSize, sizeof(UINT), 1, pFile);
-		UINT indexSize = child.m_vIndexList.size();
+		UINT indexSize = static_cast<UINT>(child.m_vIndexList.size());
 		fwrite(&indexSize, sizeof(UINT), 1, pFile);
 		fwrite(&child.m_iMaterialIndex, sizeof(UINT), 1, pFile);
 
@@ -133,12 +133,12 @@ TFbxResource AAsset::Load(const char* fileName)
 	fread(&result.m_iNodeCount, sizeof(UINT), 1, pFile);
 
 	//TEX PATH
-	for (int iTex = 0; iTex < result.m_iTexPathCount; iTex++)
+	for (UINT iTex = 0; iTex < result.m_iTexPathCount; iTex++)
 	{
-		int texPathNameSize;
+		int texPathNameSize = 0;
 		fread(&texPathNameSize, sizeof(UINT), 1, pFile);
-		int texPathIndex;
-		wstring texPath;
+		int texPathIndex = 0;
+		wstring texPath = L"";
 		texPath.resize(texPathNameSize);
 		fread(&texPathIndex, sizeof(int), 1, pFile);
 		fread(&texPath[0], sizeof(wchar_t), texPathNameSize, pFile);
@@ -155,7 +155,7 @@ TFbxResource AAsset::Load(const char* fileName)
 
 	result.m_vAnimArray.m_vAnimList.resize(texWidth * texHeight * texDepth);
 
-	for (int iAnimTrack = 0; iAnimTrack < result.m_iAnimTrackCount; iAnimTrack++)
+	for (UINT iAnimTrack = 0; iAnimTrack < result.m_iAnimTrackCount; iAnimTrack++)
 	{
 		// NODE NAME
 		int nameSize = 0;
@@ -200,11 +200,11 @@ TFbxResource AAsset::Load(const char* fileName)
 	}
 
 	// BONE
-	for (int iBone = 0; iBone < result.m_iBoneCount; iBone++)
+	for (UINT iBone = 0; iBone < result.m_iBoneCount; iBone++)
 	{
 		BoneNode bone;
 		// BONE NAME
-		UINT nameSize;
+		UINT nameSize = 0;
 		fread(&nameSize, sizeof(UINT), 1, pFile);
 		bone.m_szName.resize(nameSize);
 		fread(&bone.m_szName[0], sizeof(wchar_t), nameSize, pFile);
@@ -223,16 +223,16 @@ TFbxResource AAsset::Load(const char* fileName)
 
 	// INVERSE MAT BONE
 	result.m_vInverseBindPose.resize(result.m_iMeshCount);
-	for (int iMat = 0; iMat < result.m_iMeshCount; iMat++)
+	for (UINT iMat = 0; iMat < result.m_iMeshCount; iMat++)
 	{
 		if(result.m_iBoneCount <= 0) { continue; }
 		result.m_vInverseBindPose[iMat].resize(result.m_iNodeCount);
-		fread(&result.m_vInverseBindPose[iMat].at(0), sizeof(Matrix), result.m_iNodeCount, pFile);
+		fread(&result.m_vInverseBindPose[iMat].at(0), sizeof(Matrix), static_cast<size_t>(result.m_iNodeCount), pFile);
 	}
 
 	// MESH NODES
 	result.m_vMeshList.resize(result.m_iMeshCount);
-	for (int iMesh = 0; iMesh < result.m_iMeshCount; iMesh++)
+	for (UINT iMesh = 0; iMesh < result.m_iMeshCount; iMesh++)
 	{
 		auto& child = result.m_vMeshList[iMesh];
 		// HEADER FOR NODE
@@ -290,7 +290,7 @@ void AAsset::ExportMesh(shared_ptr<APawn> _actor, string filepath)
 		ExportStatic(pFile, mesh);
 	}
 
-	int childCount = mesh->GetChildren().size();
+	int childCount = static_cast<int>(mesh->GetChildren().size());
 	fwrite(&childCount, sizeof(int), 1, pFile);
 	for (auto& child : mesh->GetChildren())
 	{
@@ -425,7 +425,7 @@ void AAsset::ExportJsonMeshRecursive(string idx, nlohmann::ordered_json& j, shar
 	}
 
 	// Check child
-	int childCount = _mesh->GetChildren().size();
+	int childCount = static_cast<int>(_mesh->GetChildren().size());
 	j["childCount" + idx] = childCount;
 	for (int iChild = 0; iChild < childCount; iChild++)
 	{

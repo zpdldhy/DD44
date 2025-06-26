@@ -38,6 +38,8 @@ void FenceScript::Init()
 	bodyCollider->SetShapeComponent(collider);
 	OBJECT->AddActor(bodyCollider);
 	ENEMYCOLLIDER->AddObject(bodyCollider);
+
+	maxY = GetOwner()->GetPosition().y + 6.0f;
 }
 
 void FenceScript::Tick()
@@ -48,6 +50,13 @@ void FenceScript::Tick()
 		m_elapsed += dt;
 		m_dustElapsed += dt;
 		GetOwner()->AddPosition(Vec3(0, -1, 0) * 5.0f * dt);
+		auto pos = GetOwner()->GetPosition();
+		if (pos.y >= maxY)
+		{
+			pos.y = maxY;
+			GetOwner()->SetPosition(pos);
+		}
+
 		bodyCollider->SetPosition(GetOwner()->GetPosition() + Vec3(0, 2, 0));
 		if (m_elapsed > 3.0f)
 		{
@@ -82,7 +91,6 @@ void FenceScript::Tick()
 		{
 			m_elapsed = 0.0f;
 			m_bClose = false;
-			SOUND->GetPtr(ESoundType::Close_Fence)->Play2D(false);
 		}
 	}
 }
@@ -97,6 +105,12 @@ void FenceScript::Interact()
 {
 	// ´Ý±â
 	m_bClose = true;
+	if (m_bIsPaly)
+	{
+		SOUND->GetPtr(ESoundType::Close_Fence)->PlayEffect2D();
+		m_bIsPaly = false;
+	}
+	
 
 	if (GetOwner()->m_szName == L"Fence3")
 	{
@@ -107,7 +121,9 @@ void FenceScript::Interact()
 void FenceScript::Open()
 {
 	m_bOpen = true;
-	SOUND->GetPtr(ESoundType::Open_Fence)->Play2D(false);
+
+	SOUND->GetPtr(ESoundType::Open_Fence)->PlayEffect2D();
+
 
 	dustPos = bodyCollider->GetPosition();
 }

@@ -4,9 +4,9 @@
 
 struct AnimList
 {
-	wstring m_szName;
-	int startFrame;
-	int endFrame;
+	wstring m_szName = L"";
+	int startFrame = 0;
+	int endFrame = 0;
 };
 
 struct AnimEventHash {
@@ -19,9 +19,9 @@ struct AnimEventHash {
 
 class UAnimInstance : public enable_shared_from_this<UAnimInstance>
 {
-	shared_ptr<AnimData> m_pData;
+	shared_ptr<AnimData> m_pData = nullptr;
 
-	wstring m_modelName;
+	wstring m_modelName = L"";
 	vector<AnimList> animTrackList;
 
 	float animFrame = 0.0f;
@@ -29,14 +29,14 @@ class UAnimInstance : public enable_shared_from_this<UAnimInstance>
 	UINT lastEventFrame = UINT_MAX;
 
 	Vec3 rootPos = { 0, 0, 0 };
-	Matrix rootMat;
+	Matrix rootMat = Matrix();
 	int rootIndex = 0;
 	
-	int prevIndex;
-	UINT boneCount;
+	int prevIndex = 0;
+	UINT boneCount = 0;
 
 public:
-	bool m_bOnPlayOnce;
+	bool m_bOnPlayOnce = false;
 	bool m_bInPlace = false;
 	bool m_bPlay = true;
 	float m_fAnimPlayRate = 30.0f;
@@ -67,7 +67,7 @@ public:
 	int GetTotalFrame() { return animTrackList[currentAnimTrackIndex].endFrame; }
 	
 	int GetCurrentIndex() { return currentAnimTrackIndex; }
-	int GetCurrentFrame() { return animFrame; }
+	float GetCurrentFrame() { return animFrame; }
 	Vec3 GetRootPos() { return rootPos; }
 
 	Matrix GetMatrix(int _track, int _bone, int _frame);
@@ -76,7 +76,6 @@ public:
 public:
 	void SetKeyFrame(int _trackIndex, UINT _key);
 	void AddEvent(int _trackIndex, UINT _keyFrame, function<void()> _func);
-	void DeleteEvent(int _trackIndex, UINT _keyFrame);
 	void TriggetEvent(int _trackIndex, UINT currentFrame);
 public:
 	const std::vector<AnimList>& GetAnimTrackList() const { return animTrackList; }

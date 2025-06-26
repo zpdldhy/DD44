@@ -71,7 +71,6 @@ void ActorLoader::LoadAllAsset()
 }
 map<wstring, shared_ptr<UMeshResources>> ActorLoader::LoadMeshMap()
 {
-	Profiler p("ActorLoader::LoadMeshMap");
 	m_mMeshMap.clear();
 	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
 	{
@@ -131,7 +130,7 @@ map<wstring, shared_ptr<UAnimInstance>> ActorLoader::LoadAnimMap()
 		animInstance->SetBoneCount(m_vFbxList[iFbx].m_iNodeCount);
 		{
 			// NEW ( WITH 1DARRAY )
-			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
+			for (UINT iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
 			{
 				AnimList animTrack;
 				animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
@@ -287,9 +286,9 @@ vector<shared_ptr<UMeshResources>> ActorLoader::LoadMeshResources()
 vector<wstring> ActorLoader::LoadTexPath()
 {
 	vector<wstring> texPathList;
-	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
+	for (int iFbx = 0; iFbx < static_cast<int>(m_vFbxList.size()); iFbx++)
 	{
-		for (int iTex = 0; iTex < m_vFbxList[iFbx].m_iTexPathCount; iTex++)
+		for (UINT iTex = 0; iTex < m_vFbxList[iFbx].m_iTexPathCount; iTex++)
 		{
 			texPathList.emplace_back(m_vFbxList[iFbx].m_mTexPathList[iTex]);
 		}
@@ -306,7 +305,7 @@ vector<shared_ptr<UAnimInstance>> ActorLoader::LoadAnim()
 		shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 		{
 			animInstance->SetName(name);
-			for (int iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
+			for (UINT iAnim = 0; iAnim < m_vFbxList[iFbx].m_iAnimTrackCount; iAnim++)
 			{
 				AnimList animTrack;
 				animTrack.m_szName = m_vFbxList[iFbx].m_vAnimTrackList[iAnim].m_szName;
@@ -355,7 +354,7 @@ shared_ptr<APawn> ActorLoader::LoadOneActor(string _path)
 	shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 	{
 		animInstance->SetName(SplitName(to_mw(_path)));
-		for (int iAnim = 0; iAnim < resource.m_iAnimTrackCount; iAnim++)
+		for (UINT iAnim = 0; iAnim < resource.m_iAnimTrackCount; iAnim++)
 		{
 			AnimList animTrack;
 			animTrack.m_szName = resource.m_vAnimTrackList[iAnim].m_szName;
@@ -458,7 +457,7 @@ shared_ptr<APawn> ActorLoader::LoadRedeemer(string _path)
 	shared_ptr<UAnimInstance> animInstance = make_shared<UAnimInstance>();
 	{
 		animInstance->SetName(SplitName(to_mw(_path)));
-		for (int iAnim = 0; iAnim < resource.m_iAnimTrackCount; iAnim++)
+		for (UINT iAnim = 0; iAnim < resource.m_iAnimTrackCount; iAnim++)
 		{
 			AnimList animTrack;
 			animTrack.m_szName = resource.m_vAnimTrackList[iAnim].m_szName;

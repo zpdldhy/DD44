@@ -4,7 +4,7 @@
 Vec3 ABloodDecalActor::Prepare(const Vec3& _pos, const Vec3& _baseVelocity, float _scale)
 {
     Vec3 pos = _pos;
-    float size = RandomRange(.7, 2.5);
+    float size = RandomRange(0.7f, 2.5f);
         
     SetGravity(0.0f);
     SetPosition(pos);

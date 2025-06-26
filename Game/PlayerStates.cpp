@@ -13,7 +13,7 @@
 
 PlayerEmptyState::PlayerEmptyState() : PlayerBaseState(EMPTY_STATE)
 {
-	
+
 }
 void PlayerEmptyState::Enter() {}
 void PlayerEmptyState::Tick() {}
@@ -31,7 +31,7 @@ void PlayerIdleState::Enter()
 	// 애니메이션 Idle 플레이
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int idleIndex = animInstance->GetAnimIndex(L"Idle_0");
-	animInstance->SetCurrentAnimTrack(idleIndex); 
+	animInstance->SetCurrentAnimTrack(idleIndex);
 }
 void PlayerIdleState::Tick()
 {
@@ -807,5 +807,34 @@ void PlayerClimbFinish::SetLadderDir(Vec3 _dir)
 
 PlayerBaseState::PlayerBaseState(UINT _iStateId) : StateBase(_iStateId)
 {
-	
+
+}
+
+PlayerFallState::PlayerFallState(weak_ptr<AActor> _pOwner) : PlayerBaseState(PLAYER_S_FALL)
+{
+	m_pOwner = _pOwner;
+	m_bCanInterrupt = true;
+}
+
+void PlayerFallState::Enter()
+{
+	// 기본 state 세팅
+	m_bOnPlaying = true;
+
+	// 애니메이션 Attack 플레이
+	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
+	int index = animInstance->GetAnimIndex(L"Falling");
+	animInstance->m_bPlay = true;
+	animInstance->SetCurrentAnimTrack(index);
+}
+
+void PlayerFallState::Tick()
+{
+
+}
+
+void PlayerFallState::End()
+{	
+	// 기본 state 세팅
+	m_bOnPlaying = false;
 }

@@ -13,7 +13,7 @@ void PostProcessManager::Init(UINT _count)
 {
 	m_iMRTCount = _count;
 
-	for (int i = 0; i < _count; i++)
+	for (UINT i = 0; i < _count; i++)
 	{
 		auto pMRT = make_shared<ViewPortTexture>();
 		pMRT->CreateViewPortTexture(static_cast<FLOAT>(g_windowSize.x), static_cast<FLOAT>(g_windowSize.y));
@@ -43,10 +43,10 @@ void PostProcessManager::PreRender()
 	ID3D11RenderTargetView* pNullRTV = nullptr;
 	DC->OMSetRenderTargets(1, &pNullRTV, NULL);
 
-	DC->OMSetRenderTargets(m_vMRTList.size(), m_vRTVList.data(), m_vMRTList[0]->GetDSV());
+	DC->OMSetRenderTargets(static_cast<UINT>(m_vMRTList.size()), m_vRTVList.data(), m_vMRTList[0]->GetDSV());
 
 	DC->RSGetViewports(&m_iPrevViewPorts, &m_PrevVP);
-	DC->RSSetViewports(m_vMRTList.size(), m_vVPList.data());
+	DC->RSSetViewports(static_cast<UINT>(m_vMRTList.size()), m_vVPList.data());
 
 	ClearRTV(m_vRTVList, m_vMRTList[0]->GetDSV());
 }
@@ -76,7 +76,7 @@ void PostProcessManager::Present()
 	ApplyDebugCB();
 	// PRDefault ¿¬»ê
 	{
-		DC->PSSetShaderResources(0, m_vSRTList.size(), m_vSRTList.data());
+		DC->PSSetShaderResources(0, static_cast<UINT>(m_vSRTList.size()), m_vSRTList.data());
 		m_p3DWorld->Render();
 	}
 

@@ -5,7 +5,7 @@ class APawn;
 class AActor;
 class UMeshComponent;
 class UMaterial;
-class MeshComponentData;
+struct MeshComponentData;
 
 class AAsset
 {

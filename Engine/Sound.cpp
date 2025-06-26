@@ -171,7 +171,7 @@ void SoundManager::LoadAllSounds()
 	Load(ESoundType::Die, L"../Resources/Sound/hero_damaged.wav");
 
 	//Fire
-	Load(ESoundType::Die, L"../Resources/Sound/FireLoop.wav");
+	Load(ESoundType::Fire, L"../Resources/Sound/FireLoop.wav");
 
 	//Monster
 	Load(ESoundType::Attack_Bat, L"../Resources/Sound/bat_attack.wav");

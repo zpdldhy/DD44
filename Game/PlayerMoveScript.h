@@ -18,24 +18,25 @@ public:
 	float m_fRotationSpeed = 8.0f;
 
 	// Attack
-	shared_ptr<AActor> attackRangeActor;
-	shared_ptr<AActor> bow;
-	shared_ptr<AActor> sword;
-	Vec3 colOffset;
+	shared_ptr<AActor> attackRangeActor = nullptr;
+	shared_ptr<AActor> bow = nullptr;
+	shared_ptr<AActor> sword = nullptr;
+	Vec3 colOffset = Vec3();
 
-	Vec3 m_vLook;
-	Vec3 m_vRight;
-	Vec3 m_vLastMoveDir;
-	Vec3 velocity;
-	Vec3 m_vRollLook;
+	Vec3 m_vLook = Vec3();
+	Vec3 m_vRight = Vec3();
+	Vec3 m_vLastMoveDir = Vec3();
+	Vec3 velocity = Vec3();
+	Vec3 m_vRollLook = Vec3();
 
-	shared_ptr<Texture> m_pSubTexture;
-	shared_ptr<Texture> m_pNoiesTexture;
+	shared_ptr<Texture> m_pSubTexture = nullptr;
+	shared_ptr<Texture> m_pNoiesTexture = nullptr;
 
 	shared_ptr<PlayerBaseState> empty;
 	shared_ptr<PlayerBaseState> idle;
 	shared_ptr<PlayerBaseState> walk;
 	shared_ptr<PlayerBaseState> climb;
+	shared_ptr<PlayerBaseState> fall;
 	shared_ptr<PlayerBaseState> roll;
 	shared_ptr<PlayerBaseState> attack;
 	shared_ptr<PlayerBaseState> hit;
@@ -46,9 +47,9 @@ public:
 
 	// Cilmb
 	bool m_bCanClimb = false;
-	Vec3 m_vLadder;
-	Vec3 m_vDirToLadder;
-	Vec3 m_vLadderEnd;
+	Vec3 m_vLadder = Vec3();
+	Vec3 m_vDirToLadder = Vec3();
+	Vec3 m_vLadderEnd = Vec3();
 
 	// state·Î ÀÌ°ü
 	//// Slash 

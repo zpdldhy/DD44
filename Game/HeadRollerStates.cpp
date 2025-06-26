@@ -352,7 +352,6 @@ void HeadRollerDieState::Tick()
 	if (!animInstance->m_bOnPlayOnce)
 	{
 		// Á¾·á
-		Profiler p(to_string(animInstance->GetCurrentFrame()));
 		animInstance->m_bPlay = false;
 		currentPhase = STAYSTILL;
 		End();
