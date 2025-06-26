@@ -3,8 +3,6 @@
 #include "Input.h"
 #include "Timer.h"
 
-
-
 void UAnimInstance::Tick()
 {
 	if (!m_bPlay) { return; }
@@ -29,7 +27,7 @@ void UAnimInstance::Tick()
 			{
 				//currentAnimTrackIndex = prevIndex;
 				m_bOnPlayOnce = false;
-				animFrame = lastFrame - 1;
+				animFrame = static_cast<float>(lastFrame) - 1.f;
 			}
 			else
 			{
@@ -43,14 +41,14 @@ void UAnimInstance::Tick()
 				//currentAnimTrackIndex = prevIndex;
 				m_bOnPlayOnce = false;
 			}
-			animFrame = lastFrame;
+			animFrame = static_cast<float>(lastFrame);
 		}
 	}
 
 	// ROOTMOTION
 	if (m_bInPlace)
 	{
-		rootMat = GetMatrix(currentAnimTrackIndex, rootIndex, animFrame);
+		rootMat = GetMatrix(static_cast<int>(currentAnimTrackIndex), rootIndex, static_cast<int>(animFrame));
 
 		rootPos.x = rootMat._41;
 		rootPos.y = rootMat._42;
@@ -111,7 +109,7 @@ void UAnimInstance::MakeAnimData(const vector<XMFLOAT4>& _data)
 {
 	m_pData = make_shared<AnimData>();
 	m_pData->AddData(_data);
-	m_pData->CreateTex(boneCount, animTrackList.size());
+	m_pData->CreateTex(static_cast<int>(boneCount), static_cast<int>(animTrackList.size()));
 }
 
 void UAnimInstance::AddTrack(AnimList _animTrack)
@@ -158,12 +156,12 @@ void UAnimInstance::PlayOnce(int _index)
 
 Matrix UAnimInstance::GetBoneAnim(int _boneIndex)
 {
-	if (_boneIndex >= boneCount)
+	if (_boneIndex >= static_cast<int>(boneCount))
 	{
 		return Matrix();
 	}
 
-	Matrix ret = GetMatrix(currentAnimTrackIndex, _boneIndex, animFrame);
+	Matrix ret = GetMatrix(static_cast<int>(currentAnimTrackIndex), _boneIndex, static_cast<int>(animFrame));
 
 	if (m_bInPlace)
 	{
@@ -178,7 +176,7 @@ Matrix UAnimInstance::GetMatrix(int _track, int _bone, int _frame)
 {
 	Matrix ret;
 
-	if (_bone >= boneCount || _frame >= animTrackList[_track].endFrame)
+	if (_bone >= static_cast<int>(boneCount) || _frame >= animTrackList[_track].endFrame)
 	{
 		return ret;
 	}
@@ -196,7 +194,7 @@ void UAnimInstance::SetBoneCount(UINT _bone)
 // set end frame
 void UAnimInstance::SetKeyFrame(int _trackIndex, UINT _key)
 {
-	if (_key >= animTrackList[_trackIndex].endFrame || _key < 0)
+	if (static_cast<int>(_key) >= animTrackList[_trackIndex].endFrame || _key < 0)
 	{
 		return;
 	}
