@@ -60,19 +60,7 @@ void WalkerMovement::Init()
 void WalkerMovement::Tick()
 {
 	LerpRotate();
-	if (m_bWait)
-	{
-		m_wait -= TIMER->GetDeltaTime();
-		if (m_wait < 0)
-		{
-			ChangeState(walk);
-			m_bWait = false;
-		}
-		else
-		{
-			//return;
-		}
-	}
+	
 	currentState->Tick();
 	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_DEATH)
 	{
@@ -93,6 +81,51 @@ void WalkerMovement::Tick()
 		return;
 	}
 
+	// HIT
+	auto comp = dynamic_pointer_cast<TEnemy>(GetOwner());
+	bool isHit = comp->CheckHit();
+	if (isHit && !comp->IsDead())
+	{
+
+		ChangeState(hit);
+	}
+	if (comp->IsDead())
+	{
+		// 회전 
+		Vec3 direction = GetOwner()->GetPosition() - player.lock()->GetPosition();
+		direction.y = 0;
+		direction.Normalize();
+
+		Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
+		Vec3 moveDir = tempUp.Cross(direction); // 반시계 방향
+		float targetYaw = atan2f(moveDir.x, moveDir.z);
+		Vec3 currentRot = GetOwner()->GetRotation();
+		currentRot.y = targetYaw;
+		GetOwner()->SetRotation(currentRot);
+		m_rotate = false;
+
+		Vec3 playerPos = player.lock()->GetPosition();
+		playerPos.y += 1.5f;
+		Vec3 soulDirection = playerPos - GetOwner()->GetPosition();
+		soulDirection.Normalize();
+		EFFECT->PlayEffect(EEffectType::Soul, GetOwner()->GetPosition(), 0, soulDirection, 1.0f, playerPos);
+
+		ChangeState(death);
+	}
+
+	if (m_bWait)
+	{
+		m_wait -= TIMER->GetDeltaTime();
+		if (m_wait < 0)
+		{
+			ChangeState(walk);
+			m_bWait = false;
+		}
+		else
+		{
+			return;
+		}
+	}
 	// 걷는 상황일 때 위치 조절해가며 걷기
 	if (currentState->GetId() == ENEMY_STATE::ENEMY_S_WALK && !m_bWait)
 	{
@@ -126,37 +159,6 @@ void WalkerMovement::Tick()
 			GetOwner()->AddPosition(pos);
 		}
 
-	}
-	// HIT
-	auto comp = dynamic_pointer_cast<TEnemy>(GetOwner());
-	bool isHit = comp->CheckHit();
-	if (isHit && !comp->IsDead())
-	{
-
-		ChangeState(hit);
-	}
-	if (comp->IsDead())
-	{
-		// 회전 
-		Vec3 direction = GetOwner()->GetPosition() - player.lock()->GetPosition();
-		direction.y = 0;
-		direction.Normalize();
-	
-		Vec3 tempUp = { 0.0f, 1.0f, 0.0f };
-		Vec3 moveDir = tempUp.Cross(direction); // 반시계 방향
-		float targetYaw = atan2f(moveDir.x, moveDir.z);
-		Vec3 currentRot = GetOwner()->GetRotation();
-		currentRot.y = targetYaw;
-		GetOwner()->SetRotation(currentRot);
-		m_rotate = false;
-
-		Vec3 playerPos = player.lock()->GetPosition();
-		playerPos.y += 1.5f;
-		Vec3 soulDirection = playerPos - GetOwner()->GetPosition();
-		soulDirection.Normalize();
-		EFFECT->PlayEffect(EEffectType::Soul, GetOwner()->GetPosition(), 0, soulDirection, 1.0f, playerPos);
-
-		ChangeState(death);
 	}
 
 }

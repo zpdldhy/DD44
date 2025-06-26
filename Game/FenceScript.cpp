@@ -8,6 +8,7 @@
 #include "EnemyCollisionManager.h"
 
 #include "Sound.h"
+#include "EffectManager.h"
 
 void FenceScript::Init()
 {
@@ -45,6 +46,7 @@ void FenceScript::Tick()
 	if (m_bOpen)
 	{
 		m_elapsed += dt;
+		m_dustElapsed += dt;
 		GetOwner()->AddPosition(Vec3(0, -1, 0) * 5.0f * dt);
 		bodyCollider->SetPosition(GetOwner()->GetPosition() + Vec3(0, 2, 0));
 		if (m_elapsed > 3.0f)
@@ -52,6 +54,17 @@ void FenceScript::Tick()
 			m_elapsed = 0.0f;
 			m_bOpen = false;
 		}
+
+		auto right = GetOwner()->GetRight();
+		if (m_dustElapsed >= 0.5f && m_elapsed <= 1.0f)
+		{
+			//Profiler p("Enter");
+			//EFFECT->PlayEffect(EEffectType::PoppingDust, pos, 0, Vec3(0.0f, 0.0f, 0.0f), 0.6f);
+			EFFECT->PlayEffect(EEffectType::PoppingDust, dustPos - 8.0f * right, 0, Vec3(0.0f, 0.0f, 0.0f), 0.5f);
+			EFFECT->PlayEffect(EEffectType::PoppingDust, dustPos + 8.0f * right, 0, Vec3(0.0f, 0.0f, 0.0f), 0.5f);
+			m_dustElapsed = 0.0f;
+		}
+
 	}
 	else if (m_bClose)
 	{
@@ -95,4 +108,6 @@ void FenceScript::Open()
 {
 	m_bOpen = true;
 	SOUND->GetPtr(ESoundType::Open_Fence)->PlayEffect2D();
+
+	dustPos = bodyCollider->GetPosition();
 }

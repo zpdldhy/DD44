@@ -20,6 +20,8 @@
 #include "Texture.h"
 #include "MeshLoader.h"
 
+#include "StageManager.h"
+
 shared_ptr<UScriptComponent> PlayerMoveScript::Clone()
 {
 	auto script = make_shared<PlayerMoveScript>();
@@ -97,7 +99,6 @@ void PlayerMoveScript::Init()
 
 void PlayerMoveScript::Tick()
 {
-	Profiler p(to_string(currentStateId));
 	auto player = dynamic_pointer_cast<TPlayer>(GetOwner());
 	auto playerPos = player->GetPosition();
 
@@ -109,7 +110,17 @@ void PlayerMoveScript::Tick()
 
 	currentState->Tick();
 	bool currentStateEnd = !currentState->IsPlaying();
-
+	if (isSetEnd)
+	{
+		if (currentStateEnd)
+		{
+			ChangeState(idle);
+		}
+		else
+		{
+			return;
+		}
+	}
 	// state별 추가 처리
 	switch (currentStateId)
 	{
@@ -591,6 +602,14 @@ void PlayerMoveScript::CheckCoolTIme()
 			roll->m_fRollElapsed = 0.0f;
 			roll->m_bCanRoll = true;
 		}
+	}
+}
+
+void PlayerMoveScript::EndGame()
+{
+	if (!isSetEnd)
+	{
+		isSetEnd = true;
 	}
 }
 

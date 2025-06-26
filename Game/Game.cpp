@@ -82,10 +82,10 @@ void Game::Init()
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
-	m_pPlayer->SetPosition(Vec3(-90, 39, 70));
+	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
-	//m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
+	m_pPlayer->SetPosition(Vec3(78.6, -0.32, -100));
 	OBJECT->AddActor(m_pPlayer);
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
@@ -191,6 +191,7 @@ void Game::Tick()
 		//if (INPUT->GetButton(GameKey::P))
 	{
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->EndGame();
 		UI->DoFadeIn();
 		m_cUI.NoRenderStateUI();
 		m_cUI.GoEnding();
