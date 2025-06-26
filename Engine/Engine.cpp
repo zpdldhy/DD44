@@ -82,6 +82,7 @@ void Engine::Frame()
 	INPUT->Tick();
 	TIMER->Update();
 	LIGHT->Tick();
+	SOUND->Update();
 
 	UI->Tick();	// Fade가 되려면 여기 위치
 
