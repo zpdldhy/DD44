@@ -309,13 +309,12 @@ void InGameUIControler::init()
 	m_pBettyName->m_bRender = false;
 
 	m_pEnding = PToA->MakeUI("../Resources/Prefab/UI_Ending.ui.json");
-	UI->AddUI(m_pEnding);
-	m_pEnding->m_bRun = false;
-	m_pEnding->m_bRender = false;
 }
 
 void InGameUIControler::Tick()
 {
+	UpdateEnding();
+
 	if (m_bNoRender)	
 		return;	
 
@@ -329,7 +328,6 @@ void InGameUIControler::Tick()
 	UpdatePaused();
 	UpdateCoin();
 	UpdateDead();
-	UpdateEnding();
 }
 
 void InGameUIControler::Destroy()
@@ -1006,23 +1004,24 @@ void InGameUIControler::UpdateEnding()
 
 	if (oneFrame)
 	{
+		UI->AddUI(m_pEnding);
+
+		m_pEnding->m_bRun = true;
+		m_pEnding->m_bRender = true;
+
 		auto pos = m_pEnding->GetPosition();
 		pos.y = -1500.f;
 		m_pEnding->SetPosition(pos);
 		m_pEnding->SetAlignment(DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-		ending += L"ÆÀ¸í\t\t\t        DD44\n\n";
-		ending += L"ÆÀ¿ø\t\t\t        ¼­ ÁØ\n\n";
+		ending += L"ÆÀ ¸í\t\t\t        DD44\n\n";
+		ending += L"ÆÀ ¿ø\t\t\t        ¼­ ÁØ\n\n";
 		ending += L"\t\t\t        ¿À ¼¼¿µ\n\n";
 		ending += L"\t\t\t        ±è ¿¹¸°\n\n";
 		ending += L"\t\t\t        ÀÌ À±¼®\n\n";
-		ending += L"ÇùÂù\t\t          KGCA ¾ÆÄ«µ¥¹Ì\n\n\n\n\n\n\n\n\n\n";
+		ending += L"Æ¯º° °¨»ç\t\t        ±è ¸í±Õ ¼±»ý´Ô\n\n\n\n\n\n\n\n\n\n";
 		ending += L"       ÇÃ·¹ÀÌ  ÇØÁÖ¼Å¼­  °¨»çÇÕ´Ï´Ù!";
 	}
-
-	m_pEnding->m_bRun = true;
-	m_pEnding->m_bRender = true;
-
 	m_pEnding->SetText(ending);
 
 	if (m_pEnding->GetPosition().y < g_windowSize.y*0.74f)

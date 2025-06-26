@@ -172,10 +172,21 @@ void Game::Init()
 
 void Game::Tick()
 {
+	// FadeOut이 처음 완료 되었을 때,
 	if (UI->GetFadeOutDone())
 	{
 		m_bNoPaused = false;
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->CanInput();
+	}
+
+	// Betty가 죽으면
+	//if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
+	if (INPUT->GetButton(GameKey::P))
+	{
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->CanInput();
+		UI->DoFadeIn();
+		m_cUI.NoRenderStateUI();		
+		m_cUI.GoEnding();
 	}
 
 	STAGE->Tick();
@@ -438,13 +449,6 @@ void Game::UpdateUI()
 	{
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
 	}
-
-	///////////////////////////////////////////////////////////////////////////
-	///////////						Ending							///////////
-	///////////////////////////////////////////////////////////////////////////
-
-	if (INPUT->GetButton(GameKey::P))
-		m_cUI.GoEnding();
 }
 
 void Game::UpdateCursor()
