@@ -48,6 +48,7 @@ public:
 	void SetRotTime1(float _fTime) { m_fRotTime1 = _fTime; }
 	void SetTimeTrack1(float _fTime) { m_fTrack1 = _fTime; }
 	void SetMoveTime2(float _fTime) { m_fMoveTime2 = _fTime; }
+	void SetRestTime(float _fTime) { m_fRestTime = _fTime; }
 	void SetTimeTrack2(float _fTime) { m_fTrack2 = _fTime; }
 	void SetTimeTrack3(float _fTime) { m_fTrack3 = _fTime; }
 	void SetUIPopUpTime(float _fTime) { m_fPopUpTime = _fTime; }
@@ -75,6 +76,7 @@ private:
 	float m_fRotTime1 = 0.f;
 	float m_fTrack1 = 0.f;
 	float m_fMoveTime2 = 0.f;
+	float m_fRestTime = 0.f;
 	float m_fTrack2 = 0.f;
 	float m_fTrack3 = 0.f;
 	float m_fPopUpTime = 0.f;

@@ -79,6 +79,10 @@ public:
 
 	// Combo
 	int maxComboCount = 3;
+
+	// 행동 제약(Move, Attack 등)
+	bool m_bNoInput = false;
+
 public:
 	void Init() override;
 	void Tick() override;
@@ -107,6 +111,13 @@ public:
 	void UpdateCollider();
 	void UpdateBow();
 	void CheckCoolTIme();
+
+	// 행동 제약
+	void NoInput() { m_bNoInput = true; }
+	void CanInput() { m_bNoInput = false; }
+	void WalkAnim() { ChangeState(walk); }
+	void IdleAnim() { ChangeState(idle); }
+
 public:
 	void CheckClimb();
 	void CheckRoll();

@@ -105,9 +105,9 @@ void BettyMeetControler::Tick()
 			checkMoveEnd = true;
 		}
 
+		// 까마귀가 카메라 안으로 들어와서 멈추는 구간
 		if (time < m_fMoveTime2)
 		{
-			// 까마귀가 카메라 안으로 들어와서 멈추는 구간
 			static float tempTime = (m_fMoveTime2 - time);
 			float move2 = (time - m_fTrack1) / tempTime;
 
@@ -119,12 +119,17 @@ void BettyMeetControler::Tick()
 		{
 			m_bMoveEnd = true;
 		}
+		// 잠깐 움직임을 멈추고 쉬는 구간
+		else if (time < m_fRestTime)
+		{
+
+		}
 		// 베티까지 Camera Close Up
-		else if (time >= m_fMoveTime2 && time < m_fTrack2)
+		else if (time >= m_fRestTime && time < m_fTrack2)
 		{
 			static Vec3 vCurrentCameraPos = m_pMovieCamera->GetPosition();
 			static float tempTime = (m_fTrack2 - time);
-			float track2 = (time - m_fMoveTime2) / tempTime;
+			float track2 = (time - m_fRestTime) / tempTime;
 
 			m_pMovieCamera->SetPosition(LerpEased(vCurrentCameraPos, Vec3(49.5f, 6.5f, -83.f), track2));
 

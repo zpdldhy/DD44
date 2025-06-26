@@ -163,7 +163,8 @@ void Game::Init()
 	OBJECT->SetCursorActor(m_pCursor);
 
 	// FadeOut 중엔 Paused 못하게
-	m_bNoPaused = true;
+	//m_bNoPaused = true;
+	//dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
 	UI->DoFadeOut();
 
 	m_cBettyMovie.SetCameraStart(Vec3(64.f, 4.f, -94.f), Vec3(-0.06f, 11.65f, 0.f));
@@ -171,8 +172,22 @@ void Game::Init()
 
 void Game::Tick()
 {
+	// FadeOut이 처음 완료 되었을 때,
 	if (UI->GetFadeOutDone())
+	{
 		m_bNoPaused = false;
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->CanInput();
+	}
+
+	// Betty가 죽으면
+	//if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
+	if (INPUT->GetButton(GameKey::P))
+	{
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
+		UI->DoFadeIn();
+		m_cUI.NoRenderStateUI();		
+		m_cUI.GoEnding();
+	}
 
 	STAGE->Tick();
 	if (STAGE->GetCurrentStage() == StagePhase::FINAL)
@@ -439,13 +454,6 @@ void Game::UpdateUI()
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
 		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
 	}
-
-	///////////////////////////////////////////////////////////////////////////
-	///////////						Ending							///////////
-	///////////////////////////////////////////////////////////////////////////
-
-	if (INPUT->GetButton(GameKey::P))
-		m_cUI.GoEnding();
 }
 
 void Game::UpdateCursor()
@@ -498,17 +506,21 @@ void Game::BettyMeetMovie()
 	if (!m_cBettyMovie.IsStart())
 	{
 		// 연출 위치 조작
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
 		m_pPlayer->GetPhysicsComponent()->SetWeight(0.f);
 		auto pos = m_pPlayer->GetPosition();
+		pos.y = 0.025f;
+
 		m_cBettyMovie.SetPlayerEnterPos(pos);
 		m_cBettyMovie.SetPlayerStartPos(Vec3(64.f, pos.y, -94.f));
 		m_cBettyMovie.SetPlayerEndPos(Vec3(52.f, pos.y, -85.f));
 
 		m_cBettyMovie.SetMoveTime1(3.f);
-		m_cBettyMovie.SetRotTime1(5.f);
+		m_cBettyMovie.SetRotTime1(4.f);
 		m_cBettyMovie.SetTimeTrack1(7.f);
 
-		m_cBettyMovie.SetMoveTime2(10.f);
+		m_cBettyMovie.SetMoveTime2(9.f);
+		m_cBettyMovie.SetRestTime(11.f);
 		m_cBettyMovie.SetTimeTrack2(12.f);
 
 		m_cBettyMovie.SetUIPopUpTime(18.f);
@@ -524,15 +536,13 @@ void Game::BettyMeetMovie()
 
 	if (m_cBettyMovie.StartTrack1() || m_cBettyMovie.StartTrack2())
 	{
-		int i = 0;
 		m_pCursor->m_bRender = false;
-		// 까마귀를 Walk Animation으로 변경
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->WalkAnim();
 	}
 	
 	if (m_cBettyMovie.EndMove())
 	{
-		int i = 0;
-		// 까마귀를 Idle Animation으로 변경
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->IdleAnim();
 	}
 
 	if (m_cBettyMovie.StartTrack3())
@@ -552,7 +562,10 @@ void Game::BettyMeetMovie()
 		m_cUI.PopDownBettyName();
 		m_cUI.RenderStateUI();
 		CAMERA->Set3DCameraActor(m_pGameCameraActor);
+
 		m_pPlayer->GetPhysicsComponent()->SetWeight(1.f);
+		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->CanInput();
+
 		m_bStartBettyMoveScene = false;
 		m_pCursor->m_bRender = true;
 		m_bNoPaused = false;

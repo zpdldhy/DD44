@@ -161,7 +161,6 @@ void UIManager::UpdateFade()
 			isFadeOutDone = true;
 			isFadeOut = false;
 			fCurrentFadeTime = 0.f;
-			m_pFade = nullptr;
 		}
 	}
 	if (m_pFade)
