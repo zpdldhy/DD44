@@ -109,11 +109,12 @@ private:
 	Vec3 maxPos = { 0, 0, 130 };
 
 	// teleport 관련 변수
-	Vec3 destination;
+	Vec3 destination = { 0.0f, 0.0f, 0.0f };
 	float disElapsed = 0.0f;
 	float waitElapsed = 0.0f;
 	// anim 관련 변수
-	float originSpped;
+	float originSpped = 0.0f;
+	float distance = 0.0f;
 	// sub-state
 	enum AttackPhase { Attack, Runaway, Disappear, Wait, StandStill, Appear, Done };
 	AttackPhase currentPhase = AttackPhase::Attack;

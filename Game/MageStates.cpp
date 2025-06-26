@@ -275,8 +275,7 @@ void MageAttackState::Tick()
 		if (waitElapsed > 2.0f)
 		{
 			waitElapsed = 0.0f;
-			attack->Enter();
-			currentPhase = AttackPhase::Attack;
+			End();
 		}
 	}
 	break;
