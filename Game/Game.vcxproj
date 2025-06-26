@@ -166,7 +166,9 @@
     <ClInclude Include="BatStates.h" />
     <ClInclude Include="BettyMovement.h" />
     <ClInclude Include="BettyStates.h" />
-    <ClInclude Include="Editor.h" />
+    <ClInclude Include="Editor.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="EnemyCollisionManager.h" />
     <ClInclude Include="EnemyScriptBase.h" />
     <ClInclude Include="EnemyState.h" />
@@ -191,18 +193,32 @@
     <ClInclude Include="PrefabToActor.h" />
     <ClInclude Include="PlayerStates.h" />
     <ClInclude Include="ProjectileManager.h" />
-    <ClInclude Include="Sample.h" />
+    <ClInclude Include="Sample.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="ScriptManager.h" />
     <ClInclude Include="StageManager.h" />
     <ClInclude Include="StateInterface.h" />
     <ClInclude Include="TCharacter.h" />
     <ClInclude Include="TEnemy.h" />
-    <ClInclude Include="TestPlayer.h" />
-    <ClInclude Include="TestSJ.h" />
-    <ClInclude Include="TestSY.h" />
-    <ClInclude Include="TestYoooooon.h" />
-    <ClInclude Include="TestYR.h" />
-    <ClInclude Include="TestYR2.h" />
+    <ClInclude Include="TestPlayer.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="TestSJ.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="TestSY.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="TestYoooooon.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="TestYR.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="TestYR2.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="TInteractable.h" />
     <ClInclude Include="TInteractScriptComponent.h" />
     <ClInclude Include="TPlayer.h" />
@@ -216,7 +232,9 @@
     <ClCompile Include="BatStates.cpp" />
     <ClCompile Include="BettyMovement.cpp" />
     <ClCompile Include="BettyStates.cpp" />
-    <ClCompile Include="Editor.cpp" />
+    <ClCompile Include="Editor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="EnemyCollisionManager.cpp" />
     <ClCompile Include="EnemyScriptBase.cpp" />
     <ClCompile Include="EngineCameraMoveScript.cpp" />
@@ -241,18 +259,32 @@
     <ClCompile Include="PlayerStates.cpp" />
     <ClCompile Include="PrefabToActor.cpp" />
     <ClCompile Include="ProjectileManager.cpp" />
-    <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="Sample.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ScriptManager.cpp" />
     <ClCompile Include="StageManager.cpp" />
     <ClCompile Include="StateInterface.cpp" />
     <ClCompile Include="TCharacter.cpp" />
     <ClCompile Include="TEnemy.cpp" />
-    <ClCompile Include="TestPlayer.cpp" />
-    <ClCompile Include="TestSJ.cpp" />
-    <ClCompile Include="TestSY.cpp" />
-    <ClCompile Include="TestYoooooon.cpp" />
-    <ClCompile Include="TestYR.cpp" />
-    <ClCompile Include="TestYR2.cpp" />
+    <ClCompile Include="TestPlayer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="TestSJ.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="TestSY.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="TestYoooooon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="TestYR.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="TestYR2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="TInteractable.cpp" />
     <ClCompile Include="TInteractScriptComponent.cpp" />
     <ClCompile Include="TPlayer.cpp" />
