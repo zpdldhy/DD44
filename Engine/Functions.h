@@ -36,7 +36,7 @@ static void DX_CHECK(HRESULT _hr, const TCHAR* _function)
 // 추후 수정 필요
 static std::wstring SplitPath(std::wstring _filename)
 {
-	TCHAR szFileName[256];
+	TCHAR szFileName[256] = { 0, };
 	TCHAR Drive[MAX_PATH];
 	TCHAR Dir[MAX_PATH];
 	TCHAR FName[MAX_PATH];
