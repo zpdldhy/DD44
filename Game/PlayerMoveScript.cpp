@@ -38,6 +38,7 @@ void PlayerMoveScript::Init()
 	idle = make_shared<PlayerIdleState>(m_pOwner);
 	walk = make_shared<PlayerWalkState>(m_pOwner);
 	climb = make_shared<PlayerClimbState>(m_pOwner);
+	fall = make_shared<PlayerFallState>(m_pOwner);
 	roll = make_shared<PlayerRollState>(m_pOwner);
 	attack = make_shared<PlayerAttackState>(m_pOwner);
 	hit = make_shared<PlayerHitState>(m_pOwner);
@@ -106,6 +107,16 @@ void PlayerMoveScript::Tick()
 	PlayFX();
 	CheckCoolTIme();
 
+	if (GetOwner()->GetPhysicsComponent()->m_bFall)
+	{
+		ChangeState(fall);
+	}
+	else if (currentStateId == PLAYER_S_FALL)
+	{
+		ChangeState(idle);
+	}
+
+
 	currentState->Tick();
 	bool currentStateEnd = !currentState->IsPlaying();
 	if (isSetEnd)
@@ -168,6 +179,15 @@ void PlayerMoveScript::Tick()
 		//CheckCollision();
 		CheckMove();
 		break;
+	case PLAYER_S_FALL:
+		if (currentStateEnd)
+		{
+			ChangeState(idle);
+		}
+		else
+		{
+			return;
+		}
 	case PLAYER_S_SHOOT:
 		CheckCollision();
 		CheckRoll();

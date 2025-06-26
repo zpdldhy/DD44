@@ -15,6 +15,7 @@ enum PLAYER_STATE
 	PLAYER_S_HIT,
 	PLAYER_S_DEATH,
 	PLAYER_S_GETITEM,
+	PLAYER_S_FALL,
 	PLAYER_S_COUNT
 };
 class PlayerBaseState : public StateBase
@@ -278,3 +279,15 @@ public:
 	void SetLadderDir(Vec3 _dir);
 };
 
+class PlayerFallState : public PlayerBaseState
+{
+private:
+	weak_ptr<AActor> m_pOwner;
+public:
+	PlayerFallState(weak_ptr<AActor> _pOwner);
+	~PlayerFallState() {}
+public:
+	virtual void Enter() override;
+	virtual void Tick() override;
+	virtual void End() override;
+};
