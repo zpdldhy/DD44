@@ -38,6 +38,7 @@ enum class ESoundType
 
 	//Mage
 	Attack_Mage,
+	Dead_Mage,
 
 	//Betty
 	Attack_Betty,
@@ -47,6 +48,7 @@ enum class ESoundType
 	Impact_Betty2,
 	Scraping_Betty,
 	Rolling_Betty,
+	SnowFalling_Betty,
 
 	//Env
 	Open_Fence,

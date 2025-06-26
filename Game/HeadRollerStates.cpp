@@ -91,6 +91,9 @@ void HeadRollerAttackState::Tick()
 			middle->End();
 			end->Enter();
 			currentPhase = RollPhase::Final;
+
+			SOUND->GetPtr(ESoundType::Rolling_Walker)->Stop();
+			SOUND->GetPtr(ESoundType::Impact)->Play2D(false);
 		}
 		break;
 	}
@@ -195,6 +198,8 @@ void HeadRollerRollStart::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int idleIndex = animInstance->GetAnimIndex(L"Armature|roll_start");
 	animInstance->PlayOnce(idleIndex);
+
+	SOUND->GetPtr(ESoundType::Rolling_Walker)->Play2D(false);
 }
 void HeadRollerRollStart::Tick()
 {

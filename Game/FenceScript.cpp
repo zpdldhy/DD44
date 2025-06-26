@@ -91,6 +91,12 @@ void FenceScript::Tick()
 		{
 			m_elapsed = 0.0f;
 			m_bClose = false;
+
+			if (m_bIsPaly)
+			{
+				SOUND->GetPtr(ESoundType::Close_Fence)->PlayEffect2D();
+				m_bIsPaly = false;
+			}
 		}
 	}
 }
@@ -105,12 +111,6 @@ void FenceScript::Interact()
 {
 	// ´Ý±â
 	m_bClose = true;
-	if (m_bIsPaly)
-	{
-		SOUND->GetPtr(ESoundType::Close_Fence)->PlayEffect2D();
-		m_bIsPaly = false;
-	}
-	
 
 	if (GetOwner()->m_szName == L"Fence3")
 	{

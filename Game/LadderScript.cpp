@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "LadderScript.h"
 #include "Timer.h"
+#include "Sound.h"
 
 #include "EventManager.h"
 
@@ -46,6 +47,8 @@ void LadderScript::Tick()
 			{
 				activeChildNum = 0;
 				m_bAppear = false;
+
+				SOUND->GetPtr(ESoundType::Close_Fence)->PlayEffect2D();
 				return;
 			}
 			children[activeChildNum--]->SetVisible(true);
