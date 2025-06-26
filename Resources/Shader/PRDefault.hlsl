@@ -77,7 +77,7 @@ PS_PROCESS_OUT PS(VS_OUT input)
     
     for (int j = 1; j < 5; ++j)
     {
-        float2 offset = g_vTexelSize * i * g_fBlurScale * float2(0, 1);
+        float2 offset = g_vTexelSize * j * g_fBlurScale * float2(0, 1);
 
         blurV += g_txBloom.Sample(sample, uv + offset) * weights[j];
         blurV += g_txBloom.Sample(sample, uv - offset) * weights[j];
