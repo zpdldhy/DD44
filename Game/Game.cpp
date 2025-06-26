@@ -88,6 +88,7 @@ void Game::Init()
 
 	auto objectList = PToA->LoadAllPrefabs(".character.json");
 	OBJECT->AddActorList(objectList);
+
 	for (auto& interactable : objectList)
 	{
 		m_vObjectList.push_back(interactable);
@@ -95,6 +96,15 @@ void Game::Init()
 		stage1.push_back(interactable);
 		stage2.push_back(interactable); 
 
+	}
+
+	auto fenceList = ENEMYCOLLIDER->triggerObjectList;
+	for (auto& obj : fenceList)
+	{
+		m_vObjectList.push_back(obj);
+		stage0.push_back(obj);
+		stage1.push_back(obj);
+		stage2.push_back(obj);
 	}
 
 	m_pBetty = PToA->MakeCharacter("../Resources/Prefab/Player/Boss_Betty.character.json");
@@ -159,7 +169,6 @@ void Game::Init()
 	OBJECT->SetCursorActor(m_pCursor);
 
 	UI->DoFadeOut();
-
 
 }
 
@@ -603,7 +612,7 @@ void Game::CheckEnemyCollision()
 			}
 			COLLITION->CheckCollision(m_pBetty, *obj);
 			obj++;
-		}
+		}		
 		break;
 	}
 

@@ -25,6 +25,7 @@ void FenceScript::Init()
 
 	// 몸체 콜라이더
 	bodyCollider = make_shared<AActor>();
+	bodyCollider->m_szName = L"FenceCollider";
 	bodyCollider->SetPosition(GetOwner()->GetPosition() + Vec3(0, 2, 0));
 	bodyCollider->SetScale(Vec3(20.0f, 10.0f, 2.0f));
 	bodyCollider->SetRotation(GetOwner()->GetRotation());
@@ -33,7 +34,7 @@ void FenceScript::Init()
 	collider->SetCollisionEnabled(CollisionEnabled::CE_QUERYANDPHYSICS);
 	bodyCollider->SetShapeComponent(collider);
 	OBJECT->AddActor(bodyCollider);
-	ENEMYCOLLIDER->Add(bodyCollider);
+	ENEMYCOLLIDER->AddObject(bodyCollider);
 }
 
 void FenceScript::Tick()
