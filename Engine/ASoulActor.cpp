@@ -56,7 +56,7 @@ void ASoulActor::Tick()
 	//	m_vVelocity = (toTarget * m_fSpeed) + waveOffset;
 	//}
 
-	//// 위아래이지만 좌우느낌(빌보드)
+	// 위아래이지만 좌우느낌(빌보드)
 	//{
 	//	Vec3 currentPos = GetPosition();
 	//	Vec3 toTarget = m_vTargetPos - currentPos;
@@ -76,7 +76,7 @@ void ASoulActor::Tick()
 	//	m_vVelocity = toTarget * m_fSpeed + waveOffset;
 	//}
 
-		// 제자리에서 위아래만 흔들기
+	////	// 제자리에서 위아래만 흔들기
 	{
 		Vec3 currentPos = GetPosition();
 		float verticalWave = sin(TIMER->GetGameTime() * 8.f) * 1.5f;
