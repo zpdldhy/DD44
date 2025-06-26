@@ -902,13 +902,19 @@ void InGameUIControler::UpdateDead()
 	static Vec3 tempLPosition = m_vDeadUI[2]->GetPosition();
 	static Vec3 tempRPosition = m_vDeadUI[3]->GetPosition();
 
+	
+
 	if (m_bDead)
 	{
+		
 		tempTime += TIMER->GetDeltaTime();
 
 		// »ç¸Á UI°¡ ¶ß´Â ½Ã°£
 		if (tempTime > 1.f)
 		{
+			
+				
+			
 			m_vDeadUI[0]->m_bRun = true;
 			m_vDeadUI[0]->m_bRender = true;
 
@@ -982,8 +988,8 @@ void InGameUIControler::UpdateDead()
 			m_vCoins[1]->m_bRender = false;
 			m_vCoins[3]->m_bRender = false;
 		}
-
-		SOUND->GetPtr(ESoundType::Stage0)->Stop();
+		SOUND->GetPtr(ESoundType::Stage0)->SetPause(true);
+		SOUND->GetPtr(ESoundType::Boss1)->SetPause(true);
 		SOUND->GetPtr(ESoundType::CrowDead)->Play2D(false);
 	}
 	else

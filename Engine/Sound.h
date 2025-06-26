@@ -98,6 +98,8 @@ public:
 	void VolumeUp(float fVolume);
 	void VolumeDown(float fVolume);
 
+	void SetPause(bool bPause);
+
 public:
 	void Update();
 	void Destroy();
@@ -126,6 +128,7 @@ public:
 	void    LoadAllSounds();
 	Sound*  GetPtr(ESoundType type);
 	void    Update();
+	
 
 private:
 	std::map<std::wstring, Sound*> maplist;

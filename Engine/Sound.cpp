@@ -232,3 +232,27 @@ SoundManager::~SoundManager()
 		m_pSystem->release();
 	}
 }
+
+void Sound::SetPause(bool bPause)
+{
+	if (m_pChannel)
+	{
+		bool paused;
+		if (m_pChannel->getPaused(&paused) == FMOD_OK && paused != bPause)
+		{
+			m_pChannel->setPaused(bPause);
+		}
+	}
+
+	for (auto& channel : m_pEffectChannels)
+	{
+		if (channel)
+		{
+			bool paused;
+			if (channel->getPaused(&paused) == FMOD_OK && paused != bPause)
+			{
+				channel->setPaused(bPause);
+			}
+		}
+	}
+}
