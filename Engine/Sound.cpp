@@ -10,7 +10,7 @@ void Sound::Update()
 	while (it != m_pEffectChannels.end())
 	{
 		bool isPlaying = false;
-		if (*it && (*it)->isPlaying(&isPlaying) == FMOD_OK && !isPlaying)
+		if (!*it || (*it)->isPlaying(&isPlaying) != FMOD_OK || !isPlaying)
 			it = m_pEffectChannels.erase(it);
 		else
 			++it;
@@ -33,12 +33,13 @@ void Sound::Destroy()
 bool Sound::Load(FMOD::System* _pSystem, std::wstring _filename)
 {
 	m_pSystem = _pSystem;
-	FMOD_RESULT hr = m_pSystem->createSound(to_wm(_filename).c_str(), FMOD_DEFAULT, 0, &m_pSound);
-	if (hr == FMOD_OK)
-	{
-		return true;
-	}
-	return false;
+	FMOD_RESULT hr = m_pSystem->createSound(
+		to_wm(_filename).c_str(),
+		FMOD_2D | FMOD_CREATESAMPLE,
+		0,
+		&m_pSound
+	);
+	return hr == FMOD_OK;
 }
 
 void	Sound::Play2D(bool bLoop)
@@ -57,7 +58,7 @@ void	Sound::Play2D(bool bLoop)
 		}
 	}
 }
-void	Sound::PlayEffect2D(bool bLoop)
+void Sound::PlayEffect2D(bool bLoop)
 {
 	FMOD::Channel* pNewChannel = nullptr;
 	FMOD_RESULT hr = m_pSystem->playSound(m_pSound, nullptr, false, &pNewChannel);
@@ -65,6 +66,7 @@ void	Sound::PlayEffect2D(bool bLoop)
 	{
 		pNewChannel->setVolume(m_fVolume);
 		pNewChannel->setMode(bLoop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+		pNewChannel->setPriority(255);
 		m_pEffectChannels.push_back(pNewChannel);
 	}
 }
