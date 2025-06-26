@@ -105,7 +105,7 @@ private:
 	////
 	//Vec2 minPos = { -10, 60 };
 	//Vec2 maxPos = { 60, 140 };
-	Vec3 minPos = { -110, 0, 60 };
+	Vec3 minPos = { -110, 0, 70 };
 	Vec3 maxPos = { 0, 0, 130 };
 
 	// teleport 관련 변수

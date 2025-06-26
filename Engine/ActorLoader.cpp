@@ -71,7 +71,6 @@ void ActorLoader::LoadAllAsset()
 }
 map<wstring, shared_ptr<UMeshResources>> ActorLoader::LoadMeshMap()
 {
-	Profiler p("ActorLoader::LoadMeshMap");
 	m_mMeshMap.clear();
 	for (int iFbx = 0; iFbx < m_vFbxList.size(); iFbx++)
 	{

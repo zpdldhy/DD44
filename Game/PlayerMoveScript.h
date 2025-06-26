@@ -36,6 +36,7 @@ public:
 	shared_ptr<PlayerBaseState> idle;
 	shared_ptr<PlayerBaseState> walk;
 	shared_ptr<PlayerBaseState> climb;
+	shared_ptr<PlayerBaseState> fall;
 	shared_ptr<PlayerBaseState> roll;
 	shared_ptr<PlayerBaseState> attack;
 	shared_ptr<PlayerBaseState> hit;
