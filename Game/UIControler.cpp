@@ -108,6 +108,10 @@ void IntroUIControler::Tick()
 				pUI->SetPosition(NowPos);
 			}
 
+			if (INPUT->GetButton(GameKey::SPACE))
+			{
+				// Option
+			}
 		}
 		break;
 		case SM_EXIT:
@@ -121,7 +125,7 @@ void IntroUIControler::Tick()
 				pUI->SetPosition(NowPos);
 			}
 
-			if (INPUT->GetButton(ENTER))
+			if (INPUT->GetButton(GameKey::SPACE))
 			{
 				m_bSelectEndButton = true;
 			}
@@ -402,13 +406,13 @@ void InGameUIControler::UpdateHP()
 	{
 		if (i > 0)
 		{
-			m_vHPUI[i - 1]->SetColor(Color(0.055f, 0.247f, -0.324, -0.5f));
+			m_vHPUI[i - 1]->SetColor(Color(0.055f, 0.247f, -0.324f, -0.5f));
 		}
 
 		if (i < 9) 
 		{
 			m_vHPUI[i]->SetAllTexture(m_pActiveHPTexture);
-			m_vHPUI[i]->SetColor(Color(0.055f, 0.247f, -0.324, 0.0f));
+			m_vHPUI[i]->SetColor(Color(0.055f, 0.247f, -0.324f, 0.0f));
 		}
 	}
 
@@ -913,8 +917,8 @@ void InGameUIControler::UpdateDead()
 			m_vDeadUI[0]->m_bRender = true;
 
 			// ¶³¸®´Â È¿°ú
-			float deltaX = tempBackPosition.x + 2.f * cosf(rand());
-			float deltaY = tempBackPosition.y + 2.f * cosf(rand());
+			float deltaX = tempBackPosition.x + 2.f * cosf(static_cast<float>(rand()));
+			float deltaY = tempBackPosition.y + 2.f * cosf(static_cast<float>(rand()));
 
 			m_vDeadUI[0]->SetPosition(Vec3(deltaX, deltaY, 1.f));
 

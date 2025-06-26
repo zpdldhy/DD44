@@ -3,9 +3,9 @@
 class StateBase
 {
 protected: 
-	UINT m_iStateId;
-	bool m_bOnPlaying;
-	bool m_bCanInterrupt;
+	UINT m_iStateId = 0;
+	bool m_bOnPlaying = false;
+	bool m_bCanInterrupt = false;
 	float m_fDissolveTimer = 0.0f;
 public:
 	StateBase(UINT _iStateId) { m_iStateId = _iStateId; }
