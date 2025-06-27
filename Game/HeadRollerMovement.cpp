@@ -36,6 +36,7 @@ void HeadRollerMovement::Init()
 void HeadRollerMovement::Tick()
 {
 	CheckCoolDown();
+	CheckHit();
 	
 
 	currentState->Tick();
@@ -94,7 +95,6 @@ void HeadRollerMovement::Tick()
 		break;
 	}
 
-	CheckHit();
 
 }
 
