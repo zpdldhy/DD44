@@ -13,10 +13,10 @@
 #include "UBoxComponent.h"
 #include "EnemyCollisionManager.h"
 #include "EventManager.h"
-
-// temp temp temp !!!!!
-#include "Input.h"
 #include "Sound.h"
+
+#include "StageManager.h"
+#include "Input.h"
 
 void BettyMovement::Init()
 {
@@ -74,6 +74,13 @@ void BettyMovement::Init()
 
 void BettyMovement::Tick()
 {
+	if (INPUT->GetButton(M))
+	{
+		if (STAGE->GetCurrentStage() == StagePhase::FINAL)
+		{
+			ChangeState(death);
+		}
+	}
 	leftRange->SetPosition(leftHand.lock()->GetWorldPosition());
 	rightRange->SetPosition(rightHand.lock()->GetWorldPosition());
 
@@ -158,19 +165,19 @@ void BettyMovement::Tick()
 	//// 피격 효과
 	Flashing();
 
-	// 손 위치에 맞게 넣기
-	if (INPUT->GetButton(K))
-	{
-		Vec3 pos = GetOwner()->GetPosition();
-		EFFECT->PlayDustBurst(pos, 10.f, .5f);
-		EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .5f);
-		EFFECT->PlayBeamBurst(pos, 20, .5f);
-		EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3::Zero, .5f);
-	}
-	if (INPUT->GetButton(Q))
-	{
-		OneSnowBall();
-	}
+	//// 손 위치에 맞게 넣기
+	//if (INPUT->GetButton(K))
+	//{
+	//	Vec3 pos = GetOwner()->GetPosition();
+	//	EFFECT->PlayDustBurst(pos, 10.f, .5f);
+	//	EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .5f);
+	//	EFFECT->PlayBeamBurst(pos, 20, .5f);
+	//	EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3::Zero, .5f);
+	//}
+	//if (INPUT->GetButton(Q))
+	//{
+	//	OneSnowBall();
+	//}
 }
 
 shared_ptr<UScriptComponent> BettyMovement::Clone()

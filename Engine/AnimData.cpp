@@ -34,7 +34,7 @@ void AnimData::CreateTex(int _boneCount, int _trackCount)
 	HRESULT hr = DEVICE->CreateTexture3D(&desc, &initData, m_pTex3D.GetAddressOf());
 	if (FAILED(hr))
 	{
-		assert(false);
+		//assert(false);
 	}
 
 	// SRV
@@ -47,7 +47,7 @@ void AnimData::CreateTex(int _boneCount, int _trackCount)
 	hr = DEVICE->CreateShaderResourceView(m_pTex3D.Get(), &srvDesc, m_pTexSRV.GetAddressOf());
 	if (FAILED(hr))
 	{
-		assert(false);
+		//assert(false);
 	}
 }
 

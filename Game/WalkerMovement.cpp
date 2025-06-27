@@ -5,7 +5,6 @@
 #include "TPlayer.h"
 #include "EffectManager.h"
 
-#include "Input.h"
 #include "Timer.h"
 #include "ObjectManager.h"
 

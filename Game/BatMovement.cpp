@@ -6,14 +6,13 @@
 #include "UMeshComponent.h"
 #include "TCharacter.h"
 
-// temp
-#include "Input.h"
 #include "Sound.h"
-
-// temp
 #include "PlayerMoveScript.h"
-
 #include "TPlayer.h"
+
+//// temp
+//#include "Input.h"
+
 // for collider
 #include "TEnemy.h"
 #include "UBoxComponent.h"

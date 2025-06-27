@@ -5,8 +5,6 @@
 #include "Timer.h"
 #include "EffectManager.h"
 
-// temptemptemptmepte
-#include "Input.h"
 
 void HeadRollerMovement::Init()
 {
@@ -38,6 +36,7 @@ void HeadRollerMovement::Init()
 void HeadRollerMovement::Tick()
 {
 	CheckCoolDown();
+	CheckHit();
 	
 
 	currentState->Tick();
@@ -96,7 +95,6 @@ void HeadRollerMovement::Tick()
 		break;
 	}
 
-	CheckHit();
 
 }
 
