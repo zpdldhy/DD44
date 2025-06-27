@@ -129,6 +129,8 @@ void BettyIntroState::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|Intro");
 	animInstance->PlayOnce(index);
+
+	SOUND->GetPtr(ESoundType::Growling_Betty)->PlayEffect2D();
 }
 void BettyIntroState::Tick()
 {
@@ -143,6 +145,8 @@ void BettyIntroState::Tick()
 				this->PlayFx();
 				});
 			m_bNextAnim = false;
+
+			SOUND->GetPtr(ESoundType::Screaming_Betty)->PlayEffect2D();
 		}
 		else
 		{
@@ -191,7 +195,7 @@ void BettyJumpAttack::Enter()
 		});
 
 	//// 사운드
-	//SOUNDMANAGER->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Impact_Betty1)->PlayEffect2D();
 
 	// 이동
 	auto look = m_pOwner.lock()->GetLook();
@@ -294,7 +298,7 @@ void BettyTwoHandAttack::Enter()
 		this->EndAnim();
 		});
 
-
+	SOUND->GetPtr(ESoundType::Impact_Betty1)->PlayEffect2D();
 }
 void BettyTwoHandAttack::Tick()
 {
@@ -377,7 +381,7 @@ void BettyOneHandBackAttack::Enter()
 		this->EnableCollider();
 		});
 
-
+	SOUND->GetPtr(ESoundType::Attack_Betty)->PlayEffect2D();
 }
 void BettyOneHandBackAttack::Tick()
 {
@@ -472,10 +476,12 @@ void BettyOneHandDownAttack::Enter()
 	{
 		index = animInstance->GetAnimIndex(L"Armature|Punch_left");
 		leftRange.lock()->m_bCollision = true;
+		SOUND->GetPtr(ESoundType::Impact_Betty2)->PlayEffect2D();
 	}
 	else
 	{
 		rightRange.lock()->m_bCollision = true;
+		SOUND->GetPtr(ESoundType::Impact_Betty2)->PlayEffect2D();
 	}
 	originAnimSpeed = animInstance->m_fAnimPlayRate;
 	animInstance->PlayOnce(index);
@@ -584,7 +590,6 @@ void BettyRollAttack::Enter()
 	end->SetDirection(dir);
 	start->Enter();
 	rollCount--;
-
 }
 void BettyRollAttack::Tick()
 {
@@ -616,6 +621,8 @@ void BettyRollAttack::Tick()
 			middle->End(); // 얘는 end 꼭 여기서.
 			end->Enter();
 			currentPhase = RollPhase::Final;
+			SOUND->GetPtr(ESoundType::Rolling_Betty)->Stop();
+			SOUND->GetPtr(ESoundType::Impact)->PlayEffect2D();
 		}
 		break;
 	case RollPhase::Final:
@@ -663,9 +670,6 @@ void BettyRollAttack::SetTarget(weak_ptr<AActor> _target)
 }
 void BettyRollAttack::PlayFx()
 {
-	// 사운드 ( 소스 변경 필요 )
-	SOUND->GetPtr(ESoundType::Attack_Bat)->PlayEffect2D();
-
 	Vec3 pos = m_pOwner.lock()->GetPosition();
 	EFFECT->PlayDustBurst(pos, 10.f, .8f);
 	EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .5f);
@@ -698,6 +702,8 @@ void BettyRollStart::Enter()
 
 	// 회전
 	targetYaw = atan2f(dir.x, dir.z);
+
+	SOUND->GetPtr(ESoundType::Rolling_Betty)->Play2D(false);
 }
 void BettyRollStart::Tick()
 {
@@ -940,6 +946,8 @@ void BettyRoarAttack::Enter()
 	auto animInstance = m_pOwner.lock()->GetMeshComponent<USkinnedMeshComponent>()->GetAnimInstance();
 	int index = animInstance->GetAnimIndex(L"Armature|Roar");
 	animInstance->PlayOnce(index);
+
+	SOUND->GetPtr(ESoundType::Screaming_Betty)->PlayEffect2D();
 }
 void BettyRoarAttack::Tick()
 {
@@ -970,6 +978,8 @@ void BettyDeathState::Enter()
 	int index = animInstance->GetAnimIndex(L"Armature|Death_idle");
 	animInstance->SetKeyFrame(index, 15);
 	animInstance->PlayOnce(index);
+
+	SOUND->GetPtr(ESoundType::Growling_Betty)->PlayEffect2D();
 }
 void BettyDeathState::Tick()
 {

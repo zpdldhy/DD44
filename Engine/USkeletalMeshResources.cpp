@@ -122,7 +122,7 @@ void USkeletalMeshResources::AddInstanceData(UINT _index, INSTANCE_VERTEX _trans
 {
 	if (static_cast<int>(_index) >= m_instanceCount)
 	{
-		assert(false);
+		//assert(false);
 	}
 	m_vInstaceList[_index] = _transform;
 	m_vIWInstanceList[_index] = _anim;
@@ -153,7 +153,7 @@ UINT USkeletalMeshResources::AllocateInstanceIndex()
 
 		if (static_cast<int>(index) >= m_instanceCount)
 		{
-			assert(false);
+			//assert(false);
 		}
 	}
 	else

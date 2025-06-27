@@ -28,7 +28,7 @@ public:
 
 protected:
 	// 이 세계의 모든 캐릭터는 영혼을 가지고 있다...
-	int m_iSoul = 10000;
+	int m_iSoul = 0;
 public:
 	int GetHisSoul() const { return m_iSoul; }
 	void SetSoul(int _soul) { m_iSoul = _soul; }

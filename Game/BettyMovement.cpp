@@ -13,8 +13,9 @@
 #include "UBoxComponent.h"
 #include "EnemyCollisionManager.h"
 #include "EventManager.h"
+#include "Sound.h"
 
-// temp temp temp !!!!!
+#include "StageManager.h"
 #include "Input.h"
 
 void BettyMovement::Init()
@@ -52,6 +53,7 @@ void BettyMovement::Init()
 
 
 	// HP
+	//dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(1);
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetHp(40);
 	dynamic_pointer_cast<TCharacter>(GetOwner())->SetSoul(1000);
 
@@ -72,6 +74,13 @@ void BettyMovement::Init()
 
 void BettyMovement::Tick()
 {
+	if (INPUT->GetButton(M))
+	{
+		if (STAGE->GetCurrentStage() == StagePhase::FINAL)
+		{
+			ChangeState(death);
+		}
+	}
 	leftRange->SetPosition(leftHand.lock()->GetWorldPosition());
 	rightRange->SetPosition(rightHand.lock()->GetWorldPosition());
 
@@ -156,19 +165,19 @@ void BettyMovement::Tick()
 	//// 피격 효과
 	Flashing();
 
-	// 손 위치에 맞게 넣기
-	if (INPUT->GetButton(K))
-	{
-		Vec3 pos = GetOwner()->GetPosition();
-		EFFECT->PlayDustBurst(pos, 10.f, .5f);
-		EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .5f);
-		EFFECT->PlayBeamBurst(pos, 20, .5f);
-		EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3::Zero, .5f);
-	}
-	if (INPUT->GetButton(Q))
-	{
-		OneSnowBall();
-	}
+	//// 손 위치에 맞게 넣기
+	//if (INPUT->GetButton(K))
+	//{
+	//	Vec3 pos = GetOwner()->GetPosition();
+	//	EFFECT->PlayDustBurst(pos, 10.f, .5f);
+	//	EFFECT->PlayEffect(EEffectType::Shockwave, pos, 0.f, Vec3::Zero, .5f);
+	//	EFFECT->PlayBeamBurst(pos, 20, .5f);
+	//	EFFECT->PlayEffect(EEffectType::BloodDecal, pos, 0.f, Vec3::Zero, .5f);
+	//}
+	//if (INPUT->GetButton(Q))
+	//{
+	//	OneSnowBall();
+	//}
 }
 
 shared_ptr<UScriptComponent> BettyMovement::Clone()
@@ -248,6 +257,8 @@ void BettyMovement::HandleSnowBall()
 		if ((*iter)->GetPosition().y <= 0.5f)
 		{
 			EFFECT->PlayDustBurst((*iter)->GetPosition(), 10.f, 0.4f);
+			SOUND->GetPtr(ESoundType::SnowFalling_Betty)->PlayEffect2D();
+
 			(*iter)->m_bCollision = false;
 			(*iter)->SetPosition(Vec3(0.0f, 20.0f, 0.0f));
 			(*iter)->GetPhysicsComponent()->SetWeight(0.0f);
@@ -410,10 +421,10 @@ void BettyMovement::HandleAttack(float _delta)
 	}
 
 	auto hp = dynamic_pointer_cast<TCharacter>(GetOwner())->GetHp();
-	if (hp < 15 && hp > 10)
+	if (hp < 20 && hp > 10)
 	{
 		// Phase 2
-		currentSnowDropCount = 2;
+		currentSnowDropCount = 10;
 		bSnowControl = true;
 	}
 

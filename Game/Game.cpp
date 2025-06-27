@@ -26,6 +26,7 @@
 #include "TEnemy.h"
 #include "TPlayer.h"
 #include "ASoulActor.h"
+#include "ABloodActor.h"
 
 // Component
 #include "UStaticMeshComponent.h"
@@ -82,6 +83,8 @@ void Game::Init()
 
 	m_pPlayer = PToA->MakeCharacter("../Resources/Prefab/Player/Mycharacter.character.json");
 	m_pPlayer->SetUseStencil(true);
+
+	// Teleporter
 	//m_pPlayer->SetPosition(Vec3(-90, 39, 70));
 	//m_pPlayer->SetPosition(Vec3(10, 0, 0));
 	//m_pPlayer->SetPosition(Vec3(-63, 28, 26));
@@ -193,7 +196,6 @@ void Game::Tick()
 
 	// Betty°¡ Á×À¸¸é
 	if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
-		//if (INPUT->GetButton(GameKey::P))
 	{
 		static bool isEnd = false;
 		if (isEnd == false)
@@ -202,7 +204,6 @@ void Game::Tick()
 		SOUND->GetPtr(ESoundType::Ending)->Play2D();
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->NoInput();
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->EndGame();
-		UI->DoFadeIn();
 		m_cUI.NoRenderStateUI();
 		m_cUI.GoEnding();
 		}
@@ -230,28 +231,28 @@ void Game::Tick()
 
 	//wind	
 	{
-		if (INPUT->GetButton(M))
-		{
-			m_bWind = !m_bWind;
-		}
+		//if (INPUT->GetButton(M))
+		//{
+		//	m_bWind = !m_bWind;
+		//}
 
-		if (m_bWind)
-			CreateWind();
+		//if (m_bWind)
+		//	CreateWind();
 	}
 
-	if (INPUT->GetButton(O))
-	{
-		if (m_bEnginCamera)
-		{
-			m_bEnginCamera = false;
-			CAMERA->Set3DCameraActor(m_pGameCameraActor);
-		}
-		else
-		{
-			m_bEnginCamera = true;
-			CAMERA->Set3DCameraActor(m_pCameraActor);
-		}
-	}
+	//if (INPUT->GetButton(O))
+	//{
+	//	if (m_bEnginCamera)
+	//	{
+	//		m_bEnginCamera = false;
+	//		CAMERA->Set3DCameraActor(m_pGameCameraActor);
+	//	}
+	//	else
+	//	{
+	//		m_bEnginCamera = true;
+	//		CAMERA->Set3DCameraActor(m_pCameraActor);
+	//	}
+	//}
 
 	CheckFrustumCulling();
 	CheckEnemyCollision();
@@ -469,7 +470,19 @@ void Game::UpdateUI()
 	if (m_cUI.EndDeadUI())
 	{
 		dynamic_pointer_cast<PlayerMoveScript>(m_pPlayer->GetScriptList()[0])->Resurrection();
-		SOUND->GetPtr(ESoundType::Stage0)->Play2D();
+
+		StagePhase currentStage = STAGE->GetCurrentStage();
+
+		SOUND->GetPtr(ESoundType::Stage0)->SetPause(false);
+		SOUND->GetPtr(ESoundType::Boss1)->SetPause(false);
+		/*if (currentStage != StagePhase::FINAL)
+		{
+			SOUND->GetPtr(ESoundType::Stage0)->Play2D();
+		}
+		else
+		{
+			SOUND->GetPtr(ESoundType::Boss1)->Play2D();
+		}*/
 	}
 }
 
@@ -892,9 +905,17 @@ void Game::CheckEnemyCollision()
 
 void Game::CheckBloodCollision()
 {
+	StagePhase currentStage = STAGE->GetCurrentStage();
+	
 	auto& bloodList = EFFECT->GetBloodList();
 	for (auto blood = bloodList.begin(); blood != bloodList.end(); )
 	{
+		shared_ptr<ABloodActor> pBlood = dynamic_pointer_cast<ABloodActor>(*blood);
+		if (currentStage == StagePhase::FINAL)
+		{
+			pBlood->SetBlood(true);
+		}
+
 		if (!(*blood)->IsActive() || (*blood)->m_bDelete)
 		{
 			blood = bloodList.erase(blood);
@@ -912,8 +933,22 @@ void Game::CheckBloodCollision()
 			iter++;
 		}
 
+		for (auto iter = stage2.begin(); iter != stage2.end();)
+		{
+			if ((iter->get() == nullptr) || iter->get()->m_bDelete == true)
+			{
+				iter = stage2.erase(iter);
+				continue;
+			}
+			COLLITION->CheckCollision(*blood, *iter);
+			iter++;
+		}
+		
+
 		blood++;
 	}
+
+
 
 	auto& soulList = EFFECT->GetSoulList();
 	for (auto soul = soulList.begin(); soul != soulList.end(); )

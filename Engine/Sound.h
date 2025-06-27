@@ -34,16 +34,21 @@ enum class ESoundType
 	//Walker
 	Impact, //HeadRoller º®¿¡ ºÎµúÈú ¶§ ³ª´Â ¼Ò¸®
 	Dead_Walker,
+	Rolling_Walker,
 
 	//Mage
 	Attack_Mage,
+	Dead_Mage,
 
 	//Betty
 	Attack_Betty,
 	Screaming_Betty,
 	Growling_Betty,
-	Impact_Betty,
+	Impact_Betty1,
+	Impact_Betty2,
 	Scraping_Betty,
+	Rolling_Betty,
+	SnowFalling_Betty,
 
 	//Env
 	Open_Fence,
@@ -93,6 +98,8 @@ public:
 	void VolumeUp(float fVolume);
 	void VolumeDown(float fVolume);
 
+	void SetPause(bool bPause);
+
 public:
 	void Update();
 	void Destroy();
@@ -121,6 +128,7 @@ public:
 	void    LoadAllSounds();
 	Sound*  GetPtr(ESoundType type);
 	void    Update();
+	
 
 private:
 	std::map<std::wstring, Sound*> maplist;

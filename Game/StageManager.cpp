@@ -5,13 +5,13 @@
 #include "EventManager.h"
 #include "PrefabToActor.h"
 
-#include "Input.h"
+//#include "Input.h"
 
 void StageManager::AddEnemyInStage(UINT _stageId, shared_ptr<AActor> _actor)
 {
 	if (_stageId > stageList.size())
 	{
-		assert(false);
+		//assert(false);
 	}
 
 	stageList[_stageId].emplace_back(_actor->m_Index);
@@ -26,7 +26,7 @@ void StageManager::AddEnemiesInStage(UINT _stageId, vector<shared_ptr<AActor>> _
 {
 	if (_stageId > stageList.size())
 	{
-		assert(false);
+		//assert(false);
 	}
 
 	for (auto actor : _actorList)
@@ -44,7 +44,7 @@ void StageManager::DeleteEnemyInStage(UINT _stageId, UINT _actorId)
 {
 	if (_stageId > stageList.size())
 	{
-		assert(false);
+		//assert(false);
 	}
 	// 걍 바로 지울까 ? 
 	//m_freeIndices.emplace(make_pair(_stageId, _actorId));

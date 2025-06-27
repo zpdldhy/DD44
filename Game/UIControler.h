@@ -116,7 +116,8 @@ class InGameUIControler : public UIControler
 	//  Sinema  //
 	//////////////
 	shared_ptr<class AUIActor> m_pBettyName = nullptr;
-	shared_ptr<class AUIActor> m_pEnding = nullptr;
+	vector<shared_ptr<class AUIActor>> m_vEnding;
+	shared_ptr<class AUIActor> m_pEndingFade = nullptr;
 	bool m_bGoEnding = false;
 
 public:

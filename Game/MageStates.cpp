@@ -12,10 +12,8 @@
 #include "ObjectManager.h"
 
 #include "TEnemy.h"
-
-// TEMP
-#include "Input.h"
 #include "Sound.h"
+
 
 Vec3 V_Clamp(const Vec3& v, const Vec3& minV, const Vec3& maxV)
 {
@@ -275,8 +273,7 @@ void MageAttackState::Tick()
 		if (waitElapsed > 2.0f)
 		{
 			waitElapsed = 0.0f;
-			attack->Enter();
-			currentPhase = AttackPhase::Attack;
+			End();
 		}
 	}
 	break;
@@ -570,7 +567,7 @@ void MageDieState::Enter()
 	soulDirection.Normalize();
 	EFFECT->PlayEffect(EEffectType::Soul, monPos, 0, soulDirection, 1.0f, playerPos);
 
-	SOUND->GetPtr(ESoundType::Enemy_Damaged)->PlayEffect2D();
+	SOUND->GetPtr(ESoundType::Dead_Mage)->PlayEffect2D();
 }
 void MageDieState::Tick()
 {

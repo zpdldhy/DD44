@@ -56,7 +56,7 @@ enum GameKey
     // 마우스 버튼
     LCLICK  = VK_LBUTTON,
     RCLICK  = VK_RBUTTON,
-    MBUTTON = VK_MBUTTON,
+    MCLICK  = VK_MBUTTON,
 
     // 마우스 휠
     MWHEEL_UP,    // 커스텀 정의 필요

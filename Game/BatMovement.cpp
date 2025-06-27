@@ -6,14 +6,13 @@
 #include "UMeshComponent.h"
 #include "TCharacter.h"
 
-// temp
-#include "Input.h"
 #include "Sound.h"
-
-// temp
 #include "PlayerMoveScript.h"
-
 #include "TPlayer.h"
+
+//// temp
+//#include "Input.h"
+
 // for collider
 #include "TEnemy.h"
 #include "UBoxComponent.h"
@@ -124,7 +123,7 @@ void BatMovement::Tick()
 		Vec3 pos;
 		pos.x = m_vCenter.x + m_fRadius * std::cos(angle);
 		pos.z = m_vCenter.z + m_fRadius * std::sin(angle);
-
+		pos.y = m_vCenter.y;
 		GetOwner()->SetPosition(pos);
 
 		Vec3 direction = m_vCenter - GetOwner()->GetPosition();

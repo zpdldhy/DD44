@@ -23,7 +23,7 @@ private:
 	shared_ptr<StateBase> death;
 
 	// attackOffset
-	float findDistance = 10.0f;
+	float findDistance = 35.0f;
 	float hitElapsed = 0.0f;
 	// FX
 	float m_fHitFlashTimer = 0.0f;
