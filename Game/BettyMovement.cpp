@@ -15,6 +15,9 @@
 #include "EventManager.h"
 #include "Sound.h"
 
+#include "StageManager.h"
+#include "Input.h"
+
 void BettyMovement::Init()
 {
 	SetPlayer(dynamic_pointer_cast<TEnemy>(GetOwner())->GetPlayer());
@@ -71,6 +74,13 @@ void BettyMovement::Init()
 
 void BettyMovement::Tick()
 {
+	if (INPUT->GetButton(M))
+	{
+		if (STAGE->GetCurrentStage() == StagePhase::FINAL)
+		{
+			ChangeState(death);
+		}
+	}
 	leftRange->SetPosition(leftHand.lock()->GetWorldPosition());
 	rightRange->SetPosition(rightHand.lock()->GetWorldPosition());
 
