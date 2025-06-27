@@ -5,8 +5,6 @@
 #include "Timer.h"
 #include "EffectManager.h"
 
-// temptemptemptmepte
-#include "Input.h"
 
 void HeadRollerMovement::Init()
 {

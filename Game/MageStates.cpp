@@ -12,10 +12,8 @@
 #include "ObjectManager.h"
 
 #include "TEnemy.h"
-
-// TEMP
-#include "Input.h"
 #include "Sound.h"
+
 
 Vec3 V_Clamp(const Vec3& v, const Vec3& minV, const Vec3& maxV)
 {

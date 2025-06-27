@@ -5,7 +5,7 @@
 #include "EventManager.h"
 #include "PrefabToActor.h"
 
-#include "Input.h"
+//#include "Input.h"
 
 void StageManager::AddEnemyInStage(UINT _stageId, shared_ptr<AActor> _actor)
 {

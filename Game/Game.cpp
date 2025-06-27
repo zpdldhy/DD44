@@ -195,7 +195,6 @@ void Game::Tick()
 	}
 
 	// Betty°¡ Á×À¸¸é
-	//if (INPUT->GetButton(GameKey::P))
 	if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
 	{
 		static bool isEnd = false;
@@ -232,28 +231,28 @@ void Game::Tick()
 
 	//wind	
 	{
-		if (INPUT->GetButton(M))
-		{
-			m_bWind = !m_bWind;
-		}
+		//if (INPUT->GetButton(M))
+		//{
+		//	m_bWind = !m_bWind;
+		//}
 
-		if (m_bWind)
-			CreateWind();
+		//if (m_bWind)
+		//	CreateWind();
 	}
 
-	if (INPUT->GetButton(O))
-	{
-		if (m_bEnginCamera)
-		{
-			m_bEnginCamera = false;
-			CAMERA->Set3DCameraActor(m_pGameCameraActor);
-		}
-		else
-		{
-			m_bEnginCamera = true;
-			CAMERA->Set3DCameraActor(m_pCameraActor);
-		}
-	}
+	//if (INPUT->GetButton(O))
+	//{
+	//	if (m_bEnginCamera)
+	//	{
+	//		m_bEnginCamera = false;
+	//		CAMERA->Set3DCameraActor(m_pGameCameraActor);
+	//	}
+	//	else
+	//	{
+	//		m_bEnginCamera = true;
+	//		CAMERA->Set3DCameraActor(m_pCameraActor);
+	//	}
+	//}
 
 	CheckFrustumCulling();
 	CheckEnemyCollision();
