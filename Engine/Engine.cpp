@@ -8,7 +8,6 @@
 #include "Input.h"
 #include "DxWrite.h"
 #include "Timer.h" 
-#include "ImGuiCore.h"
 #include "CameraManager.h"
 #include "AActor.h"
 #include "UStaticMeshComponent.h"
@@ -25,6 +24,9 @@
 #include "WindManager.h"
 #include "ShadowManager.h"
 #include "BloomManager.h"
+#ifdef _DEBUG
+#include "ImGuiCore.h"
+#endif
 
 bool g_bRangeVisibleMode;
 
@@ -49,6 +51,7 @@ void Engine::Init()
 		DXWRITE_DD->Create();
 		SOUND->LoadAllSounds();
 
+#ifdef _DEBUG
 		if (_app->m_type != SCENE_TYPE::GAME)
 		{
 			GUI->Init();
@@ -56,6 +59,10 @@ void Engine::Init()
 		}
 		else
 			g_bRangeVisibleMode = false;
+
+#else
+		g_bRangeVisibleMode = false;
+#endif // _DEBUG
 	}
 
 	OBJECT->Init();
@@ -107,12 +114,14 @@ void Engine::Frame()
 		}
 	}
 
+#ifdef _DEBUG
 	if (_app->m_type != SCENE_TYPE::GAME)
 	{
 		if (INPUT->GetButton(V))
 			Device::GetInstance()->ChangeWireFrame();
 		GUI->Update();
 	}
+#endif
 }
 
 void Engine::Render()
@@ -167,8 +176,10 @@ void Engine::Render()
 	DXWRITE_DD->EndDraw();
 	GET_SINGLE(Device)->PostRender();
 
+#ifdef _DEBUG
 	if (_app->m_type != SCENE_TYPE::GAME)
 		GUI->Render();
+#endif
 }
 
 void Engine::Release()
@@ -192,8 +203,10 @@ void Engine::Run()
 	//_window.SetWindow();
 	_window.SetWindowFullScreen();
 
+#ifdef _DEBUG
 	if (_app->m_type != SCENE_TYPE::GAME)
 		GUI->CreateImGuiWindow(_hInstance);
+#endif
 
 	g_bRangeVisibleMode = true;
 

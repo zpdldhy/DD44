@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "Window.h"
 #include "Device.h"
+#ifdef _DEBUG
 #include "ImGuiCore.h"
+#endif
 
 // EXTERN
 POINT g_windowSize;
@@ -20,7 +22,9 @@ LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lPar
 
 	case WM_MOUSEHOVER:
 		EnableWindow(g_hWnd, true);
+#ifdef _DEBUG
 		EnableWindow(GUI->GetImGuiWindowHandle(), false);
+#endif
 		SetForegroundWindow(g_hWnd);
 		break;
 
