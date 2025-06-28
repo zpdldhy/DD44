@@ -195,7 +195,8 @@ void Game::Tick()
 	}
 
 	// Betty°¡ Á×À¸¸é
-	if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
+	if(INPUT->GetButton(GameKey::P))
+	//if (dynamic_pointer_cast<BettyMovement>(m_pBetty->GetScriptList()[0])->IsBettyDie())
 	{
 		static bool isEnd = false;
 		if (isEnd == false)
