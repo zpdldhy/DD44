@@ -1,22 +1,13 @@
 #pragma once
 
-#include "Functions.h"
-#include "Types.h"
-#include "Define.h"
-#include "Vertex.h"
-#include "ShapeData.h"
-#include "stack"
-
 // WIN
 #include <windows.h>
 #include <wrl.h>
 using namespace Microsoft::WRL;
 
 // STL
-#include <memory>
-#include <tchar.h> 
-#include <vector>
-#include <map>
+#include <stack>
+#include <unordered_map>
 #include <list>
 #include <queue>
 #include <array>
@@ -37,10 +28,16 @@ using namespace std;
 #include <d2d1helper.h>
 #include <dwrite.h>
 
+// JSON
+#include "JSON/json_fwd.hpp"
+using json = nlohmann::json;
+
 // ImGUI
+#ifdef _DEBUG
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
+#endif
 
 #ifdef _DEBUG
 // Assimp
@@ -49,10 +46,6 @@ using namespace std;
 #include <Assimp/postprocess.h>
 #include <Assimp/cimport.h>
 #endif
-
-// JSON
-#include "JSON/json.hpp"
-using json = nlohmann::json;
 
 // TEMP 
 #include "Profiler.h"
@@ -68,6 +61,12 @@ using json = nlohmann::json;
 #pragma comment(lib, "DirectXTex/DirectXTex_debug.lib")
 #pragma comment(lib, "Assimp/assimp-vc143-mtd.lib")
 #endif
+
+#include "Types.h"
+#include "Define.h"
+#include "Vertex.h"
+#include "ShapeData.h"
+#include "Functions.h"
 
 // Window º¯¼ö
 extern POINT g_windowSize;

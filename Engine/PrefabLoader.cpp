@@ -2,6 +2,7 @@
 #include "PrefabLoader.h"
 #include "fstream"
 #include "AActor.h"
+#include "JSON/json.hpp"
 
 //bool PrefabLoader::Save(const PrefabData& _prefab, const std::string& _filePath)
 //{

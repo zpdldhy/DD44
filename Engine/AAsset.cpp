@@ -6,6 +6,7 @@
 #include "SkeletalMeshData.h"
 #include "UMaterial.h"
 #include "fstream"
+#include "JSON/json.hpp"
 
 void AAsset::Export(TFbxResource _result, string filepath)
 {

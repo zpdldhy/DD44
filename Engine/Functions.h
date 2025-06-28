@@ -1,12 +1,8 @@
 #pragma once
-#include <windows.h>
-#include <string>
-#include <vector>
 #include <tchar.h> 
 #include <locale>
 #include <codecvt>
 #include <random>
-#include "Types.h"
 
 static void DX_CHECK(HRESULT _hr, const TCHAR* _function)
 {
